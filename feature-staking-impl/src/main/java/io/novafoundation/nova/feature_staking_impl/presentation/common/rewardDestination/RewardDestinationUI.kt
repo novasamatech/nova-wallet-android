@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.view.RewardDestinationChooserView
 import io.novafoundation.nova.feature_staking_impl.presentation.view.showRewardEstimation
 
-fun <V> BaseFragment<V>.observeRewardDestinationChooser(
+fun <V> BaseFragment<V, *>.observeRewardDestinationChooser(
     viewModel: V,
     chooser: RewardDestinationChooserView,
 ) where V : BaseViewModel, V : RewardDestinationMixin {

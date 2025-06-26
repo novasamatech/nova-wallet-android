@@ -6,7 +6,6 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 class AccountInChain(
     val chain: Chain,
     val projection: Projection?,
-    val from: From
 ) {
 
     class Projection(val address: String, val accountId: AccountId)

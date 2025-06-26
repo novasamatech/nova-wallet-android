@@ -14,6 +14,7 @@
     <string name="accoount_enter_evm_address">Evm címnek érvényesnek vagy üresnek kell lennie...</string>
     <string name="accoount_enter_substrate_address">Valós Substrate cím megadása...</string>
     <string name="account_add_account">Fiók hozzáadása</string>
+    <string name="account_add_address">Cím hozzáadása</string>
     <string name="account_add_already_exists_message">A fiók már létezik. Kérlek, próbálj meg egy másikat.</string>
     <string name="account_add_watch_only_description">Bármely tárca követése cím alapján</string>
     <string name="account_add_watch_wallet">Csak nézhető tárca hozzáadása</string>
@@ -43,6 +44,7 @@
     <string name="account_error_try_another_one">Kérlek, próbálj meg egy másikat.</string>
     <string name="account_ethereum_crypto_type">Ethereum kulcspár titkosítási típusa</string>
     <string name="account_ethereum_derivation_path">Ethereum titkos származtatási útvonal</string>
+    <string name="account_evm_accounts">EVM Fiókok</string>
     <string name="account_export">Fiók exportálása</string>
     <string name="account_export_action">Exportálás</string>
     <string name="account_export_existing">Létező importálása</string>
@@ -70,30 +72,36 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot alkalmazás telepítve van</string>
     <string name="account_ledger_generic_import_start_step_2">%s az Ön Ledger eszközén</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Nyissa meg a Polkadot alkalmazást</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Általános Polkadot alkalmazás)</string>
     <string name="account_ledger_import_fill_description">Győzödj meg róla, hogy a hálózati alkalmazás telepítve van azon a Ledger eszközödön, amelyik a Ledger Live-ot használja. Nyisd meg a hálózati alkalmazást a Ledger eszközödön.</string>
     <string name="account_ledger_import_fill_disabled_hint">Legalább egy fiókot hozzá kell adni</string>
     <string name="account_ledger_import_fill_title">Fiókok hozzáadása a tárcához</string>
-    <string name="account_ledger_import_start_guide">A Ledger hivatalos Bluetooth-kapcsolati útmutatója</string>
     <string name="account_ledger_import_start_step_1">Győzödj meg róla, hogy a <font color="#FFFFFF">hálózati alkalmazás telepítve van</font> azon a Ledger eszközödön, amelyik a Ledger Live-ot használja</string>
     <string name="account_ledger_import_start_step_1_highlighted">Hálózati alkalmazás telepítve van</string>
     <string name="account_ledger_import_start_step_2"><font color="#FFFFFF">Nyisd meg a hálózati alkalmazást</font> a Ledger eszközödön</string>
     <string name="account_ledger_import_start_step_2_highlighted">Nyissa meg a hálózati alkalmazást</string>
     <string name="account_ledger_import_start_step_3"><font color="#FFFFFF">Engedélyezed a Bluetooth-t és helymeghatározást</font> a Nova Wallet számára</string>
-    <string name="account_ledger_import_start_step_3_highlighted">hozzáférés a Bluetooth-hoz és a Helyhez</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth hozzáférést</string>
     <string name="account_ledger_import_start_step_4"><font color="#FFFFFF">Válaszd ki a fiókot</font> a hozzáadáshoz</string>
     <string name="account_ledger_import_start_step_4_highlighted">Fiók kiválasztása</string>
-    <string name="account_ledger_import_start_title">A Ledger Nano X csatlakoztatása</string>
+    <string name="account_ledger_import_start_step_otg">%s a telefon beállításaiban</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">OTG engedélyezése</string>
     <string name="account_ledger_legacy_warning_message">Az új, Általános Ledger alkalmazásra történő aláírás és a fiókok migrálása érdekében telepítse és nyissa meg a Migration alkalmazást. A legújabb és Migration Ledger alkalmazásokat nem támogatják a jövőben.</string>
     <string name="account_ledger_legacy_warning_title">Új Ledger alkalmazás kiadva</string>
     <string name="account_ledger_migration_app">Polkadot Migráció</string>
     <string name="account_ledger_migration_deprecation_message">A közeljövőben a Migration alkalmazás nem lesz elérhető. Használja azt fiókjainak az új Ledger alkalmazásra történő migrálásához, hogy elkerülje az alapok elvesztését.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Általános Polkadot alkalmazás)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Örökség)</string>
+    <string name="account_ledger_select_device_all_description">Ha Ledgert használ Bluetooth-on keresztül, engedélyezze a Bluetooth-t mindkét eszközön, és adja meg a Nova Bluetooth- és helyengedélyeket. USB esetén engedélyezze az OTG-t a telefon beállításaiban.</string>
     <string name="account_ledger_select_device_description">Kérlek, kapcsold be a Bluetooth-t a telefonodon és a Ledger eszközön. Old fel a Ledger eszközt és nyisd meg a(z) %s alkalmazást.</string>
     <string name="account_ledger_select_device_title">Válaszd ki Ledger eszközöd</string>
+    <string name="account_ledger_select_device_usb_description">Kérem, engedélyezze a Ledger eszközt. Oldja fel a Ledger eszköz zárolását, és nyissa meg a %s alkalmazást.</string>
+    <string name="account_migration_subtitle">Már majdnem kész vagy! 🎉\n Csak koppints az alábbi gombra, hogy befejezd a beállítást, és zökkenőmentesen kezdd el használni a fiókjaidat mind a Polkadot App-ban, mind a Nova Walletben</string>
+    <string name="account_migration_title">Üdvözlünk a Nova-ban!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 vagy 24 szavas kifejezés</string>
+    <string name="account_multisig">Többaláírás</string>
+    <string name="account_multisig_group_label">Megosztott irányítás (többaláírás)</string>
     <string name="account_needed_message">Nem rendelkezel fiókkal ezen a hálózaton, hozzáadhatsz vagy importálhatsz egyet.</string>
     <string name="account_needed_title">Fiók szükséges</string>
     <string name="account_no_chain_projection">A fiók nem található</string>
@@ -113,7 +121,8 @@
     <string name="account_parity_signer_not_supported_subtitle">A(z) %s nem támogat tetszőleges üzenetek aláírását - csak a tranzakciókét.</string>
     <string name="account_parity_signer_not_supported_title">Az aláírás nem támogatott</string>
     <string name="account_parity_signer_scan_from">QR-kód beolvasása innen: %s</string>
-    <string name="account_parity_signer_scan_with">QR-kód beolvasása ezzel: %s</string>
+    <string name="account_parity_signer_show_mode_legacy">Régi</string>
+    <string name="account_parity_signer_show_mode_new">Új (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">A(z) %s hibát mutat</string>
     <string name="account_parity_signer_sign_qr_code_expired">A QR-kód lejárt</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Biztonsági okokból a generált művelet %s-ig érvényes. Kérlek, generálj egy új QR-kódot és írd alá a(z) %s segítségével</string>
@@ -129,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">A Polkadot Vault egy %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-kód a beolvasáshoz</string>
     <string name="account_private_key">Privát kulcs</string>
+    <string name="account_proxied">Meghatalmazott</string>
     <string name="account_proxieds">Hozzád delegálva (Proxieds)</string>
     <string name="account_proxy_type_any">Bármilyen</string>
     <string name="account_proxy_type_auction">Aukció</string>
@@ -144,6 +154,7 @@
     <string name="account_select_secret_source">Válaszd ki a titkos kulcs típusát</string>
     <string name="account_select_wallet">Tárca kiválasztása</string>
     <string name="account_shared_secret">Fiókok közös titkos kulccsal</string>
+    <string name="account_substrate_accounts">Substrate Fiókok</string>
     <string name="account_substrate_crypto_type">Substrate kulcspár titkosítási típusa</string>
     <string name="account_substrate_derivation_path">Substrate titkos származtatási útvonal</string>
     <string name="account_wallet_nickname">Tárca beceneve</string>
@@ -162,6 +173,7 @@
     <string name="accounts_change_chain_account">%s fiók módosítása</string>
     <string name="accounts_change_chain_secrets">Fiók módosítása</string>
     <string name="accounts_ledger_legacy">Ledger (Örökség)</string>
+    <string name="active_multisig_title">Megosztott irányítás</string>
     <string name="add_custom_node">Egyéni csomópont hozzáadása</string>
     <string name="add_delegation_missing_account_message">Hozzá kell adj egy %s fiókot a tárcádhoz, ahhoz hogy delegálhass</string>
     <string name="add_network_title">Adja meg a hálózati adatokat</string>
@@ -173,6 +185,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">Elérted a felvehető proxy-k számát, ami %s a %s láncon. Törölj proxy-kat, hogy újakat vehess fel.</string>
     <string name="add_proxy_maximum_reached_error_title">A proxy-k száma elérte a maximumot</string>
     <string name="added_networks_empty_placeholder">Itt jelennek meg\na hozzáadott egyéni hálózatok</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Színes</string>
     <string name="appearance_title">Megjelenés</string>
     <string name="appearance_token_assets_title">token ikonjai</string>
@@ -240,12 +253,14 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Biztonsági mentés</string>
     <string name="backup_title">Biztonsági mentés</string>
+    <string name="banxa_provider_description">Közvetlen és hatékony KYC folyamat</string>
     <string name="biometric_auth_title">Biometrikus hitelesítés</string>
     <string name="browser_tabs_close_all">Összes bezárása</string>
     <string name="buy_completed">Kérlek várj, a vásárlás megkezdődött, ami eltarthat akár 60 percig is. Az állapotot nyomon követheted az e-mailben.</string>
     <string name="buy_network_flow_title">Válasszon hálózatot a vásárláshoz %s</string>
-    <string name="buy_provider_open_confirmation_message">A vásárlás folytatásához átirányítunk a Nova Wallet alkalmazásból ide: %s</string>
-    <string name="buy_provider_open_confirmation_title">Folytatás a böngészőben?</string>
+    <string name="buy_order_completed_message">Vásárlás elindítva! Kérjük, várjon legfeljebb 60 percig. A státuszt nyomon követheti az e-mailben.</string>
+    <string name="buy_token_not_supported_message">Egyik szolgáltatónk sem támogatja jelenleg ennek a tokennek a vásárlását. Kérjük, válasszon másik tokent, másik hálózatot, vagy térjen vissza később.</string>
+    <string name="buy_token_not_supported_title">Ez a token nem támogatott a vásárlás funkció által</string>
     <string name="chain_network_management_auto_balance">Automatikus csomópontok egyensúlyozása</string>
     <string name="chain_network_management_enabling">Kapcsolat engedélyezése</string>
     <string name="change_cloud_backup_password_subtitle">Kérjük, adjon meg egy jelszót, amely a pénztárcái felhőből történő visszaállításához lesz használva. Ezt a jelszót a jövőben nem lehet visszaállítani, ezért feltétlenül jegyezze meg!</string>
@@ -681,8 +696,8 @@
     <string name="delegate_search_hint">Keresés cím vagy név alapján</string>
     <string name="delegate_search_placeholder_empty">Nem megfelelő cím formátum. Győzödj meg róla, hogy a cím a megfelelő hálózathoz tartozik.</string>
     <string name="delegate_search_result_count">keresési eredmények: %d</string>
-    <string name="delegated_accounts_fragment_explanation">A Nova Wallet automatikusan hozzáadja a delegált hatásköröket (Proxy) egy külön kategóriához. A tárcákat bármikor módosíthatod a Beállításokban.</string>
-    <string name="delegated_accounts_fragment_title">Értesítés delegált fiókokról</string>
+    <string name="delegated_accounts_fragment_explanation">Meghatalmazott és Többaláírásos fiókok automatikusan észlelve és rendszerezve Önnek. Bármikor kezelheti a Beállításokban.</string>
+    <string name="delegated_accounts_fragment_title">A pénztárca listája frissült</string>
     <string name="delegation_all_votes">Összes szavazat</string>
     <string name="delegation_delegate">Delegálás</string>
     <string name="delegation_delegate_filter_all">Minden fiók</string>
@@ -719,6 +734,7 @@
     <string name="delegation_tracks_governance_preset">Kormányzás</string>
     <string name="delegation_tracks_treasury_preset">Kincstár</string>
     <string name="delegation_undelegating_period">Delegálás visszavonási időszakasz</string>
+    <string name="delegation_updates_deactivated_title">Már nem érvényes</string>
     <string name="delegation_your_delegation">Delegálásod</string>
     <string name="delegation_your_delegations">Delegálásaid</string>
     <string name="delegations_filter">Mutat</string>
@@ -752,6 +768,7 @@
     <string name="fee_not_yet_loaded_message">Kérlek, várj a díj kiszámításáig</string>
     <string name="fee_not_yet_loaded_title">A díjszámítás folyamatban van</string>
     <string name="fragment_assets_nova_card">Bankkártya kezelése</string>
+    <string name="fragment_sell_token_title">%s token eladása</string>
     <string name="fragment_set_staking_proxy_title">Delegálás megadása %s stake-eléshez</string>
     <string name="fragment_swap_main_settings_details_title">Váltás részletei</string>
     <string name="fragment_swap_main_settings_max_button">Max:</string>
@@ -806,14 +823,24 @@
     <string name="json_export_btn">JSON fájl exportálása</string>
     <string name="language_title">Nyelv</string>
     <string name="ledger_chain_not_supported">A Ledger nem támogatja a következőt: %s</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s">Nano S</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">A műveletet az eszköz megszakította. Győzödj meg róla, hogy feloldottad a Ledger eszközöd.</string>
     <string name="ledger_error_app_cancelled_title">Művelet megszakítva</string>
     <string name="ledger_error_app_not_launched_message">Nyísd meg a(z) %s alkalmazást a Ledger eszközödön</string>
     <string name="ledger_error_app_not_launched_title">A %s alkalmazás nem indult el</string>
     <string name="ledger_error_general_message">A művelet hibával végződött. Kérlek, próbáld meg újra később.</string>
     <string name="ledger_error_general_title">Ledger műveleti hiba</string>
+    <string name="ledger_hold_to_sign">Tartsa lenyomva a megerősítő gombot a %s készülékén a tranzakció jóváhagyásához</string>
     <string name="ledger_import_select_address_load_more">További fiókok betöltése</string>
     <string name="ledger_review_approve_title">Ellenőrzés és jóváhagyás</string>
+    <string name="ledger_select_address_account_label">Fiók %s</string>
+    <string name="ledger_select_address_not_found">Fiók nem található</string>
+    <string name="ledger_select_address_update_for_evm_message">A Ledger eszközöd régi általános alkalmazást használ, amely nem támogatja az EVM címeket. Frissítsd a Ledger Live-on keresztül.</string>
+    <string name="ledger_select_address_update_for_evm_title">Ledger General App frissítése</string>
     <string name="ledger_sign_approve_message">Nyomd le mindkét gombot a %s eszközön a tranzakció jóváhagyásához</string>
     <string name="ledger_sign_metadata_outdated_subtitle">Kérlek, frissítsd a %s-ot a Ledger Live-val</string>
     <string name="ledger_sign_metadata_outdated_title">A metaadatok elavultak</string>
@@ -824,7 +851,10 @@
     <string name="ledger_sign_transaction_validity_format">A tranzakció érvényes: %s</string>
     <string name="ledger_sign_tx_not_supported_subtitle">A Ledger nem támogatja ezt a tranzakciót.</string>
     <string name="ledger_sign_tx_not_supported_title">A tranzakció nem támogatott</string>
-    <string name="ledger_verify_address_subtitle">Nyomd le mindkét gombot a %s eszközön a cím jóváhagyásához</string>
+    <string name="ledger_verify_address_message_both_buttons">Nyomja meg mindkét gombot a %s készülékén a cím jóváhagyásához</string>
+    <string name="ledger_verify_address_message_confirm_button">Nyomja meg a megerősítő gombot a %s készülékén a cím jóváhagyásához</string>
+    <string name="ledger_verify_addresses_message_both_buttons">Nyomd meg mindkét gombot a %s eszközödön a címek jóváhagyásához</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Nyomd meg a megerősítés gombot a %s eszközödön a címek jóváhagyásához</string>
     <string name="ledger_wallet_details_description">Ez a tárca a Ledger-rel van párosítva. A Nova segít bármilyen művelet létrehozásában és azok aláírása a Ledger segítségével történik majd.</string>
     <string name="ledher_import_select_address_title">Válaszd ki a fiókot a hozzáadáshoz</string>
     <string name="loading_network_info">Hálózati információ betöltése...</string>
@@ -853,6 +883,7 @@
     <string name="manual_backup_select_wallet_header">Válasszon ki egy pénztárcát a mentéshez</string>
     <string name="manual_backup_warning_subtitle">Kérjük, olvassa el figyelmesen a következőket, mielőtt megtekinti a biztonsági mentését</string>
     <string name="manual_backup_warning_title">Ne ossza meg jelszavát!</string>
+    <string name="mercurio_provider_description">Legjobb ár akár 3,95% díjakkal</string>
     <string name="mnemonic_card_reveal_subtitle">Győződjön meg róla, hogy senki sem látja a képernyőjét,\nés ne készítsen képernyőképeket</string>
     <string name="mnemonic_card_title">Kérjük %s bárki</string>
     <string name="mnemonic_card_title_highlight">ne ossza meg senkivel</string>
@@ -863,6 +894,29 @@
         <item quantity="one">Legalább %d tárcát kell választani</item>
         <item quantity="other">Legalább %d tárcát kell választani</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s már kezdeményezett egy ugyanilyen műveletet, amely jelenleg aláírásra vár a többi aláíró részéről.</string>
+    <string name="multisig_callhash_exists_title">Művelet már létezik</string>
+    <string name="multisig_operation_details_approve">Jóváhagyás</string>
+    <string name="multisig_operation_details_approve_and_execute">Jóváhagyás és végrehajtás</string>
+    <string name="multisig_operation_details_call_data_not_found">Hívási adatok nem találhatóak</string>
+    <string name="multisig_operation_details_reject">Elutasítás</string>
+    <string name="multisig_operations_pending_signature">Függőben lévő aláírás</string>
+    <string name="multisig_operations_progress" formatted="false">%s a %s Ból aláírva</string>
+    <string name="multisig_operations_signed">Aláírva</string>
+    <string name="multisig_operations_unknown_calldata">[Ismeretlen művelet] (%s)</string>
+    <string name="multisig_pending_operations">Függőben lévő műveletek</string>
+    <string name="multisig_signatory">Aláíró:</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s-nak nincs elegendő egyenlege a %s értékű multisig letét elhelyezéséhez. Elérhető egyenleg: %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s-nak nincs elegendő egyenlege a %s hálózati díj megfizetéséhez és a %s multisig letét elhelyezéséhez. Elérhető egyenleg: %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s-nak legalább %s-ra van szüksége a tranzakciós díj megfizetéséhez, és hogy a minimális hálózati egyenleg fölött maradjon. Jelenlegi egyenleg: %s</string>
+    <string name="multisig_signing_is_not_supported_message">A multisig pénztárcák nem támogatják tetszőleges üzenetek aláírását — csak a tranzakciókat</string>
+    <string name="multisig_signing_warning_message">A multisig tranzakciót %s kezdeményezi. A kezdeményező fizeti a hálózati díjat és lefoglal egy multisig letétet, amely felszabadul a tranzakció végrehajtásakor.</string>
+    <string name="multisig_signing_warning_title">Többaláírásos tranzakció</string>
+    <string name="multisig_transaction_created_subtitle">Más aláírók most megerősíthetik a tranzakciót.\nNyomon követheti annak állapotát a %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Többaláírásos tranzakciók.</string>
+    <string name="multisig_transaction_created_title">Többaláírásos tranzakció létrehozva</string>
+    <string name="multisig_transaction_created_view_details">Részletek megtekintése</string>
+    <string name="multisig_wallet_details_info_warning">Ennél a fióknál a tranzakciók több aláíró jóváhagyását igénylik. Az Ön fiókja egyike az aláíróknak:</string>
     <string name="network_already_exist_failure_title">Ez a node már létezik</string>
     <string name="network_fee">Hálózati díj</string>
     <string name="network_info_address">Csomópont címe</string>
@@ -959,8 +1013,6 @@
     <string name="profile_settings_safe_mode_title">Biztonságos mód</string>
     <string name="profile_settings_title">Beállítások</string>
     <string name="proxied_wallet_details_info_warning">Ez a fiók tranzakciók végrehajtásához adott hozzáférést a következőnek:</string>
-    <string name="proxieds_updates_deactivated_title">Már nem érvényes</string>
-    <string name="proxy_about">Mi az a proxy?</string>
     <string name="proxy_access_type_staking_operations">Stake-elési műveletek</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">A delegált fiók %s nem rendelkezik elegendő egyenleggel a hálózati díj megfizetéséhez, ami %s. Az elérhető egyenleg: %s</string>
     <string name="proxy_signing_is_not_supported_message">A proxy tárcák csak a tranzakciók aláírását támogatják, egyéb üzenetekét nem.</string>
@@ -1164,11 +1216,16 @@
     <string name="select_delegation_tracks_edit_title">Kategóriák választása delegálás szerkesztéséhez</string>
     <string name="select_delegation_tracks_revoke_title">Kategóriák választána delegálás visszavonásához</string>
     <string name="select_delegation_tracks_unavailable_tracks">Nem elérhető kategóriák</string>
+    <string name="select_ledger_grant_permissions">Bluetooth engedélyezése és engedélyek megadása</string>
     <string name="select_ledger_location_enable_request_message">A Nova-nak szüksége van a helymeghatározáshoz, hogy megtalálhassa a Ledger eszköt bluetooth-on keresztül</string>
     <string name="select_ledger_location_enable_request_title">Kérlek, engedélyezd a helymeghatározást a készülék beállításaiban</string>
     <string name="select_network_title">Hálózat választása</string>
     <string name="select_tracks_for">Kategóriák választása:</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
+    <string name="sell_network_flow_title">Válasszon hálózatot a(z) %s eladásához</string>
+    <string name="sell_order_completed_message">Eladás elindítva! Kérjük, várjon legfeljebb 60 percig. A státuszt nyomon követheti az e-mailben.</string>
+    <string name="sell_token_not_supported_message">Egyik szolgáltatónk sem támogatja jelenleg ennek a tokennek az eladását. Kérjük, válasszon másik tokent, másik hálózatot, vagy térjen vissza később.</string>
+    <string name="sell_token_not_supported_title">Ez a token nem támogatott az eladási funkció által</string>
     <string name="send_address_hint">Cím vagy w3n</string>
     <string name="send_network_flow_title">Válassz hálózatot az elküldéshez %s</string>
     <string name="send_recipient_system_account_message">A címzett egy rendszerfiók. Nem áll vállalat vagy magánszemély irányítása alatt.\nBiztos, hogy még mindig el akarod indítani ezt az utalást?</string>
@@ -1512,6 +1569,8 @@
     <string name="start_create_wallet_name_your_wallet">Adjon egy nevet a pénztárcájának</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Ez csak ön számára lesz látható, és később módosíthatja.</string>
     <string name="start_create_wallet_your_wallet_is_ready">A pénztárca készen áll</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Zárolt tokenek vannak egyenlegeden a(z) %s miatt. A folytatáshoz adj meg kevesebbet, mint %s vagy többet, mint %s. Egyéb összeg stake-eléséhez a(z) %s törlése szükséges.</string>
     <string name="start_staking_cant_stake_amount">Nem tudod stake-elni a megadott összeget</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Kiválasztott: %d (max. %d)</string>
@@ -1566,6 +1625,7 @@
     <string name="swap_execution_time">Végrehajtási idő</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Nincs elegendő tokent a számládon. Legalább %s kell, hogy maradjon a(z) %s hálozati díj megfizetése után</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">Legalább %s meg kell maradjon, ahhoz hogy %s tokent fogadhass</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">Legalább %s szükséges a %s hálózaton a %s token fogadásához</string>
     <string name="swap_failure_insufficient_balance_message">Legfeljebb %1$s értékben válthatsz, mivel fizetned kell %2$s hálózati díjat is.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Legfeljebb %1$s értékben válthatsz, mivel fizetned kell %2$s hálózati díjat és konverziót is végre kell hajts %3$s és %4$s között, hogy megmaradjon a(z) %5$s minimális egyenleged.</string>
     <string name="swap_failure_swap_max_button">Max. váltás</string>
@@ -1645,6 +1705,13 @@
     <string name="tabbar_wallet_title">Tárca</string>
     <string name="today">Ma</string>
     <string name="token_price_info_provider_label">Coingecko hivatkozás az árakhoz (opcionális)</string>
+    <string name="trade_provider_list_buy_title">Válasszon szolgáltatót a(z) %s token vásárlásához</string>
+    <string name="trade_provider_list_footer">A fizetési módok, díjak és korlátok szolgáltatónként eltérőek.\nHasonlítsa össze az ajánlatukat, hogy megtalálja a legjobb lehetőséget.</string>
+    <string name="trade_provider_list_sell_title">Válasszon szolgáltatót a(z) %s token eladásához</string>
+    <string name="trade_provider_open_confirmation_message">A vásárlás folytatásához átirányítunk a Nova Wallet alkalmazásból ide: %s</string>
+    <string name="trade_provider_open_confirmation_title">Folytatás a böngészőben?</string>
+    <string name="trade_token_not_supported_message">Egyik szolgáltatónk sem támogatja jelenleg ennek a tokennek a vásárlását vagy eladását. Kérjük, válasszon másik tokent, másik hálózatot, vagy térjen vissza később.</string>
+    <string name="trade_token_not_supported_title">Ez a token nem támogatott a vásárlás/eladás funkció által</string>
     <string name="transaction_details_copy_hash">Hash másolása</string>
     <string name="transaction_details_extrinsic_fee">Díj</string>
     <string name="transaction_details_from">Innen</string>
@@ -1658,6 +1725,8 @@
     <string name="transaction_status_failed">Sikertelen</string>
     <string name="transaction_status_pending">Függőben</string>
     <string name="transactions_notification_channel_name">Tranzakciók Értesítési Csatornája</string>
+    <string name="transak_provider_buy_description">Kriptovásárlás már $5-tól</string>
+    <string name="transak_provider_sell_description">Kripto eladás már $10-től</string>
     <string name="transfer_history_income_from">Feladó: %s</string>
     <string name="transfer_history_send_to">Címzett: %s</string>
     <string name="transfer_title">Átutalás</string>
@@ -1695,10 +1764,14 @@
     <string name="waiting_top_up_card_description">Eltarthat akár 5 percig.\nEz az ablak automatikusan bezáródik.</string>
     <string name="waiting_top_up_card_timer">Becsült %s</string>
     <string name="wallet_asset_buy">Vétel</string>
+    <string name="wallet_asset_buy_sell">Vétel/Eladás</string>
+    <string name="wallet_asset_buy_tokens">Token vásárlás</string>
     <string name="wallet_asset_buy_with">Vásárlás a következővel</string>
     <string name="wallet_asset_receive">Fogadás</string>
     <string name="wallet_asset_receive_token">%s fogadása</string>
     <string name="wallet_asset_receive_token_subtitle">Csak %1$s tokent és a %2$s hálózatban lévő tokeneket küldjön erre a címre, különben elveszítheti a pénzét</string>
+    <string name="wallet_asset_sell">Elad</string>
+    <string name="wallet_asset_sell_tokens">Token eladás</string>
     <string name="wallet_asset_send">Küldés</string>
     <string name="wallet_asset_swap">Váltás</string>
     <string name="wallet_assets">Eszközök</string>

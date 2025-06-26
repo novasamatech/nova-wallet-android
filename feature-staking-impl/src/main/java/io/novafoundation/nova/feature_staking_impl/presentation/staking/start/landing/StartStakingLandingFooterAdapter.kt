@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing
 
 import android.text.method.LinkMovementMethod
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -13,12 +12,12 @@ import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.fontSpan
 import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setEndSpan
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_staking_impl.R
-import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterMoreInfo
-import kotlinx.android.synthetic.main.item_start_staking_landing_footer.view.itemStakingLandingFooterTermsOfUse
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemStartStakingLandingFooterBinding
 
 class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : SingleItemAdapter<StartStakingLandingFooterViewHolder>() {
 
@@ -29,7 +28,8 @@ class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : Sing
     private var moreInfoText: CharSequence = ""
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StartStakingLandingFooterViewHolder {
-        return StartStakingLandingFooterViewHolder(handler, parent.inflateChild(R.layout.item_start_staking_landing_footer))
+        parent.inflateChild(R.layout.item_start_staking_landing_footer)
+        return StartStakingLandingFooterViewHolder(handler, ItemStartStakingLandingFooterBinding.inflate(parent.inflater(), parent, false))
     }
 
     override fun onBindViewHolder(holder: StartStakingLandingFooterViewHolder, position: Int) {
@@ -44,11 +44,13 @@ class StartStakingLandingFooterAdapter(private val handler: ClickHandler) : Sing
 
 class StartStakingLandingFooterViewHolder(
     private val clickHandler: StartStakingLandingFooterAdapter.ClickHandler,
-    containerView: View
-) : RecyclerView.ViewHolder(containerView) {
+    private val binder: ItemStartStakingLandingFooterBinding
+) : RecyclerView.ViewHolder(binder.root) {
 
     init {
-        with(itemView) {
+        with(binder) {
+            val context = root.context
+            val resources = context.resources
             val iconColor = context.getColor(R.color.chip_icon)
             val clickablePartColor = context.getColor(R.color.link_text)
             val chevronSize = 20.dp(context)
@@ -74,7 +76,7 @@ class StartStakingLandingFooterViewHolder(
     }
 
     fun bind(title: CharSequence) {
-        with(itemView) {
+        with(binder) {
             itemStakingLandingFooterMoreInfo.text = title
         }
     }

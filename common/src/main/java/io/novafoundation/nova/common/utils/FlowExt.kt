@@ -22,6 +22,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.SendChannel
@@ -146,6 +147,15 @@ inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) 
         val flowScope = CoroutineScope(coroutineContext)
 
         block(flowScope)
+    }
+}
+
+inline fun <T> parentCancellableFlowScope(crossinline block: suspend (scope: CoroutineScope) -> T): Flow<T> {
+    return flow {
+        val flowScope = CoroutineScope(coroutineContext)
+        emit(block(flowScope))
+
+        awaitCancellation()
     }
 }
 
@@ -430,7 +440,7 @@ fun EditText.moveSelectionToTheEnd() {
     }
 }
 
-context(BaseFragment<*>)
+context(BaseFragment<*, *>)
 infix fun TabLayout.bindTo(pageIndexFlow: MutableSharedFlow<Int>) = bindTo(pageIndexFlow, this@BaseFragment.lifecycleScope)
 
 fun TabLayout.bindTo(

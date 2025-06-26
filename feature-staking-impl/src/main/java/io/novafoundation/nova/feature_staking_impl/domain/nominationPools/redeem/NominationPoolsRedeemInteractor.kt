@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.bondedAccountOf
@@ -22,7 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.state.chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -35,7 +36,7 @@ interface NominationPoolsRedeemInteractor {
 
     suspend fun estimateFee(poolMember: PoolMember): Fee
 
-    suspend fun redeem(poolMember: PoolMember): Result<RedeemConsequences>
+    suspend fun redeem(poolMember: PoolMember): Result<Pair<ExtrinsicSubmission, RedeemConsequences>>
 }
 
 class RealNominationPoolsRedeemInteractor(
@@ -69,7 +70,7 @@ class RealNominationPoolsRedeemInteractor(
         }
     }
 
-    override suspend fun redeem(poolMember: PoolMember): Result<RedeemConsequences> {
+    override suspend fun redeem(poolMember: PoolMember): Result<Pair<ExtrinsicSubmission, RedeemConsequences>> {
         return withContext(Dispatchers.IO) {
             val chain = stakingSharedState.chain()
             val activeEra = stakingRepository.getActiveEraIndex(chain.id)
@@ -79,7 +80,7 @@ class RealNominationPoolsRedeemInteractor(
             }.map {
                 val totalAfterRedeem = poolMember.totalPointsAfterRedeemAt(activeEra)
 
-                RedeemConsequences(willKillStash = totalAfterRedeem.value.isZero)
+                it to RedeemConsequences(willKillStash = totalAfterRedeem.value.isZero)
             }
         }
     }

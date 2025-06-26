@@ -2,19 +2,15 @@ package io.novafoundation.nova.feature_staking_impl.presentation.view
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewPayoutTargetBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.RewardEstimation
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountFiat
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountGain
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetAmountToken
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetCheck
-import kotlinx.android.synthetic.main.view_payout_target.view.payoutTargetName
 
 private const val CHECKABLE_DEFAULT = true
 
@@ -26,9 +22,9 @@ class RewardDestinationView @JvmOverloads constructor(
 
     private var checkable = CHECKABLE_DEFAULT
 
-    init {
-        View.inflate(context, R.layout.view_payout_target, this)
+    private val binder = ViewPayoutTargetBinding.inflate(inflater(), this)
 
+    init {
         background = context.getRoundedCornerDrawable(R.color.block_background)
 
         attrs?.let(this::applyAttrs)
@@ -41,26 +37,26 @@ class RewardDestinationView @JvmOverloads constructor(
             val checked = typedArray.getBoolean(R.styleable.RewardDestinationView_android_checked, false)
             setChecked(checked)
         }
-        payoutTargetCheck.setVisible(checkable)
+        binder.payoutTargetCheck.setVisible(checkable)
 
         val targetName = typedArray.getString(R.styleable.RewardDestinationView_targetName)
         targetName?.let(::setName)
     }
 
     fun setName(name: String) {
-        payoutTargetName.text = name
+        binder.payoutTargetName.text = name
     }
 
     fun setTokenAmount(amount: String) {
-        payoutTargetAmountToken.text = amount
+        binder.payoutTargetAmountToken.text = amount
     }
 
     fun setPercentageGain(gain: String) {
-        payoutTargetAmountGain.text = gain
+        binder.payoutTargetAmountGain.text = gain
     }
 
     fun setFiatAmount(amount: String?) {
-        payoutTargetAmountFiat.setTextOrHide(amount)
+        binder.payoutTargetAmountFiat.setTextOrHide(amount)
     }
 
     fun setChecked(checked: Boolean) {
@@ -68,7 +64,7 @@ class RewardDestinationView @JvmOverloads constructor(
             "Cannot check non-checkable view"
         }
 
-        payoutTargetCheck.isChecked = checked
+        binder.payoutTargetCheck.isChecked = checked
     }
 }
 

@@ -2,9 +2,11 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.overview
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardState
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -12,9 +14,12 @@ import io.novafoundation.nova.feature_assets.presentation.novacard.overview.mode
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.NovaCardWebViewControllerFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptor
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.CardCreationInterceptorFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptor
-import io.novafoundation.nova.feature_assets.presentation.novacard.overview.webViewController.interceptors.TopUpRequestInterceptorFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.topup.TopUpCardPayload
+import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressPayload
+import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressRequester
+import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressResponder
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
+import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -23,7 +28,11 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.withContext
 
 class NovaCardViewModel(
     private val chainRegistry: ChainRegistry,
@@ -31,11 +40,11 @@ class NovaCardViewModel(
     private val assetsRouter: AssetsRouter,
     private val novaCardInteractor: NovaCardInteractor,
     private val cardCreationInterceptorFactory: CardCreationInterceptorFactory,
-    private val topUpRequestInterceptorFactory: TopUpRequestInterceptorFactory,
-    private val novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory
-) : BaseViewModel(), CardCreationInterceptor.Callback, TopUpRequestInterceptor.Callback {
-
-    private val openedOrderIds = mutableSetOf<String>()
+    private val mercuryoSellRequestInterceptorFactory: MercuryoSellRequestInterceptorFactory,
+    private val novaCardWebViewControllerFactory: NovaCardWebViewControllerFactory,
+    private val topUpRequester: TopUpAddressRequester,
+    private val resourceManager: ResourceManager
+) : BaseViewModel(), CardCreationInterceptor.Callback, OnSellOrderCreatedListener, OnTradeOperationFinishedListener {
 
     private val metaAccount = flowOf { accountInteractor.selectedMetaAccount() }
 
@@ -51,7 +60,7 @@ class NovaCardViewModel(
         novaCardWebViewControllerFactory.create(
             interceptors = listOf(
                 cardCreationInterceptorFactory.create(this),
-                topUpRequestInterceptorFactory.create(this)
+                mercuryoSellRequestInterceptorFactory.create(this, this)
             ),
             setupConfig = setupConfig,
             scope = viewModelScope
@@ -60,27 +69,31 @@ class NovaCardViewModel(
 
     init {
         ensureCardCreationIsBlocking()
+
+        observeTopUp()
     }
 
-    override fun onTopUpStart(orderId: String, amount: BigDecimal, address: String) {
-        if (orderId in openedOrderIds) return // To not handle same order twice
-        openedOrderIds.add(orderId)
+    fun backClicked() {
+        assetsRouter.back()
+    }
 
+    override fun onSellOrderCreated(orderId: String, address: String, amount: BigDecimal) {
         launch {
-            val payload = TopUpCardPayload(
+            val asset = setupCardConfig.first().spendToken
+
+            val payload = TopUpAddressPayload(
                 amount = amount,
                 address = address,
-                asset = setupCardConfig.first().spendToken.toAssetPayload()
+                asset = setupCardConfig.first().spendToken.toAssetPayload(),
+                screenTitle = resourceManager.getString(R.string.fragment_top_up_card_title, asset.symbol.value)
             )
 
-            assetsRouter.openTopUpCard(payload)
+            topUpRequester.openRequest(payload)
         }
     }
 
-    override fun onTopUpCompleted(orderId: String) {
+    override fun onTradeOperationFinished(success: Boolean) { // Always success for mercuryo
         launch {
-            openedOrderIds.remove(orderId)
-
             novaCardInteractor.setTopUpFinishedEvent()
             setCardStateCreated()
         }
@@ -108,5 +121,33 @@ class NovaCardViewModel(
         if (novaCardInteractor.isNovaCardCreated()) return
 
         novaCardInteractor.setNovaCardState(NovaCardState.CREATED)
+    }
+
+    private fun observeTopUp() {
+        topUpRequester.responseFlow
+            .onEach {
+                when (it) {
+                    TopUpAddressResponder.Response.Cancel -> withContext(Dispatchers.Main) { // Use withContext to fix a bug with not opening a bottomsheet. TODO: We don't understand completaly why this fix works so let's investigate this problem
+                        assetsRouter.returnToMainScreen()
+                    }
+
+                    TopUpAddressResponder.Response.Success -> withContext(Dispatchers.Main) { // Use withContext to fix a bug with not opening a bottomsheet. TODO: We don't understand completaly why this fix works so let's investigate this problem
+                        updateCardState()
+                        updateLastTopUpTime()
+                        assetsRouter.openAwaitingCardCreation()
+                    }
+                }
+            }
+            .launchIn(this)
+    }
+
+    private fun updateCardState() {
+        if (!novaCardInteractor.isNovaCardCreated()) {
+            novaCardInteractor.setNovaCardState(NovaCardState.CREATION)
+        }
+    }
+
+    private fun updateLastTopUpTime() {
+        novaCardInteractor.setLastTopUpTime(System.currentTimeMillis())
     }
 }

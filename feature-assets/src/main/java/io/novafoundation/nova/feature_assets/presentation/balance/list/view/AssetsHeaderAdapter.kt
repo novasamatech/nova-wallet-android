@@ -3,21 +3,15 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.ItemAssetHeaderBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectSessionsModel
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListAvatar
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNfts
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListNovaCard
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalBalance
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListTotalTitle
-import kotlinx.android.synthetic.main.item_asset_header.view.balanceListWalletConnect
-import kotlinx.android.synthetic.main.view_asset_nova_card.view.assetNovaCardText
 
 class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<AssetsHeaderHolder>() {
 
@@ -38,11 +32,13 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 
         fun receiveClicked()
 
-        fun buyClicked()
+        fun buySellClicked()
 
         fun swapClicked()
 
         fun novaCardClick()
+
+        fun pendingOperationsClicked()
     }
 
     private var filterIconRes: Int? = null
@@ -51,6 +47,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
     private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: String? = null
     private var nftPreviews: List<NftPreviewUi>? = null
+    private var pendingOperationsModel: PendingOperationsCountModel = PendingOperationsCountModel.Gone
 
     override fun getItemViewType(position: Int): Int {
         return AssetsHeaderHolder.viewType
@@ -90,8 +87,13 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         notifyItemChanged(0, Payload.WALLET_CONNECT)
     }
 
+    fun setPendingOperationsCountModel(pendingOperationsCountModel: PendingOperationsCountModel) {
+        this.pendingOperationsModel = pendingOperationsCountModel
+        notifyItemChanged(0, Payload.PENDING_OPERATIONS_COUNT)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AssetsHeaderHolder {
-        return AssetsHeaderHolder(parent.inflateChild(viewType), handler)
+        return AssetsHeaderHolder(ItemAssetHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
 
     override fun onBindViewHolder(holder: AssetsHeaderHolder, position: Int, payloads: MutableList<Any>) {
@@ -105,6 +107,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
                     Payload.NFT_COUNT -> holder.bindNftCount(nftCountLabel)
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                     Payload.WALLET_CONNECT -> holder.bindWalletConnect(walletConnectModel)
+                    Payload.PENDING_OPERATIONS_COUNT -> holder.bindPendingOperationsModel(pendingOperationsModel)
                 }
             }
         }
@@ -116,7 +119,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
             selectedWalletModel,
             nftCountLabel,
             nftPreviews,
-            walletConnectModel
+            walletConnectModel,
+            pendingOperationsModel
         )
     }
 
@@ -126,28 +130,31 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT
+    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, PENDING_OPERATIONS_COUNT
 }
 
 class AssetsHeaderHolder(
-    override val containerView: View,
+    private val viewBinding: ItemAssetHeaderBinding,
     handler: AssetsHeaderAdapter.Handler,
-) : RecyclerView.ViewHolder(containerView), LayoutContainer {
+) : RecyclerView.ViewHolder(viewBinding.root), LayoutContainer {
+
+    override val containerView: View = viewBinding.root
 
     companion object : WithViewType {
         override val viewType: Int = R.layout.item_asset_header
     }
 
     init {
-        with(containerView) {
+        with(viewBinding) {
             balanceListWalletConnect.setOnClickListener { handler.walletConnectClicked() }
             balanceListTotalBalance.setOnClickListener { handler.totalBalanceClicked() }
             balanceListAvatar.setOnClickListener { handler.avatarClicked() }
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
-            balanceListTotalBalance.onBuyClick { handler.buyClicked() }
+            balanceListTotalBalance.onBuyClick { handler.buySellClicked() }
             balanceListNovaCard.setOnClickListener { handler.novaCardClick() }
+            balanceListPendingOperations.setOnClickListener { handler.pendingOperationsClicked() }
 
             balanceListTotalBalance.onSwapClick { handler.swapClicked() }
         }
@@ -158,40 +165,44 @@ class AssetsHeaderHolder(
         addressModel: SelectedWalletModel?,
         nftCount: String?,
         nftPreviews: List<NftPreviewUi>?,
-        walletConnect: WalletConnectSessionsModel?
+        walletConnect: WalletConnectSessionsModel?,
+        pendingOperationsCountModel: PendingOperationsCountModel,
     ) {
         bindTotalBalance(totalBalance)
         bindAddress(addressModel)
         bindNftPreviews(nftPreviews)
         bindNftCount(nftCount)
         bindWalletConnect(walletConnect)
+        bindPendingOperationsModel(pendingOperationsCountModel)
     }
 
-    fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(containerView) {
+    fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(viewBinding) {
         balanceListNfts.setPreviews(nftPreviews)
+        viewBinding.balanceTableView.invalidateChildrenVisibility()
     }
 
-    fun bindNftCount(nftCount: String?) = with(containerView) {
+    fun bindNftCount(nftCount: String?) = with(viewBinding) {
         balanceListNfts.setNftCount(nftCount)
     }
 
     fun bindTotalBalance(totalBalance: TotalBalanceModel?) = totalBalance?.let {
-        with(containerView) {
+        with(viewBinding) {
             balanceListTotalBalance.showTotalBalance(totalBalance)
         }
     }
 
     fun bindAddress(walletModel: SelectedWalletModel?) = walletModel?.let {
-        containerView.balanceListTotalTitle.text = it.name
+        viewBinding.balanceListTotalTitle.text = it.name
 
-        containerView.balanceListAvatar.setModel(it)
+        viewBinding.balanceListAvatar.setModel(it)
     }
 
     fun bindWalletConnect(walletConnectModel: WalletConnectSessionsModel?) = walletConnectModel?.let {
-        containerView.balanceListWalletConnect.setConnectionCount(it.connections)
+        viewBinding.balanceListWalletConnect.setConnectionCount(it.connections)
     }
 
-    fun bindNovaCardText(text: CharSequence?) = with(containerView) {
-        assetNovaCardText.setText(text)
+    fun bindPendingOperationsModel(model: PendingOperationsCountModel) {
+        viewBinding.balanceListPendingOperations.setPendingOperationsCount(model)
+        viewBinding.balanceTableView.invalidateChildrenVisibility()
     }
 }

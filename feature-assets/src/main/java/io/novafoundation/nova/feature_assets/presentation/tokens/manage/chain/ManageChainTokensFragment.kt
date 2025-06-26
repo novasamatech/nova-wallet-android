@@ -1,25 +1,19 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
+
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentManageChainTokensBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenChains
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenIcon
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenSubtitle
-import kotlinx.android.synthetic.main.fragment_manage_chain_tokens.manageChainTokenSymbol
+
 import javax.inject.Inject
 
 class ManageChainTokensFragment :
-    BaseBottomSheetFragment<ManageChainTokensViewModel>(),
+    BaseBottomSheetFragment<ManageChainTokensViewModel, FragmentManageChainTokensBinding>(),
     ManageChainTokensAdapter.ItemHandler {
 
     companion object {
@@ -29,6 +23,8 @@ class ManageChainTokensFragment :
         fun getBundle(payload: ManageChainTokensPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
+    override fun createBinding() = FragmentManageChainTokensBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
@@ -36,17 +32,9 @@ class ManageChainTokensFragment :
         ManageChainTokensAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_manage_chain_tokens, container, false)
-    }
-
     override fun initViews() {
-        manageChainTokenChains.setHasFixedSize(true)
-        manageChainTokenChains.adapter = tokensAdapter
+        binder.manageChainTokenChains.setHasFixedSize(true)
+        binder.manageChainTokenChains.adapter = tokensAdapter
     }
 
     override fun inject() {
@@ -58,9 +46,9 @@ class ManageChainTokensFragment :
 
     override fun subscribe(viewModel: ManageChainTokensViewModel) {
         viewModel.headerModel.observe { headerModel ->
-            manageChainTokenIcon.setTokenIcon(headerModel.icon, imageLoader)
-            manageChainTokenSymbol.text = headerModel.symbol
-            manageChainTokenSubtitle.text = headerModel.networks
+            binder.manageChainTokenIcon.setTokenIcon(headerModel.icon, imageLoader)
+            binder.manageChainTokenSymbol.text = headerModel.symbol
+            binder.manageChainTokenSubtitle.text = headerModel.networks
         }
 
         viewModel.chainInstanceModels.observe(tokensAdapter::submitList)

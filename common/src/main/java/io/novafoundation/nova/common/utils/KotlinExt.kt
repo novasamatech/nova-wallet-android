@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -12,6 +13,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.launch
 import org.web3j.utils.Numeric
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -24,8 +26,6 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -56,6 +56,14 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
         onSuccess = { transform(it) },
         onFailure = { this as Result<R> }
     )
+}
+
+inline fun <reified E : Throwable, R> Result<R>.onFailureInstance(action: (E) -> Unit): Result<R> {
+    return onFailure {
+        if (it is E) {
+            action(it)
+        }
+    }
 }
 
 inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
@@ -193,6 +201,8 @@ fun <T> unsafeLazy(initializer: () -> T) = lazy(LazyThreadSafetyMode.NONE, initi
 fun <T> MutableSet<T>.toImmutable(): Set<T> = Collections.unmodifiableSet(this)
 
 operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
+
+operator fun BigInteger.times(int: Int): BigInteger = multiply(int.toBigInteger())
 
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
@@ -481,6 +491,12 @@ fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
     splitCamelCase()
 }
 
+fun String.splitAndCapitalizeWords(): String {
+    val split = splitSnakeOrCamelCase()
+
+    return split.joinToString(separator = " ") { it.capitalize() }
+}
+
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.
  *
@@ -535,6 +551,10 @@ fun <T> List<T>.modified(index: Int, modification: T): List<T> {
     return newList
 }
 
+fun <K, V> MutableMap<K, V>.put(entry: Pair<K, V>) {
+    put(entry.first, entry.second)
+}
+
 fun <T> Set<T>.added(toAdd: T): Set<T> {
     return toMutableSet().apply { add(toAdd) }
 }
@@ -544,6 +564,8 @@ fun <K, V> Map<K, V>.inserted(key: K, value: V): Map<K, V> {
 }
 
 inline fun <T, R> Iterable<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutableSetOf(), mapper)
+
+inline fun <T, R> Iterable<T>.flatMapToSet(mapper: (T) -> Iterable<R>): Set<R> = flatMapTo(mutableSetOf(), mapper)
 
 inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fold(mutableSetOf()) { acc, value ->
     acc += mapper(value)
@@ -583,13 +605,17 @@ fun String.toUuid() = UUID.fromString(this)
 val Int.kilobytes: BigInteger
     get() = this.toBigInteger() * 1024.toBigInteger()
 
-operator fun ByteArray.compareTo(other: ByteArray): Int {
+fun ByteArray.compareTo(other: ByteArray, unsigned: Boolean): Int {
     if (size != other.size) {
         return size - other.size
     }
 
     for (i in 0 until size) {
-        val result = this[i].compareTo(other[i])
+        val result = if (unsigned) {
+            this[i].toUByte().compareTo(other[i].toUByte())
+        } else {
+            this[i].compareTo(other[i])
+        }
 
         if (result != 0) {
             return result
@@ -599,7 +625,7 @@ operator fun ByteArray.compareTo(other: ByteArray): Int {
     return 0
 }
 
-fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }
+fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b, unsigned = false) }
 
 inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
     val childScope = childScope()
@@ -672,8 +698,11 @@ fun Calendar.resetDay() {
     set(Calendar.MILLISECOND, 0)
 }
 
-inline fun CoroutineScope.launchUnit(crossinline block: suspend CoroutineScope.() -> Unit) {
-    launch { block() }
+inline fun CoroutineScope.launchUnit(
+    context: CoroutineContext = EmptyCoroutineContext,
+    crossinline block: suspend CoroutineScope.() -> Unit
+) {
+    launch(context) { block() }
 }
 
 fun Iterable<Duration>.sum(): Duration = fold(Duration.ZERO) { acc, duration -> acc + duration }
@@ -690,3 +719,9 @@ suspend fun <T> scopeAsync(
 fun Int.collectionIndexOrNull(): Int? {
     return takeIf { it >= 0 }
 }
+
+fun <T> Set<T>.hasIntersectionWith(other: Set<T>): Boolean {
+    return this.any { it in other }
+}
+
+typealias LazyGet<T> = () -> T

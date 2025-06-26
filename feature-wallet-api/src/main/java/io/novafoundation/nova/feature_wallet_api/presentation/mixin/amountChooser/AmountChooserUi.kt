@@ -37,7 +37,7 @@ sealed class MaxActionAvailability {
     object NotAvailable : MaxActionAvailability()
 }
 
-fun BaseFragment<*>.setupAmountChooser(
+fun BaseFragment<*, *>.setupAmountChooser(
     mixin: AmountChooserMixin,
     amountView: ChooseAmountView,
 ) {
@@ -46,14 +46,14 @@ fun BaseFragment<*>.setupAmountChooser(
     mixin.assetModel.observe(amountView::setChooseAmountModel)
 }
 
-fun <T> BaseFragment<*>.setupAmountChooserBase(
+fun <T> BaseFragment<*, *>.setupAmountChooserBase(
     mixin: AmountChooserMixinBase,
     view: T,
 ) where T : AmountInputView, T : MaxAvailableView {
     setupAmountChooserBase(mixin, view, view)
 }
 
-fun BaseFragment<*>.setupAmountChooserBase(
+fun BaseFragment<*, *>.setupAmountChooserBase(
     mixin: AmountChooserMixinBase,
     amountInputView: AmountInputView,
     maxAvailableView: MaxAvailableView?
@@ -83,7 +83,7 @@ fun BaseFragment<*>.setupAmountChooserBase(
     }
 }
 
-private fun BaseFragment<*>.bindInputStateToField(
+private fun BaseFragment<*, *>.bindInputStateToField(
     amountInputView: AmountInputView,
     flow: MutableSharedFlow<InputState<String>>,
     scope: CoroutineScope

@@ -1,11 +1,8 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
+
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
@@ -15,20 +12,12 @@ import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentAddTokenEnterInfoBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoAddressInput
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoContainer
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoDecimalsInput
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoPriceConfirm
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoPriceInput
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoScrollArea
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoSymbolInput
-import kotlinx.android.synthetic.main.fragment_add_token_enter_info.addTokenEnterInfoToolbar
 
-class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel>() {
+class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel, FragmentAddTokenEnterInfoBinding>() {
 
     companion object {
 
@@ -37,39 +26,33 @@ class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel>() {
         fun getBundle(payload: AddTokenEnterInfoPayload) = bundleOf(KEY_PAYLOAD to payload)
     }
 
+    override fun createBinding() = FragmentAddTokenEnterInfoBinding.inflate(layoutInflater)
+
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_add_token_enter_info, container, false)
-    }
-
     override fun initViews() {
-        addTokenEnterInfoToolbar.applyStatusBarInsets()
-        addTokenEnterInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.addTokenEnterInfoToolbar.applyStatusBarInsets()
+        binder.addTokenEnterInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        addTokenEnterInfoContainer.applyInsetter {
+        binder.addTokenEnterInfoContainer.applyInsetter {
             type(ime = true) {
                 padding()
             }
         }
 
-        addTokenEnterInfoScrollArea.scrollOnFocusTo(
-            addTokenEnterInfoAddressInput,
-            addTokenEnterInfoSymbolInput,
-            addTokenEnterInfoDecimalsInput,
-            addTokenEnterInfoPriceInput
+        binder.addTokenEnterInfoScrollArea.scrollOnFocusTo(
+            binder.addTokenEnterInfoAddressInput,
+            binder.addTokenEnterInfoSymbolInput,
+            binder.addTokenEnterInfoDecimalsInput,
+            binder.addTokenEnterInfoPriceInput
         )
 
-        addTokenEnterInfoPriceConfirm.setOnClickListener {
+        binder.addTokenEnterInfoPriceConfirm.setOnClickListener {
             viewModel.confirmClicked()
         }
 
-        addTokenEnterInfoPriceConfirm.prepareForProgress(viewLifecycleOwner)
+        binder.addTokenEnterInfoPriceConfirm.prepareForProgress(viewLifecycleOwner)
     }
 
     override fun inject() {
@@ -83,11 +66,11 @@ class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel>() {
         observeValidations(viewModel)
         val scope = viewLifecycleOwner.lifecycleScope
 
-        addTokenEnterInfoAddressInput.bindTo(viewModel.contractAddressInput, scope)
-        addTokenEnterInfoSymbolInput.bindTo(viewModel.symbolInput, scope)
-        addTokenEnterInfoDecimalsInput.bindTo(viewModel.decimalsInput, scope)
-        addTokenEnterInfoPriceInput.bindTo(viewModel.priceLinkInput, scope)
+        binder.addTokenEnterInfoAddressInput.bindTo(viewModel.contractAddressInput, scope)
+        binder.addTokenEnterInfoSymbolInput.bindTo(viewModel.symbolInput, scope)
+        binder.addTokenEnterInfoDecimalsInput.bindTo(viewModel.decimalsInput, scope)
+        binder.addTokenEnterInfoPriceInput.bindTo(viewModel.priceLinkInput, scope)
 
-        viewModel.continueButtonState.observe(addTokenEnterInfoPriceConfirm::setState)
+        viewModel.continueButtonState.observe(binder.addTokenEnterInfoPriceConfirm::setState)
     }
 }

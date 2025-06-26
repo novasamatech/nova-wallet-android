@@ -3,12 +3,14 @@ package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.l
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.dao.updateMetaAccount
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository.Payload
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerDerivationPath
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
@@ -16,35 +18,53 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 class RealGenericLedgerAddAccountRepository(
     private val accountDao: MetaAccountDao,
     private val secretStoreV2: SecretStoreV2,
+    private val accountMappers: AccountMappers,
     metaAccountChangesEventBus: MetaAccountChangesEventBus
 ) : BaseAddAccountRepository<Payload>(metaAccountChangesEventBus), GenericLedgerAddAccountRepository {
 
     override suspend fun addAccountInternal(payload: Payload): AddAccountResult {
         return when (payload) {
             is Payload.NewWallet -> addNewWallet(payload)
+            is Payload.AddEvmAccount -> addEvmAccount(payload)
         }
     }
 
     private suspend fun addNewWallet(payload: Payload.NewWallet): AddAccountResult {
         val metaAccount = MetaAccountLocal(
-            substratePublicKey = payload.universalAccount.publicKey,
-            substrateCryptoType = mapEncryptionToCryptoType(payload.universalAccount.encryptionType),
-            substrateAccountId = payload.universalAccount.address.toAccountId(),
-            ethereumPublicKey = null,
-            ethereumAddress = null,
+            substratePublicKey = payload.substrateAccount.publicKey,
+            substrateCryptoType = mapEncryptionToCryptoType(payload.substrateAccount.encryptionType),
+            substrateAccountId = payload.substrateAccount.address.toAccountId(),
+            ethereumPublicKey = payload.evmAccount?.publicKey,
+            ethereumAddress = payload.evmAccount?.accountId,
             name = payload.name,
             parentMetaId = null,
             isSelected = false,
             position = accountDao.nextAccountPosition(),
             type = MetaAccountLocal.Type.LEDGER_GENERIC,
             status = MetaAccountLocal.Status.ACTIVE,
-            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
+            typeExtras = null
         )
 
         val metaId = accountDao.insertMetaAccount(metaAccount)
         val derivationPathKey = LedgerDerivationPath.genericDerivationPathSecretKey()
-        secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, payload.universalAccount.derivationPath)
+        secretStoreV2.putAdditionalMetaAccountSecret(metaId, derivationPathKey, payload.substrateAccount.derivationPath)
 
         return AddAccountResult.AccountAdded(metaId, LightMetaAccount.Type.LEDGER)
+    }
+
+    private suspend fun addEvmAccount(payload: Payload.AddEvmAccount): AddAccountResult {
+        val metaAccountType: LightMetaAccount.Type
+
+        accountDao.updateMetaAccount(payload.metaId) { currentMetaAccount ->
+            metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(currentMetaAccount.type)
+
+            currentMetaAccount.addEvmAccount(
+                ethereumAddress = payload.evmAccount.accountId,
+                ethereumPublicKey = payload.evmAccount.publicKey
+            )
+        }
+
+        return AddAccountResult.AccountChanged(payload.metaId, metaAccountType)
     }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/multisig_pending_operations_graph"
+    app:startDestination="@id/multisigPendingOperationsFragment">
+
+    <fragment
+        android:id="@+id/multisigPendingOperationsFragment"
+        android:name="io.novafoundation.nova.feature_multisig_operations.presentation.list.MultisigPendingOperationsFragment"
+        android:label="MultisigPendingOperationsFragment"
+        tools:layout="@layout/fragment_multisig_pending_operations">
+
+        <action
+            android:id="@+id/action_multisigPendingOperationsFragment_to_multisigOperationDetailsFragment"
+            app:destination="@id/multisigOperationDetailsFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/multisigOperationDetailsFragment"
+        android:name="io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsFragment"
+        android:label="MultisigOperationDetailsFragment"
+        tools:layout="@layout/fragment_multisig_operation_details">
+
+        <action
+            android:id="@+id/action_multisigOperationDetailsFragment_to_externalExtrinsicDetailsFragment"
+            app:destination="@id/externalExtrinsicDetailsFragment" />
+
+        <action
+            android:id="@+id/action_multisigOperationDetailsFragment_to_enterCallDetails"
+            app:destination="@id/multisigOperationEnterCallDetails"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/externalExtrinsicDetailsFragment"
+        android:name="io.novafoundation.nova.feature_external_sign_impl.presentation.extrinsicDetails.ExternalExtrinsicDetailsFragment"
+        android:label="ExternalExtrinsicDetailsFragment" />
+
+    <fragment
+        android:id="@+id/multisigOperationEnterCallDetails"
+        android:name="io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallFragment"
+        android:label="MultisigOperationEnterCallFragment"
+        tools:layout="@layout/fragment_multisig_operation_enter_call" />
+</navigation>

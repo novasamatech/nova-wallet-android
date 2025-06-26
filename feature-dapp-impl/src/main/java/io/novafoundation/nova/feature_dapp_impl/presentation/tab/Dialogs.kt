@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationAwaitable
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.feature_dapp_impl.R
 
-fun BaseFragment<*>.setupCloseAllDappTabsDialogue(mixin: ConfirmationAwaitable<Unit>) {
+fun BaseFragment<*, *>.setupCloseAllDappTabsDialogue(mixin: ConfirmationAwaitable<Unit>) {
     mixin.awaitableActionLiveData.observeEvent { event ->
         warningDialog(
             context = providedContext,

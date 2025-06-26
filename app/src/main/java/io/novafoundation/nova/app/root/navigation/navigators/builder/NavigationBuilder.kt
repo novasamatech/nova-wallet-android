@@ -14,7 +14,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
  * - split_screen-navigator - the main navigator of the application. All fragments opened in it will be opened in a split screen mode
  *
  * Let's look at the scenarios for building navigation:
- * - In the normal case, you need to add a navigation node only to the split_screen_navigation_graph, be it a dialog or a fragment.
+ * - In the normal case, you need to add a navigation node only to the split_screen_nav_graph, be it a dialog or a fragment.
  *   This can be used when you are sure that the fragment or dialog should not be launched in the browser or on top of a split screen.
  *   Use [navigateInFirstAttachedContext] and the fragment will be automatically attached to the SplitScreenNavigationHolder.
  * - If you expect that the fragment can also be launched from the browser, you need to add it to both the root_navigation_graph and the split_screen_navigation_graph.
@@ -24,7 +24,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
  *   To attach the dialog to the RootNavigationHolder, call [navigateInRoot]
  * - In the latter case, we may need to add a screen that is strictly required to be opened on top of the split screen or only in the browser flow. (Such screens as entering a pin code).
  *   In this case, we need to add an action only to the root_navigation_graph
- *   To attach the the fragment to the RootNavigationHolder, call [navigateInRoot]
+ *   To attach the fragment to the RootNavigationHolder, call [navigateInRoot]
  **/
 abstract class NavigationBuilder(
     private val navigationHoldersRegistry: NavigationHoldersRegistry

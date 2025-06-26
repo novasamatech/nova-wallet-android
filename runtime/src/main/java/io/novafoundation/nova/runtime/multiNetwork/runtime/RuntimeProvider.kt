@@ -127,7 +127,7 @@ class RuntimeProvider(
             runCatching {
                 val (value, duration) = measureTimedValue { runtimeFactory.constructRuntime(chainId, typesUsage) }
 
-                Log.d(this@RuntimeProvider.LOG_TAG, "Constructed runtime for $chainId in ${duration.inSeconds} seconds")
+                Log.d(this@RuntimeProvider.LOG_TAG, "Constructed runtime for $chainId in ${duration.inWholeSeconds} seconds")
 
                 runtimeFlow.emit(value)
             }.onFailure {

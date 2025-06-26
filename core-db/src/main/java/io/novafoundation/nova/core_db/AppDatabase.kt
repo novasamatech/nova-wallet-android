@@ -34,6 +34,7 @@ import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.dao.MultisigOperationsDao
 import io.novafoundation.nova.core_db.dao.NftDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.core_db.dao.OperationDao
@@ -74,12 +75,14 @@ import io.novafoundation.nova.core_db.migrations.AddLegacyAddressPrefix_66_67
 import io.novafoundation.nova.core_db.migrations.AddLocalMigratorVersionToChainRuntimes_57_58
 import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
+import io.novafoundation.nova.core_db.migrations.AddMultisigCalls_69_70
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_38_39
 import io.novafoundation.nova.core_db.migrations.AddPoolIdToOperations_46_47
 import io.novafoundation.nova.core_db.migrations.AddProxyAccount_54_55
 import io.novafoundation.nova.core_db.migrations.AddRewardAccountToStakingDashboard_43_44
 import io.novafoundation.nova.core_db.migrations.AddRuntimeFlagToChains_36_37
+import io.novafoundation.nova.core_db.migrations.AddSellProviders_67_68
 import io.novafoundation.nova.core_db.migrations.AddSitePhishing_6_7
 import io.novafoundation.nova.core_db.migrations.AddSourceToLocalAsset_28_29
 import io.novafoundation.nova.core_db.migrations.AddStakingDashboardItems_41_42
@@ -87,6 +90,7 @@ import io.novafoundation.nova.core_db.migrations.AddStakingTypeToTotalRewards_44
 import io.novafoundation.nova.core_db.migrations.AddSwapOption_48_49
 import io.novafoundation.nova.core_db.migrations.AddTransactionVersionToRuntime_50_51
 import io.novafoundation.nova.core_db.migrations.AddTransferApisTable_29_30
+import io.novafoundation.nova.core_db.migrations.AddTypeExtrasToMetaAccount_68_69
 import io.novafoundation.nova.core_db.migrations.AddVersioningToGovernanceDapps_32_33
 import io.novafoundation.nova.core_db.migrations.AddWalletConnectSessions_39_40
 import io.novafoundation.nova.core_db.migrations.AssetTypes_2_3
@@ -126,6 +130,7 @@ import io.novafoundation.nova.core_db.model.DappAuthorizationLocal
 import io.novafoundation.nova.core_db.model.ExternalBalanceLocal
 import io.novafoundation.nova.core_db.model.FavouriteDAppLocal
 import io.novafoundation.nova.core_db.model.GovernanceDAppLocal
+import io.novafoundation.nova.core_db.model.MultisigOperationCallLocal
 import io.novafoundation.nova.core_db.model.NftLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.core_db.model.PhishingAddressLocal
@@ -156,7 +161,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 67,
+    version = 70,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -199,7 +204,8 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         NodeSelectionPreferencesLocal::class,
         TinderGovBasketItemLocal::class,
         TinderGovVotingPowerLocal::class,
-        BrowserTabLocal::class
+        BrowserTabLocal::class,
+        MultisigOperationCallLocal::class
     ],
 )
 @TypeConverters(
@@ -256,7 +262,8 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddLocalMigratorVersionToChainRuntimes_57_58, AddGloballyUniqueIdToMetaAccounts_58_59)
                     .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
                     .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
-                    .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67)
+                    .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
+                    .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70)
                     .build()
             }
             return instance!!
@@ -320,4 +327,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun tinderGovDao(): TinderGovDao
 
     abstract fun browserTabsDao(): BrowserTabsDao
+
+    abstract fun multisigOperationsDao(): MultisigOperationsDao
 }

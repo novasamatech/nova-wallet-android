@@ -21,7 +21,6 @@ import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -56,7 +55,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
@@ -65,8 +63,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderV2Factory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.WssSubstrateSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
@@ -92,14 +88,11 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import javax.inject.Named
 
 @Module
 class WalletFeatureModule {
@@ -166,14 +159,6 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSubstrateSource(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-    ): SubstrateRemoteSource = WssSubstrateSource(
-        remoteStorageSource,
-    )
-
-    @Provides
-    @FeatureScope
     fun provideTokenRepository(
         tokenDao: TokenDao,
     ): TokenRepository = TokenRepositoryImpl(
@@ -187,7 +172,6 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideWalletRepository(
-        substrateSource: SubstrateRemoteSource,
         operationsDao: OperationDao,
         phishingApi: PhishingApi,
         phishingAddressDao: PhishingAddressDao,
@@ -196,7 +180,6 @@ class WalletFeatureModule {
         chainRegistry: ChainRegistry,
         coinPriceRemoteDataSource: CoinPriceRemoteDataSource
     ): WalletRepository = WalletRepositoryImpl(
-        substrateSource,
         operationsDao,
         phishingApi,
         accountRepository,
@@ -417,18 +400,6 @@ class WalletFeatureModule {
             extrinsicWalk = extrinsicWalk
         )
     }
-
-    @Provides
-    @FeatureScope
-    fun provideProxyHaveEnoughFeeValidationFactory(
-        assetSourceRegistry: AssetSourceRegistry,
-        walletRepository: WalletRepository,
-        extrinsicService: ExtrinsicService,
-    ) = ProxyHaveEnoughFeeValidationFactory(
-        assetSourceRegistry,
-        walletRepository,
-        extrinsicService
-    )
 
     @Provides
     @FeatureScope

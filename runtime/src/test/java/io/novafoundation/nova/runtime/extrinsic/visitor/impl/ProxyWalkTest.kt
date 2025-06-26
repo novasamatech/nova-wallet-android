@@ -2,8 +2,9 @@ package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindMultiAddress
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.proxy.ProxyNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.RealExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.proxy.ProxyNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.test_shared.any
@@ -75,7 +76,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -92,7 +93,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -113,7 +114,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -134,7 +135,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -166,7 +167,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -198,7 +199,7 @@ internal class ProxyWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingle(extrinsic)
+        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(proxied, visit.origin)
         assertEquals(testInnerCall, visit.call)

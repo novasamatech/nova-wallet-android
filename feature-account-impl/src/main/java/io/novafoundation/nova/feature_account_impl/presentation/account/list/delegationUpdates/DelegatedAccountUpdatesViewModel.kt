@@ -9,8 +9,10 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.DelegatedMetaAccountUpdatesListingMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixin.FilterType
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class DelegatedAccountUpdatesViewModel(
@@ -22,12 +24,22 @@ class DelegatedAccountUpdatesViewModel(
 
     private val listingMixin = delegatedMetaAccountUpdatesListingMixinFactory.create(viewModelScope)
 
+    val filtersAvailableFlow = listingMixin.accountTypeFilter.map { it !is FilterType.UserIgnored }
+
     val accounts: Flow<List<Any>> = listingMixin.metaAccountsFlow
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     fun clickAbout() {
         openBrowserEvent.value = appLinksProvider.wikiProxy.event()
+    }
+
+    fun showProxieds() {
+        listingMixin.filterBy(FilterType.Proxied)
+    }
+
+    fun showMultisig() {
+        listingMixin.filterBy(FilterType.Multisig)
     }
 
     fun clickDone() {

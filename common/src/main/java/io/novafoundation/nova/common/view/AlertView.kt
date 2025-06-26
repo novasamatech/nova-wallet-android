@@ -1,36 +1,40 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
-import android.view.View
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewAlertBinding
+import io.novafoundation.nova.common.databinding.ViewAlertMessageBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlinx.android.synthetic.main.view_alert.view.alertActionArrow
-import kotlinx.android.synthetic.main.view_alert.view.alertActionContent
-import kotlinx.android.synthetic.main.view_alert.view.alertActionGroup
-import kotlinx.android.synthetic.main.view_alert.view.alertIcon
-import kotlinx.android.synthetic.main.view_alert.view.alertMessage
-import kotlinx.android.synthetic.main.view_alert.view.alertSubMessage
 
 typealias SimpleAlertModel = String
 
 class AlertModel(
     val style: AlertView.Style,
     val message: String,
-    val subMessage: CharSequence? = null,
+    val subMessages: List<CharSequence>,
     val action: ActionModel? = null
 ) {
+
+    constructor(
+        style: AlertView.Style,
+        message: String,
+        subMessage: CharSequence? = null,
+        action: ActionModel? = null
+    ) : this(style, message, subMessages = listOfNotNull(subMessage), action)
 
     class ActionModel(val text: String, val listener: () -> Unit)
 }
@@ -57,9 +61,9 @@ class AlertView @JvmOverloads constructor(
         }
     }
 
-    init {
-        View.inflate(context, R.layout.view_alert, this)
+    private val binder = ViewAlertBinding.inflate(inflater(), this)
 
+    init {
         updatePadding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 10.dp)
 
         attrs?.let(::applyAttrs)
@@ -75,26 +79,31 @@ class AlertView @JvmOverloads constructor(
     }
 
     fun setMessage(text: String) {
-        alertMessage.text = text
+        binder.alertMessage.text = text
     }
 
     fun setMessage(@StringRes textRes: Int) {
-        alertMessage.setText(textRes)
+        binder.alertMessage.setText(textRes)
     }
 
     fun setSubMessage(text: CharSequence?) {
-        alertSubMessage.setTextOrHide(text)
+        setSubMessages(listOfNotNull(text))
+    }
+
+    fun setSubMessages(subMessages: List<CharSequence>) {
+        binder.alertSubMessageContainer.removeAllViews()
+        subMessages.forEach { createSubMessageView(it) }
     }
 
     fun setActionText(actionText: String?) {
-        alertActionGroup.letOrHide(actionText) { text ->
-            alertActionContent.text = text
+        binder.alertActionGroup.letOrHide(actionText) { text ->
+            binder.alertActionContent.text = text
         }
     }
 
     fun setOnActionClickedListener(listener: () -> Unit) {
-        alertActionContent.setOnClickListener { listener() }
-        alertActionArrow.setOnClickListener { listener() }
+        binder.alertActionContent.setOnClickListener { listener() }
+        binder.alertActionArrow.setOnClickListener { listener() }
     }
 
     fun setModel(maybeModel: SimpleAlertModel?) = letOrHide(maybeModel) { model ->
@@ -106,8 +115,17 @@ class AlertView @JvmOverloads constructor(
     }
 
     private fun setStyleIcon(@DrawableRes iconRes: Int, iconTintRes: Int? = null) {
-        alertIcon.setImageResource(iconRes)
-        alertIcon.setImageTintRes(iconTintRes)
+        binder.alertIcon.setImageResource(iconRes)
+        binder.alertIcon.setImageTintRes(iconTintRes)
+    }
+
+    private fun createSubMessageView(text: CharSequence): TextView {
+        return ViewAlertMessageBinding.inflate(inflater(), binder.alertSubMessageContainer, true)
+            .alertSubMessage
+            .apply {
+                this.text = text
+                this.movementMethod = LinkMovementMethod.getInstance()
+            }
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {
@@ -133,7 +151,7 @@ class AlertView @JvmOverloads constructor(
 
 fun AlertView.setModel(model: AlertModel) {
     setMessage(model.message)
-    setSubMessage(model.subMessage)
+    setSubMessages(model.subMessages)
 
     if (model.action != null) {
         setActionText(model.action.text)

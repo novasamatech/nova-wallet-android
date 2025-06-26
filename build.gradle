@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '9.7.0'
-        versionCode = 194
+        versionName = '10.0.2'
+        versionCode = 215
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -12,7 +12,7 @@ buildscript {
         minSdkVersion = 24
         targetSdkVersion = 34
 
-        kotlinVersion = '1.7.21'
+        kotlinVersion = '1.9.22'
 
         ktlintPinterestVersion = '0.47.0'
 
@@ -21,13 +21,13 @@ buildscript {
         cardViewVersion = '1.0.0'
         constraintVersion = '1.1.3'
 
-        coroutinesVersion = '1.6.3'
+        coroutinesVersion = '1.8.1'
 
         biometricVersion = '1.0.1'
 
         progressButtonsVersion = '2.1.0'
 
-        daggerVersion = '2.44.2'
+        daggerVersion = '2.52'
         javaxInjectVersion = '1'
 
         architectureComponentVersion = '2.2.0'
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.4.0'
+        substrateSdkVersion = '2.7.0'
 
         gifVersion = '1.2.19'
 
@@ -79,7 +79,7 @@ buildscript {
 
         bleVersion = '2.5.1'
 
-        roomVersion = '2.4.3'
+        roomVersion = '2.6.1'
 
         markwonVersion = '4.6.2'
 
@@ -123,6 +123,7 @@ buildscript {
 
         lifecycleDep = "androidx.lifecycle:lifecycle-extensions:$architectureComponentVersion"
         lifecycleKapt = "androidx.lifecycle:lifecycle-compiler:$architectureComponentVersion"
+        lifecycleRuntime = "androidx.lifecycle:lifecycle-runtime-android:$architectureComponentVersion"
 
         coroutinesDep = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
         coroutinesAndroidDep = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
@@ -163,7 +164,8 @@ buildscript {
         zXingCoreDep = "com.google.zxing:core:$zXingVersion"
         zXingEmbeddedDep = "com.journeyapps:zxing-android-embedded:$zXingEmbeddedVersion"
 
-        substrateSdkDep = "io.github.nova-wallet:substrate-sdk-android:$substrateSdkVersion"
+        substrateSdkDep = "io.github.nova-wallet.substrate-sdk-android:core:$substrateSdkVersion"
+        substrateSdkSerializationDep = "io.github.nova-wallet.substrate-sdk-android:kotlinx-serialization-scale:$substrateSdkVersion"
 
         gifDep = "pl.droidsonroids.gif:android-gif-drawable:$gifVersion"
 
@@ -220,6 +222,10 @@ buildscript {
         chartsDep = "com.github.PhilJay:MPAndroidChart:v3.1.0"
 
         swipeRefershLayout = "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-alpha01"
+
+        branchIo = "io.branch.sdk.android:library:5.18.0"
+
+        playServiceIdentifier = "com.google.android.gms:play-services-ads-identifier:18.2.0"
     }
 
     repositories {

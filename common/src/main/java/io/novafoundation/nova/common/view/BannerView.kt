@@ -9,13 +9,11 @@ import androidx.annotation.DrawableRes
 import androidx.core.view.isVisible
 import com.google.android.material.card.MaterialCardView
 import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewBannerBinding
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getEnum
-import kotlinx.android.synthetic.main.view_banner.view.bannerBackground
-import kotlinx.android.synthetic.main.view_banner.view.bannerClose
-import kotlinx.android.synthetic.main.view_banner.view.bannerContent
-import kotlinx.android.synthetic.main.view_banner.view.bannerImage
+import io.novafoundation.nova.common.utils.inflater
 
 class BannerView @JvmOverloads constructor(
     context: Context,
@@ -23,8 +21,9 @@ class BannerView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : MaterialCardView(context, attrs, defStyle) {
 
+    private val binder = ViewBannerBinding.inflate(inflater(), this)
+
     init {
-        View.inflate(context, R.layout.view_banner, this)
         cardElevation = 0f
         radius = 12f.dpF(context)
         strokeWidth = 1.dp(context)
@@ -34,7 +33,7 @@ class BannerView @JvmOverloads constructor(
     }
 
     fun setOnCloseClickListener(listener: OnClickListener?) {
-        bannerClose.setOnClickListener(listener)
+        binder.bannerClose.setOnClickListener(listener)
     }
 
     private fun applyAttributes(attrs: AttributeSet?) {
@@ -42,18 +41,18 @@ class BannerView @JvmOverloads constructor(
             val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BannerView)
 
             val image = typedArray.getDrawable(R.styleable.BannerView_android_src)
-            bannerImage.setImageDrawable(image)
+            binder.bannerImage.setImageDrawable(image)
 
             val background = typedArray.getDrawable(R.styleable.BannerView_bannerBackground)
-            bannerBackground.background = background
+            binder.bannerBackground.background = background
 
             val closeIcon = typedArray.getDrawable(R.styleable.BannerView_closeIcon)
             if (closeIcon != null) {
-                bannerClose.setImageDrawable(closeIcon)
+                binder.bannerClose.setImageDrawable(closeIcon)
             }
 
             val showClose = typedArray.getBoolean(R.styleable.BannerView_showClose, false)
-            bannerClose.isVisible = showClose
+            binder.bannerClose.isVisible = showClose
 
             val style = typedArray.getEnum(R.styleable.BannerView_android_scaleType, ImageView.ScaleType.CENTER)
             setImageScaleType(style)
@@ -66,19 +65,19 @@ class BannerView @JvmOverloads constructor(
         if (child.id == R.id.bannerBackground) {
             super.addView(child, params)
         } else {
-            bannerContent.addView(child, params)
+            binder.bannerContent.addView(child, params)
         }
     }
 
     fun setBannerBackground(@DrawableRes backgroundRes: Int) {
-        bannerBackground.setBackgroundResource(backgroundRes)
+        binder.bannerBackground.setBackgroundResource(backgroundRes)
     }
 
     fun setImage(@DrawableRes imageRes: Int) {
-        bannerImage.setImageResource(imageRes)
+        binder.bannerImage.setImageResource(imageRes)
     }
 
     fun setImageScaleType(scaleType: ImageView.ScaleType) {
-        bannerImage.scaleType = scaleType
+        binder.bannerImage.scaleType = scaleType
     }
 }

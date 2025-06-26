@@ -8,10 +8,13 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAdapter
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableBaseItem
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.ItemNetworkAssetBinding
+import io.novafoundation.nova.feature_assets.databinding.ItemNetworkAssetGroupBinding
+import io.novafoundation.nova.feature_assets.databinding.ItemTokenAssetBinding
+import io.novafoundation.nova.feature_assets.databinding.ItemTokenAssetGroupBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetGroupViewHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.NetworkAssetViewHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.common.holders.TokenAssetGroupViewHolder
@@ -22,7 +25,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 private val priceRateExtractor = { asset: AssetModel -> asset.token.rate }
@@ -52,10 +54,10 @@ class BalanceListAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return when (viewType) {
-            TYPE_NETWORK_GROUP -> NetworkAssetGroupViewHolder(parent.inflateChild(R.layout.item_network_asset_group))
-            TYPE_NETWORK_ASSET -> NetworkAssetViewHolder(parent.inflateChild(R.layout.item_network_asset), imageLoader)
-            TYPE_TOKEN_GROUP -> TokenAssetGroupViewHolder(parent.inflateChild(R.layout.item_token_asset_group), imageLoader, itemHandler)
-            TYPE_TOKEN_ASSET -> TokenAssetViewHolder(parent.inflateChild(R.layout.item_token_asset), imageLoader)
+            TYPE_NETWORK_GROUP -> NetworkAssetGroupViewHolder(ItemNetworkAssetGroupBinding.inflate(parent.inflater(), parent, false))
+            TYPE_NETWORK_ASSET -> NetworkAssetViewHolder(ItemNetworkAssetBinding.inflate(parent.inflater(), parent, false), imageLoader)
+            TYPE_TOKEN_GROUP -> TokenAssetGroupViewHolder(ItemTokenAssetGroupBinding.inflate(parent.inflater(), parent, false), imageLoader, itemHandler)
+            TYPE_TOKEN_ASSET -> TokenAssetViewHolder(ItemTokenAssetBinding.inflate(parent.inflater(), parent, false), imageLoader)
             else -> error("Unknown view type")
         }
     }
@@ -85,6 +87,8 @@ class BalanceListAdapter(
 
             is TokenAssetViewHolder -> {
                 val item = getItem(position) as TokenAssetUi
+                holder.updateExpandableItem(item)
+
                 resolvePayload(holder, position, payloads) {
                     when (it) {
                         amountExtractor -> holder.bindTotal(item.asset)
@@ -94,6 +98,8 @@ class BalanceListAdapter(
 
             is TokenAssetGroupViewHolder -> {
                 val item = getItem(position) as TokenGroupUi
+                holder.updateExpandableItem(item)
+
                 resolvePayload(holder, position, payloads) {
                     when (it) {
                         tokenGroupPriceRateExtractor -> holder.bindPriceRate(item)

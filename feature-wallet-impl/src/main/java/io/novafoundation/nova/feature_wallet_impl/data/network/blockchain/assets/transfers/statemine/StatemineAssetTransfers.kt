@@ -1,9 +1,14 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.statemine
 
+import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
+import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine.canAcceptFunds
@@ -11,15 +16,20 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.statemineModule
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
+import io.novafoundation.nova.runtime.ext.findAssetByStatemineAssetId
+import io.novafoundation.nova.runtime.ext.findStatemineAssets
 import io.novafoundation.nova.runtime.ext.palletNameOrDefault
 import io.novafoundation.nova.runtime.ext.requireStatemine
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.prepareIdForEncoding
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import java.math.BigInteger
 
@@ -61,6 +71,32 @@ class StatemineAssetTransfers(
         }
 
         return assetAccount.canAcceptFunds
+    }
+
+    override suspend fun parseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall? {
+        if (!checkIsOurCall(call, chain)) return null
+
+        val onChainAssetId = call.arguments["id"]
+        val chainAsset = determineAsset(chain, onChainAssetId) ?: return null
+        val amount = bindNumber(call.arguments["amount"])
+        val destination = bindAccountIdentifier(call.arguments["target"]).intoKey()
+
+        return TransferParsedFromCall(
+            amount = chainAsset.withAmount(amount),
+            destination = destination
+        )
+    }
+
+    private suspend fun determineAsset(chain: Chain, onChainAssetId: Any?): Chain.Asset? {
+        val runtime = chainRegistry.getRuntime(chain.id)
+        return chain.findAssetByStatemineAssetId(runtime, onChainAssetId)
+    }
+
+    private fun checkIsOurCall(call: GenericCall.Instance, chain: Chain): Boolean {
+        if (call.function.name != "transfer") return false
+
+        val allStatemineAssetsOnChain = chain.findStatemineAssets()
+        return allStatemineAssetsOnChain.any { it.requireStatemine().palletNameOrDefault() == call.module.name }
     }
 
     private fun ExtrinsicBuilder.statemineTransfer(

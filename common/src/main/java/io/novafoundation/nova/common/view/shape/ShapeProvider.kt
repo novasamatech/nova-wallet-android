@@ -69,8 +69,8 @@ fun Context.getInputBackground() = getCornersStateDrawable(
     idleDrawable = getRoundedCornerDrawable(R.color.input_background),
     disabledDrawable = getRoundedCornerDrawableFromColors(
         fillColor = getColor(R.color.input_background),
-        strokeColor = getColor(R.color.container_border),
-        strokeSizeInDp = 1f
+        strokeColor = null,
+        strokeSizeInDp = 0f
     )
 )
 
@@ -118,6 +118,18 @@ fun Context.getTopRoundedCornerDrawable(
     return getTopRoundedCornerDrawableFromColors(fillColor, strokeColor, cornerSizeInDp, strokeSizeInDp)
 }
 
+fun Context.getBottomRoundedCornerDrawable(
+    @ColorRes fillColorRes: Int = R.color.secondary_screen_background,
+    @ColorRes strokeColorRes: Int? = null,
+    cornerSizeInDp: Int = DEFAULT_CORNER_RADIUS,
+    strokeSizeInDp: Float = 1.0f,
+): Drawable {
+    val fillColor = getColor(fillColorRes)
+    val strokeColor = strokeColorRes?.let(this::getColor)
+
+    return getBottomRoundedCornerDrawableFromColors(fillColor, strokeColor, cornerSizeInDp, strokeSizeInDp)
+}
+
 fun Context.getTopRoundedCornerDrawableFromColors(
     @ColorInt fillColor: Int = getColor(R.color.secondary_screen_background),
     @ColorInt strokeColor: Int? = null,
@@ -133,6 +145,26 @@ fun Context.getTopRoundedCornerDrawableFromColors(
             ShapeAppearanceModel.Builder()
                 .setTopLeftCorner(CornerFamily.ROUNDED, cornerSizePx)
                 .setTopRightCorner(CornerFamily.ROUNDED, cornerSizePx)
+                .build()
+        }
+    )
+}
+
+fun Context.getBottomRoundedCornerDrawableFromColors(
+    @ColorInt fillColor: Int = getColor(R.color.secondary_screen_background),
+    @ColorInt strokeColor: Int? = null,
+    cornerSizeInDp: Int = DEFAULT_CORNER_RADIUS,
+    strokeSizeInDp: Float = 1.0f,
+): Drawable {
+    return cornerDrawableFromColors(
+        fillColor = fillColor,
+        strokeColor = strokeColor,
+        cornerSizeInDp = cornerSizeInDp,
+        strokeSizeInDp = strokeSizeInDp,
+        shapeBuilder = { cornerSizePx ->
+            ShapeAppearanceModel.Builder()
+                .setBottomRightCorner(CornerFamily.ROUNDED, cornerSizePx)
+                .setBottomLeftCorner(CornerFamily.ROUNDED, cornerSizePx)
                 .build()
         }
     )

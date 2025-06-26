@@ -76,7 +76,7 @@ private class ParachainStakeSummaryComponent(
             DelegatorStatus.Active -> StakeStatusModel.Active
             DelegatorStatus.Inactive -> StakeStatusModel.Inactive
             is DelegatorStatus.Waiting -> StakeStatusModel.Waiting(
-                timeLeft = delegatorStatus.timeLeft.toLongMilliseconds(),
+                timeLeft = delegatorStatus.timeLeft.inWholeMilliseconds,
                 messageFormat = R.string.staking_parachain_next_round_format,
             )
         }

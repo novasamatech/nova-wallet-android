@@ -25,8 +25,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANS
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.TransferParameters
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderArguments
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.BuyProviderId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.TradeProviderArguments
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.TradeProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ConnectionState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
@@ -159,6 +159,10 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
             ExternalApi.ReferendumSummary(externalApiLocal.url)
         }
 
+        ApiType.MULTISIG -> {
+            ExternalApi.Multisig(externalApiLocal.url)
+        }
+
         ApiType.UNKNOWN -> null
     }
 }.getOrNull()
@@ -278,7 +282,8 @@ fun mapChainLocalToChain(
 
 fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
     val typeExtrasParsed = local.typeExtras?.let(gson::parseArbitraryObject)
-    val buyProviders = local.buyProviders?.let<String, Map<BuyProviderId, BuyProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
+    val buyProviders = local.buyProviders?.let<String, Map<TradeProviderId, TradeProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
+    val sellProviders = local.sellProviders?.let<String, Map<TradeProviderId, TradeProviderArguments>?>(gson::fromJsonOrNull).orEmpty()
 
     return Chain.Asset(
         icon = local.icon,
@@ -289,6 +294,7 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
         chainId = local.chainId,
         priceId = local.priceId,
         buyProviders = buyProviders,
+        sellProviders = sellProviders,
         staking = mapStakingTypeFromLocal(local.staking),
         type = mapChainAssetTypeFromRaw(local.type, typeExtrasParsed),
         source = mapAssetSourceFromLocal(local.source),

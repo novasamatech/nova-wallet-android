@@ -59,7 +59,7 @@ class PushWelcomeViewModel(
     fun askPermissionAndEnablePushNotifications() {
         launch {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                val isPermissionsGranted = permissionsAsker.requirePermissionsOrExit(Manifest.permission.POST_NOTIFICATIONS)
+                val isPermissionsGranted = permissionsAsker.requirePermissions(Manifest.permission.POST_NOTIFICATIONS)
 
                 if (!isPermissionsGranted) {
                     return@launch

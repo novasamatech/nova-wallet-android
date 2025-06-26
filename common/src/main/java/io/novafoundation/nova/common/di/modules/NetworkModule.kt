@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.bluetooth.RealBluetoothManager
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.location.RealLocationManager
+import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novasama.substrate_sdk_android.wsrpc.SocketService
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novasama.substrate_sdk_android.wsrpc.recovery.Reconnector
@@ -53,7 +54,7 @@ class NetworkModule {
             recommendedValidatorsLearnMore = BuildConfig.RECOMMENDED_VALIDATORS_LEARN_MORE,
             paritySignerTroubleShooting = BuildConfig.PARITY_SIGNER_TROUBLESHOOTING,
             polkadotVaultTroubleShooting = BuildConfig.POLKADOT_VAULT_TROUBLESHOOTING,
-            ledgerBluetoothGuide = BuildConfig.LEDGER_BLEUTOOTH_GUIDE,
+            ledgerConnectionGuide = BuildConfig.LEDGER_CONNECTION_GUIDE,
             telegram = BuildConfig.TELEGRAM_URL,
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
@@ -149,8 +150,9 @@ class NetworkModule {
     @Provides
     @ApplicationScope
     fun provideBluetoothManager(
-        contextManager: ContextManager
-    ): BluetoothManager = RealBluetoothManager(contextManager)
+        contextManager: ContextManager,
+        systemCallExecutor: SystemCallExecutor
+    ): BluetoothManager = RealBluetoothManager(contextManager, systemCallExecutor)
 
     @Provides
     @ApplicationScope

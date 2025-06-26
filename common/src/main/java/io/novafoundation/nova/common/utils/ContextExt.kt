@@ -22,6 +22,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.core.content.ContextCompat
+import androidx.viewbinding.ViewBinding
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
@@ -150,6 +151,9 @@ fun getRippleMask(
     cornerSizeDp: Int = 12,
 ) = context.getRippleMask(cornerSizeDp)
 
+context(View)
+fun addRipple(to: Drawable, mask: Drawable? = getRippleMask()) = context.addRipple(to, mask)
+
 fun Context.launchDeepLink(url: String) {
     try {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -166,6 +170,10 @@ fun Drawable.withRippleMask(mask: Drawable = getRippleMask()) = context.addRippl
 context(View)
 val Int.dp: Int
     get() = dp(this@View.context)
+
+context(ViewBinding)
+val Int.dp: Int
+    get() = dp(this@ViewBinding.root.context)
 
 context(View)
 val Int.dpF: Float

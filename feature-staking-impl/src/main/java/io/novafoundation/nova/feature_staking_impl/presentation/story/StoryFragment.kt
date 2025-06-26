@@ -1,26 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.story
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStoryBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import jp.shts.android.storiesprogressview.StoriesProgressView
-import kotlinx.android.synthetic.main.fragment_story.stakingStoryLearnMore
-import kotlinx.android.synthetic.main.fragment_story.stories
-import kotlinx.android.synthetic.main.fragment_story.storyBody
-import kotlinx.android.synthetic.main.fragment_story.storyCloseIcon
-import kotlinx.android.synthetic.main.fragment_story.storyContainer
-import kotlinx.android.synthetic.main.fragment_story.storyTitle
 
-class StoryFragment : BaseFragment<StoryViewModel>(), StoriesProgressView.StoriesListener {
+class StoryFragment : BaseFragment<StoryViewModel, FragmentStoryBinding>(), StoriesProgressView.StoriesListener {
 
     companion object {
         private const val KEY_STORY = "story"
@@ -34,24 +27,18 @@ class StoryFragment : BaseFragment<StoryViewModel>(), StoriesProgressView.Storie
         }
     }
 
+    override fun createBinding() = FragmentStoryBinding.inflate(layoutInflater)
+
     private var lastActionDown = 0L
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_story, container, false)
-    }
-
     override fun initViews() {
-        storyCloseIcon.setOnClickListener { viewModel.backClicked() }
+        binder.storyCloseIcon.setOnClickListener { viewModel.backClicked() }
 
-        stories.setStoriesListener(this)
+        binder.stories.setStoriesListener(this)
 
-        storyContainer.setOnTouchListener(::handleStoryTouchEvent)
+        binder.storyContainer.setOnTouchListener(::handleStoryTouchEvent)
 
-        stakingStoryLearnMore.setOnClickListener { viewModel.learnMoreClicked() }
+        binder.stakingStoryLearnMore.setOnClickListener { viewModel.learnMoreClicked() }
     }
 
     override fun inject() {
@@ -70,14 +57,14 @@ class StoryFragment : BaseFragment<StoryViewModel>(), StoriesProgressView.Storie
         observeBrowserEvents(viewModel)
 
         viewModel.storyLiveData.observe { story ->
-            stories.setStoriesCount(story.elements.size)
-            stories.setStoryDuration(STORY_DURATION)
-            stories.startStories()
+            binder.stories.setStoriesCount(story.elements.size)
+            binder.stories.setStoryDuration(STORY_DURATION)
+            binder.stories.startStories()
         }
 
         viewModel.currentStoryLiveData.observe {
-            storyTitle.setText(it.titleRes)
-            storyBody.setText(it.bodyRes)
+            binder.storyTitle.setText(it.titleRes)
+            binder.storyBody.setText(it.bodyRes)
         }
     }
 
@@ -95,23 +82,23 @@ class StoryFragment : BaseFragment<StoryViewModel>(), StoriesProgressView.Storie
 
     override fun onDestroyView() {
         super.onDestroyView()
-        stories.destroy()
+        binder.stories.destroy()
     }
 
     private fun handleStoryTouchEvent(view: View, event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 lastActionDown = System.currentTimeMillis()
-                stories.pause()
+                binder.stories.pause()
             }
             MotionEvent.ACTION_UP -> {
-                stories.resume()
+                binder.stories.resume()
                 val eventTime = System.currentTimeMillis()
                 if (eventTime - lastActionDown < STORY_CLICK_MAX_DURATION) {
                     if (view.width / 2 < event.x) {
-                        stories.skip()
+                        binder.stories.skip()
                     } else {
-                        stories.reverse()
+                        binder.stories.reverse()
                     }
                 } else {
                     view.performClick()

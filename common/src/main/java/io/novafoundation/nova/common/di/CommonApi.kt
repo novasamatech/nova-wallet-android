@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -54,7 +55,9 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
+import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
@@ -104,6 +107,12 @@ interface CommonApi {
     val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
 
     val webViewFileChooserFactory: WebViewFileChooserFactory
+
+    val interceptingWebViewClientFactory: InterceptingWebViewClientFactory
+
+    val addressSchemeFormatter: AddressSchemeFormatter
+
+    val splashPassedObserver: SplashPassedObserver
 
     fun computationalCache(): ComputationalCache
 

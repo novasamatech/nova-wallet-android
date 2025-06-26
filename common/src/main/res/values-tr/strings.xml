@@ -14,6 +14,7 @@
     <string name="accoount_enter_evm_address">EVM Adresi geçerli veya boş olmalı...</string>
     <string name="accoount_enter_substrate_address">Geçerli bir substrate adresi giriniz...</string>
     <string name="account_add_account">Hesap ekle</string>
+    <string name="account_add_address">Adres ekle</string>
     <string name="account_add_already_exists_message">Hesap zaten var. Lütfen başka bir tane deneyin.</string>
     <string name="account_add_watch_only_description">Herhangi bir cüzdanı adresi ile takip et</string>
     <string name="account_add_watch_wallet">Yalnızca-izleme cüzdanı ekle</string>
@@ -43,6 +44,7 @@
     <string name="account_error_try_another_one">Lütfen, başka bir tane deneyin.</string>
     <string name="account_ethereum_crypto_type">Ethereum anahtar çifti kripto tipi</string>
     <string name="account_ethereum_derivation_path">Ethereum gizli türetme yolu</string>
+    <string name="account_evm_accounts">EVM Hesapları</string>
     <string name="account_export">Hesabı dışa aktar</string>
     <string name="account_export_action">Dışa Aktar</string>
     <string name="account_export_existing">Mevcut olanı içe aktar</string>
@@ -70,30 +72,36 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot uygulamanın yüklü</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda %s açın</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Polkadot uygulamasını açın</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_title">Ledger (Genel Polkadot uygulaması)</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
-    <string name="account_ledger_import_start_guide">Ledger’ın resmi Bluetooth Bağlantı Kılavuzu</string>
     <string name="account_ledger_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınızda %s olduğundan emin olun</string>
     <string name="account_ledger_import_start_step_1_highlighted">ağ uygulaması yüklendi</string>
     <string name="account_ledger_import_start_step_2">Ledger cihazınızda %s</string>
     <string name="account_ledger_import_start_step_2_highlighted">ağ uygulamasını açın</string>
     <string name="account_ledger_import_start_step_3">Nova Cüzdan\'ın %s izin verin</string>
-    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth ve Konum\'a erişimini</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth\'a erişim sağlayın</string>
     <string name="account_ledger_import_start_step_4">Cüzdana eklenecek %s</string>
     <string name="account_ledger_import_start_step_4_highlighted">Hesabı seçin</string>
-    <string name="account_ledger_import_start_title">Ledger Nano X’i bağlayın</string>
+    <string name="account_ledger_import_start_step_otg">%s telefon ayarlarında</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">OTG\'yi Etkinleştir</string>
     <string name="account_ledger_legacy_warning_message">İşlemleri imzalamak ve hesaplarınızı yeni Generic Ledger uygulamasına taşımak için Migration uygulamasını yükleyin ve açın. Eski Legacy ve Migration Ledger uygulamaları gelecekte desteklenmeyecektir.</string>
     <string name="account_ledger_legacy_warning_title">Yeni Ledger uygulaması yayımlandı</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot uygulaması)</string>
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Eski)</string>
+    <string name="account_ledger_select_device_all_description">Eğer Ledger kullanıyorsanız Bluetooth ile her iki cihazda da Bluetooth\'u etkinleştirin ve Nova\'ya Bluetooth ve konum izinleri verin. USB için, telefon ayarlarınızda OTG\'yi etkinleştirin.</string>
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
+    <string name="account_ledger_select_device_usb_description">Lütfen Ledger cihazını etkinleştirin. Ledger cihazınızı açın ve %s uygulamasını açın.</string>
+    <string name="account_migration_subtitle">Neredeyse geldiniz! 🎉\n Kurulumu tamamlamak ve hesaplarınızı hem Polkadot Uygulaması\'nda hem de Nova Cüzdan\'da sorunsuz bir şekilde kullanmaya başlamak için aşağıya dokunmanız yeterli</string>
+    <string name="account_migration_title">Nova\'ya Hoş Geldiniz!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 veya 24 kelime uzunluğunda ifade</string>
+    <string name="account_multisig">Çoklu İmza</string>
+    <string name="account_multisig_group_label">Paylaşılan kontrol (çoklu imza)</string>
     <string name="account_needed_message">Bu ağ için bir hesabınız yok, hesap oluşturabilir veya hesap aktarabilirsiniz.</string>
     <string name="account_needed_title">Hesap Gerekli</string>
     <string name="account_no_chain_projection">Hesap bulunamadı</string>
@@ -113,7 +121,8 @@
     <string name="account_parity_signer_not_supported_subtitle">%s, rasgele mesajların imzalanmasını desteklemez - yalnızca işlemler</string>
     <string name="account_parity_signer_not_supported_title">İmza desteklenmiyor</string>
     <string name="account_parity_signer_scan_from">%s\'ten QR kodunu tarayın</string>
-    <string name="account_parity_signer_scan_with">%s ile QR kodunu tarayın</string>
+    <string name="account_parity_signer_show_mode_legacy">Eski</string>
+    <string name="account_parity_signer_show_mode_new">Yeni (Vault v7+)</string>
     <string name="account_parity_signer_sign_have_error">%s\'ta bir hata var</string>
     <string name="account_parity_signer_sign_qr_code_expired">QR kodunun süresi doldu</string>
     <string name="account_parity_signer_sign_qr_code_expired_descrition" formatted="false">Güvenlik nedenleriyle oluşturulan işlemler yalnızca %s için geçerlidir.\nLütfen yeni bir QR kodu oluşturun ve %s ile imzalayın</string>
@@ -129,6 +138,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">taramak için QR kodu</string>
     <string name="account_private_key">Özel anahtar</string>
+    <string name="account_proxied">Vekil</string>
     <string name="account_proxieds">Size Delege Edilenler (Proksi)</string>
     <string name="account_proxy_type_any">Herhangi</string>
     <string name="account_proxy_type_auction">Açık Artırma</string>
@@ -144,6 +154,7 @@
     <string name="account_select_secret_source">Sırrınızın tipini seçin</string>
     <string name="account_select_wallet">Cüzdan seçin</string>
     <string name="account_shared_secret">Ortak sır ile hesaplar</string>
+    <string name="account_substrate_accounts">Substrate Hesapları</string>
     <string name="account_substrate_crypto_type">Substrate anahtar çifti kripto tipi</string>
     <string name="account_substrate_derivation_path">Substrate sır türetme yolu</string>
     <string name="account_wallet_nickname">Cüzdan adı</string>
@@ -162,6 +173,7 @@
     <string name="accounts_change_chain_account">%s hesabını değiştir</string>
     <string name="accounts_change_chain_secrets">Hesabı değiştir</string>
     <string name="accounts_ledger_legacy">Ledger (Eski)</string>
+    <string name="active_multisig_title">Paylaşılan kontrol</string>
     <string name="add_custom_node">Özel düğüm ekle</string>
     <string name="add_delegation_missing_account_message">Delege etmek için cüzdana %s hesabı eklemeniz gerekiyor</string>
     <string name="add_network_title">Ağ detaylarını girin</string>
@@ -173,6 +185,7 @@
     <string name="add_proxy_maximum_reached_error_message" formatted="false">%s\'da eklenen maksimum proxy (%s) limitine ulaştınız. Yeni eklemeler yapabilmek için proxy\'leri kaldırın.</string>
     <string name="add_proxy_maximum_reached_error_title">Maksimum proxy sayısına ulaşıldı</string>
     <string name="added_networks_empty_placeholder">Eklenen özel ağlar\nburada görünecek</string>
+    <string name="additional_payment_methods">+%d</string>
     <string name="appearance_colored_icon_title">Renkli</string>
     <string name="appearance_title">Görünüm</string>
     <string name="appearance_token_assets_title">token simgeleri</string>
@@ -240,12 +253,14 @@
     <string name="backup_settings_title">Google Drive</string>
     <string name="backup_settings_toolbar_title">Yedekleme</string>
     <string name="backup_title">Yedekleme</string>
+    <string name="banxa_provider_description">Doğrudan ve etkili KYC süreci</string>
     <string name="biometric_auth_title">Biyometrik Doğrulama</string>
     <string name="browser_tabs_close_all">Hepsini Kapat</string>
     <string name="buy_completed">Satın alma başlatıldı! Lütfen 60 dakika kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_network_flow_title">Satın alma için ağ seçin %s</string>
-    <string name="buy_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
-    <string name="buy_provider_open_confirmation_title">Tarayıcıda devam et?</string>
+    <string name="buy_order_completed_message">Satın alma başlatıldı! Lütfen 60 dakikaya kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
+    <string name="buy_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satın alınmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
+    <string name="buy_token_not_supported_title">Bu token satın alma özelliği tarafından desteklenmiyor</string>
     <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>
     <string name="chain_network_management_enabling">Bağlantıyı etkinleştir</string>
     <string name="change_cloud_backup_password_subtitle">Cüzdanlarınızı bulut yedeklemesinden kurtarmak için kullanılacak bir parola girin. Bu parolanın gelecekte kurtarılamayacağını unutmayın, bu nedenle onu hatırladığınızdan emin olun!</string>
@@ -681,8 +696,8 @@
     <string name="delegate_search_hint">Adrese veya isme göre ara</string>
     <string name="delegate_search_placeholder_empty">Adres formatı geçersiz. Adresin doğru ağa ait olduğundan emin olun</string>
     <string name="delegate_search_result_count">arama sonuçları: %d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Cüzdan otomatik olarak yetkilendirdiğiniz hesapları (Vekil) sizin için ayrı bir kategoriye ekler. Ayarlarda cüzdanları daima yönetebilirsiniz.</string>
-    <string name="delegated_accounts_fragment_title">Yetkilendirilmiş hesapların güncellenmesi</string>
+    <string name="delegated_accounts_fragment_explanation">Vekil ve Çoklu İmza hesapları otomatik algılandı ve sizin için düzenlendi. İstediğiniz zaman Ayarlar\'da yönetin.</string>
+    <string name="delegated_accounts_fragment_title">Cüzdan listesi güncellendi</string>
     <string name="delegation_all_votes">Tüm zamanlar için oylama</string>
     <string name="delegation_delegate">Yetkilendir</string>
     <string name="delegation_delegate_filter_all">Tüm hesaplar</string>
@@ -719,6 +734,7 @@
     <string name="delegation_tracks_governance_preset">Yönetim</string>
     <string name="delegation_tracks_treasury_preset">Hazine</string>
     <string name="delegation_undelegating_period">Delege Edilmeme Süresi</string>
+    <string name="delegation_updates_deactivated_title">Artık geçerli değil</string>
     <string name="delegation_your_delegation">Delegasyonunuz</string>
     <string name="delegation_your_delegations">Delegasyonlarınız</string>
     <string name="delegations_filter">Göster</string>
@@ -752,6 +768,7 @@
     <string name="fee_not_yet_loaded_message">Lütfen ücret hesaplanana kadar bekleyin</string>
     <string name="fee_not_yet_loaded_title">Ücret hesaplama işlemi sürüyor</string>
     <string name="fragment_assets_nova_card">Banka Kartını Yönet</string>
+    <string name="fragment_sell_token_title">%s tokenınıza satış</string>
     <string name="fragment_set_staking_proxy_title">Staking için %s delegasyonu ekle</string>
     <string name="fragment_swap_main_settings_details_title">Takas detayları</string>
     <string name="fragment_swap_main_settings_max_button">Maks:</string>
@@ -806,14 +823,24 @@
     <string name="json_export_btn">JSON dosyasını dışa aktar</string>
     <string name="language_title">Dil</string>
     <string name="ledger_chain_not_supported">Ledger %s desteklemiyor</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_s">Nano S</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
     <string name="ledger_error_app_cancelled_message">Operasyon cihaz tarafından iptal edildi. Ledger\'ınızın kilidini açtığınızdan emin olun.</string>
     <string name="ledger_error_app_cancelled_title">Operasyon iptal edildi</string>
     <string name="ledger_error_app_not_launched_message">Ledger cihazınızda %s uygulamasını açın</string>
     <string name="ledger_error_app_not_launched_title">%s uygulaması başlatılmadı</string>
     <string name="ledger_error_general_message">Operasyon cihazda bir hata ile tamamlandı. Lütfen, daha sonra tekrar deneyin.</string>
     <string name="ledger_error_general_title">Ledger operasyonu başarısız</string>
+    <string name="ledger_hold_to_sign">İşlemi onaylamak için %s üzerinde onaylama düğmesini basılı tutun</string>
     <string name="ledger_import_select_address_load_more">Daha fazla hesap yükle</string>
     <string name="ledger_review_approve_title">İnceleyin ve Onaylayın</string>
+    <string name="ledger_select_address_account_label">Hesap %s</string>
+    <string name="ledger_select_address_not_found">Hesap bulunamadı</string>
+    <string name="ledger_select_address_update_for_evm_message">Ledger cihazınız, EVM adreslerini desteklemeyen eski bir Generic uygulaması kullanıyor. Onu Ledger Live üzerinden güncelleyin.</string>
+    <string name="ledger_select_address_update_for_evm_title">Ledger Generic Uygulamasını Güncelleyin</string>
     <string name="ledger_sign_approve_message">İşlemi onaylamak için %s üzerindeki her iki düğmeye basın</string>
     <string name="ledger_sign_metadata_outdated_subtitle">Lütfen, %s uygulamasını Ledger Live kullanarak güncelleyin</string>
     <string name="ledger_sign_metadata_outdated_title">Metaveri güncelliğini yitirdi</string>
@@ -824,7 +851,10 @@
     <string name="ledger_sign_transaction_validity_format">İşlem %s için geçerlidir</string>
     <string name="ledger_sign_tx_not_supported_subtitle">Ledger bu işlemi desteklemiyor.</string>
     <string name="ledger_sign_tx_not_supported_title">İşlem desteklenmiyor</string>
-    <string name="ledger_verify_address_subtitle">Adresi onaylamak için %s üzerindeki her iki düğmeye basın</string>
+    <string name="ledger_verify_address_message_both_buttons">Adresi onaylamak için %s üzerindeki her iki düğmeye de basın</string>
+    <string name="ledger_verify_address_message_confirm_button">Adresi onaylamak için %s üzerindeki onaylama düğmesine basın</string>
+    <string name="ledger_verify_addresses_message_both_buttons">%s üzerindeki her iki butona da basarak adresleri onaylayın</string>
+    <string name="ledger_verify_addresses_message_confirm_button">%s üzerindeki onay butonuna basarak adresleri onaylayın</string>
     <string name="ledger_wallet_details_description">Bu cüzdan Ledger ile eşleştirildi. Nova istediğiniz herhangi bir işlemi oluşturmanıza yardımcı olacak ve bunları Ledger kullanarak imzalamanız istenecektir.</string>
     <string name="ledher_import_select_address_title">Cüzdana eklemek için hesap seçin</string>
     <string name="loading_network_info">Ağ bilgisi yükleniyor...</string>
@@ -853,6 +883,7 @@
     <string name="manual_backup_select_wallet_header">Yedeklemek için bir cüzdan seçin</string>
     <string name="manual_backup_warning_subtitle">Lütfen yedeğinizi görüntülemeden önce aşağıdakileri dikkatlice okuyun</string>
     <string name="manual_backup_warning_title">Parolanızı kimseyle paylaşmayın!</string>
+    <string name="mercurio_provider_description">3.95% kadar ücretlerle en iyi fiyat</string>
     <string name="mnemonic_card_reveal_subtitle">Kimsenin ekranınızı göremediğinden emin olun\nve ekran görüntüsü almayın</string>
     <string name="mnemonic_card_title">Lütfen %s kimseyle paylaşmayın</string>
     <string name="mnemonic_card_title_highlight">paylaşmayın</string>
@@ -863,6 +894,29 @@
         <item quantity="one">En az %d cüzdan seçin</item>
         <item quantity="other">En az %d cüzdan seçin</item>
     </plurals>
+    <string name="multisig_callhash_exists_message">%s aynı işlemi başlattı ve şu anda diğer imzalayanlar tarafından imzalanmayı bekliyor.</string>
+    <string name="multisig_callhash_exists_title">İşlem zaten mevcut</string>
+    <string name="multisig_operation_details_approve">Onayla</string>
+    <string name="multisig_operation_details_approve_and_execute">Onayla ve Gerçekleştir</string>
+    <string name="multisig_operation_details_call_data_not_found">Çağrı verisi bulunamadı</string>
+    <string name="multisig_operation_details_reject">Reddet</string>
+    <string name="multisig_operations_pending_signature">Bekleyen imza</string>
+    <string name="multisig_operations_progress" formatted="false">%s / %s İmzalandı</string>
+    <string name="multisig_operations_signed">İmzalandı</string>
+    <string name="multisig_operations_unknown_calldata">[Bilinmeyen işlem] (%s)</string>
+    <string name="multisig_pending_operations">Bekleyen işlemler</string>
+    <string name="multisig_signatory">İmza Sahibi:</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s çoklu imza depozitosu için %s yatıracak yeterli bakiyeye sahip değil. Mevcut bakiye: %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s ağ ücreti %s ve çoklu imza depozitosu için yeterli bakiyeye sahip değil. Mevcut bakiye: %s</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s bu işlem ücretini ödemek ve minimum ağ bakiyesi üzerinde kalmak için en az %s\'e ihtiyaç duyar. Mevcut bakiye: %s</string>
+    <string name="multisig_signing_is_not_supported_message">Çoklu imza cüzdanları rastgele mesaj imzalamayı desteklemez — sadece işlemler</string>
+    <string name="multisig_signing_warning_message">Çoklu imza işlemi %s tarafından başlatılacak. Başlatıcı ağ ücretini öder ve bir çoklu imza depozitosu ayırır, işlem tamamlandığında bu yeniden ayırılır.</string>
+    <string name="multisig_signing_warning_title">Çoklu İmza işlemi</string>
+    <string name="multisig_transaction_created_subtitle">Diğer imza sahipleri şimdi işlemi onaylayabilir.\nDurumunu %s içinde izleyebilirsiniz</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Çoklu imza işlemleri.</string>
+    <string name="multisig_transaction_created_title">Çoklu İmza işlemi oluşturuldu</string>
+    <string name="multisig_transaction_created_view_details">Detayları Görüntüle</string>
+    <string name="multisig_wallet_details_info_warning">Bu cüzdandan yapılan işlemler birden fazla imza sahibinin onayını gerektirir. Hesabınız bu imza sahiplerinden biridir:</string>
     <string name="network_already_exist_failure_title">Bu Düğüm zaten mevcut</string>
     <string name="network_fee">Ağ ücreti</string>
     <string name="network_info_address">Düğüm adresi</string>
@@ -959,8 +1013,6 @@
     <string name="profile_settings_safe_mode_title">Güvenli mod</string>
     <string name="profile_settings_title">Ayarlar</string>
     <string name="proxied_wallet_details_info_warning">Bu hesap aşağıdaki hesaba işlem yapma yetkisi verdi:</string>
-    <string name="proxieds_updates_deactivated_title">Artık geçerli değil</string>
-    <string name="proxy_about">Proxy nedir?</string>
     <string name="proxy_access_type_staking_operations">Staking operasyonları</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Temsil edilen hesap %s, %s tutarındaki ağ ücretini ödemek için yeterli bakiyeye sahip değil. Ücreti ödemek için kullanılabilir bakiye: %s</string>
     <string name="proxy_signing_is_not_supported_message">Temsilci cüzdanlar rastgele mesajların imzalanmasını desteklemiyor - yalnızca işlemler</string>
@@ -1164,11 +1216,16 @@
     <string name="select_delegation_tracks_edit_title">Delegasyonu düzenlemek için yolları seçin</string>
     <string name="select_delegation_tracks_revoke_title">Delegasyonunuzu iptal etmek için yolları seçin</string>
     <string name="select_delegation_tracks_unavailable_tracks">Ulaşılamayan yollar</string>
+    <string name="select_ledger_grant_permissions">Bluetooth\'u Etkinleştir &amp; İzin Ver</string>
     <string name="select_ledger_location_enable_request_message">Nova\'nın Bluetooth taraması yaparak Ledger cihazınızı bulabilmesi için konumun etkinleştirilmesi gerekiyor</string>
     <string name="select_ledger_location_enable_request_title">Lütfen cihaz ayarlarında coğrafi konumu etkinleştirin</string>
     <string name="select_network_title">Ağ seç</string>
     <string name="select_tracks_for">İçin şarkıları seçin</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
+    <string name="sell_network_flow_title">%s satışı için ağı seçin</string>
+    <string name="sell_order_completed_message">Satış başlatıldı! Lütfen 60 dakikaya kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
+    <string name="sell_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satılmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
+    <string name="sell_token_not_supported_title">Bu token satış özelliği tarafından desteklenmiyor</string>
     <string name="send_address_hint">Adres veya w3n</string>
     <string name="send_network_flow_title">Gönderme için ağ seçin %s</string>
     <string name="send_recipient_system_account_message">Alıcı, bir sistem hesabıdır. Bir şirket veya birey tarafından kontrol edilmez.\nBu transferi gerçekleştirmek istediğinize emin misiniz?</string>
@@ -1512,6 +1569,8 @@
     <string name="start_create_wallet_name_your_wallet">Cüzdanınıza bir ad verin</string>
     <string name="start_create_wallet_set_wallet_name_explanation">Bu yalnızca sizin tarafınızdan görülecek ve daha sonra düzenleyebilirsiniz.</string>
     <string name="start_create_wallet_your_wallet_is_ready">Cüzdanınız hazır</string>
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
     <string name="start_staking_available_balance_gap_message" formatted="false">Bakiyenizde %s nedeniyle kilitlenmiş tokenlarınız var. Devam etmek için %s\'dan az ya da %s\'dan fazla bir miktar girmelisiniz. Başka bir miktar yatırmak için %s kilitlerinizi kaldırmalısınız.</string>
     <string name="start_staking_cant_stake_amount">Belirtilen miktarı yatıramazsınız</string>
     <string name="start_staking_editing_selection_validators_subtitle" formatted="false">Seçilen: %d (maksimum %d)</string>
@@ -1566,6 +1625,7 @@
     <string name="swap_execution_time">Gerçekleşme süresi</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">Ödeme yaptıktan sonra ağ ücreti olarak %s tutarında en azından %s tutmanız gerekmektedir çünkü yeterli olmayan tokenlara sahipsiniz</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s token almak için en az %s tutmalısınız</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">%s tokenini almak için %s üzerinde en az %s olmalıdır</string>
     <string name="swap_failure_insufficient_balance_message">Ağ ücreti için %2$s ödemeniz gerektiği için en fazla %1$s tutarında takas yapabilirsiniz.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">Ağ ücreti olarak %2$s ödemeniz ve %5$s asgari bakiyeyi karşılamak için %3$s\'i %4$s\'e dönüştürmeniz gerektiği için en fazla %1$s kadar takas yapabilirsiniz.</string>
     <string name="swap_failure_swap_max_button">Maksimuma Takas</string>
@@ -1645,6 +1705,13 @@
     <string name="tabbar_wallet_title">Cüzdan</string>
     <string name="today">Bugün</string>
     <string name="token_price_info_provider_label">Fiyat bilgisi için Coingecko bağlantısı (İsteğe bağlı)</string>
+    <string name="trade_provider_list_buy_title">%s tokenını satın almak için bir sağlayıcı seçin</string>
+    <string name="trade_provider_list_footer">Ödeme yöntemleri, ücretler ve limitler sağlayıcıya göre farklılık gösterir.\nSizin için en iyi seçeneği bulmak için teklifleri karşılaştırın.</string>
+    <string name="trade_provider_list_sell_title">%s tokenının satışını yapmak için bir sağlayıcı seçin</string>
+    <string name="trade_provider_open_confirmation_message">Satın alma işlemine devam etmek için Nova Wallet uygulamasından %s\'a yönlendirileceksiniz</string>
+    <string name="trade_provider_open_confirmation_title">Tarayıcıda devam et?</string>
+    <string name="trade_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satın alma veya satılmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
+    <string name="trade_token_not_supported_title">Bu token alış/satış özelliği tarafından desteklenmiyor</string>
     <string name="transaction_details_copy_hash">Hash\'i kopyala</string>
     <string name="transaction_details_extrinsic_fee">Ücret</string>
     <string name="transaction_details_from">Gönderen</string>
@@ -1658,6 +1725,8 @@
     <string name="transaction_status_failed">Başarısız</string>
     <string name="transaction_status_pending">Beklemede</string>
     <string name="transactions_notification_channel_name">İşlem Bildirim Kanalı</string>
+    <string name="transak_provider_buy_description">Sadece $5 ile kripto satın al</string>
+    <string name="transak_provider_sell_description">Sadece $10 ile kripto sat</string>
     <string name="transfer_history_income_from">%s tarafından</string>
     <string name="transfer_history_send_to">Alıcı: %s</string>
     <string name="transfer_title">Transfer</string>
@@ -1695,10 +1764,14 @@
     <string name="waiting_top_up_card_description">Bu işlem 5 dakika kadar sürebilir.\nBu pencere otomatik olarak kapatılacaktır.</string>
     <string name="waiting_top_up_card_timer">Tahmini %s</string>
     <string name="wallet_asset_buy">Satın al</string>
+    <string name="wallet_asset_buy_sell">Al/Sat</string>
+    <string name="wallet_asset_buy_tokens">Token al</string>
     <string name="wallet_asset_buy_with">ile Satın al</string>
     <string name="wallet_asset_receive">Al</string>
     <string name="wallet_asset_receive_token">%s al</string>
     <string name="wallet_asset_receive_token_subtitle">Bu adrese yalnızca %1$s token ve %2$s ağındaki tokenleri gönderin, aksi takdirde paranızı kaybedebilirsiniz</string>
+    <string name="wallet_asset_sell">Sat</string>
+    <string name="wallet_asset_sell_tokens">Token sat</string>
     <string name="wallet_asset_send">Gönder</string>
     <string name="wallet_asset_swap">Takas et</string>
     <string name="wallet_assets">Varlıklar</string>

@@ -6,7 +6,8 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 
 internal class RealHydrationFeeInjector(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
@@ -21,7 +22,7 @@ internal class RealHydrationFeeInjector(
         extrinsicBuilder.resetCalls()
 
         val justSetFees = getSetPhase(mode.setMode).setFees(extrinsicBuilder, paymentAsset)
-        extrinsicBuilder.calls(baseCalls)
+        extrinsicBuilder.addCalls(baseCalls)
         getResetPhase(mode.resetMode).resetFees(extrinsicBuilder, justSetFees)
     }
 

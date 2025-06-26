@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -23,12 +23,17 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_dapp_api'
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
     implementation project(':feature-account-api')
     implementation project(":feature-external-sign-api")
     implementation project(':common')
+    implementation project(':feature-deep-linking')
 
     implementation shimmerDep
 

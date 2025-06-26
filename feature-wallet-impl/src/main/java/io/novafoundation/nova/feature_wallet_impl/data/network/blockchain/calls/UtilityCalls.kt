@@ -13,7 +13,7 @@ fun RuntimeSnapshot.composeDispatchAs(
     return composeCall(
         moduleName = Modules.UTILITY,
         callName = "dispatch_as",
-        args = mapOf(
+        arguments = mapOf(
             "as_origin" to origin.toEncodableInstance(),
             "call" to call
         )
@@ -26,7 +26,7 @@ fun RuntimeSnapshot.composeBatchAll(
     return composeCall(
         moduleName = Modules.UTILITY,
         callName = "batch_all",
-        args = mapOf(
+        arguments = mapOf(
             "calls" to calls
         )
     )

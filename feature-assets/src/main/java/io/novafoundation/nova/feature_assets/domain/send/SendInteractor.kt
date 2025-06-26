@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_assets.domain.send
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
+import io.novafoundation.nova.feature_account_api.data.signer.isImmediate
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -65,7 +67,7 @@ class SendInteractor(
         originFee: OriginFee,
         crossChainFee: FeeBase?,
         coroutineScope: CoroutineScope
-    ): Result<*> = withContext(Dispatchers.Default) {
+    ): Result<ExtrinsicSubmission> = withContext(Dispatchers.Default) {
         if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
@@ -77,8 +79,11 @@ class SendInteractor(
 
             getAssetTransfers(transfer).performTransfer(transfer, coroutineScope)
                 .onSuccess { submission ->
-                    // Insert used fee regardless of who paid it
-                    walletRepository.insertPendingTransfer(submission.hash, transfer, submissionFee)
+                    // Only add pending history items for calls that are executed immediately
+                    if (submission.callExecutionType.isImmediate()) {
+                        // Insert used fee regardless of who paid it
+                        walletRepository.insertPendingTransfer(submission.hash, transfer, submissionFee)
+                    }
                 }
         }
     }

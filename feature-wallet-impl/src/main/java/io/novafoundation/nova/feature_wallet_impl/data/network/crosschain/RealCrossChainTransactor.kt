@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requi
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdatePoint
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.tryDetectDeposit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
@@ -47,7 +47,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.hasEvent
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -181,18 +181,13 @@ class RealCrossChainTransactor(
         return toProduceBlockOnOrigin + toProduceBlockOnRelay + toProduceBlockOnDestination
     }
 
-    private suspend fun Flow<Result<TransferableBalanceUpdate>>.awaitCrossChainArrival(transfer: AssetTransferBase): Result<Balance> {
+    private suspend fun Flow<Result<TransferableBalanceUpdatePoint>>.awaitCrossChainArrival(transfer: AssetTransferBase): Result<Balance> {
         return runCatching {
             withTimeout(60.seconds) {
                 transformResult { balanceUpdate ->
                     Log.d("CrossChain", "Destination balance update detected: $balanceUpdate")
 
                     val updatedAt = balanceUpdate.updatedAt
-
-                    if (updatedAt == null) {
-                        Log.w("CrossChain", "Update block hash was not present, maybe wrong datasource is used?")
-                        return@transformResult
-                    }
 
                     val blockEvents = eventsRepository.getBlockEvents(transfer.destinationChain.id, updatedAt)
 
@@ -254,14 +249,13 @@ class RealCrossChainTransactor(
         }
     }
 
-    private suspend fun observeTransferableBalance(transfer: AssetTransferBase): Flow<TransferableBalanceUpdate> {
+    private suspend fun observeTransferableBalance(transfer: AssetTransferBase): Flow<TransferableBalanceUpdatePoint> {
         val destinationAssetBalances = assetSourceRegistry.sourceFor(transfer.destinationChainAsset)
 
-        return destinationAssetBalances.balance.subscribeTransferableAccountBalance(
+        return destinationAssetBalances.balance.subscribeAccountBalanceUpdatePoint(
             chain = transfer.destinationChain,
             chainAsset = transfer.destinationChainAsset,
             accountId = transfer.recipientAccountId.value,
-            sharedSubscriptionBuilder = null
         )
     }
 

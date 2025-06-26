@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenReposito
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.validation.MultisigExtrinsicValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
@@ -70,6 +72,10 @@ interface WalletFeatureApi {
     val assetsValidationContextFactory: AssetsValidationContext.Factory
 
     val statemineAssetsRepository: StatemineAssetsRepository
+
+    val multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
+
+    val accountInfoRepository: AccountInfoRepository
 
     fun provideWalletRepository(): WalletRepository
 

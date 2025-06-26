@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -15,10 +16,12 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
@@ -45,16 +48,24 @@ class AccountDetailsModule {
         proxyFormatter: ProxyFormatter,
         interactor: WalletDetailsInteractor,
         appLinksProvider: AppLinksProvider,
-        ledgerMigrationTracker: LedgerMigrationTracker
+        ledgerMigrationTracker: LedgerMigrationTracker,
+        multisigFormatter: MultisigFormatter,
+        router: AccountRouter,
+        addressSchemeFormatter: AddressSchemeFormatter,
+        chainRegistry: ChainRegistry
     ): WalletDetailsMixinFactory {
         return WalletDetailsMixinFactory(
-            polkadotVaultVariantConfigProvider,
-            resourceManager,
-            accountFormatterFactory,
-            proxyFormatter,
-            interactor,
-            appLinksProvider,
-            ledgerMigrationTracker
+            polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
+            resourceManager = resourceManager,
+            accountFormatterFactory = accountFormatterFactory,
+            proxyFormatter = proxyFormatter,
+            multisigFormatter = multisigFormatter,
+            interactor = interactor,
+            appLinksProvider = appLinksProvider,
+            ledgerMigrationTracker = ledgerMigrationTracker,
+            router = router,
+            addressSchemeFormatter = addressSchemeFormatter,
+            chainRegistry = chainRegistry
         )
     }
 
@@ -70,7 +81,8 @@ class AccountDetailsModule {
         chainRegistry: ChainRegistry,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
-        walletDetailsMixinFactory: WalletDetailsMixinFactory
+        walletDetailsMixinFactory: WalletDetailsMixinFactory,
+        addressActionsMixinFactory: AddressActionsMixin.Factory
     ): ViewModel {
         return WalletDetailsViewModel(
             rootScope = rootScope,
@@ -81,7 +93,8 @@ class AccountDetailsModule {
             chainRegistry = chainRegistry,
             importTypeChooserMixin = importTypeChooserMixin,
             addAccountLauncherPresentationFactory = addAccountLauncherPresentationFactory,
-            walletDetailsMixinFactory = walletDetailsMixinFactory
+            walletDetailsMixinFactory = walletDetailsMixinFactory,
+            addressActionsMixinFactory = addressActionsMixinFactory
         )
     }
 

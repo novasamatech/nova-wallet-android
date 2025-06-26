@@ -8,13 +8,14 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
-import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -48,11 +49,13 @@ class ConfirmUnbondViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val payload: ConfirmUnbondPayload,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     unbondHintsMixinFactory: UnbondHintsMixinFactory,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -132,16 +135,15 @@ class ConfirmUnbondViewModel(
     private fun sendTransaction(validPayload: UnbondValidationPayload) = launch {
         val amountInPlanks = validPayload.asset.token.configuration.planksFromAmount(payload.amount)
 
-        val result = unbondInteractor.unbond(validPayload.stash, validPayload.asset.bondedInPlanks, amountInPlanks)
+        unbondInteractor.unbond(validPayload.stash, validPayload.asset.bondedInPlanks, amountInPlanks)
+            .onSuccess {
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+
+                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
+            }.onFailure {
+                showError(it)
+            }
 
         _showNextProgress.value = false
-
-        if (result.isSuccess) {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-
-            router.returnToStakingMain()
-        } else {
-            showError(result.requireException())
-        }
     }
 }

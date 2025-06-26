@@ -22,11 +22,11 @@ import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryProvider
-import io.novafoundation.nova.feature_buy_api.presentation.mixin.BuyMixin
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
@@ -93,7 +93,6 @@ class BalanceDetailModule {
         sendInteractor: SendInteractor,
         router: AssetsRouter,
         transactionHistoryMixin: TransactionHistoryMixin,
-        buyMixinFactory: BuyMixin.Factory,
         assetPayload: AssetPayload,
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
@@ -102,7 +101,8 @@ class BalanceDetailModule {
         externalBalancesInteractor: ExternalBalancesInteractor,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
-        chartsInteractor: ChartsInteractor
+        chartsInteractor: ChartsInteractor,
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -110,7 +110,6 @@ class BalanceDetailModule {
             sendInteractor = sendInteractor,
             router = router,
             assetPayload = assetPayload,
-            buyMixinFactory = buyMixinFactory,
             transactionHistoryMixin = transactionHistoryMixin,
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
@@ -119,7 +118,8 @@ class BalanceDetailModule {
             externalBalancesInteractor = externalBalancesInteractor,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
-            chartsInteractor = chartsInteractor
+            chartsInteractor = chartsInteractor,
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory
         )
     }
 

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.acala.ContributionType
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class AcalaCustomizationPayload(

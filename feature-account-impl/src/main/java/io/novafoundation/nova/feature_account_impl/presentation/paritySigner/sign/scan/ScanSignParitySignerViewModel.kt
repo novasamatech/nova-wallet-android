@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan
 
+import android.util.Log
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
@@ -40,7 +41,7 @@ class ScanSignParitySignerViewModel(
     val title = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_title, payload.variant)
     val scanLabel = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_scan_from, payload.variant)
 
-    private val validityPeriod = mapValidityPeriodFromParcel(payload.validityPeriod)
+    private val validityPeriod = payload.validityPeriod?.let(::mapValidityPeriodFromParcel)
     val validityPeriodFlow = flowOf(validityPeriod)
 
     fun backClicked() {
@@ -49,14 +50,16 @@ class ScanSignParitySignerViewModel(
 
     fun timerFinished() {
         launch {
-            qrCodeExpiredPresentable.showQrCodeExpired(validityPeriod)
+            qrCodeExpiredPresentable.showQrCodeExpired(validityPeriod!!)
         }
     }
 
     override suspend fun scanned(result: String) {
-        interactor.encodeAndVerifySignature(signSharedState.getOrThrow().extrinsic, result)
+        interactor.encodeAndVerifySignature(signSharedState.getOrThrow().payload, result)
             .onSuccess(::respondResult)
             .onFailure {
+                Log.e("ScanSignParitySignerViewModel", "Failed to verify signature", it)
+
                 invalidQrConfirmation.awaitAction()
 
                 resetScanning()

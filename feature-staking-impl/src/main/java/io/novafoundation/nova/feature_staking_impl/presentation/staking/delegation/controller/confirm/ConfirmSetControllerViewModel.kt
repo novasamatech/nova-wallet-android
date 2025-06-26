@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
@@ -39,10 +40,12 @@ class ConfirmSetControllerViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: SetControllerValidationSystem,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -109,18 +112,16 @@ class ConfirmSetControllerViewModel(
     }
 
     private fun sendTransaction() = launch {
-        val result = controllerInteractor.setController(
+        controllerInteractor.setController(
             stashAccountAddress = payload.stashAddress,
             controllerAccountAddress = payload.controllerAddress
-        )
-
-        submittingInProgress.value = false
-
-        if (result.isSuccess) {
+        ).onSuccess {
             showMessage(resourceManager.getString(R.string.staking_controller_change_success))
 
             router.returnToStakingMain()
         }
+
+        submittingInProgress.value = false
     }
 
     private suspend fun generateIcon(address: String) = addressIconGenerator.createAccountAddressModel(

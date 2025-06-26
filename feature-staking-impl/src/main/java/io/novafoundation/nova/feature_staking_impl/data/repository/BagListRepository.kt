@@ -6,12 +6,14 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.electionProviderMultiPhaseOrNull
+import io.novafoundation.nova.common.utils.getAs
 import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.common.utils.voterListOrNull
 import io.novafoundation.nova.feature_staking_impl.domain.bagList.BagListLocator
 import io.novafoundation.nova.feature_staking_impl.domain.model.BagListNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novafoundation.nova.runtime.network.binding.collectionOf
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -40,7 +42,7 @@ class LocalBagListRepository(
 ) : BagListRepository {
 
     override suspend fun bagThresholds(chainId: ChainId): List<BagListNode.Score>? {
-        return localStorage.query(chainId) {
+        return chainRegistry.withRuntime(chainId) {
             runtime.metadata.voterListOrNull()?.constant("BagThresholds")?.getAs(collectionOf(::score))
         }
     }

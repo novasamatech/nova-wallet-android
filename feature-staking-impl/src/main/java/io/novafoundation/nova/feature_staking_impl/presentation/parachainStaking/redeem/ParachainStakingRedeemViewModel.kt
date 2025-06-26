@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.redeem.ParachainStakingRedeemInteractor
@@ -44,6 +46,7 @@ class ParachainStakingRedeemViewModel(
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
     private val delegatorStateUseCase: DelegatorStateUseCase,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
@@ -51,7 +54,8 @@ class ParachainStakingRedeemViewModel(
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -127,10 +131,10 @@ class ParachainStakingRedeemViewModel(
     private fun sendTransaction() = launch {
         interactor.redeem(delegatorState.first())
             .onFailure(::showError)
-            .onSuccess { redeemConsequences ->
+            .onSuccess { (submissionResult, redeemConsequences) ->
                 showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishRedeemFlow(redeemConsequences)
+                startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
             }
 
         _showNextProgress.value = false

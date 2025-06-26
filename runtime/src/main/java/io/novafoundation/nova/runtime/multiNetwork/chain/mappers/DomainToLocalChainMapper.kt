@@ -97,6 +97,7 @@ fun mapChainAssetToLocal(asset: Chain.Asset, gson: Gson): ChainAssetLocal {
         type = type,
         source = mapAssetSourceToLocal(asset.source),
         buyProviders = gson.toJson(asset.buyProviders),
+        sellProviders = gson.toJson(asset.sellProviders),
         typeExtras = gson.toJson(typeExtras),
         icon = asset.icon,
         enabled = asset.enabled
@@ -193,10 +194,11 @@ fun mapChainExternalApiToLocal(gson: Gson, chainId: String, api: ExternalApi): C
         is ExternalApi.GovernanceReferenda -> mapExternalApiGovernanceReferenda(gson, chainId, api)
         is ExternalApi.Staking -> mapExternalApiStaking(chainId, api)
         is ExternalApi.ReferendumSummary -> mapExternalApiReferendumSummary(chainId, api)
+        is ExternalApi.Multisig -> mapExternalApiMultisig(chainId, api)
     }
 }
 
-fun mapExternalApiTransfers(gson: Gson, chainId: String, api: ExternalApi.Transfers): ChainExternalApiLocal {
+private fun mapExternalApiTransfers(gson: Gson, chainId: String, api: ExternalApi.Transfers): ChainExternalApiLocal {
     fun transferParametersByType(gson: Gson, type: String): String {
         return gson.toJson(TransferParameters(type))
     }
@@ -215,7 +217,7 @@ fun mapExternalApiTransfers(gson: Gson, chainId: String, api: ExternalApi.Transf
     )
 }
 
-fun mapExternalApiCrowdloans(chainId: String, api: ExternalApi.Crowdloans): ChainExternalApiLocal {
+private fun mapExternalApiCrowdloans(chainId: String, api: ExternalApi.Crowdloans): ChainExternalApiLocal {
     return ChainExternalApiLocal(
         chainId = chainId,
         sourceType = SourceType.GITHUB,
@@ -225,7 +227,7 @@ fun mapExternalApiCrowdloans(chainId: String, api: ExternalApi.Crowdloans): Chai
     )
 }
 
-fun mapExternalApiGovernanceDelegations(chainId: String, api: ExternalApi.GovernanceDelegations): ChainExternalApiLocal {
+private fun mapExternalApiGovernanceDelegations(chainId: String, api: ExternalApi.GovernanceDelegations): ChainExternalApiLocal {
     return ChainExternalApiLocal(
         chainId = chainId,
         sourceType = SourceType.SUBQUERY,
@@ -235,7 +237,7 @@ fun mapExternalApiGovernanceDelegations(chainId: String, api: ExternalApi.Govern
     )
 }
 
-fun mapExternalApiGovernanceReferenda(gson: Gson, chainId: String, api: ExternalApi.GovernanceReferenda): ChainExternalApiLocal {
+private fun mapExternalApiGovernanceReferenda(gson: Gson, chainId: String, api: ExternalApi.GovernanceReferenda): ChainExternalApiLocal {
     val (source, parameters) = when (api.source) {
         ExternalApi.GovernanceReferenda.Source.SubSquare -> SourceType.SUBSQUARE to null
 
@@ -253,7 +255,7 @@ fun mapExternalApiGovernanceReferenda(gson: Gson, chainId: String, api: External
     )
 }
 
-fun mapExternalApiStaking(chainId: String, api: ExternalApi.Staking): ChainExternalApiLocal {
+private fun mapExternalApiStaking(chainId: String, api: ExternalApi.Staking): ChainExternalApiLocal {
     return ChainExternalApiLocal(
         chainId = chainId,
         sourceType = SourceType.SUBQUERY,
@@ -263,11 +265,21 @@ fun mapExternalApiStaking(chainId: String, api: ExternalApi.Staking): ChainExter
     )
 }
 
-fun mapExternalApiReferendumSummary(chainId: String, api: ExternalApi.ReferendumSummary): ChainExternalApiLocal {
+private fun mapExternalApiReferendumSummary(chainId: String, api: ExternalApi.ReferendumSummary): ChainExternalApiLocal {
     return ChainExternalApiLocal(
         chainId = chainId,
         sourceType = SourceType.UNKNOWN,
         apiType = ChainExternalApiLocal.ApiType.REFERENDUM_SUMMARY,
+        parameters = null,
+        url = api.url
+    )
+}
+
+private fun mapExternalApiMultisig(chainId: String, api: ExternalApi.Multisig): ChainExternalApiLocal {
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = SourceType.SUBSQUARE,
+        apiType = ChainExternalApiLocal.ApiType.MULTISIG,
         parameters = null,
         url = api.url
     )

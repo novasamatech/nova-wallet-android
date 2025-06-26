@@ -5,12 +5,12 @@ import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.SignInterScreenCommunicator
 import io.novafoundation.nova.runtime.extrinsic.ValidityPeriod
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ScanSignParitySignerPayload(
     val request: SignInterScreenCommunicator.Request,
-    val validityPeriod: ValidityPeriodParcel,
+    val validityPeriod: ValidityPeriodParcel?,
     val variant: PolkadotVaultVariant,
 ) : Parcelable
 

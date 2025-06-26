@@ -76,7 +76,7 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun finishParitySignerFlow()
 
-    fun openAddLedgerChainAccountFlow(payload: AddAccountPayload.ChainAccount)
+    fun openAddLedgerChainAccountFlow(addAccountPayload: AddAccountPayload.ChainAccount)
 
     fun openCreateCloudBackupPassword(walletName: String)
 
@@ -103,4 +103,8 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
     fun closeChainAddressesSelector()
 
     fun finishApp()
+
+    fun openAddGenericEvmAddressSelectLedger(metaId: Long)
+
+    fun openMainWithFinishMultisigTransaction()
 }

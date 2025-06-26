@@ -8,9 +8,9 @@
     tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/selectLedgerToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/selectLedgerToolbar"
         app:dividerVisible="false" />
 
     <TextView
@@ -20,25 +20,34 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:textColor="@color/text_primary"
-        android:text="@string/account_ledger_select_device_title" />
+        android:text="@string/account_ledger_select_device_title"
+        android:textColor="@color/text_primary" />
 
     <TextView
+        android:id="@+id/selectLedgerHints"
         style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/selectLedgerHints"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:textColor="@color/text_secondary"
         tools:text="@string/account_ledger_select_device_description" />
 
+    <io.novafoundation.nova.common.view.ReadMoreView
+        android:id="@+id/selectLedgerGrantPermissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:text="@string/select_ledger_grant_permissions"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/selectLedgerDevices"
         android:layout_width="match_parent"
-        android:layout_marginTop="16dp"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:layout_weight="1"
         android:visibility="gone"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

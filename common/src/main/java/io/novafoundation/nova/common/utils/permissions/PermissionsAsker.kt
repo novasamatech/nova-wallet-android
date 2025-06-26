@@ -16,6 +16,12 @@ interface PermissionsAsker {
     val showPermissionsDenied: ActionAwaitableMixin<PermissionDeniedLevel, PermissionDeniedAction>
 
     interface Presentation : PermissionsAsker {
-        suspend fun requirePermissionsOrExit(vararg permissions: Permission): Boolean
+        suspend fun requirePermissions(vararg permissions: Permission): Boolean
+
+        fun checkPermissions(vararg permissions: Permission): Boolean
     }
+}
+
+fun PermissionsAsker.Presentation.checkPermissions(permissions: List<Permission>): Boolean {
+    return checkPermissions(*permissions.toTypedArray())
 }

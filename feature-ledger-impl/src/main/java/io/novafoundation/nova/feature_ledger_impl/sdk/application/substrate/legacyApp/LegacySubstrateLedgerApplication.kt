@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.legacyApp
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.chunked
 import io.novafoundation.nova.feature_ledger_api.data.repository.LedgerRepository
+import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerEvmAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
@@ -15,8 +15,7 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Subs
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.getConfig
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
 
 class LegacySubstrateLedgerApplication(
     private val transport: LedgerTransport,
@@ -24,7 +23,7 @@ class LegacySubstrateLedgerApplication(
     private val supportedApplications: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all(),
 ) : SubstrateLedgerApplication {
 
-    override suspend fun getAccount(
+    override suspend fun getSubstrateAccount(
         device: LedgerDevice,
         chainId: ChainId,
         accountIndex: Int,
@@ -45,18 +44,20 @@ class LegacySubstrateLedgerApplication(
             device = device
         )
 
-        Log.w("Ledger", "Got response (${rawResponse.size} bytes): ${rawResponse.joinToString()}")
+        return SubstrateLedgerAppCommon.parseSubstrateAccountResponse(rawResponse, derivationPath)
+    }
 
-        return SubstrateLedgerAppCommon.parseAccountResponse(rawResponse, derivationPath)
+    override suspend fun getEvmAccount(device: LedgerDevice, accountIndex: Int, confirmAddress: Boolean): LedgerEvmAccount? {
+        return null
     }
 
     override suspend fun getSignature(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: SignerPayloadExtrinsic,
+        payload: InheritedImplication,
     ): SignatureWrapper {
-        val payloadBytes = payload.encodedSignaturePayload(hashBigPayloads = false)
+        val payloadBytes = payload.encoded()
         val applicationConfig = supportedApplications.getConfig(chainId)
 
         val derivationPath = ledgerRepository.getChainAccountDerivationPath(metaId, chainId)
@@ -81,6 +82,6 @@ class LegacySubstrateLedgerApplication(
 
         val signatureWithType = results.last()
 
-        return SubstrateLedgerAppCommon.parseSignature(signatureWithType)
+        return SubstrateLedgerAppCommon.parseMultiSignature(signatureWithType)
     }
 }

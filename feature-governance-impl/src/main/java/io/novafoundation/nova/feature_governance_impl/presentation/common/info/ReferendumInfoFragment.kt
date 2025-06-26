@@ -2,32 +2,21 @@ package io.novafoundation.nova.feature_governance_impl.presentation.common.info
 
 import android.os.Bundle
 import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.setAddressOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_governance_impl.R
+import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendumInfoBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.common.share.setupReferendumSharing
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTimeEstimation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.model.setReferendumTrackModel
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoContainer
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoDescription
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoNumber
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoProgress
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoProposer
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoTime
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoTitle
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoToolbar
-import kotlinx.android.synthetic.main.fragment_referendum_info.referendumInfoTrack
 
-class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
+class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel, FragmentReferendumInfoBinding>() {
 
     companion object {
         private const val KEY_PAYLOAD = "KEY_PAYLOAD"
@@ -39,20 +28,14 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ): View? {
-        return inflater.inflate(R.layout.fragment_referendum_info, container, false)
-    }
+    override fun createBinding() = FragmentReferendumInfoBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        referendumInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.referendumInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        referendumInfoToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
+        binder.referendumInfoToolbar.setRightActionClickListener { viewModel.shareButtonClicked() }
 
-        referendumInfoProposer.setOnClickListener {
+        binder.referendumInfoProposer.setOnClickListener {
             viewModel.proposerClicked()
         }
     }
@@ -68,15 +51,15 @@ class ReferendumInfoFragment : BaseFragment<ReferendumInfoViewModel>() {
         setupExternalActions(viewModel)
         setupReferendumSharing(viewModel.shareReferendumMixin)
 
-        viewModel.titleFlow.observe { referendumInfoTitle.text = it }
-        viewModel.subtitleFlow.observe { referendumInfoDescription.text = it }
-        viewModel.idFlow.observe { referendumInfoNumber.setText(it) }
-        viewModel.trackFlow.observe { referendumInfoTrack.setReferendumTrackModel(it) }
-        viewModel.timeEstimation.observe { referendumInfoTime.setReferendumTimeEstimation(it, Gravity.END) }
-        viewModel.proposerAddressModel.observeWhenVisible(referendumInfoProposer::setAddressOrHide)
+        viewModel.titleFlow.observe { binder.referendumInfoTitle.text = it }
+        viewModel.subtitleFlow.observe { binder.referendumInfoDescription.text = it }
+        viewModel.idFlow.observe { binder.referendumInfoNumber.setText(it) }
+        viewModel.trackFlow.observe { binder.referendumInfoTrack.setReferendumTrackModel(it) }
+        viewModel.timeEstimation.observe { binder.referendumInfoTime.setReferendumTimeEstimation(it, Gravity.END) }
+        viewModel.proposerAddressModel.observeWhenVisible(binder.referendumInfoProposer::setAddressOrHide)
         viewModel.isLoadingState.observe {
-            referendumInfoContainer.isGone = it
-            referendumInfoProgress.isVisible = it
+            binder.referendumInfoContainer.isGone = it
+            binder.referendumInfoProgress.isVisible = it
         }
     }
 }

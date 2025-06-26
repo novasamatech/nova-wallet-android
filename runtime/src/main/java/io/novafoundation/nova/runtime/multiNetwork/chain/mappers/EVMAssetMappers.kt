@@ -31,6 +31,7 @@ fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote, gson: Gson): 
             source = AssetSourceLocal.ERC20,
             type = type,
             buyProviders = gson.toJson(it.buyProviders),
+            sellProviders = gson.toJson(it.sellProviders),
             typeExtras = gson.toJson(typeExtras),
             enabled = true
         )

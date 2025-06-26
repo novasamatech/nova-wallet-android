@@ -3,15 +3,12 @@ package io.novafoundation.nova.feature_governance_impl.presentation.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
-import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_governance_impl.R
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockAmount
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockedIcon
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceLockedTitle
-import kotlinx.android.synthetic.main.view_governance_locks.view.governanceUnlockBadge
+import io.novafoundation.nova.feature_governance_impl.databinding.ViewGovernanceLocksBinding
 
 class GovernanceLocksView @JvmOverloads constructor(
     context: Context,
@@ -19,12 +16,12 @@ class GovernanceLocksView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
-    init {
-        View.inflate(context, R.layout.view_governance_locks, this)
+    private val binder = ViewGovernanceLocksBinding.inflate(inflater(), this)
 
+    init {
         setBackgroundResource(R.drawable.bg_primary_list_item)
 
-        governanceLockAmount.isEnabled = false
+        binder.governanceLockAmount.isEnabled = false
 
         attrs?.let(::applyAttributes)
     }
@@ -38,17 +35,17 @@ class GovernanceLocksView @JvmOverloads constructor(
     }
 
     fun setTitle(title: String) {
-        governanceLockedTitle.text = title
+        binder.governanceLockedTitle.text = title
     }
 
     fun setLeftIcon(icon: Drawable?) {
-        governanceLockedIcon.setImageDrawable(icon)
+        binder.governanceLockedIcon.setImageDrawable(icon)
     }
 
     fun setModel(model: GovernanceLocksModel) {
-        governanceLockedTitle.text = model.title
-        governanceLockAmount.setTextOrHide(model.amount)
-        governanceUnlockBadge.isVisible = model.hasUnlockableLocks
+        binder.governanceLockedTitle.text = model.title
+        binder.governanceLockAmount.setTextOrHide(model.amount)
+        binder.governanceUnlockBadge.isVisible = model.hasUnlockableLocks
     }
 }
 

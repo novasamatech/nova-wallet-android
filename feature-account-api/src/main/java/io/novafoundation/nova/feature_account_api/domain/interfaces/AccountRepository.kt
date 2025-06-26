@@ -42,8 +42,6 @@ interface AccountRepository {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
-    suspend fun allLightMetaAccounts(): List<LightMetaAccount>
-
     suspend fun hasActiveMetaAccounts(): Boolean
 
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
@@ -126,9 +124,11 @@ interface AccountRepository {
 
     suspend fun getActiveMetaAccounts(): List<MetaAccount>
 
+    suspend fun getAllMetaAccounts(): List<MetaAccount>
+
     suspend fun getActiveMetaAccountsQuantity(): Int
 
-    suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
+    fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean>
 
     suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
 

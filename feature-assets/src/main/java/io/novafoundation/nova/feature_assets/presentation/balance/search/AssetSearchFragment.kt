@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.search
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
+
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
@@ -16,7 +13,7 @@ import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentAssetSearchBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetTokensDecoration
@@ -27,15 +24,13 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDec
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetContainer
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetList
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetSearch
-import kotlinx.android.synthetic.main.fragment_asset_search.searchAssetsPlaceholder
 import javax.inject.Inject
 
 class AssetSearchFragment :
-    BaseBottomSheetFragment<AssetSearchViewModel>(),
+    BaseBottomSheetFragment<AssetSearchViewModel, FragmentAssetSearchBinding>(),
     BalanceListAdapter.ItemAssetHandler {
+
+    override fun createBinding() = FragmentAssetSearchBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var imageLoader: ImageLoader
@@ -44,40 +39,32 @@ class AssetSearchFragment :
         BalanceListAdapter(imageLoader, this)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_asset_search, container, false)
-    }
-
     override fun initViews() {
-        searchAssetSearch.applyStatusBarInsets()
-        searchAssetContainer.applyInsetter {
+        binder.searchAssetSearch.applyStatusBarInsets()
+        binder.searchAssetContainer.applyInsetter {
             type(ime = true) {
                 padding()
             }
         }
 
-        searchAssetList.setHasFixedSize(true)
-        searchAssetList.adapter = assetsAdapter
+        binder.searchAssetList.setHasFixedSize(true)
+        binder.searchAssetList.adapter = assetsAdapter
 
         val animationSettings = ExpandableAnimationSettings.createForAssets()
-        val animator = ExpandableAnimator(searchAssetList, animationSettings, assetsAdapter)
+        val animator = ExpandableAnimator(binder.searchAssetList, animationSettings, assetsAdapter)
 
-        searchAssetList.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
-        searchAssetList.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
+        binder.searchAssetList.addItemDecoration(AssetTokensDecoration(requireContext(), assetsAdapter, animator))
+        binder.searchAssetList.itemAnimator = AssetTokensItemAnimator(animationSettings, animator)
 
-        AssetBaseDecoration.applyDefaultTo(searchAssetList, assetsAdapter)
+        AssetBaseDecoration.applyDefaultTo(binder.searchAssetList, assetsAdapter)
 
-        searchAssetSearch.cancel.setOnClickListener {
+        binder.searchAssetSearch.cancel.setOnClickListener {
             viewModel.cancelClicked()
         }
         onBackPressed { viewModel.cancelClicked() }
 
-        searchAssetSearch.searchInput.requestFocus()
-        searchAssetSearch.searchInput.content.showSoftKeyboard()
+        binder.searchAssetSearch.searchInput.requestFocus()
+        binder.searchAssetSearch.searchInput.content.showSoftKeyboard()
     }
 
     override fun inject() {
@@ -88,26 +75,26 @@ class AssetSearchFragment :
     }
 
     override fun subscribe(viewModel: AssetSearchViewModel) {
-        searchAssetSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
+        binder.searchAssetSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
 
         viewModel.query.observe {
-            searchAssetList.post {
-                searchAssetList.layoutManager!!.scrollToPosition(0)
+            binder.searchAssetList.post {
+                binder.searchAssetList.layoutManager!!.scrollToPosition(0)
             }
         }
 
         viewModel.searchResults.observe { data ->
-            searchAssetsPlaceholder.setVisible(data.isEmpty())
-            searchAssetList.setVisible(data.isNotEmpty())
+            binder.searchAssetsPlaceholder.setVisible(data.isEmpty())
+            binder.searchAssetList.setVisible(data.isNotEmpty())
 
-            assetsAdapter.submitList(data) { searchAssetList.invalidateItemDecorations() }
+            assetsAdapter.submitList(data) { binder.searchAssetList.invalidateItemDecorations() }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
 
-        searchAssetSearch.searchInput.hideSoftKeyboard()
+        binder.searchAssetSearch.searchInput.hideSoftKeyboard()
     }
 
     override fun assetClicked(asset: Chain.Asset) {
@@ -118,7 +105,7 @@ class AssetSearchFragment :
         if (tokenGroup.groupType is TokenGroupUi.GroupType.SingleItem) {
             viewModel.assetClicked(tokenGroup.groupType.asset)
         } else {
-            val itemAnimator = searchAssetList.itemAnimator as AssetTokensItemAnimator
+            val itemAnimator = binder.searchAssetList.itemAnimator as AssetTokensItemAnimator
             itemAnimator.prepareForAnimation()
 
             viewModel.assetListMixin.expandToken(tokenGroup)

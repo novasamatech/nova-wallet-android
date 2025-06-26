@@ -10,34 +10,24 @@ import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.proxy
-import io.novafoundation.nova.feature_proxy_api.data.common.NestedProxiesGraphConstructor
+import io.novafoundation.nova.feature_proxy_api.data.model.OnChainProxiedModel
+import io.novafoundation.nova.feature_proxy_api.data.model.OnChainProxyModel
+import io.novafoundation.nova.feature_proxy_api.data.model.ProxiesMap
 import io.novafoundation.nova.feature_proxy_api.data.model.ProxyPermission
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.feature_proxy_api.domain.model.fromString
-import io.novafoundation.nova.feature_proxy_impl.data.common.RealNestedProxiesGraphConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import java.math.BigInteger
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-
-private class OnChainProxiedModel(
-    val proxies: List<OnChainProxyModel>,
-    val deposit: BigInteger
-)
-
-private class OnChainProxyModel(
-    val accountId: AccountIdKey,
-    val proxyType: String,
-    val delay: BigInteger
-)
+import java.math.BigInteger
 
 class RealGetProxyRepository(
     private val remoteSource: StorageDataSource,
@@ -45,23 +35,8 @@ class RealGetProxyRepository(
     private val chainRegistry: ChainRegistry,
 ) : GetProxyRepository {
 
-    override suspend fun findAllProxiedsForAccounts(chainId: ChainId, accountIds: Set<AccountIdKey>): List<NestedProxiesGraphConstructor.Node> {
-        val delegatorToProxies = receiveAllProxiesInChain(chainId)
-        val proxyPermissions = delegatorToProxies
-            .flatMap { (delegator, proxied) ->
-                val notDelayedProxies = proxied.proxies.filter { it.delay == BigInteger.ZERO }
-
-                notDelayedProxies.map { proxy ->
-                    ProxyPermission(
-                        proxiedAccountId = delegator,
-                        proxyAccountId = proxy.accountId,
-                        proxyType = ProxyType.fromString(proxy.proxyType)
-                    )
-                }
-            }
-
-        return RealNestedProxiesGraphConstructor(accountIds, proxyPermissions)
-            .build()
+    override suspend fun getAllProxies(chainId: ChainId): ProxiesMap {
+        return receiveAllProxiesInChain(chainId)
     }
 
     override suspend fun getDelegatedProxyTypesRemote(chainId: ChainId, proxiedAccountId: AccountId, proxyAccountId: AccountId): List<ProxyType> {
@@ -101,8 +76,8 @@ class RealGetProxyRepository(
                 )
         }.map { proxied ->
             proxied.proxies
-                .filter { it.proxyType == proxyType.name }
-                .map { ProxyPermission(accountId.intoKey(), it.accountId, ProxyType.fromString(it.proxyType)) }
+                .filter { it.proxyType.name == proxyType.name }
+                .map { ProxyPermission(accountId.intoKey(), it.proxy, it.proxyType) }
         }
     }
 
@@ -120,8 +95,8 @@ class RealGetProxyRepository(
         val proxied = getAllProxiesFor(storageDataSource, chainId, proxiedAccountId)
 
         return proxied.proxies
-            .filter { it.accountId == proxyAccountId.intoKey() }
-            .map { ProxyType.fromString(it.proxyType) }
+            .filter { it.proxy == proxyAccountId.intoKey() }
+            .map { it.proxyType }
     }
 
     private suspend fun getAllProxiesFor(storageDataSource: StorageDataSource, chainId: ChainId, accountId: AccountId): OnChainProxiedModel {
@@ -162,9 +137,9 @@ class RealGetProxyRepository(
                 val proxyType = proxy.get<Any?>("proxyType").castToDictEnum()
                 val delay = proxy.getTyped<BigInteger>("delay")
                 OnChainProxyModel(
-                    proxyAccountId.intoKey(),
-                    proxyType.name,
-                    delay
+                    proxy = proxyAccountId.intoKey(),
+                    proxyType = ProxyType.fromString(proxyType.name),
+                    delay = delay
                 )
             },
             deposit = root[1].cast()

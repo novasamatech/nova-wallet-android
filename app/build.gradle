@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: "com.github.triplet.play"
@@ -156,6 +156,12 @@ android {
     packagingOptions {
         resources.excludes.add("META-INF/versions/9/previous-compilation-data.bin")
         resources.excludes.add("META-INF/DEPENDENCIES")
+        resources.excludes.add("META-INF/NOTICE.md")
+    }
+
+
+    buildFeatures {
+        viewBinding true
     }
     namespace 'io.novafoundation.nova.app'
 }
@@ -207,6 +213,8 @@ dependencies {
 
     implementation project(':feature-account-api')
     implementation project(':feature-account-impl')
+
+    implementation project(':feature-account-migration')
 
     implementation project(':feature-wallet-api')
     implementation project(':feature-wallet-impl')
@@ -262,7 +270,6 @@ dependencies {
 
     implementation project(':feature-push-notifications')
     implementation project(':feature-deep-linking')
-    implementation project(':feature-deep-link-building')
 
     implementation project(':feature-cloud-backup-api')
     implementation project(':feature-cloud-backup-impl')
@@ -274,12 +281,15 @@ dependencies {
 
     implementation project(":feature-xcm:impl")
 
+    implementation project(":feature-multisig:operations")
+
     implementation project(':test-shared')
 
     implementation kotlinDep
 
     implementation biometricDep
 
+    
     implementation androidDep
     implementation constraintDep
 

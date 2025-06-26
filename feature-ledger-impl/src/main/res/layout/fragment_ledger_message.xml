@@ -7,18 +7,18 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
-    android:paddingBottom="16dp"
+    android:paddingBottom="24dp"
     tools:background="@color/bottom_sheet_background">
 
     <View
         style="@style/Widget.Nova.Puller"
         android:layout_marginTop="6dp" />
 
-    <io.novafoundation.nova.feature_ledger_impl.view.LedgerActionView
-        android:id="@+id/ledgerMessageGraphics"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+    <ImageView
+        android:id="@+id/ledgerMessageImage"
+        android:layout_width="210dp"
+        android:layout_height="190dp"
+        android:layout_marginTop="22dp"
         tools:la_icon="@drawable/ic_eye_filled" />
 
     <TextView
@@ -48,21 +48,70 @@
         android:id="@+id/ledgerMessageAlert"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_marginHorizontal="16dp" />
-
+        android:layout_marginHorizontal="16dp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/ledgerMessageFooterMessage"
         android:layout_width="match_parent"
-        android:layout_height="52dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
         android:gravity="center"
-        android:textColor="@color/text_primary"
+        android:minHeight="52dp"
+        android:paddingVertical="16dp"
+        android:textColor="@color/text_secondary"
         android:visibility="gone"
         tools:text="Transaction is valid for 05:39" />
+
+    <LinearLayout
+        android:id="@+id/ledgerMessageFooterColumns"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            android:id="@+id/ledgerMessageFooterTitle1"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            tools:text="Title 1" />
+
+        <TextView
+            android:id="@+id/ledgerMessageFooterMessage1"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            tools:text="Message 1" />
+
+        <TextView
+            android:id="@+id/ledgerMessageFooterTitle2"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Primary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            tools:text="Title 1" />
+
+        <TextView
+            android:id="@+id/ledgerMessageFooterMessage2"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            tools:text="Message 1" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/ledgerMessageActions"

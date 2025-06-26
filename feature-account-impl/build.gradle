@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 
 android {
@@ -32,6 +32,10 @@ android {
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_account_impl'
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -49,6 +53,7 @@ dependencies {
     implementation project(":feature-swap-core:api")
     implementation project(":feature-xcm:api")
     implementation project(':web3names')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 

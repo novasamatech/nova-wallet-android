@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -45,10 +46,12 @@ interface CrossChainTransfersUseCase {
         cachingScope: CoroutineScope?
     ): CrossChainTransferFee
 
+    suspend fun ExtrinsicService.performTransferOfExactAmount(transfer: AssetTransferBase, computationalScope: CoroutineScope): Result<ExtrinsicSubmission>
+
     /**
      * @return result of actual received balance on destination
      */
-    suspend fun ExtrinsicService.performTransfer(
+    suspend fun ExtrinsicService.performTransferAndTrackTransfer(
         transfer: AssetTransferBase,
         computationalScope: CoroutineScope
     ): Result<Balance>

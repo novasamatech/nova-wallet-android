@@ -1,16 +1,13 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
-import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.transition.TransitionInflater
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.app.SharedElementCallback
 import androidx.core.os.bundleOf
@@ -25,6 +22,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
+import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentDappBrowserBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
@@ -39,28 +37,15 @@ import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
+import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBar
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserAddressBarGroup
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserBack
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserHide
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserForward
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserMore
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserProgress
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserRefresh
 import javax.inject.Inject
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserFavorite
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabs
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsContent
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTabsIcon
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserTransitionImage
-import kotlinx.android.synthetic.main.fragment_dapp_browser.dappBrowserWebViewContainer
 
 private const val OVERFLOW_TABS_COUNT = 100
 
 const val DAPP_SHARED_ELEMENT_ID_IMAGE_TAB = "DAPP_SHARED_ELEMENT_ID_IMAGE_TAB"
 
-class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomSheetDialog.Callback, PageCallback {
+class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrowserBinding>(), OptionsBottomSheetDialog.Callback, PageCallback {
 
     companion object {
 
@@ -68,6 +53,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
         fun getBundle(payload: DAppBrowserPayload) = bundleOf(PAYLOAD to payload)
     }
+
+    override fun createBinding() = FragmentDappBrowserBinding.inflate(layoutInflater)
 
     @Inject
     lateinit var compoundWeb3Injector: CompoundWeb3Injector
@@ -82,6 +69,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
     lateinit var permissionAsker: WebViewPermissionAsker
 
     @Inject
+    lateinit var webViewRequestInterceptor: WebViewRequestInterceptor
+
+    @Inject
     lateinit var imageLoader: ImageLoader
 
     private var webViewClient: Web3WebViewClient? = null
@@ -90,7 +80,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
 
     private val dappBrowserWebView: WebView?
         get() {
-            return dappBrowserWebViewContainer.getChildAt(0) as? WebView
+            return binder.dappBrowserWebViewContainer.getChildAt(0) as? WebView
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,47 +90,39 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         sharedElementEnterTransition = TransitionInflater.from(requireContext())
             .inflateTransition(android.R.transition.move).apply {
                 addListener(
-                    onStart = { dappBrowserWebViewContainer.makeGone() }, // Hide WebView during transition animation
+                    onStart = { binder.dappBrowserWebViewContainer.makeGone() }, // Hide WebView during transition animation
                     onEnd = {
-                        dappBrowserWebViewContainer.makeVisible()
-                        dappBrowserTransitionImage.animate()
+                        binder.dappBrowserWebViewContainer.makeVisible()
+                        binder.dappBrowserTransitionImage.animate()
                             .setDuration(300)
                             .alpha(0f)
-                            .withEndAction { dappBrowserTransitionImage.makeGone() }
+                            .withEndAction { binder.dappBrowserTransitionImage.makeGone() }
                             .start()
                     }
                 )
             }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_dapp_browser, container, false)
-    }
-
     override fun initViews() {
-        dappBrowserAddressBarGroup.applyStatusBarInsets()
+        binder.dappBrowserAddressBarGroup.applyStatusBarInsets()
 
-        dappBrowserHide.setOnClickListener { viewModel.closeClicked() }
+        binder.dappBrowserHide.setOnClickListener { viewModel.closeClicked() }
 
-        dappBrowserBack.setOnClickListener { backClicked() }
+        binder.dappBrowserBack.setOnClickListener { backClicked() }
 
-        dappBrowserAddressBar.setOnClickListener {
+        binder.dappBrowserAddressBar.setOnClickListener {
             viewModel.openSearch()
         }
 
-        dappBrowserForward.setOnClickListener { forwardClicked() }
-        dappBrowserTabs.setOnClickListener { viewModel.openTabs() }
-        dappBrowserRefresh.setOnClickListener { refreshClicked() }
-        dappBrowserFavorite.setOnClickListener { viewModel.onFavoriteClick() }
-        dappBrowserMore.setOnClickListener { moreClicked() }
+        binder.dappBrowserForward.setOnClickListener { forwardClicked() }
+        binder.dappBrowserTabs.setOnClickListener { viewModel.openTabs() }
+        binder.dappBrowserRefresh.setOnClickListener { refreshClicked() }
+        binder.dappBrowserFavorite.setOnClickListener { viewModel.onFavoriteClick() }
+        binder.dappBrowserMore.setOnClickListener { moreClicked() }
 
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
 
-        dappBrowserTransitionImage.transitionName = DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
+        binder.dappBrowserTransitionImage.transitionName = DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
 
         setEnterSharedElementCallback(object : SharedElementCallback() {
             override fun onSharedElementStart(
@@ -150,13 +132,13 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
             ) {
                 val sharedView = sharedElements?.firstOrNull { it.transitionName == DAPP_SHARED_ELEMENT_ID_IMAGE_TAB }
                 val sharedImageView = sharedView as? ImageView
-                dappBrowserTransitionImage.setImageDrawable(sharedImageView?.drawable) // Set image from shared element
+                binder.dappBrowserTransitionImage.setImageDrawable(sharedImageView?.drawable) // Set image from shared element
             }
         })
     }
 
     override fun onDestroyView() {
-        dappBrowserWebViewContainer.removeAllViews()
+        binder.dappBrowserWebViewContainer.removeAllViews()
         viewModel.detachCurrentSession()
         super.onDestroyView()
 
@@ -233,20 +215,20 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         }
 
         viewModel.currentPageAnalyzed.observe {
-            dappBrowserAddressBar.setAddress(it.display)
-            dappBrowserAddressBar.showSecure(it.isSecure)
-            dappBrowserFavorite.setImageResource(favoriteIcon(it.isFavourite))
+            binder.dappBrowserAddressBar.setAddress(it.display)
+            binder.dappBrowserAddressBar.showSecure(it.isSecure)
+            binder.dappBrowserFavorite.setImageResource(favoriteIcon(it.isFavourite))
 
             updateButtonsState()
         }
 
         viewModel.tabsCountFlow.observe {
             if (it >= OVERFLOW_TABS_COUNT) {
-                dappBrowserTabsIcon.makeVisible()
-                dappBrowserTabsContent.text = null
+                binder.dappBrowserTabsIcon.makeVisible()
+                binder.dappBrowserTabsContent.text = null
             } else {
-                dappBrowserTabsIcon.makeGone()
-                dappBrowserTabsContent.text = it.toString()
+                binder.dappBrowserTabsIcon.makeGone()
+                binder.dappBrowserTabsContent.text = it.toString()
             }
         }
     }
@@ -257,20 +239,20 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         webViewHolder.set(session.webView)
         webViewClient = session.webViewClient
 
-        dappBrowserWebViewContainer.removeAllViews()
-        dappBrowserWebViewContainer.addView(session.webView)
+        binder.dappBrowserWebViewContainer.removeAllViews()
+        binder.dappBrowserWebViewContainer.addView(session.webView)
     }
 
     private fun clearProgress() {
-        dappBrowserProgress.makeGone()
-        dappBrowserProgress.progress = 0
+        binder.dappBrowserProgress.makeGone()
+        binder.dappBrowserProgress.progress = 0
     }
 
-    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, dappBrowserProgress, viewModel.viewModelScope)
+    private fun createChromeClient() = Web3ChromeClient(permissionAsker, fileChooser, viewModel.viewModelScope, binder.dappBrowserProgress)
 
     private fun updateButtonsState() {
-        dappBrowserForward.isEnabled = dappBrowserWebView?.canGoForward() ?: false
-        dappBrowserBack.isEnabled = dappBrowserWebView?.canGoBack() ?: false
+        binder.dappBrowserForward.isEnabled = dappBrowserWebView?.canGoForward() ?: false
+        binder.dappBrowserBack.isEnabled = dappBrowserWebView?.canGoBack() ?: false
     }
 
     private fun showConfirmAuthorizeSheet(pendingConfirmation: DappPendingConfirmation<Action.Authorize>) {
@@ -326,13 +308,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel>(), OptionsBottomS
         compoundWeb3Injector.injectForPage(webView, viewModel.extensionsStore)
     }
 
-    override fun handleBrowserIntent(intent: Intent) {
-        try {
-            startActivity(intent)
-        } catch (e: Exception) {
-            Toast.makeText(requireContext(), R.string.common_no_app_to_handle_intent, Toast.LENGTH_LONG)
-                .show()
-        }
+    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        return webViewRequestInterceptor.intercept(request)
     }
 
     override fun onPageChanged(webView: WebView, url: String?, title: String?) {

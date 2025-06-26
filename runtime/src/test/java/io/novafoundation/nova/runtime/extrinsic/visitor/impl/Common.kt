@@ -3,9 +3,9 @@ package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindMultiAddress
 import io.novafoundation.nova.runtime.ext.Geneses
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.walkToList
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.walkToList
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicWithEvents
 import io.novafoundation.nova.test_shared.whenever
@@ -49,7 +49,7 @@ fun createExtrinsic(
     events: List<GenericEvent.Instance>
 ) = ExtrinsicWithEvents(
     extrinsic = Extrinsic.Instance(
-        signature = Extrinsic.Signature(
+        type = Extrinsic.ExtrinsicType.Signed(
             accountIdentifier = bindMultiAddress(MultiAddress.Id(signer)),
             signature = null,
             signedExtras = emptyMap()
@@ -117,16 +117,30 @@ class TestModuleMocker {
     }
 }
 
-suspend fun ExtrinsicWalk.walkSingle(extrinsicWithEvents: ExtrinsicWithEvents): ExtrinsicVisit {
-    val visits = walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT)
+suspend fun ExtrinsicWalk.walkSingleIgnoringBranches(extrinsicWithEvents: ExtrinsicWithEvents): ExtrinsicVisit {
+    val visits = walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT).ignoreBranches()
     Assert.assertEquals(1, visits.size)
 
     return visits.single()
 }
 
-suspend fun ExtrinsicWalk.walkMultiple(extrinsicWithEvents: ExtrinsicWithEvents, expectedSize: Int): List<ExtrinsicVisit> {
-    val visits = walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT)
+suspend fun ExtrinsicWalk.walkToList(extrinsicWithEvents: ExtrinsicWithEvents): List<ExtrinsicVisit> {
+   return walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT)
+}
+
+suspend fun ExtrinsicWalk.walkEmpty(extrinsicWithEvents: ExtrinsicWithEvents) {
+    val visits = walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT).ignoreBranches()
+    Assert.assertTrue(visits.isEmpty())
+}
+
+
+suspend fun ExtrinsicWalk.walkMultipleIgnoringBranches(extrinsicWithEvents: ExtrinsicWithEvents, expectedSize: Int): List<ExtrinsicVisit> {
+    val visits = walkToList(extrinsicWithEvents, Chain.Geneses.POLKADOT).ignoreBranches()
     Assert.assertEquals(expectedSize, visits.size)
 
     return visits
+}
+
+private fun List<ExtrinsicVisit>.ignoreBranches(): List<ExtrinsicVisit> {
+    return filterNot { it.hasRegisteredNode }
 }

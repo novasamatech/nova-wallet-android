@@ -14,13 +14,13 @@ import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_wallet_connect_impl.WalletConnectRouter
 import io.novafoundation.nova.splash.SplashRouter
 
 @Module(
     includes = [
         AccountNavigationModule::class,
+        AssetNavigationModule::class,
         DAppNavigationModule::class,
         NftNavigationModule::class,
         StakingNavigationModule::class,
@@ -35,8 +35,10 @@ import io.novafoundation.nova.splash.SplashRouter
         SwapNavigationModule::class,
         BuyNavigationModule::class,
         PushNotificationsNavigationModule::class,
-        DeepLinkingNavigationModule::class,
-        CloudBackupNavigationModule::class
+        CloudBackupNavigationModule::class,
+        AssetNavigationModule::class,
+        AccountMigrationNavigationModule::class,
+        MultisigNavigationModule::class
     ]
 )
 class NavigationModule {
@@ -66,9 +68,8 @@ class NavigationModule {
     @Provides
     fun provideNavigator(
         navigationHoldersRegistry: NavigationHoldersRegistry,
-        walletConnectRouter: WalletConnectRouter,
-        stakingDashboardRouter: StakingDashboardRouter,
-    ): Navigator = Navigator(navigationHoldersRegistry, walletConnectRouter, stakingDashboardRouter)
+        walletConnectRouter: WalletConnectRouter
+    ): Navigator = Navigator(navigationHoldersRegistry, walletConnectRouter)
 
     @Provides
     @ApplicationScope

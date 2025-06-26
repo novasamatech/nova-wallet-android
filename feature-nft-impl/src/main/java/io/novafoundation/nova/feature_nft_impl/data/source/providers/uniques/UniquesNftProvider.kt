@@ -107,7 +107,7 @@ class UniquesNftProvider(
             }
         }
 
-        nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, metaAccount.id, newNfts, forceOverwrite)
+        nftDao.insertNftsDiff(NftLocal.Type.UNIQUES, chain.id, metaAccount.id, newNfts, forceOverwrite)
     }
 
     override suspend fun nftFullSync(nft: Nft) {

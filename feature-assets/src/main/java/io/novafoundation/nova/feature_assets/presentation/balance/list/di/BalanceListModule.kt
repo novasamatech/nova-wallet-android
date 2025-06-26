@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -20,6 +21,8 @@ import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownIn
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
@@ -88,7 +91,10 @@ class BalanceListModule {
         walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetListMixinFactory: AssetListMixinFactory,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+        multisigPendingOperationsService: MultisigPendingOperationsService,
+        multisigRestrictionCheckMixinFactory: MultisigRestrictionCheckMixinFactory
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -103,7 +109,10 @@ class BalanceListModule {
             walletConnectSessionsUseCase = walletConnectSessionsUseCase,
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory,
+            multisigPendingOperationsService = multisigPendingOperationsService,
+            multisigRestrictionCheckMixinFactory = multisigRestrictionCheckMixinFactory
         )
     }
 

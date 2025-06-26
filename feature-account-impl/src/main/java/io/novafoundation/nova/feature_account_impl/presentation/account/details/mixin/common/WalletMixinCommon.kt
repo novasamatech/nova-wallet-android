@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common
 
-import io.novafoundation.nova.common.list.headers.TextHeader
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_api.domain.model.asPolkadotVaultVariantOrThrow
+import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.ChainAccountGroupUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_impl.R
@@ -39,17 +39,17 @@ fun AccountInChain.polkadotVaultTitle(resourceManager: ResourceManager, metaAcco
     }
 }
 
-fun AccountInChain.From.mapToAccountHeader(resourceManager: ResourceManager): TextHeader {
+fun AccountInChain.From.mapToAccountGroupUi(resourceManager: ResourceManager): ChainAccountGroupUi {
     val resId = when (this) {
         AccountInChain.From.META_ACCOUNT -> R.string.account_shared_secret
         AccountInChain.From.CHAIN_ACCOUNT -> R.string.account_custom_secret
     }
 
-    return TextHeader(resourceManager.getString(resId))
-}
-
-fun notHasAccountComparator(): Comparator<AccountInChain> {
-    return compareBy { !it.hasChainAccount }
+    return ChainAccountGroupUi(
+        id = name,
+        title = resourceManager.getString(resId),
+        action = null
+    )
 }
 
 fun hasAccountComparator(): Comparator<AccountInChain> {
@@ -57,7 +57,11 @@ fun hasAccountComparator(): Comparator<AccountInChain> {
 }
 
 fun Comparator<AccountInChain>.withChainComparator(): Comparator<AccountInChain> {
-    return then(Chain.defaultComparatorFrom(AccountInChain::chain))
+    return then(Chain.accountInChainComparator())
+}
+
+fun Chain.Companion.accountInChainComparator(): Comparator<AccountInChain> {
+    return Chain.defaultComparatorFrom(AccountInChain::chain)
 }
 
 val AccountInChain.hasChainAccount

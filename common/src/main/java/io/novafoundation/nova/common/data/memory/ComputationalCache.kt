@@ -17,7 +17,7 @@ interface ComputationalCache {
     fun <T> useSharedFlow(
         key: String,
         scope: CoroutineScope,
-        flowLazy: suspend () -> Flow<T>
+        flowLazy: suspend CoroutineScope.() -> Flow<T>
     ): Flow<T>
 }
 
@@ -30,5 +30,5 @@ suspend fun <T> ComputationalCache.useCache(
 context(ComputationalScope)
 fun <T> ComputationalCache.useSharedFlow(
     key: String,
-    flowLazy: suspend () -> Flow<T>
+    flowLazy: suspend CoroutineScope.() -> Flow<T>
 ): Flow<T> = useSharedFlow(key, this@ComputationalScope, flowLazy)

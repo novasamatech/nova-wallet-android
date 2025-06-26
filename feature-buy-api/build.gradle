@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'io.novafoundation.nova.feature_buy_api'
@@ -28,8 +28,8 @@ dependencies {
     implementation project(":feature-account-api")
     implementation project(":feature-wallet-api")
     implementation project(":common")
+    implementation project(':feature-deep-linking')
 
-    implementation androidDep
     implementation materialDep
 
     implementation daggerDep

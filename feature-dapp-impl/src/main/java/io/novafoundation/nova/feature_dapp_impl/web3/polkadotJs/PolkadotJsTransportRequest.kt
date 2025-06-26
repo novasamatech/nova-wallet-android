@@ -18,10 +18,11 @@ sealed class PolkadotJsTransportRequest<R>(
     protected val web3Responder: Web3Responder,
     protected val identifier: Identifier,
     val url: String,
+    val requestId: String,
 ) : Web3Transport.Request<R> {
 
     override fun reject(error: Throwable) {
-        web3Responder.respondError(identifier.id, error)
+        web3Responder.respondError(requestId, error)
     }
 
     enum class Identifier(val id: String) {
@@ -37,19 +38,21 @@ sealed class PolkadotJsTransportRequest<R>(
     sealed class Single<R>(
         web3Responder: Web3Responder,
         url: String,
-        identifier: Identifier
-    ) : PolkadotJsTransportRequest<R>(web3Responder, identifier, url) {
+        identifier: Identifier,
+        requestId: String
+    ) : PolkadotJsTransportRequest<R>(web3Responder, identifier, url, requestId) {
 
         abstract fun serializeResponse(response: R): String
 
         override fun accept(response: R) {
-            web3Responder.respondResult(identifier.id, serializeResponse(response))
+            web3Responder.respondResult(requestId, serializeResponse(response))
         }
 
         class AuthorizeTab(
             web3Responder: Web3Responder,
-            url: String
-        ) : Single<Boolean>(web3Responder, url, Identifier.AUTHORIZE_TAB) {
+            url: String,
+            requestId: String
+        ) : Single<Boolean>(web3Responder, url, Identifier.AUTHORIZE_TAB, requestId) {
 
             @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
             override fun serializeResponse(authorized: Boolean): String {
@@ -61,7 +64,8 @@ sealed class PolkadotJsTransportRequest<R>(
             web3Responder: Web3Responder,
             url: String,
             private val gson: Gson,
-        ) : Single<List<InjectedAccount>>(web3Responder, url, Identifier.LIST_ACCOUNTS) {
+            requestId: String
+        ) : Single<List<InjectedAccount>>(web3Responder, url, Identifier.LIST_ACCOUNTS, requestId) {
 
             override fun serializeResponse(response: List<InjectedAccount>): String {
                 return gson.toJson(response)
@@ -71,11 +75,11 @@ sealed class PolkadotJsTransportRequest<R>(
         sealed class Sign(
             web3Responder: Web3Responder,
             url: String,
-            val requestId: String,
+            requestId: String,
             val signerPayload: SignerPayload,
             private val gson: Gson,
             identifier: Identifier,
-        ) : Single<PolkadotSignerResult>(web3Responder, url, identifier) {
+        ) : Single<PolkadotSignerResult>(web3Responder, url, identifier, requestId) {
 
             override fun serializeResponse(response: PolkadotSignerResult): String {
                 return gson.toJson(response)
@@ -102,7 +106,8 @@ sealed class PolkadotJsTransportRequest<R>(
             web3Responder: Web3Responder,
             url: String,
             private val gson: Gson,
-        ) : Single<List<InjectedMetadataKnown>>(web3Responder, url, Identifier.LIST_METADATA) {
+            requestId: String
+        ) : Single<List<InjectedMetadataKnown>>(web3Responder, url, Identifier.LIST_METADATA, requestId) {
 
             override fun serializeResponse(response: List<InjectedMetadataKnown>): String {
                 return gson.toJson(response)
@@ -112,7 +117,8 @@ sealed class PolkadotJsTransportRequest<R>(
         class ProvideMetadata(
             web3Responder: Web3Responder,
             url: String,
-        ) : Single<Boolean>(web3Responder, url, Identifier.PROVIDE_METADATA) {
+            requestId: String
+        ) : Single<Boolean>(web3Responder, url, Identifier.PROVIDE_METADATA, requestId) {
 
             override fun serializeResponse(response: Boolean): String {
                 return response.toString()
@@ -122,16 +128,16 @@ sealed class PolkadotJsTransportRequest<R>(
 
     sealed class Subscription<R>(
         private val scope: CoroutineScope,
-        private val requestId: String,
+        requestId: String,
         web3Responder: Web3Responder,
         url: String,
         identifier: Identifier
-    ) : PolkadotJsTransportRequest<Flow<R>>(web3Responder, identifier, url) {
+    ) : PolkadotJsTransportRequest<Flow<R>>(web3Responder, identifier, url, requestId) {
 
         abstract fun serializeSubscriptionResponse(response: R): String
 
         override fun accept(response: Flow<R>) {
-            web3Responder.respondResult(identifier.id, "true")
+            web3Responder.respondResult(requestId, "true")
 
             response
                 .map(::serializeSubscriptionResponse)

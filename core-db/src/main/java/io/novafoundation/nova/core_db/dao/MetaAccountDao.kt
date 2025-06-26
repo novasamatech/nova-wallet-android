@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
-import io.novafoundation.nova.core_db.model.chain.account.MetaAccountIdsLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
@@ -18,6 +17,9 @@ import kotlinx.coroutines.flow.Flow
 import org.intellij.lang.annotations.Language
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * Fetch meta account where either
@@ -92,7 +94,7 @@ interface MetaAccountDao {
     }
 
     @Transaction
-    suspend fun withTransaction(action: suspend () -> Unit) {
+    suspend fun runInTransaction(action: suspend () -> Unit) {
         action()
     }
 
@@ -117,25 +119,20 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
-    @Query("SELECT globallyUniqueId, id FROM meta_accounts")
-    suspend fun getMetaAccountIds(): List<MetaAccountIdsLocal>
-
-    @Query("SELECT * FROM chain_accounts WHERE metaId = :metaId")
-    suspend fun getChainAccounts(metaId: Long): List<ChainAccountLocal>
+    @Query("SELECT * FROM meta_accounts WHERE id = :id")
+    suspend fun getMetaAccount(id: Long): MetaAccountLocal?
 
     @Query("SELECT COUNT(*) FROM meta_accounts WHERE status = :status")
     @Transaction
     suspend fun getMetaAccountsQuantityByStatus(status: MetaAccountLocal.Status): Int
 
-    @Query("SELECT id FROM meta_accounts WHERE status = :status")
-    suspend fun getMetaAccountIdsByStatus(status: MetaAccountLocal.Status): List<Long>
-
-    @Query("SELECT id FROM meta_accounts WHERE type = :type")
-    suspend fun getMetaAccountIdsByType(type: MetaAccountLocal.Type): List<Long>
-
     @Query("SELECT * FROM meta_accounts WHERE status = :status")
     @Transaction
     suspend fun getMetaAccountsByStatus(status: MetaAccountLocal.Status): List<RelationJoinedMetaAccountInfo>
+
+    @Query("SELECT * FROM meta_accounts")
+    @Transaction
+    suspend fun getFullMetaAccounts(): List<RelationJoinedMetaAccountInfo>
 
     @Query("SELECT * FROM meta_accounts")
     fun getJoinedMetaAccountsInfoFlow(): Flow<List<RelationJoinedMetaAccountInfo>>
@@ -148,9 +145,6 @@ interface MetaAccountDao {
 
     @Query(META_ACCOUNT_WITH_BALANCE_QUERY)
     fun metaAccountWithBalanceFlow(metaId: Long): Flow<List<MetaAccountWithBalanceLocal>>
-
-    @Query("SELECT * FROM proxy_accounts WHERE chainId = :chainId")
-    suspend fun getProxyAccounts(chainId: String): List<ProxyAccountLocal>
 
     @Query("UPDATE meta_accounts SET isSelected = (id = :metaId)")
     suspend fun selectMetaAccount(metaId: Long)
@@ -220,6 +214,9 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts WHERE isSelected = 1")
     suspend fun selectedMetaAccount(): RelationJoinedMetaAccountInfo?
 
+    @Query("SELECT EXISTS(SELECT id FROM meta_accounts WHERE type = :type)")
+    fun hasMetaAccountsCountOfTypeFlow(type: MetaAccountLocal.Type): Flow<Boolean>
+
     @Query(
         """
         DELETE FROM meta_accounts
@@ -255,6 +252,34 @@ interface MetaAccountDao {
 
     @Query("DELETE FROM meta_accounts WHERE status = :status ")
     fun removeMetaAccountsByStatus(status: MetaAccountLocal.Status)
+}
+
+suspend inline fun <T : Any> MetaAccountDao.withTransaction(crossinline action: suspend () -> T): T {
+    var result: T? = null
+
+    runInTransaction {
+        result = action()
+    }
+
+    return result!!
+}
+
+@OptIn(ExperimentalContracts::class)
+suspend fun MetaAccountDao.updateMetaAccount(metaId: Long, updateClosure: (MetaAccountLocal) -> MetaAccountLocal) {
+    contract {
+        callsInPlace(updateClosure, InvocationKind.EXACTLY_ONCE)
+    }
+
+    val metaAccount = requireNotNull(getMetaAccount(metaId)) {
+        "Meta account $metaId was not found"
+    }
+
+    val updated = updateClosure(metaAccount)
+    require(updated.id == metaId) {
+        "Cannot modify metaId"
+    }
+
+    updateMetaAccount(updated)
 }
 
 class MetaAccountWithBalanceLocal(

@@ -8,19 +8,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import coil.ImageLoader
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setCompoundDrawableTint
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getMaskedRipple
 import io.novafoundation.nova.feature_settings_impl.R
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkImage
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkLabel
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkStatus
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkStatusShimmer
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkSubtitle
-import kotlinx.android.synthetic.main.item_network_settings.view.itemNetworkTitle
+import io.novafoundation.nova.feature_settings_impl.databinding.ItemNetworkSettingsBinding
 
 class NetworkManagementListAdapter(
     private val imageLoader: ImageLoader,
@@ -33,7 +28,7 @@ class NetworkManagementListAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NetworkListViewHolder {
-        return NetworkListViewHolder(parent, imageLoader, itemHandler)
+        return NetworkListViewHolder(ItemNetworkSettingsBinding.inflate(parent.inflater(), parent, false), imageLoader, itemHandler)
     }
 
     override fun onBindViewHolder(holder: NetworkListViewHolder, position: Int) {
@@ -54,16 +49,16 @@ class NetworkManagementListDiffCallback : DiffUtil.ItemCallback<NetworkListRvIte
 }
 
 class NetworkListViewHolder(
-    parent: ViewGroup,
+    private val binder: ItemNetworkSettingsBinding,
     private val imageLoader: ImageLoader,
     private val itemHandler: NetworkManagementListAdapter.ItemHandler
-) : ViewHolder(parent.inflateChild(R.layout.item_network_settings)) {
+) : ViewHolder(binder.root) {
 
     init {
         itemView.background = itemView.context.getMaskedRipple(cornerSizeInDp = 0)
     }
 
-    fun bind(item: NetworkListRvItem) = with(itemView) {
+    fun bind(item: NetworkListRvItem) = with(binder) {
         itemView.setOnClickListener { itemHandler.onNetworkClicked(item.chainId) }
 
         itemNetworkImage.setIcon(item.chainIcon, imageLoader)

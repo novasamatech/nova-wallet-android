@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmT
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -49,7 +50,7 @@ import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetect
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -104,6 +105,8 @@ interface WalletFeatureDependencies {
     val xcmPaymentApi: XcmPaymentApi
 
     val xcmBuilderFactory: XcmBuilder.Factory
+
+    val multisigValidationsRepository: MultisigValidationsRepository
 
     fun preferences(): Preferences
 

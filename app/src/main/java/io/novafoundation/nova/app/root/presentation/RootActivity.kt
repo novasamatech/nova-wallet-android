@@ -2,9 +2,11 @@ package io.novafoundation.nova.app.root.presentation
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.app.databinding.ActivityRootBinding
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
@@ -17,11 +19,12 @@ import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
-import kotlinx.android.synthetic.main.activity_root.rootNetworkBar
+
 import javax.inject.Inject
 
-class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
+class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var rootNavigationHolder: RootNavigationHolder
@@ -31,6 +34,13 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
     @Inject
     lateinit var contextManager: ContextManager
+
+    @Inject
+    lateinit var branchIOLinkHandler: BranchIOLinkHandler
+
+    override fun createBinding(): ActivityRootBinding {
+        return ActivityRootBinding.inflate(LayoutInflater.from(this))
+    }
 
     override fun inject() {
         FeatureUtils.getFeature<RootComponent>(this, RootApi::class.java)
@@ -59,7 +69,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
 
         contextManager.attachActivity(this)
 
-        rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
+        binder.rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->
             view.updatePadding(top = insets.systemWindowInsetTop)
 
             insets
@@ -68,7 +78,6 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         intent?.let(::processIntent)
 
         viewModel.applySafeModeIfEnabled()
-//        processJsonOpenIntent()
     }
 
     override fun onDestroy() {
@@ -78,13 +87,11 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         rootNavigationHolder.detach()
     }
 
-    override fun layoutResource(): Int {
-        return R.layout.activity_root
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        setIntent(intent)
 
+        branchIOLinkHandler.onActivityNewIntent(this, intent)
         processIntent(intent)
     }
 
@@ -100,6 +107,8 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     override fun onStart() {
         super.onStart()
 
+        branchIOLinkHandler.onActivityStart(this, viewModel::handleDeepLink)
+
         viewModel.noticeInForeground()
     }
 
@@ -107,7 +116,7 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
         observeActionBottomSheet(viewModel)
 
         viewModel.showConnectingBarLiveData.observe(this) { show ->
-            rootNetworkBar.setVisible(show)
+            binder.rootNetworkBar.setVisible(show)
         }
 
         viewModel.messageLiveData.observe(
@@ -133,20 +142,8 @@ class RootActivity : BaseActivity<RootViewModel>(), SplashBackgroundHolder {
     }
 
     private fun processIntent(intent: Intent) {
-        intent.data?.let {
-            viewModel.handleDeepLink(it)
-        }
+        intent.data?.let { viewModel.handleDeepLink(it) }
     }
-
-//    private fun processJsonOpenIntent() {
-//        if (Intent.ACTION_VIEW == intent.action && intent.type != null) {
-//            if ("application/json" == intent.type) {
-//                val file = this.contentResolver.openInputStream(intent.data!!)
-//                val content = file?.reader(Charsets.UTF_8)?.readText()
-//                viewModel.jsonFileOpened(content)
-//            }
-//        }
-//    }
 
     private val rootNavController: NavController by lazy {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.rootNavHost) as NavHostFragment

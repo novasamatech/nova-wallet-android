@@ -8,7 +8,6 @@ import io.novafoundation.nova.runtime.storage.source.StorageKey
 import io.novafoundation.nova.runtime.storage.source.StorageValue
 import io.novafoundation.nova.runtime.storage.source.multi.MultiQueryBuilder
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
-import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
@@ -41,8 +40,8 @@ interface StorageQueryContext : RuntimeContext {
     fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V>
-    ): Flow<Map<K, V>>
+        binding: DynamicInstanceBinderWithKey<K, V?>
+    ): Flow<Map<K, V?>>
 
     suspend fun <K, V> StorageEntry.observeByPrefix(
         vararg prefixArgs: Any?,
@@ -106,8 +105,6 @@ interface StorageQueryContext : RuntimeContext {
         keyExtractor = { it.component1<Any?>() as K },
         binding = binding
     )
-
-    suspend fun <V> Constant.getAs(binding: DynamicInstanceBinder<V>): V
 }
 
 @Suppress("DEPRECATION")

@@ -1,9 +1,184 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. You need to add %s more to your balance</string>
+    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. You need to add %s more to your balance</string>
+    <string name="multisig_signatory_validation_fee">%s doesn’t have enough balance to pay the network fee of %s. You need to add %s more to your balance</string>
+    <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
+<!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
+    <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
+
+    <string name="invalid_call_data_title">Invalid call data</string>
+    <string name="invalid_call_data_message">This call data for another operation with call hash %s</string>
+
+    <!--<string name="multisig_operation_details_call_data_not_found">Call-data not found</string>-->
+    <string name="multisig_operation_details_call_data_not_found">Enter call data to view details</string>
+
+    <string name="enter_call_data_title">Enter call data</string>
+
+
+    <string name="multisig_wallet_details_info_warning_other_signatories">Other signatories:</string>
+    <string name="multisig_wallet_details_info_warning_title">Threshold %d out of %d</string>
+
+    <string name="multisig_card_not_supported_title">Debit Card not supported for Multisig</string>
+    <string name="multisig_card_not_supported_message">To manage your Debit Card, please switch to a different type of wallet.</string>
+
+    <string name="multisig_sell_not_supported_title">Sell not supported for Multisig</string>
+    <string name="multisig_sell_not_supported_message">To sell crypto for fiat, please switch to a different type of wallet.</string>
+
+
+    <string name="multisig_pending_operations">Transactions to sign</string>
+<!--    <string name="multisig_pending_operations">Pending operations</string>-->
+
+    <string name="multisig_operations_progress">Signing (%s of %s)</string>
+<!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
+
+
+    <string name="multisig_operations_created">Created by you</string>
+    <string name="multisig_operations_signed">Signed by you</string>
+<!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
+<!--    <string name="multisig_operations_signed">Signed</string>-->
+
+
+    <string name="multisig_pending_operations_on_behalf_of">On behalf of:</string>
+
+<!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
+    <string name="multisig_operations_unknown_calldata">Unknown operation</string>
+
+
+    <string name="multisig_callhash_exists_title">Operation already exists</string>
+    <string name="multisig_callhash_exists_message">%s has already initiated the same operation and it is currently waiting to be signed by other signatories.</string>
+
+    <string name="multisig_signatory_validation_ed">%s needs at least %s to pay this transaction fee and stay above the minimum network balance. Current balance is: %s</string>
+
+    <string name="multisig_signing_is_not_supported_message">Multisig wallets do not support signing arbitrary messages — only transactions</string>
+
+    <string name="multisig_signing_warning_title">Multisig transaction</string>
+    <string name="multisig_signing_warning_message">The multisig transaction will be initiated by %s. The initiator pays the network fee and reserves a multisig deposit, which will be unreserved once the transaction is executed.</string>
+
+    <string name="account_multisig_group_label">shared control (multisig)</string>
+
+    <string name="delegated_accounts_fragment_title">Wallet list has been updated</string>
+
+    <string name="delegated_accounts_fragment_explanation">Proxy and Multisig accounts auto-detected and organized for you. Manage anytime in Settings.</string>
+
+    <string name="account_proxied">Proxied</string>
+    <string name="active_multisig_title">Shared control</string>
+
+    <string name="delegation_updates_deactivated_title">No longer valid</string>
+
+    <string name="multisig_transaction_created_title">Multisig transaction created</string>
+    <string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Multisig transactions.</string>
+    <string name="multisig_transaction_created_view_details">View details</string>
+
+    <string name="multisig_operation_details_approve">Approve</string>
+    <string name="multisig_operation_details_approve_and_execute">Approve &amp; Execute</string>
+    <string name="multisig_operation_details_reject">Reject</string>
+
+    <string name="account_multisig">Multisig</string>
+    <string name="multisig_wallet_details_info_warning">Transactions from this wallet require approval from multiple signatories. Your account is one of the signatories:</string>
+    <string name="multisig_signatory">Signatory:</string>
+
+
+    <string name="swap_failure_cannot_receive_insufficient_asset_out">You must have at least %s on %s to receive %s token</string>
+
+    <string name="account_migration_title">Welcome to Nova!</string>
+    <string name="account_migration_subtitle">You’re almost there! 🎉\n Just tap below to complete the setup and start using your accounts seamlessly in both the Polkadot App and Nova Wallet</string>
+
+    <string name="account_migration_fallback_name" translatable="false">%s Wallet</string>
+
+    <string name="account_migration_accepted_url" translatable="false">%s://polkadot/migration-accepted?key=%s</string>
+    <string name="account_ledger_import_start_step_3_highlighted">access Bluetooth</string>
+
+    <string name="branch_io_link_host" translatable="false">nova-wallet.app.link</string>
+    <string name="branch_io_link_host_alternate" translatable="false">nova-wallet-alternate.app.link</string>
+
+    <string name="ledger_verify_addresses_message_both_buttons">Press both buttons on your %s to approve the addresses</string>
+    <string name="ledger_verify_addresses_message_confirm_button">Press confirm button on your %s to approve the addresses</string>
+
+    <string name="account_add_address">Add address</string>
+    <string name="account_substrate_accounts">Substrate Accounts</string>
+    <string name="account_evm_accounts">EVM Accounts</string>
+
+    <string name="ledger_select_address_update_for_evm_title">Update Ledger Generic App</string>
+    <string name="ledger_select_address_update_for_evm_message">Your Ledger device is using an outdated Generic app that doesn’t support EVM addresses. Update it via Ledger Live.</string>
+
+    <string name="ledger_select_address_not_found">Account not found</string>
+
+    <string name="ledger_select_address_account_label">Account %s</string>
+    <string name="ledger_device_nano_s">Nano S</string>
+
+    <string name="trade_provider_open_confirmation_title">Continue in browser?</string>
+    <string name="trade_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
+
+    <string name="buy_token_not_supported_title">This token is not supported by the buy feature</string>
+    <string name="buy_token_not_supported_message">None of our providers currently support the buying of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="sell_token_not_supported_title">This token is not supported by the sell feature</string>
+    <string name="sell_token_not_supported_message">None of our providers currently support the selling of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="trade_token_not_supported_title">This token is not supported by the buy/sell feature</string>
+    <string name="trade_token_not_supported_message">None of our providers currently support the buying or selling of this token. Please choose a different token, a different network, or check back later.</string>
+
+    <string name="buy_order_completed_message">Purchase initiated! Please wait up to 60 minutes. You can track status on the email.</string>
+    <string name="sell_order_completed_message">Sale initiated! Please wait up to 60 minutes. You can track status on the email.</string>
+
+    <string name="fragment_sell_token_title">Sell %s token</string>
+    <string name="sell_network_flow_title">Select network for selling %s</string>
+
+    <string name="mercurio_provider_description">Best price with fees up to 3.95%</string>
+    <string name="transak_provider_buy_description">Buy crypto starting from just $5</string>
+    <string name="banxa_provider_description">Straightforward and efficient KYC process</string>
+
+    <string name="transak_provider_sell_description">Sell crypto starting from just $10</string>
+
+    <string name="wallet_asset_sell">Sell</string>
+
+    <string name="additional_payment_methods">+%d</string>
+
+    <string name="trade_provider_list_buy_title">Select a provider to buy %s token</string>
+
+    <string name="trade_provider_list_sell_title">Select a provider to sell %s token</string>
+
+    <string name="trade_provider_list_footer">Payment methods, fees and limits differ by provider.\nCompare their quotes to find the best option for you.</string>
+
+    <string name="wallet_asset_sell_tokens">Sell tokens</string>
+    <string name="wallet_asset_buy_tokens">Buy tokens</string>
+
+    <string name="wallet_asset_buy_sell">Buy/Sell</string>
+
+
+    <string name="account_ledger_import_start_step_otg">%s in your phone settings</string>
+    <string name="account_ledger_import_start_step_otg_highlighted">Enable OTG</string>
+
+    <string name="select_ledger_grant_permissions">Enable Bluetooth &amp; Grant Permissions</string>
+
+    <string name="ledger_verify_address_message_both_buttons">Press both buttons on your %s to approve the address</string>
+    <string name="ledger_verify_address_message_confirm_button">Press confirm button on your %s to approve the address</string>
+    <string name="ledger_hold_to_sign">Hold confirm button on your %s to approve the transaction</string>
+
+    <string name="ledger_device_nano_x">Nano X</string>
+    <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_stax">Ledger Stax</string>
+    <string name="ledger_device_nano_s_plus">Nano S Plus</string>
+
+    <string name="account_ledger_select_device_all_description">If using a Ledger via Bluetooth, enable Bluetooth on both devices and grant Nova Bluetooth and location permissions. For USB, enable OTG in your phone settings.</string>
+    <string name="account_ledger_select_device_usb_description">Please, enable Ledger device. Unlock your Ledger device and open the %s app.</string>
+
+    <string name="account_ledger_import_start_guide">Ledger Connection Guide</string>
+
+    <string name="account_ledger_import_start_title">Connect Ledger</string>
+
+    <string name="start_import_ledger_connection_mode_bluetooth">Bluetooth</string>
+    <string name="start_import_ledger_connection_mode_usb">USB</string>
+
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
+
+    <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot app)</string>
+
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
     <string name="account_parity_signer_show_mode_legacy">Legacy</string>
     <string name="account_parity_signer_show_mode_new">New (Vault v7+)</string>
-
-<!--    <string name="account_parity_signer_scan_with">Scan the QR code with the %s</string>-->
 
     <string name="unified_address_title">New Unified Address</string>
     <string name="unified_address_subtitle">Some exchanges may still require the legacy format\nfor operations while they update. %s</string>
@@ -39,7 +214,7 @@
     <string name="price_chart_year">1Y</string>
     <string name="price_chart_max">All</string>
 
-    <string name="app_link_scheme" translatable="false">app.novawallet.io</string>
+    <string name="app_link_host" translatable="false">app.novawallet.io</string>
 
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 
@@ -155,8 +330,6 @@
     <string name="referenda_swipe_gov_banner_subtitle">Swipe to vote on referenda with AI summaries. Fast &amp; easy!</string>
     <string name="referenda_swipe_gov_banner_chip">%d referenda</string>
 
-    <string name="account_ledger_nano_x_generic">Ledger Nano X (Generic Polkadot app)</string>
-
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot app is installed</string>
 
     <string name="account_ledger_generic_import_start_step_2_highlighted">Open the Polkadot app</string>
@@ -166,7 +339,6 @@
     <string name="account_ledger_generic_import_start_step_2">%s on your Ledger device</string>
 
     <string name="account_ledger_import_start_step_3">Allow Nova Wallet to %s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">access Bluetooth and Location</string>
 
     <string name="account_ledger_import_start_step_4">%s to add to wallet</string>
     <string name="account_ledger_import_start_step_4_highlighted">Select account</string>
@@ -221,8 +393,6 @@
 
     <string name="account_ledger_legacy_warning_title">New Ledger app has been released</string>
     <string name="account_ledger_legacy_warning_message">To sign operations and migrate your accounts to the new Generic Ledger app install and open Migration app. Legacy Old and Migration Ledger apps will not be supported in the future.</string>
-
-    <string name="account_ledger_nano_x_legacy">Ledger Nano X (Legacy)</string>
 
     <string name="account_ledger_nano_x">Ledger Nano X</string>
 
@@ -714,12 +884,6 @@
 
     <string name="proxy_signing_is_not_supported_message">Proxied wallets do not support signing arbitrary messages — only transactions</string>
 
-    <string name="delegated_accounts_fragment_title">Delegated accounts update</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Wallet automatically adds delegated authorities (Proxy) to a separate category for you. You can always manage wallets in Settings.</string>
-    <string name="proxy_about">What is a Proxy?</string>
-
-    <string name="proxieds_updates_deactivated_title">No longer valid</string>
-
     <string name="proxy_wallet_type">%s proxy</string>
     <string name="account_proxy_type_any">Any</string>
     <string name="account_proxy_type_non_transfer">Non Transfer</string>
@@ -833,9 +997,6 @@
 
     <string name="assets_crowdloan_unlock_banner_title">Boost your DOT 🚀</string>
     <string name="assets_crowdloan_unlock_banner_description">Received your DOT back from crowdloans? Start staking your DOT today to get the maximum possible rewards!</string>
-
-    <string name="buy_provider_open_confirmation_title">Continue in browser?</string>
-    <string name="buy_provider_open_confirmation_message">To continue the purchase you will be redirected from Nova Wallet app to %s</string>
 
     <string name="assets_buy_tokens_placeholder_button">Buy tokens</string>
 
@@ -1550,8 +1711,6 @@
 
     <string name="common_ledger">Ledger</string>
 
-    <string name="ledger_verify_address_subtitle">Press both buttons on your %s to approve address</string>
-
     <string name="ledger_import_select_address_load_more">Load more accounts</string>
     <string name="ledher_import_select_address_title">Select account to add to wallet</string>
 
@@ -1576,9 +1735,6 @@
     <string name="account_ledger_import_fill_description">Make sure Network app is installed to your Ledger device using Ledger Live app. Open the network app on your Ledger device.</string>
 
     <string name="account_select_hardware_wallet">Select hardware wallet</string>
-
-    <string name="account_ledger_import_start_title">Connect Ledger Nano X</string>
-    <string name="account_ledger_import_start_guide">Ledger’s official Bluetooth Connection Guide</string>
 
     <string name="common_total">Total</string>
 

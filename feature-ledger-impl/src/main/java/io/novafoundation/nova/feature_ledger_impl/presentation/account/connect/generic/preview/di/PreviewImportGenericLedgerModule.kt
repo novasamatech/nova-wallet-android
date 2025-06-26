@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -14,10 +15,11 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
+import io.novafoundation.nova.feature_ledger_impl.di.annotations.GenericLedger
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic.preview.PreviewImportGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.domain.account.connect.generic.preview.RealPreviewImportGenericLedgerInteractor
 import io.novafoundation.nova.feature_ledger_impl.presentation.LedgerRouter
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.formatters.LedgerMessageFormatterFactory
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.bottomSheet.MessageCommandFormatter
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.generic.preview.PreviewImportGenericLedgerViewModel
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.newApp.GenericSubstrateLedgerApplication
@@ -47,7 +49,8 @@ class PreviewImportGenericLedgerModule {
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
-        ledgerMessageFormatterFactory: LedgerMessageFormatterFactory
+        @GenericLedger messageCommandFormatter: MessageCommandFormatter,
+        addressSchemeFormatter: AddressSchemeFormatter
     ): ViewModel {
         return PreviewImportGenericLedgerViewModel(
             interactor = interactor,
@@ -57,7 +60,8 @@ class PreviewImportGenericLedgerModule {
             externalActions = externalActions,
             chainRegistry = chainRegistry,
             resourceManager = resourceManager,
-            messageFormatter = ledgerMessageFormatterFactory.createGeneric()
+            messageCommandFormatter = messageCommandFormatter,
+            addressSchemeFormatter = addressSchemeFormatter
         )
     }
 

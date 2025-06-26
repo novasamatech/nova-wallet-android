@@ -64,7 +64,7 @@ class JsonImportSource(
 
     override val chooseJsonFileEvent = MutableLiveData<Event<RequestCode>>()
 
-    override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*>): ImportSourceView<*> {
+    override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*, *>): ImportSourceView<*> {
         return JsonImportView(fragment.requireContext()).apply {
             observeCommon(viewModel, fragment.viewLifecycleOwner)
             observeSource(this@JsonImportSource, fragment.viewLifecycleOwner)

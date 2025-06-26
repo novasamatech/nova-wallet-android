@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
@@ -38,6 +38,10 @@ android {
         targetCompatibility 1.8
     }
     namespace 'io.novafoundation.nova.feature_staking_impl'
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -51,6 +55,7 @@ dependencies {
     implementation project(':feature-dapp-api')
     implementation project(':feature-proxy-api')
     implementation project(':runtime')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 

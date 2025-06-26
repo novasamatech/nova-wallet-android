@@ -1,8 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.reward.direct
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.ViewGroup
+
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.formatting.formatDateTime
@@ -10,22 +9,15 @@ import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddressOrHide
 import io.novafoundation.nova.feature_account_api.view.showChain
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentRewardSlashDetailsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_assets.presentation.model.OperationParcelizeModel
 import io.novafoundation.nova.feature_assets.presentation.model.showOperationStatus
 import io.novafoundation.nova.feature_assets.presentation.model.toAmountModel
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailAmount
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEra
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailEvent
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailNetwork
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailStatus
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailToolbar
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailType
-import kotlinx.android.synthetic.main.fragment_reward_slash_details.rewardDetailValidator
 
-class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
+class RewardDetailFragment : BaseFragment<RewardDetailViewModel, FragmentRewardSlashDetailsBinding>() {
+
     companion object {
         private const val KEY_REWARD = "KEY_REWARD"
 
@@ -34,20 +26,16 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ) = layoutInflater.inflate(R.layout.fragment_reward_slash_details, container, false)
+    override fun createBinding() = FragmentRewardSlashDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        rewardDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.rewardDetailToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        rewardDetailEvent.setOnClickListener {
+        binder.rewardDetailEvent.setOnClickListener {
             viewModel.eventIdClicked()
         }
 
-        rewardDetailValidator.setOnClickListener {
+        binder.rewardDetailValidator.setOnClickListener {
             viewModel.validatorAddressClicked()
         }
     }
@@ -68,19 +56,19 @@ class RewardDetailFragment : BaseFragment<RewardDetailViewModel>() {
         setupExternalActions(viewModel)
 
         with(viewModel.operation) {
-            rewardDetailEvent.showValue(eventId)
-            rewardDetailToolbar.setTitle(time.formatDateTime())
-            rewardDetailAmount.setAmount(amount.toAmountModel())
+            binder.rewardDetailEvent.showValue(eventId)
+            binder.rewardDetailToolbar.setTitle(time.formatDateTime())
+            binder.rewardDetailAmount.setAmount(amount.toAmountModel())
 
-            rewardDetailEra.showValueOrHide(era)
+            binder.rewardDetailEra.showValueOrHide(era)
 
-            rewardDetailStatus.showOperationStatus(statusAppearance)
+            binder.rewardDetailStatus.showOperationStatus(statusAppearance)
 
-            rewardDetailType.showValue(type)
+            binder.rewardDetailType.showValue(type)
         }
 
-        viewModel.validatorAddressModelFlow.observe(rewardDetailValidator::showAddressOrHide)
+        viewModel.validatorAddressModelFlow.observe(binder.rewardDetailValidator::showAddressOrHide)
 
-        viewModel.chainUi.observe(rewardDetailNetwork::showChain)
+        viewModel.chainUi.observe(binder.rewardDetailNetwork::showChain)
     }
 }

@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_cloud_backup_api.presenter.action
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.addColor
 import io.novafoundation.nova.common.utils.formatting.spannable.spannableFormatting
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ButtonPreferences
 import io.novafoundation.nova.common.view.bottomSheet.action.negative
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.common.view.bottomSheet.action.secondary
@@ -23,12 +23,12 @@ fun ActionBottomSheetLauncher.launchBackupLostPasswordAction(resourceManager: Re
 
             getString(R.string.restore_cloud_backup_delete_backup_description).spannableFormatting(highlightedFirstPart, highlightedSecondPart)
         },
-        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
+        neutralButtonPreferences = ButtonPreferences.secondary(
             resourceManager.getString(
                 R.string.common_cancel
             )
         ),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+        actionButtonPreferences = ButtonPreferences.negative(
             resourceManager.getString(R.string.cloud_backup_delete_button),
             onDeleteClicked
         )
@@ -44,12 +44,12 @@ fun ActionBottomSheetLauncher.launchDeleteBackupAction(resourceManager: Resource
                 .addColor(getColor(R.color.text_primary))
             getString(R.string.cloud_backup_delete_action_subtitle).spannableFormatting(highlightedPart)
         },
-        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
+        neutralButtonPreferences = ButtonPreferences.secondary(
             resourceManager.getString(
                 R.string.common_cancel
             )
         ),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+        actionButtonPreferences = ButtonPreferences.negative(
             resourceManager.getString(R.string.cloud_backup_delete_button),
             onDeleteClicked
         )
@@ -66,7 +66,7 @@ fun ActionBottomSheetLauncher.launchRememberPasswordWarning(resourceManager: Res
 
             getString(R.string.create_cloud_backup_password_alert_subtitle).spannableFormatting(highlightedPart)
         },
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(resourceManager.getString(R.string.common_got_it))
+        actionButtonPreferences = ButtonPreferences.primary(resourceManager.getString(R.string.common_got_it))
     )
 }
 
@@ -80,8 +80,8 @@ fun ActionBottomSheetLauncher.launchCorruptedBackupFoundAction(resourceManager: 
 
             getString(R.string.corrupted_backup_error_subtitle).spannableFormatting(highlightedPart)
         },
-        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+        neutralButtonPreferences = ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
+        actionButtonPreferences = ButtonPreferences.negative(
             resourceManager.getString(R.string.cloud_backup_delete_button),
             onDeleteClicked
         )
@@ -98,8 +98,8 @@ fun ActionBottomSheetLauncher.launchExistingCloudBackupAction(resourceManager: R
 
             getString(R.string.existing_cloud_backup_found_subtitle).spannableFormatting(highlightedPart)
         },
-        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
+        neutralButtonPreferences = ButtonPreferences.secondary(resourceManager.getString(R.string.common_cancel)),
+        actionButtonPreferences = ButtonPreferences.primary(
             resourceManager.getString(R.string.existing_cloud_backup_found_button),
             onImportClicked
         )
@@ -116,8 +116,8 @@ fun ActionBottomSheetLauncher.launchDeprecatedPasswordAction(resourceManager: Re
 
             getString(R.string.deprecated_cloud_backup_password_subtitle).spannableFormatting(highlightedPart)
         },
-        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(resourceManager.getString(R.string.common_not_now)),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
+        neutralButtonPreferences = ButtonPreferences.secondary(resourceManager.getString(R.string.common_not_now)),
+        actionButtonPreferences = ButtonPreferences.primary(
             resourceManager.getString(R.string.common_enter_password),
             onEnterPasswordClick
         )
@@ -129,10 +129,10 @@ fun ActionBottomSheetLauncher.launchCloudBackupChangesAction(resourceManager: Re
         imageRes = R.drawable.ic_cloud_backup_warning,
         title = resourceManager.getString(R.string.cloud_backup_destructive_changes_action_title),
         subtitle = resourceManager.getString(R.string.cloud_backup_destructive_changes_action_subtitle),
-        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
+        neutralButtonPreferences = ButtonPreferences.secondary(
             resourceManager.getString(R.string.common_not_now)
         ),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.primary(
+        actionButtonPreferences = ButtonPreferences.primary(
             resourceManager.getString(R.string.cloud_backup_destructive_changes_button),
             onReviewClicked
         )
@@ -147,10 +147,10 @@ fun ActionBottomSheetLauncher.launchCloudBackupDestructiveChangesNotApplied(
         imageRes = R.drawable.ic_cloud_backup_warning,
         title = resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_title),
         subtitle = resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_subtitle),
-        neutralButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
+        neutralButtonPreferences = ButtonPreferences.secondary(
             resourceManager.getString(R.string.common_not_now)
         ),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.negative(
+        actionButtonPreferences = ButtonPreferences.negative(
             resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_button),
             onReviewClicked
         )
@@ -164,7 +164,7 @@ fun ActionBottomSheetLauncher.launchCloudBackupDestructiveChangesNotAppliedWitho
         imageRes = R.drawable.ic_cloud_backup_warning,
         title = resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_title),
         subtitle = resourceManager.getString(R.string.cloud_backup_destructive_changes_not_applied_subtitle),
-        actionButtonPreferences = ActionBottomSheet.ButtonPreferences.secondary(
+        actionButtonPreferences = ButtonPreferences.secondary(
             resourceManager.getString(R.string.common_got_it)
         )
     )

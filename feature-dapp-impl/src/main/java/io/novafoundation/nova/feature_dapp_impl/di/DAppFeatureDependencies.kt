@@ -7,14 +7,17 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
@@ -30,6 +33,7 @@ import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRep
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
@@ -65,6 +69,12 @@ interface DAppFeatureDependencies {
     val webViewPermissionAskerFactory: WebViewPermissionAskerFactory
 
     val webViewFileChooserFactory: WebViewFileChooserFactory
+
+    val preferences: Preferences
+
+    val walletConnectService: WalletConnectService
+
+    val automaticInteractionGate: AutomaticInteractionGate
 
     fun currencyRepository(): CurrencyRepository
 
@@ -102,4 +112,6 @@ interface DAppFeatureDependencies {
     fun dappAuthorizationDao(): DappAuthorizationDao
 
     fun browserHostSettingsDao(): BrowserHostSettingsDao
+
+    fun toastMessageManager(): ToastMessageManager
 }

@@ -1,32 +1,27 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.waiting
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.content.DialogInterface
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_assets.databinding.FragmentWaitingNovaCardTopUpBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
-import kotlinx.android.synthetic.main.fragment_waiting_nova_card_top_up.topUpWaitingTitle
-import kotlinx.android.synthetic.main.fragment_waiting_nova_card_top_up.waitingTopUpCardTimer
 
-class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopUpViewModel>() {
+class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopUpViewModel, FragmentWaitingNovaCardTopUpBinding>() {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return layoutInflater.inflate(R.layout.fragment_waiting_nova_card_top_up, container, false)
-    }
+    override fun createBinding() = FragmentWaitingNovaCardTopUpBinding.inflate(layoutInflater)
 
     override fun initViews() {
         dialog?.setCanceledOnTouchOutside(false)
-        isCancelable = false
         getBehaviour().isHideable = false
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        viewModel.onScreenCancelled()
+
+        super.onCancel(dialog)
     }
 
     override fun inject() {
@@ -38,10 +33,10 @@ class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopU
 
     override fun subscribe(viewModel: WaitingNovaCardTopUpViewModel) {
         viewModel.titleFlow.observe {
-            topUpWaitingTitle.text = it
+            binder.topUpWaitingTitle.text = it
         }
 
-        waitingTopUpCardTimer.startTimer(
+        binder.waitingTopUpCardTimer.startTimer(
             value = viewModel.getTimerValue(),
             customMessageFormat = R.string.waiting_top_up_card_timer,
             durationFormatter = viewModel.getTimerFormatter(),

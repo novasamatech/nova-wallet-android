@@ -1,14 +1,13 @@
 package io.novafoundation.nova.feature_banners_api.presentation
 
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.list.SingleItemAdapter
-import io.novafoundation.nova.common.utils.inflateChild
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 import io.novafoundation.nova.feature_banners_api.R
+import io.novafoundation.nova.feature_banners_api.databinding.ItemPromotionBannerBinding
 import io.novafoundation.nova.feature_banners_api.presentation.view.BannerPagerView
-import kotlinx.android.synthetic.main.item_promotion_banner.view.bannerPager
 
 class PromotionBannerAdapter(
     private val closable: Boolean
@@ -18,7 +17,7 @@ class PromotionBannerAdapter(
     private var bannerCallback: BannerPagerView.Callback? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BannerHolder {
-        return BannerHolder(parent.inflateChild(viewType), closable)
+        return BannerHolder(ItemPromotionBannerBinding.inflate(parent.inflater(), parent, false), closable)
     }
 
     override fun onBindViewHolder(holder: BannerHolder, position: Int) {
@@ -40,22 +39,22 @@ class PromotionBannerAdapter(
     }
 }
 
-class BannerHolder(view: View, closable: Boolean) : RecyclerView.ViewHolder(view) {
+class BannerHolder(private val binder: ItemPromotionBannerBinding, closable: Boolean) : RecyclerView.ViewHolder(binder.root) {
 
     companion object : WithViewType {
         override val viewType: Int = R.layout.item_promotion_banner
     }
 
     init {
-        itemView.bannerPager.setClosable(closable)
+        binder.bannerPager.setClosable(closable)
     }
 
-    fun bind(banners: List<BannerPageModel>, bannerCallback: BannerPagerView.Callback?) = with(itemView) {
+    fun bind(banners: List<BannerPageModel>, bannerCallback: BannerPagerView.Callback?) = with(binder) {
         bannerPager.setCallback(bannerCallback)
         showBanners(banners)
     }
 
-    fun showBanners(banners: List<BannerPageModel>) = with(itemView) {
+    fun showBanners(banners: List<BannerPageModel>) = with(binder) {
         bannerPager.setBanners(banners)
     }
 }

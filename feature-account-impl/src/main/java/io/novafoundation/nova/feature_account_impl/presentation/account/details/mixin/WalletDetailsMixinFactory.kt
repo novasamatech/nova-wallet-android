@@ -1,25 +1,36 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin
 
+import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type
+import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import kotlinx.coroutines.CoroutineScope
 
 class WalletDetailsMixinFactory(
     private val polkadotVaultVariantConfigProvider: PolkadotVaultVariantConfigProvider,
     private val resourceManager: ResourceManager,
     private val accountFormatterFactory: AccountFormatterFactory,
     private val proxyFormatter: ProxyFormatter,
+    private val multisigFormatter: MultisigFormatter,
     private val interactor: WalletDetailsInteractor,
     private val appLinksProvider: AppLinksProvider,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
+    private val router: AccountRouter,
+    private val addressSchemeFormatter: AddressSchemeFormatter,
+    private val chainRegistry: ChainRegistry
 ) {
 
-    suspend fun create(metaId: Long, host: WalletDetailsMixinHost): WalletDetailsMixin {
+    suspend fun create(metaId: Long, coroutineScope: CoroutineScope, host: WalletDetailsMixinHost): WalletDetailsMixin {
         val metaAccount = interactor.getMetaAccount(metaId)
 
         return when (metaAccount.type) {
@@ -52,7 +63,9 @@ class WalletDetailsMixinFactory(
                 accountFormatterFactory = accountFormatterFactory,
                 interactor = interactor,
                 ledgerMigrationTracker = ledgerMigrationTracker,
-                metaAccount = metaAccount
+                metaAccount = metaAccount,
+                router = router,
+                addressSchemeFormatter = addressSchemeFormatter
             )
 
             Type.PARITY_SIGNER,
@@ -69,7 +82,18 @@ class WalletDetailsMixinFactory(
                 accountFormatterFactory = accountFormatterFactory,
                 interactor = interactor,
                 proxyFormatter = proxyFormatter,
-                metaAccount = metaAccount
+                metaAccount = metaAccount as ProxiedMetaAccount
+            )
+
+            Type.MULTISIG -> MultisigWalletDetailsMixin(
+                resourceManager = resourceManager,
+                accountFormatterFactory = accountFormatterFactory,
+                interactor = interactor,
+                multisigFormatter = multisigFormatter,
+                metaAccount = metaAccount as MultisigMetaAccount,
+                host = host,
+                chainRegistry = chainRegistry,
+                coroutineScope = coroutineScope
             )
         }
     }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.textWithDescriptionItem
 import io.novafoundation.nova.feature_swap_impl.R
@@ -15,8 +16,9 @@ class GetAssetInBottomSheet(
     onCancel: () -> Unit,
     private val payload: Payload,
     private val onClicked: (GetAssetInOption) -> Unit,
-) : FixedListBottomSheet(
-    context = context,
+) : FixedListBottomSheet<BottomSheeetFixedListBinding>(
+    context,
+    viewConfiguration = ViewConfiguration.default(context),
     onCancel = onCancel
 ) {
 

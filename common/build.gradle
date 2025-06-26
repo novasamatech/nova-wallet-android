@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-parcelize'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -39,7 +39,7 @@ android {
 
         buildConfigField "String", "LEDGER_MIGRATION_ARTICLE", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/hardware-wallets/ledger-nano-x/ledger-app-migration\""
 
-        buildConfigField "String", "LEDGER_BLEUTOOTH_GUIDE", "\"https://support.ledger.com/hc/en-us/articles/360019138694-Set-up-Bluetooth-connection\""
+        buildConfigField "String", "LEDGER_CONNECTION_GUIDE", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/hardware-wallets/ledger-devices\""
 
         buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://play.google.com/store/apps/details?id=io.novafoundation.nova.market\""
 
@@ -76,7 +76,12 @@ android {
         jvmTarget = '1.8'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
+
     namespace 'io.novafoundation.nova.common'
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -87,6 +92,7 @@ dependencies {
     api project(":core-api")
 
     implementation kotlinDep
+
 
     implementation androidDep
     implementation cardViewDep
@@ -152,4 +158,5 @@ dependencies {
     implementation kotlinReflect
 
     implementation playServicesAuthDep
+
 }

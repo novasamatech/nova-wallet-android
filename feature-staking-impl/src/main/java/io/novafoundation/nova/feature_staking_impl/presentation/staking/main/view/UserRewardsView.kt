@@ -7,25 +7,14 @@ import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
+import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.databinding.ViewUserRewardsBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState.ClaimableRewards
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsBanner
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsContentGroup
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmount
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsFiatAmountShimmer
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingAmount
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingClaim
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingContainer
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingFiat
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsPendingGroup
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsShimmerGroup
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsStakingPeriod
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsTokenAmount
-import kotlinx.android.synthetic.main.view_user_rewards.view.userRewardsTokenAmountShimmer
 
 class UserRewardsView @JvmOverloads constructor(
     context: Context,
@@ -33,61 +22,61 @@ class UserRewardsView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle), WithContextExtensions by WithContextExtensions(context) {
 
-    init {
-        View.inflate(context, R.layout.view_user_rewards, this)
+    private val binder = ViewUserRewardsBinding.inflate(inflater(), this, true)
 
-        userRewardsPendingContainer.background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 10)
-        userRewardsPendingGroup.makeGone()
+    init {
+        binder.userRewardsPendingContainer.background = getRoundedCornerDrawable(fillColorRes = R.color.block_background, cornerSizeDp = 10)
+        binder.userRewardsPendingGroup.makeGone()
     }
 
     fun showPendingRewardsLoading() {
-        userRewardsShimmerGroup.makeVisible()
-        userRewardsContentGroup.makeInvisible()
+        binder.userRewardsShimmerGroup.makeVisible()
+        binder.userRewardsContentGroup.makeInvisible()
 
-        userRewardsTokenAmountShimmer.startShimmer()
-        userRewardsFiatAmountShimmer.startShimmer()
+        binder.userRewardsTokenAmountShimmer.startShimmer()
+        binder.userRewardsFiatAmountShimmer.startShimmer()
     }
 
     fun setStakingPeriod(period: String) {
-        userRewardsStakingPeriod.text = period
+        binder.userRewardsStakingPeriod.text = period
     }
 
     fun showRewards(amountModel: AmountModel) {
-        userRewardsShimmerGroup.makeGone()
-        userRewardsContentGroup.makeVisible()
+        binder.userRewardsShimmerGroup.makeGone()
+        binder.userRewardsContentGroup.makeVisible()
 
-        userRewardsTokenAmountShimmer.stopShimmer()
-        userRewardsFiatAmountShimmer.stopShimmer()
+        binder.userRewardsTokenAmountShimmer.stopShimmer()
+        binder.userRewardsFiatAmountShimmer.stopShimmer()
 
-        userRewardsTokenAmount.text = amountModel.token
-        userRewardsFiatAmount.text = amountModel.fiat
+        binder.userRewardsTokenAmount.text = amountModel.token
+        binder.userRewardsFiatAmount.text = amountModel.fiat
     }
 
     fun setBannerImage(@DrawableRes imageRes: Int) {
-        userRewardsBanner.setImage(imageRes)
+        binder.userRewardsBanner.setImage(imageRes)
     }
 
     fun setClaimClickListener(listener: (View) -> Unit) {
-        userRewardsPendingClaim.setOnClickListener(listener)
+        binder.userRewardsPendingClaim.setOnClickListener(listener)
     }
 
     fun setClaimableRewardsState(pendingRewardsState: LoadingState<ClaimableRewards>?) {
         when (pendingRewardsState) {
-            null, is LoadingState.Loading -> userRewardsPendingGroup.makeGone()
+            null, is LoadingState.Loading -> binder.userRewardsPendingGroup.makeGone()
             is LoadingState.Loaded -> {
                 val claimableRewards = pendingRewardsState.data
 
-                userRewardsPendingGroup.makeVisible()
+                binder.userRewardsPendingGroup.makeVisible()
 
-                userRewardsPendingAmount.text = claimableRewards.amountModel.token
-                userRewardsPendingFiat.text = claimableRewards.amountModel.fiat
+                binder.userRewardsPendingAmount.text = claimableRewards.amountModel.token
+                binder.userRewardsPendingFiat.text = claimableRewards.amountModel.fiat
 
-                userRewardsPendingClaim.isEnabled = claimableRewards.canClaim
+                binder.userRewardsPendingClaim.isEnabled = claimableRewards.canClaim
             }
         }
     }
 
     fun setOnRewardPeriodClickedListener(onClick: OnClickListener) {
-        userRewardsStakingPeriod.setOnClickListener(onClick)
+        binder.userRewardsStakingPeriod.setOnClickListener(onClick)
     }
 }

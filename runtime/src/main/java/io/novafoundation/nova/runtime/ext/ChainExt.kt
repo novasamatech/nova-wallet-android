@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.ext
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.MultiAddress
 import io.novafoundation.nova.common.data.network.runtime.binding.bindOrNull
@@ -31,6 +32,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.hasSameId
+import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
+import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
 import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
 import io.novasama.substrate_sdk_android.extensions.asEthereumPublicKey
@@ -154,10 +159,6 @@ fun Chain.Additional?.shouldDisableMetadataHashCheck(): Boolean {
     return this?.disabledCheckMetadataHash ?: false
 }
 
-fun Chain.Additional?.isMigrationLedgerAppSupported(): Boolean {
-    return isGenericLedgerAppSupported()
-}
-
 fun ChainId.chainIdHexPrefix16(): String {
     return removeHexPrefix()
         .take(32)
@@ -192,6 +193,10 @@ fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
 
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
+}
+
+inline fun <reified T : Chain.ExternalApi> Chain.hasExternalApi(): Boolean {
+    return externalApis.any { it is T }
 }
 
 const val UTILITY_ASSET_ID = 0
@@ -257,6 +262,10 @@ fun Chain.addressOf(accountId: ByteArray): String {
     } else {
         accountId.toAddress(addressPrefix.toShort())
     }
+}
+
+fun Chain.addressOf(accountId: AccountIdKey): String {
+    return addressOf(accountId.value)
 }
 
 fun Chain.legacyAddressOfOrNull(accountId: ByteArray): String? {
@@ -387,7 +396,7 @@ object ChainGeneses {
     const val POLKADOT = "91b171bb158e2d3848fa23a9f1c25182fb8e20313b2c1eb49219da7a70ce90c3"
     const val WESTEND = "e143f23803ac50e8f6f8e62695d1ce9e4e1d68aa36c1cd2cfd15340213f3423e"
 
-    const val STATEMINE = "48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a"
+    const val KUSAMA_ASSET_HUB = "48239ef607d7928874027a43a67689209727dfb3d3dc5e5b03a39bdc2eda771a"
 
     const val ACALA = "fc41b9bd8ef8fe53d58c7ea67c794c7ec9a73daf05e6d54b14ff6342c99ba64c"
 
@@ -456,6 +465,10 @@ fun Chain.Asset.requireStatemine(): Type.Statemine {
     return type
 }
 
+fun Chain.findStatemineAssets(): List<Chain.Asset> {
+    return assets.filter { it.type is Type.Statemine }
+}
+
 fun Chain.Asset.statemineOrNull(): Type.Statemine? {
     return type as? Type.Statemine
 }
@@ -469,6 +482,9 @@ fun Chain.Asset.requireOrml(): Type.Orml {
 
     return type
 }
+
+val Chain.addressScheme: AddressScheme
+    get() = if (isEthereumBased) AddressScheme.EVM else AddressScheme.SUBSTRATE
 
 fun Chain.Asset.ormlOrNull(): Type.Orml? {
     return type as? Type.Orml
@@ -516,6 +532,14 @@ fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?):
         val currencyIdScale = bindOrNull { currencyType.toHexUntyped(runtime, currencyId) } ?: return@find false
 
         currencyIdScale == asset.type.currencyIdScale
+    }
+}
+
+fun Chain.findAssetByStatemineAssetId(runtime: RuntimeSnapshot, assetId: Any?): Chain.Asset? {
+    return assets.find { asset ->
+        if (asset.type !is Type.Statemine) return@find false
+
+        asset.type.hasSameId(runtime, assetId)
     }
 }
 
@@ -567,3 +591,16 @@ fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
 }
 
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)
+
+fun SignatureVerifier.verifyMultiChain(
+    chain: Chain,
+    signature: SignatureWrapper,
+    message: ByteArray,
+    publicKey: ByteArray
+): Boolean {
+    return if (chain.isEthereumBased) {
+        verify(signature, Signer.MessageHashing.ETHEREUM, message, publicKey)
+    } else {
+        verify(signature, Signer.MessageHashing.SUBSTRATE, message, publicKey)
+    }
+}

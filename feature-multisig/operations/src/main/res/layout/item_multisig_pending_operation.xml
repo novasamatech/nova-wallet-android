@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="4dp"
+    tools:background="@color/block_background">
+
+    <TextView
+        android:id="@+id/itemPendingOperationProgress"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_marginTop="12dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="signing (1 of 3)" />
+
+    <TextView
+        android:id="@+id/item_pending_operation_action"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Signed"
+        tools:textColor="@color/text_positive" />
+
+    <ImageView
+        android:id="@+id/itemPendingOperationIcon"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:padding="2dp"
+        android:background="@drawable/bg_icon_container_on_color"
+        app:layout_constraintBottom_toTopOf="@+id/itemPendingOperationOnBehalfOfContainer"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/itemPendingOperationProgress"
+        app:layout_goneMarginBottom="20dp"
+        app:tint="@color/text_secondary"
+        tools:src="@drawable/ic_arrow_up" />
+
+    <ImageView
+        android:id="@+id/itemPendingOperationChain"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="19dp"
+        app:layout_constraintStart_toStartOf="@+id/itemPendingOperationIcon"
+        app:layout_constraintTop_toTopOf="@+id/itemPendingOperationIcon"
+        tools:src="@drawable/ic_polkadot_24" />
+
+    <TextView
+        android:id="@+id/itemPendingOperationTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/itemPendingOperationSubtitle"
+        app:layout_constraintStart_toEndOf="@+id/itemPendingOperationIcon"
+        app:layout_constraintTop_toTopOf="@+id/itemPendingOperationIcon"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Transfer" />
+
+    <TextView
+        android:id="@+id/itemPendingOperationSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="middle"
+        android:singleLine="true"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintBottom_toBottomOf="@+id/itemPendingOperationIcon"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/itemPendingOperationTitle"
+        app:layout_constraintTop_toBottomOf="@+id/itemPendingOperationTitle"
+        tools:text="To: GybH5si5nAGybH5GybH5" />
+
+    <TextView
+        android:id="@+id/itemPendingOperationPrimaryValue"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/itemPendingOperationTime"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/itemPendingOperationIcon"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="−10 DOT" />
+
+    <TextView
+        android:id="@+id/itemPendingOperationTime"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintBottom_toBottomOf="@+id/itemPendingOperationIcon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemPendingOperationPrimaryValue"
+        tools:text="18:00" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/itemPendingOperationOnBehalfOfContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:background="@color/block_background">
+
+        <View
+            android:id="@+id/itemPendingOperationOnBehalfOfDivider"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <TextView
+            android:id="@+id/textView4"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="12dp"
+            android:layout_marginStart="12dp"
+            android:text="@string/multisig_pending_operations_on_behalf_of"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/itemPendingOperationOnBehalfOfIcon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/itemPendingOperationOnBehalfOfAddress"
+            app:layout_constraintEnd_toStartOf="@+id/itemPendingOperationOnBehalfOfAddress"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/textView4"
+            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            app:layout_constraintTop_toTopOf="@+id/itemPendingOperationOnBehalfOfAddress"
+            tools:background="@tools:sample/avatars" />
+
+        <TextView
+            android:id="@+id/itemPendingOperationOnBehalfOfAddress"
+            style="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:ellipsize="middle"
+            android:singleLine="true"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/itemPendingOperationOnBehalfOfIcon"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Proxy Wallet" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="190dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>

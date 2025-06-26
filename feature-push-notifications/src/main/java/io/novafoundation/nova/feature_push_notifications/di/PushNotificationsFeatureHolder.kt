@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
-import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
+import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsCommunicator
@@ -30,7 +30,7 @@ class PushNotificationsFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .governanceFeatureApi(getFeature(GovernanceFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
-            .deepLinkBuildingFeatureApi(getFeature(DeepLinkBuildingFeatureApi::class.java))
+            .assetsFeatureApi(getFeature(AssetsFeatureApi::class.java))
             .build()
 
         return DaggerPushNotificationsFeatureComponent.factory()
