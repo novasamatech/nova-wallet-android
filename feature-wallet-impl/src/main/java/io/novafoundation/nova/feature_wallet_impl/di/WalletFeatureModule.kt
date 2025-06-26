@@ -32,13 +32,14 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
@@ -48,7 +49,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCas
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -72,6 +72,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynami
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainWeigher
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainWeigher
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.DryRunSucceedsValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.subquery.SubQueryOperationsApi
 import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepositoryImpl
@@ -285,22 +286,18 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideCrossChainTransactor(
         assetSourceRegistry: AssetSourceRegistry,
-        phishingValidationFactory: PhishingValidationFactory,
-        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
         eventsRepository: EventsRepository,
         chainStateRepository: ChainStateRepository,
         chainRegistry: ChainRegistry,
         dynamic: DynamicCrossChainTransactor,
-        legacy: LegacyCrossChainTransactor
+        legacy: LegacyCrossChainTransactor,
     ): CrossChainTransactor = RealCrossChainTransactor(
         assetSourceRegistry = assetSourceRegistry,
-        phishingValidationFactory = phishingValidationFactory,
-        enoughTotalToStayAboveEDValidationFactory = enoughTotalToStayAboveEDValidationFactory,
         eventsRepository = eventsRepository,
         chainStateRepository = chainStateRepository,
         chainRegistry = chainRegistry,
         dynamic = dynamic,
-        legacy = legacy
+        legacy = legacy,
     )
 
     @Provides

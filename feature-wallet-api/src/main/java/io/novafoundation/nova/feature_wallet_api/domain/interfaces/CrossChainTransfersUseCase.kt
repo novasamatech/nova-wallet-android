@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -31,6 +32,8 @@ interface CrossChainTransfersUseCase {
     fun outcomingCrossChainDirectionsFlow(origin: Chain.Asset): Flow<List<OutcomingDirection>>
 
     suspend fun getConfiguration(): CrossChainTransfersConfiguration
+
+    suspend fun transferConfigurationFor(transfer: AssetTransferDirection, cachingScope: CoroutineScope?): CrossChainTransferConfiguration
 
     suspend fun requiredRemainingAmountAfterTransfer(
         originChain: Chain,

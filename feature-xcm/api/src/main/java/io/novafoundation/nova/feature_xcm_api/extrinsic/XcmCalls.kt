@@ -16,7 +16,7 @@ fun composeXcmExecute(
     return composeCall(
         moduleName = runtime.metadata.xcmPalletName(),
         callName = "execute",
-        args = mapOf(
+        arguments = mapOf(
             "message" to message.toEncodableInstance(),
             "max_weight" to maxWeight.toEncodableInstance()
         )

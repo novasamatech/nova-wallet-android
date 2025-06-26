@@ -17,3 +17,7 @@ sealed interface XcmTransferReserve {
 fun XcmTransferReserve.remoteReserveLocation(): ChainLocation? {
     return (this as? XcmTransferReserve.Reserve.Remote)?.remoteReserveLocation
 }
+
+fun XcmTransferReserve.isRemoteReserve(): Boolean {
+    return this is XcmTransferReserve.Reserve.Remote
+}

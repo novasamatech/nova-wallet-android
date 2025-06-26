@@ -52,8 +52,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddr
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
-import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
+import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -73,17 +73,18 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainValidationSystemProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -130,6 +131,8 @@ interface AssetsFeatureDependencies {
     val crossChainWeigher: CrossChainWeigher
 
     val crossChainTransactor: CrossChainTransactor
+
+    val crossChainValidationSystemProvider: CrossChainValidationSystemProvider
 
     val resourcesHintsMixinFactory: ResourcesHintsMixinFactory
 

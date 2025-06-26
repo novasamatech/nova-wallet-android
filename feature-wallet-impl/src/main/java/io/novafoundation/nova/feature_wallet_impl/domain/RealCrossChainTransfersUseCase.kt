@@ -117,12 +117,8 @@ internal class RealCrossChainTransfersUseCase(
         sendingAsset: Chain.Asset,
         destinationChain: Chain,
     ): Balance {
-        val xcmConfig = cachedConfigurationFlow(CoroutineScope(coroutineContext)).first()
-        val transferConfig = xcmConfig.transferConfiguration(
-            originChain = parachainInfoRepository.getXcmChain(originChain),
-            originAsset = sendingAsset,
-            destinationChain = parachainInfoRepository.getXcmChain(destinationChain),
-        )!!
+        val cachingScope = CoroutineScope(coroutineContext)
+        val transferConfig = transferConfigurationFor(originChain, sendingAsset, destinationChain, cachingScope)
 
         return crossChainTransactor.requiredRemainingAmountAfterTransfer(transferConfig)
     }
@@ -131,12 +127,7 @@ internal class RealCrossChainTransfersUseCase(
         transfer: AssetTransferBase,
         cachingScope: CoroutineScope?
     ): CrossChainTransferFee = withContext(Dispatchers.IO) {
-        val configuration = cachedConfigurationFlow(cachingScope).first()
-        val transferConfiguration = configuration.transferConfiguration(
-            originChain = parachainInfoRepository.getXcmChain(transfer.originChain),
-            originAsset = transfer.originChainAsset,
-            destinationChain = parachainInfoRepository.getXcmChain(transfer.destinationChain),
-        )!!
+        val transferConfiguration = transferConfigurationFor(transfer, cachingScope)
 
         val originFeeAsync = async { crossChainTransactor.estimateOriginFee(transferConfiguration, transfer) }
         val crossChainFeeAsync = async { crossChainWeigher.estimateFee(transfer, transferConfiguration) }
@@ -181,16 +172,30 @@ internal class RealCrossChainTransfersUseCase(
         return crossChainTransactor.estimateMaximumExecutionTime(transferConfiguration)
     }
 
-    private suspend fun transferConfigurationFor(
+    override suspend fun transferConfigurationFor(
         transfer: AssetTransferDirection,
-        computationalScope: CoroutineScope
+        cachingScope: CoroutineScope?
     ): CrossChainTransferConfiguration {
-        val configuration = cachedConfigurationFlow(computationalScope).first()
+       return transferConfigurationFor(
+           originChain = transfer.originChain,
+           sendingAsset = transfer.originChainAsset,
+           destinationChain = transfer.destinationChain,
+           cachingScope = cachingScope
+       )
+    }
+
+    private suspend fun transferConfigurationFor(
+        originChain: Chain,
+        sendingAsset: Chain.Asset,
+        destinationChain: Chain,
+        cachingScope: CoroutineScope?
+    ): CrossChainTransferConfiguration {
+        val configuration = cachedConfigurationFlow(cachingScope).first()
 
         return configuration.transferConfiguration(
-            originChain = parachainInfoRepository.getXcmChain(transfer.originChain),
-            originAsset = transfer.originChainAsset,
-            destinationChain = parachainInfoRepository.getXcmChain(transfer.destinationChain),
+            originChain = parachainInfoRepository.getXcmChain(originChain),
+            originAsset = sendingAsset,
+            destinationChain = parachainInfoRepository.getXcmChain(destinationChain),
         )!!
     }
 
