@@ -148,17 +148,32 @@ jobs:
           echo "Listing 100 largest packages"
           dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
           df -h
-          echo "Removing large packages"
-          sudo apt-get remove -y '^dotnet-.*'
-          sudo apt-get remove -y '^llvm-.*'
-          sudo apt-get remove -y 'php.*'
-          sudo apt-get remove -y azure-cli google-cloud-sdk hhvm google-chrome-stable firefox powershell mono-devel
-          sudo apt-get autoremove -y
-          sudo apt-get clean
+          
+          echo "Removing large packages safely"
+          # Remove packages one by one with error handling
+          sudo apt-get remove -y '^dotnet-.*' || echo "Failed to remove dotnet packages"
+          sudo apt-get remove -y '^llvm-.*' || echo "Failed to remove llvm packages"
+          sudo apt-get remove -y 'php.*' || echo "Failed to remove php packages"
+          sudo apt-get remove -y azure-cli || echo "Failed to remove azure-cli"
+          sudo apt-get remove -y hhvm || echo "Failed to remove hhvm"
+          sudo apt-get remove -y google-chrome-stable || echo "Failed to remove google-chrome-stable"
+          sudo apt-get remove -y firefox || echo "Failed to remove firefox"
+          sudo apt-get remove -y powershell || echo "Failed to remove powershell"
+          sudo apt-get remove -y mono-devel || echo "Failed to remove mono-devel"
+          
+          # Clean up dependencies and cache
+          sudo apt-get autoremove -y || echo "Failed to autoremove packages"
+          sudo apt-get clean || echo "Failed to clean package cache"
+          
           df -h
-          echo "Removing large directories"
-          # deleting 15GB
-          rm -rf /usr/share/dotnet/
+          echo "Removing large directories safely"
+          # Remove dotnet directory with error handling
+          if [ -d "/usr/share/dotnet/" ]; then
+            rm -rf /usr/share/dotnet/ || echo "Failed to remove dotnet directory"
+          else
+            echo "Dotnet directory not found"
+          fi
+          
           df -h
 
       - name: 📂 Set up DEV Google Services
