@@ -9,7 +9,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove"/>
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"
+        tools:node="remove" />
 
     <uses-permission
         android:name="android.permission.BLUETOOTH"
@@ -126,12 +128,13 @@
 
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="https"/>
-                <data android:host="@string/branch_io_link_host"/>
-                <data android:host="@string/branch_io_link_host_alternate"/>
+                <data android:scheme="https" />
+                <data android:host="@string/branch_io_link_host" />
+                <data android:host="@string/branch_io_link_host_alternate" />
             </intent-filter>
 
         </activity>
@@ -198,9 +201,13 @@
             android:name="io.novafoundation.nova.staking_notification_channel_id"
             android:value="@string/staking_notification_channel_id" />
 
-        <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_dsxlmUqNhbtOYX6e7cfgrpkbqsjGPYBf" />
+        <meta-data
+            android:name="io.branch.sdk.BranchKey"
+            android:value="key_live_dsxlmUqNhbtOYX6e7cfgrpkbqsjGPYBf" />
 
-        <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
+        <meta-data
+            android:name="io.branch.sdk.TestMode"
+            android:value="false" />
 
     </application>
 
@@ -208,6 +215,17 @@
         <intent>
             <action android:name="android.intent.action.SEND" />
             <data android:mimeType="text/plain" />
+        </intent>
+
+        <!-- Allow Google Pay feature in WebView -->
+        <intent>
+            <action android:name="org.chromium.intent.action.PAY" />
+        </intent>
+        <intent>
+            <action android:name="org.chromium.intent.action.IS_READY_TO_PAY" />
+        </intent>
+        <intent>
+            <action android:name="org.chromium.intent.action.UPDATE_PAYMENT_DETAILS" />
         </intent>
     </queries>
 </manifest>

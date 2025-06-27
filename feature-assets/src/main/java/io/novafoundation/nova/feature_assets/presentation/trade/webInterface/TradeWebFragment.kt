@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_assets.presentation.trade.webInterface
 
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
@@ -27,6 +29,13 @@ class TradeWebFragment : BaseFragment<TradeWebViewModel, FragmentTradeWebInterfa
             allowContentAccess = true
             useWideViewPort = true
             displayZoomControls = false
+
+            javaScriptCanOpenWindowsAutomatically = true
+            setSupportMultipleWindows(true)
+
+            if (WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
+                WebSettingsCompat.setPaymentRequestEnabled(this, true)
+            }
         }
     }
 

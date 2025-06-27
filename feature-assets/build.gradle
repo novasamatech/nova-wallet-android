@@ -88,6 +88,8 @@ dependencies {
     implementation lifecycleDep
     kapt lifecycleKapt
 
+    implementation androidxWebKit
+
     implementation bouncyCastleDep
 
     testImplementation jUnitDep

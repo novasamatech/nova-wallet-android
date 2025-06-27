@@ -226,6 +226,8 @@ buildscript {
         branchIo = "io.branch.sdk.android:library:5.18.0"
 
         playServiceIdentifier = "com.google.android.gms:play-services-ads-identifier:18.2.0"
+
+        androidxWebKit = "androidx.webkit:webkit:1.14.0"
     }
 
     repositories {
