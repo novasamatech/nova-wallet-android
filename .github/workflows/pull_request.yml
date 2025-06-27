@@ -5,10 +5,17 @@ on:
 
 
 jobs:
-  test:
+  build-and-test:
     uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@fix/io_space
     with:
       branch: ${{github.head_ref}}
       gradlew-command: assembleDevelop
+      build-debug-tests: false
+    secrets: inherit
+  
+  build-test-app:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@fix/io_space
+    with:
+      branch: ${{github.head_ref}}
       build-debug-tests: true
     secrets: inherit
