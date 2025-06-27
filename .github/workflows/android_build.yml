@@ -125,7 +125,7 @@ env:
   POLKASSEMBLY_SUMMARY_API_KEY: ${{ secrets.POLKASSEMBLY_SUMMARY_API_KEY }}
 
 concurrency: 
-  group: ${{ github.workflow }}-${{ github.ref }}-${{inputs.upload-name}}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{inputs.upload-name}}-${{github.job}}
   cancel-in-progress: true
 
 jobs:
