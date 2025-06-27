@@ -13,12 +13,14 @@ import io.novafoundation.nova.feature_nft_impl.data.source.providers.kodadot.Kod
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.pdc20.Pdc20Provider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV1.RmrkV1NftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.rmrkV2.RmrkV2NftProvider
+import io.novafoundation.nova.feature_nft_impl.data.source.providers.unique_network.UniqueNetworkNftProvider
 import io.novafoundation.nova.feature_nft_impl.data.source.providers.uniques.UniquesNftProvider
 import io.novafoundation.nova.feature_nft_impl.di.modules.KodadotModule
 import io.novafoundation.nova.feature_nft_impl.di.modules.Pdc20Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV1Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.RmrkV2Module
 import io.novafoundation.nova.feature_nft_impl.di.modules.UniquesModule
+import io.novafoundation.nova.feature_nft_impl.di.modules.UniqueNetworkModule
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(
@@ -27,7 +29,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
         RmrkV1Module::class,
         RmrkV2Module::class,
         Pdc20Module::class,
-        KodadotModule::class
+        KodadotModule::class,
+        UniqueNetworkModule::class
     ]
 )
 class NftFeatureModule {
@@ -43,8 +46,9 @@ class NftFeatureModule {
         rmrkV1NftProvider: RmrkV1NftProvider,
         rmrkV2NftProvider: RmrkV2NftProvider,
         pdc20Provider: Pdc20Provider,
-        kodadotProvider: KodadotProvider
-    ) = NftProvidersRegistry(uniquesNftProvider, rmrkV1NftProvider, rmrkV2NftProvider, pdc20Provider, kodadotProvider)
+        kodadotProvider: KodadotProvider,
+        uniqueNetworkProvider: UniqueNetworkNftProvider
+    ) = NftProvidersRegistry(uniquesNftProvider, rmrkV1NftProvider, rmrkV2NftProvider, pdc20Provider, kodadotProvider, uniqueNetworkProvider)
 
     @Provides
     @FeatureScope
