@@ -3,22 +3,27 @@ package io.novafoundation.nova.feature_account_impl.data.multisig
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.fromHexOrNull
-import io.novafoundation.nova.common.address.fromHexOrThrow
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.HexString
+import io.novafoundation.nova.common.utils.RuntimeContext
+import io.novafoundation.nova.common.utils.callHash
 import io.novafoundation.nova.common.utils.fromHex
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.FindMultisigsApi
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.FindMultisigsRequest
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.GetCallDatasRequest
+import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.OffChainPendingMultisigInfoRequest
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.FindMultisigsResponse
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetCallDatasResponse
+import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetPedingMultisigOperationsResponse
+import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetPedingMultisigOperationsResponse.OperationRemote
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.MultisigRemote
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multisigs
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.DiscoveredMultisig
+import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.hasExternalApi
@@ -32,6 +37,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Named
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 interface MultisigRepository {
 
@@ -47,11 +54,11 @@ interface MultisigRepository {
         operationIds: Collection<CallHash>
     ): Flow<Map<CallHash, OnChainMultisig?>>
 
-    /**
-     * Returns the call datas corresponding to the given [callHashes]. The result map may contain null when it is not possible
-     * to resolve call data for corresponding call hash
-     */
-    suspend fun getCallDatas(chain: Chain, callHashes: List<CallHash>): Map<CallHash, GenericCall.Instance?>
+    suspend fun getOffChainPendingOperationsInfo(
+        chain: Chain,
+        accountId: AccountIdKey,
+        pendingCallHashes: Collection<CallHash>
+    ): Result<Map<CallHash, OffChainPendingMultisigOperationInfo>>
 }
 
 @FeatureScope
@@ -93,39 +100,60 @@ class RealMultisigRepository @Inject constructor(
         }
     }
 
-    override suspend fun getCallDatas(
+    override suspend fun getOffChainPendingOperationsInfo(
         chain: Chain,
-        callHashes: List<CallHash>
-    ): Map<CallHash, GenericCall.Instance?> {
-        val apiConfig = chain.externalApi<ExternalApi.Multisig>() ?: return callHashes.associateWith { null }
+        accountId: AccountIdKey,
+        pendingCallHashes: Collection<CallHash>
+    ): Result<Map<CallHash, OffChainPendingMultisigOperationInfo>> {
+        val apiConfig = chain.externalApi<ExternalApi.Multisig>() ?: return Result.success(emptyMap())
+
         return kotlin.runCatching {
-            val request = GetCallDatasRequest(callHashes)
+            val request = OffChainPendingMultisigInfoRequest(accountId, pendingCallHashes)
             val response = api.getCallDatas(apiConfig.url, request)
-            response.toCallDataMap(chain, callHashes)
+            response.toDomain(chain)
         }
             .onFailure { Log.e("RealMultisigRepository", "Failed to fetch call datas in ${chain.name}", it) }
-            .getOrDefault(callHashes.associateWith { null })
     }
 
-    private suspend fun SubQueryResponse<GetCallDatasResponse>.toCallDataMap(
-        chain: Chain,
-        callHashes: List<CallHash>
-    ): Map<CallHash, GenericCall.Instance?> {
-        val compactMap = chainRegistry.withRuntime(chain.id) {
+    private suspend fun SubQueryResponse<GetPedingMultisigOperationsResponse>.toDomain(chain: Chain): Map<CallHash, OffChainPendingMultisigOperationInfo> {
+        return chainRegistry.withRuntime(chain.id) {
             data.multisigOperations.nodes.mapNotNull { multisigOperation ->
-                runCatching {
-                    val callHash = CallHash.fromHexOrThrow(multisigOperation.callHash)
-                    val callData = multisigOperation.callData ?: return@mapNotNull null
-                    val call = GenericCall.fromHex(callData)
+                val callHash = CallHash.fromHexOrNull(multisigOperation.callHash) ?: return@mapNotNull null
+                val callData = parseCallData(multisigOperation.callData, callHash, chain)
 
-                    callHash to call
-                }
-                    .onFailure { Log.e("RealMultisigRepository", "Failed to decode call data on ${chain.name}: ${multisigOperation.callData}", it) }
-                    .getOrNull()
-            }.toMap()
+                OffChainPendingMultisigOperationInfo(
+                    timestamp = multisigOperation.timestamp(),
+                    callData = callData,
+                    callHash = callHash
+                )
+            }
+                .associateBy { it.callHash }
         }
+    }
 
-        return callHashes.associateWith { compactMap[it] }
+    private fun OperationRemote.timestamp(): Duration {
+        val inSeconds = events.nodes.firstOrNull()?.timestamp ?: timestamp
+        return inSeconds.seconds
+    }
+
+    context(RuntimeContext)
+    private fun parseCallData(
+        callData: HexString?,
+        callHash: CallHash,
+        chain: Chain
+    ): GenericCall.Instance? {
+        if (callData == null) return null
+
+        return runCatching {
+            val hashFromCallData = callData.callHash().intoKey()
+            require(hashFromCallData == callHash) {
+                "Call-data does not match call hash. Expected hash: ${callHash}, Actual hash: ${hashFromCallData}. Call data: ${callData}"
+            }
+
+            GenericCall.fromHex(callData)
+        }
+            .onFailure { Log.e("RealMultisigRepository", "Failed to decode call data on ${chain.name}: $callData}", it) }
+            .getOrNull()
     }
 
     private fun SubQueryResponse<FindMultisigsResponse>.toDiscoveredMultisigs(): List<DiscoveredMultisig> {
