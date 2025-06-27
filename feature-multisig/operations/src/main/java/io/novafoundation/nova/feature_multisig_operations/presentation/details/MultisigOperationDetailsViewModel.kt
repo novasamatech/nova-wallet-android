@@ -283,7 +283,7 @@ class MultisigOperationDetailsViewModel(
     }
 
     fun onSignatoryClicked(signatoryRvItem: SignatoryRvItem) {
-        showAddressAction(signatoryRvItem.address)
+        showAddressAction(signatoryRvItem.address.address)
     }
 
     fun walletDetailsClicked() = launchUnit {

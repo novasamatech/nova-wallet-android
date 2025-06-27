@@ -1,11 +1,9 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.adapter
 
-import android.graphics.drawable.Drawable
+import io.novafoundation.nova.common.address.AddressModel
 
 data class SignatoryRvItem(
-    val address: String,
-    val icon: Drawable,
-    val title: String,
+    val address: AddressModel,
     val subtitle: CharSequence?,
     val isApproved: Boolean,
 )

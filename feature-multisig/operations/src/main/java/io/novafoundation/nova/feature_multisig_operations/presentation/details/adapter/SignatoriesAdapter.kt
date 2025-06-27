@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_multisig_operations.presentation.details.
 
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import coil.clear
@@ -39,9 +38,9 @@ class SignatoryViewHolder(
 
     fun bind(item: SignatoryRvItem) = with(binder) {
         root.setOnClickListener { itemHandler.onSignatoryClicked(item) }
-        itemSignatoryAccountIcon.setImageDrawable(item.icon)
+        itemSignatoryAccountIcon.setImageDrawable(item.address.image)
         itemSignatoryAccountSelected.setVisible(item.isApproved, falseState = View.INVISIBLE)
-        itemSignatoryAccountTitle.text = item.title
+        itemSignatoryAccountTitle.text = item.address.nameOrAddress
         itemSignatoryAccountSubtitle.setTextOrHide(item.subtitle)
     }
 

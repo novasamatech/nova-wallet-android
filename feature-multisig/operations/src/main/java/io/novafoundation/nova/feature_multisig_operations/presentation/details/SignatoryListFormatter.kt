@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_BIG
+import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -30,7 +31,7 @@ class SignatoryListFormatter(
 
         fun account(id: Long): MetaAccount = metaAccounts.getValue(id)
 
-        fun approvedBy(accountId: AccountIdKey): Boolean = accountId in approvals
+        fun isApprovedBy(accountId: AccountIdKey): Boolean = accountId in approvals
     }
 
     suspend fun formatSignatories(
@@ -59,16 +60,16 @@ class SignatoryListFormatter(
     }
 
     private suspend fun formatUnknownAccount(accountId: AccountIdKey, chain: Chain, context: FormattingContext): SignatoryRvItem {
+        val address = chain.addressOf(accountId)
         return SignatoryRvItem(
-            address = chain.addressOf(accountId),
-            icon = addressIconGenerator.createAddressIcon(
-                accountId.value,
+            address = addressIconGenerator.createAddressModel(
+                accountAddress = address,
+                accountName = address.ellipsizeAddress(),
                 sizeInDp = SIZE_BIG,
-                backgroundColorRes = BACKGROUND_TRANSPARENT
+                background = BACKGROUND_TRANSPARENT
             ),
-            title = chain.addressOf(accountId).ellipsizeAddress(),
             subtitle = null,
-            isApproved = context.approvedBy(accountId)
+            isApproved = context.isApprovedBy(accountId)
         )
     }
 
@@ -79,11 +80,14 @@ class SignatoryListFormatter(
         context: FormattingContext
     ): SignatoryRvItem {
         return SignatoryRvItem(
-            address = metaAccount.requireAddressIn(chain),
-            icon = walletUiUseCase.walletIcon(metaAccount),
-            title = metaAccount.name,
+            address = addressIconGenerator.createAddressModel(
+                accountAddress = metaAccount.requireAddressIn(chain),
+                accountName = metaAccount.name,
+                sizeInDp = SIZE_BIG,
+                background = BACKGROUND_TRANSPARENT
+            ),
             subtitle = metaAccount.formatSubtitle(context),
-            isApproved = context.approvedBy(accountId)
+            isApproved = context.isApprovedBy(accountId)
         )
     }
 
