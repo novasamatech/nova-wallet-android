@@ -163,9 +163,23 @@ jobs:
       - name: 🔧 Install dependencies
         uses: ./.github/workflows/install/
 
+      - name: 📊 Check disk space after install
+        run: |
+          echo "Disk space after install:"
+          df -h
+          echo "Largest directories:"
+          du -h -d 2 /home/runner/ | sort -hr | head -10
+
       - name: 🧪 Run tests
         if: ${{ inputs.run-tests }}
         run: ./gradlew runTest
+
+      - name: 📊 Check disk space after tests
+        run: |
+          echo "Disk space after tests:"
+          df -h
+          echo "Largest directories:"
+          du -h -d 2 /home/runner/ | sort -hr | head -10
 
       - name: 🔐 Getting github sign key
         if: ${{ startsWith(inputs.keystore-file-name, 'github_key.jks') }}
