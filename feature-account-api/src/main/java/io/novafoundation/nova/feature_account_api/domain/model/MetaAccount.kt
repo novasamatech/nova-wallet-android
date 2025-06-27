@@ -162,6 +162,8 @@ fun MultisigMetaAccount.isThreshold1(): Boolean {
     return threshold == 1
 }
 
+fun MetaAccount.requireMultisigAccount() = this as MultisigMetaAccount
+
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
 
 fun MetaAccount.addressIn(chain: Chain): String? {
@@ -249,4 +251,9 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
 val LightMetaAccount.Type.isProxied: Boolean
     get() = this == LightMetaAccount.Type.PROXIED
 
-fun MultisigMetaAccount.allSignatories() = otherSignatories.toSet() + this.signatoryAccountId
+fun MultisigMetaAccount.signatoriesCount() = 1 + otherSignatories.size
+
+fun MultisigMetaAccount.allSignatories() = buildSet {
+    add(signatoryAccountId)
+    addAll(otherSignatories.toSet())
+}

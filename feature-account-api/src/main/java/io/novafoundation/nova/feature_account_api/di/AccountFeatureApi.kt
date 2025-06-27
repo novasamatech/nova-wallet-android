@@ -36,6 +36,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -114,6 +116,10 @@ interface AccountFeatureApi {
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository
+
+    val multisigFormatter: MultisigFormatter
+
+    val proxyFormatter: ProxyFormatter
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

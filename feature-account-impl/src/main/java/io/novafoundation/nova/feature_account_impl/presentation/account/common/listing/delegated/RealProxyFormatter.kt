@@ -12,16 +12,17 @@ import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.splitCamelCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 
-class ProxyFormatter(
+class RealProxyFormatter(
     private val walletUiUseCase: WalletUiUseCase,
     private val resourceManager: ResourceManager,
-) {
+) : ProxyFormatter {
 
-    suspend fun mapProxyMetaAccountSubtitle(
+    override fun mapProxyMetaAccountSubtitle(
         proxyAccountName: String,
         proxyAccountIcon: Drawable,
         proxyAccount: ProxyAccount
@@ -35,14 +36,14 @@ class ProxyFormatter(
             .append(formattedProxyMetaAccount)
     }
 
-    suspend fun mapProxyMetaAccount(proxyAccountName: String, proxyAccountIcon: Drawable): CharSequence {
+    override fun mapProxyMetaAccount(proxyAccountName: String, proxyAccountIcon: Drawable): CharSequence {
         return SpannableStringBuilder()
             .appendEnd(drawableSpan(proxyAccountIcon))
             .appendSpace()
             .append(proxyAccountName, colorSpan(resourceManager.getColor(R.color.text_primary)))
     }
 
-    fun mapProxyTypeToString(type: ProxyType): String {
+    override fun mapProxyTypeToString(type: ProxyType): String {
         val proxyType = when (type) {
             ProxyType.Any -> resourceManager.getString(R.string.account_proxy_type_any)
             ProxyType.NonTransfer -> resourceManager.getString(R.string.account_proxy_type_non_transfer)
@@ -58,7 +59,7 @@ class ProxyFormatter(
         return resourceManager.getString(R.string.proxy_wallet_type, proxyType)
     }
 
-    suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
+    override suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
         return walletUiUseCase.walletIcon(metaAccount, SUBTITLE_ICON_SIZE_DP)
     }
 }
