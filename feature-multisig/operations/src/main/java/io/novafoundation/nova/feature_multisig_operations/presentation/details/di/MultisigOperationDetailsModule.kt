@@ -23,9 +23,11 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.RealMul
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationSystem
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.approveMultisigOperation
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsViewModel
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.SignatoryListFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.di.MultisigOperationDetailsModule.BindsModule
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -64,7 +66,9 @@ class MultisigOperationDetailsModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         validationSystem: ApproveMultisigOperationValidationSystem,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        signatoryListFormatter: SignatoryListFormatter,
         walletUiUseCase: WalletUiUseCase,
+        multisigCallFormatter: MultisigCallFormatter
     ): ViewModel {
         return MultisigOperationDetailsViewModel(
             router = router,
@@ -79,7 +83,9 @@ class MultisigOperationDetailsModule {
             selectedAccountUseCase = selectedAccountUseCase,
             walletUiUseCase = walletUiUseCase,
             validationSystem = validationSystem,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            signatoryListFormatter = signatoryListFormatter,
+            multisigCallFormatter = multisigCallFormatter
         )
     }
 

@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
@@ -14,6 +15,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setDrawableEnd
 
 enum class ExpandableViewState {
     COLLAPSED,
@@ -26,6 +28,10 @@ class ExpandableView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
+    fun interface Callback {
+        fun onStateChanged(state: ExpandableViewState)
+    }
+
     private var supportAnimation: Boolean = true
     private var collapsedByDefault: Boolean = false
     private var chevronResId: Int? = null
@@ -37,6 +43,8 @@ class ExpandableView @JvmOverloads constructor(
     private val expandablePart: View? by lazy { findViewByIdOrNull(expandablePartResId) }
 
     private var isExpandable: Boolean = true
+
+    private var callback: Callback? = null
 
     init {
         applyAttributes(attrs)
@@ -69,6 +77,17 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
+    fun currentState(): ExpandableViewState {
+        return when (isExpanded()) {
+            true -> ExpandableViewState.EXPANDED
+            false -> ExpandableViewState.COLLAPSED
+        }
+    }
+
+    fun setCallback(callback: Callback) {
+        this.callback = callback
+    }
+
     fun setState(state: ExpandableViewState) {
         when (state) {
             ExpandableViewState.COLLAPSED -> collapse()
@@ -77,11 +96,13 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     fun collapseImmediate() {
+        callback?.onStateChanged(ExpandableViewState.COLLAPSED)
         expandablePart?.makeGone()
         chevron?.rotation = -180f
     }
 
     fun expandImmediate() {
+        callback?.onStateChanged(ExpandableViewState.EXPANDED)
         expandablePart?.makeVisible()
         chevron?.rotation = 0f
     }
@@ -105,10 +126,12 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
+    private fun isExpanded() = expandablePart?.isVisible == true
+
     private fun toggle() {
         if (!isExpandable) return
 
-        if (expandablePart?.isVisible == true) {
+        if (isExpanded()) {
             collapse()
         } else {
             expand()
@@ -117,6 +140,7 @@ class ExpandableView @JvmOverloads constructor(
 
     private fun collapse() {
         if (supportAnimation) {
+            callback?.onStateChanged(ExpandableViewState.COLLAPSED)
             expandCollapseAnimator.removeAllListeners()
             expandCollapseAnimator.setFloatValues(0f, -1f)
             expandCollapseAnimator.doOnEnd { expandablePart?.makeGone() }
@@ -128,6 +152,7 @@ class ExpandableView @JvmOverloads constructor(
 
     private fun expand() {
         if (supportAnimation) {
+            callback?.onStateChanged(ExpandableViewState.EXPANDED)
             expandCollapseAnimator.removeAllListeners()
             expandCollapseAnimator.setFloatValues(-1f, 0f)
             expandCollapseAnimator.doOnStart { expandablePart?.makeVisible() }
@@ -138,4 +163,23 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     private fun findViewByIdOrNull(id: Int?): View? = id?.let { findViewById(it) }
+}
+
+fun ExpandableView.bindWithHideShowButton(hideShowButton: TextView) {
+    hideShowButton.setHideShowButtonState(currentState())
+    setCallback { hideShowButton.setHideShowButtonState(it) }
+}
+
+private fun TextView.setHideShowButtonState(state: ExpandableViewState) {
+    when (state) {
+        ExpandableViewState.COLLAPSED -> {
+            text = context.getString(R.string.common_show)
+            setDrawableEnd(R.drawable.ic_eye_show, widthInDp = 20, paddingInDp = 8)
+        }
+
+        ExpandableViewState.EXPANDED -> {
+            text = context.getString(R.string.common_hide)
+            setDrawableEnd(R.drawable.ic_eye_hide, widthInDp = 20, paddingInDp = 8)
+        }
+    }
 }
