@@ -170,36 +170,19 @@ jobs:
           echo "Largest directories:"
           du -h -d 2 /home/runner/ | sort -hr | head -10
 
-      - name: 🧪 Run tests
-        if: ${{ inputs.run-tests }}
-        run: ./gradlew runTest
-
-      - name: 📊 Check disk space after tests
-        run: |
-          echo "Disk space after tests:"
-          df -h
-          echo "Largest directories:"
-          du -h -d 2 /home/runner/ | sort -hr | head -10
-
       - name: 🧹 Clean up after tests
         if: ${{ inputs.run-tests }}
         run: |
-          echo "Cleaning up after tests..."
-          # Clean test outputs
-          ./gradlew cleanTest
-          # Remove test reports and coverage
-          find . -name "test-results" -type d -exec rm -rf {} + 2>/dev/null || true
-          find . -name "reports" -type d -exec rm -rf {} + 2>/dev/null || true
-          find . -name "coverage" -type d -exec rm -rf {} + 2>/dev/null || true
-          # Clean intermediate test files
-          find . -path "*/build/intermediates/javac/*" -type d -exec rm -rf {} + 2>/dev/null || true
-          find . -path "*/build/intermediates/kotlin/*" -type d -exec rm -rf {} + 2>/dev/null || true
-          find . -path "*/build/intermediates/compile_and_runtime_not_namespaced_r_class_jar/*" -type d -exec rm -rf {} + 2>/dev/null || true
-          # Clean temporary files
-          find . -name "*.tmp" -type f -delete
-          find . -name "*.log" -type f -delete
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
           echo "Disk space after cleanup:"
           df -h
+
+      - name: 🧪 Run tests
+        if: ${{ inputs.run-tests }}
+        run: ./gradlew runTest
 
       - name: 🔐 Getting github sign key
         if: ${{ startsWith(inputs.keystore-file-name, 'github_key.jks') }}
