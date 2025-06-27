@@ -13,8 +13,6 @@ interface MultisigCallDataWatcher {
     val callData: Flow<Map<MultiChainCallHash, GenericCall.Instance>>
 }
 
-
-
 class MultiChainMultisigEvent(
     val multisig: AccountIdKey,
     val callHash: CallHash,

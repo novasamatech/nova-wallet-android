@@ -147,7 +147,7 @@ class RealMultisigRepository @Inject constructor(
         return runCatching {
             val hashFromCallData = callData.callHash().intoKey()
             require(hashFromCallData == callHash) {
-                "Call-data does not match call hash. Expected hash: ${callHash}, Actual hash: ${hashFromCallData}. Call data: ${callData}"
+                "Call-data does not match call hash. Expected hash: $callHash, Actual hash: $hashFromCallData. Call data: $callData"
             }
 
             GenericCall.fromHex(callData)

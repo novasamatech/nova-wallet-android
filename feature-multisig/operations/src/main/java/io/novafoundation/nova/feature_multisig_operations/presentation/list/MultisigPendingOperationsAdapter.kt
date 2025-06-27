@@ -39,11 +39,11 @@ class MultisigPendingOperationsAdapter(
     }
 
     override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
-       return MultisigPendingOperationHolder(
-           viewBinding = ItemMultisigPendingOperationBinding.inflate(parent.inflater(), parent, false),
-           itemHandler = handler,
-           imageLoader = imageLoader
-       )
+        return MultisigPendingOperationHolder(
+            viewBinding = ItemMultisigPendingOperationBinding.inflate(parent.inflater(), parent, false),
+            itemHandler = handler,
+            imageLoader = imageLoader
+        )
     }
 
     override fun bindChild(holder: GroupedListHolder, child: PendingMultisigOperationModel) {
@@ -57,7 +57,7 @@ class MultisigPendingOperationsAdapter(
 
 class MultisigPendingOperationHeaderHolder(
     private val viewBinding: ItemMultisigPendingOperationHeaderBinding,
-): GroupedListHolder(viewBinding.root) {
+) : GroupedListHolder(viewBinding.root) {
 
     fun bind(model: PendingMultisigOperationHeaderModel) {
         viewBinding.itemMultisigPendingOperationHeader.text = model.daysSinceEpoch.formatDaysSinceEpoch(viewBinding.root.context)
@@ -119,7 +119,6 @@ private class PendingMultisigOperationDiffCallback : BaseGroupedDiffCallback<Pen
 
     override fun areChildItemsTheSame(oldItem: PendingMultisigOperationModel, newItem: PendingMultisigOperationModel): Boolean {
         return oldItem.id == newItem.id
-
     }
 
     override fun areChildContentsTheSame(oldItem: PendingMultisigOperationModel, newItem: PendingMultisigOperationModel): Boolean {
