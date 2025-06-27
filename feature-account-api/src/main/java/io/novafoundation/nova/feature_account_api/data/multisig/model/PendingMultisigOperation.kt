@@ -42,6 +42,7 @@ fun PendingMultisigOperation.userAction(): MultisigAction {
         !in approvals -> MultisigAction.CanApprove(
             isFinalApproval = approvals.size == threshold - 1
         )
+
         else -> MultisigAction.Signed
     }
 }

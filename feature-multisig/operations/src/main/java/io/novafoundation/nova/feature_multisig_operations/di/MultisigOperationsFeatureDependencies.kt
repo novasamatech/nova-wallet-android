@@ -12,8 +12,11 @@ import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingO
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
@@ -60,6 +63,12 @@ interface MultisigOperationsFeatureDependencies {
     val callTraversal: CallTraversal
 
     val addressIconGenerator: AddressIconGenerator
+
+    val multisigFormatter: MultisigFormatter
+
+    val proxyFormatter: ProxyFormatter
+
+    val accountInteractor: AccountInteractor
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

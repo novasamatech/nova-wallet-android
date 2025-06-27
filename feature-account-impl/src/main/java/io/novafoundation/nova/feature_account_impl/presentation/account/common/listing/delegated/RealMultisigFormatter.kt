@@ -11,24 +11,27 @@ import io.novafoundation.nova.common.utils.appendEnd
 import io.novafoundation.nova.common.utils.appendSpace
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.drawableSpan
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_impl.R
 import javax.inject.Inject
 
 @FeatureScope
-class MultisigFormatter @Inject constructor(
+class RealMultisigFormatter @Inject constructor(
     private val walletUiUseCase: WalletUiUseCase,
     private val addressIconGenerator: AddressIconGenerator,
+    private val accountInteractor: AccountInteractor,
     private val resourceManager: ResourceManager
-) {
+) : MultisigFormatter {
 
-    suspend fun formatSignatorySubtitle(signatory: MetaAccount): CharSequence {
+    override suspend fun formatSignatorySubtitle(signatory: MetaAccount): CharSequence {
         val icon = makeAccountDrawable(signatory)
         return formatSignatorySubtitle(signatory, icon)
     }
 
-    fun formatSignatorySubtitle(signatory: MetaAccount, icon: Drawable): CharSequence {
+    override fun formatSignatorySubtitle(signatory: MetaAccount, icon: Drawable): CharSequence {
         val formattedMetaAccount = formatAccount(signatory.name, icon)
 
         return SpannableStringBuilder(resourceManager.getString(R.string.multisig_signatory))
@@ -36,7 +39,7 @@ class MultisigFormatter @Inject constructor(
             .append(formattedMetaAccount)
     }
 
-    suspend fun formatSignatory(signatory: MetaAccount): CharSequence {
+    override suspend fun formatSignatory(signatory: MetaAccount): CharSequence {
         val icon = makeAccountDrawable(signatory)
         return formatAccount(signatory.name, icon)
     }
@@ -49,12 +52,12 @@ class MultisigFormatter @Inject constructor(
             .append(proxyAccountName, colorSpan(resourceManager.getColor(R.color.text_primary)))
     }
 
-    suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
+    override suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
         // TODO multisig: this does db request for each icon. We should probably batch it. Same with proxieds
         return walletUiUseCase.walletIcon(metaAccount, SUBTITLE_ICON_SIZE_DP)
     }
 
-    suspend fun makeAccountDrawable(accountId: ByteArray): Drawable {
+    override suspend fun makeAccountDrawable(accountId: ByteArray): Drawable {
         return addressIconGenerator.createAddressIcon(accountId, SUBTITLE_ICON_SIZE_DP, backgroundColorRes = BACKGROUND_TRANSPARENT)
     }
 }

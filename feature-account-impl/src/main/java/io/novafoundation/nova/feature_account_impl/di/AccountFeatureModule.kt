@@ -125,8 +125,10 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.addressA
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealMultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
@@ -195,6 +197,12 @@ class AccountFeatureModule {
 
         @Binds
         fun bindNestedSigningPresenter(real: RealNestedSigningPresenter): NestedSigningPresenter
+
+        @Binds
+        fun bindProxyFormatter(real: RealProxyFormatter): ProxyFormatter
+
+        @Binds
+        fun bindMultisigFormatter(real: RealMultisigFormatter): MultisigFormatter
     }
 
     @Provides
@@ -566,7 +574,7 @@ class AccountFeatureModule {
     fun provideProxyFormatter(
         walletUseCase: WalletUiUseCase,
         resourceManager: ResourceManager
-    ) = ProxyFormatter(walletUseCase, resourceManager)
+    ) = RealProxyFormatter(walletUseCase, resourceManager)
 
     @Provides
     @FeatureScope
