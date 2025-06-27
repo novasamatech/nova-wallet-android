@@ -32,7 +32,8 @@
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
 
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/multisigPendingOperationDetailsNetwork"
@@ -52,7 +53,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueEndIcon="@drawable/ic_info"
-                    app:title="@string/multisig_pending_operations_on_behalf_of" />
+                    app:title="@string/multisig_on_behalf_of" />
 
             </io.novafoundation.nova.common.view.TableView>
 

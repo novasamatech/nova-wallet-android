@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="multisig_on_behalf_of">On behalf of</string>
     <string name="common_signatory">Signatory</string>
     <string name="common_hide">Hide</string>
     <string name="common_show">Show</string>
