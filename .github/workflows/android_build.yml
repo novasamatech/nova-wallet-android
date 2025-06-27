@@ -139,6 +139,13 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
+      - name: 📊 Check initial disk space
+        run: |
+          echo "Initial disk space:"
+          df -h
+          echo "Largest directories:"
+          du -h -d 2 /home/runner/ | sort -hr | head -10
+
       - name: 📂 Set up DEV Google Services
         uses: davidSchuppa/base64Secret-toFile-action@v3
         with:
