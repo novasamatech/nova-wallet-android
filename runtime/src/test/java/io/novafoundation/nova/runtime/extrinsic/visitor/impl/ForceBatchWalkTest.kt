@@ -202,7 +202,7 @@ internal class ForceBatchWalkTest {
             addAll(innerBatchEvents)
             add(itemCompleted())
 
-            // first leve batch ends
+            // first level batch ends
             add(batchCompleted())
             add(extrinsicSuccess())
         }
