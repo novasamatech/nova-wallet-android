@@ -197,7 +197,7 @@ class DynamicCrossChainTransactor @Inject constructor(
         beneficiary: AccountIdKey,
         amount: Balance,
     ) {
-        val feesAmount = amount / 2.toBigInteger()
+        val feesAmount = deriveBuyExecutionUpperBoundAmount(amount)
 
         // Origin
         withdrawAsset(assetLocation, amount)
@@ -218,7 +218,7 @@ class DynamicCrossChainTransactor @Inject constructor(
         beneficiary: AccountIdKey,
         amount: Balance,
     ) {
-        val feesAmount = amount / 2.toBigInteger()
+        val feesAmount = deriveBuyExecutionUpperBoundAmount(amount)
 
         // Origin
         withdrawAsset(assetLocation, amount)
@@ -236,7 +236,7 @@ class DynamicCrossChainTransactor @Inject constructor(
         beneficiary: AccountIdKey,
         amount: Balance,
     ) {
-        val feesAmount = amount / 2.toBigInteger()
+        val feesAmount = deriveBuyExecutionUpperBoundAmount(amount)
 
         // Origin
         withdrawAsset(assetLocation, amount)
@@ -255,7 +255,7 @@ class DynamicCrossChainTransactor @Inject constructor(
         beneficiary: AccountIdKey,
         amount: Balance,
     ) {
-        val feesAmount = amount / 2.toBigInteger()
+        val feesAmount = deriveBuyExecutionUpperBoundAmount(amount)
 
         // Origin
         withdrawAsset(assetLocation, amount)
@@ -269,6 +269,10 @@ class DynamicCrossChainTransactor @Inject constructor(
         // Destination
         buyExecution(assetLocation, feesAmount, WeightLimit.Unlimited)
         depositAsset(MultiAssetFilter.singleCounted(), beneficiary)
+    }
+
+    private fun deriveBuyExecutionUpperBoundAmount(transferringAmount: Balance): Balance {
+        return transferringAmount / 2.toBigInteger()
     }
 
     private fun <T> T.versionedXcm() = versionedXcm(USED_XCM_VERSION)
