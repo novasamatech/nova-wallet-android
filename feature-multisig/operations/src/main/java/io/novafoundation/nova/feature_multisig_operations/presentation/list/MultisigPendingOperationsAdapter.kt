@@ -1,11 +1,12 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.list
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import coil.ImageLoader
-import io.novafoundation.nova.common.list.BaseListAdapter
-import io.novafoundation.nova.common.list.BaseViewHolder
+import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
+import io.novafoundation.nova.common.list.GroupedListAdapter
+import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.presentation.setColoredText
+import io.novafoundation.nova.common.utils.formatting.formatDaysSinceEpoch
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
@@ -17,21 +18,27 @@ import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.databinding.ItemMultisigPendingOperationBinding
+import io.novafoundation.nova.feature_multisig_operations.databinding.ItemMultisigPendingOperationHeaderBinding
+import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationHeaderModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel
 
 class MultisigPendingOperationsAdapter(
     private val handler: ItemHandler,
     private val imageLoader: ImageLoader,
-) : BaseListAdapter<PendingMultisigOperationModel, MultisigPendingOperationHolder>(
-    PendingMultisigOperationDiffCallback()
-) {
+) : GroupedListAdapter<PendingMultisigOperationHeaderModel, PendingMultisigOperationModel>(PendingMultisigOperationDiffCallback()) {
 
     interface ItemHandler {
 
         fun itemClicked(model: PendingMultisigOperationModel)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MultisigPendingOperationHolder {
+    override fun createGroupViewHolder(parent: ViewGroup): GroupedListHolder {
+        return MultisigPendingOperationHeaderHolder(
+            viewBinding = ItemMultisigPendingOperationHeaderBinding.inflate(parent.inflater(), parent, false)
+        )
+    }
+
+    override fun createChildViewHolder(parent: ViewGroup): GroupedListHolder {
         return MultisigPendingOperationHolder(
             viewBinding = ItemMultisigPendingOperationBinding.inflate(parent.inflater(), parent, false),
             itemHandler = handler,
@@ -39,8 +46,21 @@ class MultisigPendingOperationsAdapter(
         )
     }
 
-    override fun onBindViewHolder(holder: MultisigPendingOperationHolder, position: Int) {
-        holder.bind(getItem(position))
+    override fun bindChild(holder: GroupedListHolder, child: PendingMultisigOperationModel) {
+        (holder as MultisigPendingOperationHolder).bind(child)
+    }
+
+    override fun bindGroup(holder: GroupedListHolder, group: PendingMultisigOperationHeaderModel) {
+        (holder as MultisigPendingOperationHeaderHolder).bind(group)
+    }
+}
+
+class MultisigPendingOperationHeaderHolder(
+    private val viewBinding: ItemMultisigPendingOperationHeaderBinding,
+) : GroupedListHolder(viewBinding.root) {
+
+    fun bind(model: PendingMultisigOperationHeaderModel) {
+        viewBinding.itemMultisigPendingOperationHeader.text = model.daysSinceEpoch.formatDaysSinceEpoch(viewBinding.root.context)
     }
 }
 
@@ -48,7 +68,7 @@ class MultisigPendingOperationHolder(
     private val viewBinding: ItemMultisigPendingOperationBinding,
     private val itemHandler: MultisigPendingOperationsAdapter.ItemHandler,
     private val imageLoader: ImageLoader,
-) : BaseViewHolder(viewBinding.root) {
+) : GroupedListHolder(viewBinding.root) {
 
     init {
         with(viewBinding.root) {
@@ -83,17 +103,25 @@ class MultisigPendingOperationHolder(
 
         root.setOnClickListener { itemHandler.itemClicked(model) }
     }
-
-    override fun unbind() {}
 }
 
-private class PendingMultisigOperationDiffCallback : DiffUtil.ItemCallback<PendingMultisigOperationModel>() {
+private class PendingMultisigOperationDiffCallback : BaseGroupedDiffCallback<PendingMultisigOperationHeaderModel, PendingMultisigOperationModel>(
+    PendingMultisigOperationHeaderModel::class.java
+) {
 
-    override fun areItemsTheSame(oldItem: PendingMultisigOperationModel, newItem: PendingMultisigOperationModel): Boolean {
+    override fun areGroupItemsTheSame(oldItem: PendingMultisigOperationHeaderModel, newItem: PendingMultisigOperationHeaderModel): Boolean {
+        return oldItem.daysSinceEpoch == newItem.daysSinceEpoch
+    }
+
+    override fun areGroupContentsTheSame(oldItem: PendingMultisigOperationHeaderModel, newItem: PendingMultisigOperationHeaderModel): Boolean {
+        return true
+    }
+
+    override fun areChildItemsTheSame(oldItem: PendingMultisigOperationModel, newItem: PendingMultisigOperationModel): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: PendingMultisigOperationModel, newItem: PendingMultisigOperationModel): Boolean {
+    override fun areChildContentsTheSame(oldItem: PendingMultisigOperationModel, newItem: PendingMultisigOperationModel): Boolean {
         return oldItem == newItem
     }
 }

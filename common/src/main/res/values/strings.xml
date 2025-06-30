@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="multisig_on_behalf_of">On behalf of</string>
+    <string name="common_signatory">Signatory</string>
+    <string name="common_hide">Hide</string>
+    <string name="common_show">Show</string>
+    <string name="multisig_operation_details_signatories">Signatories (%d of %d)</string>
+
     <string name="swap_dry_run_failed_inline_message">Simulation of swap step failed</string>
 
     <string name="common_dry_run_failed_title">Transaction simulation failed</string>

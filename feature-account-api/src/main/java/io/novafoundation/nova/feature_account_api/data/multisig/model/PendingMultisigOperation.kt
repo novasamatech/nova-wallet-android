@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import kotlin.time.Duration
 
 class PendingMultisigOperation(
     val call: GenericCall.Instance?,
@@ -17,6 +18,7 @@ class PendingMultisigOperation(
     val signatoryAccountId: AccountIdKey,
     val signatoryMetaId: Long,
     val threshold: Int,
+    val timestamp: Duration,
 ) : Identifiable {
 
     override val identifier: PendingMultisigOperationId = "${chain.id}.${callHash.toHex()}.${timePoint.height}.${timePoint.extrinsicIndex}"
@@ -25,7 +27,7 @@ class PendingMultisigOperation(
         val callFormatted = if (call != null) {
             "${call.module.name}.${call.function.name}"
         } else {
-            callHash
+            callHash.toHex()
         }
 
         return "Call: $callFormatted, Chain: ${chain.name}, Approvals: ${approvals.size}/$threshold, User action: ${userAction()}"
@@ -42,6 +44,7 @@ fun PendingMultisigOperation.userAction(): MultisigAction {
         !in approvals -> MultisigAction.CanApprove(
             isFinalApproval = approvals.size == threshold - 1
         )
+
         else -> MultisigAction.Signed
     }
 }

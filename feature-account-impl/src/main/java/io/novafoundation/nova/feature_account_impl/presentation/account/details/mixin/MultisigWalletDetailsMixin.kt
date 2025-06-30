@@ -4,6 +4,7 @@ import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.format.AddressFormat
 import io.novafoundation.nova.common.address.format.asAccountId
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.UNIFIED_ADDRESS_PREFIX
 import io.novafoundation.nova.common.utils.append
@@ -25,7 +26,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.details.
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -103,7 +104,7 @@ class MultisigWalletDetailsMixin(
         val accountDrawable = multisigFormatter.makeAccountDrawable(accountIdKey.value)
         val accountAddress = addressFormat.addressOf(accountIdKey.value.asAccountId())
             .value
-            .ellipsizeMiddle(shownSymbols = 9)
+            .ellipsizeAddress()
 
         val addressColor = resourceManager.getColor(R.color.text_secondary)
         val infoIcon = resourceManager.getDrawable(R.drawable.ic_info).apply {
@@ -131,14 +132,6 @@ class MultisigWalletDetailsMixin(
                 host.externalActions.showAddressActions(accountIdKey.value, chain)
             }
         }
-    }
-
-    private fun CharSequence.ellipsizeMiddle(shownSymbols: Int): CharSequence {
-        if (length < shownSymbols * 2) return this
-
-        return SpannableStringBuilder(this.subSequence(0, shownSymbols))
-            .append("...")
-            .append(this.substring(length - shownSymbols))
     }
 
     private suspend fun getAddressFormat(metaAccount: MultisigMetaAccount): AddressFormat {
