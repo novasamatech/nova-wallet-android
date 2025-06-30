@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details
 
 import androidx.lifecycle.viewModelScope
-import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.TitleAndMessage
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -42,7 +41,6 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.callForma
 import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.adapter.SignatoryRvItem
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
-import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
