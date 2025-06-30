@@ -70,11 +70,11 @@ class RealMultisigRepository @Inject constructor(
 ) : MultisigRepository {
 
     override fun supportsMultisigSync(chain: Chain): Boolean {
-        return chain.hasExternalApi<ExternalApi.Multisig>()
+        return chain.hasMultisigApi()
     }
 
     override suspend fun findMultisigAccounts(chain: Chain, accountIds: Set<AccountIdKey>): List<DiscoveredMultisig> {
-        val apiConfig = chain.externalApi<ExternalApi.Multisig>() ?: return emptyList()
+        val apiConfig = chain.multisigApi() ?: return emptyList()
         val request = FindMultisigsRequest(accountIds)
         return api.findMultisigs(apiConfig.url, request).toDiscoveredMultisigs()
     }
@@ -105,7 +105,7 @@ class RealMultisigRepository @Inject constructor(
         accountId: AccountIdKey,
         pendingCallHashes: Collection<CallHash>
     ): Result<Map<CallHash, OffChainPendingMultisigOperationInfo>> {
-        val apiConfig = chain.externalApi<ExternalApi.Multisig>() ?: return Result.success(emptyMap())
+        val apiConfig = chain.multisigApi() ?: return Result.success(emptyMap())
 
         return kotlin.runCatching {
             val request = OffChainPendingMultisigInfoRequest(accountId, pendingCallHashes)
@@ -171,5 +171,13 @@ class RealMultisigRepository @Inject constructor(
     private fun MultisigRemote.thresholdIfValid(): Int? {
         // TODO there is a but on SubQuery that results in threshold=0 for threshold 1 multisigs
         return threshold.takeIf { it >= 1 }
+    }
+
+    private fun Chain.hasMultisigApi(): Boolean {
+        return hasExternalApi<ExternalApi.Multisig>()
+    }
+
+    private fun Chain.multisigApi(): ExternalApi.Multisig? {
+        return externalApi()
     }
 }
