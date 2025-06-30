@@ -6,7 +6,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import io.novafoundation.nova.common.utils.ByteArrayHexAdapter
+import io.novafoundation.nova.common.utils.ByteArrayAsReadableStringSerializer
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import java.lang.reflect.Type
 
@@ -24,7 +24,7 @@ private class GenericCallAdapter : JsonSerializer<GenericCall.Instance> {
 object ExtrinsicSerializers {
 
     fun gson() = GsonBuilder()
-        .registerTypeHierarchyAdapter(ByteArray::class.java, ByteArrayHexAdapter())
+        .registerTypeHierarchyAdapter(ByteArray::class.java, ByteArrayAsReadableStringSerializer())
         .registerTypeHierarchyAdapter(GenericCall.Instance::class.java, GenericCallAdapter())
         .setPrettyPrinting()
         .create()

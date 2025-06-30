@@ -38,6 +38,8 @@ class WalletConnectError(val code: Int, override val message: String) : Throwabl
     companion object {
         val REJECTED = WalletConnectError(5000, "Rejected by user")
 
+        val SEND_HANDLED_BY_SIGNER = WalletConnectError(50001, "Sending extrinsic was handled by Nova Wallet directly")
+
         val GENERAL_FAILURE = WalletConnectError(0, "Unknown error")
 
         val NO_SESSION_FOR_TOPIC = WalletConnectError(7001, "No session for topic")
@@ -61,7 +63,7 @@ fun Wallet.Model.SessionRequest.failed(error: WalletConnectError): Wallet.Params
     )
 }
 
-fun Wallet.Model.SessionRequest.rejected(): Wallet.Params.SessionRequestResponse {
+fun Wallet.Model.SessionRequest.rejected(reason: WalletConnectError = WalletConnectError.REJECTED): Wallet.Params.SessionRequestResponse {
     return failed(WalletConnectError.REJECTED)
 }
 
