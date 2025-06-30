@@ -1,14 +1,14 @@
-package io.novafoundation.nova.feature_xcm_impl.dryRun
+package io.novafoundation.nova.feature_xcm_impl.runtimeApi.dryRun
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ScaleResult
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.provideContext
-import io.novafoundation.nova.feature_xcm_api.dryRun.DryRunApi
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.CallDryRunEffects
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.DryRunEffectsResultErr
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.OriginCaller
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.XcmDryRunEffects
 import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.CallDryRunEffects
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.DryRunEffectsResultErr
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.XcmDryRunEffects
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcmLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance

@@ -12,11 +12,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.isCrossChain
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainValidationSystemProvider
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -32,6 +33,7 @@ class SendInteractor(
     private val parachainInfoRepository: ParachainInfoRepository,
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val extrinsicService: ExtrinsicService,
+    private val crossChainValidationProvider: CrossChainValidationSystemProvider
 ) {
 
     suspend fun getFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): TransferFee = withContext(Dispatchers.Default) {
@@ -42,10 +44,10 @@ class SendInteractor(
 
             val originFee = OriginFee(
                 submissionFee = fees.submissionFee,
-                deliveryFee = fees.deliveryFee,
+                deliveryFee = fees.postSubmissionByAccount,
             )
 
-            TransferFee(originFee, fees.executionFee)
+            TransferFee(originFee, fees.postSubmissionFromAmount)
         } else {
             TransferFee(
                 originFee = getOriginFee(transfer, coroutineScope),
@@ -89,7 +91,7 @@ class SendInteractor(
     }
 
     fun validationSystemFor(transfer: AssetTransfer, coroutineScope: CoroutineScope) = if (transfer.isCrossChain) {
-        crossChainTransactor.validationSystem
+        crossChainValidationProvider.createValidationSystem()
     } else {
         assetSourceRegistry.sourceFor(transfer.originChainAsset).transfers.getValidationSystem(coroutineScope)
     }
