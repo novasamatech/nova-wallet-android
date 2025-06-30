@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.bold
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.formatting.spannable.format
+import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -233,7 +234,7 @@ class MultisigOperationDetailsViewModel(
         actionBottomSheetLauncher.launchBottomSheet(
             imageRes = R.drawable.ic_multisig,
             title = resourceManager.getString(R.string.multisig_signing_warning_title),
-            subtitle = resourceManager.getString(R.string.multisig_signing_reject_confirmation_subtitle, depositorName),
+            subtitle = resourceManager.highlightedText(R.string.multisig_signing_reject_confirmation_subtitle, depositorName),
             actionButtonPreferences = ButtonPreferences(
                 text = resourceManager.getString(R.string.common_confirm),
                 style = PrimaryButton.Appearance.PRIMARY,
