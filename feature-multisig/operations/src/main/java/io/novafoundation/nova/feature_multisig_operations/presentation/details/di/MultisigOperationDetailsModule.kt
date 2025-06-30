@@ -13,7 +13,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -68,7 +70,9 @@ class MultisigOperationDetailsModule {
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
         signatoryListFormatter: SignatoryListFormatter,
         walletUiUseCase: WalletUiUseCase,
-        multisigCallFormatter: MultisigCallFormatter
+        multisigCallFormatter: MultisigCallFormatter,
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
+        accountInteractor: AccountInteractor,
     ): ViewModel {
         return MultisigOperationDetailsViewModel(
             router = router,
@@ -85,7 +89,9 @@ class MultisigOperationDetailsModule {
             validationSystem = validationSystem,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
             signatoryListFormatter = signatoryListFormatter,
-            multisigCallFormatter = multisigCallFormatter
+            multisigCallFormatter = multisigCallFormatter,
+            actionBottomSheetLauncherFactory = actionBottomSheetLauncherFactory,
+            accountInteractor = accountInteractor
         )
     }
 

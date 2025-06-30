@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_multisig_operations.di
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
@@ -69,6 +71,10 @@ interface MultisigOperationsFeatureDependencies {
     val proxyFormatter: ProxyFormatter
 
     val accountInteractor: AccountInteractor
+
+    val toggleFeatureRepository: ToggleFeatureRepository
+
+    val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider
