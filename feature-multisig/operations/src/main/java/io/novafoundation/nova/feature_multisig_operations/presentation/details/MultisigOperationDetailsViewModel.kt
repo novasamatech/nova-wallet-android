@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.bold
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.formatting.spannable.format
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -23,7 +22,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.allSignatories
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireMultisigAccount
-import io.novafoundation.nova.feature_account_api.domain.model.signatoriesCount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -127,7 +125,7 @@ class MultisigOperationDetailsViewModel(
         selectedAccountFlow,
         operationFlow
     ) { metaAccount, operation ->
-        resourceManager.getString(R.string.multisig_operation_details_signatories, operation.approvals.size, metaAccount.signatoriesCount())
+        resourceManager.getString(R.string.multisig_operation_details_signatories, operation.approvals.size, metaAccount.threshold)
     }.shareInBackground()
 
     val signatories = combine(
