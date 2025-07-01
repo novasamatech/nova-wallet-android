@@ -156,7 +156,6 @@ class RealMultisigCallFormatter @Inject constructor(
         }
     }
 
-
     private suspend fun createOnBehalfOf(
         callVisit: CallVisit,
         initialOrigin: AccountIdKey,

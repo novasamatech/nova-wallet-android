@@ -120,7 +120,7 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
 
             setTitle(entry.name)
 
-            when(val value = entry.value) {
+            when (val value = entry.value) {
                 is MultisigCallDetailsModel.TableValue.Account -> {
                     setExtraInfoAvailable(true)
                     showAddress(value.addressModel)
