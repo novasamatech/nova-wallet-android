@@ -30,6 +30,13 @@
             android:layout_marginEnd="16dp"
             android:orientation="vertical">
 
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+                android:id="@+id/multisigPendingOperationPrimaryAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp" />
+
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,6 +63,12 @@
                     app:title="@string/multisig_on_behalf_of" />
 
             </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.TableView
+                android:layout_width="match_parent"
+                android:id="@+id/multisigPendingOperationDetailsCallTable"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"

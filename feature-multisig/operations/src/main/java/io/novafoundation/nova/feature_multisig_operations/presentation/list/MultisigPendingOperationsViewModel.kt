@@ -61,7 +61,7 @@ class MultisigPendingOperationsViewModel(
 
     private suspend fun PendingMultisigOperation.toUi(selectedAccount: MetaAccount): PendingMultisigOperationModel {
         val initialOrigin = selectedAccount.requireAccountIdKeyIn(chain)
-        val formattedCall = multisigCallFormatter.formatMultisigCall(call, initialOrigin, chain)
+        val formattedCall = multisigCallFormatter.formatPreview(call, initialOrigin, chain)
 
         return PendingMultisigOperationModel(
             id = identifier,

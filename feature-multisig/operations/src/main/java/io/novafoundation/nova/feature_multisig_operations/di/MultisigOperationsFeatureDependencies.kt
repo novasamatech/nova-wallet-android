@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
@@ -69,6 +70,8 @@ interface MultisigOperationsFeatureDependencies {
     val proxyFormatter: ProxyFormatter
 
     val accountInteractor: AccountInteractor
+
+    val arbitraryTokenUseCase: ArbitraryTokenUseCase
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

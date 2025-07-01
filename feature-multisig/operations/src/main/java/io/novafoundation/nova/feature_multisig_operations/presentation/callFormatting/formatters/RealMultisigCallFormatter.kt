@@ -14,8 +14,11 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalI
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_multisig_operations.R
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallPreviewModel
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallVisit
@@ -34,28 +37,67 @@ class RealMultisigCallFormatter @Inject constructor(
     @LocalIdentity private val identityProvider: IdentityProvider,
     private val addressIconGenerator: AddressIconGenerator,
     private val assetIconProvider: AssetIconProvider,
+    private val tokenUseCase: ArbitraryTokenUseCase,
 ) : MultisigCallFormatter {
 
-    override suspend fun formatMultisigCall(
+    override suspend fun formatPreview(
         call: GenericCall.Instance?,
         initialOrigin: AccountIdKey,
         chain: Chain
     ): MultisigCallPreviewModel {
+        return formatCall(
+            call = call,
+            initialOrigin = initialOrigin,
+            chain = chain,
+            formatUnknown = ::formatUnknownPreview,
+            formatDefault = { formatDefaultPreview(it, chain) },
+            formatSpecific = { delegate, callVisit -> delegate.formatPreview(callVisit, chain) },
+            constructFinalResult = { delegateResult, onBehalfOf -> createCallPreview(delegateResult, onBehalfOf) }
+        )
+    }
+
+    override suspend fun formatDetails(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): MultisigCallDetailsModel {
+        return formatCall(
+            call = call,
+            initialOrigin = initialOrigin,
+            chain = chain,
+            formatUnknown = ::formatUnknownDetails,
+            formatDefault = { formatDefaultDetails(it) },
+            formatSpecific = { delegate, callVisit -> delegate.formatDetails(callVisit, chain) },
+            constructFinalResult = { delegateResult, onBehalfOf -> createCallDetails(delegateResult, onBehalfOf) }
+        )
+    }
+
+    private suspend fun <D : Any, R> formatCall(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain,
+        formatUnknown: () -> R,
+        formatDefault: suspend (GenericCall.Instance) -> R,
+        formatSpecific: suspend (MultisigActionFormatterDelegate, CallVisit) -> D?,
+        constructFinalResult: suspend (D, onBehalfOf: AddressModel?) -> R
+    ): R {
         if (call == null) return formatUnknown()
 
         val singleFormattedVisit = callTraversal.collect(call, initialOrigin)
-            .map { formatCallVisit(it, chain) }
+            .map { formatCallVisit(it) { delegate -> formatSpecific(delegate, it) } }
             .ensureSingleFormattedVisit()
 
         return if (singleFormattedVisit != null) {
             val (singleMatch, singleMatchVisit) = singleFormattedVisit
-            createCallPreview(singleMatchVisit, singleMatch!!, initialOrigin, chain)
+
+            val onBehalfOf = createOnBehalfOf(singleMatchVisit, initialOrigin, chain)
+            return constructFinalResult(singleMatch!!, onBehalfOf)
         } else {
-            formatDefault(call, chain)
+            formatDefault(call)
         }
     }
 
-    private fun List<DelegateResultWithVisit>.ensureSingleFormattedVisit(): DelegateResultWithVisit? {
+    private fun <T> List<DelegateResultWithVisit<T>>.ensureSingleFormattedVisit(): DelegateResultWithVisit<T>? {
         // We do not want to present a formatted call when there was at least one not resolved leaf - it might make signers not notice unformatted part whatsoever
         // So, we always forbid formatting if some leaf was not resolved
         val hasUnformattedLeafs = any { (formatResult, callVisit) -> formatResult == null && callVisit.isLeaf }
@@ -71,15 +113,49 @@ class RealMultisigCallFormatter @Inject constructor(
         }
     }
 
-    private suspend fun createCallPreview(
-        callVisit: CallVisit,
-        delegateResult: MultisigActionFormatterDelegateResult,
-        initialOrigin: AccountIdKey,
-        chain: Chain
+    private fun createCallPreview(
+        delegateResult: MultisigActionFormatterDelegatePreviewResult,
+        onBehalfOf: AddressModel?
     ): MultisigCallPreviewModel {
-        val onBehalfOf = createOnBehalfOf(callVisit, initialOrigin, chain)
         return with(delegateResult) { MultisigCallPreviewModel(title, subtitle, primaryValue, icon, onBehalfOf) }
     }
+
+    private suspend fun createCallDetails(
+        delegateResult: MultisigActionFormatterDelegateDetailsResult,
+        onBehalfOf: AddressModel?
+    ): MultisigCallDetailsModel {
+        return MultisigCallDetailsModel(
+            title = delegateResult.title,
+            primaryAmount = delegateResult.primaryAmount?.let {
+                val token = tokenUseCase.getToken(it.chainAssetId)
+                mapAmountToAmountModel(it.amount, token)
+            },
+            tableEntries = delegateResult.tableEntries.map { it.toUi() },
+            onBehalfOf = onBehalfOf
+        )
+    }
+
+    private suspend fun MultisigActionFormatterDelegateDetailsResult.TableEntry.toUi(): MultisigCallDetailsModel.TableEntry {
+        return MultisigCallDetailsModel.TableEntry(
+            name = name,
+            value = value.toUi()
+        )
+    }
+
+    private suspend fun MultisigActionFormatterDelegateDetailsResult.TableValue.toUi(): MultisigCallDetailsModel.TableValue {
+        return when (this) {
+            is MultisigActionFormatterDelegateDetailsResult.TableValue.Account -> {
+                val addressModel = addressIconGenerator.createAccountAddressModel(
+                    chain = chain,
+                    accountId = accountId.value,
+                    name = identityProvider.identityFor(accountId.value, chain.id)?.name
+                )
+
+                MultisigCallDetailsModel.TableValue.Account(addressModel, chain)
+            }
+        }
+    }
+
 
     private suspend fun createOnBehalfOf(
         callVisit: CallVisit,
@@ -97,15 +173,15 @@ class RealMultisigCallFormatter @Inject constructor(
         )
     }
 
-    private suspend fun formatCallVisit(
+    private suspend fun <D : Any> formatCallVisit(
         callVisit: CallVisit,
-        chain: Chain,
-    ): DelegateResultWithVisit {
-        val result = delegates.tryFindNonNull { it.formatAction(callVisit, chain) }
+        format: suspend (MultisigActionFormatterDelegate) -> D?
+    ): DelegateResultWithVisit<D> {
+        val result = delegates.tryFindNonNull { format(it) }
         return result to callVisit
     }
 
-    private fun formatDefault(call: GenericCall.Instance, chain: Chain): MultisigCallPreviewModel {
+    private fun formatDefaultPreview(call: GenericCall.Instance, chain: Chain): MultisigCallPreviewModel {
         return MultisigCallPreviewModel(
             title = call.function.name.splitAndCapitalizeWords(),
             subtitle = call.module.name.splitAndCapitalizeWords(),
@@ -115,7 +191,7 @@ class RealMultisigCallFormatter @Inject constructor(
         )
     }
 
-    private fun formatUnknown(): MultisigCallPreviewModel {
+    private fun formatUnknownPreview(): MultisigCallPreviewModel {
         return MultisigCallPreviewModel(
             title = resourceManager.getString(R.string.multisig_operations_unknown_calldata),
             subtitle = null,
@@ -124,6 +200,24 @@ class RealMultisigCallFormatter @Inject constructor(
             onBehalfOf = null
         )
     }
+
+    private fun formatDefaultDetails(call: GenericCall.Instance): MultisigCallDetailsModel {
+        return MultisigCallDetailsModel(
+            title = "${call.module.name}.${call.function.name}",
+            primaryAmount = null,
+            tableEntries = emptyList(),
+            onBehalfOf = null
+        )
+    }
+
+    private fun formatUnknownDetails(): MultisigCallDetailsModel {
+        return MultisigCallDetailsModel(
+            title = resourceManager.getString(R.string.multisig_operations_unknown_calldata),
+            primaryAmount = null,
+            tableEntries = emptyList(),
+            onBehalfOf = null
+        )
+    }
 }
 
-private typealias DelegateResultWithVisit = Pair<MultisigActionFormatterDelegateResult?, CallVisit>
+private typealias DelegateResultWithVisit<T> = Pair<T?, CallVisit>

@@ -334,13 +334,6 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideArbitraryTokenUseCase(
-        coinPriceRepository: CoinPriceRepository,
-        currencyRepository: CurrencyRepository
-    ): ArbitraryTokenUseCase = RealArbitraryTokenUseCase(coinPriceRepository, currencyRepository)
-
-    @Provides
-    @FeatureScope
     fun provideArbitraryAssetUseCase(
         accountRepository: AccountRepository,
         walletRepository: WalletRepository,

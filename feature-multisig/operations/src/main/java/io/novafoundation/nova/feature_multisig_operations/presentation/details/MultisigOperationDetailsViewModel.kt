@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.utils.bold
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.formatting.spannable.format
-import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
@@ -34,8 +33,8 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationPayload
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationSystem
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.adapter.SignatoryRvItem
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
@@ -56,7 +55,6 @@ import kotlinx.coroutines.launch
 class MultisigOperationDetailsViewModel(
     private val router: MultisigOperationsRouter,
     private val resourceManager: ResourceManager,
-    private val operationFormatter: MultisigOperationFormatter,
     private val interactor: MultisigOperationDetailsInteractor,
     private val multisigOperationsService: MultisigPendingOperationsService,
     private val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
@@ -83,9 +81,6 @@ class MultisigOperationDetailsViewModel(
     }
         .shareInBackground()
 
-    val title = operationFlow.map { operationFormatter.formatTitle(it) }
-        .shareInBackground()
-
     private val chainFlow = operationFlow.map { it.chain }
         .shareInBackground()
 
@@ -102,16 +97,12 @@ class MultisigOperationDetailsViewModel(
     val walletFlow = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
         .shareInBackground()
 
-    private val formattedCall = combine(
+    val formattedCall = combine(
         selectedAccountFlow,
         operationFlow
     ) { metaAccount, operation ->
         val initialOrigin = metaAccount.requireAccountIdKeyIn(operation.chain)
-        multisigCallFormatter.formatMultisigCall(operation.call, initialOrigin, operation.chain)
-    }.shareInBackground()
-
-    val behalfOfFlow = formattedCall.map {
-        it.onBehalfOf
+        multisigCallFormatter.formatDetails(operation.call, initialOrigin, operation.chain)
     }.shareInBackground()
 
     private val signatory = operationFlow
@@ -282,8 +273,8 @@ class MultisigOperationDetailsViewModel(
         showNextProgress.value = false
     }
 
-    fun onSignatoryClicked(signatoryRvItem: SignatoryRvItem) {
-        showAddressAction(signatoryRvItem.address.address)
+    fun onSignatoryClicked(signatoryRvItem: SignatoryRvItem) = launchUnit {
+        showAddressActionForOriginChain(signatoryRvItem.address.address)
     }
 
     fun walletDetailsClicked() = launchUnit {
@@ -292,9 +283,13 @@ class MultisigOperationDetailsViewModel(
         externalActions.showAddressActions(metaAccount, chain)
     }
 
+    fun onTableAccountClicked(tableAccount: MultisigCallDetailsModel.TableValue.Account) = launchUnit {
+        externalActions.showAddressActions(tableAccount.addressModel.address, tableAccount.chain)
+    }
+
     fun behalfOfClicked() = launchUnit {
-        val behalfOf = behalfOfFlow.first() ?: return@launchUnit
-        showAddressAction(behalfOf.address)
+        val behalfOf = formattedCall.first().onBehalfOf ?: return@launchUnit
+        showAddressActionForOriginChain(behalfOf.address)
     }
 
     fun signatoryDetailsClicked() = launchUnit {
@@ -303,7 +298,7 @@ class MultisigOperationDetailsViewModel(
         externalActions.showAddressActions(metaAccount, chain)
     }
 
-    fun showAddressAction(address: String) = launchUnit {
+    private suspend fun showAddressActionForOriginChain(address: String) {
         externalActions.showAddressActions(address, chainFlow.first())
     }
 }
