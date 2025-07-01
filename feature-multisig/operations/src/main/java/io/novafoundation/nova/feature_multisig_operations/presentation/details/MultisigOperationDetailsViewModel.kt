@@ -58,7 +58,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
 
 class MultisigOperationDetailsViewModel(
     private val router: MultisigOperationsRouter,
@@ -209,12 +211,13 @@ class MultisigOperationDetailsViewModel(
     fun actionClicked() {
         launch {
             val operation = operationFlow.first()
+
             val isReject = operation.userAction() == MultisigAction.CanReject
             if (isReject) {
-                confirmRejectAndDo(operation.getDepositorName()) { sendTransactionIfValid() }
-            } else {
-                sendTransactionIfValid()
+                confirmReject(operation.getDepositorName())
             }
+
+            sendTransactionIfValid()
         }
     }
 
@@ -223,10 +226,10 @@ class MultisigOperationDetailsViewModel(
         return depositorAccount?.name ?: chain.addressOf(depositor)
     }
 
-    private fun confirmRejectAndDo(depositorName: String, onConfirm: () -> Unit) {
+    private suspend fun confirmReject(depositorName: String) = suspendCancellableCoroutine<Unit> {
         if (interactor.getSkipRejectConfirmation()) {
-            onConfirm()
-            return
+            it.resume(Unit)
+            return@suspendCancellableCoroutine
         }
 
         var isAutoContinueChecked = false
@@ -240,12 +243,13 @@ class MultisigOperationDetailsViewModel(
                 style = PrimaryButton.Appearance.PRIMARY,
                 onClick = {
                     interactor.setSkipRejectConfirmation(isAutoContinueChecked)
-                    onConfirm()
+                    it.resume(Unit)
                 }
             ),
             neutralButtonPreferences = ButtonPreferences(
                 text = resourceManager.getString(R.string.common_cancel),
-                style = PrimaryButton.Appearance.SECONDARY
+                style = PrimaryButton.Appearance.SECONDARY,
+                onClick = { it.cancel() }
             ),
             checkBoxPreferences = CheckBoxPreferences(
                 text = resourceManager.getString(R.string.common_check_box_auto_continue),
