@@ -84,7 +84,7 @@ class MultisigSignatoryHasEnoughBalanceValidation(
     }
 
     private suspend fun calculateFee(value: MultisigExtrinsicValidationPayload, signatoryCall: GenericCall.Instance): Fee {
-        return extrinsicService.estimateFee(value.chain, value.signatory.intoOrigin()) {
+        return extrinsicService.estimateFee(value.chain, value.multisig.intoOrigin()) {
             call(signatoryCall)
         }
     }
