@@ -41,6 +41,7 @@ class MultisigSignatoryHasEnoughBalanceValidation(
 
         var balanceValidation = assetSourceRegistry.sourceFor(chainAsset).balance
             .accountBalanceForValidation(value.chain, chainAsset, value.signatoryAccountId())
+            .legacyAdapter() // Multisig pallet still uses legacy logic to calculate balances
             .beginValidation()
 
         if (fee != null) {
