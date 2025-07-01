@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Multisig transactions.</string>-->
+    <string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Transactions to sign</string>
+
+    <string name="accounts_update_proxieds_title">Delegated to you</string>
+
+    <!--<string name="account_proxieds">Delegated to you (Proxieds)</string>-->
+    <string name="account_proxieds">Delegated to you (Proxied)</string>
+
     <!--<string name="common_dont_show_again">Do not show this again</string>-->
 
     <string name="multisig_on_behalf_of">On behalf of</string>
@@ -18,7 +28,7 @@
     <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. You need to add %s more to your balance</string>
     <string name="multisig_signatory_validation_fee">%s doesn’t have enough balance to pay the network fee of %s. You need to add %s more to your balance</string>
     <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
-<!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
+    <!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
     <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
 
     <string name="invalid_call_data_title">Invalid call data</string>
@@ -41,21 +51,21 @@
 
 
     <string name="multisig_pending_operations">Transactions to sign</string>
-<!--    <string name="multisig_pending_operations">Pending operations</string>-->
+    <!--    <string name="multisig_pending_operations">Pending operations</string>-->
 
     <string name="multisig_operations_progress">Signing (%s of %s)</string>
-<!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
+    <!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
 
 
     <string name="multisig_operations_created">Created by you</string>
     <string name="multisig_operations_signed">Signed by you</string>
-<!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
-<!--    <string name="multisig_operations_signed">Signed</string>-->
+    <!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
+    <!--    <string name="multisig_operations_signed">Signed</string>-->
 
 
     <string name="multisig_pending_operations_on_behalf_of">On behalf of:</string>
 
-<!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
+    <!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
     <string name="multisig_operations_unknown_calldata">Unknown operation</string>
 
 
@@ -81,8 +91,6 @@
     <string name="delegation_updates_deactivated_title">No longer valid</string>
 
     <string name="multisig_transaction_created_title">Multisig transaction created</string>
-    <string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s</string>
-    <string name="multisig_transaction_created_subtitle_highlight">Multisig transactions.</string>
     <string name="multisig_transaction_created_view_details">View details</string>
 
     <string name="multisig_operation_details_approve">Approve</string>
@@ -905,8 +913,6 @@
     <string name="account_proxy_type_cancel_proxy">Cancel Proxy</string>
     <string name="account_proxy_type_auction">Auction</string>
     <string name="account_proxy_type_nomination_pools">Nomination Pools</string>
-
-    <string name="account_proxieds">Delegated to you (Proxieds)</string>
 
     <string name="deep_linking_chain_id_is_not_found">Chain is not found</string>
     <string name="deep_linking_governance_type_is_not_specified">Governance type is not specified</string>
