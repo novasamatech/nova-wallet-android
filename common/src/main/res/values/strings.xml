@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="common_dont_show_again">Do not show this again</string>-->
+
     <string name="multisig_on_behalf_of">On behalf of</string>
     <string name="common_signatory">Signatory</string>
     <string name="common_hide">Hide</string>
@@ -885,8 +887,6 @@
     <string name="error_not_enough_to_pay_fee_title">Not enough tokens to pay the fee</string>
 
     <string name="proxied_wallet_details_info_warning">This account granted access to perform transactions to the following account:</string>
-
-    <string name="common_dont_show_again">Do not show this again</string>
 
     <string name="proxy_signing_warning_title">This is Delegating (Proxied) account</string>
     <string name="proxy_signing_warning_message">Transaction will be initiated by %s as a delegated account. Network fee will be paid by delegated account.</string>
