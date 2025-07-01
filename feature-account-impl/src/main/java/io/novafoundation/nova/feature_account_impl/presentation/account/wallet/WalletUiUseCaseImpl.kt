@@ -11,7 +11,10 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount.ChainAccount
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressIcon
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -142,9 +145,9 @@ class WalletUiUseCaseImpl(
     }
 
     override suspend fun walletAddressModel(metaAccount: MetaAccount, chain: Chain, iconSize: Int): AddressModel {
-        return AddressModel(
-            address = metaAccount.requireAddressIn(chain),
-            image = walletIcon(metaAccount, iconSize, transparentBackground = true),
+        return addressIconGenerator.createAccountAddressModel(
+            chain = chain,
+            account = metaAccount,
             name = metaAccount.name
         )
     }
