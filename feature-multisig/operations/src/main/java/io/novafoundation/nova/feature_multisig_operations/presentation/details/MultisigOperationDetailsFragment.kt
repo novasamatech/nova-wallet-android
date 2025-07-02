@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bindWithHideShowButton
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -71,6 +72,7 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel.feeLoaderMixin, binder.multisigPendingOperationDetailsFee)
+        observeActionBottomSheet(viewModel.actionBottomSheetLauncher)
 
         viewModel.title.observe(binder.multisigPendingOperationDetailsToolbar::setTitle)
 

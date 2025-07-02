@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="multisig_signing_reject_confirmation_subtitle">Transaction will be rejected. Multisig deposit will be returned to %s.</string>
     <string name="multisig_on_behalf_of">On behalf of</string>
     <string name="common_signatory">Signatory</string>
     <string name="common_hide">Hide</string>
@@ -16,7 +17,7 @@
     <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. You need to add %s more to your balance</string>
     <string name="multisig_signatory_validation_fee">%s doesn’t have enough balance to pay the network fee of %s. You need to add %s more to your balance</string>
     <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
-<!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
+    <!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
     <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
 
     <string name="invalid_call_data_title">Invalid call data</string>
@@ -39,21 +40,21 @@
 
 
     <string name="multisig_pending_operations">Transactions to sign</string>
-<!--    <string name="multisig_pending_operations">Pending operations</string>-->
+    <!--    <string name="multisig_pending_operations">Pending operations</string>-->
 
     <string name="multisig_operations_progress">Signing (%s of %s)</string>
-<!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
+    <!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
 
 
     <string name="multisig_operations_created">Created by you</string>
     <string name="multisig_operations_signed">Signed by you</string>
-<!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
-<!--    <string name="multisig_operations_signed">Signed</string>-->
+    <!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
+    <!--    <string name="multisig_operations_signed">Signed</string>-->
 
 
     <string name="multisig_pending_operations_on_behalf_of">On behalf of:</string>
 
-<!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
+    <!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
     <string name="multisig_operations_unknown_calldata">Unknown operation</string>
 
 
