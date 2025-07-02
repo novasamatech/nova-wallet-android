@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.approveMultisigOperation
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsViewModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.SignatoryListFormatter
@@ -58,7 +57,6 @@ class MultisigOperationDetailsModule {
     fun provideViewModel(
         router: MultisigOperationsRouter,
         resourceManager: ResourceManager,
-        operationFormatter: MultisigOperationFormatter,
         interactor: MultisigOperationDetailsInteractor,
         multisigOperationsService: MultisigPendingOperationsService,
         feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
@@ -77,7 +75,6 @@ class MultisigOperationDetailsModule {
         return MultisigOperationDetailsViewModel(
             router = router,
             resourceManager = resourceManager,
-            operationFormatter = operationFormatter,
             interactor = interactor,
             multisigOperationsService = multisigOperationsService,
             feeLoaderMixinV2Factory = feeLoaderMixinV2Factory,

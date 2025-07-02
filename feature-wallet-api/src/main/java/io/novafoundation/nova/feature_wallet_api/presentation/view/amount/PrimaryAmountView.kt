@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import androidx.annotation.ColorRes
 import io.novafoundation.nova.common.presentation.LoadingView
 import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -47,4 +48,8 @@ class PrimaryAmountView @JvmOverloads constructor(
     }
 
     override fun showData(data: AmountModel) = setAmount(data)
+}
+
+fun PrimaryAmountView.setAmountOrHide(model: AmountModel?) = letOrHide(model) { nonNullModel ->
+    setAmount(nonNullModel)
 }
