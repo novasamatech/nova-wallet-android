@@ -4,10 +4,10 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
-import io.novafoundation.nova.feature_external_sign_impl.presentation.extrinsicDetails.ExternalExtrinsicDetailsFragment
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsFragment
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsFragment
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.full.MultisigOperationFullDetailsFragment
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallFragment
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 
@@ -31,9 +31,9 @@ class MultisigOperationsNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openMultisigCallDetails(extrinsicContent: String) {
+    override fun openMultisigFullDetails(payload: MultisigOperationDetailsPayload) {
         navigationBuilder().action(R.id.action_multisigOperationDetailsFragment_to_externalExtrinsicDetailsFragment)
-            .setArgs(ExternalExtrinsicDetailsFragment.getBundle(extrinsicContent))
+            .setArgs(MultisigOperationFullDetailsFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 

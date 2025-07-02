@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showValueOrHide
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.chain.showChainsOverview
 import io.novafoundation.nova.feature_external_sign_api.presentation.dapp.showDAppIcon

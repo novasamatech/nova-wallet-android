@@ -137,8 +137,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/transaction_details_title"
+                android:text="@string/common_full_details"
                 android:textAppearance="@style/GoNextTransactionDetailsTextAppearance"
+                android:textColor="@color/button_text_accent"
                 app:actionIcon="@drawable/ic_chevron_right"
                 app:dividerVisible="false"
                 tools:background="@color/block_background" />

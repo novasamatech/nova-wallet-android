@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_multisig_operations.presentation.details
+package io.novafoundation.nova.feature_multisig_operations.presentation.details.general
 
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
@@ -11,14 +11,15 @@ import io.novafoundation.nova.common.view.bindWithHideShowButton
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddressOrHide
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationDetailsBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.adapter.SignatoriesAdapter
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoriesAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
 class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsViewModel, FragmentMultisigOperationDetailsBinding>() {

@@ -19,11 +19,11 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 
 sealed interface AccountModel {
 
-    fun getTitle(): String
+    fun title(): String
 
-    fun getIcon(): Drawable?
+    fun image(): Drawable?
 
-    fun getAddress(): String
+    fun address(): String
 
     class Wallet(
         metaId: Long,
@@ -34,9 +34,9 @@ sealed interface AccountModel {
 
         constructor(walletModel: WalletModel, address: String) : this(walletModel.metaId, walletModel.name, walletModel.icon, address)
 
-        override fun getTitle() = name
-        override fun getIcon() = icon
-        override fun getAddress() = address
+        override fun title() = name
+        override fun image() = icon
+        override fun address() = address
     }
 
     class Address(
@@ -47,9 +47,9 @@ sealed interface AccountModel {
 
         constructor(addressModel: AddressModel) : this(addressModel.address, addressModel.image, addressModel.name)
 
-        override fun getTitle() = nameOrAddress
-        override fun getIcon() = image
-        override fun getAddress() = address
+        override fun title() = nameOrAddress
+        override fun image() = image
+        override fun address() = address
     }
 }
 

@@ -24,9 +24,16 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.queryAccountBalanceCatching
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +45,8 @@ interface MultisigOperationDetailsInteractor {
 
     fun callDetails(call: GenericCall.Instance): String
 
+    suspend fun callHash(call: GenericCall.Instance, chainId: ChainId): String
+
     suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee?
 
     suspend fun performAction(operation: PendingMultisigOperation): Result<ExtrinsicExecutionResult>
@@ -47,6 +56,8 @@ interface MultisigOperationDetailsInteractor {
     suspend fun getSignatoryBalance(signatory: MetaAccount, chain: Chain): Result<ChainAssetBalance>
 
     fun isCallValid(operation: PendingMultisigOperation, enteredCall: String): Boolean
+
+    fun tokenFlow(chainAsset: Chain.Asset): Flow<Token>
 }
 
 @FeatureScope
@@ -58,6 +69,8 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     private val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository,
     @ExtrinsicSerialization
     private val extrinsicGson: Gson,
+    private val tokenRepository: TokenRepository,
+    private val chainRegistry: ChainRegistry
 ) : MultisigOperationDetailsInteractor {
 
     override suspend fun setCall(operation: PendingMultisigOperation, call: String) {
@@ -74,6 +87,11 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
     override fun callDetails(call: GenericCall.Instance): String {
         return extrinsicGson.toJson(call)
+    }
+
+    override suspend fun callHash(call: GenericCall.Instance, chainId: ChainId): String {
+        val runtime = chainRegistry.getRuntime(chainId)
+        return call.callHash(runtime).toHexString(withPrefix = true)
     }
 
     override suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee? {
@@ -110,6 +128,10 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
         operationHash.contentEquals(enteredHash)
     }.getOrDefault(false)
+
+    override fun tokenFlow(chainAsset: Chain.Asset): Flow<Token> {
+        return tokenRepository.observeToken(chainAsset)
+    }
 
     private suspend fun estimateApproveFee(operation: PendingMultisigOperation): Fee? {
         if (operation.call == null) return null

@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="referendum_details_full_details">Full details</string>-->
+    <string name="common_full_details">Full details</string>
+
+    <string name="multisig_deposit_description">The deposit stays locked on the depositor’s account until the multisig operation is executed or rejected.</string>
+
+    <!--<string name="referendum_full_details_copy_hash">Copy hash</string>-->
+    <string name="common_copy_hash">Copy hash</string>
+
+    <string name="common_depositor">Depositor</string>
+    <string name="multisig_deposit">Multisig deposit</string>
+    <string name="common_call_data">Call data</string>
+    <string name="multisig_extrinsic_details_subtitle">Make sure the operation is correct</string>
+
     <string name="multisig_on_behalf_of">On behalf of</string>
     <string name="common_signatory">Signatory</string>
     <string name="common_hide">Hide</string>
@@ -16,7 +29,7 @@
     <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. You need to add %s more to your balance</string>
     <string name="multisig_signatory_validation_fee">%s doesn’t have enough balance to pay the network fee of %s. You need to add %s more to your balance</string>
     <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
-<!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
+    <!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
     <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
 
     <string name="invalid_call_data_title">Invalid call data</string>
@@ -39,21 +52,21 @@
 
 
     <string name="multisig_pending_operations">Transactions to sign</string>
-<!--    <string name="multisig_pending_operations">Pending operations</string>-->
+    <!--    <string name="multisig_pending_operations">Pending operations</string>-->
 
     <string name="multisig_operations_progress">Signing (%s of %s)</string>
-<!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
+    <!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
 
 
     <string name="multisig_operations_created">Created by you</string>
     <string name="multisig_operations_signed">Signed by you</string>
-<!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
-<!--    <string name="multisig_operations_signed">Signed</string>-->
+    <!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
+    <!--    <string name="multisig_operations_signed">Signed</string>-->
 
 
     <string name="multisig_pending_operations_on_behalf_of">On behalf of:</string>
 
-<!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
+    <!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
     <string name="multisig_operations_unknown_calldata">Unknown operation</string>
 
 
@@ -1623,7 +1636,6 @@
 
     <string name="referendum_dapp_list_title">Use Nova DApp browser</string>
 
-    <string name="referendum_details_full_details">Full details</string>
     <string name="voting_status">Voting status</string>
     <string name="referendum_details_requested_amount">Requested amount</string>
 
@@ -1638,7 +1650,6 @@
     <string name="referendum_full_details_hash">Call hash</string>
     <string name="referendum_full_details_approve_threshold">Approve curve</string>
     <string name="referendum_full_details_support_threshold">Support curve</string>
-    <string name="referendum_full_details_copy_hash">Copy hash</string>
     <string name="referendum_positive_voters_title">Aye votes</string>
     <string name="referendum_negative_voters_title">Nay votes</string>
 

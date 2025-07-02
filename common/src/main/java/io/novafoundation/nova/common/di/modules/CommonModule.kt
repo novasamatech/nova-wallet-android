@@ -44,6 +44,8 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableProvid
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.condition.RealConditionMixinFactory
+import io.novafoundation.nova.common.mixin.copy.CopyTextMixin
+import io.novafoundation.nova.common.mixin.copy.CopyTextMixinProvider
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -406,4 +408,8 @@ class CommonModule {
         toastMessageManager,
         resourceManager
     )
+
+    @Provides
+    @ApplicationScope
+    fun provideCopyTextMixin(): CopyTextMixin.Presentation = CopyTextMixinProvider()
 }
