@@ -4,16 +4,15 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_BIG
-import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
-import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoryRvItem
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -63,7 +62,8 @@ class SignatoryListFormatter(
         val address = chain.addressOf(accountId)
         return SignatoryRvItem(
             address = addressIconGenerator.createAddressModel(
-                accountAddress = address,
+                chain = chain,
+                address = address,
                 accountName = address.ellipsizeAddress(),
                 sizeInDp = SIZE_BIG,
                 background = BACKGROUND_TRANSPARENT
@@ -80,12 +80,7 @@ class SignatoryListFormatter(
         context: FormattingContext
     ): SignatoryRvItem {
         return SignatoryRvItem(
-            address = addressIconGenerator.createAddressModel(
-                accountAddress = metaAccount.requireAddressIn(chain),
-                accountName = metaAccount.name,
-                sizeInDp = SIZE_BIG,
-                background = BACKGROUND_TRANSPARENT
-            ),
+            address = walletUiUseCase.walletAddressModel(metaAccount, chain, iconSize = SIZE_BIG),
             subtitle = metaAccount.formatSubtitle(context),
             isApproved = context.isApprovedBy(accountId)
         )

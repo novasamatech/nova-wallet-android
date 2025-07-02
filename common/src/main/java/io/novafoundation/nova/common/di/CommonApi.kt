@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecuto
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
@@ -114,6 +115,8 @@ interface CommonApi {
     val addressSchemeFormatter: AddressSchemeFormatter
 
     val splashPassedObserver: SplashPassedObserver
+
+    val toggleFeatureRepository: ToggleFeatureRepository
 
     fun copyTextMixin(): CopyTextMixin.Presentation
 

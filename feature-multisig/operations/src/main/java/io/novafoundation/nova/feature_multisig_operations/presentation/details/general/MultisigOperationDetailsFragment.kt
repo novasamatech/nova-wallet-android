@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.general
 
+import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
@@ -7,20 +10,26 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.bindWithHideShowButton
+import io.novafoundation.nova.common.view.setExtraInfoAvailable
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showAddressOrHide
 import io.novafoundation.nova.feature_account_api.view.showChain
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationDetailsBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoriesAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setAmountOrHide
 
 class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsViewModel, FragmentMultisigOperationDetailsBinding>() {
 
@@ -72,8 +81,7 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel.feeLoaderMixin, binder.multisigPendingOperationDetailsFee)
-
-        viewModel.title.observe(binder.multisigPendingOperationDetailsToolbar::setTitle)
+        observeActionBottomSheet(viewModel.actionBottomSheetLauncher)
 
         viewModel.showCallButtonState.observe(binder.multisigPendingOperationDetailsEnterCallData::isVisible::set)
         viewModel.actionButtonState.observe(binder.multisigPendingOperationDetailsAction::setState)
@@ -81,7 +89,14 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
 
         viewModel.chainUiFlow.observe(binder.multisigPendingOperationDetailsNetwork::showChain)
         viewModel.walletFlow.observe(binder.multisigPendingOperationDetailsWallet::showWallet)
-        viewModel.behalfOfFlow.observe(binder.multisigPendingOperationDetailsBehalfOf::showAddressOrHide)
+
+        viewModel.formattedCall.observe {
+            binder.multisigPendingOperationDetailsBehalfOf.showAddressOrHide(it.onBehalfOf)
+            binder.multisigPendingOperationDetailsToolbar.setTitle(it.title)
+            binder.multisigPendingOperationPrimaryAmount.setAmountOrHide(it.primaryAmount)
+
+            showFormattedCallTable(it.tableEntries)
+        }
 
         viewModel.signatoryAccount.observe(binder.multisigPendingOperationDetailsSignatory::showWallet)
 
@@ -89,5 +104,32 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         viewModel.signatories.observe { adapter.submitList(it) }
 
         viewModel.callDetailsVisible.observe(binder.multisigPendingOperationCallDetails::setVisible)
+    }
+
+    private fun showFormattedCallTable(tableEntries: List<MultisigCallDetailsModel.TableEntry>) {
+        binder.multisigPendingOperationDetailsCallTable.removeAllViews()
+
+        tableEntries.forEach {
+            val entryView = createFormattedCallEntryView(it)
+            binder.multisigPendingOperationDetailsCallTable.addView(entryView)
+        }
+
+        binder.multisigPendingOperationDetailsCallTable.invalidateChildrenVisibility()
+    }
+
+    private fun createFormattedCallEntryView(entry: MultisigCallDetailsModel.TableEntry): TableCellView {
+        return TableCellView(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+
+            setTitle(entry.name)
+
+            when (val value = entry.value) {
+                is MultisigCallDetailsModel.TableValue.Account -> {
+                    setExtraInfoAvailable(true)
+                    showAddress(value.addressModel)
+                    setOnClickListener { viewModel.onTableAccountClicked(value) }
+                }
+            }
+        }
     }
 }

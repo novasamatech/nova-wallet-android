@@ -41,6 +41,7 @@ class MultisigSignatoryHasEnoughBalanceValidation(
 
         var balanceValidation = assetSourceRegistry.sourceFor(chainAsset).balance
             .accountBalanceForValidation(value.chain, chainAsset, value.signatoryAccountId())
+            .legacyAdapter() // Multisig pallet still uses legacy logic to calculate balances
             .beginValidation()
 
         if (fee != null) {
@@ -83,7 +84,7 @@ class MultisigSignatoryHasEnoughBalanceValidation(
     }
 
     private suspend fun calculateFee(value: MultisigExtrinsicValidationPayload, signatoryCall: GenericCall.Instance): Fee {
-        return extrinsicService.estimateFee(value.chain, value.signatory.intoOrigin()) {
+        return extrinsicService.estimateFee(value.chain, value.multisig.intoOrigin()) {
             call(signatoryCall)
         }
     }

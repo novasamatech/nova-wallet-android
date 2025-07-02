@@ -32,6 +32,7 @@ class MultisigOperationEnterCallFragment : BaseFragment<MultisigOperationEnterCa
 
     override fun initViews() {
         binder.multisigOperationEnterCallToolbar.applyStatusBarInsets()
+        binder.multisigOperationEnterCallToolbar.setHomeButtonListener { viewModel.back() }
         binder.root.applyImeInsetts()
 
         binder.multisigOperationEnterCallAction.setOnClickListener { viewModel.approve() }

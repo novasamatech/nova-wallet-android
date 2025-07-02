@@ -101,7 +101,7 @@ private class RealDelegatedMetaAccountUpdatesListingMixin(
 
     private fun mapActiveHeader(type: FilterType): String {
         return when (type) {
-            FilterType.Proxied -> resourceManager.getString(R.string.account_proxieds)
+            FilterType.Proxied -> resourceManager.getString(R.string.accounts_update_proxieds_title)
             FilterType.Multisig -> resourceManager.getString(R.string.active_multisig_title)
             is FilterType.UserIgnored -> mapActiveHeader(type.overriddenFilter)
         }

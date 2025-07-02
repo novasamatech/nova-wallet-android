@@ -10,19 +10,24 @@ import io.novafoundation.nova.common.utils.bold
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.formatting.spannable.format
+import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.PrimaryButton
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.common.view.bottomSheet.action.ButtonPreferences
+import io.novafoundation.nova.common.view.bottomSheet.action.CheckBoxPreferences
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAction
+import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.allSignatories
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireMultisigAccount
-import io.novafoundation.nova.feature_account_api.domain.model.signatoriesCount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -33,8 +38,8 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationPayload
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationSystem
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoryRvItem
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
@@ -43,7 +48,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -52,11 +59,13 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
 
 class MultisigOperationDetailsViewModel(
     private val router: MultisigOperationsRouter,
     private val resourceManager: ResourceManager,
-    private val operationFormatter: MultisigOperationFormatter,
     private val interactor: MultisigOperationDetailsInteractor,
     private val multisigOperationsService: MultisigPendingOperationsService,
     private val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
@@ -67,6 +76,8 @@ class MultisigOperationDetailsViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val signatoryListFormatter: SignatoryListFormatter,
     private val multisigCallFormatter: MultisigCallFormatter,
+    private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
+    private val accountInteractor: AccountInteractor,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
@@ -81,9 +92,6 @@ class MultisigOperationDetailsViewModel(
         val operationsCount = multisigOperationsService.getPendingOperationsCount()
         operationsCount == 1
     }
-        .shareInBackground()
-
-    val title = operationFlow.map { operationFormatter.formatTitle(it) }
         .shareInBackground()
 
     private val chainFlow = operationFlow.map { it.chain }
@@ -102,16 +110,12 @@ class MultisigOperationDetailsViewModel(
     val walletFlow = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
         .shareInBackground()
 
-    private val formattedCall = combine(
+    val formattedCall = combine(
         selectedAccountFlow,
         operationFlow
     ) { metaAccount, operation ->
         val initialOrigin = metaAccount.requireAccountIdKeyIn(operation.chain)
-        multisigCallFormatter.formatMultisigCall(operation.call, initialOrigin, operation.chain)
-    }.shareInBackground()
-
-    val behalfOfFlow = formattedCall.map {
-        it.onBehalfOf
+        multisigCallFormatter.formatDetails(operation.call, initialOrigin, operation.chain)
     }.shareInBackground()
 
     private val signatory = operationFlow
@@ -127,7 +131,7 @@ class MultisigOperationDetailsViewModel(
         selectedAccountFlow,
         operationFlow
     ) { metaAccount, operation ->
-        resourceManager.getString(R.string.multisig_operation_details_signatories, operation.approvals.size, metaAccount.signatoriesCount())
+        resourceManager.getString(R.string.multisig_operation_details_signatories, operation.approvals.size, metaAccount.threshold)
     }.shareInBackground()
 
     val signatories = combine(
@@ -187,6 +191,8 @@ class MultisigOperationDetailsViewModel(
         .map { operation -> operation.call != null }
         .shareInBackground()
 
+    val actionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
+
     init {
         loadFee()
     }
@@ -196,7 +202,53 @@ class MultisigOperationDetailsViewModel(
     }
 
     fun actionClicked() {
-        sendTransactionIfValid()
+        launch {
+            val operation = operationFlow.first()
+
+            val isReject = operation.userAction() == MultisigAction.CanReject
+            if (isReject) {
+                confirmReject(operation.getDepositorName())
+            }
+
+            sendTransactionIfValid()
+        }
+    }
+
+    private suspend fun PendingMultisigOperation.getDepositorName(): String {
+        val depositorAccount = withContext(Dispatchers.Default) { accountInteractor.findMetaAccount(chain, depositor.value) }
+        return depositorAccount?.name ?: chain.addressOf(depositor)
+    }
+
+    private suspend fun confirmReject(depositorName: String) = suspendCancellableCoroutine<Unit> {
+        if (interactor.getSkipRejectConfirmation()) {
+            it.resume(Unit)
+            return@suspendCancellableCoroutine
+        }
+
+        var isAutoContinueChecked = false
+
+        actionBottomSheetLauncher.launchBottomSheet(
+            imageRes = R.drawable.ic_multisig,
+            title = resourceManager.getString(R.string.multisig_signing_warning_title),
+            subtitle = resourceManager.highlightedText(R.string.multisig_signing_reject_confirmation_subtitle, depositorName),
+            actionButtonPreferences = ButtonPreferences(
+                text = resourceManager.getString(R.string.common_confirm),
+                style = PrimaryButton.Appearance.PRIMARY,
+                onClick = {
+                    interactor.setSkipRejectConfirmation(isAutoContinueChecked)
+                    it.resume(Unit)
+                }
+            ),
+            neutralButtonPreferences = ButtonPreferences(
+                text = resourceManager.getString(R.string.common_cancel),
+                style = PrimaryButton.Appearance.SECONDARY,
+                onClick = { it.cancel() }
+            ),
+            checkBoxPreferences = CheckBoxPreferences(
+                text = resourceManager.getString(R.string.common_check_box_auto_continue),
+                onCheckChanged = { isAutoContinueChecked = it }
+            )
+        )
     }
 
     fun backClicked() {
@@ -280,8 +332,8 @@ class MultisigOperationDetailsViewModel(
         showNextProgress.value = false
     }
 
-    fun onSignatoryClicked(signatoryRvItem: SignatoryRvItem) {
-        showAddressAction(signatoryRvItem.address.address)
+    fun onSignatoryClicked(signatoryRvItem: SignatoryRvItem) = launchUnit {
+        showAddressActionForOriginChain(signatoryRvItem.address.address)
     }
 
     fun walletDetailsClicked() = launchUnit {
@@ -290,9 +342,13 @@ class MultisigOperationDetailsViewModel(
         externalActions.showAddressActions(metaAccount, chain)
     }
 
+    fun onTableAccountClicked(tableAccount: MultisigCallDetailsModel.TableValue.Account) = launchUnit {
+        externalActions.showAddressActions(tableAccount.addressModel.address, tableAccount.chain)
+    }
+
     fun behalfOfClicked() = launchUnit {
-        val behalfOf = behalfOfFlow.first() ?: return@launchUnit
-        showAddressAction(behalfOf.address)
+        val behalfOf = formattedCall.first().onBehalfOf ?: return@launchUnit
+        showAddressActionForOriginChain(behalfOf.address)
     }
 
     fun signatoryDetailsClicked() = launchUnit {
@@ -301,7 +357,7 @@ class MultisigOperationDetailsViewModel(
         externalActions.showAddressActions(metaAccount, chain)
     }
 
-    fun showAddressAction(address: String) = launchUnit {
+    private suspend fun showAddressActionForOriginChain(address: String) {
         externalActions.showAddressActions(address, chainFlow.first())
     }
 }

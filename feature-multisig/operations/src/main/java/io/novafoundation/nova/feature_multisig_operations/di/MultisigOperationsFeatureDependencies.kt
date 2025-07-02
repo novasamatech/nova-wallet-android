@@ -4,10 +4,12 @@ import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.mixin.copy.CopyTextMixin
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
@@ -74,6 +77,12 @@ interface MultisigOperationsFeatureDependencies {
     val proxyFormatter: ProxyFormatter
 
     val accountInteractor: AccountInteractor
+
+    val arbitraryTokenUseCase: ArbitraryTokenUseCase
+
+    val toggleFeatureRepository: ToggleFeatureRepository
+
+    val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
 
     val tokenRepository: TokenRepository
 

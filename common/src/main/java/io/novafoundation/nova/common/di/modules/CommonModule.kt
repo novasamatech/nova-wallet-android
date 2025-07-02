@@ -25,6 +25,8 @@ import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.repository.RealAssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.RealAssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
+import io.novafoundation.nova.common.data.repository.RealToggleFeatureRepository
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -408,6 +410,10 @@ class CommonModule {
         toastMessageManager,
         resourceManager
     )
+
+    @Provides
+    @ApplicationScope
+    fun provideToggleFeatureRepository(preferences: Preferences): ToggleFeatureRepository = RealToggleFeatureRepository(preferences)
 
     @Provides
     @ApplicationScope

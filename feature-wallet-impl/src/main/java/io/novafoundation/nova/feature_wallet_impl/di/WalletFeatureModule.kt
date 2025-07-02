@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
-import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.CoinPriceLocalDataSourceImpl
@@ -44,9 +43,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -331,13 +328,6 @@ class WalletFeatureModule {
         cacheDataSource: CoinPriceLocalDataSource,
         remoteDataSource: CoinPriceRemoteDataSource
     ): CoinPriceRepository = CoinPriceRepositoryImpl(cacheDataSource, remoteDataSource)
-
-    @Provides
-    @FeatureScope
-    fun provideArbitraryTokenUseCase(
-        coinPriceRepository: CoinPriceRepository,
-        currencyRepository: CurrencyRepository
-    ): ArbitraryTokenUseCase = RealArbitraryTokenUseCase(coinPriceRepository, currencyRepository)
 
     @Provides
     @FeatureScope
