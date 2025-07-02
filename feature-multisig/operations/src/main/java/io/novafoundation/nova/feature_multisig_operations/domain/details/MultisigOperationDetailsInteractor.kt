@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_multisig_operations.domain.details
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.callHash
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -47,7 +48,13 @@ interface MultisigOperationDetailsInteractor {
     suspend fun getSignatoryBalance(signatory: MetaAccount, chain: Chain): Result<ChainAssetBalance>
 
     fun isCallValid(operation: PendingMultisigOperation, enteredCall: String): Boolean
+
+    fun setSkipRejectConfirmation(value: Boolean)
+
+    fun getSkipRejectConfirmation(): Boolean
 }
+
+private const val SKIP_REJECT_CONFIRMATION_KEY = "SKIP_REJECT_CONFIRMATION_KEY"
 
 @FeatureScope
 class RealMultisigOperationDetailsInteractor @Inject constructor(
@@ -58,6 +65,7 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     private val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository,
     @ExtrinsicSerialization
     private val extrinsicGson: Gson,
+    private val toggleFeatureRepository: ToggleFeatureRepository
 ) : MultisigOperationDetailsInteractor {
 
     override suspend fun setCall(operation: PendingMultisigOperation, call: String) {
@@ -110,6 +118,14 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
         operationHash.contentEquals(enteredHash)
     }.getOrDefault(false)
+
+    override fun getSkipRejectConfirmation(): Boolean {
+        return toggleFeatureRepository.get(SKIP_REJECT_CONFIRMATION_KEY, false)
+    }
+
+    override fun setSkipRejectConfirmation(value: Boolean) {
+        toggleFeatureRepository.set(SKIP_REJECT_CONFIRMATION_KEY, value)
+    }
 
     private suspend fun estimateApproveFee(operation: PendingMultisigOperation): Fee? {
         if (operation.call == null) return null

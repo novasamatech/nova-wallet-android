@@ -29,6 +29,10 @@ class MultisigOperationEnterCallViewModel(
         }
     }
 
+    fun back() {
+        router.back()
+    }
+
     fun approve() = launchUnit {
         val operation = multisigOperationsService.pendingOperation(payload.operationId) ?: return@launchUnit
         if (interactor.isCallValid(operation, enteredCall.value)) {

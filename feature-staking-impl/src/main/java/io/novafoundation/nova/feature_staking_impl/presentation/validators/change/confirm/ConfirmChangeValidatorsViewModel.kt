@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createAddressModel
+import io.novafoundation.nova.common.address.createSubstrateAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -176,7 +176,7 @@ class ConfirmChangeValidatorsViewModel(
     }
 
     private suspend fun generateDestinationModel(address: String, name: String?): AddressModel {
-        return addressIconGenerator.createAddressModel(
+        return addressIconGenerator.createSubstrateAddressModel(
             accountAddress = address,
             sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
             accountName = name,

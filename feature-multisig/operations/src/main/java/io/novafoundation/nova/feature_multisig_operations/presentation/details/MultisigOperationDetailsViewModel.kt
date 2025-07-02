@@ -10,19 +10,24 @@ import io.novafoundation.nova.common.utils.bold
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.formatting.spannable.format
+import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.PrimaryButton
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.common.view.bottomSheet.action.ButtonPreferences
+import io.novafoundation.nova.common.view.bottomSheet.action.CheckBoxPreferences
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAction
+import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.allSignatories
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireMultisigAccount
-import io.novafoundation.nova.feature_account_api.domain.model.signatoriesCount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -42,7 +47,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -51,6 +58,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
 
 class MultisigOperationDetailsViewModel(
     private val router: MultisigOperationsRouter,
@@ -65,6 +75,8 @@ class MultisigOperationDetailsViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val signatoryListFormatter: SignatoryListFormatter,
     private val multisigCallFormatter: MultisigCallFormatter,
+    private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
+    private val accountInteractor: AccountInteractor,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
@@ -118,7 +130,7 @@ class MultisigOperationDetailsViewModel(
         selectedAccountFlow,
         operationFlow
     ) { metaAccount, operation ->
-        resourceManager.getString(R.string.multisig_operation_details_signatories, operation.approvals.size, metaAccount.signatoriesCount())
+        resourceManager.getString(R.string.multisig_operation_details_signatories, operation.approvals.size, metaAccount.threshold)
     }.shareInBackground()
 
     val signatories = combine(
@@ -178,6 +190,8 @@ class MultisigOperationDetailsViewModel(
         .map { operation -> operation.call != null }
         .shareInBackground()
 
+    val actionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
+
     init {
         loadFee()
     }
@@ -187,7 +201,53 @@ class MultisigOperationDetailsViewModel(
     }
 
     fun actionClicked() {
-        sendTransactionIfValid()
+        launch {
+            val operation = operationFlow.first()
+
+            val isReject = operation.userAction() == MultisigAction.CanReject
+            if (isReject) {
+                confirmReject(operation.getDepositorName())
+            }
+
+            sendTransactionIfValid()
+        }
+    }
+
+    private suspend fun PendingMultisigOperation.getDepositorName(): String {
+        val depositorAccount = withContext(Dispatchers.Default) { accountInteractor.findMetaAccount(chain, depositor.value) }
+        return depositorAccount?.name ?: chain.addressOf(depositor)
+    }
+
+    private suspend fun confirmReject(depositorName: String) = suspendCancellableCoroutine<Unit> {
+        if (interactor.getSkipRejectConfirmation()) {
+            it.resume(Unit)
+            return@suspendCancellableCoroutine
+        }
+
+        var isAutoContinueChecked = false
+
+        actionBottomSheetLauncher.launchBottomSheet(
+            imageRes = R.drawable.ic_multisig,
+            title = resourceManager.getString(R.string.multisig_signing_warning_title),
+            subtitle = resourceManager.highlightedText(R.string.multisig_signing_reject_confirmation_subtitle, depositorName),
+            actionButtonPreferences = ButtonPreferences(
+                text = resourceManager.getString(R.string.common_confirm),
+                style = PrimaryButton.Appearance.PRIMARY,
+                onClick = {
+                    interactor.setSkipRejectConfirmation(isAutoContinueChecked)
+                    it.resume(Unit)
+                }
+            ),
+            neutralButtonPreferences = ButtonPreferences(
+                text = resourceManager.getString(R.string.common_cancel),
+                style = PrimaryButton.Appearance.SECONDARY,
+                onClick = { it.cancel() }
+            ),
+            checkBoxPreferences = CheckBoxPreferences(
+                text = resourceManager.getString(R.string.common_check_box_auto_continue),
+                onCheckChanged = { isAutoContinueChecked = it }
+            )
+        )
     }
 
     fun backClicked() {

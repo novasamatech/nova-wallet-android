@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.PreferredCryptoTy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 interface AccountInteractor {
@@ -72,4 +73,6 @@ interface AccountInteractor {
     suspend fun hasCustomChainAccounts(metaId: Long): Boolean
 
     suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
+
+    suspend fun findMetaAccount(chain: Chain, value: AccountId): MetaAccount?
 }

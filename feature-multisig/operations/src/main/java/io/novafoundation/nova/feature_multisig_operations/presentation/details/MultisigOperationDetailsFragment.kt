@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.bindWithHideShowButton
 import io.novafoundation.nova.common.view.setExtraInfoAvailable
+import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -79,6 +80,7 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         observeValidations(viewModel)
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel.feeLoaderMixin, binder.multisigPendingOperationDetailsFee)
+        observeActionBottomSheet(viewModel.actionBottomSheetLauncher)
 
         viewModel.showCallButtonState.observe(binder.multisigPendingOperationDetailsEnterCallData::isVisible::set)
         viewModel.actionButtonState.observe(binder.multisigPendingOperationDetailsAction::setState)
