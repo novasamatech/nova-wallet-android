@@ -13,6 +13,8 @@
 
     <!--<string name="common_dont_show_again">Do not show this again</string>-->
 
+    <string name="multisig_signing_reject_confirmation_subtitle">Transaction will be rejected. Multisig deposit will be returned to %s.</string>
+
     <string name="multisig_on_behalf_of">On behalf of</string>
     <string name="common_signatory">Signatory</string>
     <string name="common_hide">Hide</string>
