@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigrationDeepLinks
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -113,6 +114,8 @@ interface RootDependencies {
     val multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus
 
     val multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
+
+    val multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 

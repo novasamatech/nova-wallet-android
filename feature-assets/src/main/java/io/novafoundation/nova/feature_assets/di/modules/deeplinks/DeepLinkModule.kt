@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_assets.di.modules.deeplinks
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkHandler
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.deeplink.NovaCardDeepLinkHandler
@@ -45,11 +47,15 @@ class DeepLinkModule {
     @FeatureScope
     fun provideNovaCardDeepLinkHandler(
         router: AssetsRouter,
-        automaticInteractionGate: AutomaticInteractionGate
+        automaticInteractionGate: AutomaticInteractionGate,
+        multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin,
+        resourceManager: ResourceManager
     ): NovaCardDeepLinkHandler {
         return NovaCardDeepLinkHandler(
             router,
-            automaticInteractionGate
+            automaticInteractionGate,
+            multisigRestrictionCheckMixin,
+            resourceManager
         )
     }
 

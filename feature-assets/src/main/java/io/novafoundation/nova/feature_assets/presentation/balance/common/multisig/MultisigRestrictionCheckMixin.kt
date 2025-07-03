@@ -55,3 +55,10 @@ class RealMultisigRestrictionCheckMixin(
 }
 
 suspend fun MultisigRestrictionCheckMixin.isNotMultisig() = !isMultisig()
+
+fun MultisigRestrictionCheckMixin.showNovaCardRestrictionDialog(resourceManager: ResourceManager) {
+    showWarning(
+        resourceManager.getString(R.string.multisig_card_not_supported_title),
+        resourceManager.getString(R.string.multisig_card_not_supported_message)
+    )
+}
