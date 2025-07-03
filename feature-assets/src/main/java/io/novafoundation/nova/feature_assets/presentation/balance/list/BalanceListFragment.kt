@@ -112,7 +112,6 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        observeMultisigCheck(viewModel.multisigRestrictionCheckMixin)
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
 
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
