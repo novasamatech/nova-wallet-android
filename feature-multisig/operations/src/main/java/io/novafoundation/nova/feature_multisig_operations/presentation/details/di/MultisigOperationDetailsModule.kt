@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.navigation.Extri
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.domain.details.RealMultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.ApproveMultisigOperationValidationSystem
+import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.OperationIsStillPendingValidation
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.approveMultisigOperation
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
@@ -47,8 +48,9 @@ class MultisigOperationDetailsModule {
     @ScreenScope
     fun provideValidationSystem(
         edValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
+        operationIsStillPendingValidation: OperationIsStillPendingValidation
     ): ApproveMultisigOperationValidationSystem {
-        return ValidationSystem.approveMultisigOperation(edValidationFactory)
+        return ValidationSystem.approveMultisigOperation(edValidationFactory, operationIsStillPendingValidation)
     }
 
     @Provides

@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -78,6 +79,8 @@ interface MultisigOperationsFeatureDependencies {
     val toggleFeatureRepository: ToggleFeatureRepository
 
     val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+
+    val multisigValidationsRepository: MultisigValidationsRepository
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

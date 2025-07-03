@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="multisig_approve_transaction_unavailable_title">Cannot perform this transaction</string>
+    <string name="multisig_approve_transaction_unavailable_message">This transaction has already been rejected or executed.</string>
 
     <!--<string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s</string>
     <string name="multisig_transaction_created_subtitle_highlight">Multisig transactions.</string>-->
