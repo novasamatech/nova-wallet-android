@@ -12,7 +12,7 @@ class OperationIsStillPendingValidation @Inject constructor(
 ) : ApproveMultisigOperationValidation {
 
     override suspend fun validate(value: ApproveMultisigOperationValidationPayload): ValidationStatus<ApproveMultisigOperationValidationFailure> {
-        val hasPendingCallHash = multisigValidationsRepository.hasPendingCallHash(value.chain.id, value.signatoryAccountId, value.operation.callHash)
+        val hasPendingCallHash = multisigValidationsRepository.hasPendingCallHash(value.chain.id, value.multisigAccountId, value.operation.callHash)
 
         return hasPendingCallHash isTrueOrError {
             ApproveMultisigOperationValidationFailure.TransactionIsNotAvailable
