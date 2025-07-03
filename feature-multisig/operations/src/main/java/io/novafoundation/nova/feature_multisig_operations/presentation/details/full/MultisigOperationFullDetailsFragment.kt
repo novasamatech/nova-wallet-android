@@ -49,7 +49,7 @@ class MultisigOperationFullDetailsFragment : BaseFragment<MultisigOperationFullD
 
         viewModel.depositorAccountModel.observe { binder.multisigPendingOperationDetailsDepositor.showAccountWithLoading(it) }
         viewModel.depositAmount.observe { binder.multisigPendingOperationDetailsDeposit.showAmount(it) }
-        viewModel.ellipsizedCallHash.observe { binder.multisigPendingOperationDetailsCallData.showValueOrHide(it, null) }
+        viewModel.ellipsizedCallData.observe { binder.multisigPendingOperationDetailsCallData.showValueOrHide(it, null) }
         viewModel.formattedCall.observe { binder.multisigPendingOperationDetailsCall.text = it }
     }
 }

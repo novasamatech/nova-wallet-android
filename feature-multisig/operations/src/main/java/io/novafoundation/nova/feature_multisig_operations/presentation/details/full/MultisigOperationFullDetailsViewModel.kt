@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.full
 
-import io.novafoundation.nova.common.address.toHexWithPrefix
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
@@ -65,11 +64,11 @@ class MultisigOperationFullDetailsViewModel(
         mapAmountToAmountModel(operation.deposit, token)
     }.shareInBackground()
 
-    private val callHash = operationFlow.map { operation ->
-        operation.callHash.toHexWithPrefix()
+    private val callDataFlow = operationFlow.map { operation ->
+        operation.call?.let { interactor.callDataAsString(it, operation.chain.id) }
     }.shareInBackground()
 
-    val ellipsizedCallHash = callHash.map { it.ellipsizeMiddle(CALL_HASH_SHOWN_SYMBOLS) }
+    val ellipsizedCallData = callDataFlow.map { it?.ellipsizeMiddle(CALL_HASH_SHOWN_SYMBOLS) }
 
     val formattedCall = operationFlow.map { operation ->
         operation.call?.let { interactor.callDetails(it) }
@@ -83,11 +82,14 @@ class MultisigOperationFullDetailsViewModel(
     }
 
     fun callHashClicked() = launchUnit {
-        val callHash = callHash.first()
+        val callDataEllipsized = ellipsizedCallData.first() ?: return@launchUnit
+        val callData = callDataFlow.first() ?: return@launchUnit
         copyTextLauncher.showCopyTextDialog(
             CopyTextLauncher.Payload(
-                callHash,
-                resourceManager.getString(R.string.common_copy_call_data)
+                title = callDataEllipsized.toString(),
+                textToCopy = callData,
+                resourceManager.getString(R.string.common_copy_call_data),
+                resourceManager.getString(R.string.common_share_call_data)
             )
         )
     }

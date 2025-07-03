@@ -163,6 +163,7 @@
                 android:textAppearance="@style/GoNextTransactionDetailsTextAppearance"
                 android:textColor="@color/button_text_accent"
                 app:actionIcon="@drawable/ic_chevron_right"
+                app:actionTint="@color/icon_secondary"
                 app:dividerVisible="false"
                 tools:background="@color/block_background" />
         </LinearLayout>

@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.copy.setupCopyText
 import io.novafoundation.nova.common.presentation.CopierBottomSheet
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
@@ -53,7 +54,7 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
 
         binder.referendumFullDetailsCallHash.showValueOrHide(primary = viewModel.callHash)
         viewModel.callHash?.let { hash ->
-            binder.referendumFullDetailsCallHash.setOnClickListener { showCopyingBottomSheet(hash) }
+            binder.referendumFullDetailsCallHash.setOnClickListener { viewModel.copyCallHash() }
         }
 
         binder.referendumFullDetailsPreimageTitle.isVisible = viewModel.hasPreimage
@@ -77,6 +78,7 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
 
     override fun subscribe(viewModel: ReferendumFullDetailsViewModel) {
         setupExternalActions(viewModel)
+        setupCopyText(viewModel)
 
         viewModel.proposerModel.observe { state ->
             updateProposerState(state)
@@ -124,13 +126,5 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
             binder.referendumFullDetailsBeneficiary.showProgress()
             binder.referendumFullDetailsRequestedAmount.showProgress()
         }
-    }
-
-    private fun showCopyingBottomSheet(value: String) {
-        CopierBottomSheet(
-            requireContext(),
-            value = value,
-            buttonNameRes = R.string.common_copy_hash
-        ).show()
     }
 }
