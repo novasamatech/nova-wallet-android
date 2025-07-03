@@ -43,7 +43,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.RealMultisigRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
