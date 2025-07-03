@@ -33,11 +33,13 @@ class CopierBottomSheet(
         super.onCreate(savedInstanceState)
         setTitle(payload.title)
         textItem(R.drawable.ic_copy_outline, payload.copyButtonName, false) {
+            // TODO: We'd like to have it in mixin or view model
             clipboardManager.addToClipboard(payload.textToCopy)
             Toast.makeText(context, context.getString(R.string.common_copied), Toast.LENGTH_LONG)
                 .show()
         }
         textItem(R.drawable.ic_share_outline, payload.shareButtonName, false) {
+            // TODO: We'd like to have it in mixin or view model
             context.shareText(payload.textToCopy)
         }
     }

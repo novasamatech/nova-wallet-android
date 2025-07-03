@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.callHash
 import io.novafoundation.nova.common.utils.toByteArray
+import io.novafoundation.nova.common.utils.toHex
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
@@ -103,7 +104,7 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
     override suspend fun callDataAsString(call: GenericCall.Instance, chainId: ChainId): String {
         val runtime = chainRegistry.getRuntime(chainId)
-        return call.toByteArray(runtime).toHexString(withPrefix = true)
+        return call.toHex(runtime)
     }
 
     override suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee? {
