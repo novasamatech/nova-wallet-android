@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigO
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.full.MultisigOperationFullDetailsViewModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.di.MultisigOperationDetailsModule.BindsModule
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 
 @Module(includes = [ViewModelModule::class, BindsModule::class])
 class MultisigOperationFullDetailsModule {
@@ -35,7 +36,8 @@ class MultisigOperationFullDetailsModule {
         payload: MultisigOperationDetailsPayload,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         copyTextLauncher: CopyTextLauncher.Presentation,
-        accountUIUseCase: AccountUIUseCase
+        accountUIUseCase: AccountUIUseCase,
+        arbitraryTokenUseCase: ArbitraryTokenUseCase
     ): ViewModel {
         return MultisigOperationFullDetailsViewModel(
             router = router,
@@ -46,7 +48,8 @@ class MultisigOperationFullDetailsModule {
             payload = payload,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             copyTextLauncher = copyTextLauncher,
-            accountUIUseCase = accountUIUseCase
+            accountUIUseCase = accountUIUseCase,
+            arbitraryTokenUseCase = arbitraryTokenUseCase
         )
     }
 

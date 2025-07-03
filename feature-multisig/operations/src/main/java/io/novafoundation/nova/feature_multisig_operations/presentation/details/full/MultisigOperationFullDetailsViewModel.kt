@@ -52,7 +52,6 @@ class MultisigOperationFullDetailsViewModel(
         .filterNotNull()
         .shareInBackground()
 
-
     private val tokenFlow = operationFlow.map {
         arbitraryTokenUseCase.getToken(it.chain.utilityAsset.fullId)
     }.shareInBackground()
