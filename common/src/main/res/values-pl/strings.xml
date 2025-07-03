@@ -139,7 +139,7 @@
     <string name="account_polkadot_vault_import_start_step_3_highlighted">kod QR do zeskanowania</string>
     <string name="account_private_key">Klucz prywatny</string>
     <string name="account_proxied">Zastępczy</string>
-    <string name="account_proxieds">Delegowane do Ciebie (Proxieds)</string>
+    <string name="account_proxieds">Delegowane do Ciebie (Proxied)</string>
     <string name="account_proxy_type_any">Dowolne</string>
     <string name="account_proxy_type_auction">Aukcja</string>
     <string name="account_proxy_type_cancel_proxy">Anuluj Proxy</string>
@@ -173,6 +173,7 @@
     <string name="accounts_change_chain_account">Zmień konto %s</string>
     <string name="accounts_change_chain_secrets">Zmień konto</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="accounts_update_proxieds_title">Delegowane do Ciebie</string>
     <string name="active_multisig_title">Wspólna kontrola</string>
     <string name="add_custom_node">Dodaj niestandardowy węzeł</string>
     <string name="add_delegation_missing_account_message">Musisz dodać konto %s do portfela, aby delegować</string>
@@ -339,6 +340,7 @@
     <string name="common_balance">Saldo</string>
     <string name="common_bonus">Bonus</string>
     <string name="common_call">Połączenie</string>
+    <string name="common_call_data">Dane wywołania</string>
     <string name="common_cancel">Anuluj</string>
     <string name="common_cancel_operation_warning">Czy na pewno chcesz anulować tę operację?</string>
     <string name="common_cannot_find_app">Przepraszamy, nie masz odpowiedniej aplikacji do przetworzenia tego żądania</string>
@@ -366,17 +368,21 @@
     <string name="common_continue">Kontynuuj</string>
     <string name="common_copied">Skopiowano do schowka</string>
     <string name="common_copy_address">Kopiuj adres</string>
+    <string name="common_copy_call_data">Skopiuj dane wywołania</string>
+    <string name="common_copy_hash">Skopiuj hash</string>
     <string name="common_copy_id">Kopiuj id</string>
     <string name="common_crypto_type">Typ klucza kryptograficznego</string>
     <string name="common_date">Data</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s i %s</string>
     <string name="common_delete">Usuń</string>
+    <string name="common_depositor">Depozytariusz</string>
     <string name="common_details">Szczegóły</string>
     <string name="common_disabled">Wyłączony</string>
     <string name="common_disconnect">Odłącz</string>
     <string name="common_do_not_close_app">Nie zamykaj aplikacji!</string>
     <string name="common_done">Gotowe</string>
-    <string name="common_dont_show_again">Nie pokazuj tego ponownie</string>
+    <string name="common_dry_run_failed_message">Nova symuluje transakcję wcześniej, aby zapobiec błędom. Ta symulacja nie powiodła się. Spróbuj ponownie później lub z większą kwotą. Jeśli problem będzie się powtarzał, skontaktuj się z pomocą techniczną Nova Wallet w ustawieniach.</string>
+    <string name="common_dry_run_failed_title">Symulacja transakcji nie powiodła się</string>
     <string name="common_edit">Edytuj</string>
     <string name="common_element_and_more_format" formatted="false">%s (+%s więcej)</string>
     <string name="common_email_chooser_title">Wybierz aplikację do poczty</string>
@@ -410,10 +416,12 @@
     </plurals>
     <string name="common_frequency_days_daily">codziennie</string>
     <string name="common_frequency_days_everyday">codziennie</string>
+    <string name="common_full_details">Pełne szczegóły</string>
     <string name="common_get_token_format">Odbierz %s</string>
     <string name="common_got_it">Rozumiem</string>
     <string name="common_governance">Zarządzanie</string>
     <string name="common_hexadecimal_string">Ciąg szesnastkowy</string>
+    <string name="common_hide">Ukryj</string>
     <plurals name="common_hours_format">
         <item quantity="one">%d godzina</item>
         <item quantity="few">%d godziny</item>
@@ -511,8 +519,12 @@
     <string name="common_see_all">Zobacz wszystkie</string>
     <string name="common_settings">Ustawienia</string>
     <string name="common_share">Udostępnij</string>
+    <string name="common_share_call_data">Udostępnij dane wywołania</string>
+    <string name="common_share_hash">Udostępnij hash</string>
+    <string name="common_show">Pokaż</string>
     <string name="common_sign_in">Zaloguj się</string>
     <string name="common_sign_request">Żądanie podpisu</string>
+    <string name="common_signatory">Sygnatariusz</string>
     <string name="common_signature_invalid">Podpis jest nieważny</string>
     <string name="common_skip">Pomiń</string>
     <string name="common_skip_process">Pomiń proces</string>
@@ -763,6 +775,7 @@
     <string name="ed25519_selection_subtitle">ed25519 (alternatywny)</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">Hasło do kopii zapasowej</string>
+    <string name="enter_call_data_title">Wprowadź dane wywołania</string>
     <string name="error_not_enough_to_pay_fee_title">Niewystarczająca ilość tokenów do opłacenia opłaty</string>
     <string name="ethereum_contract">Kontrakt</string>
     <string name="ethereum_contract_call">Wywołanie kontraktu</string>
@@ -827,6 +840,8 @@
     <string name="integrate_networks_banner_description">Zintegruj wszystkie funkcje sieci, którą tworzysz, z Nova Wallet, udostępniając ją wszystkim.</string>
     <string name="integrate_networks_banner_link">Zintegruj swoją sieć</string>
     <string name="integrate_networks_banner_title">Tworzysz dla Polkadot?</string>
+    <string name="invalid_call_data_message">Te dane wywołania dla innej operacji z hashem wywołania %s</string>
+    <string name="invalid_call_data_title">Nieprawidłowe dane wywołania</string>
     <string name="invalid_proxy_address_message">Adres proxy powinien być prawidłowym adresem %s</string>
     <string name="invalid_proxy_address_title">Nieprawidłowy adres proxy</string>
     <string name="invalid_token_symbol_message">Wprowadzony symbol waluty (%1$s) nie pasuje do sieci (%2$s). Czy chcesz użyć poprawnego symbolu waluty?</string>
@@ -910,29 +925,45 @@
         <item quantity="many">Wybierz co najmniej %d portfeli</item>
         <item quantity="other">Wybierz co najmniej %d portfeli</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">Ta transakcja została już odrzucona lub wykonana.</string>
+    <string name="multisig_approve_transaction_unavailable_title">Nie można wykonać tej transakcji</string>
     <string name="multisig_callhash_exists_message">%s już zainicjował taką samą operację i obecnie oczekuje ona na podpisanie przez innych sygnatariuszy.</string>
     <string name="multisig_callhash_exists_title">Operacja już istnieje</string>
+    <string name="multisig_card_not_supported_message">Aby zarządzać kartą debetową, przełącz się na inny typ portfela.</string>
+    <string name="multisig_card_not_supported_title">Karta debetowa nie jest obsługiwana dla Multisig</string>
+    <string name="multisig_deposit">Depozyt multisig</string>
+    <string name="multisig_deposit_description">Depozyt pozostaje zablokowany na koncie depozytariusza do momentu wykonania lub odrzucenia operacji multisig.</string>
+    <string name="multisig_extrinsic_details_subtitle">Upewnij się, że operacja jest poprawna</string>
+    <string name="multisig_on_behalf_of">W imieniu</string>
     <string name="multisig_operation_details_approve">Zatwierdź</string>
     <string name="multisig_operation_details_approve_and_execute">Zatwierdź i wykonaj</string>
-    <string name="multisig_operation_details_call_data_not_found">Nie znaleziono danych wywołania</string>
+    <string name="multisig_operation_details_call_data_not_found">Wprowadź dane wywołania, aby zobaczyć szczegóły</string>
     <string name="multisig_operation_details_reject">Odrzuć</string>
-    <string name="multisig_operations_pending_signature">Oczekujące na podpis</string>
-    <string name="multisig_operations_progress" formatted="false">%s z %s Podpisane</string>
-    <string name="multisig_operations_signed">Podpisane</string>
-    <string name="multisig_operations_unknown_calldata">[Nieznana operacja] (%s)</string>
-    <string name="multisig_pending_operations">Oczekujące operacje</string>
+    <string name="multisig_operation_details_signatories" formatted="false">Sygnatariusze (%d z %d)</string>
+    <string name="multisig_operations_created">Utworzone przez Ciebie</string>
+    <string name="multisig_operations_progress" formatted="false">Podpisywanie (%s z %s)</string>
+    <string name="multisig_operations_signed">Podpisano przez Ciebie</string>
+    <string name="multisig_operations_unknown_calldata">Nieznana operacja</string>
+    <string name="multisig_pending_operations">Transakcje do podpisania</string>
+    <string name="multisig_pending_operations_on_behalf_of">W imieniu:</string>
+    <string name="multisig_sell_not_supported_message">Aby sprzedać kryptowaluty za fiat, przełącz się na inny typ portfela.</string>
+    <string name="multisig_sell_not_supported_title">Sprzedaż nie jest obsługiwana dla Multisig</string>
     <string name="multisig_signatory">Sygnatariusz:</string>
-    <string name="multisig_signatory_validation_deposit" formatted="false">%s nie ma wystarczających środków, aby złożyć depozyt multisig w wysokości %s. Dostępne saldo: %s</string>
-    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s nie ma wystarczających środków, aby opłacić opłatę sieciową w wysokości %s i złożyć depozyt multisig w wysokości %s. Dostępne saldo: %s</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s nie ma wystarczającego salda, aby umieścić depozyt multisig w wysokości %s. Musisz dodać do swojego salda jeszcze %s</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s nie ma wystarczającego salda, aby zapłacić opłatę sieciową w wysokości %s i umieścić depozyt multisig w wysokości %s. Musisz dodać do swojego salda jeszcze %s</string>
     <string name="multisig_signatory_validation_ed" formatted="false">%s potrzebuje co najmniej %s, aby opłacić tę opłatę transakcyjną i pozostać powyżej minimalnego salda sieciowego. Aktualne saldo wynosi: %s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">%s nie ma wystarczającego salda, aby zapłacić opłatę sieciową w wysokości %s. Musisz dodać do swojego salda jeszcze %s</string>
     <string name="multisig_signing_is_not_supported_message">Portfele multisig nie obsługują podpisywania dowolnych wiadomości — tylko transakcje</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">Transakcja zostanie odrzucona. Depozyt multisig zostanie zwrócony do %s.</string>
     <string name="multisig_signing_warning_message">Transakcja multisig zostanie zainicjowana przez %s. Inicjator płaci opłatę sieciową i rezerwuje depozyt multisig, który zostanie odblokowany po wykonaniu transakcji.</string>
     <string name="multisig_signing_warning_title">Transakcja multisig</string>
-    <string name="multisig_transaction_created_subtitle">Inni sygnatariusze mogą teraz potwierdzić transakcję.\nMożesz śledzić jej status w %s</string>
-    <string name="multisig_transaction_created_subtitle_highlight">transakcjach Multisig.</string>
+    <string name="multisig_transaction_created_subtitle">Inni sygnatariusze mogą teraz potwierdzić transakcję.\nMożesz śledzić jej status w %s.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Transakcje do podpisania</string>
     <string name="multisig_transaction_created_title">Transakcja multisig utworzona</string>
     <string name="multisig_transaction_created_view_details">Pokaż szczegóły</string>
     <string name="multisig_wallet_details_info_warning">Transakcje z tego portfela wymagają zatwierdzenia przez wielu sygnatariuszy. Twoje konto jest jednym z sygnatariuszy:</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">Inni sygnatariusze:</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">Próg %d z %d</string>
     <string name="network_already_exist_failure_title">Ten węzeł już istnieje</string>
     <string name="network_fee">Opłata sieciowa</string>
     <string name="network_info_address">Adres węzła</string>
@@ -1104,13 +1135,11 @@
     <string name="referendum_aye_format">Za: %s</string>
     <string name="referendum_dapp_list_title">Użyj przeglądarki Nova DApp</string>
     <string name="referendum_description_fallback">Tylko wnioskodawca może edytować ten opis i tytuł. Jeśli posiadasz konto wnioskodawcy, odwiedź Polkassembly i uzupełnij informacje o swoim wniosku</string>
-    <string name="referendum_details_full_details">Pełne szczegóły</string>
     <string name="referendum_details_requested_amount">Żądana kwota</string>
     <string name="referendum_details_timeline">Oś czasu</string>
     <string name="referendum_details_your_vote">Twój głos:</string>
     <string name="referendum_full_details_approve_threshold">Krzywa zatwierdzenia</string>
     <string name="referendum_full_details_beneficiary">Beneficjent</string>
-    <string name="referendum_full_details_copy_hash">Skopiuj hash</string>
     <string name="referendum_full_details_deposit">Depozyt</string>
     <string name="referendum_full_details_electorate">Elektorat</string>
     <string name="referendum_full_details_hash">Hash połączenia</string>
@@ -1633,6 +1662,7 @@
     <string name="state_removed">Usunięty</string>
     <string name="swap_custom_fee_selector_description">Token do opłacenia opłaty sieciowej</string>
     <string name="swap_custom_fee_selector_footer">Opłata sieciowa jest dodawana do wprowadzonej kwoty</string>
+    <string name="swap_dry_run_failed_inline_message">Symulacja kroku wymiany nie powiodła się</string>
     <string name="swap_error_pair_not_supported">Ta para nie jest obsługiwana</string>
     <string name="swap_execution_failure" formatted="false">Niepowodzenie w operacji #%s (%s)</string>
     <string name="swap_execution_failure_swap_label" formatted="false">Zamiana %s na %s na %s</string>
