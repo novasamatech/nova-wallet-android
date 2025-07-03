@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Balance
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.observeMultisigCheck
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderHolder
