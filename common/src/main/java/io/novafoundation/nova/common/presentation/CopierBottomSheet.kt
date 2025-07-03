@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.widget.Toast
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.BottomSheeetCopierBinding
 import io.novafoundation.nova.common.di.FeatureUtils

@@ -7,7 +7,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.copy.setupCopyText
-import io.novafoundation.nova.common.presentation.CopierBottomSheet
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible

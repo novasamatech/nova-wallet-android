@@ -101,7 +101,6 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
         return call.callHash(runtime).toHexString(withPrefix = true)
     }
 
-
     override suspend fun callDataAsString(call: GenericCall.Instance, chainId: ChainId): String {
         val runtime = chainRegistry.getRuntime(chainId)
         return call.toByteArray(runtime).toHexString(withPrefix = true)

@@ -38,7 +38,8 @@ class ReferendumFullDetailsViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val copyTextLauncher: CopyTextLauncher.Presentation,
     private val resourceManager: ResourceManager
-) : BaseViewModel(), ExternalActions by externalActions,
+) : BaseViewModel(),
+    ExternalActions by externalActions,
     CopyTextLauncher by copyTextLauncher {
 
     private val payloadFlow = flowOf { payload }
