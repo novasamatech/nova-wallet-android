@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_multisig_operations.presentation.details.di
+package io.novafoundation.nova.feature_multisig_operations.presentation.details.general.di
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -26,10 +26,10 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.approveMultisigOperation
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsViewModel
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.SignatoryListFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.di.MultisigOperationDetailsModule.BindsModule
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsViewModel
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.SignatoryListFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.di.MultisigOperationDetailsModule.BindsModule
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 

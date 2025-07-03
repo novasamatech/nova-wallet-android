@@ -8,7 +8,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
-class WalletModel(val metaId: Long, val name: String, val icon: Drawable?) {
+open class WalletModel(val metaId: Long, val name: String, val icon: Drawable?) {
 
     override fun equals(other: Any?): Boolean {
         return other is WalletModel && metaId == other.metaId && name == other.name
