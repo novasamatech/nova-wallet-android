@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_multisig_operations.di
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.mixin.copy.CopyTextMixin
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -90,7 +90,7 @@ interface MultisigOperationsFeatureDependencies {
 
     val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
 
-    val copyTextMixin: CopyTextMixin.Presentation
+    val copyTextLauncher: CopyTextLauncher.Presentation
 
     val accountUIUseCase: AccountUIUseCase
 

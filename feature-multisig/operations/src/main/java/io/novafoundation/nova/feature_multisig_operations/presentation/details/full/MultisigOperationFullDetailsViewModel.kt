@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.full
 
+import io.novafoundation.nova.common.address.toHexWithPrefix
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.onLoaded
-import io.novafoundation.nova.common.mixin.copy.CopyTextMixin
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.ellipsizeMiddle
-import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -17,12 +17,16 @@ import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+
+private const val CALL_HASH_SHOWN_SYMBOLS = 9
 
 class MultisigOperationFullDetailsViewModel(
     private val router: MultisigOperationsRouter,
@@ -33,10 +37,11 @@ class MultisigOperationFullDetailsViewModel(
     private val payload: MultisigOperationDetailsPayload,
     private val accountUIUseCase: AccountUIUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val copyTextMixin: CopyTextMixin.Presentation
+    private val copyTextLauncher: CopyTextLauncher.Presentation,
+    private val arbitraryTokenUseCase: ArbitraryTokenUseCase
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    CopyTextMixin by copyTextMixin,
+    CopyTextLauncher by copyTextLauncher,
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
     fun backClicked() {
@@ -47,8 +52,9 @@ class MultisigOperationFullDetailsViewModel(
         .filterNotNull()
         .shareInBackground()
 
-    private val tokenFlow = flowOfAll {
-        interactor.tokenFlow(operationFlow.first().chain.utilityAsset)
+
+    private val tokenFlow = operationFlow.map {
+        arbitraryTokenUseCase.getToken(it.chain.utilityAsset.fullId)
     }.shareInBackground()
 
     val depositorAccountModel = operationFlow.map {
@@ -61,10 +67,10 @@ class MultisigOperationFullDetailsViewModel(
     }.shareInBackground()
 
     private val callHash = operationFlow.map { operation ->
-        operation.call?.let { interactor.callHash(it, operation.chain.id) }
+        operation.callHash.toHexWithPrefix()
     }.shareInBackground()
 
-    val ellipsizedCallHash = callHash.map { it?.ellipsizeMiddle(9) }
+    val ellipsizedCallHash = callHash.map { it.ellipsizeMiddle(CALL_HASH_SHOWN_SYMBOLS) }
 
     val formattedCall = operationFlow.map { operation ->
         operation.call?.let { interactor.callDetails(it) }
@@ -78,8 +84,13 @@ class MultisigOperationFullDetailsViewModel(
     }
 
     fun callHashClicked() = launchUnit {
-        val callHash = callHash.first() ?: return@launchUnit
-        copyTextMixin.showCopyTextDialog(callHash)
+        val callHash = callHash.first()
+        copyTextLauncher.showCopyTextDialog(
+            CopyTextLauncher.Payload(
+                callHash,
+                resourceManager.getString(R.string.common_copy_hash)
+            )
+        )
     }
 
     fun depositClicked() {

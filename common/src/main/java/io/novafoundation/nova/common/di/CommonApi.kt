@@ -33,7 +33,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
-import io.novafoundation.nova.common.mixin.copy.CopyTextMixin
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -118,7 +118,7 @@ interface CommonApi {
 
     val toggleFeatureRepository: ToggleFeatureRepository
 
-    fun copyTextMixin(): CopyTextMixin.Presentation
+    fun copyTextMixin(): CopyTextLauncher.Presentation
 
     fun computationalCache(): ComputationalCache
 

@@ -58,8 +58,6 @@ interface MultisigOperationDetailsInteractor {
 
     fun isCallValid(operation: PendingMultisigOperation, enteredCall: String): Boolean
 
-    fun tokenFlow(chainAsset: Chain.Asset): Flow<Token>
-
     fun setSkipRejectConfirmation(value: Boolean)
 
     fun getSkipRejectConfirmation(): Boolean
@@ -143,10 +141,6 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
     override fun setSkipRejectConfirmation(value: Boolean) {
         toggleFeatureRepository.set(SKIP_REJECT_CONFIRMATION_KEY, value)
-    }
-
-    override fun tokenFlow(chainAsset: Chain.Asset): Flow<Token> {
-        return tokenRepository.observeToken(chainAsset)
     }
 
     private suspend fun estimateApproveFee(operation: PendingMultisigOperation): Fee? {

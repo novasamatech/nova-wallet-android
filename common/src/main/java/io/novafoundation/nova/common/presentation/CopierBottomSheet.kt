@@ -16,7 +16,7 @@ class CopierBottomSheet(
     context: Context,
     private val value: String,
     private val buttonName: String,
-    private val onClipboardMessage: String,
+    private val onClipboardMessage: String = context.getString(R.string.common_copied),
 ) : FixedListBottomSheet<BottomSheeetCopierBinding>(
     context,
     viewConfiguration = FixedListBottomSheet.ViewConfiguration(

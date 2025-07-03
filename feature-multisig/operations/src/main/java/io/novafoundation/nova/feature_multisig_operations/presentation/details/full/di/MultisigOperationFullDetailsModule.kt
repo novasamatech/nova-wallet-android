@@ -8,7 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.mixin.copy.CopyTextMixin
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
@@ -34,7 +34,7 @@ class MultisigOperationFullDetailsModule {
         externalActions: ExternalActions.Presentation,
         payload: MultisigOperationDetailsPayload,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-        copyTextMixin: CopyTextMixin.Presentation,
+        copyTextLauncher: CopyTextLauncher.Presentation,
         accountUIUseCase: AccountUIUseCase
     ): ViewModel {
         return MultisigOperationFullDetailsViewModel(
@@ -45,7 +45,7 @@ class MultisigOperationFullDetailsModule {
             externalActions = externalActions,
             payload = payload,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
-            copyTextMixin = copyTextMixin,
+            copyTextLauncher = copyTextLauncher,
             accountUIUseCase = accountUIUseCase
         )
     }
