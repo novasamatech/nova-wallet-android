@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="common_copy_call_data">Copy call data</string>
+
     <string name="multisig_approve_transaction_unavailable_title">Cannot perform this transaction</string>
     <string name="multisig_approve_transaction_unavailable_message">This transaction has already been rejected or executed.</string>
 

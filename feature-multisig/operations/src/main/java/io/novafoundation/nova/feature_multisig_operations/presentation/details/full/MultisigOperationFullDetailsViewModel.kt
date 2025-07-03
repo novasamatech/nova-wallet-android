@@ -87,7 +87,7 @@ class MultisigOperationFullDetailsViewModel(
         copyTextLauncher.showCopyTextDialog(
             CopyTextLauncher.Payload(
                 callHash,
-                resourceManager.getString(R.string.common_copy_hash)
+                resourceManager.getString(R.string.common_copy_call_data)
             )
         )
     }
