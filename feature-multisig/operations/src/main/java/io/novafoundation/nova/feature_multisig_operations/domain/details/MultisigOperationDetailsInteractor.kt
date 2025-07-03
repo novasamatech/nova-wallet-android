@@ -25,9 +25,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.queryAccountBalanceCatching
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +43,8 @@ interface MultisigOperationDetailsInteractor {
     suspend fun setCall(operation: PendingMultisigOperation, call: String)
 
     fun callDetails(call: GenericCall.Instance): String
+
+    suspend fun callHash(call: GenericCall.Instance, chainId: ChainId): String
 
     suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee?
 
@@ -65,6 +72,8 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     private val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository,
     @ExtrinsicSerialization
     private val extrinsicGson: Gson,
+    private val tokenRepository: TokenRepository,
+    private val chainRegistry: ChainRegistry,
     private val toggleFeatureRepository: ToggleFeatureRepository
 ) : MultisigOperationDetailsInteractor {
 
@@ -82,6 +91,11 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
     override fun callDetails(call: GenericCall.Instance): String {
         return extrinsicGson.toJson(call)
+    }
+
+    override suspend fun callHash(call: GenericCall.Instance, chainId: ChainId): String {
+        val runtime = chainRegistry.getRuntime(chainId)
+        return call.callHash(runtime).toHexString(withPrefix = true)
     }
 
     override suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee? {

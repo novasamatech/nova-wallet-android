@@ -17,6 +17,19 @@
 
     <string name="multisig_signing_reject_confirmation_subtitle">Transaction will be rejected. Multisig deposit will be returned to %s.</string>
 
+    <!--<string name="referendum_details_full_details">Full details</string>-->
+    <string name="common_full_details">Full details</string>
+
+    <string name="multisig_deposit_description">The deposit stays locked on the depositor’s account until the multisig operation is executed or rejected.</string>
+
+    <!--<string name="referendum_full_details_copy_hash">Copy hash</string>-->
+    <string name="common_copy_hash">Copy hash</string>
+
+    <string name="common_depositor">Depositor</string>
+    <string name="multisig_deposit">Multisig deposit</string>
+    <string name="common_call_data">Call data</string>
+    <string name="multisig_extrinsic_details_subtitle">Make sure the operation is correct</string>
+
     <string name="multisig_on_behalf_of">On behalf of</string>
     <string name="common_signatory">Signatory</string>
     <string name="common_hide">Hide</string>
@@ -1633,7 +1646,6 @@
 
     <string name="referendum_dapp_list_title">Use Nova DApp browser</string>
 
-    <string name="referendum_details_full_details">Full details</string>
     <string name="voting_status">Voting status</string>
     <string name="referendum_details_requested_amount">Requested amount</string>
 
@@ -1648,7 +1660,6 @@
     <string name="referendum_full_details_hash">Call hash</string>
     <string name="referendum_full_details_approve_threshold">Approve curve</string>
     <string name="referendum_full_details_support_threshold">Support curve</string>
-    <string name="referendum_full_details_copy_hash">Copy hash</string>
     <string name="referendum_positive_voters_title">Aye votes</string>
     <string name="referendum_negative_voters_title">Nay votes</string>
 

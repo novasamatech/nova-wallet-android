@@ -130,7 +130,7 @@ class ReferendumFullDetailsFragment : BaseFragment<ReferendumFullDetailsViewMode
         CopierBottomSheet(
             requireContext(),
             value = value,
-            buttonNameRes = R.string.referendum_full_details_copy_hash
+            buttonNameRes = R.string.common_copy_hash
         ).show()
     }
 }

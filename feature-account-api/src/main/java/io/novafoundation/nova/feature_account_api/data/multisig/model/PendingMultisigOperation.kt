@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import java.math.BigInteger
 import kotlin.time.Duration
 
 class PendingMultisigOperation(
@@ -15,6 +16,7 @@ class PendingMultisigOperation(
     val timePoint: MultisigTimePoint,
     val approvals: List<AccountIdKey>,
     val depositor: AccountIdKey,
+    val deposit: BigInteger,
     val signatoryAccountId: AccountIdKey,
     val signatoryMetaId: Long,
     val threshold: Int,

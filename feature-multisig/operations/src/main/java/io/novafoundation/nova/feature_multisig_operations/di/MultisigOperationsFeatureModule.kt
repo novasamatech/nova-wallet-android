@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.callForma
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.formatters.MultisigActionFormatterDelegate
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.formatters.RealMultisigCallFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.formatters.TransferMultisigActionFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.SignatoryListFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.SignatoryListFormatter
 
 @Module(includes = [BindsModule::class])
 class MultisigOperationsFeatureModule {

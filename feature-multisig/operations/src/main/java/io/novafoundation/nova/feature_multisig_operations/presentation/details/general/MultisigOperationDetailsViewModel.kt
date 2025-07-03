@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_multisig_operations.presentation.details
+package io.novafoundation.nova.feature_multisig_operations.presentation.details.general
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -40,7 +40,8 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.adapter.SignatoryRvItem
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoryRvItem
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -255,9 +256,7 @@ class MultisigOperationDetailsViewModel(
     }
 
     fun callDetailsClicked() = launch {
-        val operationCall = operationFlow.first().call ?: return@launch
-        val readableContent = interactor.callDetails(operationCall)
-        router.openMultisigCallDetails(readableContent)
+        router.openMultisigFullDetails(payload)
     }
 
     private fun loadFee() {

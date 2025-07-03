@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_multisig_operations.presentation.details
+package io.novafoundation.nova.feature_multisig_operations.presentation.details.general
 
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
@@ -17,7 +17,7 @@ import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottom
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.addRipple
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showAddressOrHide
@@ -26,7 +26,8 @@ import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMu
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.adapter.SignatoriesAdapter
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoriesAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setAmountOrHide
 

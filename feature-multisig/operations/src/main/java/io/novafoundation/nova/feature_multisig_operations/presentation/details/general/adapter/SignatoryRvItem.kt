@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_multisig_operations.presentation.details.adapter
+package io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter
 
 import io.novafoundation.nova.common.address.AddressModel
 

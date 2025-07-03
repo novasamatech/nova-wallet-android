@@ -181,6 +181,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
             signatoryMetaId = multisig.signatoryMetaId,
             threshold = multisig.threshold,
             depositor = onChainMultisig.depositor,
+            deposit = onChainMultisig.deposit,
             timePoint = onChainMultisig.timePoint,
             timestamp = timestamp
         )

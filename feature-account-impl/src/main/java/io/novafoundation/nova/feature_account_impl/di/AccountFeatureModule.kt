@@ -41,10 +41,14 @@ import io.novafoundation.nova.feature_account_api.data.repository.addAccount.sec
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.RealAccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -788,5 +792,21 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideMultisigOperationLocalCallRepository(multisigOperationsDao: MultisigOperationsDao): MultisigOperationLocalCallRepository {
         return RealMultisigOperationLocalCallRepository(multisigOperationsDao)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAccountUIUseCase(
+        accountRepository: AccountRepository,
+        walletUiUseCase: WalletUiUseCase,
+        addressIconGenerator: AddressIconGenerator,
+        @OnChainIdentity identityProvider: IdentityProvider
+    ): AccountUIUseCase {
+        return RealAccountUIUseCase(
+            accountRepository,
+            walletUiUseCase,
+            addressIconGenerator,
+            identityProvider
+        )
     }
 }
