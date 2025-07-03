@@ -8,8 +8,7 @@ fun <T> BaseFragment<T, *>.setupCopyText(viewModel: T) where T : BaseViewModel, 
     viewModel.showCopyTextDialog.observeEvent {
         CopierBottomSheet(
             requireContext(),
-            value = it.text,
-            buttonName = it.buttonName
+            payload = it
         ).show()
     }
 }

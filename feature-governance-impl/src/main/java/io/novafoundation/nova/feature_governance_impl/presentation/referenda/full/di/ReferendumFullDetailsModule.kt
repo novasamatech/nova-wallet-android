@@ -9,6 +9,8 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
@@ -30,7 +32,9 @@ class ReferendumFullDetailsModule {
         addressIconGenerator: AddressIconGenerator,
         governanceSharedState: GovernanceSharedState,
         tokenUseCase: TokenUseCase,
-        externalAction: ExternalActions.Presentation
+        externalAction: ExternalActions.Presentation,
+        copyTextLauncher: CopyTextLauncher.Presentation,
+        resourceManager: ResourceManager
     ): ViewModel {
         return ReferendumFullDetailsViewModel(
             router,
@@ -39,7 +43,9 @@ class ReferendumFullDetailsModule {
             addressIconGenerator,
             governanceSharedState,
             tokenUseCase,
-            externalAction
+            externalAction,
+            copyTextLauncher,
+            resourceManager
         )
     }
 

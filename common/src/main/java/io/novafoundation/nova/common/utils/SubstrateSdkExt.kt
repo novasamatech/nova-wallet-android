@@ -503,6 +503,10 @@ fun RuntimeMetadata.hasDetectedRuntimeApi(section: String, method: String): Bool
     return runtimeApiOrNull(section)?.methodOrNull(method) != null
 }
 
+fun GenericCall.Instance.toHex(runtimeSnapshot: RuntimeSnapshot): String {
+    return toByteArray(runtimeSnapshot).toHexString(withPrefix = true)
+}
+
 fun GenericCall.Instance.toByteArray(runtimeSnapshot: RuntimeSnapshot): ByteArray {
     return GenericCall.toByteArray(runtimeSnapshot, this)
 }

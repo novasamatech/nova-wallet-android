@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.utils.Event
 
 interface CopyTextLauncher {
 
-    class Payload(val text: String, val buttonName: String)
+    class Payload(val title: String, val textToCopy: String, val copyButtonName: String, val shareButtonName: String)
 
     val showCopyTextDialog: LiveData<Event<Payload>>
 
