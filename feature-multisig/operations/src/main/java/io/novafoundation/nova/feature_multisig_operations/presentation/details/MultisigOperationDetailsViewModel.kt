@@ -283,7 +283,7 @@ class MultisigOperationDetailsViewModel(
             fee = feeLoaderMixin.awaitFee(),
             signatoryBalance = signatoryBalance,
             signatory = signatory,
-            operation = operationFlow.first()
+            operation = operation
         )
 
         validationExecutor.requireValid(
