@@ -269,9 +269,9 @@ class MultisigOperationDetailsViewModel(
         showNextProgress.value = true
 
         val signatory = signatory.first()
-        val chain = operationFlow.first().chain
+        val operation = operationFlow.first()
 
-        val signatoryBalance = interactor.getSignatoryBalance(signatory, chain)
+        val signatoryBalance = interactor.getSignatoryBalance(signatory, operation.chain)
             .onFailure {
                 showError(it)
                 showNextProgress.value = false
@@ -282,7 +282,7 @@ class MultisigOperationDetailsViewModel(
             fee = feeLoaderMixin.awaitFee(),
             signatoryBalance = signatoryBalance,
             signatory = signatory,
-            chain = chain
+            operation = operation
         )
 
         validationExecutor.requireValid(
@@ -308,6 +308,11 @@ class MultisigOperationDetailsViewModel(
                 )
 
                 title to message
+            }
+
+            ApproveMultisigOperationValidationFailure.TransactionIsNotAvailable -> {
+                resourceManager.getString(R.string.multisig_approve_transaction_unavailable_title) to
+                    resourceManager.getString(R.string.multisig_approve_transaction_unavailable_message)
             }
         }
     }
