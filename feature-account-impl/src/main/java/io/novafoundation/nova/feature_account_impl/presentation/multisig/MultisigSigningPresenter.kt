@@ -27,6 +27,8 @@ interface MultisigSigningPresenter {
     suspend fun signingIsNotSupported()
 
     suspend fun presentValidationFailure(failure: MultisigExtrinsicValidationFailure)
+
+    suspend fun presentValidationException(exception: Throwable)
 }
 
 @FeatureScope
@@ -62,6 +64,13 @@ class RealMultisigSigningPresenter @Inject constructor(
         }
 
         nestedSigningPresenter.presentValidationFailure(title, message)
+    }
+
+    override suspend fun presentValidationException(exception: Throwable) {
+        nestedSigningPresenter.presentValidationFailure(
+            resourceManager.getString(R.string.common_error_general_title),
+            exception.message ?: resourceManager.getString(R.string.common_undefined_error_message)
+        )
     }
 
     private fun formatOperationAlreadyExists(failure: MultisigExtrinsicValidationFailure.OperationAlreadyExists): ValidationTitleAndMessage {
