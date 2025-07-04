@@ -19,6 +19,10 @@ fun <T> Collection<T>.isNotLast(value: T): Boolean {
     return lastOrNull() != null && !isLast(value)
 }
 
+fun <T> List<T>.getFromTheEndOrNull(index: Int): T? {
+    return getOrNull(lastIndex - index)
+}
+
 inline fun <T> List<T>.binarySearchFloor(fromIndex: Int = 0, toIndex: Int = size, comparison: (T) -> Int): Int {
     rangeCheck(fromIndex, toIndex)
 

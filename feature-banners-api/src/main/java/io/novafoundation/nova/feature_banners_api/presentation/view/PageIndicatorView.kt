@@ -10,6 +10,7 @@ import android.view.View
 import androidx.annotation.ColorInt
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.getFromTheEndOrNull
 import io.novafoundation.nova.common.utils.isLast
 import io.novafoundation.nova.common.utils.isNotLast
 
@@ -105,9 +106,17 @@ class PageIndicatorView @JvmOverloads constructor(
 
         indicator.size = indicatorFullLength - offset * indicatorFullLength
 
-        if (indicators.isNotLast(indicator)) {
-            val marginToNext = if (isRemovingAnimation) indicatorMargin - offset * indicatorMargin else indicatorMargin
-            indicator.marginToNext = marginToNext
+        when {
+            indicators.isLast(indicator) && isRemovingAnimation -> {
+                val nextLastIndicator = indicators.getFromTheEndOrNull(1)
+                nextLastIndicator?.marginToNext = indicatorMargin - offset * indicatorMargin
+                indicator.marginToNext = 0f
+            }
+
+            indicators.isNotLast(indicator) -> {
+                val marginToNext = if (isRemovingAnimation) indicatorMargin - offset * indicatorMargin else indicatorMargin
+                indicator.marginToNext = marginToNext
+            }
         }
 
         val endColor = if (isRemovingAnimation) goneIndicatorColor else indicatorColor
