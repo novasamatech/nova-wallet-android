@@ -1,8 +1,9 @@
 package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.BatchAllNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.RealExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.batch.BatchAllNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.test_shared.any
@@ -179,7 +180,7 @@ internal class BatchAllWalkTest {
             addAll(innerBatchEvents)
             add(itemCompleted())
 
-            // first leve batch ends
+            // first level batch ends
             add(batchCompleted())
             add(extrinsicSuccess())
         }

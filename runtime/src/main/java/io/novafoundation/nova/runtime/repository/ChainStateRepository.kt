@@ -17,8 +17,8 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.network.updaters.SampledBlockTime
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
+import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import io.novafoundation.nova.runtime.storage.typed.number
 import io.novafoundation.nova.runtime.storage.typed.system
@@ -117,6 +117,10 @@ class ChainStateRepository(
     fun currentBlockNumberFlow(chainId: ChainId): Flow<BlockNumber> = localStorage.observeBlockNumber(chainId)
 
     fun currentRemoteBlockNumberFlow(chainId: ChainId): Flow<BlockNumber> = remoteStorage.observeBlockNumber(chainId)
+
+    suspend fun currentRemoteBlock(chainId: ChainId) = remoteStorage.query(chainId) {
+        metadata.system.number.queryNonNull()
+    }
 
     private fun StorageDataSource.observeBlockNumber(chainId: ChainId) = subscribe(chainId) {
         metadata.system.number.observeNonNull()

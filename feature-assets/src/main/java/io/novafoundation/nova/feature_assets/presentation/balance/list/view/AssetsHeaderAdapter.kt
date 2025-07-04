@@ -178,6 +178,7 @@ class AssetsHeaderHolder(
 
     fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(viewBinding) {
         balanceListNfts.setPreviews(nftPreviews)
+        viewBinding.balanceTableView.invalidateChildrenVisibility()
     }
 
     fun bindNftCount(nftCount: String?) = with(viewBinding) {
@@ -202,5 +203,6 @@ class AssetsHeaderHolder(
 
     fun bindPendingOperationsModel(model: PendingOperationsCountModel) {
         viewBinding.balanceListPendingOperations.setPendingOperationsCount(model)
+        viewBinding.balanceTableView.invalidateChildrenVisibility()
     }
 }

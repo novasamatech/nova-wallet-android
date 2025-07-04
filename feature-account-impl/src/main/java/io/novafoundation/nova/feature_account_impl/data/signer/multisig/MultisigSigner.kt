@@ -5,8 +5,8 @@ import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.validation.ValidationStatus
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigAsMulti
+import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigAsMultiThreshold1
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationPayload
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.SignatoryFeePaymentMode
@@ -19,8 +19,9 @@ import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.isThreshold1
+import io.novafoundation.nova.feature_account_impl.data.signer.LeafSigner
 import io.novafoundation.nova.feature_account_impl.presentation.multisig.MultisigSigningPresenter
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -31,18 +32,14 @@ import javax.inject.Inject
 
 @FeatureScope
 class MultisigSignerFactory @Inject constructor(
-    private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
-    private val extrinsicSplitter: ExtrinsicSplitter,
     private val multisigExtrinsicValidationEventBus: MultisigExtrinsicValidationRequestBus,
     private val multisigSigningPresenter: MultisigSigningPresenter,
 ) {
 
     fun create(metaAccount: MultisigMetaAccount, signerProvider: SignerProvider, isRoot: Boolean): MultisigSigner {
         return MultisigSigner(
-            chainRegistry = chainRegistry,
             accountRepository = accountRepository,
-            extrinsicSplitter = extrinsicSplitter,
             signerProvider = signerProvider,
             isRootSigner = isRoot,
             multisigExtrinsicValidationEventBus = multisigExtrinsicValidationEventBus,
@@ -54,16 +51,12 @@ class MultisigSignerFactory @Inject constructor(
 }
 
 // TODO multisig:
-// 1. support threshold 1 multisigs (including weight estimation upon submission)
-// 2. certain operations cannot execute multisig (in general - CallExecutionType.DELAYED). We should add corresponding checks and validations
 // 3. Create a base class NestedSigner for Multisig and Proxieds
 // Example: 1 click swaps
 class MultisigSigner(
     private val multisigAccount: MultisigMetaAccount,
-    private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
-    private val extrinsicSplitter: ExtrinsicSplitter,
     private val multisigExtrinsicValidationEventBus: MultisigExtrinsicValidationRequestBus,
     private val multisigSigningPresenter: MultisigSigningPresenter,
     private val isRootSigner: Boolean,
@@ -71,7 +64,11 @@ class MultisigSigner(
 
     override val metaAccount = multisigAccount
 
-    private val selfCallExecutionType = CallExecutionType.DELAYED
+    private val selfCallExecutionType = if (multisigAccount.isThreshold1()) {
+        CallExecutionType.IMMEDIATE
+    } else {
+        CallExecutionType.DELAYED
+    }
 
     private val signatoryMetaAccount = SingleValueCache {
         computeSignatoryMetaAccount()
@@ -156,8 +153,10 @@ class MultisigSigner(
     }
 
     context(ExtrinsicBuilder)
-    private fun determineSignatoryFeePaymentMode(actualCall: GenericCall.Instance): SignatoryFeePaymentMode {
-        return if (isRootSigner) {
+    private suspend fun determineSignatoryFeePaymentMode(actualCall: GenericCall.Instance): SignatoryFeePaymentMode {
+        // Our direct signatory only pay fees if it is a LeafSigner
+        // Otherwise it is paid by signer's own delegate
+        return if (delegateSigner() is LeafSigner) {
             SignatoryFeePaymentMode.PaysSubmissionFee(
                 actualCall = actualCall
             )
@@ -181,12 +180,19 @@ class MultisigSigner(
     private fun wrapCallsInAsMulti(maxWeight: WeightV2) {
         val call = getWrappedCall()
 
-        val multisigCall = runtime.composeMultisigAsMulti(
-            multisigMetaAccount = multisigAccount,
-            maybeTimePoint = null,
-            call = call,
-            maxWeight = maxWeight
-        )
+        val multisigCall = if (multisigAccount.isThreshold1()) {
+            runtime.composeMultisigAsMultiThreshold1(
+                multisigMetaAccount = multisigAccount,
+                call = call
+            )
+        } else {
+            runtime.composeMultisigAsMulti(
+                multisigMetaAccount = multisigAccount,
+                maybeTimePoint = null,
+                call = call,
+                maxWeight = maxWeight
+            )
+        }
 
         resetCalls()
         call(multisigCall)

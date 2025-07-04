@@ -8,6 +8,9 @@ import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.createAndSelectTab
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.hasSelectedTab
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +21,8 @@ private const val DAPP_DEEP_LINK_PREFIX = "/open/dapp"
 class DAppDeepLinkHandler(
     private val dappRepository: DAppMetadataRepository,
     private val router: DAppRouter,
-    private val automaticInteractionGate: AutomaticInteractionGate
+    private val automaticInteractionGate: AutomaticInteractionGate,
+    private val browserTabService: BrowserTabService
 ) : DeepLinkHandler {
 
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
@@ -36,7 +40,11 @@ class DAppDeepLinkHandler(
 
         ensureDAppInCatalog(normalizedUrl)
 
-        router.openDAppBrowser(DAppBrowserPayload.Address(url))
+        if (browserTabService.hasSelectedTab()) {
+            browserTabService.createAndSelectTab(normalizedUrl)
+        } else {
+            router.openDAppBrowser(DAppBrowserPayload.Address(url))
+        }
     }
 
     private suspend fun ensureDAppInCatalog(normalizedUrl: String) {

@@ -28,6 +28,20 @@ fun RuntimeSnapshot.composeMultisigAsMulti(
     )
 }
 
+fun RuntimeSnapshot.composeMultisigAsMultiThreshold1(
+    multisigMetaAccount: MultisigMetaAccount,
+    call: GenericCall.Instance,
+): GenericCall.Instance {
+    return composeCall(
+        moduleName = Modules.MULTISIG,
+        callName = "as_multi_threshold_1",
+        arguments = mapOf(
+            "other_signatories" to multisigMetaAccount.otherSignatories.map { it.value },
+            "call" to call,
+        )
+    )
+}
+
 fun RuntimeSnapshot.composeMultisigCancelAsMulti(
     multisigMetaAccount: MultisigMetaAccount,
     maybeTimePoint: MultisigTimePoint,

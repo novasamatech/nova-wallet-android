@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
 
-object NoOpRealtimeCallDataWatcher : RealtimeCallDataWatcher {
+object NoOpRealtimeCallDataWatcher : MultisigCallDataWatcher {
     override val newMultisigEvents: Flow<MultiChainMultisigEvent> = emptyFlow()
 
-    override val realtimeCallData: StateFlow<Map<MultiChainCallHash, GenericCall.Instance>> = MutableStateFlow(emptyMap())
+    override val callData: StateFlow<Map<MultiChainCallHash, GenericCall.Instance>> = MutableStateFlow(emptyMap())
 }

@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.checkForFeeChanges
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.recipientIsNotSystemAccount
@@ -22,6 +23,7 @@ import io.novafoundation.nova.runtime.ethereum.transaction.builder.contractCall
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.requireErc20
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
 
 // a conservative upper limit. Usually transfer takes around 30-50k
@@ -65,6 +67,10 @@ class EvmErc20AssetTransfers(
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
         return true
+    }
+
+    override suspend fun parseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall? {
+        return null
     }
 
     private fun EvmTransactionBuilder.transfer(transfer: AssetTransfer) {

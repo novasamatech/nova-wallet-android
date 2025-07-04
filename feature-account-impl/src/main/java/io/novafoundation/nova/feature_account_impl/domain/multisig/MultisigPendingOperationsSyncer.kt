@@ -2,20 +2,25 @@ package io.novafoundation.nova.feature_account_impl.domain.multisig
 
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.data.memory.LazyAsyncMultiCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
-import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.RealtimeCallDataWatcher
+import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
+import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.MultisigCallDataWatcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.repository.blockDurationEstimatorFromRemote
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -26,19 +31,25 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @FeatureScope
 internal class MultisigChainPendingOperationsSyncerFactory @Inject constructor(
     private val multisigRepository: MultisigRepository,
+    private val operationLocalCallRepository: MultisigOperationLocalCallRepository,
+    private val accountRepository: AccountRepository,
+    private val chainStateRepository: ChainStateRepository,
 ) {
 
     fun create(
         chain: Chain,
         multisig: MultisigMetaAccount,
-        callDataWatcher: RealtimeCallDataWatcher,
+        callDataWatcher: MultisigCallDataWatcher,
         scope: CoroutineScope,
     ): MultisigPendingOperationsSyncer {
         return RealMultisigChainPendingOperationsSyncer(
@@ -46,7 +57,10 @@ internal class MultisigChainPendingOperationsSyncerFactory @Inject constructor(
             multisig = multisig,
             scope = scope,
             multisigRepository = multisigRepository,
-            callDataWatcher = callDataWatcher
+            callDataWatcher = callDataWatcher,
+            operationLocalCallRepository = operationLocalCallRepository,
+            accountRepository = accountRepository,
+            chainStateRepository = chainStateRepository
         )
     }
 }
@@ -62,15 +76,16 @@ internal class RealMultisigChainPendingOperationsSyncer(
     private val chain: Chain,
     private val multisig: MultisigMetaAccount,
     private val scope: CoroutineScope,
-    private val callDataWatcher: RealtimeCallDataWatcher,
+    private val callDataWatcher: MultisigCallDataWatcher,
     private val multisigRepository: MultisigRepository,
+    private val accountRepository: AccountRepository,
+    private val operationLocalCallRepository: MultisigOperationLocalCallRepository,
+    private val chainStateRepository: ChainStateRepository,
 ) : CoroutineScope by scope, MultisigPendingOperationsSyncer {
 
     private val pendingCallHashesFlow = MutableStateFlow<Set<CallHash>>(emptySet())
 
-    private val knownCallDatas = LazyAsyncMultiCache(scope, debugLabel = "CallDataCache") {
-        multisigRepository.getCallDatas(chain, it)
-    }
+    private val offChainInfos = MutableStateFlow(emptyMap<CallHash, OffChainPendingMultisigOperationInfo>())
 
     override val pendingOperationsCount = pendingCallHashesFlow
         .map { it.size }
@@ -87,6 +102,23 @@ internal class RealMultisigChainPendingOperationsSyncer(
 
     init {
         observePendingCallHashes()
+
+        startOffChainRefreshJob()
+    }
+
+    private fun startOffChainRefreshJob() {
+        pendingCallHashesFlow
+            .mapLatest(::syncOffChainInfo)
+            .launchIn(this)
+    }
+
+    private suspend fun syncOffChainInfo(callHashes: Set<CallHash>) {
+        if (callHashes.isEmpty()) return
+
+        val accountId = multisig.requireAccountIdKeyIn(chain)
+
+        multisigRepository.getOffChainPendingOperationsInfo(chain, accountId, callHashes)
+            .onSuccess { offChainInfos.value = it }
     }
 
     private fun cleanInactiveOperations(pendingOperations: Map<CallHash, PendingMultisigOperation?>) {
@@ -97,7 +129,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     private fun observePendingCallHashes() = launchUnit {
         val accountId = multisig.accountIdKeyIn(chain) ?: return@launchUnit
 
-        loadInitialHashes(accountId)
+        syncInitialHashes(accountId)
         startDetectingNewPendingCallHashesFromEvents(accountId)
     }
 
@@ -113,20 +145,22 @@ internal class RealMultisigChainPendingOperationsSyncer(
         val accountId = multisig.accountIdKeyIn(chain)
         if (accountId == null || callHashes.isEmpty()) return flowOf { emptyMap() }
 
-        val callDatasFromFetchFlow = flowOf { knownCallDatas.getOrCompute(callHashes) }
+        val timeEstimator = chainStateRepository.blockDurationEstimatorFromRemote(chain.id)
 
         return combine(
-            callDataWatcher.realtimeCallData,
-            callDatasFromFetchFlow,
+            callDataWatcher.callData,
+            offChainInfos,
             multisigRepository.subscribePendingOperations(this.chain, accountId, callHashes)
-        ) { realtimeCallDatas, callDatas, onChainOperations ->
+        ) { realtimeCallDatas, offChainInfos, onChainOperations ->
             onChainOperations.mapValues { (callHash, onChainOperation) ->
                 val realtimeKey = chain.id to callHash
+                val offChainInfo = offChainInfos[callHash]
 
                 PendingMultisigOperation.from(
                     onChainMultisig = onChainOperation ?: return@mapValues null,
-                    callData = realtimeCallDatas[realtimeKey] ?: callDatas[callHash],
+                    callData = realtimeCallDatas[realtimeKey] ?: offChainInfo?.callData,
                     chain = chain,
+                    timestamp = offChainInfo?.timestamp ?: timeEstimator.timestampOf(onChainOperation.timePoint.height).milliseconds
                 )
             }
         }
@@ -136,6 +170,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
         onChainMultisig: OnChainMultisig,
         callData: GenericCall.Instance?,
         chain: Chain,
+        timestamp: Duration
     ): PendingMultisigOperation {
         return PendingMultisigOperation(
             call = callData,
@@ -146,16 +181,28 @@ internal class RealMultisigChainPendingOperationsSyncer(
             signatoryMetaId = multisig.signatoryMetaId,
             threshold = multisig.threshold,
             depositor = onChainMultisig.depositor,
-            timePoint = onChainMultisig.timePoint
+            deposit = onChainMultisig.deposit,
+            timePoint = onChainMultisig.timePoint,
+            timestamp = timestamp
         )
     }
 
-    private suspend fun loadInitialHashes(accountId: AccountIdKey) {
+    private suspend fun syncInitialHashes(accountId: AccountIdKey) {
         runCatching {
             val pendingOperationsHashes = multisigRepository.getPendingOperationIds(chain, accountId)
+            removeOutdatedLocalCallHashes(pendingOperationsHashes)
             pendingCallHashesFlow.value = pendingOperationsHashes
         }.onFailure {
             Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to load initial call hashes", it)
         }
+    }
+
+    private suspend fun removeOutdatedLocalCallHashes(callHashes: Set<CallHash>) {
+        val metaAccount = accountRepository.getSelectedMetaAccount()
+        operationLocalCallRepository.removeCallHashesExclude(
+            metaAccount.id,
+            chain.id,
+            callHashes
+        )
     }
 }

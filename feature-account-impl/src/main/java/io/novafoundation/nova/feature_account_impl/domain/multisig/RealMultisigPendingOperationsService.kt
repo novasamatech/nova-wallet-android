@@ -15,8 +15,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
-import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.RealtimeCallDataWatcher
-import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.RealtimeCallDataWatcherFactory
+import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.MultisigCallDataWatcher
+import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.MultisigCallDataWatcherFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +37,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
     private val accountRepository: AccountRepository,
     private val multisigRepository: MultisigRepository,
     private val chainRegistry: ChainRegistry,
-    private val realtimeCallDataWatcherFactory: RealtimeCallDataWatcherFactory,
+    private val realtimeCallDataWatcherFactory: MultisigCallDataWatcherFactory,
 ) : SharedComputation(computationalCache), MultisigPendingOperationsService {
 
     context(ComputationalScope)
@@ -66,6 +66,11 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
     }
 
     context(ComputationalScope)
+    override suspend fun pendingOperation(id: PendingMultisigOperationId): PendingMultisigOperation? {
+        return pendingOperationFlow(id).first()
+    }
+
+    context(ComputationalScope)
     private fun getCachedSyncer(): Flow<MultisigPendingOperationsSyncer> {
         return cachedFlow(OPERATIONS_SYNCER_CACHE_KEY) {
             accountRepository.selectedMetaAccountFlow().flatMapLatest {
@@ -77,7 +82,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
     }
 
     context(ComputationalScope)
-    private suspend fun getCachedRealtimeCallDataWatcher(): RealtimeCallDataWatcher {
+    private suspend fun getCachedRealtimeCallDataWatcher(): MultisigCallDataWatcher {
         return cachedValue(CALL_DATA_SYNCER_CACHE_KEY) {
             realtimeCallDataWatcherFactory.createOnlyMultisig(coroutineScope = this)
         }
@@ -85,7 +90,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
 
     private suspend fun createSyncer(
         account: MetaAccount,
-        callDataWatcher: RealtimeCallDataWatcher,
+        callDataWatcher: MultisigCallDataWatcher,
         scope: CoroutineScope
     ): MultisigPendingOperationsSyncer {
         return if (account is MultisigMetaAccount) {
@@ -97,7 +102,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
 
     private suspend fun createMultisigSynced(
         account: MultisigMetaAccount,
-        callDataWatcher: RealtimeCallDataWatcher,
+        callDataWatcher: MultisigCallDataWatcher,
         scope: CoroutineScope
     ): MultisigPendingOperationsSyncer {
         val multisigChainSyncers = chainRegistry.enabledChains()

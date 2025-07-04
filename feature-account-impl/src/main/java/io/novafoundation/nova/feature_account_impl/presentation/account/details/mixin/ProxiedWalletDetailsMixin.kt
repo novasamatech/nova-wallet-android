@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccoun
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasAccountComparator

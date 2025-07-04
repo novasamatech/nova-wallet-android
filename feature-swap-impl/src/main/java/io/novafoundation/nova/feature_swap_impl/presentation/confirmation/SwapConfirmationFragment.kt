@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.observeDescrip
 import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.showValueOrHide
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi

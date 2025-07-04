@@ -77,6 +77,7 @@
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
     <string name="account_ledger_import_fill_title">Cüzdanınıza hesaplar ekleyin</string>
+    <string name="account_ledger_import_start_guide">Ledger Bağlantı Kılavuzu</string>
     <string name="account_ledger_import_start_step_1">Ledger Live uygulamasını kullanarak Ledger cihazınızda %s olduğundan emin olun</string>
     <string name="account_ledger_import_start_step_1_highlighted">ağ uygulaması yüklendi</string>
     <string name="account_ledger_import_start_step_2">Ledger cihazınızda %s</string>
@@ -87,12 +88,14 @@
     <string name="account_ledger_import_start_step_4_highlighted">Hesabı seçin</string>
     <string name="account_ledger_import_start_step_otg">%s telefon ayarlarında</string>
     <string name="account_ledger_import_start_step_otg_highlighted">OTG\'yi Etkinleştir</string>
+    <string name="account_ledger_import_start_title">Ledger\'ı Bağla</string>
     <string name="account_ledger_legacy_warning_message">İşlemleri imzalamak ve hesaplarınızı yeni Generic Ledger uygulamasına taşımak için Migration uygulamasını yükleyin ve açın. Eski Legacy ve Migration Ledger uygulamaları gelecekte desteklenmeyecektir.</string>
     <string name="account_ledger_legacy_warning_title">Yeni Ledger uygulaması yayımlandı</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Geçiş uygulaması yakın gelecekte kullanılamaz hale gelecektir. Hesaplarınızı yeni Ledger uygulamasına taşımak için kullanın ve fonlarınızı kaybetmeyin.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
     <string name="account_ledger_select_device_all_description">Eğer Ledger kullanıyorsanız Bluetooth ile her iki cihazda da Bluetooth\'u etkinleştirin ve Nova\'ya Bluetooth ve konum izinleri verin. USB için, telefon ayarlarınızda OTG\'yi etkinleştirin.</string>
     <string name="account_ledger_select_device_description">Lütfen telefon ayarlarınızda ve Ledger cihazınızda Bluetooth’u etkinleştirin. Ledger cihazınızın kilidini açın ve %s uygulamasını açın.</string>
     <string name="account_ledger_select_device_title">Ledger cihazınızı seçin</string>
@@ -139,7 +142,7 @@
     <string name="account_polkadot_vault_import_start_step_3_highlighted">taramak için QR kodu</string>
     <string name="account_private_key">Özel anahtar</string>
     <string name="account_proxied">Vekil</string>
-    <string name="account_proxieds">Size Delege Edilenler (Proksi)</string>
+    <string name="account_proxieds">Size Delege Edilenler (Proxied)</string>
     <string name="account_proxy_type_any">Herhangi</string>
     <string name="account_proxy_type_auction">Açık Artırma</string>
     <string name="account_proxy_type_cancel_proxy">Proksiyi İptal Et</string>
@@ -173,6 +176,7 @@
     <string name="accounts_change_chain_account">%s hesabını değiştir</string>
     <string name="accounts_change_chain_secrets">Hesabı değiştir</string>
     <string name="accounts_ledger_legacy">Ledger (Eski)</string>
+    <string name="accounts_update_proxieds_title">Size vekâlet edildi</string>
     <string name="active_multisig_title">Paylaşılan kontrol</string>
     <string name="add_custom_node">Özel düğüm ekle</string>
     <string name="add_delegation_missing_account_message">Delege etmek için cüzdana %s hesabı eklemeniz gerekiyor</string>
@@ -339,6 +343,7 @@
     <string name="common_balance">Bakiye</string>
     <string name="common_bonus">Bonus</string>
     <string name="common_call">Ara</string>
+    <string name="common_call_data">Arama verisi</string>
     <string name="common_cancel">İptal et</string>
     <string name="common_cancel_operation_warning">Bu işlemi iptal etmek istediğinizden emin misiniz?</string>
     <string name="common_cannot_find_app">Üzgünüz, bu isteği işlemek için doğru uygulamanız yok</string>
@@ -366,17 +371,21 @@
     <string name="common_continue">Devam et</string>
     <string name="common_copied">Panoya kopyalandı</string>
     <string name="common_copy_address">Adresi kopyala</string>
+    <string name="common_copy_call_data">Arama verisini kopyala</string>
+    <string name="common_copy_hash">Hash\'i kopyala</string>
     <string name="common_copy_id">Kimliği kopyala</string>
     <string name="common_crypto_type">Şifreleme tipi</string>
     <string name="common_date">Tarih</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s ve %s</string>
     <string name="common_delete">Sil</string>
+    <string name="common_depositor">Yatıran</string>
     <string name="common_details">Detaylar</string>
     <string name="common_disabled">Devre dışı</string>
     <string name="common_disconnect">Bağlantıyı kes</string>
     <string name="common_do_not_close_app">Uygulamayı kapatmayın!</string>
     <string name="common_done">Tamam</string>
-    <string name="common_dont_show_again">Bunu bir daha gösterme</string>
+    <string name="common_dry_run_failed_message">Nova, hataları önlemek için işlemi önceden simüle eder. Bu simülasyon başarılı olmadı. Daha sonra veya daha yüksek bir miktarla yeniden deneyin. Sorun devam ederse, Ayarlar\'dan Nova Cüzdan Desteği ile iletişime geçin.</string>
+    <string name="common_dry_run_failed_title">İşlem simülasyonu başarısız oldu</string>
     <string name="common_edit">Düzenle</string>
     <string name="common_element_and_more_format" formatted="false">%s (+%s daha fazla)</string>
     <string name="common_email_chooser_title">E-posta uygulaması seçin</string>
@@ -408,10 +417,12 @@
     </plurals>
     <string name="common_frequency_days_daily">günlük</string>
     <string name="common_frequency_days_everyday">her gün</string>
+    <string name="common_full_details">Tam detaylar</string>
     <string name="common_get_token_format">%s alın</string>
     <string name="common_got_it">Anladım</string>
     <string name="common_governance">Yönetim</string>
     <string name="common_hexadecimal_string">Onaltılık dizi</string>
+    <string name="common_hide">Gizle</string>
     <plurals name="common_hours_format">
         <item quantity="one">%d saat</item>
         <item quantity="other">%d saat</item>
@@ -501,8 +512,12 @@
     <string name="common_see_all">Hepsini Gör</string>
     <string name="common_settings">Ayarlar</string>
     <string name="common_share">Paylaş</string>
+    <string name="common_share_call_data">Arama verisini paylaş</string>
+    <string name="common_share_hash">Hash\'i paylaş</string>
+    <string name="common_show">Göster</string>
     <string name="common_sign_in">Giriş Yap</string>
     <string name="common_sign_request">İmza isteği</string>
+    <string name="common_signatory">İmza yetkilisi</string>
     <string name="common_signature_invalid">İmza geçersiz</string>
     <string name="common_skip">Atla</string>
     <string name="common_skip_process">İşlemi atla</string>
@@ -751,6 +766,7 @@
     <string name="ed25519_selection_subtitle">ed25519 (alternatif)</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">Yedekleme parolası</string>
+    <string name="enter_call_data_title">Arama verisini girin</string>
     <string name="error_not_enough_to_pay_fee_title">Ücreti ödemek için yeterli token yok</string>
     <string name="ethereum_contract">Kontrat</string>
     <string name="ethereum_contract_call">Kontrat Çağrısı</string>
@@ -813,6 +829,8 @@
     <string name="integrate_networks_banner_description">Nova Wallet\'ta geliştirdiğiniz ağın tüm özelliklerini entegre edin ve herkesin erişebilmesini sağlayın.</string>
     <string name="integrate_networks_banner_link">Ağınızı entegre edin</string>
     <string name="integrate_networks_banner_title">Polkadot için mi geliştiriyorsunuz?</string>
+    <string name="invalid_call_data_message">Bu arama verisi, çağrı hash %s ile başka bir işlem için</string>
+    <string name="invalid_call_data_title">Geçersiz arama verisi</string>
     <string name="invalid_proxy_address_message">Proxy adresi geçerli bir %s adresi olmalıdır</string>
     <string name="invalid_proxy_address_title">Geçersiz proxy adresi</string>
     <string name="invalid_token_symbol_message">Girilen Para Birimi Sembolü (%1$s) ağ (%2$s) ile eşleşmiyor. Doğru para birimi sembolünü kullanmak istiyor musunuz?</string>
@@ -894,29 +912,45 @@
         <item quantity="one">En az %d cüzdan seçin</item>
         <item quantity="other">En az %d cüzdan seçin</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">Bu işlem zaten reddedildi veya gerçekleştirildi.</string>
+    <string name="multisig_approve_transaction_unavailable_title">Bu işlem gerçekleştirilemiyor</string>
     <string name="multisig_callhash_exists_message">%s aynı işlemi başlattı ve şu anda diğer imzalayanlar tarafından imzalanmayı bekliyor.</string>
     <string name="multisig_callhash_exists_title">İşlem zaten mevcut</string>
+    <string name="multisig_card_not_supported_message">Debit Kartınızı yönetmek için lütfen farklı bir cüzdan türüne geçin.</string>
+    <string name="multisig_card_not_supported_title">Debit Kart Çoklu İmza için desteklenmiyor</string>
+    <string name="multisig_deposit">Çoklu imza depozitosu</string>
+    <string name="multisig_deposit_description">Depozito, çoklu imza işlemi gerçekleşene veya reddedilene kadar yatıranın hesabında kilitli kalır.</string>
+    <string name="multisig_extrinsic_details_subtitle">İşlemin doğru olduğundan emin olun</string>
+    <string name="multisig_on_behalf_of">Adına</string>
     <string name="multisig_operation_details_approve">Onayla</string>
     <string name="multisig_operation_details_approve_and_execute">Onayla ve Gerçekleştir</string>
-    <string name="multisig_operation_details_call_data_not_found">Çağrı verisi bulunamadı</string>
+    <string name="multisig_operation_details_call_data_not_found">Detayları görmek için arama verisi girin</string>
     <string name="multisig_operation_details_reject">Reddet</string>
-    <string name="multisig_operations_pending_signature">Bekleyen imza</string>
-    <string name="multisig_operations_progress" formatted="false">%s / %s İmzalandı</string>
-    <string name="multisig_operations_signed">İmzalandı</string>
-    <string name="multisig_operations_unknown_calldata">[Bilinmeyen işlem] (%s)</string>
-    <string name="multisig_pending_operations">Bekleyen işlemler</string>
+    <string name="multisig_operation_details_signatories" formatted="false">İmza yetkilileri (%d / %d)</string>
+    <string name="multisig_operations_created">Sizin tarafınızdan oluşturuldu</string>
+    <string name="multisig_operations_progress" formatted="false">İmzalanıyor (%s / %s)</string>
+    <string name="multisig_operations_signed">Sizin tarafınızdan imzalandı</string>
+    <string name="multisig_operations_unknown_calldata">Bilinmeyen işlem</string>
+    <string name="multisig_pending_operations">İmzalanacak işlemler</string>
+    <string name="multisig_pending_operations_on_behalf_of">Adına:</string>
+    <string name="multisig_sell_not_supported_message">Kriptoyu fiat ile satmak için lütfen farklı bir cüzdan türüne geçin.</string>
+    <string name="multisig_sell_not_supported_title">Satış, Çoklu İmza için desteklenmiyor</string>
     <string name="multisig_signatory">İmza Sahibi:</string>
-    <string name="multisig_signatory_validation_deposit" formatted="false">%s çoklu imza depozitosu için %s yatıracak yeterli bakiyeye sahip değil. Mevcut bakiye: %s</string>
-    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s ağ ücreti %s ve çoklu imza depozitosu için yeterli bakiyeye sahip değil. Mevcut bakiye: %s</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s, %s çoklu imza depozitosunu yatırmak için yeterli bakiyeye sahip değil. Bakiyenize %s daha eklemeniz gerekiyor</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s, %s ağ ücretini ödemek ve %s çoklu imza depozitosunu yatırmak için yeterli bakiyeye sahip değil. Bakiyenize %s daha eklemeniz gerekiyor</string>
     <string name="multisig_signatory_validation_ed" formatted="false">%s bu işlem ücretini ödemek ve minimum ağ bakiyesi üzerinde kalmak için en az %s\'e ihtiyaç duyar. Mevcut bakiye: %s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">%s, %s ağ ücretini ödemek için yeterli bakiyeye sahip değil. Bakiyenize %s daha eklemeniz gerekiyor</string>
     <string name="multisig_signing_is_not_supported_message">Çoklu imza cüzdanları rastgele mesaj imzalamayı desteklemez — sadece işlemler</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">İşlem reddedilecek. Çoklu imza depozitosu %s\'e geri dönecek.</string>
     <string name="multisig_signing_warning_message">Çoklu imza işlemi %s tarafından başlatılacak. Başlatıcı ağ ücretini öder ve bir çoklu imza depozitosu ayırır, işlem tamamlandığında bu yeniden ayırılır.</string>
     <string name="multisig_signing_warning_title">Çoklu İmza işlemi</string>
-    <string name="multisig_transaction_created_subtitle">Diğer imza sahipleri şimdi işlemi onaylayabilir.\nDurumunu %s içinde izleyebilirsiniz</string>
-    <string name="multisig_transaction_created_subtitle_highlight">Çoklu imza işlemleri.</string>
+    <string name="multisig_transaction_created_subtitle">Diğer imza yetkilileri şimdi işlemi onaylayabilir.\nDurumunu %s içinde takip edebilirsiniz.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">İmzalanacak işlemler</string>
     <string name="multisig_transaction_created_title">Çoklu İmza işlemi oluşturuldu</string>
     <string name="multisig_transaction_created_view_details">Detayları Görüntüle</string>
     <string name="multisig_wallet_details_info_warning">Bu cüzdandan yapılan işlemler birden fazla imza sahibinin onayını gerektirir. Hesabınız bu imza sahiplerinden biridir:</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">Diğer imza yetkilileri:</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">Eşik %d / %d</string>
     <string name="network_already_exist_failure_title">Bu Düğüm zaten mevcut</string>
     <string name="network_fee">Ağ ücreti</string>
     <string name="network_info_address">Düğüm adresi</string>
@@ -1088,13 +1122,11 @@
     <string name="referendum_aye_format">Evet: %s</string>
     <string name="referendum_dapp_list_title">Nova DApp tarayıcısını kullanın</string>
     <string name="referendum_description_fallback">Bu açıklamayı ve başlığı yalnızca öneren kişi düzenleyebilir. Eğer öneren kişinin hesabına erişiminiz varsa, Polkassembly\'i ziyaret edin ve teklifiniz hakkında bilgi doldurun</string>
-    <string name="referendum_details_full_details">Tam detaylar</string>
     <string name="referendum_details_requested_amount">İstenen miktar</string>
     <string name="referendum_details_timeline">Zaman çizelgesi</string>
     <string name="referendum_details_your_vote">Oyunuz:</string>
     <string name="referendum_full_details_approve_threshold">Onay eğrisi</string>
     <string name="referendum_full_details_beneficiary">Yararlanıcı</string>
-    <string name="referendum_full_details_copy_hash">Hash\'i kopyala</string>
     <string name="referendum_full_details_deposit">Depozito</string>
     <string name="referendum_full_details_electorate">Seçmen</string>
     <string name="referendum_full_details_hash">Çağrı hash\'i</string>
@@ -1611,6 +1643,7 @@
     <string name="state_removed">Kaldırıldı</string>
     <string name="swap_custom_fee_selector_description">Ağ ücreti ödemek için token</string>
     <string name="swap_custom_fee_selector_footer">Ağ ücreti girilen miktarın üstüne eklenir</string>
+    <string name="swap_dry_run_failed_inline_message">Swap adımının simülasyonu başarısız oldu</string>
     <string name="swap_error_pair_not_supported">Bu çift desteklenmiyor</string>
     <string name="swap_execution_failure" formatted="false">#%s (%s) işlemi başarısız oldu</string>
     <string name="swap_execution_failure_swap_label" formatted="false">%s\'den %s\'e %s üzerinde swap</string>

@@ -10,8 +10,9 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
-import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.MultisigPendingOperationsViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -24,13 +25,15 @@ class MultisigPendingOperationsModule {
         discoveryService: MultisigPendingOperationsService,
         router: MultisigOperationsRouter,
         resourceManager: ResourceManager,
-        operationFormatter: MultisigOperationFormatter
+        multisigCallFormatter: MultisigCallFormatter,
+        accountUseCase: SelectedAccountUseCase,
     ): ViewModel {
         return MultisigPendingOperationsViewModel(
             discoveryService = discoveryService,
             router = router,
             resourceManager = resourceManager,
-            operationFormatter = operationFormatter
+            multisigCallFormatter = multisigCallFormatter,
+            selectedAccountUseCase = accountUseCase
         )
     }
 

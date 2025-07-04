@@ -1,31 +1,52 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.list
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.list.toListWithHeaders
+import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAction
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
-import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationHeaderModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel
+import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel.SigningAction
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 
 class MultisigPendingOperationsViewModel(
     discoveryService: MultisigPendingOperationsService,
     private val router: MultisigOperationsRouter,
     private val resourceManager: ResourceManager,
-    private val operationFormatter: MultisigOperationFormatter,
+    private val multisigCallFormatter: MultisigCallFormatter,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
 ) : BaseViewModel() {
 
+    val account = selectedAccountUseCase.selectedMetaAccountFlow()
+
     val pendingOperationsFlow = discoveryService.pendingOperations()
-        .mapList { it.toUi() }
+        .map { operations ->
+            val account = account.first()
+
+            operations
+                .groupBy { it.timestamp.inWholeDays }
+                .toSortedMap(Comparator.reverseOrder())
+                .toListWithHeaders(
+                    keyMapper = { day, _ -> PendingMultisigOperationHeaderModel(day) },
+                    valueMapper = { operation -> operation.toUi(account) }
+                )
+        }
         .withSafeLoading()
         .shareInBackground()
 
@@ -38,13 +59,17 @@ class MultisigPendingOperationsViewModel(
         router.openMultisigOperationDetails(payload)
     }
 
-    private fun PendingMultisigOperation.toUi(): PendingMultisigOperationModel {
+    private suspend fun PendingMultisigOperation.toUi(selectedAccount: MetaAccount): PendingMultisigOperationModel {
+        val initialOrigin = selectedAccount.requireAccountIdKeyIn(chain)
+        val formattedCall = multisigCallFormatter.formatPreview(call, initialOrigin, chain)
+
         return PendingMultisigOperationModel(
             id = identifier,
             chain = mapChainToUi(chain),
             action = formatAction(),
-            operationTitle = operationFormatter.formatTitle(this),
-            progress = formatProgress()
+            call = formattedCall,
+            progress = formatProgress(),
+            time = resourceManager.formatTime(timestamp.inWholeMilliseconds)
         )
     }
 
@@ -52,16 +77,27 @@ class MultisigPendingOperationsViewModel(
         return resourceManager.getString(R.string.multisig_operations_progress, approvals.size.format(), threshold.format())
     }
 
-    private fun PendingMultisigOperation.formatAction(): ColoredText {
+    private fun PendingMultisigOperation.formatAction(): SigningAction? {
         return when (userAction()) {
-            is MultisigAction.CanApprove -> ColoredText(
-                text = resourceManager.getText(R.string.multisig_operations_pending_signature),
-                colorRes = R.color.button_text_accent
+            is MultisigAction.CanApprove -> null
+
+            is MultisigAction.CanReject -> SigningAction(
+                text = ColoredText(
+                    text = resourceManager.getText(R.string.multisig_operations_created),
+                    colorRes = R.color.text_secondary
+                ),
+                icon = null
             )
 
-            is MultisigAction.CanReject, MultisigAction.Signed -> ColoredText(
-                text = resourceManager.getText(R.string.multisig_operations_signed),
-                colorRes = R.color.text_secondary
+            MultisigAction.Signed -> SigningAction(
+                text = ColoredText(
+                    text = resourceManager.getText(R.string.multisig_operations_signed),
+                    colorRes = R.color.text_positive
+                ),
+                icon = ColoredDrawable(
+                    drawableRes = R.drawable.ic_checkmark_circle_16,
+                    iconColor = R.color.icon_positive
+                )
             )
         }
     }

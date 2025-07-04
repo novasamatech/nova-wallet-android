@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.checkForFeeChanges
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.recipientIsNotSystemAccount
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.recipientCan
 import io.novafoundation.nova.runtime.ethereum.transaction.builder.EvmTransactionBuilder
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
 
 // native coin transfer has a fixed fee
@@ -61,6 +63,10 @@ class EvmNativeAssetTransfers(
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
         return true
+    }
+
+    override suspend fun parseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall? {
+        return null
     }
 
     private fun EvmTransactionBuilder.nativeTransfer(transfer: AssetTransfer) {

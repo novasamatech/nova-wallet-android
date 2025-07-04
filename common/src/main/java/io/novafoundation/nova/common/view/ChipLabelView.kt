@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.px
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
-import kotlin.math.roundToInt
 
 private const val BASE_ICON_PADDING_DP = 6
 
@@ -63,7 +62,7 @@ class ChipLabelView @JvmOverloads constructor(
         iconStartPadding = typedArray.getDimension(R.styleable.ChipLabelView_iconStartPadding, BASE_ICON_PADDING_DP.dpF(context))
         startIconTint = typedArray.getResourceId(R.styleable.ChipLabelView_iconStartTint, R.color.chip_icon)
         typedArray.getResourceIdOrNull(R.styleable.ChipLabelView_iconStart)?.let {
-            setDrawableStart(it, widthInDp = 16, paddingInDp = iconStartPadding.roundToInt(), tint = startIconTint)
+            setDrawableStart(it, widthInDp = 16, paddingInDp = iconStartPadding.px(context), tint = startIconTint)
         }
 
         iconEndPadding = typedArray.getDimension(R.styleable.ChipLabelView_iconEndPadding, BASE_ICON_PADDING_DP.dpF(context))

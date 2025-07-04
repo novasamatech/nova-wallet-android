@@ -7,5 +7,7 @@ interface AssetSourceRegistry {
 
     fun sourceFor(chainAsset: Chain.Asset): AssetSource
 
+    fun allSources(): List<AssetSource>
+
     suspend fun getEventDetector(chainAsset: Chain.Asset): AssetEventDetector
 }

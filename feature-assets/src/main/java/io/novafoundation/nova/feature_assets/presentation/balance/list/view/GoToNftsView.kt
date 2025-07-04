@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.ViewGoToNftsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -45,8 +44,6 @@ class GoToNftsView @JvmOverloads constructor(
     }
 
     init {
-        background = addRipple(getRoundedCornerDrawable(R.color.block_background))
-
         FeatureUtils.getFeature<AssetsFeatureComponent>(
             context,
             AssetsFeatureApi::class.java

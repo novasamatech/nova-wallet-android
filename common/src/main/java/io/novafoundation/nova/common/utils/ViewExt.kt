@@ -36,6 +36,7 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dev.chrisbanes.insetter.applyInsetter
+import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
 
@@ -170,6 +171,17 @@ fun TextView.setDrawableEnd(
         setCompoundDrawablesRelative(start, top, it, bottom)
     }
 }
+
+fun TextView.removeDrawableEnd() {
+    setDrawableEnd(null as Int?)
+}
+
+fun TextView.setDrawableEnd(
+    icon: ColoredDrawable?,
+    widthInDp: Int? = null,
+    heightInDp: Int? = widthInDp,
+    paddingInDp: Int = 0,
+) = setDrawableEnd(icon?.drawableRes, widthInDp, heightInDp, paddingInDp, icon?.iconColor)
 
 fun TextView.setDrawableStart(
     @DrawableRes drawableRes: Int? = null,

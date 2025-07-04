@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.ext.isSwapSupported
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime

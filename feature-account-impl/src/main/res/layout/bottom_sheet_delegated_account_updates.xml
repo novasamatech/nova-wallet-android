@@ -36,7 +36,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         android:paddingVertical="8dp"
-        app:linkText="@string/common_learn_more"/>
+        app:linkText="@string/common_learn_more" />
 
     <io.novafoundation.nova.common.view.SegmentedTabLayout
         android:id="@+id/delegatedAccountUpdatesMode"
@@ -49,10 +49,12 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/delegatedAccountUpdatesList"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:clipToPadding="false"
         android:paddingBottom="16dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:itemCount="2"
         tools:listitem="@layout/item_account" />
 
     <io.novafoundation.nova.common.view.PrimaryButton

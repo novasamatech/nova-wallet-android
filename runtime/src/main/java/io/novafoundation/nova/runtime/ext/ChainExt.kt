@@ -32,6 +32,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.hasSameId
 import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.Signer
@@ -464,6 +465,10 @@ fun Chain.Asset.requireStatemine(): Type.Statemine {
     return type
 }
 
+fun Chain.findStatemineAssets(): List<Chain.Asset> {
+    return assets.filter { it.type is Type.Statemine }
+}
+
 fun Chain.Asset.statemineOrNull(): Type.Statemine? {
     return type as? Type.Statemine
 }
@@ -527,6 +532,14 @@ fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?):
         val currencyIdScale = bindOrNull { currencyType.toHexUntyped(runtime, currencyId) } ?: return@find false
 
         currencyIdScale == asset.type.currencyIdScale
+    }
+}
+
+fun Chain.findAssetByStatemineAssetId(runtime: RuntimeSnapshot, assetId: Any?): Chain.Asset? {
+    return assets.find { asset ->
+        if (asset.type !is Type.Statemine) return@find false
+
+        asset.type.hasSameId(runtime, assetId)
     }
 }
 

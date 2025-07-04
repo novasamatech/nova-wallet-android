@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
+import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
@@ -60,7 +61,8 @@ class RootActivityModule {
         pushNotificationsInteractor: PushNotificationsInteractor,
         externalServiceInitializer: ExternalServiceInitializer,
         @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher,
-        toastMessageManager: ToastMessageManager
+        toastMessageManager: ToastMessageManager,
+        multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -81,7 +83,8 @@ class RootActivityModule {
             pushNotificationsInteractor,
             externalServiceInitializer,
             actionBottomSheetLauncher,
-            toastMessageManager
+            toastMessageManager,
+            multisigRestrictionCheckMixin
         )
     }
 

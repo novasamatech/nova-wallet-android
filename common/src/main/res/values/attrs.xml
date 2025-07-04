@@ -70,6 +70,7 @@
         <attr name="editTextHint" format="string" />
         <attr name="editTextHintColor" format="color" />
         <attr name="android:textAppearance" />
+        <attr name="editTextMinHeight" format="dimension" />
         <attr name="editTextPaddingStart" format="dimension" />
         <attr name="editTextPaddingEnd" format="dimension" />
         <attr name="editTextPaddingTop" format="dimension" />
@@ -116,12 +117,18 @@
 
     <declare-styleable name="TableView">
         <attr name="title" />
+        <attr name="drawDividers" format="boolean" />
         <attr name="showBackground" format="boolean" />
+        <attr name="childrenPaddingStart" format="dimension" />
+        <attr name="childrenPaddingEnd" format="dimension" />
+        <attr name="childrenPaddingTop" format="dimension" />
+        <attr name="childrenPaddingBottom" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="GoNextView">
         <attr name="inProgress" format="boolean" />
         <attr name="android:text" />
+        <attr name="android:textColor" />
         <attr name="icon" />
         <attr name="iconTint" />
         <attr name="actionIcon" />

@@ -9,9 +9,8 @@ import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.buildSpannable
-import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
-import io.novafoundation.nova.common.utils.splitSnakeOrCamelCase
+import io.novafoundation.nova.common.utils.splitAndCapitalizeWords
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_assets.R
@@ -95,19 +94,13 @@ private fun incomeTextColor(isIncome: Boolean, operationStatus: Operation.Status
     }
 }
 
-private fun String.itemToCapitalizedWords(): String {
-    val split = splitSnakeOrCamelCase()
-
-    return split.joinToString(separator = " ") { it.capitalize() }
-}
-
 private fun mapExtrinsicContentToHeaderAndSubHeader(extrinsicContent: Content, resourceManager: ResourceManager): Pair<String, EllipsizedString> {
     return when (extrinsicContent) {
         is Content.ContractCall -> mapContractCallToHeaderAndSubHeader(extrinsicContent, resourceManager)
 
         is Content.SubstrateCall -> {
-            val header = extrinsicContent.call.itemToCapitalizedWords()
-            val subHeader = extrinsicContent.module.itemToCapitalizedWords()
+            val header = extrinsicContent.call.splitAndCapitalizeWords()
+            val subHeader = extrinsicContent.module.splitAndCapitalizeWords()
 
             header to EllipsizedString(subHeader, TextUtils.TruncateAt.END)
         }
@@ -131,7 +124,7 @@ private fun formatContractFunctionName(extrinsicContent: Content.ContractCall): 
     return extrinsicContent.function?.let { function ->
         val withoutArguments = function.split("(").first()
 
-        withoutArguments.itemToCapitalizedWords()
+        withoutArguments.splitAndCapitalizeWords()
     }
 }
 
@@ -176,9 +169,9 @@ private fun substrateCallUi(
             transactionId(txHash)
         }
 
-        value(resourceManager.getString(R.string.common_module), content.module.itemToCapitalizedWords())
+        value(resourceManager.getString(R.string.common_module), content.module.splitAndCapitalizeWords())
 
-        value(resourceManager.getString(R.string.common_call), content.call.itemToCapitalizedWords())
+        value(resourceManager.getString(R.string.common_call), content.call.splitAndCapitalizeWords())
     }
 }
 

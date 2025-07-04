@@ -12,6 +12,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.model.AccountDelegation
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.getChainOrNull
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountTitleGroupRvItem
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -99,7 +101,7 @@ private class RealDelegatedMetaAccountUpdatesListingMixin(
 
     private fun mapActiveHeader(type: FilterType): String {
         return when (type) {
-            FilterType.Proxied -> resourceManager.getString(R.string.account_proxieds)
+            FilterType.Proxied -> resourceManager.getString(R.string.accounts_update_proxieds_title)
             FilterType.Multisig -> resourceManager.getString(R.string.active_multisig_title)
             is FilterType.UserIgnored -> mapActiveHeader(type.overriddenFilter)
         }

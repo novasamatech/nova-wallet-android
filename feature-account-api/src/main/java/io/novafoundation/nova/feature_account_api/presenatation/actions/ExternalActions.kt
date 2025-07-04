@@ -5,6 +5,8 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -46,6 +48,11 @@ interface ExternalActions : Browserable {
         suspend fun showExternalActions(type: Type, chain: Chain)
     }
 }
+
+suspend fun ExternalActions.Presentation.showAddressActions(metaAccount: MetaAccount, chain: Chain) = showAddressActions(
+    address = metaAccount.addressIn(chain),
+    chain = chain
+)
 
 suspend fun ExternalActions.Presentation.showAddressActions(accountId: AccountId, chain: Chain) = showAddressActions(
     address = chain.addressOf(accountId),

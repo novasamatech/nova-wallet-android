@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.domain.account.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.utils.compareTo
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -50,7 +51,7 @@ class RealMultisigMetaAccount(
 
     override val availability: MultisigAvailability
         get() = if (chainAccounts.isEmpty()) {
-            MultisigAvailability.Universal
+            MultisigAvailability.Universal(addressScheme())
         } else {
             MultisigAvailability.SingleChain(chainAccounts.keys.first())
         }
@@ -86,5 +87,12 @@ class RealMultisigMetaAccount(
 
     private fun isSupported(chain: Chain): Boolean {
         return multisigRepository.supportsMultisigSync(chain)
+    }
+
+    private fun addressScheme(): AddressScheme {
+        return when {
+            substrateAccountId != null -> AddressScheme.SUBSTRATE
+            else -> AddressScheme.EVM
+        }
     }
 }

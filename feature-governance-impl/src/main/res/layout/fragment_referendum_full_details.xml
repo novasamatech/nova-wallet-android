@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:titleText="@string/referendum_details_full_details" />
+        app:titleText="@string/common_full_details" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/referendumDetailsScrollView"

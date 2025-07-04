@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_account_api.presenatation.language.LanguageUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
@@ -108,6 +109,8 @@ interface SettingsFeatureDependencies {
     val walletUiUseCase: WalletUiUseCase
 
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+
+    val addressActionsMixinFactory: AddressActionsMixin.Factory
 
     fun biometricServiceFactory(): BiometricServiceFactory
 

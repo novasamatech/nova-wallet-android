@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.chain.mo
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.ChainAccountGroupUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.setupAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.setupImportTypeChooser
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentWalletDetailsBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
@@ -83,8 +84,11 @@ class WalletDetailsFragment : BaseFragment<WalletDetailsViewModel, FragmentWalle
                 availableAccountActions = viewModel.availableAccountActions.first()
             )
         }
+
         setupImportTypeChooser(viewModel)
         setupAddAccountLauncher(viewModel.addAccountLauncherMixin)
+
+        viewModel.addressActionsMixin.setupAddressActions()
 
         binder.accountDetailsNameField.content.bindTo(viewModel.accountNameFlow, viewLifecycleOwner.lifecycleScope)
 

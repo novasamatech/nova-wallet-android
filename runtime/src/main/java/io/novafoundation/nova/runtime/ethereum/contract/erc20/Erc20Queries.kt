@@ -1,6 +1,7 @@
 package io.novafoundation.nova.runtime.ethereum.contract.erc20
 
 import kotlinx.coroutines.Deferred
+import org.web3j.abi.EventEncoder
 import org.web3j.abi.TypeDecoder
 import org.web3j.abi.TypeReference
 import org.web3j.abi.datatypes.Address
@@ -23,11 +24,27 @@ interface Erc20Queries {
             )
         )
 
+        fun transferEventSignature(): String {
+            return EventEncoder.encode(TRANSFER_EVENT)
+        }
+
         fun parseTransferEvent(log: Log): Transfer {
+            return parseTransferEvent(
+                topic1 = log.topics[1],
+                topic2 = log.topics[2],
+                data = log.data
+            )
+        }
+
+        fun parseTransferEvent(
+            topic1: String,
+            topic2: String,
+            data: String
+        ): Transfer {
             return Transfer(
-                from = TypeDecoder.decodeAddress(log.topics[1]),
-                to = TypeDecoder.decodeAddress(log.topics[2]),
-                amount = TypeDecoder.decodeNumeric(log.data, Uint256::class.java)
+                from = TypeDecoder.decodeAddress(topic1),
+                to = TypeDecoder.decodeAddress(topic2),
+                amount = TypeDecoder.decodeNumeric(data, Uint256::class.java)
             )
         }
     }

@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmou
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.assetTxFeePaidEvent
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvents

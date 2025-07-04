@@ -32,7 +32,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdatePoint
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.bindEquilibriumBalanceLocks
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.updateLocks
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -135,12 +135,11 @@ class EquilibriumAssetBalance(
         )
     }
 
-    override suspend fun subscribeTransferableAccountBalance(
+    override suspend fun subscribeAccountBalanceUpdatePoint(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder?
-    ): Flow<TransferableBalanceUpdate> {
+    ): Flow<TransferableBalanceUpdatePoint> {
         TODO("Not yet implemented")
     }
 

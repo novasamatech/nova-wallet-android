@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.TypeBasedAssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.evmErc20.EvmErc20EventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml.OrmlAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine.StatemineAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.utility.NativeAssetEventDetector
@@ -38,6 +39,7 @@ class AssetsModule {
         nativeAssetEventDetector: NativeAssetEventDetector,
         ormlAssetEventDetectorFactory: OrmlAssetEventDetectorFactory,
         statemineAssetEventDetectorFactory: StatemineAssetEventDetectorFactory,
+        erc20EventDetectorFactory: EvmErc20EventDetectorFactory
     ): AssetSourceRegistry = TypeBasedAssetSourceRegistry(
         nativeSource = native,
         statemineSource = statemine,
@@ -49,6 +51,7 @@ class AssetsModule {
 
         nativeAssetEventDetector = nativeAssetEventDetector,
         ormlAssetEventDetectorFactory = ormlAssetEventDetectorFactory,
-        statemineAssetEventDetectorFactory = statemineAssetEventDetectorFactory
+        statemineAssetEventDetectorFactory = statemineAssetEventDetectorFactory,
+        erc20EventDetectorFactory = erc20EventDetectorFactory
     )
 }
