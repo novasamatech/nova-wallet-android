@@ -139,7 +139,7 @@
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-kód a beolvasáshoz</string>
     <string name="account_private_key">Privát kulcs</string>
     <string name="account_proxied">Meghatalmazott</string>
-    <string name="account_proxieds">Hozzád delegálva (Proxieds)</string>
+    <string name="account_proxieds">Hozzád delegálva (Proxied)</string>
     <string name="account_proxy_type_any">Bármilyen</string>
     <string name="account_proxy_type_auction">Aukció</string>
     <string name="account_proxy_type_cancel_proxy">Proxy megszakító</string>
@@ -173,6 +173,7 @@
     <string name="accounts_change_chain_account">%s fiók módosítása</string>
     <string name="accounts_change_chain_secrets">Fiók módosítása</string>
     <string name="accounts_ledger_legacy">Ledger (Örökség)</string>
+    <string name="accounts_update_proxieds_title">Önnek delegált</string>
     <string name="active_multisig_title">Megosztott irányítás</string>
     <string name="add_custom_node">Egyéni csomópont hozzáadása</string>
     <string name="add_delegation_missing_account_message">Hozzá kell adj egy %s fiókot a tárcádhoz, ahhoz hogy delegálhass</string>
@@ -339,6 +340,7 @@
     <string name="common_balance">Egyenleg</string>
     <string name="common_bonus">Bónusz</string>
     <string name="common_call">Hívás</string>
+    <string name="common_call_data">Hívás adatok</string>
     <string name="common_cancel">Mégsem</string>
     <string name="common_cancel_operation_warning">Biztosan megszakítja ezt a műveletet?</string>
     <string name="common_cannot_find_app">Sajnáljuk, de az alkalmaás nem megfelelő a kérés végrehajtásához.</string>
@@ -366,17 +368,21 @@
     <string name="common_continue">Folytatás</string>
     <string name="common_copied">Vágólapra másolva</string>
     <string name="common_copy_address">Cím másolása</string>
+    <string name="common_copy_call_data">Hívás adatok másolása</string>
+    <string name="common_copy_hash">Hash másolása</string>
     <string name="common_copy_id">Id másolása</string>
     <string name="common_crypto_type">Kulcspár titkosítási típusa</string>
     <string name="common_date">Dátum</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s és %s</string>
     <string name="common_delete">Törlés</string>
+    <string name="common_depositor">Letétbe helyező</string>
     <string name="common_details">Részletek</string>
     <string name="common_disabled">Letiltva</string>
     <string name="common_disconnect">Kapcsolat bontása</string>
     <string name="common_do_not_close_app">Ne zárja be az alkalmazást!</string>
     <string name="common_done">Kész</string>
-    <string name="common_dont_show_again">Ne mutasd ezt mégegyszer</string>
+    <string name="common_dry_run_failed_message">A Nova előre szimulálja a tranzakciót a hibák megelőzése érdekében. Ez a szimuláció nem sikerült. Próbálja újra később vagy nagyobb összeggel. Ha a probléma továbbra is fennáll, kérjük, vegye fel a kapcsolatot a Nova Wallet Támogatással a Beállításokban.</string>
+    <string name="common_dry_run_failed_title">A tranzakciós szimuláció nem sikerült</string>
     <string name="common_edit">Szerkeszt</string>
     <string name="common_element_and_more_format" formatted="false">%s (további +%s)</string>
     <string name="common_email_chooser_title">Válaszd ki az e-mail alkalmazást</string>
@@ -408,10 +414,12 @@
     </plurals>
     <string name="common_frequency_days_daily">naponta</string>
     <string name="common_frequency_days_everyday">minden nap</string>
+    <string name="common_full_details">Minden részlet</string>
     <string name="common_get_token_format">%s beszerzése</string>
     <string name="common_got_it">Értem</string>
     <string name="common_governance">Kormányzás</string>
     <string name="common_hexadecimal_string">Hexadecimális szöveg</string>
+    <string name="common_hide">Elrejt</string>
     <plurals name="common_hours_format">
         <item quantity="one">%d óra</item>
         <item quantity="other">%d óra</item>
@@ -501,8 +509,12 @@
     <string name="common_see_all">Összes megtekintése</string>
     <string name="common_settings">Beállítások</string>
     <string name="common_share">Megosztás</string>
+    <string name="common_share_call_data">Hívás adatok megosztása</string>
+    <string name="common_share_hash">Hash megosztása</string>
+    <string name="common_show">Megjelenít</string>
     <string name="common_sign_in">Bejelentkezés</string>
     <string name="common_sign_request">Aláírási kérelem</string>
+    <string name="common_signatory">Aláíró</string>
     <string name="common_signature_invalid">Érvénytelen aláírás</string>
     <string name="common_skip">Kihagyás</string>
     <string name="common_skip_process">Folyamat kihagyása</string>
@@ -751,6 +763,7 @@
     <string name="ed25519_selection_subtitle">ed25519 (alternatív)</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">Biztonsági mentés jelszó</string>
+    <string name="enter_call_data_title">Adja meg a hívás adatokat</string>
     <string name="error_not_enough_to_pay_fee_title">Nincs elegendő token a díj megfizetéséhez</string>
     <string name="ethereum_contract">Szerződés</string>
     <string name="ethereum_contract_call">Szerződés hívás</string>
@@ -813,6 +826,8 @@
     <string name="integrate_networks_banner_description">Integráld a fejlesztés alatt álló hálózat összes funkcióját a Nova Walletbe, hogy mindenki számára elérhető legyen.</string>
     <string name="integrate_networks_banner_link">Integráld a hálózatod</string>
     <string name="integrate_networks_banner_title">Fejlesztés Polkadot számára?</string>
+    <string name="invalid_call_data_message">Ez a hívás adatkészlet egy másik művelethez, hívás hash: %s</string>
+    <string name="invalid_call_data_title">Érvénytelen hívás adatok</string>
     <string name="invalid_proxy_address_message">A proxy címnek érvényes %s címnek kell lennie</string>
     <string name="invalid_proxy_address_title">Érvénytelen proxy cím</string>
     <string name="invalid_token_symbol_message">A megadott pénznem szimbóluma (%1$s) nem egyezik meg a hálózattal (%2$s). Használni szeretnéd a helyes pénznem szimbólumot?</string>
@@ -894,29 +909,45 @@
         <item quantity="one">Legalább %d tárcát kell választani</item>
         <item quantity="other">Legalább %d tárcát kell választani</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">Ez a tranzakció már elutasítva vagy végrehajtva lett.</string>
+    <string name="multisig_approve_transaction_unavailable_title">Ezt a tranzakciót nem lehet végrehajtani</string>
     <string name="multisig_callhash_exists_message">%s már kezdeményezett egy ugyanilyen műveletet, amely jelenleg aláírásra vár a többi aláíró részéről.</string>
     <string name="multisig_callhash_exists_title">Művelet már létezik</string>
+    <string name="multisig_card_not_supported_message">A bankkártya kezeléséhez kérjük, váltson más típusú tárcára.</string>
+    <string name="multisig_card_not_supported_title">A bankkártya nem támogatott a Multisig számára</string>
+    <string name="multisig_deposit">Multisig letét</string>
+    <string name="multisig_deposit_description">A letét zárolva marad a letétbe helyező számláján, amíg a multisig művelet végrehajtásra nem kerül, vagy el nem utasítják.</string>
+    <string name="multisig_extrinsic_details_subtitle">Győződjön meg róla, hogy a művelet helyes</string>
+    <string name="multisig_on_behalf_of">Nevében</string>
     <string name="multisig_operation_details_approve">Jóváhagyás</string>
     <string name="multisig_operation_details_approve_and_execute">Jóváhagyás és végrehajtás</string>
-    <string name="multisig_operation_details_call_data_not_found">Hívási adatok nem találhatóak</string>
+    <string name="multisig_operation_details_call_data_not_found">Adja meg a hívás adatokat a részletek megtekintéséhez</string>
     <string name="multisig_operation_details_reject">Elutasítás</string>
-    <string name="multisig_operations_pending_signature">Függőben lévő aláírás</string>
-    <string name="multisig_operations_progress" formatted="false">%s a %s Ból aláírva</string>
-    <string name="multisig_operations_signed">Aláírva</string>
-    <string name="multisig_operations_unknown_calldata">[Ismeretlen művelet] (%s)</string>
-    <string name="multisig_pending_operations">Függőben lévő műveletek</string>
+    <string name="multisig_operation_details_signatories" formatted="false">Aláírók (%d a %d-ből)</string>
+    <string name="multisig_operations_created">Ön által létrehozva</string>
+    <string name="multisig_operations_progress" formatted="false">Aláírás (%s a %s-ből)</string>
+    <string name="multisig_operations_signed">Ön által aláírva</string>
+    <string name="multisig_operations_unknown_calldata">Ismeretlen művelet</string>
+    <string name="multisig_pending_operations">Aláírásra váró tranzakciók</string>
+    <string name="multisig_pending_operations_on_behalf_of">Nevében:</string>
+    <string name="multisig_sell_not_supported_message">Kriptopénz eladása fiat pénzért, kérjük, váltson más típusú tárcára.</string>
+    <string name="multisig_sell_not_supported_title">Az eladás nem támogatott a Multisig számára</string>
     <string name="multisig_signatory">Aláíró:</string>
-    <string name="multisig_signatory_validation_deposit" formatted="false">%s-nak nincs elegendő egyenlege a %s értékű multisig letét elhelyezéséhez. Elérhető egyenleg: %s</string>
-    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s-nak nincs elegendő egyenlege a %s hálózati díj megfizetéséhez és a %s multisig letét elhelyezéséhez. Elérhető egyenleg: %s</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s nem rendelkezik elegendő egyenleggel a multisig letét %s elhelyezéséhez. Még %s forintot kell hozzáadnia az egyenlegéhez.</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s nem rendelkezik elegendő egyenleggel a hálózati díj %s és a multisig letét %s elhelyezéséhez. Még %s forintot kell hozzáadnia az egyenlegéhez.</string>
     <string name="multisig_signatory_validation_ed" formatted="false">%s-nak legalább %s-ra van szüksége a tranzakciós díj megfizetéséhez, és hogy a minimális hálózati egyenleg fölött maradjon. Jelenlegi egyenleg: %s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">%s nem rendelkezik elegendő egyenleggel a hálózati díj %s megfizetéséhez. Még %s forintot kell hozzáadnia az egyenlegéhez.</string>
     <string name="multisig_signing_is_not_supported_message">A multisig pénztárcák nem támogatják tetszőleges üzenetek aláírását — csak a tranzakciókat</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">A tranzakció elutasításra kerül. A multisig letét visszakerül %s-hoz.</string>
     <string name="multisig_signing_warning_message">A multisig tranzakciót %s kezdeményezi. A kezdeményező fizeti a hálózati díjat és lefoglal egy multisig letétet, amely felszabadul a tranzakció végrehajtásakor.</string>
     <string name="multisig_signing_warning_title">Többaláírásos tranzakció</string>
-    <string name="multisig_transaction_created_subtitle">Más aláírók most megerősíthetik a tranzakciót.\nNyomon követheti annak állapotát a %s</string>
-    <string name="multisig_transaction_created_subtitle_highlight">Többaláírásos tranzakciók.</string>
+    <string name="multisig_transaction_created_subtitle">Más aláírók most megerősíthetik a tranzakciót.\nKövetheti státuszát a %s-ban.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Aláírásra váró tranzakciók</string>
     <string name="multisig_transaction_created_title">Többaláírásos tranzakció létrehozva</string>
     <string name="multisig_transaction_created_view_details">Részletek megtekintése</string>
     <string name="multisig_wallet_details_info_warning">Ennél a fióknál a tranzakciók több aláíró jóváhagyását igénylik. Az Ön fiókja egyike az aláíróknak:</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">Más aláírók:</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">Küszöb %d a %d-ből</string>
     <string name="network_already_exist_failure_title">Ez a node már létezik</string>
     <string name="network_fee">Hálózati díj</string>
     <string name="network_info_address">Csomópont címe</string>
@@ -1088,13 +1119,11 @@
     <string name="referendum_aye_format">Igen: %s</string>
     <string name="referendum_dapp_list_title">Nova DApp böngésző használata</string>
     <string name="referendum_description_fallback">A címet és leírást csak a javaslattevő szerkesztheti. Amennyiben az ajánlattevő fiók a sajátod, látogass el a Polkassembly oldalra és töltsd fel információkkal a javaslatot.</string>
-    <string name="referendum_details_full_details">Minden részlet</string>
     <string name="referendum_details_requested_amount">Igényelt összeg</string>
     <string name="referendum_details_timeline">Idővonal</string>
     <string name="referendum_details_your_vote">Szavazatod:</string>
     <string name="referendum_full_details_approve_threshold">Jóváhagyási görbe</string>
     <string name="referendum_full_details_beneficiary">Kedvezményezett</string>
-    <string name="referendum_full_details_copy_hash">Hash másolása</string>
     <string name="referendum_full_details_deposit">Letét</string>
     <string name="referendum_full_details_electorate">Választók</string>
     <string name="referendum_full_details_hash">Hívási hash</string>
@@ -1611,6 +1640,7 @@
     <string name="state_removed">Eltávolítva</string>
     <string name="swap_custom_fee_selector_description">Token a hálózati díj fizetéséhez</string>
     <string name="swap_custom_fee_selector_footer">A hálózati díj hozzáadódik a megadott összeghez</string>
+    <string name="swap_dry_run_failed_inline_message">Az átváltási lépés szimulációja nem sikerült</string>
     <string name="swap_error_pair_not_supported">Ez a pár nem támogatott</string>
     <string name="swap_execution_failure" formatted="false">A(z) #%s (%s) művelet nem sikerült</string>
     <string name="swap_execution_failure_swap_label" formatted="false">%s csere %s-ra %s-on</string>

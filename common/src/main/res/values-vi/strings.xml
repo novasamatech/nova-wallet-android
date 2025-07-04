@@ -139,7 +139,7 @@
     <string name="account_polkadot_vault_import_start_step_3_highlighted">quét mã QR</string>
     <string name="account_private_key">Khoá riêng tư</string>
     <string name="account_proxied">Được ủy quyền</string>
-    <string name="account_proxieds">Được ủy quyền cho bạn (Proxieds)</string>
+    <string name="account_proxieds">Được ủy quyền cho bạn (Proxied)</string>
     <string name="account_proxy_type_any">Bất kỳ</string>
     <string name="account_proxy_type_auction">Đấu giá</string>
     <string name="account_proxy_type_cancel_proxy">Hủy Proxy</string>
@@ -173,6 +173,7 @@
     <string name="accounts_change_chain_account">Thay đổi tài khoản %s</string>
     <string name="accounts_change_chain_secrets">Thay đổi tài khoản</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="accounts_update_proxieds_title">Ủy quyền cho bạn</string>
     <string name="active_multisig_title">Kiểm soát chung</string>
     <string name="add_custom_node">Thêm node tùy chỉnh</string>
     <string name="add_delegation_missing_account_message">Bạn cần thêm tài khoản %s vào ví để ủy quyền</string>
@@ -339,6 +340,7 @@
     <string name="common_balance">Số dư</string>
     <string name="common_bonus">Tiền thưởng</string>
     <string name="common_call">Gọi</string>
+    <string name="common_call_data">Dữ liệu cuộc gọi</string>
     <string name="common_cancel">Hủy</string>
     <string name="common_cancel_operation_warning">Bạn có chắc chắn muốn hủy thao tác này?</string>
     <string name="common_cannot_find_app">Rất tiếc, bạn không có ứng dụng phù hợp để xử lý yêu cầu này</string>
@@ -366,17 +368,21 @@
     <string name="common_continue">Tiếp tục</string>
     <string name="common_copied">Đã sao chép vào bộ nhớ đệm</string>
     <string name="common_copy_address">Sao chép địa chỉ</string>
+    <string name="common_copy_call_data">Sao chép dữ liệu cuộc gọi</string>
+    <string name="common_copy_hash">Sao chép hash</string>
     <string name="common_copy_id">Sao chép id</string>
     <string name="common_crypto_type">Loại khóa cặp</string>
     <string name="common_date">Ngày</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s và %s</string>
     <string name="common_delete">Xóa</string>
+    <string name="common_depositor">Người gửi tiền</string>
     <string name="common_details">Chi tiết</string>
     <string name="common_disabled">Đã tắt</string>
     <string name="common_disconnect">Ngắt kết nối</string>
     <string name="common_do_not_close_app">Không đóng ứng dụng!</string>
     <string name="common_done">Hoàn thành</string>
-    <string name="common_dont_show_again">Không hiển thị lại điều này</string>
+    <string name="common_dry_run_failed_message">Nova mô phỏng giao dịch trước để ngăn ngừa lỗi. Mô phỏng này không thành công. Thử lại sau hoặc với số tiền lớn hơn. Nếu vấn đề vẫn tồn tại, vui lòng liên hệ Hỗ trợ Ví Nova trong Cài đặt.</string>
+    <string name="common_dry_run_failed_title">Mô phỏng giao dịch thất bại</string>
     <string name="common_edit">Chỉnh sửa</string>
     <string name="common_element_and_more_format" formatted="false">%s (+%s thêm)</string>
     <string name="common_email_chooser_title">Chọn ứng dụng email</string>
@@ -407,10 +413,12 @@
     </plurals>
     <string name="common_frequency_days_daily">hàng ngày</string>
     <string name="common_frequency_days_everyday">mỗi ngày</string>
+    <string name="common_full_details">Chi tiết đầy đủ</string>
     <string name="common_get_token_format">Nhận %s</string>
     <string name="common_got_it">Hiểu rồi</string>
     <string name="common_governance">Quản trị</string>
     <string name="common_hexadecimal_string">Chuỗi thập lục phân</string>
+    <string name="common_hide">Ẩn</string>
     <plurals name="common_hours_format">
         <item quantity="other">%d giờ</item>
     </plurals>
@@ -496,8 +504,12 @@
     <string name="common_see_all">Xem tất cả</string>
     <string name="common_settings">Cài đặt</string>
     <string name="common_share">Chia sẻ</string>
+    <string name="common_share_call_data">Chia sẻ dữ liệu cuộc gọi</string>
+    <string name="common_share_hash">Chia sẻ hash</string>
+    <string name="common_show">Hiển thị</string>
     <string name="common_sign_in">Đăng nhập</string>
     <string name="common_sign_request">Yêu cầu ký</string>
+    <string name="common_signatory">Người ký</string>
     <string name="common_signature_invalid">Chữ ký không hợp lệ</string>
     <string name="common_skip">Bỏ qua</string>
     <string name="common_skip_process">Bỏ qua quy trình</string>
@@ -745,6 +757,7 @@
     <string name="ed25519_selection_subtitle">ed25519 (thay thế)</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">Mật khẩu sao lưu</string>
+    <string name="enter_call_data_title">Nhập dữ liệu cuộc gọi</string>
     <string name="error_not_enough_to_pay_fee_title">Không đủ token để trả phí</string>
     <string name="ethereum_contract">Hợp đồng</string>
     <string name="ethereum_contract_call">Gọi hợp đồng</string>
@@ -806,6 +819,8 @@
     <string name="integrate_networks_banner_description">Tích hợp tất cả các tính năng của mạng bạn đang xây dựng vào Nova Wallet, làm cho nó trở nên dễ tiếp cận với mọi người.</string>
     <string name="integrate_networks_banner_link">Tích hợp mạng của bạn</string>
     <string name="integrate_networks_banner_title">Xây dựng cho Polkadot?</string>
+    <string name="invalid_call_data_message">Dữ liệu cuộc gọi này cho thao tác khác với call hash %s</string>
+    <string name="invalid_call_data_title">Dữ liệu cuộc gọi không hợp lệ</string>
     <string name="invalid_proxy_address_message">Địa chỉ proxy phải là địa chỉ %s hợp lệ</string>
     <string name="invalid_proxy_address_title">Địa chỉ proxy không hợp lệ</string>
     <string name="invalid_token_symbol_message">Biểu tượng tiền tệ đã nhập (%1$s) không khớp với mạng (%2$s). Bạn có muốn sử dụng biểu tượng tiền tệ đúng không?</string>
@@ -886,29 +901,45 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">Chọn ít nhất %d ví</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">Giao dịch này đã bị từ chối hoặc đã được thực hiện.</string>
+    <string name="multisig_approve_transaction_unavailable_title">Không thể thực hiện giao dịch này</string>
     <string name="multisig_callhash_exists_message">%s đã khởi tạo hoạt động tương tự và hiện đang chờ để được ký bởi các bên ký khác.</string>
     <string name="multisig_callhash_exists_title">Hoạt động đã tồn tại</string>
+    <string name="multisig_card_not_supported_message">Để quản lý Thẻ ghi nợ, vui lòng chuyển sang loại ví khác.</string>
+    <string name="multisig_card_not_supported_title">Thẻ ghi nợ không được hỗ trợ cho Đa chữ ký</string>
+    <string name="multisig_deposit">Đặt cọc đa chữ ký</string>
+    <string name="multisig_deposit_description">Khoản đặt cọc sẽ bị khóa trên tài khoản của người gửi tiền cho đến khi thao tác đa chữ ký được thực hiện hoặc bị từ chối.</string>
+    <string name="multisig_extrinsic_details_subtitle">Hãy chắc chắn rằng thao tác là đúng</string>
+    <string name="multisig_on_behalf_of">Thay mặt cho</string>
     <string name="multisig_operation_details_approve">Phê duyệt</string>
     <string name="multisig_operation_details_approve_and_execute">Phê duyệt &amp; Thực hiện</string>
-    <string name="multisig_operation_details_call_data_not_found">Dữ liệu cuộc gọi không tìm thấy</string>
+    <string name="multisig_operation_details_call_data_not_found">Nhập dữ liệu cuộc gọi để xem chi tiết</string>
     <string name="multisig_operation_details_reject">Từ chối</string>
-    <string name="multisig_operations_pending_signature">Chờ chữ ký</string>
-    <string name="multisig_operations_progress" formatted="false">%s trong %s đã ký</string>
-    <string name="multisig_operations_signed">Đã ký</string>
-    <string name="multisig_operations_unknown_calldata">[Thao tác không rõ] (%s)</string>
-    <string name="multisig_pending_operations">Thao tác đang chờ</string>
+    <string name="multisig_operation_details_signatories" formatted="false">Người ký (%d của %d)</string>
+    <string name="multisig_operations_created">Được tạo bởi bạn</string>
+    <string name="multisig_operations_progress" formatted="false">Ký (%s của %s)</string>
+    <string name="multisig_operations_signed">Được bạn ký</string>
+    <string name="multisig_operations_unknown_calldata">Thao tác không rõ</string>
+    <string name="multisig_pending_operations">Giao dịch cần ký</string>
+    <string name="multisig_pending_operations_on_behalf_of">Thay mặt cho:</string>
+    <string name="multisig_sell_not_supported_message">Để bán tiền điện tử lấy tiền pháp định, vui lòng chuyển sang loại ví khác.</string>
+    <string name="multisig_sell_not_supported_title">Bán không được hỗ trợ cho Đa chữ ký</string>
     <string name="multisig_signatory">Người ký:</string>
-    <string name="multisig_signatory_validation_deposit" formatted="false">%s không có đủ số dư để đặt cọc multisig %s. Số dư khả dụng: %s</string>
-    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s không có đủ số dư để trả phí mạng %s và đặt cọc multisig %s. Số dư khả dụng: %s</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s không đủ số dư để đặt cọc đa chữ ký %s. Bạn cần thêm %s vào số dư của bạn</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s không đủ số dư để trả phí mạng của %s và đặt cọc đa chữ ký %s. Bạn cần thêm %s vào số dư của bạn</string>
     <string name="multisig_signatory_validation_ed" formatted="false">%s cần ít nhất %s để trả phí giao dịch này và duy trì trên số dư tối thiểu của mạng. Số dư hiện tại là: %s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">%s không đủ số dư để trả phí mạng của %s. Bạn cần thêm %s vào số dư của bạn</string>
     <string name="multisig_signing_is_not_supported_message">Ví multisig không hỗ trợ ký các tin nhắn tùy ý — chỉ có các giao dịch</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">Giao dịch sẽ bị từ chối. Tiền gửi multisig sẽ được trả lại cho %s.</string>
     <string name="multisig_signing_warning_message">Giao dịch multisig sẽ được khởi tạo bởi %s. Người khởi tạo trả phí mạng và dự trữ một khoản đặt cọc multisig, sẽ được giải phóng sau khi giao dịch được thực thi.</string>
     <string name="multisig_signing_warning_title">Giao dịch Đa chữ ký</string>
-    <string name="multisig_transaction_created_subtitle">Các người ký khác bây giờ có thể xác nhận giao dịch.\nBạn có thể theo dõi trạng thái của nó trong %s</string>
-    <string name="multisig_transaction_created_subtitle_highlight">các giao dịch Đa chữ ký.</string>
+    <string name="multisig_transaction_created_subtitle">Các người ký khác bây giờ có thể xác nhận giao dịch.\nBạn có thể theo dõi trạng thái của nó trong %s.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Các giao dịch cần ký</string>
     <string name="multisig_transaction_created_title">Giao dịch Đa chữ ký đã được tạo</string>
     <string name="multisig_transaction_created_view_details">Xem chi tiết</string>
     <string name="multisig_wallet_details_info_warning">Các giao dịch từ ví này yêu cầu sự chấp thuận từ nhiều người ký. Tài khoản của bạn là một trong những người ký:</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">Các người ký khác:</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">Ngưỡng %d trên %d</string>
     <string name="network_already_exist_failure_title">Node này đã tồn tại</string>
     <string name="network_fee">Phí mạng</string>
     <string name="network_info_address">Địa chỉ nút</string>
@@ -1080,13 +1111,11 @@
     <string name="referendum_aye_format">Đồng ý: %s</string>
     <string name="referendum_dapp_list_title">Sử dụng trình duyệt Nova DApp</string>
     <string name="referendum_description_fallback">Chỉ người đề xuất mới có thể chỉnh sửa mô tả và tiêu đề này. Nếu bạn sở hữu tài khoản của người đề xuất, hãy truy cập Polkassembly và điền thông tin về đề xuất của bạn.</string>
-    <string name="referendum_details_full_details">Chi tiết đầy đủ</string>
     <string name="referendum_details_requested_amount">Số tiền yêu cầu</string>
     <string name="referendum_details_timeline">Dòng thời gian</string>
     <string name="referendum_details_your_vote">Phiếu bầu của bạn:</string>
     <string name="referendum_full_details_approve_threshold">Đường phê duyệt</string>
     <string name="referendum_full_details_beneficiary">Người thụ hưởng</string>
-    <string name="referendum_full_details_copy_hash">Sao chép hash</string>
     <string name="referendum_full_details_deposit">Đặt cọc</string>
     <string name="referendum_full_details_electorate">Cử tri</string>
     <string name="referendum_full_details_hash">Gọi hash</string>
@@ -1600,6 +1629,7 @@
     <string name="state_removed">Đã xóa</string>
     <string name="swap_custom_fee_selector_description">Token để trả phí mạng</string>
     <string name="swap_custom_fee_selector_footer">Phí mạng được thêm vào trên số tiền đã nhập</string>
+    <string name="swap_dry_run_failed_inline_message">Mô phỏng bước hoán đổi đã thất bại</string>
     <string name="swap_error_pair_not_supported">Cặp này không được hỗ trợ</string>
     <string name="swap_execution_failure" formatted="false">Thất bại trên hoạt động #%s (%s)</string>
     <string name="swap_execution_failure_swap_label" formatted="false">%s sang %s hoán đổi trên %s</string>
