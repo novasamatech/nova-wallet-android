@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.fu
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
+import io.novafoundation.nova.common.mixin.copy.showCopyCallHash
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
@@ -11,7 +12,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.ReferendumProposer
-import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.identity.GovernanceIdentityProviderFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
@@ -149,13 +149,6 @@ class ReferendumFullDetailsViewModel(
     fun copyCallHash() = launchUnit {
         val callHash = callHash ?: return@launchUnit
 
-        copyTextLauncher.showCopyTextDialog(
-            CopyTextLauncher.Payload(
-                title = callHash,
-                textToCopy = callHash,
-                resourceManager.getString(R.string.common_copy_hash),
-                resourceManager.getString(R.string.common_share_hash)
-            )
-        )
+        copyTextLauncher.showCopyCallHash(resourceManager, callHash)
     }
 }

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="referendum_full_details_hash">Call hash</string>-->
+    <string name="common_call_hash">Call hash</string>
+
     <string name="common_copy_call_data">Copy call data</string>
     <string name="common_share_call_data">Share call data</string>
 
@@ -1646,7 +1649,6 @@
     <string name="referendum_full_details_vote_threshold">Vote threshold</string>
     <string name="referendum_full_details_turnout">Turnout</string>
     <string name="referendum_full_details_electorate">Electorate</string>
-    <string name="referendum_full_details_hash">Call hash</string>
     <string name="referendum_full_details_approve_threshold">Approve curve</string>
     <string name="referendum_full_details_support_threshold">Support curve</string>
     <string name="referendum_positive_voters_title">Aye votes</string>
