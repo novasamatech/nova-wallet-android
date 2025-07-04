@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.signer.TxModificationInfo
 import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -91,7 +92,7 @@ class MultisigSigner(
     }
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerDataForSubmission(context: SigningContext) {
+    override suspend fun setSignerDataForSubmission(context: SigningContext): TxModificationInfo {
         if (isRootSigner) {
             acknowledgeMultisigOperation()
         }
@@ -104,13 +105,17 @@ class MultisigSigner(
         validateExtrinsic(context.chain, actualCall = actualCall, delegatedCall = delegatedCall)
 
         wrapCallsInAsMultiForSubmission()
+
+        return TxModificationInfo(modifiedCall = true, modifiedExistingExtensions = true)
     }
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerDataForFee(context: SigningContext) {
+    override suspend fun setSignerDataForFee(context: SigningContext): TxModificationInfo {
         delegateSigner().setSignerDataForFee(context)
 
         wrapCallsInProxyForFee()
+
+        return TxModificationInfo(modifiedCall = true, modifiedExistingExtensions = true)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {

@@ -40,7 +40,7 @@ interface NovaSigner : Signer {
      * So, this should be the final operation that modifies the extrinsic, followed just by [ExtrinsicBuilder.buildExtrinsic]
      */
     context(ExtrinsicBuilder)
-    suspend fun setSignerDataForSubmission(context: SigningContext)
+    suspend fun setSignerDataForSubmission(context: SigningContext): TxModificationInfo
 
     /**
      * Same as [setSignerDataForSubmission] but should use fake signature so signed extrinsic can be safely used for fee calculation
@@ -51,7 +51,7 @@ interface NovaSigner : Signer {
      * So, this should be the final operation that modifies the extrinsic, followed just by [ExtrinsicBuilder.buildExtrinsic]
      */
     context(ExtrinsicBuilder)
-    suspend fun setSignerDataForFee(context: SigningContext)
+    suspend fun setSignerDataForFee(context: SigningContext): TxModificationInfo
 
     /**
      * Return accountId of a signer that will actually sign this extrinsic
@@ -74,8 +74,8 @@ interface NovaSigner : Signer {
 }
 
 context(ExtrinsicBuilder)
-suspend fun NovaSigner.setSignerData(context: SigningContext, mode: SigningMode) {
-    when (mode) {
+suspend fun NovaSigner.setSignerData(context: SigningContext, mode: SigningMode): TxModificationInfo {
+    return when (mode) {
         SigningMode.FEE -> setSignerDataForFee(context)
         SigningMode.SUBMISSION -> setSignerDataForSubmission(context)
     }

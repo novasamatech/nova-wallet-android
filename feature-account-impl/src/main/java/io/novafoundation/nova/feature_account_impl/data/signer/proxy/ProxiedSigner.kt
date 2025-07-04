@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.signer.TxModificationInfo
 import io.novafoundation.nova.feature_account_api.data.signer.intersect
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -98,7 +99,7 @@ class ProxiedSigner(
     }
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerDataForSubmission(context: SigningContext) {
+    override suspend fun setSignerDataForSubmission(context: SigningContext): TxModificationInfo {
         wrapCallsInProxyForSubmission()
 
         Log.d("Signer", "ProxiedSigner: wrapped proxy calls for submission")
@@ -109,15 +110,19 @@ class ProxiedSigner(
             acknowledgeProxyOperation(proxyMetaAccount())
             validateExtrinsic(context.chain)
         }
+
+        return TxModificationInfo(modifiedCall = true, modifiedExistingExtensions = true)
     }
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerDataForFee(context: SigningContext) {
+    override suspend fun setSignerDataForFee(context: SigningContext): TxModificationInfo {
         wrapCallsInProxyForFee()
 
         Log.d("Signer", "ProxiedSigner: wrapped proxy calls for fee")
 
         delegateSigner().setSignerDataForFee(context)
+
+        return TxModificationInfo(modifiedCall = true, modifiedExistingExtensions = true)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {

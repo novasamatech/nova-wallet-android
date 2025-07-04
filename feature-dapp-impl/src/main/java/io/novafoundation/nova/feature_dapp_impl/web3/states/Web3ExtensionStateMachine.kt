@@ -43,6 +43,8 @@ interface Web3StateMachineHost {
     object NotAuthorizedException : Exception("Rejected by user")
     object SigningFailedException : Exception("Signing failed")
 
+    object SendHandledBySigner : Exception("Sending extrinsic was handled by Nova Wallet directly")
+
     val selectedAccount: Flow<MetaAccount>
     val currentPageAnalyzed: Flow<BrowserPageAnalyzed>
 

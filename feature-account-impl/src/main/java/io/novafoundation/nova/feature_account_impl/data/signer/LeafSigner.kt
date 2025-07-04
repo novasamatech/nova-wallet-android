@@ -3,12 +3,13 @@ package io.novafoundation.nova.feature_account_impl.data.signer
 import android.util.Log
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.signer.TxModificationInfo
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
-import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
@@ -43,17 +44,19 @@ abstract class LeafSigner(
     }
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerDataForSubmission(context: SigningContext) {
+    override suspend fun setSignerDataForSubmission(context: SigningContext): TxModificationInfo {
         val accountId = metaAccount.requireAccountIdKeyIn(context.chain)
         setNonce(context.getNonce(accountId))
 
         Log.d("Signer", "${this::class.simpleName}: set real signature")
 
         setVerifySignature(signer = this, accountId = accountId.value)
+
+        return TxModificationInfo.modifiedNothing()
     }
 
     context(ExtrinsicBuilder)
-    override suspend fun setSignerDataForFee(context: SigningContext) {
+    override suspend fun setSignerDataForFee(context: SigningContext): TxModificationInfo{
         // We set it to 100 so we won't accidentally cause fee underestimation
         // Underestimation might happen because fee depends on the extrinsic length and encoding of zero is more compact
         setNonce(100.toBigInteger())
@@ -63,6 +66,8 @@ abstract class LeafSigner(
         Log.d("Signer", "${this::class.simpleName}: set fake signature")
 
         setVerifySignature(signer, accountId)
+
+        return TxModificationInfo.modifiedNothing()
     }
 
     override suspend fun submissionSignerAccountId(chain: Chain): AccountId {

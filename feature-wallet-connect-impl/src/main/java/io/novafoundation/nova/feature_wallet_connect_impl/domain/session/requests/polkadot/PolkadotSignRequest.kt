@@ -7,7 +7,9 @@ import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommun
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignerResult
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.WalletConnectError
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.approved
+import io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk.rejected
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.SignWalletConnectRequest
 
 class PolkadotSignRequest(
@@ -16,6 +18,10 @@ class PolkadotSignRequest(
     private val sessionRequest: Wallet.Model.SessionRequest,
     context: Context
 ) : SignWalletConnectRequest(sessionRequest, context) {
+
+    override suspend fun sentResponse(response: ExternalSignCommunicator.Response.Sent): Wallet.Params.SessionRequestResponse {
+        return sessionRequest.rejected(reason = WalletConnectError.SEND_HANDLED_BY_SIGNER)
+    }
 
     override suspend fun signedResponse(response: ExternalSignCommunicator.Response.Signed): Wallet.Params.SessionRequestResponse {
         val responseData = PolkadotSignerResult(id, signature = response.signature, response.modifiedTransaction)

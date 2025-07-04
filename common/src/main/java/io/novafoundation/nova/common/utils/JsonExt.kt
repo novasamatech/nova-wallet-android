@@ -24,6 +24,14 @@ class ByteArrayHexAdapter : JsonSerializer<ByteArray>, JsonDeserializer<ByteArra
     }
 }
 
+class ByteArrayAsReadableStringSerializer : JsonSerializer<ByteArray> {
+
+    override fun serialize(src: ByteArray, typeOfSrc: Type, context: JsonSerializationContext): JsonElement {
+        val asString = src.toUtf8OrHex()
+        return JsonPrimitive(asString)
+    }
+}
+
 fun Any?.asGsonParsedNumberOrNull(): BigInteger? = when (this) {
     // gson parses integers as double when type is not specified
     is Double -> toLong().toBigInteger()

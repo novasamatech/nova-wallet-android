@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
+import io.novafoundation.nova.feature_account_api.data.signer.TxModificationInfo
 import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -144,14 +145,18 @@ class MetadataShortenerTest : BaseIntegrationTest() {
         }
 
         context(ExtrinsicBuilder)
-        override suspend fun setSignerDataForSubmission(context: SigningContext) {
+        override suspend fun setSignerDataForSubmission(context: SigningContext): TxModificationInfo {
             setNonce(BigInteger.ZERO)
             setVerifySignature(this, accountId)
+
+            return TxModificationInfo.modifiedNothing()
         }
 
         context(ExtrinsicBuilder)
-        override suspend fun setSignerDataForFee(context: SigningContext) {
+        override suspend fun setSignerDataForFee(context: SigningContext): TxModificationInfo {
             setSignerDataForSubmission(context)
+
+            return TxModificationInfo.modifiedNothing()
         }
 
         override suspend fun submissionSignerAccountId(chain: Chain): AccountId {

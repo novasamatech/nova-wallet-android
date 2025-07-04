@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.utils
 
 import android.net.Uri
 import android.util.Log
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -281,6 +282,11 @@ fun Iterable<BigInteger>.sum() = sumOf { it }
 
 fun String.decodeEvmQuantity(): BigInteger {
     return Numeric.decodeQuantity(this)
+}
+
+fun ByteArray.toUtf8OrHex(): String {
+    return kotlin.runCatching { decodeToString(throwOnInvalidSequence = true) }
+        .getOrDefault(toHexString(withPrefix = true))
 }
 
 suspend operator fun <T> Deferred<T>.invoke() = await()

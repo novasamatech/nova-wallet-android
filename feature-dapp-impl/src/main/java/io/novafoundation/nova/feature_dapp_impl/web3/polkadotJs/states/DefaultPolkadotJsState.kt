@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMa
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3ExtensionStateMachine.StateMachineTransition
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost
 import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost.NotAuthorizedException
+import io.novafoundation.nova.feature_dapp_impl.web3.states.Web3StateMachineHost.SendHandledBySigner
 import io.novafoundation.nova.feature_dapp_impl.web3.states.hostApi.ConfirmTxResponse
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignerResult
@@ -74,7 +75,7 @@ class DefaultPolkadotJsState(
 
         when (val response = hostApi.confirmTx(signRequest)) {
             is ConfirmTxResponse.Rejected -> request.reject(NotAuthorizedException)
-            is ConfirmTxResponse.Sent -> throw IllegalStateException("Unexpected 'Sent' response for PolkadotJs extension")
+            is ConfirmTxResponse.Sent -> request.reject(SendHandledBySigner)
             is ConfirmTxResponse.Signed -> request.accept(PolkadotSignerResult(response.requestId, response.signature, response.modifiedTransaction))
             is ConfirmTxResponse.SigningFailed -> {
                 if (response.shouldPresent) hostApi.showError(resourceManager.getString(R.string.dapp_sign_extrinsic_failed))
