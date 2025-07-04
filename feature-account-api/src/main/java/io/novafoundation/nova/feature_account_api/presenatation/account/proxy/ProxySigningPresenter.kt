@@ -14,4 +14,6 @@ interface ProxySigningPresenter {
     suspend fun signingIsNotSupported()
 
     suspend fun notEnoughFee(metaAccount: MetaAccount, chainAsset: Chain.Asset, availableBalance: BigInteger, fee: BigInteger)
+
+    suspend fun presentValidationException(exception: Throwable)
 }
