@@ -10,6 +10,8 @@ import android.view.View
 import androidx.annotation.ColorInt
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.dpF
+import io.novafoundation.nova.common.utils.isLast
+import io.novafoundation.nova.common.utils.isNotLast
 
 private const val NO_PAGE = -1
 
@@ -92,7 +94,10 @@ class PageIndicatorView @JvmOverloads constructor(
     private fun increaseSizeForAnimationOffset(indicatorIndex: Int, offset: Float) {
         val indicator = indicators.getOrNull(indicatorIndex) ?: return
         indicator.size = offset * indicatorFullLength
-        indicator.marginToNext = indicatorMargin
+
+        if (indicators.isNotLast(indicator)) {
+            indicator.marginToNext = indicatorMargin
+        }
     }
 
     private fun decreaseSizeForAnimationOffset(indicatorIndex: Int, offset: Float, isRemovingAnimation: Boolean) {
@@ -100,10 +105,12 @@ class PageIndicatorView @JvmOverloads constructor(
 
         indicator.size = indicatorFullLength - offset * indicatorFullLength
 
-        val marginToNext = if (isRemovingAnimation) indicatorMargin - offset * indicatorMargin else indicatorMargin
-        val endColor = if (isRemovingAnimation) goneIndicatorColor else indicatorColor
+        if (indicators.isNotLast(indicator)) {
+            val marginToNext = if (isRemovingAnimation) indicatorMargin - offset * indicatorMargin else indicatorMargin
+            indicator.marginToNext = marginToNext
+        }
 
-        indicator.marginToNext = marginToNext
+        val endColor = if (isRemovingAnimation) goneIndicatorColor else indicatorColor
         indicator.color = argbEvaluator.evaluate(offset, indicatorColor, endColor) as Int
     }
 
