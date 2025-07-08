@@ -16,6 +16,8 @@ interface MultisigValidationsRepository {
 }
 
 suspend fun MultisigValidationsRepository.getMultisigDeposit(chainId: ChainId, threshold: Int): BalanceOf {
+    if (threshold == 1) return BalanceOf.ZERO
+
     val base = getMultisigDepositBase(chainId)
     val factor = getMultisigDepositFactor(chainId)
 

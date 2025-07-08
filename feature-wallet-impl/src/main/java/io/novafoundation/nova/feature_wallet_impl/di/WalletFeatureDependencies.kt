@@ -43,12 +43,14 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_xcm_api.dryRun.DryRunApi
+import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.XcmPaymentApi
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -99,6 +101,10 @@ interface WalletFeatureDependencies {
     val xcmVersionDetector: XcmVersionDetector
 
     val dryRunApi: DryRunApi
+
+    val xcmPaymentApi: XcmPaymentApi
+
+    val xcmBuilderFactory: XcmBuilder.Factory
 
     val multisigValidationsRepository: MultisigValidationsRepository
 

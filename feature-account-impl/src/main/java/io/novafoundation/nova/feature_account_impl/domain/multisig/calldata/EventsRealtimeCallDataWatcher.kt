@@ -12,9 +12,9 @@ import io.novafoundation.nova.common.utils.put
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_api.domain.multisig.bindCallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicVisit
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.api.walkToList
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.walkToList
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
@@ -41,7 +41,7 @@ class EventsRealtimeCallDataWatcher(
     private val chainRegistry: ChainRegistry,
     private val multisigRepository: MultisigRepository,
     coroutineScope: CoroutineScope,
-) : RealtimeCallDataWatcher, CoroutineScope by coroutineScope {
+) : MultisigCallDataWatcher, CoroutineScope by coroutineScope {
 
     companion object {
 
@@ -50,7 +50,7 @@ class EventsRealtimeCallDataWatcher(
         private const val MULTISIG_APPROVAL = "MultisigApproval"
     }
 
-    override val realtimeCallData = MutableStateFlow<Map<MultiChainCallHash, GenericCall.Instance>>(emptyMap())
+    override val callData = MutableStateFlow<Map<MultiChainCallHash, GenericCall.Instance>>(emptyMap())
 
     override val newMultisigEvents = MutableSharedFlow<MultiChainMultisigEvent>(extraBufferCapacity = 10)
 
@@ -96,7 +96,7 @@ class EventsRealtimeCallDataWatcher(
 
         Log.d("ChainRealtimeCallDataWatcher", "Found call-datas: ${newCallDatas.size}")
 
-        realtimeCallData.value += newCallDatasWithChain
+        callData.value += newCallDatasWithChain
     }.onFailure {
         Log.e("ChainRealtimeCallDataWatcher", "Error while detecting call-data from chain", it)
     }

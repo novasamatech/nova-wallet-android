@@ -4,10 +4,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfigurationBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransfersConfiguration.XcmFee
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class LegacyCrossChainTransferConfiguration(
     override val originChainId: ChainId,
+    val originChainAsset: Chain.Asset,
     val assetLocation: RelativeMultiLocation,
     val reserveChainLocation: RelativeMultiLocation,
     val destinationChainLocation: RelativeMultiLocation,

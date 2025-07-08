@@ -12,4 +12,6 @@ sealed class ApproveMultisigOperationValidationFailure {
         val minimumNeeded: BigDecimal,
         val available: BigDecimal
     ) : ApproveMultisigOperationValidationFailure()
+
+    data object TransactionIsNotAvailable : ApproveMultisigOperationValidationFailure()
 }

@@ -77,6 +77,7 @@
     <string name="account_ledger_import_fill_description">Убедитесь, что приложение сети установлено на вашем Ledger устройстве через приложение Ledger Live. Откройте приложение сети на вашем Ledger устройстве.</string>
     <string name="account_ledger_import_fill_disabled_hint">Добавьте аккаунт</string>
     <string name="account_ledger_import_fill_title">Добавьте аккаунты в Ваш кошелёк</string>
+    <string name="account_ledger_import_start_guide">Руководство по подключению Ledger</string>
     <string name="account_ledger_import_start_step_1">Удостоверьтесь, что %s на Ваше устройство Ledger, используя приложение Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">приложение Сети установлено</string>
     <string name="account_ledger_import_start_step_2">%s на Вашем Ledger устройстве</string>
@@ -87,12 +88,14 @@
     <string name="account_ledger_import_start_step_4_highlighted">Выберите аккаунт</string>
     <string name="account_ledger_import_start_step_otg">%s в настройках вашего телефона</string>
     <string name="account_ledger_import_start_step_otg_highlighted">Включите OTG</string>
+    <string name="account_ledger_import_start_title">Подключить Ledger</string>
     <string name="account_ledger_legacy_warning_message">Чтобы подписать операции и перенести свои учетные записи в новое приложение Generic Ledger, установите и откройте приложение Migration. Приложения Ledger (Legacy) и Migration Ledger не будут поддерживаться в будущем.</string>
     <string name="account_ledger_legacy_warning_title">Выпущено новое приложение Ledger</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration приложение в ближайшее время будет недоступно. Используйте его для переноса своих учетных записей в новое приложение Ledger, чтобы не потерять свои средства.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
     <string name="account_ledger_select_device_all_description">Если вы используете Ledger через Bluetooth, включите Bluetooth на обоих устройствах и предоставьте Nova разрешения на использование Bluetooth и местоположения. Для USB включите OTG в настройках вашего телефона.</string>
     <string name="account_ledger_select_device_description">Пожалуйста, включите Bluetooth в настройках телефона. Разблокируйте Ledger устройство и откройте %s приложение.</string>
     <string name="account_ledger_select_device_title">Выберите устройство Ledger</string>
@@ -139,7 +142,7 @@
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-код для сканирования</string>
     <string name="account_private_key">Приватный ключ</string>
     <string name="account_proxied">Проксированный</string>
-    <string name="account_proxieds">Делегировано вам (проксированные)</string>
+    <string name="account_proxieds">Делегировано вам (Proxied)</string>
     <string name="account_proxy_type_any">Любые действия</string>
     <string name="account_proxy_type_auction">Аукционы</string>
     <string name="account_proxy_type_cancel_proxy">Отмена прокси</string>
@@ -173,6 +176,7 @@
     <string name="accounts_change_chain_account">Изменить аккаунт %s</string>
     <string name="accounts_change_chain_secrets">Изменить аккаунт</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="accounts_update_proxieds_title">Делегировано вам</string>
     <string name="active_multisig_title">Совместный контроль</string>
     <string name="add_custom_node">Добавить пользовательскую ноду</string>
     <string name="add_delegation_missing_account_message">Вы должны добавить %s аккаунт в кошелек, чтобы иметь возможность делегировать</string>
@@ -339,6 +343,7 @@
     <string name="common_balance">Баланс</string>
     <string name="common_bonus">Бонус</string>
     <string name="common_call">Вызов</string>
+    <string name="common_call_data">Данные вызова</string>
     <string name="common_cancel">Отмена</string>
     <string name="common_cancel_operation_warning">Вы уверены, что хотите отменить операцию?</string>
     <string name="common_cannot_find_app">К сожалению, у вас нет подходящего приложения для обработки этого запроса</string>
@@ -366,17 +371,21 @@
     <string name="common_continue">Продолжить</string>
     <string name="common_copied">Скопировано в буфер обмена</string>
     <string name="common_copy_address">Копировать адрес</string>
+    <string name="common_copy_call_data">Скопировать данные вызова</string>
+    <string name="common_copy_hash">Копировать хэш</string>
     <string name="common_copy_id">Копировать идентификатор</string>
     <string name="common_crypto_type">Тип ключевой пары</string>
     <string name="common_date">Дата</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s и %s</string>
     <string name="common_delete">Удалить</string>
+    <string name="common_depositor">Депозитор</string>
     <string name="common_details">Подробности</string>
     <string name="common_disabled">Отключен</string>
     <string name="common_disconnect">Отключить</string>
     <string name="common_do_not_close_app">Не закрывайте приложение!</string>
     <string name="common_done">Готово</string>
-    <string name="common_dont_show_again">Больше не показывать это</string>
+    <string name="common_dry_run_failed_message">Nova заранее симулирует транзакцию, чтобы предотвратить ошибки. Эта симуляция не удалась. Попробуйте позже или с большей суммой. Если проблема сохраняется, пожалуйста, свяжитесь со службой поддержки Nova Wallet в Настройках.</string>
+    <string name="common_dry_run_failed_title">Ошибка симуляции транзакции</string>
     <string name="common_edit">Редактировать</string>
     <string name="common_element_and_more_format" formatted="false">%s (и еще %s)</string>
     <string name="common_email_chooser_title">Выберите приложение для работы с почтой</string>
@@ -410,10 +419,12 @@
     </plurals>
     <string name="common_frequency_days_daily">ежедневно</string>
     <string name="common_frequency_days_everyday">ежедневно</string>
+    <string name="common_full_details">Полная информация</string>
     <string name="common_get_token_format">Получить %s</string>
     <string name="common_got_it">Понятно</string>
     <string name="common_governance">Демократия</string>
     <string name="common_hexadecimal_string">Шестнадцатеричная строка</string>
+    <string name="common_hide">Скрыть</string>
     <plurals name="common_hours_format">
         <item quantity="one">%d час</item>
         <item quantity="few">%d часа</item>
@@ -511,8 +522,12 @@
     <string name="common_see_all">Посмотреть все</string>
     <string name="common_settings">Настройки</string>
     <string name="common_share">Поделиться</string>
+    <string name="common_share_call_data">Поделиться данными вызова</string>
+    <string name="common_share_hash">Поделиться хэшем</string>
+    <string name="common_show">Показать</string>
     <string name="common_sign_in">Войти</string>
     <string name="common_sign_request">Запрос на подпись</string>
+    <string name="common_signatory">Подписант</string>
     <string name="common_signature_invalid">Неверная подпись</string>
     <string name="common_skip">Пропустить</string>
     <string name="common_skip_process">Пропустить</string>
@@ -763,6 +778,7 @@
     <string name="ed25519_selection_subtitle">ed25519 (альтернативный)</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">Пароль бэкапа</string>
+    <string name="enter_call_data_title">Введите данные вызова</string>
     <string name="error_not_enough_to_pay_fee_title">Недостаточно токенов для оплаты комиссии</string>
     <string name="ethereum_contract">Контракт</string>
     <string name="ethereum_contract_call">Вызов контракта</string>
@@ -827,6 +843,8 @@
     <string name="integrate_networks_banner_description">Интегрируйте все функции сети, которую вы создаете, в Nova Wallet, чтобы сделать ее доступной для всех.</string>
     <string name="integrate_networks_banner_link">Интегрировать вашу сеть</string>
     <string name="integrate_networks_banner_title">Создаете для Polkadot?</string>
+    <string name="invalid_call_data_message">Эти данные вызова для другой операции с хэшом вызова %s</string>
+    <string name="invalid_call_data_title">Некорректные данные вызова</string>
     <string name="invalid_proxy_address_message">Адрес прокси должен быть действительным адресом %s</string>
     <string name="invalid_proxy_address_title">Неверный адрес прокси</string>
     <string name="invalid_token_symbol_message">Введенный символ валюты (%1$s) не совпадает с сетью (%2$s). Вы хотите использовать правильный символ валюты?</string>
@@ -910,29 +928,45 @@
         <item quantity="many">Выберите хотя бы %d кошельков</item>
         <item quantity="other">Выберите хотя бы %d кошельков</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">Эта транзакция уже была отклонена или выполнена.</string>
+    <string name="multisig_approve_transaction_unavailable_title">Невозможно выполнить эту транзакцию</string>
     <string name="multisig_callhash_exists_message">%s уже инициировал ту же операцию, и в настоящий момент она ожидает подписи других подписантов.</string>
     <string name="multisig_callhash_exists_title">Операция уже существует</string>
+    <string name="multisig_card_not_supported_message">Чтобы управлять своей дебетовой картой, пожалуйста, переключитесь на другой тип кошелька.</string>
+    <string name="multisig_card_not_supported_title">Дебетовая карта не поддерживается для мультиподписей</string>
+    <string name="multisig_deposit">Депозит мультиподписи</string>
+    <string name="multisig_deposit_description">Депозит остаётся заблокированным на счету депозита до тех пор, пока операция мультиподписи не будет выполнена или отклонена.</string>
+    <string name="multisig_extrinsic_details_subtitle">Убедитесь, что операция корректна</string>
+    <string name="multisig_on_behalf_of">От имени</string>
     <string name="multisig_operation_details_approve">Одобрить</string>
     <string name="multisig_operation_details_approve_and_execute">Одобрить и выполнить</string>
-    <string name="multisig_operation_details_call_data_not_found">Данные вызова не найдены</string>
+    <string name="multisig_operation_details_call_data_not_found">Введите данные вызова, чтобы просмотреть детали</string>
     <string name="multisig_operation_details_reject">Отклонить</string>
-    <string name="multisig_operations_pending_signature">Ожидается подпись</string>
-    <string name="multisig_operations_progress" formatted="false">%s из %s Подписано</string>
-    <string name="multisig_operations_signed">Подписано</string>
-    <string name="multisig_operations_unknown_calldata">[Неизвестная операция] (%s)</string>
-    <string name="multisig_pending_operations">Ожидающие операции</string>
+    <string name="multisig_operation_details_signatories" formatted="false">Подписанты (%d из %d)</string>
+    <string name="multisig_operations_created">Создано вами</string>
+    <string name="multisig_operations_progress" formatted="false">Подписание (%s из %s)</string>
+    <string name="multisig_operations_signed">Подписано вами</string>
+    <string name="multisig_operations_unknown_calldata">Неизвестная операция</string>
+    <string name="multisig_pending_operations">Транзакции для подписи</string>
+    <string name="multisig_pending_operations_on_behalf_of">От имени:</string>
+    <string name="multisig_sell_not_supported_message">Чтобы продать криптовалюту за фиат, пожалуйста, переключитесь на другой тип кошелька.</string>
+    <string name="multisig_sell_not_supported_title">Продажа не поддерживается для мультиподписей</string>
     <string name="multisig_signatory">Подписант:</string>
-    <string name="multisig_signatory_validation_deposit" formatted="false">У %s недостаточно баланса для размещения мультиподписи депозита в размере %s. Доступный баланс: %s</string>
-    <string name="multisig_signatory_validation_deposit_fee" formatted="false">У %s недостаточно баланса для оплаты сетевой комиссии в размере %s и размещения мультиподписи депозита в размере %s. Доступный баланс: %s</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">У %s недостаточно средств для размещения депозита мультиподписи в размере %s. Вам необходимо добавить ещё %s на ваш баланс</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">У %s недостаточно средств для оплаты сетевого сбора в размере %s и размещения депозита мультиподписи в размере %s. Вам необходимо добавить ещё %s на ваш баланс</string>
     <string name="multisig_signatory_validation_ed" formatted="false">%s необходимо как минимум %s для оплаты этой комиссии на транзакцию и сохранения баланса выше минимального сетевого уровня. Текущий баланс: %s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">У %s недостаточно средств для оплаты сетевого сбора в размере %s. Вам необходимо добавить ещё %s на ваш баланс</string>
     <string name="multisig_signing_is_not_supported_message">Мультиподпись кошельки не поддерживают подписание произвольных сообщений — только транзакции</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">Транзакция будет отклонена. Депозит мультиподписи будет возвращен %s.</string>
     <string name="multisig_signing_warning_message">Транзакция с мультиподписью будет инициирована %s. Инициатор оплачивает сетевую комиссию и резервирует депозит под мультиподпись, который будет освобожден после выполнения транзакции.</string>
     <string name="multisig_signing_warning_title">Мультисиг транзакция</string>
-    <string name="multisig_transaction_created_subtitle">Другие подписанты теперь могут подтвердить транзакцию.\nВы можете отслеживать ее статус в %s</string>
-    <string name="multisig_transaction_created_subtitle_highlight">Мультисиг транзакции.</string>
+    <string name="multisig_transaction_created_subtitle">Другие подписанты теперь могут подтвердить транзакцию.\nВы можете отслеживать её статус в %s.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Транзакции для подписи</string>
     <string name="multisig_transaction_created_title">Мультисиг транзакция создана</string>
     <string name="multisig_transaction_created_view_details">Просмотреть детали</string>
     <string name="multisig_wallet_details_info_warning">Транзакции с этого кошелька требуют одобрения от нескольких подписантов. Ваш аккаунт — один из подписантов:</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">Другие подписанты:</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">Порог %d из %d</string>
     <string name="network_already_exist_failure_title">Эта нода уже существует</string>
     <string name="network_fee">Комиссия сети</string>
     <string name="network_info_address">Адрес ноды</string>
@@ -1104,13 +1138,11 @@
     <string name="referendum_aye_format">За: %s</string>
     <string name="referendum_dapp_list_title">Используйте Nova DApp браузер</string>
     <string name="referendum_description_fallback">Только автор референдума может редактировать это описание и заголовок. Если у вас есть доступ к аккаунту автора, посетите Polkassembly и заполните информацию о вашем референдуме</string>
-    <string name="referendum_details_full_details">Полная информация</string>
     <string name="referendum_details_requested_amount">Запрашиваемая сумма</string>
     <string name="referendum_details_timeline">Временная шкала</string>
     <string name="referendum_details_your_vote">Ваш голос:</string>
     <string name="referendum_full_details_approve_threshold">Кривая одобрения</string>
     <string name="referendum_full_details_beneficiary">Получатель</string>
-    <string name="referendum_full_details_copy_hash">Копировать хэш</string>
     <string name="referendum_full_details_deposit">Депозит</string>
     <string name="referendum_full_details_electorate">Электорат</string>
     <string name="referendum_full_details_hash">Хэш вызова</string>
@@ -1633,6 +1665,7 @@
     <string name="state_removed">Удалён</string>
     <string name="swap_custom_fee_selector_description">Токен для оплаты комиссии сети</string>
     <string name="swap_custom_fee_selector_footer">Комиссия сети добавится к введенной сумме</string>
+    <string name="swap_dry_run_failed_inline_message">Симуляция шага обмена не удалась</string>
     <string name="swap_error_pair_not_supported">Эта пара не поддерживается</string>
     <string name="swap_execution_failure" formatted="false">Не удалось выполнить операцию #%s (%s)</string>
     <string name="swap_execution_failure_swap_label" formatted="false">Обмен %s на %s в %s</string>

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.chain.mo
 import io.novafoundation.nova.feature_account_api.presenatation.account.chain.model.ChainAccountGroupUi
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -33,18 +34,22 @@ class WalletDetailsViewModel(
     private val chainRegistry: ChainRegistry,
     private val importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
     private val addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
-    private val walletDetailsMixinFactory: WalletDetailsMixinFactory
+    private val walletDetailsMixinFactory: WalletDetailsMixinFactory,
+    private val addressActionsMixinFactory: AddressActionsMixin.Factory
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     ImportTypeChooserMixin by importTypeChooserMixin {
 
+    val addressActionsMixin = addressActionsMixinFactory.create(this)
+
     val addAccountLauncherMixin = addAccountLauncherPresentationFactory.create(viewModelScope)
 
     private val detailsHost = WalletDetailsMixinHost(
-        browserableDelegate = externalActions
+        externalActions = externalActions,
+        addressActionsMixin = addressActionsMixin
     )
 
-    private val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId, detailsHost) }
+    private val walletDetailsMixin = async { walletDetailsMixinFactory.create(metaId, coroutineScope = viewModelScope, detailsHost) }
 
     private val startAccountName = async { walletDetailsMixin().metaAccount.name }
 

@@ -21,4 +21,7 @@ interface MultisigPendingOperationsService {
 
     context(ComputationalScope)
     fun pendingOperationFlow(id: PendingMultisigOperationId): Flow<PendingMultisigOperation?>
+
+    context(ComputationalScope)
+    suspend fun pendingOperation(id: PendingMultisigOperationId): PendingMultisigOperation?
 }

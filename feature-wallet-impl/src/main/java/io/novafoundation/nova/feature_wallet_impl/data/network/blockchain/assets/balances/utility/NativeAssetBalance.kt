@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.ext.transferableBalance
-import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
@@ -24,7 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdatePoint
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.toChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
@@ -109,20 +107,14 @@ class NativeAssetBalance(
         return accountInfoRepository.getAccountInfo(chain.id, accountId).data.toChainAssetBalance(chainAsset)
     }
 
-    override suspend fun subscribeTransferableAccountBalance(
+    override suspend fun subscribeAccountBalanceUpdatePoint(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-        sharedSubscriptionBuilder: SharedRequestsBuilder?
-    ): Flow<TransferableBalanceUpdate> {
-        return remoteStorage.subscribe(chain.id, sharedSubscriptionBuilder) {
+    ): Flow<TransferableBalanceUpdatePoint> {
+        return remoteStorage.subscribe(chain.id) {
             metadata.system.account.observeWithRaw(accountId).map {
-                val accountInfo = it.value ?: AccountInfo.empty()
-
-                TransferableBalanceUpdate(
-                    newBalance = accountInfo.transferableBalance(),
-                    updatedAt = it.at
-                )
+                TransferableBalanceUpdatePoint(it.at!!)
             }
         }
     }

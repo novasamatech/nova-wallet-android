@@ -16,11 +16,12 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.addressActions.AddressActionsMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.WalletDetailsViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.WalletDetailsMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
@@ -50,7 +51,8 @@ class AccountDetailsModule {
         ledgerMigrationTracker: LedgerMigrationTracker,
         multisigFormatter: MultisigFormatter,
         router: AccountRouter,
-        addressSchemeFormatter: AddressSchemeFormatter
+        addressSchemeFormatter: AddressSchemeFormatter,
+        chainRegistry: ChainRegistry
     ): WalletDetailsMixinFactory {
         return WalletDetailsMixinFactory(
             polkadotVaultVariantConfigProvider = polkadotVaultVariantConfigProvider,
@@ -63,6 +65,7 @@ class AccountDetailsModule {
             ledgerMigrationTracker = ledgerMigrationTracker,
             router = router,
             addressSchemeFormatter = addressSchemeFormatter,
+            chainRegistry = chainRegistry
         )
     }
 
@@ -78,7 +81,8 @@ class AccountDetailsModule {
         chainRegistry: ChainRegistry,
         importTypeChooserMixin: ImportTypeChooserMixin.Presentation,
         addAccountLauncherPresentationFactory: AddAccountLauncherPresentationFactory,
-        walletDetailsMixinFactory: WalletDetailsMixinFactory
+        walletDetailsMixinFactory: WalletDetailsMixinFactory,
+        addressActionsMixinFactory: AddressActionsMixin.Factory
     ): ViewModel {
         return WalletDetailsViewModel(
             rootScope = rootScope,
@@ -89,7 +93,8 @@ class AccountDetailsModule {
             chainRegistry = chainRegistry,
             importTypeChooserMixin = importTypeChooserMixin,
             addAccountLauncherPresentationFactory = addAccountLauncherPresentationFactory,
-            walletDetailsMixinFactory = walletDetailsMixinFactory
+            walletDetailsMixinFactory = walletDetailsMixinFactory,
+            addressActionsMixinFactory = addressActionsMixinFactory
         )
     }
 

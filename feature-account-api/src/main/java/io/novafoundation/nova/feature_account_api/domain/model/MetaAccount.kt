@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_api.domain.model
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
@@ -141,7 +142,7 @@ interface MultisigMetaAccount : MetaAccount {
 
 sealed class MultisigAvailability {
 
-    data object Universal : MultisigAvailability()
+    class Universal(val addressScheme: AddressScheme) : MultisigAvailability()
 
     class SingleChain(val chainId: ChainId) : MultisigAvailability()
 }
@@ -153,9 +154,15 @@ fun MetaAccount.isUniversal(): Boolean {
 fun MultisigAvailability.singleChainId(): ChainId? {
     return when (this) {
         is MultisigAvailability.SingleChain -> chainId
-        MultisigAvailability.Universal -> null
+        is MultisigAvailability.Universal -> null
     }
 }
+
+fun MultisigMetaAccount.isThreshold1(): Boolean {
+    return threshold == 1
+}
+
+fun MetaAccount.requireMultisigAccount() = this as MultisigMetaAccount
 
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
 
@@ -243,3 +250,10 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
 
 val LightMetaAccount.Type.isProxied: Boolean
     get() = this == LightMetaAccount.Type.PROXIED
+
+fun MultisigMetaAccount.signatoriesCount() = 1 + otherSignatories.size
+
+fun MultisigMetaAccount.allSignatories() = buildSet {
+    add(signatoryAccountId)
+    addAll(otherSignatories.toSet())
+}

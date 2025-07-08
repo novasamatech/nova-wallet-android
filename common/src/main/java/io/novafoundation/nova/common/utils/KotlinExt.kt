@@ -34,7 +34,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
@@ -84,7 +83,6 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
 
 fun Result<*>.coerceToUnit(): Result<Unit> = map { }
 
-@OptIn(ExperimentalTime::class)
 inline fun <R> measureExecution(label: String, function: () -> R): R {
     val (value, time) = measureTimedValue(function)
     Log.d("Performance", "$label took $time")
@@ -489,6 +487,12 @@ fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
     splitSnakeCase()
 } else {
     splitCamelCase()
+}
+
+fun String.splitAndCapitalizeWords(): String {
+    val split = splitSnakeOrCamelCase()
+
+    return split.joinToString(separator = " ") { it.capitalize() }
 }
 
 /**

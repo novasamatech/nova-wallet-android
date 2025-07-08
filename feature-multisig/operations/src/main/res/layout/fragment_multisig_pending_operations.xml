@@ -5,13 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:background="@color/secondary_screen_background">
+    android:background="@drawable/drawable_background_image">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/multisigPendingOperationsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:dividerVisible="false"
+        app:contentBackground="@android:color/transparent"
+        android:background="@color/blur_navigation_background"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

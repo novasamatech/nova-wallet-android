@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepos
 import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.deeplink.DAppDeepLinkHandler
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 
 @Module
 class DeepLinkModule {
@@ -17,11 +18,13 @@ class DeepLinkModule {
     fun provideDappDeepLinkHandler(
         dAppMetadataRepository: DAppMetadataRepository,
         router: DAppRouter,
-        automaticInteractionGate: AutomaticInteractionGate
+        automaticInteractionGate: AutomaticInteractionGate,
+        browserTabService: BrowserTabService
     ) = DAppDeepLinkHandler(
         dAppMetadataRepository,
         router,
-        automaticInteractionGate
+        automaticInteractionGate,
+        browserTabService
     )
 
     @Provides

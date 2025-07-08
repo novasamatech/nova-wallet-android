@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RealEth
 import io.novafoundation.nova.feature_wallet_impl.data.network.etherscan.RetrofitEtherscanTransactionsApi
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import javax.inject.Qualifier
 
 @Qualifier
@@ -37,7 +38,8 @@ class EvmErc20AssetsModule {
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
         erc20Standard: Erc20Standard,
-    ) = EvmErc20AssetBalance(chainRegistry, assetCache, erc20Standard)
+        rpcCalls: RpcCalls
+    ) = EvmErc20AssetBalance(chainRegistry, assetCache, erc20Standard, rpcCalls)
 
     @Provides
     @FeatureScope

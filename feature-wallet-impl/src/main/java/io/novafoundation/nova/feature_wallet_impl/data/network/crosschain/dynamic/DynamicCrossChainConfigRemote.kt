@@ -29,4 +29,5 @@ class DynamicXcmTransferRemote(
     val chainId: ChainId,
     val assetId: Int,
     val hasDeliveryFee: Boolean,
+    val supportsXcmExecute: Boolean
 )

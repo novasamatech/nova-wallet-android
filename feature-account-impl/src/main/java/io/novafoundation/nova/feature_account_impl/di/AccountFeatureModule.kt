@@ -24,6 +24,7 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.AccountDao
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
+import io.novafoundation.nova.core_db.dao.MultisigOperationsDao
 import io.novafoundation.nova.core_db.dao.NodeDao
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
@@ -33,16 +34,21 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.RealAccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
@@ -73,6 +79,7 @@ import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicS
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
+import io.novafoundation.nova.feature_account_impl.data.multisig.repository.RealMultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
@@ -122,8 +129,10 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.addressA
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealMultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
@@ -192,6 +201,12 @@ class AccountFeatureModule {
 
         @Binds
         fun bindNestedSigningPresenter(real: RealNestedSigningPresenter): NestedSigningPresenter
+
+        @Binds
+        fun bindProxyFormatter(real: RealProxyFormatter): ProxyFormatter
+
+        @Binds
+        fun bindMultisigFormatter(real: RealMultisigFormatter): MultisigFormatter
     }
 
     @Provides
@@ -563,7 +578,7 @@ class AccountFeatureModule {
     fun provideProxyFormatter(
         walletUseCase: WalletUiUseCase,
         resourceManager: ResourceManager
-    ) = ProxyFormatter(walletUseCase, resourceManager)
+    ) = RealProxyFormatter(walletUseCase, resourceManager)
 
     @Provides
     @FeatureScope
@@ -770,6 +785,28 @@ class AccountFeatureModule {
         return RealExtrinsicNavigationWrapper(
             accountRouter = accountRouter,
             accountUseCase = accountUseCase
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMultisigOperationLocalCallRepository(multisigOperationsDao: MultisigOperationsDao): MultisigOperationLocalCallRepository {
+        return RealMultisigOperationLocalCallRepository(multisigOperationsDao)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAccountUIUseCase(
+        accountRepository: AccountRepository,
+        walletUiUseCase: WalletUiUseCase,
+        addressIconGenerator: AddressIconGenerator,
+        @OnChainIdentity identityProvider: IdentityProvider
+    ): AccountUIUseCase {
+        return RealAccountUIUseCase(
+            accountRepository,
+            walletUiUseCase,
+            addressIconGenerator,
+            identityProvider
         )
     }
 }

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.bold
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
+import io.novafoundation.nova.common.utils.formatting.spannable.format
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationFailure
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationFailure.NotEnoughSignatoryBalance
@@ -77,37 +78,37 @@ class RealMultisigSigningPresenter @Inject constructor(
         val title: String = resourceManager.getString(R.string.common_error_not_enough_tokens)
 
         val signatoryName = formatName(failure.signatory)
-        val message: CharSequence = when (failure) {
-            is NotEnoughSignatoryBalance.ToPayFeeAndDeposit -> {
-                val format = resourceManager.getString(R.string.multisig_signatory_validation_deposit_fee)
-                SpannableFormatter.format(
-                    format,
-                    signatoryName,
-                    formatAmount(failure.asset, failure.fee),
-                    formatAmount(failure.asset, failure.deposit),
-                    formatAmount(failure.asset, failure.availableBalance)
-                )
-            }
 
-            is NotEnoughSignatoryBalance.ToPayFeeAndStayAboveEd -> {
-                val format = resourceManager.getString(R.string.multisig_signatory_validation_ed)
-                SpannableFormatter.format(
-                    format,
-                    signatoryName,
-                    formatAmount(failure.asset, failure.neededBalance),
-                    formatAmount(failure.asset, failure.availableBalance)
-                )
-            }
+        val deposit = failure.deposit
+        val fee = failure.fee
 
-            is NotEnoughSignatoryBalance.ToPlaceDeposit -> {
-                val format = resourceManager.getString(R.string.multisig_signatory_validation_deposit)
-                SpannableFormatter.format(
-                    format,
-                    signatoryName,
-                    formatAmount(failure.asset, failure.deposit),
-                    formatAmount(failure.asset, failure.availableBalance)
-                )
-            }
+        val message = when {
+            fee != null && deposit != null -> SpannableFormatter.format(
+                resourceManager,
+                R.string.multisig_signatory_validation_deposit_fee,
+                signatoryName,
+                formatAmount(failure.asset, fee),
+                formatAmount(failure.asset, deposit),
+                formatAmount(failure.asset, failure.balanceToAdd)
+            )
+
+            deposit != null -> SpannableFormatter.format(
+                resourceManager,
+                R.string.multisig_signatory_validation_deposit,
+                signatoryName,
+                formatAmount(failure.asset, deposit),
+                formatAmount(failure.asset, failure.balanceToAdd)
+            )
+
+            fee != null -> SpannableFormatter.format(
+                resourceManager,
+                R.string.multisig_signatory_validation_fee,
+                signatoryName,
+                formatAmount(failure.asset, fee),
+                formatAmount(failure.asset, failure.balanceToAdd)
+            )
+
+            else -> error("Fee and deposit cannot be null at the same time")
         }
 
         return title to message

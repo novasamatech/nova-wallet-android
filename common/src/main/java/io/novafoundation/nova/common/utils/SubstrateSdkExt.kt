@@ -46,6 +46,7 @@ import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method
+import io.novasama.substrate_sdk_android.runtime.metadata.methodOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
@@ -83,6 +84,9 @@ val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
 
 val SS58Encoder.DEFAULT_PREFIX: Short
     get() = 42.toShort()
+
+val SS58Encoder.UNIFIED_ADDRESS_PREFIX: Short
+    get() = 0.toShort()
 
 val SS58Encoder.GENERIC_ADDRESS_PREFIX: Short
     get() = DEFAULT_PREFIX
@@ -493,12 +497,30 @@ fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
     return apis != null
 }
 
+fun RuntimeMetadata.hasDetectedRuntimeApi(section: String, method: String): Boolean {
+    if (!hasRuntimeApisMetadata()) return false
+
+    return runtimeApiOrNull(section)?.methodOrNull(method) != null
+}
+
+fun GenericCall.Instance.toHex(runtimeSnapshot: RuntimeSnapshot): String {
+    return toByteArray(runtimeSnapshot).toHexString(withPrefix = true)
+}
+
 fun GenericCall.Instance.toByteArray(runtimeSnapshot: RuntimeSnapshot): ByteArray {
     return GenericCall.toByteArray(runtimeSnapshot, this)
 }
 
 fun GenericCall.Instance.callHash(runtimeSnapshot: RuntimeSnapshot): ByteArray {
     return toByteArray(runtimeSnapshot).blake2b256()
+}
+
+fun String.callHash(): ByteArray {
+    return fromHex().blake2b256()
+}
+
+fun String.callHashString(): String {
+    return callHash().toHexString(withPrefix = true)
 }
 
 fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
@@ -615,4 +637,6 @@ object Modules {
     const val ASSET_REGISTRY = "AssetRegistry"
 
     const val COLLATOR_STAKING = "CollatorStaking"
+
+    const val EVM = "EVM"
 }
