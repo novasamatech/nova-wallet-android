@@ -29,7 +29,8 @@ class MultisigOperationFullDetailsFragment : BaseFragment<MultisigOperationFullD
         binder.multisigPendingOperationFullDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.multisigPendingOperationDetailsDepositor.setOnClickListener { viewModel.onDepositorClicked() }
         binder.multisigPendingOperationDetailsDeposit.setOnClickListener { viewModel.depositClicked() }
-        binder.multisigPendingOperationDetailsCallData.setOnClickListener { viewModel.callHashClicked() }
+        binder.multisigPendingOperationDetailsCallHash.setOnClickListener { viewModel.callHashClicked() }
+        binder.multisigPendingOperationDetailsCallData.setOnClickListener { viewModel.callDataClicked() }
     }
 
     override fun inject() {
@@ -49,6 +50,7 @@ class MultisigOperationFullDetailsFragment : BaseFragment<MultisigOperationFullD
 
         viewModel.depositorAccountModel.observe { binder.multisigPendingOperationDetailsDepositor.showAccountWithLoading(it) }
         viewModel.depositAmount.observe { binder.multisigPendingOperationDetailsDeposit.showAmount(it) }
+        viewModel.ellipsizedCallHash.observe { binder.multisigPendingOperationDetailsCallHash.showValueOrHide(it, null) }
         viewModel.ellipsizedCallData.observe { binder.multisigPendingOperationDetailsCallData.showValueOrHide(it, null) }
         viewModel.formattedCall.observe { binder.multisigPendingOperationDetailsCall.text = it }
     }
