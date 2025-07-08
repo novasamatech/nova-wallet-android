@@ -158,6 +158,10 @@ fun MultisigAvailability.singleChainId(): ChainId? {
     }
 }
 
+fun MetaAccount.requireIsThreshold1(): Boolean {
+    return (this as MultisigMetaAccount).isThreshold1()
+}
+
 fun MultisigMetaAccount.isThreshold1(): Boolean {
     return threshold == 1
 }
@@ -250,6 +254,9 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
 
 val LightMetaAccount.Type.isProxied: Boolean
     get() = this == LightMetaAccount.Type.PROXIED
+
+val LightMetaAccount.Type.isMultisig: Boolean
+    get() = this == LightMetaAccount.Type.MULTISIG
 
 fun MultisigMetaAccount.signatoriesCount() = 1 + otherSignatories.size
 
