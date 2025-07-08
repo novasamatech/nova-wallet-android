@@ -20,7 +20,7 @@ class MultisigExtrinsicValidationPayload(
 
 sealed class SignatoryFeePaymentMode {
 
-    data object PaysSubmissionFee: SignatoryFeePaymentMode()
+    data object PaysSubmissionFee : SignatoryFeePaymentMode()
 
     data object NothingToPay : SignatoryFeePaymentMode()
 }

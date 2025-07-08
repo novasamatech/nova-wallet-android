@@ -46,7 +46,7 @@ class MultisigSignerFactory @Inject constructor(
             multisigSigningPresenter = multisigSigningPresenter,
             multisigAccount = metaAccount,
 
-            )
+        )
     }
 }
 
@@ -99,7 +99,7 @@ class MultisigSigner(
 
         // We intentionally do validation before wrapping to pass the actual call to the validation
         validateExtrinsic(context.chain, callInsideAsMulti)
-        
+
         wrapCallsInAsMultiForSubmission()
 
         delegateSigner().setSignerDataForSubmission(context)
