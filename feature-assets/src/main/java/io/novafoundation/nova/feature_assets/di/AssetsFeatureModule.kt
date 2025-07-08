@@ -274,12 +274,14 @@ class AssetsFeatureModule {
     fun provideNovaCardRestrictionCheckMixin(
         accountUseCase: SelectedAccountUseCase,
         actionLauncher: ActionBottomSheetLauncher,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        chainRegistry: ChainRegistry
     ): NovaCardRestrictionCheckMixin {
         return NovaCardRestrictionCheckMixin(
             accountUseCase,
             resourceManager,
-            actionLauncher
+            actionLauncher,
+            chainRegistry
         )
     }
 

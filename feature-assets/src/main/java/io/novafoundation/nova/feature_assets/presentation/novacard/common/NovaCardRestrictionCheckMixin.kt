@@ -9,10 +9,11 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_account_api.domain.model.isThreshold1
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 private const val NOVA_CARD_AVAILABLE_CHAIN_ID = ChainGeneses.POLKADOT
 
@@ -20,35 +21,39 @@ class NovaCardRestrictionCheckMixin(
     private val accountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager,
     private val actionLauncher: ActionBottomSheetLauncher,
+    private val chainRegistry: ChainRegistry
 ) : RestrictionCheckMixin {
 
     override suspend fun isRestricted(): Boolean {
         val selectedAccount = accountUseCase.getSelectedMetaAccount()
-        return isRestrictedByMultisig(selectedAccount) || isRestrictedByProxied(selectedAccount)
+        val availableChain = chainRegistry.getChain(NOVA_CARD_AVAILABLE_CHAIN_ID)
+
+        return isRestrictedByMultisig(selectedAccount, availableChain) || isRestrictedByProxied(selectedAccount, availableChain)
     }
 
     override suspend fun checkRestrictionAndDo(action: () -> Unit) {
         val selectedAccount = accountUseCase.getSelectedMetaAccount()
+        val availableChain = chainRegistry.getChain(NOVA_CARD_AVAILABLE_CHAIN_ID)
 
         when {
-            isRestrictedByMultisig(selectedAccount) -> showMultisigWarning()
-            isRestrictedByProxied(selectedAccount) -> showProxiedWarning()
+            isRestrictedByMultisig(selectedAccount, availableChain) -> showMultisigWarning()
+            isRestrictedByProxied(selectedAccount, availableChain) -> showProxiedWarning()
             else -> action()
         }
     }
 
-    private fun isRestrictedByMultisig(metaAccount: MetaAccount): Boolean {
+    private fun isRestrictedByMultisig(metaAccount: MetaAccount, availableChain: Chain): Boolean {
         if (metaAccount !is MultisigMetaAccount) return false
 
-        val isThresholdNot1 = !metaAccount.isThreshold1()
-        val chainNotAvailable = !metaAccount.hasChainAccountIn(NOVA_CARD_AVAILABLE_CHAIN_ID)
-        return isThresholdNot1 || chainNotAvailable
+        if (metaAccount.isThreshold1() && metaAccount.hasAccountIn(availableChain)) return false
+
+        return true
     }
 
-    private fun isRestrictedByProxied(metaAccount: MetaAccount): Boolean {
+    private fun isRestrictedByProxied(metaAccount: MetaAccount, availableChain: Chain): Boolean {
         if (metaAccount !is ProxiedMetaAccount) return false
 
-        return !metaAccount.hasChainAccountIn(NOVA_CARD_AVAILABLE_CHAIN_ID)
+        return !metaAccount.hasAccountIn(availableChain)
     }
 
     private fun showMultisigWarning() {
