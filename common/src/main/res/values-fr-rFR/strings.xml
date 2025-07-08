@@ -77,6 +77,7 @@
     <string name="account_ledger_import_fill_description">Assurez-vous que l\'application réseau est installée sur votre Ledger à l\'aide de l\'application Ledger Live. Puis ouvrez l\'application réseau sur votre Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Ajoutez au moins un compte</string>
     <string name="account_ledger_import_fill_title">Ajouter des comptes à votre portefeuille</string>
+    <string name="account_ledger_import_start_guide">Guide de connexion Ledger</string>
     <string name="account_ledger_import_start_step_1">Assurez-vous que %s sur votre appareil Ledger à l\'aide de l\'application Ledger Live</string>
     <string name="account_ledger_import_start_step_1_highlighted">l\'application Network est installée</string>
     <string name="account_ledger_import_start_step_2">%s sur votre appareil Ledger</string>
@@ -87,12 +88,14 @@
     <string name="account_ledger_import_start_step_4_highlighted">Sélectionnez un compte</string>
     <string name="account_ledger_import_start_step_otg">%s dans les paramètres de votre téléphone</string>
     <string name="account_ledger_import_start_step_otg_highlighted">Activer OTG</string>
+    <string name="account_ledger_import_start_title">Connecter Ledger</string>
     <string name="account_ledger_legacy_warning_message">Pour signer des opérations et migrer vos comptes vers la nouvelle application Generic Ledger, installez et ouvrez l\'application Migration. Les applications Ledger Legacy Old et Migration ne seront plus supportées à l\'avenir.</string>
     <string name="account_ledger_legacy_warning_title">Une nouvelle application Ledger a été publiée</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">L\'application Migration sera bientôt indisponible. Utilisez-la pour migrer vos comptes vers la nouvelle application Ledger afin d\'éviter de perdre vos fonds.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_legacy">Ledger Legacy</string>
     <string name="account_ledger_select_device_all_description">Si vous utilisez un Ledger via Bluetooth, activez le Bluetooth sur les deux appareils et accordez à Nova les permissions Bluetooth et de localisation. Pour l\'USB, activez OTG dans les paramètres de votre téléphone.</string>
     <string name="account_ledger_select_device_description">Veuillez activer le Bluetooth dans les paramètres de votre téléphone et de votre appareil Ledger. Déverrouillez votre Ledger et ouvrez l\'application %s.</string>
     <string name="account_ledger_select_device_title">Sélectionnez votre appareil Ledger</string>
