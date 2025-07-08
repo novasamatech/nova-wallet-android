@@ -17,6 +17,8 @@ import io.novasama.substrate_sdk_android.extensions.toAccountId
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 class MetaAccountOrdering(
     val id: Long,
@@ -145,6 +147,15 @@ sealed class MultisigAvailability {
     class Universal(val addressScheme: AddressScheme) : MultisigAvailability()
 
     class SingleChain(val chainId: ChainId) : MultisigAvailability()
+}
+
+@OptIn(ExperimentalContracts::class)
+fun MetaAccount.isMultisig(): Boolean {
+    contract {
+        returns(true) implies (this@isMultisig is MultisigMetaAccount)
+    }
+
+    return this is MultisigMetaAccount
 }
 
 fun MetaAccount.isUniversal(): Boolean {

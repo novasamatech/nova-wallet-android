@@ -15,15 +15,12 @@ class MultisigExtrinsicValidationPayload(
     val chain: Chain,
     val signatoryFeePaymentMode: SignatoryFeePaymentMode,
     // Call that is passed to as_multi. Might be both the actual call (in case multisig is a the root signer) or be wrapped by some other signer
-    val delegatedCall: GenericCall.Instance,
+    val callInsideAsMulti: GenericCall.Instance,
 )
 
 sealed class SignatoryFeePaymentMode {
 
-    class PaysSubmissionFee(
-        // The inner-most call (e.g. transfer)
-        val actualCall: GenericCall.Instance
-    ) : SignatoryFeePaymentMode()
+    data object PaysSubmissionFee: SignatoryFeePaymentMode()
 
     data object NothingToPay : SignatoryFeePaymentMode()
 }
