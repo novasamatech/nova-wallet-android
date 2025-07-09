@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.relevantEllipsizeMode
 import io.novafoundation.nova.feature_multisig_operations.databinding.ItemMultisigSignatoryAccountBinding
 
 class SignatoriesAdapter(
@@ -41,6 +42,7 @@ class SignatoryViewHolder(
         itemSignatoryAccountIcon.setImageDrawable(item.accountModel.drawable())
         itemSignatoryAccountSelected.setVisible(item.isApproved, falseState = View.INVISIBLE)
         itemSignatoryAccountTitle.text = item.accountModel.nameOrAddress()
+        itemSignatoryAccountTitle.ellipsize = item.accountModel.relevantEllipsizeMode()
         itemSignatoryAccountSubtitle.setTextOrHide(item.subtitle)
     }
 
