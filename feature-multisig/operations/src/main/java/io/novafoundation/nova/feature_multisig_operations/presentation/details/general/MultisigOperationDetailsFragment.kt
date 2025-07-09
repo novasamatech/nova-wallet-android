@@ -7,6 +7,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
@@ -101,7 +104,11 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         viewModel.signatoryAccount.observe(binder.multisigPendingOperationDetailsSignatory::showWallet)
 
         viewModel.signatoriesTitle.observe(binder.multisigOperationSignatoriesTitle::setText)
-        viewModel.signatories.observe { adapter.submitList(it) }
+        viewModel.formattedSignatories.observe { signatoriesLoadingState ->
+            binder.multisigOperationSignatoriesShimmering.isVisible = signatoriesLoadingState.isLoading
+            binder.multisigOperationSignatories.isVisible = signatoriesLoadingState.isLoaded()
+            signatoriesLoadingState.onLoaded { adapter.submitList(it) }
+        }
 
         viewModel.callDetailsVisible.observe(binder.multisigPendingOperationCallDetails::setVisible)
     }

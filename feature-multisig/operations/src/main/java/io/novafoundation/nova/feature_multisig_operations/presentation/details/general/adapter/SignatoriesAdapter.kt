@@ -38,9 +38,9 @@ class SignatoryViewHolder(
 
     fun bind(item: SignatoryRvItem) = with(binder) {
         root.setOnClickListener { itemHandler.onSignatoryClicked(item) }
-        itemSignatoryAccountIcon.setImageDrawable(item.address.image)
+        itemSignatoryAccountIcon.setImageDrawable(item.accountModel.drawable())
         itemSignatoryAccountSelected.setVisible(item.isApproved, falseState = View.INVISIBLE)
-        itemSignatoryAccountTitle.text = item.address.nameOrAddress
+        itemSignatoryAccountTitle.text = item.accountModel.nameOrAddress()
         itemSignatoryAccountSubtitle.setTextOrHide(item.subtitle)
     }
 
@@ -54,7 +54,7 @@ class SignatoryViewHolder(
 class SignatoriesDiffCallback : DiffUtil.ItemCallback<SignatoryRvItem>() {
 
     override fun areItemsTheSame(oldItem: SignatoryRvItem, newItem: SignatoryRvItem): Boolean {
-        return oldItem.address == newItem.address
+        return oldItem.accountModel == newItem.accountModel
     }
 
     override fun areContentsTheSame(oldItem: SignatoryRvItem, newItem: SignatoryRvItem): Boolean {

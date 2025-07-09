@@ -1,89 +1,66 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.general
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
-import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_BIG
-import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountModel
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoryRvItem
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class SignatoryListFormatter(
-    private val addressIconGenerator: AddressIconGenerator,
-    private val walletUiUseCase: WalletUiUseCase,
     private val accountInteractor: AccountInteractor,
     private val proxyFormatter: ProxyFormatter,
     private val multisigFormatter: MultisigFormatter
 ) {
 
-    private class FormattingContext(val metaAccounts: Map<Long, MetaAccount>, val approvals: Set<AccountIdKey>) {
+    private class FormattingContext(
+        val metaAccountByAccountIds: Map<AccountIdKey, MetaAccount>,
+        val metaAccountsMetaId: Map<Long, MetaAccount>,
+        val approvals: Set<AccountIdKey>
+    ) {
 
-        fun account(id: Long): MetaAccount = metaAccounts.getValue(id)
+        fun account(accountId: AccountIdKey): MetaAccount? = metaAccountByAccountIds
+            .filter { (key, _) -> accountId == key }
+            .values
+            .findRelevantAccountToShow()
+
+        fun account(metaId: Long) = metaAccountsMetaId[metaId]
 
         fun isApprovedBy(accountId: AccountIdKey): Boolean = accountId in approvals
     }
 
     suspend fun formatSignatories(
         chain: Chain,
-        signatories: Set<AccountIdKey>,
+        signatories: Map<AccountIdKey, AccountModel>,
         approvals: Set<AccountIdKey>
     ): List<SignatoryRvItem> {
         val metaAccounts = accountInteractor.getActiveMetaAccounts()
-        val metaAccountsByAccountId = metaAccounts.filter { it.hasAccountIn(chain) }
-            .associateBy { it.requireAccountIdKeyIn(chain) }
+        val formattingContext = formattingContext(chain, metaAccounts, approvals)
 
-        val formattingContext = getFormattingContext(metaAccounts, approvals)
-
-        return signatories.map {
-            val metaAccount = metaAccountsByAccountId[it]
-            when {
-                metaAccount != null -> formatMetaAccount(metaAccount, chain, it, formattingContext)
-                else -> formatUnknownAccount(it, chain, formattingContext)
-            }
+        return signatories.map { (signatoryAccountId, signatoryAccountModel) ->
+            val maybeMetaAccount = formattingContext.account(signatoryAccountId)
+            SignatoryRvItem(
+                accountModel = signatoryAccountModel,
+                subtitle = maybeMetaAccount?.formatSubtitle(formattingContext),
+                isApproved = formattingContext.isApprovedBy(signatoryAccountId)
+            )
         }
     }
 
-    private fun getFormattingContext(metaAccounts: List<MetaAccount>, approvals: Set<AccountIdKey>): FormattingContext {
-        val metaAccountsById = metaAccounts.associateBy { it.id }
-        return FormattingContext(metaAccountsById, approvals)
-    }
+    private fun formattingContext(chain: Chain, metaAccounts: List<MetaAccount>, approvals: Set<AccountIdKey>): FormattingContext {
+        val metaAccountsByAccountIds = metaAccounts
+            .filter { it.hasAccountIn(chain) }
+            .associateBy { it.requireAccountIdKeyIn(chain) }
 
-    private suspend fun formatUnknownAccount(accountId: AccountIdKey, chain: Chain, context: FormattingContext): SignatoryRvItem {
-        val address = chain.addressOf(accountId)
-        return SignatoryRvItem(
-            address = addressIconGenerator.createAddressModel(
-                chain = chain,
-                address = address,
-                accountName = address.ellipsizeAddress(),
-                sizeInDp = SIZE_BIG,
-                background = BACKGROUND_TRANSPARENT
-            ),
-            subtitle = null,
-            isApproved = context.isApprovedBy(accountId)
-        )
-    }
+        val metaAccountsByMetaIds = metaAccounts.associateBy { it.id }
 
-    private suspend fun formatMetaAccount(
-        metaAccount: MetaAccount,
-        chain: Chain,
-        accountId: AccountIdKey,
-        context: FormattingContext
-    ): SignatoryRvItem {
-        return SignatoryRvItem(
-            address = walletUiUseCase.walletAddressModel(metaAccount, chain, iconSize = SIZE_BIG),
-            subtitle = metaAccount.formatSubtitle(context),
-            isApproved = context.isApprovedBy(accountId)
-        )
+        return FormattingContext(metaAccountsByAccountIds, metaAccountsByMetaIds, approvals)
     }
 
     private suspend fun MetaAccount.formatSubtitle(context: FormattingContext): CharSequence? = when (this) {
@@ -92,8 +69,8 @@ class SignatoryListFormatter(
         else -> null
     }
 
-    private suspend fun ProxiedMetaAccount.formatSubtitle(context: FormattingContext): CharSequence {
-        val proxyMetaAccount = context.account(this.proxy.proxyMetaId)
+    private suspend fun ProxiedMetaAccount.formatSubtitle(context: FormattingContext): CharSequence? {
+        val proxyMetaAccount = context.account(this.proxy.proxyMetaId) ?: return null
 
         return proxyFormatter.mapProxyMetaAccountSubtitle(
             proxyMetaAccount.name,
@@ -102,9 +79,30 @@ class SignatoryListFormatter(
         )
     }
 
-    private suspend fun MultisigMetaAccount.formatSubtitle(context: FormattingContext): CharSequence {
-        val signatory = context.account(this.signatoryMetaId)
+    private suspend fun MultisigMetaAccount.formatSubtitle(context: FormattingContext): CharSequence? {
+        val signatory = context.account(this.signatoryMetaId) ?: return null
 
         return multisigFormatter.formatSignatorySubtitle(signatory)
     }
+}
+
+/**
+ * Since we may have multiple accounts by one account id it would be better to show the most relevant to user.
+ * For example we show secrets-account instead of the proxied-account
+ */
+private fun Collection<MetaAccount>.findRelevantAccountToShow(): MetaAccount? {
+    return minByOrNull { it.priorityToShowAsSignatory() }
+}
+
+private fun MetaAccount.priorityToShowAsSignatory() = when (type) {
+    LightMetaAccount.Type.SECRETS -> 0
+
+    LightMetaAccount.Type.PARITY_SIGNER,
+    LightMetaAccount.Type.LEDGER_LEGACY,
+    LightMetaAccount.Type.LEDGER,
+    LightMetaAccount.Type.POLKADOT_VAULT,
+    LightMetaAccount.Type.WATCH_ONLY -> 1
+
+    LightMetaAccount.Type.PROXIED,
+    LightMetaAccount.Type.MULTISIG -> 2
 }

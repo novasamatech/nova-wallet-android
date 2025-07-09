@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatt
 import io.novafoundation.nova.common.utils.formatting.spannable.format
 import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.withLoadingShared
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.PrimaryButton
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAc
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.allSignatories
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
@@ -78,6 +80,7 @@ class MultisigOperationDetailsViewModel(
     private val multisigCallFormatter: MultisigCallFormatter,
     private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val accountInteractor: AccountInteractor,
+    private val accountUIUseCase: AccountUIUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
@@ -134,17 +137,22 @@ class MultisigOperationDetailsViewModel(
         resourceManager.getString(R.string.multisig_operation_details_signatories, operation.approvals.size, metaAccount.threshold)
     }.shareInBackground()
 
-    val signatories = combine(
-        selectedAccountFlow,
-        chainFlow,
+    private val signatoryAccounts = selectedAccountFlow.map { it.allSignatories() }
+        .distinctUntilChanged()
+        .map { accountUIUseCase.getAccountModels(it, chainFlow.first()) }
+        .shareInBackground()
+
+    val formattedSignatories = combine(
+        signatoryAccounts,
         operationFlow
-    ) { metaAccount, chain, operation ->
+    ) { signatories, operation ->
         signatoryListFormatter.formatSignatories(
-            chain,
-            signatories = metaAccount.allSignatories(),
+            chain = chainFlow.first(),
+            signatories = signatories,
             approvals = operation.approvals.toSet()
         )
-    }.shareInBackground()
+    }.withLoadingShared()
+        .shareInBackground()
 
     private val showNextProgress = MutableStateFlow(false)
 
@@ -339,7 +347,7 @@ class MultisigOperationDetailsViewModel(
     }
 
     fun onSignatoryClicked(signatoryRvItem: SignatoryRvItem) = launchUnit {
-        showAddressActionForOriginChain(signatoryRvItem.address.address)
+        showAddressActionForOriginChain(signatoryRvItem.accountModel.address())
     }
 
     fun walletDetailsClicked() = launchUnit {
