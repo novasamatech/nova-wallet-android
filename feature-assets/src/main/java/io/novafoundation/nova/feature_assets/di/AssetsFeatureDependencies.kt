@@ -54,6 +54,7 @@ import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersM
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.mercuryo.MercuryoSignatureGenerator
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -225,6 +226,8 @@ interface AssetsFeatureDependencies {
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+
+    val mercuryoSignatureGenerator: MercuryoSignatureGenerator
 
     fun web3NamesInteractor(): Web3NamesInteractor
 
