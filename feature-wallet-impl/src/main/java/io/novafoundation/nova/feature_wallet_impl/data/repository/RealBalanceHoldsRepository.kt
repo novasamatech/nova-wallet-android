@@ -28,7 +28,7 @@ class RealBalanceHoldsRepository(
     override suspend fun chainHasHoldId(chainId: ChainId, holdId: BalanceHold.HoldId): Boolean {
         val holdReasonType = getHoldReasonType(chainId) ?: return false
         return holdReasonType.hasHoldId(holdId).also {
-            Log.d(LOG_TAG, "chainHasHoldId for ${chainId}: $it")
+            Log.d(LOG_TAG, "chainHasHoldId for $chainId: $it")
         }
     }
 
