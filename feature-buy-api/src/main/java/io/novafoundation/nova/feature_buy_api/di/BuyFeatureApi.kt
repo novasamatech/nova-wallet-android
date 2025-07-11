@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_buy_api.di
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
-import io.novafoundation.nova.feature_buy_api.presentation.trade.common.mercuryo.MercuryoSignatureGenerator
+import io.novafoundation.nova.feature_buy_api.presentation.trade.common.mercuryo.MercuryoSignatureFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 
@@ -19,5 +19,5 @@ interface BuyFeatureApi {
 
     val buyDeepLinks: BuyDeepLinks
 
-    val mercuryoSignatureGenerator: MercuryoSignatureGenerator
+    val mercuryoSignatureFactory: MercuryoSignatureFactory
 }
