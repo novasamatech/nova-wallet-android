@@ -46,7 +46,7 @@ class MultisigSignerFactory @Inject constructor(
             multisigSigningPresenter = multisigSigningPresenter,
             multisigAccount = metaAccount,
 
-            )
+        )
     }
 }
 
