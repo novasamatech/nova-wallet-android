@@ -9,4 +9,4 @@ interface RestrictionCheckMixin {
     suspend fun checkRestrictionAndDo(action: () -> Unit)
 }
 
-suspend fun RestrictionCheckMixin.isNotRestricted() = !isRestricted()
+suspend fun RestrictionCheckMixin.isAllowed() = !isRestricted()

@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.buySel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.mixin.restrictions.isNotRestricted
+import io.novafoundation.nova.common.mixin.restrictions.isAllowed
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -74,14 +74,14 @@ class RealBuySellSelectorMixin(
 
     private suspend fun openAllAssetsSelector() = BuySellSelectorMixin.SelectorPayload(
         buyItem(enabled = true) { router.openBuyFlow() },
-        sellItem(enabled = buySellRestrictionCheckMixin.isNotRestricted()) { router.openSellFlow() }
+        sellItem(enabled = buySellRestrictionCheckMixin.isAllowed()) { router.openSellFlow() }
     )
 
     private suspend fun openSpecifiedAssetSelector(selectorType: SelectorType.Asset): BuySellSelectorMixin.SelectorPayload? {
         val chainAsset = chainRegistry.asset(selectorType.chaiId, selectorType.assetId)
         val buyAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.BUY)
         val sellAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.SELL) &&
-            buySellRestrictionCheckMixin.isNotRestricted()
+            buySellRestrictionCheckMixin.isAllowed()
 
         if (!buyAvailable && !sellAvailable) {
             showErrorMessage(R.string.trade_token_not_supported_title, R.string.trade_token_not_supported_message)

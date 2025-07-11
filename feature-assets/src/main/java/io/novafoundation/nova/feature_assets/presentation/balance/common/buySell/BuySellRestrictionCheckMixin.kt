@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.view.bottomSheet.action.ButtonPreferences
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.isMultisig
-import io.novafoundation.nova.feature_account_api.domain.model.requireIsThreshold1
+import io.novafoundation.nova.feature_account_api.domain.model.isThreshold1
 import io.novafoundation.nova.feature_assets.R
 
 class BuySellRestrictionCheckMixin(
@@ -18,7 +18,7 @@ class BuySellRestrictionCheckMixin(
 
     override suspend fun isRestricted(): Boolean {
         val selectedAccount = accountUseCase.getSelectedMetaAccount()
-        return selectedAccount.type.isMultisig && !selectedAccount.requireIsThreshold1()
+        return selectedAccount.isMultisig() && !selectedAccount.isThreshold1()
     }
 
     override suspend fun checkRestrictionAndDo(action: () -> Unit) {
