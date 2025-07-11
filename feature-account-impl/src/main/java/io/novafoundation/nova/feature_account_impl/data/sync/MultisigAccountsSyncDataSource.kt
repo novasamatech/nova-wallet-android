@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.otherSignatories
+import io.novafoundation.nova.runtime.ext.addressScheme
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChains
@@ -99,7 +100,7 @@ private class MultisigAccountsSyncDataSource(
         }
 
         override fun isAvailableOn(chain: Chain): Boolean {
-            return chain.id in multisigChainIds
+            return chain.id in multisigChainIds && chain.addressScheme == addressScheme
         }
 
         override suspend fun addControlledAccount(

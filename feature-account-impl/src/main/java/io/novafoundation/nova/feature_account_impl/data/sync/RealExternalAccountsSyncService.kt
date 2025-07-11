@@ -273,6 +273,8 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
         var position = accountDao.nextAccountPosition()
 
+        Log.d("ExternalAccountsDiscovery", "Checking ${foundExternalAccounts.size} found external accounts against local state in ${chain.name}")
+
         foundExternalAccounts.onEach { externalAccount ->
             val controllers = controllersByAccountId[externalAccount.controllerAccountId].orEmpty()
 
