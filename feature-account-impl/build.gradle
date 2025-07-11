@@ -13,6 +13,7 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
+        buildConfigField "String", "EXTERNAL_ACCOUNTS_SYNC_URL", "\"https://subquery-account-manager-stg.novasama-tech.org/\""
     }
 
     buildTypes {
