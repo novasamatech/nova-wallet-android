@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.root.presentation.requestBusHandler
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bus.EventBus
-import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.onEachLatest
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
@@ -18,7 +17,6 @@ import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCl
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupDestructiveChangesNotAppliedWithoutRouting
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.launchIn
 
 class CloudBackupSyncRequestBusHandler(
     private val rootRouter: RootRouter,

@@ -13,7 +13,6 @@ import io.novafoundation.nova.app.root.presentation.requestBusHandler.PushSettin
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.RequestBusHandler
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
