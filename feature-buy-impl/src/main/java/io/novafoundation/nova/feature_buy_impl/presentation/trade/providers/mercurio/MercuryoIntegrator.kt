@@ -62,11 +62,15 @@ class MercuryoIntegrator(
         val tradeFlow: TradeTokenRegistry.TradeType
     )
 
-    override suspend fun run(using: WebView) = withContext(Dispatchers.Main) {
-        using.webViewClient = webViewClient
+    override suspend fun run(using: WebView) {
+        withContext(Dispatchers.Main) {
+            using.webViewClient = webViewClient
 
-        val link = withContext(Dispatchers.IO) { createLink() }
-        using.loadUrl(link)
+            runCatching {
+                val link = withContext(Dispatchers.IO) { createLink() }
+                using.loadUrl(link)
+            }
+        }
     }
 
     private suspend fun createLink(): String {
