@@ -46,7 +46,7 @@ class MultisigSignerFactory @Inject constructor(
             multisigSigningPresenter = multisigSigningPresenter,
             multisigAccount = metaAccount,
 
-        )
+            )
     }
 }
 
@@ -151,8 +151,7 @@ class MultisigSigner(
                 }
             }
             .onFailure {
-                multisigSigningPresenter.presentValidationException(it)
-                throw SigningCancelledException()
+                throw it
             }
     }
 

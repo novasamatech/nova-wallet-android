@@ -80,13 +80,6 @@ class RealProxySigningPresenter @Inject constructor(
         )
     }
 
-    override suspend fun presentValidationException(exception: Throwable) {
-        nestedSigningPresenter.presentValidationFailure(
-            resourceManager.getString(R.string.common_error_general_title),
-            exception.message ?: resourceManager.getString(R.string.common_undefined_error_message)
-        )
-    }
-
     private fun formatSubtitleForWarning(proxyMetaAccount: MetaAccount): CharSequence {
         val subtitle = resourceManager.getString(R.string.proxy_signing_warning_message)
         val primaryColor = resourceManager.getColor(R.color.text_primary)

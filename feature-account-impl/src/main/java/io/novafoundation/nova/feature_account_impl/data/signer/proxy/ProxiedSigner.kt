@@ -141,16 +141,6 @@ class ProxiedSigner(
         )
 
         val requestBusPayload = ProxyExtrinsicValidationRequestBus.Request(validationPayload)
-        val validationResponse = proxyExtrinsicValidationEventBus.handle(requestBusPayload)
-
-        val validationStatus = validationResponse.validationResult.getOrNull()
-        if (validationStatus is ValidationStatus.NotValid && validationStatus.reason is ProxyNotEnoughFee) {
-            val reason = validationStatus.reason as ProxyNotEnoughFee
-            proxySigningPresenter.notEnoughFee(reason.metaAccount, reason.asset, reason.availableBalance, reason.fee)
-
-            throw SigningCancelledException()
-        }
-
         proxyExtrinsicValidationEventBus.handle(requestBusPayload)
             .validationResult
             .onSuccess {
@@ -162,9 +152,7 @@ class ProxiedSigner(
                 }
             }
             .onFailure {
-                proxySigningPresenter.presentValidationException(it)
-
-                throw SigningCancelledException()
+                throw it
             }
     }
 
