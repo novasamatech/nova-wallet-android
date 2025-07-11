@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.data.sync
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 internal interface ExternalAccountsSyncDataSource {
 
@@ -59,13 +57,6 @@ internal interface ExternalControllableAccount {
      * This might be used by certain data-sources to understand whether control of such account is actually possible
      */
     fun dispatchChangesOriginFilters(): Boolean
-
-    sealed class Availability {
-
-        data class Universal(val addressScheme: AddressScheme) : Availability()
-
-        data class SingleChain(val chainId: ChainId) : Availability()
-    }
 }
 
 internal interface ExternalSourceCreatedAccount {
