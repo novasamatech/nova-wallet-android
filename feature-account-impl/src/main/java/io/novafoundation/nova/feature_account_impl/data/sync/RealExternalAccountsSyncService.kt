@@ -209,7 +209,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
                 val externalAccountsAvailableOnChain = externalAccounts.filter { it.isAvailableOn(chain) }
 
-                val (added, reachableExistingMetaIds)  = addNewExternalAccounts(
+                val (added, reachableExistingMetaIds) = addNewExternalAccounts(
                     allAccounts = allAccountsAvailableOnChain,
                     directlyControlledAccounts = directAccountsAvailableOnChain,
                     foundExternalAccounts = externalAccountsAvailableOnChain,

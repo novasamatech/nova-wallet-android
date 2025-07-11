@@ -17,7 +17,7 @@ enum class AddressScheme {
 
     companion object {
         fun findFromAccountId(accountId: AccountId): AddressScheme? {
-            return when(accountId.size) {
+            return when (accountId.size) {
                 32 -> SUBSTRATE
                 20 -> EVM
                 else -> null

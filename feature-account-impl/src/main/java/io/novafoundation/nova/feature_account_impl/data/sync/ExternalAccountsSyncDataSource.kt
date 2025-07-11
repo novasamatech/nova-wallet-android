@@ -14,7 +14,7 @@ internal interface ExternalAccountsSyncDataSource {
 
     interface Factory {
 
-       suspend fun create(): ExternalAccountsSyncDataSource
+        suspend fun create(): ExternalAccountsSyncDataSource
     }
 
     fun supportedChains(): Collection<Chain>
@@ -62,9 +62,9 @@ internal interface ExternalControllableAccount {
 
     sealed class Availability {
 
-        data class Universal(val addressScheme: AddressScheme): Availability()
+        data class Universal(val addressScheme: AddressScheme) : Availability()
 
-        data class SingleChain(val chainId: ChainId): Availability()
+        data class SingleChain(val chainId: ChainId) : Availability()
     }
 }
 

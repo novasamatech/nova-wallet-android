@@ -28,5 +28,3 @@ class FindProxiesRequest(
         }
     """.trimIndent()
 }
-
-

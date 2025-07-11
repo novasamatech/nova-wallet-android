@@ -14,7 +14,6 @@ interface FindProxiesApi {
         const val PROXY_SYNC_URL = BuildConfig.EXTERNAL_ACCOUNTS_SYNC_URL
     }
 
-
     @POST(PROXY_SYNC_URL)
     suspend fun findProxies(@Body body: FindProxiesRequest): SubQueryResponse<FindProxiesResponse>
 }
