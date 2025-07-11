@@ -33,7 +33,7 @@ class RealBalanceHoldsRepository(
                 Log.d(LOG_TAG, "chainHasHoldId for $chainId: $it")
             }
         }
-            .onFailure {  Log.w(LOG_TAG, "Failed to get hold reason type", it) }
+            .onFailure { Log.w(LOG_TAG, "Failed to get hold reason type", it) }
             .getOrDefault(false)
     }
 
