@@ -7,22 +7,22 @@ import io.novafoundation.nova.feature_account_api.data.multisig.validation.Multi
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationRequestBus.ValidationResponse
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationSystem
 import io.novafoundation.nova.feature_wallet_api.domain.validation.MultisigExtrinsicValidationFactory
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 
 class MultisigExtrinsicValidationRequestBusHandler(
-    private val scope: RootScope,
     private val multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus,
     private val multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
 ) : RequestBusHandler {
 
-    override fun observe() {
-        multisigExtrinsicValidationRequestBus.observeEvent()
+    override fun observe(): Flow<*> {
+        return multisigExtrinsicValidationRequestBus.observeEvent()
             .observeBusEvent { request ->
                 val validationResult = createValidationSystem()
                     .validate(request.validationPayload)
 
                 ValidationResponse(validationResult)
-            }.launchIn(scope)
+            }
     }
 
     private fun createValidationSystem(): MultisigExtrinsicValidationSystem {

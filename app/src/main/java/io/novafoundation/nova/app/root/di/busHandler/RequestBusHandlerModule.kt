@@ -32,12 +32,10 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun providePushSettingsSyncRequestBusHandler(
-        scope: RootScope,
         metaAccountChangesEventBus: MetaAccountChangesEventBus,
         pushNotificationsInteractor: PushNotificationsInteractor
     ): RequestBusHandler {
         return PushSettingsSyncRequestBusHandler(
-            scope,
             metaAccountChangesEventBus,
             pushNotificationsInteractor
         )
@@ -47,12 +45,10 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun provideProxyExtrinsicValidationRequestBusHandler(
-        scope: RootScope,
         proxyProxyExtrinsicValidationRequestBus: ProxyExtrinsicValidationRequestBus,
         proxyHaveEnoughFeeValidationFactory: ProxyHaveEnoughFeeValidationFactory
     ): RequestBusHandler {
         return ProxyExtrinsicValidationRequestBusHandler(
-            scope,
             proxyProxyExtrinsicValidationRequestBus,
             proxyHaveEnoughFeeValidationFactory
         )
@@ -62,12 +58,10 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun provideMultisigExtrinsicValidationRequestBusHandler(
-        scope: RootScope,
         multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus,
         multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
     ): RequestBusHandler {
         return MultisigExtrinsicValidationRequestBusHandler(
-            scope,
             multisigExtrinsicValidationRequestBus,
             multisigExtrinsicValidationFactory
         )
@@ -77,7 +71,6 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun provideCloudBackupSyncRequestBusHandler(
-        scope: RootScope,
         rootRouter: RootRouter,
         resourceManager: ResourceManager,
         metaAccountChangesEventBus: MetaAccountChangesEventBus,
@@ -88,7 +81,6 @@ class RequestBusHandlerModule {
     ): RequestBusHandler {
         return CloudBackupSyncRequestBusHandler(
             rootRouter,
-            scope,
             resourceManager,
             metaAccountChangesEventBus,
             applyLocalSnapshotToCloudBackupUseCase,
