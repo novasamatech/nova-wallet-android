@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.repository
 import android.util.Log
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.balances
+import io.novafoundation.nova.common.utils.getOrNull
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
@@ -26,10 +27,14 @@ class RealBalanceHoldsRepository(
 ) : BalanceHoldsRepository {
 
     override suspend fun chainHasHoldId(chainId: ChainId, holdId: BalanceHold.HoldId): Boolean {
-        val holdReasonType = getHoldReasonType(chainId) ?: return false
-        return holdReasonType.hasHoldId(holdId).also {
-            Log.d(LOG_TAG, "chainHasHoldId for $chainId: $it")
+        return runCatching {
+            val holdReasonType = getHoldReasonType(chainId) ?: return false
+            holdReasonType.hasHoldId(holdId).also {
+                Log.d(LOG_TAG, "chainHasHoldId for $chainId: $it")
+            }
         }
+            .onFailure {  Log.w(LOG_TAG, "Failed to get hold reason type", it) }
+            .getOrDefault(false)
     }
 
     override suspend fun observeBalanceHolds(metaInt: Long, chainAsset: Chain.Asset): Flow<List<BalanceHold>> {
@@ -50,22 +55,18 @@ class RealBalanceHoldsRepository(
     }
 
     private fun DictEnum.hasHoldId(holdId: BalanceHold.HoldId): Boolean {
-        val moduleReasons = get(holdId.module) as? DictEnum ?: return false
+        val moduleReasons = getOrNull(holdId.module) as? DictEnum ?: return false
         return moduleReasons[holdId.reason] != null
     }
 
     private suspend fun getHoldReasonType(chainId: ChainId): DictEnum? {
-        return runCatching {
-            val runtime = chainRegistry.getRuntime(chainId)
+        val runtime = chainRegistry.getRuntime(chainId)
 
-            val storage = runtime.metadata.balances().storageOrNull("Holds") ?: return null
-            val storageReturnType = storage.type.value as Vec
+        val storage = runtime.metadata.balances().storageOrNull("Holds") ?: return null
+        val storageReturnType = storage.type.value as Vec
 
-            storageReturnType
-                .innerType<Struct>()!!
-                .get<DictEnum>("id")
-        }.onFailure {
-            Log.w(LOG_TAG, "Failed to get hold reason type", it)
-        }.getOrNull()
+        return storageReturnType
+            .innerType<Struct>()!!
+            .get<DictEnum>("id")
     }
 }
