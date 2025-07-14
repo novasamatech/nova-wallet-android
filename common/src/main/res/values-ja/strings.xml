@@ -77,6 +77,7 @@
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
+    <string name="account_ledger_import_start_guide">Ledger接続ガイド</string>
     <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使ってLedgerデバイスに%sを確実にしてください</string>
     <string name="account_ledger_import_start_step_1_highlighted">ネットワークアプリがインストールされている</string>
     <string name="account_ledger_import_start_step_2">あなたのLedgerデバイス上の%s</string>
@@ -87,12 +88,14 @@
     <string name="account_ledger_import_start_step_4_highlighted">アカウントを選択</string>
     <string name="account_ledger_import_start_step_otg">%s を電話の設定で</string>
     <string name="account_ledger_import_start_step_otg_highlighted">OTGを有効にする</string>
+    <string name="account_ledger_import_start_title">Ledgerを接続</string>
     <string name="account_ledger_legacy_warning_message">操作にサインしてアカウントを新しいGeneric Ledgerアプリに移行するには、Migrationアプリをインストールして開いてください。Legacy OldおよびMigration Ledgerアプリは将来サポートされなくなります。</string>
     <string name="account_ledger_legacy_warning_title">新しいLedgerアプリがリリースされました</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migrationアプリは近い将来使用できなくなります。新しいLedgerアプリにアカウントを移行して資金を失わないようにしてください。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_legacy">レジャー・レガシー</string>
     <string name="account_ledger_select_device_all_description">LedgerをBluetoothで使用する場合は、両方のデバイスでBluetoothを有効にし、NovaにBluetoothおよび位置情報の権限を付与してください。USBの場合は、電話の設定でOTGを有効にしてください。</string>
     <string name="account_ledger_select_device_description">電話の設定とLedgerデバイスでBluetoothを有効にしてください。Ledgerデバイスを解除し、%sアプリを開いてください。</string>
     <string name="account_ledger_select_device_title">Ledgerデバイスを選択</string>

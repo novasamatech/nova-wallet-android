@@ -40,6 +40,7 @@ class MultisigPendingOperationsViewModel(
             val account = account.first()
 
             operations
+                .sortedByDescending { it.timestamp }
                 .groupBy { it.timestamp.inWholeDays }
                 .toSortedMap(Comparator.reverseOrder())
                 .toListWithHeaders(
