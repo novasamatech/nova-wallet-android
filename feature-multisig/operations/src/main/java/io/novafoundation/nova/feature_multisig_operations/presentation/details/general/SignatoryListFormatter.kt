@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.general
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountModel
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
@@ -20,28 +21,37 @@ class SignatoryListFormatter(
 ) {
 
     private class FormattingContext(
-        val metaAccountByAccountIds: Map<AccountIdKey, MetaAccount>,
-        val metaAccountsMetaId: Map<Long, MetaAccount>,
+        val currentSignatoryAccountId: AccountIdKey,
+        val currentSignatory: MetaAccount,
+        val metaAccountByAccountIds: GroupedList<AccountIdKey, MetaAccount>,
+        val metaAccountsByMetaId: Map<Long, MetaAccount>,
         val approvals: Set<AccountIdKey>
     ) {
 
-        fun account(accountId: AccountIdKey): MetaAccount? = metaAccountByAccountIds
-            .filter { (key, _) -> accountId == key }
-            .values
-            .findRelevantAccountToShow()
+        /**
+         * We try to show the most relevant account to user.
+         * For signatory account that associated with current multisig account we like to show the same account
+         */
+        fun account(accountId: AccountIdKey): MetaAccount? {
+            if (currentSignatoryAccountId == accountId) return currentSignatory
 
-        fun account(metaId: Long) = metaAccountsMetaId[metaId]
+            return metaAccountByAccountIds[accountId]
+                ?.findRelevantAccountToShow()
+        }
+
+        fun account(metaId: Long) = metaAccountsByMetaId[metaId]
 
         fun isApprovedBy(accountId: AccountIdKey): Boolean = accountId in approvals
     }
 
     suspend fun formatSignatories(
         chain: Chain,
+        currentSignatory: MetaAccount,
         signatories: Map<AccountIdKey, AccountModel>,
         approvals: Set<AccountIdKey>
     ): List<SignatoryRvItem> {
         val metaAccounts = accountInteractor.getActiveMetaAccounts()
-        val formattingContext = formattingContext(chain, metaAccounts, approvals)
+        val formattingContext = formattingContext(chain, currentSignatory, metaAccounts, approvals)
 
         return signatories.map { (signatoryAccountId, signatoryAccountModel) ->
             val maybeMetaAccount = formattingContext.account(signatoryAccountId)
@@ -53,14 +63,25 @@ class SignatoryListFormatter(
         }
     }
 
-    private fun formattingContext(chain: Chain, metaAccounts: List<MetaAccount>, approvals: Set<AccountIdKey>): FormattingContext {
+    private fun formattingContext(
+        chain: Chain,
+        currentSignatory: MetaAccount,
+        metaAccounts: List<MetaAccount>,
+        approvals: Set<AccountIdKey>
+    ): FormattingContext {
         val metaAccountsByAccountIds = metaAccounts
             .filter { it.hasAccountIn(chain) }
-            .associateBy { it.requireAccountIdKeyIn(chain) }
+            .groupBy { it.requireAccountIdKeyIn(chain) }
 
         val metaAccountsByMetaIds = metaAccounts.associateBy { it.id }
 
-        return FormattingContext(metaAccountsByAccountIds, metaAccountsByMetaIds, approvals)
+        return FormattingContext(
+            currentSignatory.requireAccountIdKeyIn(chain),
+            currentSignatory,
+            metaAccountsByAccountIds,
+            metaAccountsByMetaIds,
+            approvals
+        )
     }
 
     private suspend fun MetaAccount.formatSubtitle(context: FormattingContext): CharSequence? = when (this) {

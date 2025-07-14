@@ -143,12 +143,14 @@ class MultisigOperationDetailsViewModel(
         .shareInBackground()
 
     val formattedSignatories = combine(
+        signatory,
         signatoryAccounts,
         operationFlow
-    ) { signatories, operation ->
+    ) { currentSignatory, allSignatories, operation ->
         signatoryListFormatter.formatSignatories(
             chain = chainFlow.first(),
-            signatories = signatories,
+            currentSignatory = currentSignatory,
+            signatories = allSignatories,
             approvals = operation.approvals.toSet()
         )
     }.withLoadingShared()
