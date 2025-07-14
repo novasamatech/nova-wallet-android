@@ -83,6 +83,7 @@ import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.action.RealActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -418,4 +419,10 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideCopyTextMixin(): CopyTextLauncher.Presentation = RealCopyTextLauncher()
+
+    @Provides
+    @ApplicationScope
+    fun actionBottomSheetLauncher(
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+    ): ActionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
 }

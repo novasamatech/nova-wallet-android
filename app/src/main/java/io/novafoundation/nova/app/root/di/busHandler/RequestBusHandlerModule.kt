@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.root.di.busHandler
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import io.novafoundation.nova.app.root.di.RootActionBottomSheetLauncher
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CloudBackupSyncRequestBusHandler
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
@@ -83,7 +82,7 @@ class RequestBusHandlerModule {
         metaAccountChangesEventBus: MetaAccountChangesEventBus,
         applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase,
         accountRepository: AccountRepository,
-        @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        actionBottomSheetLauncher: ActionBottomSheetLauncher,
         automaticInteractionGate: AutomaticInteractionGate
     ): RequestBusHandler {
         return CloudBackupSyncRequestBusHandler(

@@ -19,7 +19,6 @@ import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.observeMultisigCheck
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 
@@ -114,7 +113,6 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
     }
 
     override fun subscribe(viewModel: RootViewModel) {
-        observeMultisigCheck(viewModel.multisigRestrictionCheckMixin)
         observeActionBottomSheet(viewModel)
 
         viewModel.showConnectingBarLiveData.observe(this) { show ->

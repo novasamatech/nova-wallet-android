@@ -62,6 +62,7 @@ import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.input.chooser.ListChooserMixin
@@ -117,6 +118,8 @@ interface CommonApi {
     val splashPassedObserver: SplashPassedObserver
 
     val toggleFeatureRepository: ToggleFeatureRepository
+
+    val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
     fun copyTextMixin(): CopyTextLauncher.Presentation
 
