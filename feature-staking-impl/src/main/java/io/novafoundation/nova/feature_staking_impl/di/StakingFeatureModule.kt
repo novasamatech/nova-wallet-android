@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -75,12 +76,15 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
 import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
+import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureModule.BindsModule
 import io.novafoundation.nova.feature_staking_impl.di.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.RealStakingHoldsMigrationUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingHoldsMigrationUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -92,7 +96,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.Valida
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
@@ -138,8 +141,15 @@ import javax.inject.Named
 const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
 const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
-@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class])
+@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class, BindsModule::class])
 class StakingFeatureModule {
+
+    @Module
+    interface BindsModule {
+
+        @Binds
+        fun bindHoldsMigrationUseCase(real: RealStakingHoldsMigrationUseCase): StakingHoldsMigrationUseCase
+    }
 
     @Provides
     @FeatureScope
@@ -504,13 +514,6 @@ class StakingFeatureModule {
         sharedState: StakingSharedState,
         extrinsicService: ExtrinsicService,
     ) = PayoutInteractor(sharedState, extrinsicService)
-
-    @Provides
-    @FeatureScope
-    fun provideBondMoreInteractor(
-        sharedState: StakingSharedState,
-        extrinsicService: ExtrinsicService,
-    ) = BondMoreInteractor(extrinsicService, sharedState)
 
     @Provides
     @FeatureScope

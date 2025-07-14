@@ -28,7 +28,7 @@ class MaxActionProviderFactory(
         deductEd: Flow<Boolean> = flowOf(false)
     ): MaxActionProvider {
         return MaxActionProvider.create(viewModelScope) {
-            assetInFlow.providingMaxOf(balance)
+            assetInFlow.providingMaxOfAsync(balance)
                 .deductFee(feeLoaderMixin)
                 .deductEd(assetSourceRegistry, deductEd)
         }
