@@ -104,6 +104,7 @@ class RootViewModel(
 
     private fun observeBusEvents() {
         compoundRequestBusHandler.observe()
+            .launchIn(this)
     }
 
     private fun subscribeDeepLinkCallback() {

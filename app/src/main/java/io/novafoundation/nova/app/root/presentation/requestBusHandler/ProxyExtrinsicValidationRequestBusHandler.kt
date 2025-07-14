@@ -1,7 +1,6 @@
 package io.novafoundation.nova.app.root.presentation.requestBusHandler
 
 import io.novafoundation.nova.common.utils.bus.observeBusEvent
-import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
@@ -10,21 +9,20 @@ import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedE
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.proxyHasEnoughFeeValidation
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.Flow
 
 class ProxyExtrinsicValidationRequestBusHandler(
-    private val scope: RootScope,
     private val proxyProxyExtrinsicValidationRequestBus: ProxyExtrinsicValidationRequestBus,
     private val proxyHaveEnoughFeeValidationFactory: ProxyHaveEnoughFeeValidationFactory
 ) : RequestBusHandler {
 
-    override fun observe() {
-        proxyProxyExtrinsicValidationRequestBus.observeEvent()
+    override fun observe(): Flow<*> {
+        return proxyProxyExtrinsicValidationRequestBus.observeEvent()
             .observeBusEvent { request ->
                 val validationResult = createValidationSystem()
                     .validate(request.validationPayload)
                 ValidationResponse(validationResult)
-            }.launchIn(scope)
+            }
     }
 
     private fun createValidationSystem(): ValidationSystem<ProxiedExtrinsicValidationPayload, ProxiedExtrinsicValidationFailure> {
