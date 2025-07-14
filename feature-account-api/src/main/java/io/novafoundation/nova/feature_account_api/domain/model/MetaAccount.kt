@@ -257,7 +257,7 @@ fun LightMetaAccount.isProxied(): Boolean {
         returns(true) implies (this@isProxied is ProxiedMetaAccount)
     }
 
-    return type == LightMetaAccount.Type.PROXIED
+    return this is ProxiedMetaAccount
 }
 
 @OptIn(ExperimentalContracts::class)
@@ -266,7 +266,7 @@ fun LightMetaAccount.isMultisig(): Boolean {
         returns(true) implies (this@isMultisig is MultisigMetaAccount)
     }
 
-    return type == LightMetaAccount.Type.MULTISIG
+    return this is MultisigMetaAccount
 }
 
 
