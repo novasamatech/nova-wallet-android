@@ -160,7 +160,6 @@ fun MultisigAvailability.singleChainId(): ChainId? {
     }
 }
 
-
 fun MultisigMetaAccount.isThreshold1(): Boolean {
     return threshold == 1
 }
@@ -268,7 +267,6 @@ fun LightMetaAccount.isMultisig(): Boolean {
 
     return this is MultisigMetaAccount
 }
-
 
 fun LightMetaAccount.asProxied(): ProxiedMetaAccount = this as ProxiedMetaAccount
 fun LightMetaAccount.asMultisig(): MultisigMetaAccount = this as MultisigMetaAccount

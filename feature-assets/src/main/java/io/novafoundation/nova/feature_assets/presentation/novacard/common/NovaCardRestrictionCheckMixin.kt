@@ -2,13 +2,11 @@ package io.novafoundation.nova.feature_assets.presentation.novacard.common
 
 import io.novafoundation.nova.common.mixin.restrictions.RestrictionCheckMixin
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.doIf
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ButtonPreferences
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.asMultisig
