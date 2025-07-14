@@ -608,7 +608,7 @@ fun ByteArray.compareTo(other: ByteArray, unsigned: Boolean): Int {
         return size - other.size
     }
 
-    for (i in 0 until size) {
+    for (i in indices) {
         val result = if (unsigned) {
             this[i].toUByte().compareTo(other[i].toUByte())
         } else {
