@@ -5,7 +5,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.http.GET
 
 interface PublicIpReceiverApi {
-    @GET("https://api.ipify.org/")
+    @GET("https://api64.ipify.org//")
     suspend fun get(): String
 }
 
