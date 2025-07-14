@@ -58,7 +58,7 @@ class MultisigOperationFullDetailsViewModel(
     }.shareInBackground()
 
     val depositorAccountModel = operationFlow.map {
-        accountUIUseCase.getAccountModel(it.depositor.value, it.chain)
+        accountUIUseCase.getAccountModel(it.depositor, it.chain)
     }.withSafeLoading()
         .shareInBackground()
 
