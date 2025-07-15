@@ -54,6 +54,10 @@ class NovaCardWebViewController(
         webView.webViewClient = interceptingWebViewClient
         webView.webChromeClient = novaCardWebChromeClient
 
+        loadUrl(webView)
+    }
+
+    private fun loadUrl(webView: WebView) {
         val uri = Uri.parse(appLinksProvider.novaCardWidgetUrl).buildUpon()
             .appendQueryParameter("widget_id", widgetId)
             .appendQueryParameter("type", "sell")

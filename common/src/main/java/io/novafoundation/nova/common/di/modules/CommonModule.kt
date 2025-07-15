@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
@@ -71,6 +72,9 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
+import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
+import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
+import io.novafoundation.nova.common.utils.ip.PublicIpReceiverApi
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -419,6 +423,12 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideCopyTextMixin(): CopyTextLauncher.Presentation = RealCopyTextLauncher()
+
+    @Provides
+    @ApplicationScope
+    fun provideIpReceiver(
+        networkApiCreator: NetworkApiCreator
+    ): IpAddressReceiver = PublicIpAddressReceiver(networkApiCreator.create(PublicIpReceiverApi::class.java))
 
     @Provides
     @ApplicationScope
