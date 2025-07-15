@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_buy_api.presentation.trade.common.mercuryo
+package io.novafoundation.nova.feature_buy_impl.presentation.common
 
 import java.util.UUID
 

@@ -72,8 +72,8 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
-import io.novafoundation.nova.common.utils.ip.IpReceiver
-import io.novafoundation.nova.common.utils.ip.PublicIpReceiver
+import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
+import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpReceiverApi
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
@@ -427,5 +427,5 @@ class CommonModule {
     @ApplicationScope
     fun provideIpReceiver(
         networkApiCreator: NetworkApiCreator
-    ): IpReceiver = PublicIpReceiver(networkApiCreator.create(PublicIpReceiverApi::class.java))
+    ): IpAddressReceiver = PublicIpAddressReceiver(networkApiCreator.create(PublicIpReceiverApi::class.java))
 }

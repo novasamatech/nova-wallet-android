@@ -5,12 +5,12 @@ import kotlinx.coroutines.withContext
 import retrofit2.http.GET
 
 interface PublicIpReceiverApi {
-    @GET("https://api64.ipify.org//")
+    @GET("https://api.ipify.org//")
     suspend fun get(): String
 }
 
-class PublicIpReceiver(
+class PublicIpAddressReceiver(
     private val api: PublicIpReceiverApi
-) : IpReceiver {
+) : IpAddressReceiver {
     override suspend fun get(): String = withContext(Dispatchers.IO) { api.get() }
 }

@@ -4,11 +4,11 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.ip.IpReceiver
+import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
-import io.novafoundation.nova.feature_buy_api.presentation.trade.common.mercuryo.MercuryoSignatureFactory
+import io.novafoundation.nova.feature_buy_impl.presentation.common.MercuryoSignatureFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_impl.BuildConfig
@@ -50,8 +50,8 @@ class BuyFeatureModule {
     @Provides
     @FeatureScope
     fun provideMercuryoSignatureGenerator(
-        ipReceiver: IpReceiver
-    ): MercuryoSignatureFactory = RealMercuryoSignatureFactory(ipReceiver)
+        ipAddressReceiver: IpAddressReceiver
+    ): MercuryoSignatureFactory = RealMercuryoSignatureFactory(ipAddressReceiver)
 
     @Provides
     @FeatureScope

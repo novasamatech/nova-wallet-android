@@ -10,8 +10,8 @@ import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFact
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnSellOrderCreatedListener
 import io.novafoundation.nova.feature_buy_api.presentation.trade.common.OnTradeOperationFinishedListener
-import io.novafoundation.nova.feature_buy_api.presentation.trade.common.mercuryo.MercuryoSignatureFactory
-import io.novafoundation.nova.feature_buy_api.presentation.trade.common.mercuryo.generateMerchantTransactionId
+import io.novafoundation.nova.feature_buy_impl.presentation.common.MercuryoSignatureFactory
+import io.novafoundation.nova.feature_buy_impl.presentation.common.generateMerchantTransactionId
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.providers.WebViewIntegrationProvider

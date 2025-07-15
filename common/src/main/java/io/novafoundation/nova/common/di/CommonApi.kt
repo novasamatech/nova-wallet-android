@@ -51,7 +51,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
 import io.novafoundation.nova.common.utils.coroutines.RootScope
-import io.novafoundation.nova.common.utils.ip.IpReceiver
+import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -119,7 +119,7 @@ interface CommonApi {
 
     val toggleFeatureRepository: ToggleFeatureRepository
 
-    val ipReceiver: IpReceiver
+    val ipAddressReceiver: IpAddressReceiver
 
     fun copyTextMixin(): CopyTextLauncher.Presentation
 
