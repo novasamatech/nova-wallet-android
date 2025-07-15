@@ -4,11 +4,17 @@ import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 
 internal class CompoundExternalAccountsSyncDataSource(
     private val delegates: List<ExternalAccountsSyncDataSource>
 ) : ExternalAccountsSyncDataSource {
+
+    override fun supportedChains(): Collection<Chain> {
+        return delegates.flatMap { it.supportedChains() }
+            .distinctBy { it.id }
+    }
 
     override suspend fun isCreatedFromDataSource(metaAccount: MetaAccount): Boolean {
         return delegates.any { it.isCreatedFromDataSource(metaAccount) }

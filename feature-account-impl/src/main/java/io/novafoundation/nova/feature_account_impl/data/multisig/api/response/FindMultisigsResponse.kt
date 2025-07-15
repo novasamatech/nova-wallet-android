@@ -4,18 +4,20 @@ import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.HexString
 
 class FindMultisigsResponse(
-    val accounts: SubQueryNodes<MultisigRemote>
+    val accountMultisigs: SubQueryNodes<AccountMultisigRemote>
 )
 
-class MultisigRemote(
-    val id: HexString,
-    val threshold: Int,
-    val signatories: SubQueryNodes<SignatoryRemoteWrapper>
+class AccountMultisigRemote(
+    val multisig: MultisigRemote,
 ) {
 
-    class SignatoryRemoteWrapper(val signatory: SignatoryRemote)
+    class MultisigRemote(
+        val id: HexString,
+        val threshold: Int,
+        val signatories: SubQueryNodes<SignatoryRemote>
+    )
 
     class SignatoryRemote(
-        val id: HexString
+        val signatoryId: HexString
     )
 }

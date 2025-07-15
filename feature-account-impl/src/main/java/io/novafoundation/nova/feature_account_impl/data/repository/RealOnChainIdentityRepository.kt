@@ -1,9 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.data.repository
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.format.getAddressSchemeOrThrow
 import io.novafoundation.nova.common.address.get
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.filterNotNull
+import io.novafoundation.nova.common.utils.groupByToSet
 import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.identity
 import io.novafoundation.nova.common.utils.mapToSet
@@ -15,7 +18,9 @@ import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.bindings.bindIdentity
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.bindings.bindSuperOf
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.addressScheme
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -35,6 +40,11 @@ class RealOnChainIdentityRepository(
     private val chainRegistry: ChainRegistry
 ) : OnChainIdentityRepository {
 
+    companion object {
+
+        private val MULTICHAIN_IDENTITY_CHAINS = listOf(Chain.Geneses.POLKADOT_PEOPLE, Chain.Geneses.KUSAMA_PEOPLE)
+    }
+
     override suspend fun getIdentitiesFromIdsHex(
         chainId: ChainId,
         accountIdsHex: Collection<String>
@@ -49,14 +59,21 @@ class RealOnChainIdentityRepository(
         chainId: ChainId
     ): AccountIdKeyMap<OnChainIdentity?> = withContext(Dispatchers.Default) {
         val identityChainId = findIdentityChain(chainId)
+        val uniqueIds = accountIds.mapToSet(AccountId::intoKey)
+
+        getIdentitiesFromIdOnIdentityChain(uniqueIds, identityChainId)
+    }
+
+    private suspend fun getIdentitiesFromIdOnIdentityChain(
+        accountIds: Set<AccountIdKey>,
+        identityChainId: ChainId
+    ): AccountIdKeyMap<OnChainIdentity?> = withContext(Dispatchers.Default) {
         storageDataSource.query(identityChainId) {
             if (!runtime.metadata.hasModule(Modules.IDENTITY)) {
                 return@query emptyMap()
             }
 
-            val distinctKeys = accountIds.mapToSet(::AccountIdKey)
-
-            val superOfArguments = distinctKeys.map { listOf(it.value) }
+            val superOfArguments = accountIds.map { listOf(it.value) }
             val superOfValues = runtime.metadata.identity().storage("SuperOf").entries(
                 keysArguments = superOfArguments,
                 keyExtractor = { (accountId: AccountId) -> AccountIdKey(accountId) },
@@ -72,7 +89,7 @@ class RealOnChainIdentityRepository(
                 parentIdentity?.let { ChildIdentity(superOf.childName, it) }
             }
 
-            val leftAccountIds = distinctKeys - childIdentities.keys - parentIdentities.keys
+            val leftAccountIds = accountIds - childIdentities.keys - parentIdentities.keys
 
             val rootIdentities = fetchIdentities(leftAccountIds.toList())
 
@@ -105,6 +122,26 @@ class RealOnChainIdentityRepository(
         }
     }
 
+    override suspend fun getMultiChainIdentities(
+        accountIds: Collection<AccountIdKey>
+    ): AccountIdKeyMap<OnChainIdentity?> {
+        val accountIdsByAddressScheme = accountIds.groupByToSet { it.getAddressSchemeOrThrow() }
+        val identityChains = MULTICHAIN_IDENTITY_CHAINS.mapNotNull { chainRegistry.getChainOrNull(it) }
+
+        return buildMap {
+            identityChains.onEach { identityChain ->
+                val addressScheme = identityChain.addressScheme
+                val accountIdsPerScheme = accountIdsByAddressScheme[addressScheme] ?: return@onEach
+
+                val identities = getIdentitiesFromIdOnIdentityChain(accountIdsPerScheme, identityChain.id)
+                putAll(identities)
+
+                // Early return if we already fetched all required identities
+                if (size == accountIds.size) return@buildMap
+            }
+        }
+    }
+
     override suspend fun getIdentitiesFromAddresses(chain: Chain, accountAddresses: List<String>): AccountAddressMap<OnChainIdentity?> {
         val accountIds = accountAddresses.map(chain::accountIdOf)
 
@@ -132,8 +169,11 @@ class RealOnChainIdentityRepository(
 
     private suspend fun findIdentityChain(identitiesRequestedOn: ChainId): ChainId {
         val requestedChain = chainRegistry.getChain(identitiesRequestedOn)
-        val identityChain = requestedChain.additional?.identityChain?.let { chainRegistry.getChainOrNull(it) }
+        return findIdentityChain(requestedChain).id
+    }
 
-        return identityChain?.id ?: requestedChain.id
+    private suspend fun findIdentityChain(requestedChain: Chain): Chain {
+        val identityChain = requestedChain.additional?.identityChain?.let { chainRegistry.getChainOrNull(it) }
+        return identityChain ?: requestedChain
     }
 }

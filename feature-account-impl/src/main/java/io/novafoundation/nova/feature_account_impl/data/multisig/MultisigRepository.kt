@@ -15,10 +15,10 @@ import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.FindMultisigsApi
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.FindMultisigsRequest
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.OffChainPendingMultisigInfoRequest
+import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.AccountMultisigRemote
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.FindMultisigsResponse
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetPedingMultisigOperationsResponse
 import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetPedingMultisigOperationsResponse.OperationRemote
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.MultisigRemote
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multisigs
@@ -44,7 +44,7 @@ interface MultisigRepository {
 
     fun supportsMultisigSync(chain: Chain): Boolean
 
-    suspend fun findMultisigAccounts(chain: Chain, accountIds: Set<AccountIdKey>): List<DiscoveredMultisig>
+    suspend fun findMultisigAccounts(accountIds: Set<AccountIdKey>): List<DiscoveredMultisig>
 
     suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): Set<CallHash>
 
@@ -73,10 +73,9 @@ class RealMultisigRepository @Inject constructor(
         return chain.hasMultisigApi()
     }
 
-    override suspend fun findMultisigAccounts(chain: Chain, accountIds: Set<AccountIdKey>): List<DiscoveredMultisig> {
-        val apiConfig = chain.multisigApi() ?: return emptyList()
+    override suspend fun findMultisigAccounts(accountIds: Set<AccountIdKey>): List<DiscoveredMultisig> {
         val request = FindMultisigsRequest(accountIds)
-        return api.findMultisigs(apiConfig.url, request).toDiscoveredMultisigs()
+        return api.findMultisigs(request).toDiscoveredMultisigs()
     }
 
     override suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): Set<CallHash> {
@@ -157,19 +156,21 @@ class RealMultisigRepository @Inject constructor(
     }
 
     private fun SubQueryResponse<FindMultisigsResponse>.toDiscoveredMultisigs(): List<DiscoveredMultisig> {
-        return data.accounts.nodes.mapNotNull { multisigNode ->
+        return data.accountMultisigs.nodes.mapNotNull { multisigNode ->
+            val multisig = multisigNode.multisig
+
             DiscoveredMultisig(
-                accountId = AccountIdKey.fromHexOrNull(multisigNode.id) ?: return@mapNotNull null,
-                threshold = multisigNode.thresholdIfValid() ?: return@mapNotNull null,
-                allSignatories = multisigNode.signatories.nodes.map { signatoryNode ->
-                    AccountIdKey.fromHexOrNull(signatoryNode.signatory.id) ?: return@mapNotNull null
+                accountId = AccountIdKey.fromHexOrNull(multisig.id) ?: return@mapNotNull null,
+                threshold = multisig.thresholdIfValid() ?: return@mapNotNull null,
+                allSignatories = multisig.signatories.nodes.map { signatoryNode ->
+                    AccountIdKey.fromHexOrNull(signatoryNode.signatoryId) ?: return@mapNotNull null
                 }
             )
         }
     }
 
-    private fun MultisigRemote.thresholdIfValid(): Int? {
-        // TODO there is a but on SubQuery that results in threshold=0 for threshold 1 multisigs
+    private fun AccountMultisigRemote.MultisigRemote.thresholdIfValid(): Int? {
+        // Just to be sure we do not insert some invalid data
         return threshold.takeIf { it >= 1 }
     }
 
