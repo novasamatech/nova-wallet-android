@@ -87,6 +87,7 @@ import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.action.RealActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -428,4 +429,10 @@ class CommonModule {
     fun provideIpReceiver(
         networkApiCreator: NetworkApiCreator
     ): IpAddressReceiver = PublicIpAddressReceiver(networkApiCreator.create(PublicIpReceiverApi::class.java))
+
+    @Provides
+    @ApplicationScope
+    fun actionBottomSheetLauncher(
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+    ): ActionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
 }

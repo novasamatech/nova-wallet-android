@@ -21,7 +21,9 @@ import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
@@ -32,6 +34,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.findExplicitOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.signer
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliasesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.getGenesisHashOrThrow
@@ -94,6 +97,11 @@ val SS58Encoder.GENERIC_ADDRESS_PREFIX: Short
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
 fun StorageEntry.defaultInHex() = default.toHexString(withPrefix = true)
+
+fun DictEnum.getOrNull(name: String): Type<*>? {
+    val element = elements.values.find { it.name == name } ?: return null
+    return element.value.skipAliasesOrNull()?.value
+}
 
 fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.runtimeConfiguration.addressByte)
 

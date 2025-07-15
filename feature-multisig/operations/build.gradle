@@ -68,6 +68,8 @@ dependencies {
     testImplementation jUnitDep
     testImplementation mockitoDep
 
+    implementation shimmerDep
+
     implementation gsonDep
 
     implementation insetterDep

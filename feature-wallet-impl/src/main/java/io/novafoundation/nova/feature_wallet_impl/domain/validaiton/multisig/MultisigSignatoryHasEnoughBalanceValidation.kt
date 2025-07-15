@@ -24,7 +24,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.balance.tryRe
 import io.novafoundation.nova.feature_wallet_api.domain.validation.balance.tryWithdrawFee
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class MultisigSignatoryHasEnoughBalanceValidation(
     private val assetSourceRegistry: AssetSourceRegistry,
@@ -36,7 +35,7 @@ class MultisigSignatoryHasEnoughBalanceValidation(
         val chain = value.chain
         val chainAsset = chain.utilityAsset
 
-        val fee = calculateFee(value)
+        val fee = calculateFeeForMode(value)
         val deposit = determineNeededDeposit(value)
 
         var balanceValidation = assetSourceRegistry.sourceFor(chainAsset).balance
@@ -55,11 +54,11 @@ class MultisigSignatoryHasEnoughBalanceValidation(
         return balanceValidation.toValidationStatus { prepareError(value, fee, deposit, it) }
     }
 
-    private suspend fun calculateFee(payload: MultisigExtrinsicValidationPayload): Fee? {
-        return when (val mode = payload.signatoryFeePaymentMode) {
+    private suspend fun calculateFeeForMode(payload: MultisigExtrinsicValidationPayload): Fee? {
+        return when (payload.signatoryFeePaymentMode) {
             SignatoryFeePaymentMode.NothingToPay -> null
 
-            is SignatoryFeePaymentMode.PaysSubmissionFee -> calculateFee(payload, mode.actualCall)
+            is SignatoryFeePaymentMode.PaysSubmissionFee -> calculateFee(payload)
         }
     }
 
@@ -83,9 +82,9 @@ class MultisigSignatoryHasEnoughBalanceValidation(
         ).validationError()
     }
 
-    private suspend fun calculateFee(value: MultisigExtrinsicValidationPayload, signatoryCall: GenericCall.Instance): Fee {
+    private suspend fun calculateFee(value: MultisigExtrinsicValidationPayload): Fee {
         return extrinsicService.estimateFee(value.chain, value.multisig.intoOrigin()) {
-            call(signatoryCall)
+            call(value.callInsideAsMulti)
         }
     }
 }

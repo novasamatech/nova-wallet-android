@@ -17,6 +17,8 @@ import io.novasama.substrate_sdk_android.extensions.toAccountId
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
 class MetaAccountOrdering(
     val id: Long,
@@ -248,8 +250,26 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
     }
 }
 
-val LightMetaAccount.Type.isProxied: Boolean
-    get() = this == LightMetaAccount.Type.PROXIED
+@OptIn(ExperimentalContracts::class)
+fun LightMetaAccount.isProxied(): Boolean {
+    contract {
+        returns(true) implies (this@isProxied is ProxiedMetaAccount)
+    }
+
+    return this is ProxiedMetaAccount
+}
+
+@OptIn(ExperimentalContracts::class)
+fun LightMetaAccount.isMultisig(): Boolean {
+    contract {
+        returns(true) implies (this@isMultisig is MultisigMetaAccount)
+    }
+
+    return this is MultisigMetaAccount
+}
+
+fun LightMetaAccount.asProxied(): ProxiedMetaAccount = this as ProxiedMetaAccount
+fun LightMetaAccount.asMultisig(): MultisigMetaAccount = this as MultisigMetaAccount
 
 fun MultisigMetaAccount.signatoriesCount() = 1 + otherSignatories.size
 

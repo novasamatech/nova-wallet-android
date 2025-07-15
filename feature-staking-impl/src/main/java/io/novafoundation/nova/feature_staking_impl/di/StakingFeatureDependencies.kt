@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -133,6 +134,8 @@ interface StakingFeatureDependencies {
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     val assetSourceRegistry: AssetSourceRegistry
+
+    val balanceHoldsRepository: BalanceHoldsRepository
 
     fun contextManager(): ContextManager
 
