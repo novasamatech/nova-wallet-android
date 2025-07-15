@@ -96,7 +96,7 @@ class VersionService(
         } else {
             context.packageManager.getPackageInfo(context.packageName, 0)
         }
-        return packageInfo.versionName.toVersion()
+        return packageInfo.versionName!!.toVersion()
     }
 
     private fun String.toVersion(): Version {

@@ -12,5 +12,5 @@ internal class OSAppVersionProvider(
 ) : AppVersionProvider {
 
     override val versionName: String
-        get() = appContext.packageManager.getPackageInfo(appContext.packageName, 0).versionName
+        get() = appContext.packageManager.getPackageInfo(appContext.packageName, 0).versionName!!
 }

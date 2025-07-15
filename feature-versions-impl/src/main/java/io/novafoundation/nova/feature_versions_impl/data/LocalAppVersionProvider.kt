@@ -19,6 +19,6 @@ class PackageManagerAppVersionProvider(
         } else {
             context.packageManager.getPackageInfo(context.packageName, 0)
         }
-        return packageInfo.versionName
+        return packageInfo.versionName!!
     }
 }
