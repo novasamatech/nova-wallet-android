@@ -576,7 +576,6 @@ private fun Byte.convertToExternalCompatibleVByte(): Byte {
     throw IllegalArgumentException("Invalid vByte: $this")
 }
 
-
 // Web3j supports only one format - when vByte is between [27..34]
 // However, there is a second format - when vByte is between [0..7] - e.g. Ledger and Parity Signer
 private fun Byte.convertToWeb3jCompatibleVByte(): Byte {
