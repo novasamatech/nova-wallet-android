@@ -92,7 +92,6 @@ private fun bindGeneralKey(instance: Any?): HexString {
     return keyBytes.toHexString(withPrefix = true)
 }
 
-
 private fun bindAccountIdJunction(instance: Any?, accountIdKey: String): AccountIdKey {
     val asStruct = instance.castToStruct()
 
