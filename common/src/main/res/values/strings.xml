@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>-->
+    <string name="push_wallets_title">Select up to %d wallets to be notified when wallet has activity</string>
+
     <string name="push_settings_multisig_operations">Multisig transactions</string>
 
     <string name="proxied_card_not_supported_title">Debit Card is not supported for this Proxied wallet</string>
@@ -821,7 +824,6 @@
     <string name="common_clear">Clear</string>
 
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
-    <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
 
     <string name="push_settings_staking_rewards">Staking rewards</string>
     <string name="push_settings_others">Others</string>

@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 private const val MIN_WALLETS = 1
-private const val MAX_WALLETS = 3
+private const val MAX_WALLETS = 5
 
 class PushSettingsViewModel(
     private val router: PushNotificationsRouter,
@@ -162,7 +162,7 @@ class PushSettingsViewModel(
     fun walletsClicked() {
         walletRequester.openRequest(
             SelectMultipleWalletsRequester.Request(
-                titleText = resourceManager.getString(R.string.push_wallets_title),
+                titleText = resourceManager.getString(R.string.push_wallets_title, MAX_WALLETS),
                 currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
                 min = MIN_WALLETS,
                 max = MAX_WALLETS
