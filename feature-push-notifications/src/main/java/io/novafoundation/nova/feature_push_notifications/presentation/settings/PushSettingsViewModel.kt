@@ -82,6 +82,9 @@ class PushSettingsViewModel(
     val pushReceivedTokens = pushSettingsState.mapNotNull { it?.receivedTokensEnabled }
         .distinctUntilChanged()
 
+    val pushMultisigTransactions = pushSettingsState.mapNotNull { it?.multisigTransactionsEnabled }
+        .distinctUntilChanged()
+
     val pushGovernanceState = pushSettingsState.mapNotNull { it }
         .map { resourceManager.formatBooleanToState(it.isGovEnabled()) }
         .distinctUntilChanged()
@@ -177,6 +180,10 @@ class PushSettingsViewModel(
 
     fun receivedTokensClicked() {
         pushSettingsState.updateValue { it?.copy(receivedTokensEnabled = !it.receivedTokensEnabled) }
+    }
+
+    fun multisigOperationsClicked() {
+        pushSettingsState.updateValue { it?.copy(multisigTransactionsEnabled = !it.multisigTransactionsEnabled) }
     }
 
     fun governanceClicked() {

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="push_settings_multisig_operations">Multisig transactions</string>
+
     <string name="proxied_card_not_supported_title">Debit Card is not supported for this Proxied wallet</string>
     <string name="proxied_card_not_supported_message">To manage your Debit Card, please switch to a different wallet with Polkadot network.</string>
 

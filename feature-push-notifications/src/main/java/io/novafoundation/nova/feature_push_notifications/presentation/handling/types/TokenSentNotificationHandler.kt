@@ -38,7 +38,7 @@ class TokenSentNotificationHandler(
     private val accountRepository: AccountRepository,
     private val tokenRepository: TokenRepository,
     override val chainRegistry: ChainRegistry,
-    private val configurator: io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator,
+    private val configurator: AssetDetailsDeepLinkConfigurator,
     activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,
     gson: Gson,
@@ -51,8 +51,7 @@ class TokenSentNotificationHandler(
     notificationManager,
     resourceManager,
     channel = NovaNotificationChannel.TRANSACTIONS
-),
-    PushChainRegestryHolder {
+), PushChainRegestryHolder {
 
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()

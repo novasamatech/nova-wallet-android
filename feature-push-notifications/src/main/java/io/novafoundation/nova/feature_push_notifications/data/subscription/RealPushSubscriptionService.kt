@@ -165,7 +165,8 @@ class RealPushSubscriptionService(
             "notifications" to mapOfNotNullValues(
                 "stakingReward" to mapToFirestoreChainFeature(settings.stakingReward),
                 "tokenSent" to settings.sentTokensEnabled.mapToFirestoreChainFeatureOrNull(),
-                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull()
+                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull(),
+                "multisigOperations" to settings.multisigTransactionsEnabled.mapToFirestoreChainFeatureOrNull()
             )
         )
     }
