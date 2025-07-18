@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="multisig_notification_rejected_transaction_title">Transaction rejected</string>
+    <string name="multisig_notification_rejected_transaction_message">Rejected by: %s.</string>
+
+    <string name="multisig_notification_executed_transaction_title">Transaction executed</string>
+    <string name="multisig_notification_executed_transaction_message">Signed and executed by: %s.</string>
+
+    <string name="multisig_notification_new_approval_title_additional_message">%d of %d signatures collected.</string>
+    <string name="multisig_notification_new_approval_title">%s signed transaction</string>
+
+    <string name="multisig_notification_init_transaction_title">Your signature requested</string>
+    <string name="multisig_notification_init_transaction_message_transfer">%1$s → %2$s on %3$s.</string>
+    <string name="multisig_notification_init_transaction_message">%s on %s.</string>
+    <string name="multisig_notification_executed_transaction_message_header">Signed and executed by: %s.</string>
+    <string name="multisig_notification_review_footer">👉 Open app to review.</string>
+    <string name="multisig_notification_sign_footer">👉 Open app to sign.</string>
+    <string name="multisig_notification_message_header">Wallet: %s</string>
+
+    <string name="multisigs_notification_channel_name">Multisig Transactions Notification Channel</string>
+    <string name="multisigs_notification_channel_id" translatable="false">multisigs_notification_channel_id</string>
+
     <!--<string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>-->
     <string name="push_wallets_title">Select up to %d wallets to be notified when wallet has activity</string>
 

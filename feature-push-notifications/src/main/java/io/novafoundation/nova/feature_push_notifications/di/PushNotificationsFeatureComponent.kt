@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsCommunicator
@@ -61,7 +62,8 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
             AccountFeatureApi::class,
             GovernanceFeatureApi::class,
             WalletFeatureApi::class,
-            AssetsFeatureApi::class
+            AssetsFeatureApi::class,
+            MultisigOperationsFeatureApi::class
         ]
     )
     interface PushNotificationsFeatureDependenciesComponent : PushNotificationsFeatureDependencies

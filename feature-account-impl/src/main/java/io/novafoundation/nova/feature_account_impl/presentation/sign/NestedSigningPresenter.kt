@@ -48,7 +48,8 @@ class RealNestedSigningPresenter @Inject constructor(
             return@withContext true
         }
 
-        val resumingAllowed = suspendCoroutine { continuation ->
+        val resumingAllowed = suspendCoroutine {
+                continuation ->
             NestedSignWarningBottomSheet(
                 context = contextManager.requireActivity(),
                 title = title(),

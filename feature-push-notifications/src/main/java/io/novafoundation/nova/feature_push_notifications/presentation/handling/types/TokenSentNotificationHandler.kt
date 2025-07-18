@@ -51,7 +51,8 @@ class TokenSentNotificationHandler(
     notificationManager,
     resourceManager,
     channel = NovaNotificationChannel.TRANSACTIONS
-), PushChainRegestryHolder {
+),
+    PushChainRegestryHolder {
 
     override suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean {
         val content = message.getMessageContent()

@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.common.utils.splitAndCapitalizeWords
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -69,6 +70,22 @@ class RealMultisigCallFormatter @Inject constructor(
             formatDefault = { formatDefaultDetails(it) },
             formatSpecific = { delegate, callVisit -> delegate.formatDetails(callVisit, chain) },
             constructFinalResult = { delegateResult, onBehalfOf -> createCallDetails(delegateResult, onBehalfOf) }
+        )
+    }
+
+    override suspend fun formatPushNotificationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): String {
+        return formatCall(
+            call = call,
+            initialOrigin = initialOrigin,
+            chain = chain,
+            formatUnknown = { formatUnknownPushNotification(chain) },
+            formatDefault = { formatDefaultPushNotification(chain, it) },
+            formatSpecific = { delegate, callVisit -> delegate.formatPushNotificationMessage(callVisit, chain) },
+            constructFinalResult = { delegateResult, _ -> delegateResult }
         )
     }
 
@@ -215,6 +232,22 @@ class RealMultisigCallFormatter @Inject constructor(
             primaryAmount = null,
             tableEntries = emptyList(),
             onBehalfOf = null
+        )
+    }
+
+    private fun formatUnknownPushNotification(chain: Chain): String {
+        return resourceManager.getString(
+            R.string.multisig_notification_init_transaction_message,
+            resourceManager.getString(R.string.multisig_operations_unknown_calldata),
+            chain.name
+        )
+    }
+
+    private fun formatDefaultPushNotification(chain: Chain, call: GenericCall.Instance): String {
+        return resourceManager.getString(
+            R.string.multisig_notification_init_transaction_message,
+            "${call.module.name.capitalize()} ${call.function.name.capitalize()}",
+            chain.name
         )
     }
 }

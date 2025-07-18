@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -91,6 +92,7 @@ interface RootComponent {
             BuyFeatureApi::class,
             DeepLinkingFeatureApi::class,
             AccountMigrationFeatureApi::class,
+            MultisigOperationsFeatureApi::class,
         ]
     )
     interface RootFeatureDependenciesComponent : RootDependencies

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_push_notifications.data.settings.model
 
-import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.chain.ChainFeatureCacheV1
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.chain.toDomain
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.governance.GovernanceStateCacheV1
@@ -34,5 +33,4 @@ class PushSettingsCacheV1(
             governance = governance.mapValues { (_, value) -> value.toDomain() }
         )
     }
-
 }
