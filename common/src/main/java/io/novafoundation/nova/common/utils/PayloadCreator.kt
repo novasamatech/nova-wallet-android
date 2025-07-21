@@ -3,7 +3,6 @@ package io.novafoundation.nova.common.utils
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
-import io.novafoundation.nova.common.base.BaseFragment
 
 const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
