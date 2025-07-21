@@ -62,13 +62,3 @@ fun <T> List<T>.rangeCheck(fromIndex: Int, toIndex: Int) {
         toIndex > size -> throw IndexOutOfBoundsException("toIndex ($toIndex) is greater than size ($size).")
     }
 }
-
-fun <T> Collection<T>.associateByOrNull(keySelector: (T) -> Any?): Map<Any, T> {
-    val result = LinkedHashMap<Any, T>()
-    for (element in this) {
-        keySelector(element)?.let { key ->
-            result[key] = element
-        }
-    }
-    return result
-}
