@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.view.bottomSheet.action
 
 import androidx.annotation.DrawableRes
+import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.PrimaryButton
 
 class ActionBottomSheetPayload(
@@ -9,6 +10,7 @@ class ActionBottomSheetPayload(
     val subtitle: CharSequence,
     val actionButtonPreferences: ButtonPreferences,
     val neutralButtonPreferences: ButtonPreferences? = null,
+    val alertModel: AlertModel? = null,
     val checkBoxPreferences: CheckBoxPreferences? = null
 )
 
