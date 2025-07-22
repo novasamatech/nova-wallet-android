@@ -43,7 +43,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 private const val MIN_WALLETS = 1
-private const val MAX_WALLETS = 3
+private const val MAX_WALLETS = 5
 
 class PushSettingsViewModel(
     private val router: PushNotificationsRouter,
@@ -80,6 +80,9 @@ class PushSettingsViewModel(
         .distinctUntilChanged()
 
     val pushReceivedTokens = pushSettingsState.mapNotNull { it?.receivedTokensEnabled }
+        .distinctUntilChanged()
+
+    val pushMultisigTransactions = pushSettingsState.mapNotNull { it?.multisigTransactionsEnabled }
         .distinctUntilChanged()
 
     val pushGovernanceState = pushSettingsState.mapNotNull { it }
@@ -159,7 +162,7 @@ class PushSettingsViewModel(
     fun walletsClicked() {
         walletRequester.openRequest(
             SelectMultipleWalletsRequester.Request(
-                titleText = resourceManager.getString(R.string.push_wallets_title),
+                titleText = resourceManager.getString(R.string.push_wallets_title, MAX_WALLETS),
                 currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
                 min = MIN_WALLETS,
                 max = MAX_WALLETS
@@ -177,6 +180,10 @@ class PushSettingsViewModel(
 
     fun receivedTokensClicked() {
         pushSettingsState.updateValue { it?.copy(receivedTokensEnabled = !it.receivedTokensEnabled) }
+    }
+
+    fun multisigOperationsClicked() {
+        pushSettingsState.updateValue { it?.copy(multisigTransactionsEnabled = !it.multisigTransactionsEnabled) }
     }
 
     fun governanceClicked() {

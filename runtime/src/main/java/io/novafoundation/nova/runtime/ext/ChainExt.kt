@@ -288,6 +288,14 @@ fun Chain.accountIdOf(address: String): ByteArray {
     }
 }
 
+fun String.toAccountId(chain: Chain): ByteArray {
+    return chain.accountIdOf(this)
+}
+
+fun String.toAccountIdKey(chain: Chain): AccountIdKey {
+    return chain.accountIdKeyOf(this)
+}
+
 fun Chain.accountIdKeyOf(address: String): AccountIdKey {
     return accountIdOf(address).intoKey()
 }
