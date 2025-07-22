@@ -47,8 +47,8 @@ fun BottomSheetActionBinding.setupView(
     } ?: neutralButton.makeGone()
 
     payload.alertModel?.let {
-        alert.makeVisible()
         alert.apply {
+            makeVisible()
             setStyle(it.style)
             setMessage(it.message)
         }
