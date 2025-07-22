@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.asHexString
 import io.novafoundation.nova.common.utils.bigIntegerFromHex
+import io.novafoundation.nova.common.utils.convertToExternalCompatibleFormat
 import io.novafoundation.nova.common.utils.endsWith
 import io.novafoundation.nova.common.utils.intFromHex
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
@@ -194,7 +195,7 @@ class PolkadotExternalSignInteractor(
         val payload = SignerPayloadRaw.fromUnsafeString(signBytesPayload.data, accountId)
 
         val chainId = signBytesChainResolver.resolveChainId(signBytesPayload.address)
-        val signature = signer.signRaw(payload, chainId)
+        val signature = signer.signRaw(payload, chainId).signatureWrapper.convertToExternalCompatibleFormat()
 
         return SignedResult(signature.asHexString(), modifiedTransaction = null)
     }
