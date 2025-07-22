@@ -26,6 +26,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
         binder.pushSettingsWallets.setOnClickListener { viewModel.walletsClicked() }
         binder.pushSettingsAnnouncements.setOnClickListener { viewModel.announementsClicked() }
         binder.pushSettingsSentTokens.setOnClickListener { viewModel.sentTokensClicked() }
+        binder.pushSettingsMultisigOperations.setOnClickListener { viewModel.multisigOperationsClicked() }
         binder.pushSettingsReceivedTokens.setOnClickListener { viewModel.receivedTokensClicked() }
         binder.pushSettingsGovernance.setOnClickListener { viewModel.governanceClicked() }
         binder.pushSettingsStakingRewards.setOnClickListener { viewModel.stakingRewardsClicked() }
@@ -58,6 +59,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
         viewModel.pushAnnouncements.observe { binder.pushSettingsAnnouncements.setChecked(it) }
         viewModel.pushSentTokens.observe { binder.pushSettingsSentTokens.setChecked(it) }
         viewModel.pushReceivedTokens.observe { binder.pushSettingsReceivedTokens.setChecked(it) }
+        viewModel.pushMultisigTransactions.observe { binder.pushSettingsMultisigOperations.setChecked(it) }
         viewModel.pushGovernanceState.observe { binder.pushSettingsGovernance.setValue(it) }
         viewModel.pushStakingRewardsState.observe { binder.pushSettingsStakingRewards.setValue(it) }
     }

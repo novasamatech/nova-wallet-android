@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.di
 
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.deeplink.MultisigOperationDeepLinkConfigurator
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import com.google.gson.Gson
@@ -11,10 +12,14 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.CompoundNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.SystemNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationHandler
@@ -27,6 +32,10 @@ import io.novafoundation.nova.feature_push_notifications.presentation.handling.t
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.StakingRewardNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.TokenReceivedNotificationHandler
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.TokenSentNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.multisig.MultisigTransactionCancelledNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.multisig.MultisigTransactionExecutedNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.multisig.MultisigTransactionInitiatedNotificationHandler
+import io.novafoundation.nova.feature_push_notifications.presentation.handling.types.multisig.MultisigTransactionNewApprovalNotificationHandler
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -208,6 +217,122 @@ class NotificationHandlersModule {
             notificationIdProvider,
             gson,
             notificationManagerCompat,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun multisigTransactionInitiatedNotificationHandler(
+        context: Context,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        activityIntentProvider: ActivityIntentProvider,
+        notificationIdProvider: NotificationIdProvider,
+        multisigCallFormatter: MultisigCallFormatter,
+        configurator: MultisigOperationDeepLinkConfigurator,
+        gson: Gson,
+        notificationManager: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+    ): NotificationHandler {
+        return MultisigTransactionInitiatedNotificationHandler(
+            context,
+            accountRepository,
+            multisigCallFormatter,
+            configurator,
+            chainRegistry,
+            activityIntentProvider,
+            notificationIdProvider,
+            gson,
+            notificationManager,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun multisigTransactionNewApprovalNotificationHandler(
+        context: Context,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        activityIntentProvider: ActivityIntentProvider,
+        notificationIdProvider: NotificationIdProvider,
+        multisigCallFormatter: MultisigCallFormatter,
+        configurator: MultisigOperationDeepLinkConfigurator,
+        multisigApprovalsRepository: MultisigApprovalsRepository,
+        gson: Gson,
+        notificationManager: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+    ): NotificationHandler {
+        return MultisigTransactionNewApprovalNotificationHandler(
+            context,
+            accountRepository,
+            multisigApprovalsRepository,
+            multisigCallFormatter,
+            configurator,
+            identityProvider,
+            chainRegistry,
+            activityIntentProvider,
+            notificationIdProvider,
+            gson,
+            notificationManager,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun multisigTransactionExecutedNotificationHandler(
+        context: Context,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        activityIntentProvider: ActivityIntentProvider,
+        notificationIdProvider: NotificationIdProvider,
+        multisigCallFormatter: MultisigCallFormatter,
+        gson: Gson,
+        notificationManager: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+    ): NotificationHandler {
+        return MultisigTransactionExecutedNotificationHandler(
+            context,
+            accountRepository,
+            multisigCallFormatter,
+            identityProvider,
+            chainRegistry,
+            activityIntentProvider,
+            notificationIdProvider,
+            gson,
+            notificationManager,
+            resourceManager
+        )
+    }
+
+    @Provides
+    @IntoSet
+    fun multisigTransactionCancelledNotificationHandler(
+        context: Context,
+        accountRepository: AccountRepository,
+        chainRegistry: ChainRegistry,
+        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        activityIntentProvider: ActivityIntentProvider,
+        notificationIdProvider: NotificationIdProvider,
+        multisigCallFormatter: MultisigCallFormatter,
+        gson: Gson,
+        notificationManager: NotificationManagerCompat,
+        resourceManager: ResourceManager,
+    ): NotificationHandler {
+        return MultisigTransactionCancelledNotificationHandler(
+            context,
+            accountRepository,
+            multisigCallFormatter,
+            identityProvider,
+            chainRegistry,
+            activityIntentProvider,
+            notificationIdProvider,
+            gson,
+            notificationManager,
             resourceManager
         )
     }

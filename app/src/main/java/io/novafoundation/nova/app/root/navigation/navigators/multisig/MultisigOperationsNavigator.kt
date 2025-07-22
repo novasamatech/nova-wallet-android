@@ -26,7 +26,9 @@ class MultisigOperationsNavigator(
     }
 
     override fun openMultisigOperationDetails(payload: MultisigOperationDetailsPayload) {
-        navigationBuilder().action(R.id.action_multisigPendingOperationsFragment_to_multisigOperationDetailsFragment)
+        navigationBuilder().cases()
+            .addCase(R.id.multisigPendingOperationsFragment, R.id.action_multisigPendingOperationsFragment_to_multisigOperationDetailsFragment)
+            .setFallbackCase(R.id.action_multisigOperationDetailsFragment)
             .setArgs(MultisigOperationDetailsFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }

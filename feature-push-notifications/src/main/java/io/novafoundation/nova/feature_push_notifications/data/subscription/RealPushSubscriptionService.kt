@@ -158,6 +158,8 @@ class RealPushSubscriptionService(
             .getActiveMetaAccounts()
             .associateBy { it.id }
 
+        val multisigSettings = settings.multisigTransactionsEnabled.mapToFirestoreChainFeatureOrNull()
+
         return mapOf(
             "pushToken" to token,
             "updatedAt" to formatDateISO_8601_NoMs(date),
@@ -165,7 +167,11 @@ class RealPushSubscriptionService(
             "notifications" to mapOfNotNullValues(
                 "stakingReward" to mapToFirestoreChainFeature(settings.stakingReward),
                 "tokenSent" to settings.sentTokensEnabled.mapToFirestoreChainFeatureOrNull(),
-                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull()
+                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull(),
+                "newMultisig" to multisigSettings,
+                "multisigApproval" to multisigSettings,
+                "multisigExecuted" to multisigSettings,
+                "multisigCancelled" to multisigSettings
             )
         )
     }

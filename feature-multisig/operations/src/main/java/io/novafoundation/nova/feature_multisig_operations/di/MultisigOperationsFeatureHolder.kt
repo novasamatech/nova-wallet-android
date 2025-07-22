@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -23,6 +24,7 @@ class MultisigOperationsFeatureHolder @Inject constructor(
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
+            .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .build()
 
         return DaggerMultisigOperationsFeatureComponent.factory()
