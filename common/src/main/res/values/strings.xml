@@ -26,6 +26,11 @@
 
     <string name="push_settings_multisig_operations">Multisig transactions</string>
 
+    <string name="invalid_call_data_format_message">The call data you provided is invalid or has the wrong format. Please ensure it is correct and try again.</string>
+
+    <string name="multisig_operations_placeholder">No transactions yet.\nSigning requests will show up here</string>
+
+
     <string name="proxied_card_not_supported_title">Debit Card is not supported for this Proxied wallet</string>
     <string name="proxied_card_not_supported_message">To manage your Debit Card, please switch to a different wallet with Polkadot network.</string>
 
