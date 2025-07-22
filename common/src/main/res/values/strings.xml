@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="multisig_operations_placeholder">No transactions yet.\nSigning requests will show up here</string>
+
     <string name="proxied_card_not_supported_title">Debit Card is not supported for this Proxied wallet</string>
     <string name="proxied_card_not_supported_message">To manage your Debit Card, please switch to a different wallet with Polkadot network.</string>
 
