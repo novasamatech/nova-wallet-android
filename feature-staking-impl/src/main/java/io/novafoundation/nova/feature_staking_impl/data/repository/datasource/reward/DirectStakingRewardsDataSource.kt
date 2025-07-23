@@ -7,18 +7,20 @@ import io.novafoundation.nova.feature_staking_impl.data.network.subquery.Staking
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.DirectStakingPeriodRewardsRequest
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class DirectStakingRewardsDataSource(
     private val stakingApi: StakingApi,
-    private val stakingTotalRewardDao: StakingTotalRewardDao,
-) : BaseStakingRewardsDataSource(stakingTotalRewardDao) {
+    chainRegistry: ChainRegistry,
+    stakingTotalRewardDao: StakingTotalRewardDao,
+) : BaseStakingRewardsDataSource(chainRegistry, stakingTotalRewardDao) {
 
-    override suspend fun sync(accountId: AccountId, stakingOption: StakingOption, rewardPeriod: RewardPeriod) {
-        val chain = stakingOption.assetWithChain.chain
-
-        val stakingExternalApi = chain.stakingExternalApi() ?: return
+    override suspend fun getTotalRewards(chain: Chain, accountId: AccountId, rewardPeriod: RewardPeriod): Balance {
+        val stakingExternalApi = chain.stakingExternalApi() ?: return Balance.ZERO
         val address = chain.addressOf(accountId)
 
         val response = stakingApi.getRewardsByPeriod(
@@ -29,8 +31,7 @@ class DirectStakingRewardsDataSource(
                 endTimestamp = rewardPeriod.endTimestamp
             )
         )
-        val totalResult = response.data.totalReward
 
-        saveTotalReward(totalResult, accountId, stakingOption)
+        return response.data.totalReward
     }
 }
