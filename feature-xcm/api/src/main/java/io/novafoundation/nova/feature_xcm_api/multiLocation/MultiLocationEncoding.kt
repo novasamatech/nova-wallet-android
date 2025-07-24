@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
@@ -63,7 +64,8 @@ private fun bindJunction(instance: Any?): Junction {
 
     return when (asDictEnum.name) {
         "GeneralKey" -> {
-            val keyBytes = bindByteArray(asDictEnum.value)
+            val struct = asDictEnum.value.castToStruct()
+            val keyBytes = struct.getTyped<ByteArray>("data")
             Junction.GeneralKey(keyBytes.toHexString(withPrefix = true))
         }
 
