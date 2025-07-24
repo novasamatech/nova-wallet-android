@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward
 
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
-import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.model.stakingExternalApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
-import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.DirectStakingPeriodRewardsRequest
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.PoolStakingPeriodRewardsRequest
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod

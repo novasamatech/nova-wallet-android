@@ -8,11 +8,9 @@ import io.novafoundation.nova.core_db.model.TotalRewardLocal
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapTotalRewardLocalToTotalReward
-import io.novafoundation.nova.feature_staking_impl.data.model.stakingExternalApi
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.timelineChainId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString

@@ -11,7 +11,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.updaters.multiChain.MultiChainUpdateSystem
 
-
 class StakingUpdateSystem(
     private val chainRegistry: ChainRegistry,
     private val stakingUpdaters: StakingUpdaters,

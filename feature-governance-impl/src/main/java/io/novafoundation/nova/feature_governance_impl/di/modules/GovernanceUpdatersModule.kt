@@ -12,7 +12,6 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
-import io.novafoundation.nova.runtime.network.updaters.ConstantSingleChainUpdateSystem
 import io.novafoundation.nova.runtime.network.updaters.InactiveIssuanceUpdater
 import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
 import io.novafoundation.nova.runtime.network.updaters.multiChain.AsSharedStateUpdater
