@@ -9,7 +9,7 @@ import javax.inject.Inject
 @FeatureScope
 class TimelineDelegatingChainIdHolder @Inject constructor(
     private val stakingSharedState: StakingSharedState
-): ChainIdHolder {
+) : ChainIdHolder {
 
     override suspend fun chainId(): String {
         return stakingSharedState.chain().timelineChainIdOrSelf()

@@ -15,7 +15,7 @@ abstract class TimelineDelegatingSingleKeyUpdater<V>(
     chainRegistry: ChainRegistry,
     storageCache: StorageCache,
     timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder
-): SingleStorageKeyUpdater<V>(scope, timelineDelegatingChainIdHolder, chainRegistry, storageCache), SharedStateBasedUpdater<V> {
+) : SingleStorageKeyUpdater<V>(scope, timelineDelegatingChainIdHolder, chainRegistry, storageCache), SharedStateBasedUpdater<V> {
 
     override fun getSyncChainId(sharedStateChain: Chain): ChainId {
         return sharedStateChain.timelineChainIdOrSelf()
