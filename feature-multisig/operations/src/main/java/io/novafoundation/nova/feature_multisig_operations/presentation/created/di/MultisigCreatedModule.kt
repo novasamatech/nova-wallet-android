@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -20,9 +21,10 @@ class MultisigCreatedModule {
     @ViewModelKey(MultisigCreatedViewModel::class)
     fun provideViewModel(
         resourceManager: ResourceManager,
-        router: MultisigOperationsRouter
+        router: MultisigOperationsRouter,
+        payload: MultisigCreatedPayload
     ): ViewModel {
-        return MultisigCreatedViewModel(resourceManager, router)
+        return MultisigCreatedViewModel(resourceManager, router, payload)
     }
 
     @Provides

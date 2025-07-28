@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -30,12 +31,11 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.showNovaCardRestrictionDialog
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeModel
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.PendingOperationsCountModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.assetsSource
@@ -85,7 +85,7 @@ class BalanceListViewModel(
     private val amountFormatter: AmountFormatter,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
-    private val multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin
+    private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin
 ) : BaseViewModel() {
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -337,13 +337,9 @@ class BalanceListViewModel(
         router.openSwapFlow()
     }
 
-    fun novaCardClicked() {
-        launch {
-            if (multisigRestrictionCheckMixin.isMultisig()) {
-                multisigRestrictionCheckMixin.showNovaCardRestrictionDialog(resourceManager)
-            } else {
-                router.openNovaCard()
-            }
+    fun novaCardClicked() = launchUnit {
+        novaCardRestrictionCheckMixin.checkRestrictionAndDo {
+            router.openNovaCard()
         }
     }
 

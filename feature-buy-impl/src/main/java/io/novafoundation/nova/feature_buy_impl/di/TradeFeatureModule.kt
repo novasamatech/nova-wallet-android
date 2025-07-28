@@ -4,13 +4,16 @@ import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_buy_api.presentation.mixin.TradeMixin
+import io.novafoundation.nova.feature_buy_impl.presentation.common.MercuryoSignatureFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.interceptors.mercuryo.MercuryoSellRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_impl.BuildConfig
 import io.novafoundation.nova.feature_buy_impl.di.deeplinks.DeepLinkModule
+import io.novafoundation.nova.feature_buy_impl.presentation.common.RealMercuryoSignatureFactory
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.RealTradeTokenRegistry
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.banxa.BanxaProvider
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.mercurio.MercuryoIntegratorFactory
@@ -46,15 +49,23 @@ class BuyFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideMercuryoSignatureGenerator(
+        ipAddressReceiver: IpAddressReceiver
+    ): MercuryoSignatureFactory = RealMercuryoSignatureFactory(ipAddressReceiver)
+
+    @Provides
+    @FeatureScope
     fun provideMercuryoIntegratorFactory(
         mercuryoBuyInterceptorFactory: MercuryoBuyRequestInterceptorFactory,
         mercuryoSellInterceptorFactory: MercuryoSellRequestInterceptorFactory,
         interceptingWebViewClientFactory: InterceptingWebViewClientFactory,
+        mercuryoSignatureFactory: MercuryoSignatureFactory
     ): MercuryoIntegratorFactory {
         return MercuryoIntegratorFactory(
             mercuryoBuyInterceptorFactory,
             mercuryoSellInterceptorFactory,
-            interceptingWebViewClientFactory
+            interceptingWebViewClientFactory,
+            mercuryoSignatureFactory
         )
     }
 

@@ -112,7 +112,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueEndIcon="@drawable/ic_info"
-                    app:title="@string/referendum_full_details_hash" />
+                    app:title="@string/common_call_hash" />
 
             </io.novafoundation.nova.common.view.TableView>
 

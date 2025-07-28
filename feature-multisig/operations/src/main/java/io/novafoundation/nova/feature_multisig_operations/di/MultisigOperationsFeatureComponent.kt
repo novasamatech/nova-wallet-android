@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
+import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.di.deeplink.DeepLinkModule
 import io.novafoundation.nova.feature_multisig_operations.presentation.created.di.MultisigCreatedComponent
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.full.di.MultisigOperationFullDetailsComponent
@@ -21,6 +23,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
     ],
     modules = [
         MultisigOperationsFeatureModule::class,
+        DeepLinkModule::class
     ]
 )
 @FeatureScope
@@ -51,7 +54,8 @@ interface MultisigOperationsFeatureComponent : MultisigOperationsFeatureApi {
             RuntimeApi::class,
             DbApi::class,
             WalletFeatureApi::class,
-            AccountFeatureApi::class
+            AccountFeatureApi::class,
+            DeepLinkingFeatureApi::class
         ]
     )
     interface MultisigOperationsFeatureDependenciesComponent : MultisigOperationsFeatureDependencies

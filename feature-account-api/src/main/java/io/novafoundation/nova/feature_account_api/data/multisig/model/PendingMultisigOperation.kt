@@ -10,6 +10,7 @@ import java.math.BigInteger
 import kotlin.time.Duration
 
 class PendingMultisigOperation(
+    val multisigMetaId: Long,
     val call: GenericCall.Instance?,
     val callHash: CallHash,
     val chain: Chain,
@@ -23,7 +24,7 @@ class PendingMultisigOperation(
     val timestamp: Duration,
 ) : Identifiable {
 
-    override val identifier: PendingMultisigOperationId = "${chain.id}.${callHash.toHex()}.${timePoint.height}.${timePoint.extrinsicIndex}"
+    override val identifier: PendingMultisigOperationId = createIdentifier(multisigMetaId, chain, callHash.toHex())
 
     override fun toString(): String {
         val callFormatted = if (call != null) {
@@ -49,4 +50,8 @@ fun PendingMultisigOperation.userAction(): MultisigAction {
 
         else -> MultisigAction.Signed
     }
+}
+
+fun PendingMultisigOperation.Companion.createIdentifier(multisigMetaId: Long, chain: Chain, callHash: String): PendingMultisigOperationId {
+    return "$multisigMetaId.${chain.id}.$callHash"
 }
