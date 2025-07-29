@@ -111,4 +111,8 @@ dependencies {
 
     testImplementation jUnitDep
     testImplementation mockitoDep
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
 }
