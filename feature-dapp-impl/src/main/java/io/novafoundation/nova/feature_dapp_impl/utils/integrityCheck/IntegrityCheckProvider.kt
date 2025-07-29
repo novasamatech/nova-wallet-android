@@ -1,9 +1,12 @@
 package io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck
 
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.launchUnit
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class IntegrityCheckProviderFactory(
@@ -38,20 +41,27 @@ class IntegrityCheckProvider(
     }
 
     fun onRequestIntegrityCheck(baseUrl: String) = launchUnit {
-        log("request integrity check. BaseUrl: $baseUrl")
+        log("Android client: request integrity check. BaseUrl: $baseUrl")
         session = integrityCheckSessionFactory.createSession(baseUrl, this@IntegrityCheckProvider)
         runCatching { session?.startIntegrityCheck() }
-            .onFailure { it.message?.let { errorFlow.emit(it) } }
+            .onFailure {
+                log("Android client: error: ${it.message}")
+                it.message?.let { errorFlow.emit(it) }
+            }
     }
 
     fun onSignatureVerificationError(code: Int, error: String) = launchUnit {
-        log("signature verification error")
         if (session == null) return@launchUnit
 
+        log("Android client: onSignatureVerificationError: $error")
+
         if (code == APP_INTEGRITY_ID_NOT_FOUND_CODE) {
-            log("restart integrity check")
+            log("Android client: restart integrity check")
             runCatching { session?.restartIntegrityCheck() }
-                .onFailure { it.message?.let { errorFlow.emit(it) } }
+                .onFailure {
+                    log("Android client: error: ${it.message}")
+                    it.message?.let { errorFlow.emit(it) }
+                }
         } else {
             errorFlow.emit(error)
         }
@@ -76,7 +86,10 @@ class IntegrityCheckProvider(
         webView.evaluateJavascript(jsCode, null)
     }
 
-    private fun log(message: String) = webView.evaluateJavascript("console.log('$message')", null)
+    private fun log(message: String) = launchUnit(Dispatchers.Main) {
+        Log.e(LOG_TAG, message)
+        webView.evaluateJavascript("console.log('$message')", null)
+    }
 
     inner class IntegrityProviderJsCallback {
         @JavascriptInterface

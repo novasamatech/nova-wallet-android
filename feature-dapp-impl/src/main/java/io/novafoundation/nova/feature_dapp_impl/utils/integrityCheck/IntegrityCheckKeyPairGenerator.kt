@@ -32,6 +32,8 @@ object IntegrityCheckKeyPairGenerator {
         }
 
         keyPairGenerator.initialize(parameterSpec)
+
+        keyPairGenerator.generateKeyPair()
     }
 
     fun getPublicKey(alias: String): ByteArray {
@@ -63,7 +65,7 @@ object IntegrityCheckKeyPairGenerator {
 }
 
 fun IntegrityCheckKeyPairGenerator.ensureKeyPairGenerated(alias: String) {
-    if (!IntegrityCheckKeyPairGenerator.isKeyPairGenerated(alias)) {
-        IntegrityCheckKeyPairGenerator.generateKeyPair(alias)
+    if (!isKeyPairGenerated(alias)) {
+        generateKeyPair(alias)
     }
 }

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.IntegrityService
+import io.novafoundation.nova.common.utils.ensureSuffix
 import io.novafoundation.nova.common.utils.sha256
 import io.novafoundation.nova.common.utils.toBase64
 import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckSession.Callback
@@ -18,7 +19,7 @@ class IntegrityCheckSessionFactory(
         baseUrl: String,
         callback: Callback
     ) = IntegrityCheckSession(
-        apiCreator.create(IntegrityCheckApi::class.java, baseUrl),
+        apiCreator.create(IntegrityCheckApi::class.java, baseUrl.ensureSuffix("/")),
         preferences,
         integrityService,
         callback
@@ -26,6 +27,7 @@ class IntegrityCheckSessionFactory(
 }
 
 private const val PREFS_APP_INTEGRITY_ID = "PREFS_APP_INTEGRITY_ID"
+private const val PREFS_ATTESTATION_SUCCEED = "PREFS_ATTESTATION_SUCCEED"
 
 class IntegrityCheckSession(
     private val integrityCheckApi: IntegrityCheckApi,
@@ -73,6 +75,8 @@ class IntegrityCheckSession(
                 challenge = challengeResponse.challenge
             )
         )
+
+        preferences.putBoolean(PREFS_ATTESTATION_SUCCEED, true)
     }
 
     private suspend fun runVerifying() {
@@ -89,7 +93,14 @@ class IntegrityCheckSession(
     }
 
     private fun isAttestationNeeded(): Boolean {
-        return preferences.getString(PREFS_APP_INTEGRITY_ID) == null
+        val appIntegrityId = preferences.getString(PREFS_APP_INTEGRITY_ID)
+        return appIntegrityId == null
+            || !isAttestationSucceed()
+            || !IntegrityCheckKeyPairGenerator.isKeyPairGenerated(appIntegrityId)
+    }
+
+    private fun isAttestationSucceed(): Boolean {
+        return preferences.getBoolean(PREFS_ATTESTATION_SUCCEED, false)
     }
 
     private fun createRequestHash(value: String): String {

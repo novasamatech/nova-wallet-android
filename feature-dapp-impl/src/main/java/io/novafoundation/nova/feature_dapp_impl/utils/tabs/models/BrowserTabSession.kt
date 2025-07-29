@@ -27,7 +27,7 @@ class BrowserTabSessionFactory(
 
     suspend fun create(tabId: String, startUrl: String, onPageChangedCallback: OnPageChangedCallback): BrowserTabSession {
         return withContext(Dispatchers.Main) {
-            val coroutineScope = CoroutineScope(Dispatchers.Default)
+            val coroutineScope = CoroutineScope(Dispatchers.Main)
             val context = contextManager.getActivity()!!
             val webView = WebView(context)
             val integrityCheckProvider = integrityCheckProviderFactory.create(webView, coroutineScope)

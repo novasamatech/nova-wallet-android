@@ -1,14 +1,15 @@
 package io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck
 
+import retrofit2.http.Body
 import retrofit2.http.POST
 
 interface IntegrityCheckApi {
 
-    @POST("/auth/challenges")
+    @POST("challenges")
     suspend fun getChallenge(): ChallengeResponse
 
-    @POST("/auth/app-integrity/attestations")
-    suspend fun attest(request: AttestRequest)
+    @POST("app-integrity/attestations")
+    suspend fun attest(@Body request: AttestRequest)
 }
 
 class ChallengeResponse(val challenge: String)
