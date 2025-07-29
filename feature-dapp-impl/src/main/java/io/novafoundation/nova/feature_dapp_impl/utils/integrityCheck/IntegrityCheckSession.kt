@@ -23,7 +23,6 @@ class IntegrityCheckSessionFactory(
         integrityService,
         callback
     )
-
 }
 
 private const val PREFS_APP_INTEGRITY_ID = "PREFS_APP_INTEGRITY_ID"

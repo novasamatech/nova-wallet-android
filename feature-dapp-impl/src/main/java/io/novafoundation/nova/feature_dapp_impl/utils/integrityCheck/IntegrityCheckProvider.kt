@@ -38,15 +38,18 @@ class IntegrityCheckProvider(
     }
 
     fun onRequestIntegrityCheck(baseUrl: String) = launchUnit {
+        log("request integrity check. BaseUrl: $baseUrl")
         session = integrityCheckSessionFactory.createSession(baseUrl, this@IntegrityCheckProvider)
         runCatching { session?.startIntegrityCheck() }
             .onFailure { it.message?.let { errorFlow.emit(it) } }
     }
 
     fun onSignatureVerificationError(code: Int, error: String) = launchUnit {
+        log("signature verification error")
         if (session == null) return@launchUnit
 
         if (code == APP_INTEGRITY_ID_NOT_FOUND_CODE) {
+            log("restart integrity check")
             runCatching { session?.restartIntegrityCheck() }
                 .onFailure { it.message?.let { errorFlow.emit(it) } }
         } else {
@@ -55,6 +58,7 @@ class IntegrityCheckProvider(
     }
 
     fun onPageFinished() {
+        session?.let { log("clear integrity check session") }
         session?.removeCallback()
         session = null
     }
@@ -71,6 +75,8 @@ class IntegrityCheckProvider(
 
         webView.evaluateJavascript(jsCode, null)
     }
+
+    private fun log(message: String) = webView.evaluateJavascript("console.log('$message')", null)
 
     inner class IntegrityProviderJsCallback {
         @JavascriptInterface
