@@ -1,46 +1,60 @@
 package io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck
 
+import android.webkit.JavascriptInterface
 import android.webkit.WebView
+import io.novafoundation.nova.common.utils.launchUnit
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 class IntegrityCheckProviderFactory(
     private val integrityCheckSessionFactory: IntegrityCheckSessionFactory
 ) {
 
-    fun create(webView: WebView): IntegrityCheckProvider {
+    fun create(webView: WebView, coroutineScope: CoroutineScope): IntegrityCheckProvider {
         return IntegrityCheckProvider(
             integrityCheckSessionFactory,
-            webView
+            webView,
+            coroutineScope
         )
     }
 }
 
+private const val JAVASCRIPT_INTERFACE_NAME = "IntegrityProvider"
 private const val APP_INTEGRITY_ID_NOT_FOUND_CODE = 400
 
 class IntegrityCheckProvider(
     private val integrityCheckSessionFactory: IntegrityCheckSessionFactory,
-    private val webView: WebView
-) : IntegrityCheckSession.Callback {
+    private val webView: WebView,
+    private val coroutineScope: CoroutineScope
+) : IntegrityCheckSession.Callback, CoroutineScope by coroutineScope {
+
+    val errorFlow = MutableSharedFlow<String>()
 
     private var session: IntegrityCheckSession? = null
-    private val errorFlow = MutableSharedFlow<String>()
+    private val providerJsCallback = IntegrityProviderJsCallback()
 
-    suspend fun onRequestIntegrityCheck(baseUrl: String) {
-        session = integrityCheckSessionFactory.createSession(baseUrl, this)
-        session?.startIntegrityCheck()
+    init {
+        webView.addJavascriptInterface(providerJsCallback, JAVASCRIPT_INTERFACE_NAME)
     }
 
-    suspend fun signatureVerificationError(code: Int, error: String) {
-        if (session == null) return
+    fun onRequestIntegrityCheck(baseUrl: String) = launchUnit {
+        session = integrityCheckSessionFactory.createSession(baseUrl, this@IntegrityCheckProvider)
+        runCatching { session?.startIntegrityCheck() }
+            .onFailure { it.message?.let { errorFlow.emit(it) } }
+    }
+
+    fun onSignatureVerificationError(code: Int, error: String) = launchUnit {
+        if (session == null) return@launchUnit
 
         if (code == APP_INTEGRITY_ID_NOT_FOUND_CODE) {
-            session?.restartIntegrityCheck()
+            runCatching { session?.restartIntegrityCheck() }
+                .onFailure { it.message?.let { errorFlow.emit(it) } }
         } else {
             errorFlow.emit(error)
         }
     }
 
-    fun onPageUpdated() {
+    fun onPageFinished() {
         session?.removeCallback()
         session = null
     }
@@ -56,5 +70,17 @@ class IntegrityCheckProvider(
         """.trimIndent()
 
         webView.evaluateJavascript(jsCode, null)
+    }
+
+    inner class IntegrityProviderJsCallback {
+        @JavascriptInterface
+        fun requestIntegrityCheck(baseUrl: String) {
+            onRequestIntegrityCheck(baseUrl)
+        }
+
+        @JavascriptInterface
+        fun signatureVerificationError(code: Int, error: String) {
+            onSignatureVerificationError(code, error)
+        }
     }
 }
