@@ -93,7 +93,6 @@ dependencies {
 
     implementation kotlinDep
 
-
     implementation androidDep
     implementation cardViewDep
     implementation recyclerViewDep
@@ -140,6 +139,8 @@ dependencies {
     api coroutinesRxDep
 
     implementation shimmerDep
+
+    implementation playIntegrity
 
     testImplementation jUnitDep
     testImplementation mockitoDep
