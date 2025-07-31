@@ -45,6 +45,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.utils.CopyValueMixin
+import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
@@ -123,6 +124,8 @@ interface CommonApi {
     val ipAddressReceiver: IpAddressReceiver
 
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
+
+    val integrityService: IntegrityService
 
     fun copyTextMixin(): CopyTextLauncher.Presentation
 

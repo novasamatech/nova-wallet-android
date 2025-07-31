@@ -3,9 +3,12 @@ package io.novafoundation.nova.feature_dapp_impl.di.modules
 import android.content.Context
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -16,6 +19,8 @@ import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.BrowserTabI
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealPageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.RealBrowserTabRepository
+import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckProviderFactory
+import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckSessionFactory
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.PageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealTabMemoryRestrictionService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.TabMemoryRestrictionService
@@ -55,11 +60,30 @@ class BrowserTabsModule {
 
     @FeatureScope
     @Provides
+    fun provideIntegrityCheckSessionFactory(
+        apiCreator: NetworkApiCreator,
+        preferences: Preferences,
+        integrityService: IntegrityService
+    ) = IntegrityCheckSessionFactory(
+        apiCreator,
+        preferences,
+        integrityService
+    )
+
+    @FeatureScope
+    @Provides
+    fun provideIntegrityCheckProviderFactory(
+        integrityCheckSessionFactory: IntegrityCheckSessionFactory
+    ) = IntegrityCheckProviderFactory(integrityCheckSessionFactory)
+
+    @FeatureScope
+    @Provides
     fun providePageSessionFactory(
         compoundWeb3Injector: CompoundWeb3Injector,
-        contextManager: ContextManager
+        contextManager: ContextManager,
+        integrityCheckProviderFactory: IntegrityCheckProviderFactory
     ): BrowserTabSessionFactory {
-        return BrowserTabSessionFactory(compoundWeb3Injector, contextManager)
+        return BrowserTabSessionFactory(compoundWeb3Injector, contextManager, integrityCheckProviderFactory)
     }
 
     @FeatureScope
