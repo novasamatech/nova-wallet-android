@@ -19,6 +19,7 @@ class IntegrityCheckSessionFactory(
         baseUrl: String,
         callback: Callback
     ) = IntegrityCheckSession(
+        baseUrl,
         apiCreator.create(IntegrityCheckApi::class.java, baseUrl.ensureSuffix("/")),
         preferences,
         integrityService,
@@ -27,9 +28,10 @@ class IntegrityCheckSessionFactory(
 }
 
 private const val PREFS_APP_INTEGRITY_ID = "PREFS_APP_INTEGRITY_ID"
-private const val PREFS_ATTESTATION_SUCCEED = "PREFS_ATTESTATION_SUCCEED"
+private const val PREFS_ATTESTATION_PASSED = "PREFS_ATTESTATION_PASSED"
 
 class IntegrityCheckSession(
+    private val baseUrl: String,
     private val integrityCheckApi: IntegrityCheckApi,
     private val preferences: Preferences,
     private val integrityService: IntegrityService,
@@ -41,7 +43,7 @@ class IntegrityCheckSession(
     }
 
     suspend fun startIntegrityCheck() {
-        if (isAttestationNeeded()) {
+        if (!isAttestationPassed()) {
             runAttestation()
         }
 
@@ -65,7 +67,7 @@ class IntegrityCheckSession(
         val publicKey = IntegrityCheckKeyPairGenerator.getPublicKey(appIntegrityId).toBase64()
 
         val requestHash = createRequestHash(challengeResponse.challenge + appIntegrityId + publicKey)
-        val integrityToken = integrityService.getIntegrityToken(requestHash = requestHash)
+        val integrityToken = integrityService.getIntegrityToken(requestHash = requestHash.toBase64())
 
         integrityCheckApi.attest(
             AttestRequest(
@@ -76,14 +78,14 @@ class IntegrityCheckSession(
             )
         )
 
-        preferences.putBoolean(PREFS_ATTESTATION_SUCCEED, true)
+        setAttestationPassed()
     }
 
     private suspend fun runVerifying() {
         val challengeResponse = integrityCheckApi.getChallenge()
         val appIntegrityId = getAppIntegrityId()
         val requestHash = createRequestHash(challengeResponse.challenge + appIntegrityId)
-        val signature = IntegrityCheckKeyPairGenerator.signData(appIntegrityId, requestHash.toByteArray())
+        val signature = IntegrityCheckKeyPairGenerator.signData(appIntegrityId, requestHash)
 
         callback?.sendVerificationRequest(
             appIntegrityId = appIntegrityId,
@@ -92,21 +94,19 @@ class IntegrityCheckSession(
         )
     }
 
-    private fun isAttestationNeeded(): Boolean {
-        val appIntegrityId = preferences.getString(PREFS_APP_INTEGRITY_ID)
-        return appIntegrityId == null
-            || !isAttestationSucceed()
-            || !IntegrityCheckKeyPairGenerator.isKeyPairGenerated(appIntegrityId)
+    private fun setAttestationPassed() {
+        preferences.putBoolean(getKey(), true)
     }
 
-    private fun isAttestationSucceed(): Boolean {
-        return preferences.getBoolean(PREFS_ATTESTATION_SUCCEED, false)
+    private fun isAttestationPassed(): Boolean {
+        return preferences.getBoolean(getKey(), false)
     }
 
-    private fun createRequestHash(value: String): String {
+    private fun getKey() = "$PREFS_ATTESTATION_PASSED:$baseUrl"
+
+    private fun createRequestHash(value: String): ByteArray {
         return value.toByteArray()
             .sha256()
-            .toBase64()
     }
 
     private fun getAppIntegrityId(): String {
