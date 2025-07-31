@@ -2,11 +2,13 @@ package io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
 import java.security.Signature
 import java.security.spec.ECGenParameterSpec
+import java.security.spec.X509EncodedKeySpec
 
 object IntegrityCheckKeyPairGenerator {
 
@@ -55,6 +57,18 @@ object IntegrityCheckKeyPairGenerator {
     fun verifySignature(alias: String, data: ByteArray, signatureBytes: ByteArray): Boolean {
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val publicKey = keyStore.getCertificate(alias).publicKey
+
+        val signature = Signature.getInstance("SHA256withECDSA")
+        signature.initVerify(publicKey)
+        signature.update(data)
+
+        return signature.verify(signatureBytes)
+    }
+
+    fun verifySignature(publicKeyBytes: ByteArray, data: ByteArray, signatureBytes: ByteArray): Boolean {
+        val keyFactory = KeyFactory.getInstance("EC")
+        val publicKeySpec = X509EncodedKeySpec(publicKeyBytes)
+        val publicKey = keyFactory.generatePublic(publicKeySpec)
 
         val signature = Signature.getInstance("SHA256withECDSA")
         signature.initVerify(publicKey)

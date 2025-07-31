@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.launchUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import retrofit2.HttpException
 
 class IntegrityCheckProviderFactory(
     private val integrityCheckSessionFactory: IntegrityCheckSessionFactory
@@ -44,13 +45,10 @@ class IntegrityCheckProvider(
         log("Android client: request integrity check. BaseUrl: $baseUrl")
         session = integrityCheckSessionFactory.createSession(baseUrl, this@IntegrityCheckProvider)
         runCatching { session?.startIntegrityCheck() }
-            .onFailure {
-                log("Android client: error: ${it.message}")
-                it.message?.let { errorFlow.emit(it) }
-            }
+            .onFailure { onVerificationFailedOnClient(it) }
     }
 
-    fun onSignatureVerificationError(code: Int, error: String) = launchUnit {
+    fun onDAppSignatureVerificationError(code: Int, error: String) = launchUnit {
         if (session == null) return@launchUnit
 
         log("Android client: onSignatureVerificationError: $error")
@@ -58,10 +56,7 @@ class IntegrityCheckProvider(
         if (code == APP_INTEGRITY_ID_NOT_FOUND_CODE) {
             log("Android client: restart integrity check")
             runCatching { session?.restartIntegrityCheck() }
-                .onFailure {
-                    log("Android client: error: ${it.message}")
-                    it.message?.let { errorFlow.emit(it) }
-                }
+                .onFailure { onVerificationFailedOnClient(it) }
         } else {
             errorFlow.emit(error)
         }
@@ -86,6 +81,23 @@ class IntegrityCheckProvider(
         webView.evaluateJavascript(jsCode, null)
     }
 
+    private suspend fun onVerificationFailedOnClient(exception: Throwable) {
+        log("Android client: error: ${exception.message}")
+        exception.message?.let { errorFlow.emit(it) }
+
+        if (exception is HttpException) {
+            val jsCode = """
+            window.verificationFailedOnClient({
+                error: ${exception.code()},
+                message: ${exception.message()}
+            });
+            """.trimIndent()
+
+            webView.evaluateJavascript(jsCode, null)
+        }
+    }
+
+
     private fun log(message: String) = launchUnit(Dispatchers.Main) {
         Log.e(LOG_TAG, message)
         webView.evaluateJavascript("console.log('$message')", null)
@@ -99,7 +111,7 @@ class IntegrityCheckProvider(
 
         @JavascriptInterface
         fun signatureVerificationError(code: Int, error: String) {
-            onSignatureVerificationError(code, error)
+            onDAppSignatureVerificationError(code, error)
         }
     }
 }
