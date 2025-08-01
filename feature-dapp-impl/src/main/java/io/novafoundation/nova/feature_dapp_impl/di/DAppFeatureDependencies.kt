@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
@@ -75,6 +76,8 @@ interface DAppFeatureDependencies {
     val walletConnectService: WalletConnectService
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val integrityService: IntegrityService
 
     fun currencyRepository(): CurrencyRepository
 

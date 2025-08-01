@@ -38,6 +38,9 @@ import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChoos
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
 import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
+import io.novafoundation.nova.common.view.dialog.dialog
+import io.novafoundation.nova.common.view.dialog.infoDialog
+import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.SessionCallback
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import javax.inject.Inject
 
@@ -45,7 +48,7 @@ private const val OVERFLOW_TABS_COUNT = 100
 
 const val DAPP_SHARED_ELEMENT_ID_IMAGE_TAB = "DAPP_SHARED_ELEMENT_ID_IMAGE_TAB"
 
-class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrowserBinding>(), OptionsBottomSheetDialog.Callback, PageCallback {
+class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrowserBinding>(), OptionsBottomSheetDialog.Callback, SessionCallback {
 
     companion object {
 
@@ -314,6 +317,13 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
     override fun onPageChanged(webView: WebView, url: String?, title: String?) {
         viewModel.onPageChanged(url, title)
+    }
+
+    override fun onPageError(error: String) {
+        infoDialog(requireContext()) {
+            setTitle(R.string.common_error_general_title)
+            setMessage(error)
+        }
     }
 
     private fun favoriteIcon(isFavorite: Boolean): Int {
