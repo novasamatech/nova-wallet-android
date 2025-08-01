@@ -405,6 +405,7 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideCopyTextMixin(): CopyTextLauncher.Presentation = RealCopyTextLauncher()
+
     @Provides
     @ApplicationScope
     fun provideIntegrityService(context: Context): IntegrityService {

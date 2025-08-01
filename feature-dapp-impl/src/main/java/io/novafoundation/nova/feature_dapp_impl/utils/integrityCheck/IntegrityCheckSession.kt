@@ -63,8 +63,8 @@ class IntegrityCheckSession(
     private suspend fun runAttestation() {
         val challengeResponse = integrityCheckApi.getChallenge()
         val appIntegrityId = getAppIntegrityId()
-        IntegrityCheckKeyPairGenerator.ensureKeyPairGenerated(appIntegrityId)
-        val publicKey = IntegrityCheckKeyPairGenerator.getPublicKey(appIntegrityId).toBase64()
+        IntegrityCheckKeyPairService.ensureKeyPairGenerated(appIntegrityId)
+        val publicKey = IntegrityCheckKeyPairService.getPublicKey(appIntegrityId).toBase64()
 
         val requestHash = createRequestHash(challengeResponse.challenge + appIntegrityId + publicKey)
         val integrityToken = integrityService.getIntegrityToken(requestHash = requestHash.toBase64())
@@ -85,7 +85,7 @@ class IntegrityCheckSession(
         val challengeResponse = integrityCheckApi.getChallenge()
         val appIntegrityId = getAppIntegrityId()
         val requestHash = createRequestHash(challengeResponse.challenge + appIntegrityId)
-        val signature = IntegrityCheckKeyPairGenerator.signData(appIntegrityId, requestHash)
+        val signature = IntegrityCheckKeyPairService.signData(appIntegrityId, requestHash)
 
         callback?.sendVerificationRequest(
             appIntegrityId = appIntegrityId,

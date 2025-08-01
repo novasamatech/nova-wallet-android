@@ -10,7 +10,7 @@ import java.security.Signature
 import java.security.spec.ECGenParameterSpec
 import java.security.spec.X509EncodedKeySpec
 
-object IntegrityCheckKeyPairGenerator {
+object IntegrityCheckKeyPairService {
 
     fun isKeyPairGenerated(alias: String): Boolean {
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
@@ -78,7 +78,7 @@ object IntegrityCheckKeyPairGenerator {
     }
 }
 
-fun IntegrityCheckKeyPairGenerator.ensureKeyPairGenerated(alias: String) {
+fun IntegrityCheckKeyPairService.ensureKeyPairGenerated(alias: String) {
     if (!isKeyPairGenerated(alias)) {
         generateKeyPair(alias)
     }
