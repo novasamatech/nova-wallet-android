@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.InflationPredicti
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -45,8 +44,6 @@ interface StakingRepository {
         chainAsset: Chain.Asset,
         accountId: AccountId
     ): Flow<StakingState>
-
-    fun stakingStoriesFlow(): Flow<List<StakingStory>>
 
     fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger>
 
