@@ -45,8 +45,8 @@ class RealStakingStatsDataSource(
             val response = api.fetchStakingStats(request, dashboardApiUrl).data
 
             val earnings = response.stakingApies.associatedById()
-            val rewards = response.rewards?.associatedById()?.aggregateWithTimelineChainOrSkip(chainsById) ?: emptyMap()
-            val slashes = response.slashes?.associatedById()?.aggregateWithTimelineChainOrSkip(chainsById) ?: emptyMap()
+            val rewards = response.rewards?.associatedById()?.aggregateWithTimelineChain(chainsById) ?: emptyMap()
+            val slashes = response.slashes?.associatedById()?.aggregateWithTimelineChain(chainsById) ?: emptyMap()
             val activeStakers = response.activeStakers?.groupedById() ?: emptyMap()
 
             request.stakingKeysMapping.mapValues { (originalStakingOptionId, stakingKeys) ->
@@ -107,30 +107,40 @@ class RealStakingStatsDataSource(
         )
     }
 
-    private fun Map<StakingOptionId, AccumulatedReward>.aggregateWithTimelineChainOrSkip(
+    /**
+     * Aggregates chain.rewards with timelineChain.rewards.
+     * Consider cases when in rewards map we have only timelineChain.rewards. In that case we aggregate rewards to assetHubChain
+     * @return Map with aggregated rewards (timeline chains will be excluded from map)
+     */
+    private fun Map<StakingOptionId, AccumulatedReward>.aggregateWithTimelineChain(
         chains: Map<String, Chain>
     ): Map<StakingOptionId, AccumulatedReward> {
-        val result = this.toMutableMap()
+        val result = mutableMapOf<StakingOptionId, AccumulatedReward>()
 
-        val timelineChainIdToAssetHubChain = chains.values
-            .filter { it.timelineChainId() != null }
-            .associate { it.timelineChainId()!! to it.id }
+        val assetHubToTimeline = chains.values.associate { it.id to it.timelineChainId() }.filterNotNull()
+        val timelineToAssetHub = assetHubToTimeline.entries.associate { it.value to it.key }
 
-        for ((key, value) in this) {
-            // We potentially may not have asset hub chain in rewards (for example if there is still no rewards)
-            if (key.chainId in timelineChainIdToAssetHubChain) {
-                val assetHubChainId = timelineChainIdToAssetHubChain[key.chainId] ?: continue
-                val assetHubKey = key.copy(chainId = assetHubChainId)
+        val visited = mutableSetOf<StakingOptionId>()
 
-                val assetHubRewardsValue = this[assetHubKey]
-                result[assetHubKey] = AccumulatedReward(value.amount + assetHubRewardsValue?.amount.orZero())
+        for ((key, reward) in this) {
+            if (key in visited) continue
+
+            val pairedChainId = timelineToAssetHub[key.chainId] ?: assetHubToTimeline[key.chainId]
+            val pairedKey = pairedChainId?.let { key.copy(chainId = it) }
+
+            val pairedReward = this[pairedKey]?.amount.orZero()
+            val aggregatedAmount = reward.amount + pairedReward
+
+            val outputKey = if (timelineToAssetHub.containsKey(key.chainId)) {
+                // Use assetHub chain in case if current key is timeline chain
+                pairedKey!!
             } else {
-                val timelineChainKey = chains[key.chainId]?.timelineChainId()
-                    ?.let { key.copy(chainId = it) }
-
-                val assetHubRewardsValue = this[timelineChainKey]
-                result[key] = AccumulatedReward(value.amount + assetHubRewardsValue?.amount.orZero())
+                key
             }
+
+            visited += outputKey
+
+            result[outputKey] = AccumulatedReward(aggregatedAmount)
         }
 
         return result
