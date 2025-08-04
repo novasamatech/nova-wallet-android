@@ -573,8 +573,12 @@ fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
     return externalApi<Chain.ExternalApi.ReferendumSummary>()
 }
 
+fun Chain.timelineChainId(): ChainId? {
+    return additional?.timelineChain
+}
+
 fun Chain.timelineChainIdOrSelf(): ChainId {
-    return additional?.timelineChain ?: id
+    return timelineChainId() ?: id
 }
 
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)

@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.GlobalScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
