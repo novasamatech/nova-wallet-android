@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.retryUntilDone
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
+import io.novafoundation.nova.runtime.ext.timelineChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -37,13 +39,14 @@ class RealStakingStatsDataSource(
         stakingChains: List<Chain>
     ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {
+            val chainsById = stakingChains.associateBy { it.id }
             val request = StakingStatsRequest(stakingAccounts, stakingChains)
             val dashboardApiUrl = stakingGlobalConfigRepository.getStakingGlobalConfig().multiStakingApiUrl
             val response = api.fetchStakingStats(request, dashboardApiUrl).data
 
             val earnings = response.stakingApies.associatedById()
-            val rewards = response.rewards?.associatedById() ?: emptyMap()
-            val slashes = response.slashes?.associatedById() ?: emptyMap()
+            val rewards = response.rewards?.associatedById()?.aggregateWithTimelineChainOrSkip(chainsById) ?: emptyMap()
+            val slashes = response.slashes?.associatedById()?.aggregateWithTimelineChainOrSkip(chainsById) ?: emptyMap()
             val activeStakers = response.activeStakers?.groupedById() ?: emptyMap()
 
             request.stakingKeysMapping.mapValues { (originalStakingOptionId, stakingKeys) ->
@@ -102,5 +105,34 @@ class RealStakingStatsDataSource(
             },
             valueTransform = { rewardAggregate -> rewardAggregate.sum }
         )
+    }
+
+    private fun Map<StakingOptionId, AccumulatedReward>.aggregateWithTimelineChainOrSkip(
+        chains: Map<String, Chain>
+    ): Map<StakingOptionId, AccumulatedReward> {
+        val result = this.toMutableMap()
+
+        val timelineChainIdToAssetHubChain = chains.values
+            .filter { it.timelineChainId() != null }
+            .associate { it.timelineChainId()!! to it.id }
+
+        for ((key, value) in this) {
+            // We potentially may not have asset hub chain in rewards (for example if there is still no rewards)
+            if (key.chainId in timelineChainIdToAssetHubChain) {
+                val assetHubChainId = timelineChainIdToAssetHubChain[key.chainId] ?: continue
+                val assetHubKey = key.copy(chainId = assetHubChainId)
+
+                val assetHubRewardsValue = this[assetHubKey]
+                result[assetHubKey] = AccumulatedReward(value.amount + assetHubRewardsValue?.amount.orZero())
+            } else {
+                val timelineChainKey = chains[key.chainId]?.timelineChainId()
+                    ?.let { key.copy(chainId = it) }
+
+                val assetHubRewardsValue = this[timelineChainKey]
+                result[key] = AccumulatedReward(value.amount + assetHubRewardsValue?.amount.orZero())
+            }
+        }
+
+        return result
     }
 }
