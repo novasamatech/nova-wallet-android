@@ -1,0 +1,28 @@
+def APP_MODULE = 'app'
+
+subprojects {
+    if (!file("$projectDir/build.gradle").exists()) {
+        return
+    }
+
+    if (APP_MODULE == project.name) {
+        apply plugin: 'com.android.application'
+    } else {
+        apply plugin: 'com.android.library'
+    }
+
+    apply plugin: 'kotlin-android'
+    apply plugin: "com.google.devtools.ksp"
+
+    android {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_17
+            targetCompatibility JavaVersion.VERSION_17
+        }
+
+        kotlinOptions {
+            jvmTarget = JavaVersion.VERSION_17.toString()
+            freeCompilerArgs = ["-Xcontext-receivers"]
+        }
+    }
+}

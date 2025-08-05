@@ -23,13 +23,13 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     buildFeatures {
@@ -71,7 +71,7 @@ dependencies {
     implementation shimmerDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerKapt
 
     testImplementation jUnitDep
     testImplementation mockitoDep

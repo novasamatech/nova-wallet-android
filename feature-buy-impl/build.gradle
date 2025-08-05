@@ -57,12 +57,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
@@ -98,13 +98,13 @@ dependencies {
     implementation lifeCycleKtxDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerKapt
 
     implementation roomDep
-    kapt roomKapt
+    ksp roomKapt
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleKapt
 
     testImplementation jUnitDep
     testImplementation mockitoDep

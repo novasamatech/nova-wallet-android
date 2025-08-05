@@ -23,12 +23,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '17'
         freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_push_notifications'
@@ -63,8 +63,8 @@ dependencies {
     implementation coroutinesDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerKapt
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleKapt
 }
