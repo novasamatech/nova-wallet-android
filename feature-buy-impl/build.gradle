@@ -6,13 +6,10 @@ apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
 
     namespace 'io.novafoundation.nova.feature_buy_impl'
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 

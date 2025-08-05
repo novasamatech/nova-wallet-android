@@ -5,16 +5,7 @@ apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
     namespace 'io.novafoundation.nova.feature_settings_impl'
-
-    defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-    }
 
     buildTypes {
         release {

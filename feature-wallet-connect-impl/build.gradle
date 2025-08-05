@@ -8,13 +8,10 @@ apply from: "../scripts/secrets.gradle"
 android {
     namespace 'io.novafoundation.nova.feature_wallet_connect_impl'
 
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
 
         buildConfigField "String", "WALLET_CONNECT_PROJECT_ID", readStringSecret("WALLET_CONNECT_PROJECT_ID")
     }

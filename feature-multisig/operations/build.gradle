@@ -6,15 +6,6 @@ apply plugin: 'kotlin-parcelize'
 android {
     namespace 'io.novafoundation.nova.feature_multisig_operations'
 
-    compileSdkVersion rootProject.compileSdkVersion
-
-    defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-    }
 
     buildTypes {
         release {

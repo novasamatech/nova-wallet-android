@@ -6,13 +6,10 @@ apply plugin: 'kotlin-kapt'
 android {
     namespace 'io.novafoundation.nova.feature_xcm_api'
 
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
 }
 
