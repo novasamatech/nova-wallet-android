@@ -31,16 +31,6 @@ android {
             buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v7/transfers_dynamic.json\""
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
     namespace 'io.novafoundation.nova.feature_wallet_impl'
 
     buildFeatures {

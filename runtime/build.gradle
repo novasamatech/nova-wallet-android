@@ -39,16 +39,6 @@ android {
             buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/details\""
         }
     }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
     namespace 'io.novafoundation.nova.runtime'
 }
 

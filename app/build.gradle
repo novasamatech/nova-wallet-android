@@ -136,16 +136,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
     applicationVariants.all { variant ->
         String name = variant.buildType.name
         if (name != "release" && name.startsWith("release")) {
@@ -158,7 +148,6 @@ android {
         resources.excludes.add("META-INF/DEPENDENCIES")
         resources.excludes.add("META-INF/NOTICE.md")
     }
-
 
     buildFeatures {
         viewBinding true

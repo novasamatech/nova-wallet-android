@@ -12,12 +12,6 @@ android {
         targetSdkVersion rootProject.targetSdkVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     buildFeatures {

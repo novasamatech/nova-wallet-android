@@ -14,16 +14,6 @@ android {
         namespace 'io.novafoundation.nova.feature_swap_api'
     }
 
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
     buildFeatures {
         viewBinding true
     }

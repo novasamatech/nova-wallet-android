@@ -13,11 +13,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
-
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
     namespace 'io.novafoundation.nova.feature_wallet_api'
 
     buildFeatures {

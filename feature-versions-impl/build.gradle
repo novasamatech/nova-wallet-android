@@ -27,16 +27,6 @@ android {
             buildConfigField "String", "NOTIFICATION_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-wallet-android-releases/master/updates/changelogs/release/\""
         }
     }
-
-    kotlinOptions {
-        jvmTarget = '17'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
     namespace 'io.novafoundation.nova.feature_versions_impl'
 
     buildFeatures {
