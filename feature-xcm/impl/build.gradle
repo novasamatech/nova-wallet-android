@@ -22,7 +22,7 @@ dependencies {
     implementation substrateSdkDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep

@@ -31,7 +31,7 @@ dependencies {
     implementation retrofitDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation multibaseDep
 

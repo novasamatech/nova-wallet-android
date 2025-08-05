@@ -48,7 +48,7 @@ dependencies {
     implementation project(":core-db")
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep

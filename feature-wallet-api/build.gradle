@@ -20,7 +20,7 @@ dependencies {
 
     implementation daggerDep
     implementation project(':feature-xcm:api')
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation substrateSdkDep
 

@@ -57,10 +57,10 @@ dependencies {
 
     implementation daggerDep
 
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation lifecycleDep
-    ksp lifecycleKapt
+    ksp lifecycleCompiler
 
     implementation viewModelKtxDep
     implementation liveDataKtxDep

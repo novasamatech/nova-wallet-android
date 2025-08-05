@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
     id 'kotlin-parcelize'
 }
 
@@ -42,7 +41,7 @@ dependencies {
     implementation project(':feature-deep-linking')
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation androidDep
     implementation constraintDep

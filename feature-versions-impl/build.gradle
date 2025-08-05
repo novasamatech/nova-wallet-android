@@ -47,12 +47,12 @@ dependencies {
     implementation markwonDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation retrofitDep
 
     implementation lifecycleDep
-    ksp lifecycleKapt
+    ksp lifecycleCompiler
 
     testImplementation project(":test-shared")
 }

@@ -39,10 +39,10 @@ dependencies {
     implementation lifeCycleKtxDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation lifecycleDep
-    ksp lifecycleKapt
+    ksp lifecycleCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep

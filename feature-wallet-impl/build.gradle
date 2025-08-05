@@ -59,13 +59,13 @@ dependencies {
 
     implementation daggerDep
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation roomDep
-    ksp roomKapt
+    ksp roomCompiler
 
     implementation lifecycleDep
-    ksp lifecycleKapt
+    ksp lifecycleCompiler
 
     implementation bouncyCastleDep
 

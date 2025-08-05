@@ -12,7 +12,7 @@ dependencies {
     implementation androidDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     api project(':core-api')
     api project(':core-db')

@@ -30,7 +30,7 @@ dependencies {
     implementation coroutinesDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep

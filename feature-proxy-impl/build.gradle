@@ -40,7 +40,7 @@ dependencies {
     implementation lifeCycleKtxDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep

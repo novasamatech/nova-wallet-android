@@ -24,7 +24,7 @@ dependencies {
     implementation androidDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation androidDep
 

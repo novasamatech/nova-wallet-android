@@ -55,7 +55,7 @@ dependencies {
     implementation shimmerDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep

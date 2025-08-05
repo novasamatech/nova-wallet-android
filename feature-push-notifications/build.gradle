@@ -41,8 +41,8 @@ dependencies {
     implementation coroutinesDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation lifecycleDep
-    ksp lifecycleKapt
+    ksp lifecycleCompiler
 }

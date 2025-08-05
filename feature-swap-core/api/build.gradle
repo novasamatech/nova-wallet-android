@@ -11,7 +11,7 @@ dependencies {
     implementation substrateSdkDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation androidDep
 

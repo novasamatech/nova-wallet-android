@@ -16,7 +16,7 @@ dependencies {
     implementation project(":common")
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     api substrateSdkDep
 

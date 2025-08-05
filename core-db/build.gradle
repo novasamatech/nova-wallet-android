@@ -39,11 +39,11 @@ dependencies {
     implementation coroutinesDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation roomDep
     implementation roomKtxDep
-    ksp roomKapt
+    ksp roomCompiler
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep

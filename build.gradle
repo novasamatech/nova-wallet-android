@@ -119,10 +119,10 @@ buildscript {
         flexBoxDep = "com.google.android.flexbox:flexbox:$flexBoxVersion"
 
         daggerDep = "com.google.dagger:dagger:$daggerVersion"
-        daggerKapt = "com.google.dagger:dagger-compiler:$daggerVersion"
+        daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
 
         lifecycleDep = "androidx.lifecycle:lifecycle-extensions:$architectureComponentVersion"
-        lifecycleKapt = "androidx.lifecycle:lifecycle-compiler:$architectureComponentVersion"
+        lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$architectureComponentVersion"
         lifecycleRuntime = "androidx.lifecycle:lifecycle-runtime-android:$architectureComponentVersion"
 
         coroutinesDep = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
@@ -147,7 +147,7 @@ buildscript {
 
         roomDep = "androidx.room:room-runtime:$roomVersion"
         roomKtxDep = "androidx.room:room-ktx:$roomVersion"
-        roomKapt = "androidx.room:room-compiler:$roomVersion"
+        roomCompiler = "androidx.room:room-compiler:$roomVersion"
 
         navigationFragmentDep = "androidx.navigation:navigation-fragment-ktx:$navControllerVersion"
         navigationUiDep = "androidx.navigation:navigation-ui-ktx:$navControllerVersion"

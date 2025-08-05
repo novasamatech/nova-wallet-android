@@ -56,7 +56,7 @@ dependencies {
     implementation retrofitDep
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     testImplementation project(':test-shared')
 

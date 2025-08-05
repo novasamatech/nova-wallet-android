@@ -45,13 +45,13 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     implementation daggerDep
-    ksp daggerKapt
+    ksp daggerCompiler
 
     implementation roomDep
-    ksp roomKapt
+    ksp roomCompiler
 
     implementation lifecycleDep
-    ksp lifecycleKapt
+    ksp lifecycleCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep
