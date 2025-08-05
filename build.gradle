@@ -43,7 +43,7 @@ buildscript {
         navControllerVersion = '2.3.1'
 
         junitVersion = '4.12'
-        mockitoVersion = '3.12.4'
+        mockitoVersion = '5.12.0'
         robolectricVersion = '4.1'
         allureVersion = '2.4.0'
 
@@ -176,7 +176,7 @@ buildscript {
         storiesDep = "com.github.shts:StoriesProgressView:$storiesVersion"
 
         jUnitDep = "junit:junit:$junitVersion"
-        mockitoDep = "org.mockito:mockito-inline:$mockitoVersion"
+        mockitoDep = "org.mockito:mockito-core:$mockitoVersion"
         robolectricDep = "org.robolectric:robolectric:$robolectricVersion"
         archCoreTestDep = "androidx.arch.core:core-testing:$architectureComponentVersion"
 
