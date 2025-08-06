@@ -5,7 +5,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.applyStatusBarInsets

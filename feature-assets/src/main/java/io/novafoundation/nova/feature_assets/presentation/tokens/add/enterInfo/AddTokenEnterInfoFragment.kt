@@ -5,7 +5,6 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations

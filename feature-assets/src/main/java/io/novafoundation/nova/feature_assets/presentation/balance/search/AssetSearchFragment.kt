@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.search
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
-import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyNavigationBarInsets
@@ -28,7 +26,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 
-class AssetSearchFragment : BaseFragment<AssetSearchViewModel, FragmentAssetSearchBinding>(),
+class AssetSearchFragment :
+    BaseFragment<AssetSearchViewModel, FragmentAssetSearchBinding>(),
     BalanceListAdapter.ItemAssetHandler {
 
     override fun createBinding() = FragmentAssetSearchBinding.inflate(layoutInflater)

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.creat
 import android.view.View
 import androidx.lifecycle.lifecycleScope
 
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applySystemBarInsets
