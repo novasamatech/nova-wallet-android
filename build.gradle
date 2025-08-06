@@ -71,8 +71,6 @@ buildscript {
 
         shimmerVersion = '0.5.0'
 
-        storiesVersion = '3.0.0'
-
         coilVersion = '1.2.1'
 
         flexBoxVersion = "3.0.0"
@@ -172,8 +170,6 @@ buildscript {
         wsDep = "com.neovisionaries:nv-websocket-client:$wsVersion"
 
         shimmerDep = "com.facebook.shimmer:shimmer:$shimmerVersion"
-
-        storiesDep = "com.github.shts:StoriesProgressView:$storiesVersion"
 
         jUnitDep = "junit:junit:$junitVersion"
         mockitoDep = "org.mockito:mockito-core:$mockitoVersion"
