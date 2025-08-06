@@ -85,7 +85,7 @@ class AddAccountInteractor(
 
     suspend fun importFromTrustWallet(mnemonic: String, addAccountType: AddAccountType.MetaAccount): Result<Unit> {
         return addAccount(
-           addAccountType =  addAccountType,
+            addAccountType = addAccountType,
             addAccountRepository = trustWalletAddAccountRepository,
             payload = TrustWalletAddAccountRepository.Payload(mnemonic, addAccountType)
         )
