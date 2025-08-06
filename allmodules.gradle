@@ -21,7 +21,7 @@ subprojects {
             minSdkVersion rootProject.minSdkVersion
             targetSdkVersion rootProject.targetSdkVersion
 
-            
+            testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         }
 
         compileOptions {
