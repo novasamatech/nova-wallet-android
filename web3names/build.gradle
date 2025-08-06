@@ -2,11 +2,6 @@
 android {
     namespace 'io.novafoundation.nova.web3names'
 
-    defaultConfig {
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
     buildTypes {
         release {
             minifyEnabled false

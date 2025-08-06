@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
 
         buildConfigField "String", "RAMP_TOKEN", "\"n8ev677z3z7enckabyc249j84ajpc28o9tmsgob7\""
         buildConfigField "String", "RAMP_HOST", "\"ri-widget-staging.firebaseapp.com\""

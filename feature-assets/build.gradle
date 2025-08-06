@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
 
         buildConfigField "String", "NOVA_CARD_WIDGET_ID", "\"4ce98182-ed76-4933-ba1b-b85e4a51d75a\""
     }

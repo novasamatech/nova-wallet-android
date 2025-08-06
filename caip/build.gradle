@@ -4,7 +4,7 @@ android {
 
     defaultConfig {
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
         buildConfigField "String", "SLIP_44_COINS_BASE_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/slip44.json\""
     }
 

@@ -8,11 +8,7 @@ android {
     namespace 'io.novafoundation.nova.feature_account_migration'
     compileSdk rootProject.compileSdkVersion
 
-    defaultConfig {
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
+    
     buildFeatures {
         buildConfig true
         viewBinding true

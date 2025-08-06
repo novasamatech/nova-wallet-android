@@ -10,7 +10,7 @@ android {
         applicationId rootProject.applicationId
         versionCode computeVersionCode()
         versionName computeVersionName()
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
     }
     signingConfigs {
         dev {

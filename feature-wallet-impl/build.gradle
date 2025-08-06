@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
 
         buildConfigField "String", "EHTERSCAN_API_KEY_MOONBEAM", readStringSecret("EHTERSCAN_API_KEY_MOONBEAM")
         buildConfigField "String", "EHTERSCAN_API_KEY_MOONRIVER", readStringSecret("EHTERSCAN_API_KEY_MOONRIVER")

@@ -5,11 +5,7 @@ android {
 
     ndkVersion "26.1.10909125"
 
-    defaultConfig {
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
+    
     buildTypes {
         release {
             minifyEnabled false
