@@ -12,7 +12,7 @@ buildscript {
         minSdkVersion = 24
         targetSdkVersion = 36
 
-        kotlinVersion = '1.9.22'
+        kotlinVersion = '2.1.0'
 
         ktlintPinterestVersion = '0.47.0'
 
@@ -43,7 +43,7 @@ buildscript {
         navControllerVersion = '2.3.1'
 
         junitVersion = '4.12'
-        mockitoVersion = '3.12.4'
+        mockitoVersion = '5.12.0'
         robolectricVersion = '4.1'
         allureVersion = '2.4.0'
 
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.7.0'
+        substrateSdkVersion = '2.7.2'
 
         gifVersion = '1.2.19'
 
@@ -117,10 +117,10 @@ buildscript {
         flexBoxDep = "com.google.android.flexbox:flexbox:$flexBoxVersion"
 
         daggerDep = "com.google.dagger:dagger:$daggerVersion"
-        daggerKapt = "com.google.dagger:dagger-compiler:$daggerVersion"
+        daggerCompiler = "com.google.dagger:dagger-compiler:$daggerVersion"
 
         lifecycleDep = "androidx.lifecycle:lifecycle-extensions:$architectureComponentVersion"
-        lifecycleKapt = "androidx.lifecycle:lifecycle-compiler:$architectureComponentVersion"
+        lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$architectureComponentVersion"
         lifecycleRuntime = "androidx.lifecycle:lifecycle-runtime-android:$architectureComponentVersion"
 
         coroutinesDep = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
@@ -145,7 +145,7 @@ buildscript {
 
         roomDep = "androidx.room:room-runtime:$roomVersion"
         roomKtxDep = "androidx.room:room-ktx:$roomVersion"
-        roomKapt = "androidx.room:room-compiler:$roomVersion"
+        roomCompiler = "androidx.room:room-compiler:$roomVersion"
 
         navigationFragmentDep = "androidx.navigation:navigation-fragment-ktx:$navControllerVersion"
         navigationUiDep = "androidx.navigation:navigation-ui-ktx:$navControllerVersion"
@@ -172,7 +172,7 @@ buildscript {
         shimmerDep = "com.facebook.shimmer:shimmer:$shimmerVersion"
 
         jUnitDep = "junit:junit:$junitVersion"
-        mockitoDep = "org.mockito:mockito-inline:$mockitoVersion"
+        mockitoDep = "org.mockito:mockito-core:$mockitoVersion"
         robolectricDep = "org.robolectric:robolectric:$robolectricVersion"
         archCoreTestDep = "androidx.arch.core:core-testing:$architectureComponentVersion"
 
@@ -237,6 +237,7 @@ buildscript {
         classpath 'org.mozilla.rust-android-gradle:plugin:0.9.6'
         classpath "com.google.firebase:firebase-appdistribution-gradle:$firebaseAppDistrVersion"
         classpath "com.github.triplet.gradle:play-publisher:$playPublisherVersion"
+        classpath "com.google.devtools.ksp:symbol-processing-gradle-plugin:2.1.0-1.0.29"
     }
 }
 
@@ -259,6 +260,7 @@ configurations {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
 
 dependencies {
     ktlint("com.pinterest:ktlint:$ktlintPinterestVersion") {
@@ -291,3 +293,5 @@ task ktlintFormat(type: JavaExec, group: "formatting") {
 task runTest(type: GradleBuild) {
     tasks = ['clean', 'ktlint', 'testDebugUnitTest']
 }
+
+apply from: "allmodules.gradle"
