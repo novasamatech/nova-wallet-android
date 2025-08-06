@@ -94,5 +94,4 @@ dependencies {
     implementation retrofitDep
 
     implementation shimmerDep
-    implementation storiesDep
 }
