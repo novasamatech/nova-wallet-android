@@ -12,11 +12,12 @@ import io.novafoundation.nova.feature_account_api.data.derivationPath.Derivation
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
-import io.novasama.substrate_sdk_android.encrypt.keypair.ethereum.EthereumKeypairFactory
+import io.novasama.substrate_sdk_android.encrypt.keypair.bip32.Bip32EcdsaKeypairFactory
+import io.novasama.substrate_sdk_android.encrypt.keypair.generate
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
-import io.novasama.substrate_sdk_android.encrypt.seed.ethereum.EthereumSeedFactory
+import io.novasama.substrate_sdk_android.encrypt.seed.bip39.Bip39SeedFactory
 import io.novasama.substrate_sdk_android.encrypt.seed.substrate.SubstrateSeedFactory
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
@@ -84,7 +85,7 @@ class AccountSecretsFactory(
             val junctions = decodedDerivationPath?.junctions.orEmpty()
 
             if (isEthereum) {
-                EthereumKeypairFactory.generate(seed, junctions)
+                Bip32EcdsaKeypairFactory.generate(seed, junctions)
             } else {
                 SubstrateKeypairFactory.generate(encryptionType, seed, junctions)
             }
@@ -118,7 +119,7 @@ class AccountSecretsFactory(
 
             val seed = deriveSeed(it.mnemonic, password = decodedEthereumDerivationPath?.password, ethereum = true).seed
 
-            EthereumKeypairFactory.generate(seed = seed, junctions = decodedEthereumDerivationPath?.junctions.orEmpty())
+            Bip32EcdsaKeypairFactory.generate(seed = seed, junctions = decodedEthereumDerivationPath?.junctions.orEmpty())
         }
 
         val secrets = MetaAccountSecrets(
@@ -135,7 +136,7 @@ class AccountSecretsFactory(
 
     private fun deriveSeed(mnemonic: String, password: String?, ethereum: Boolean): SeedFactory.Result {
         return if (ethereum) {
-            EthereumSeedFactory.deriveSeed(mnemonic, password)
+            Bip39SeedFactory.deriveSeed(mnemonic, password)
         } else {
             SubstrateSeedFactory.deriveSeed32(mnemonic, password)
         }
