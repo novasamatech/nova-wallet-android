@@ -6,6 +6,7 @@ import android.view.View
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.isVisible
 import androidx.core.view.marginTop
 import androidx.navigation.NavController
@@ -21,6 +22,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.RoundCornersOutlineProvider
+import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.payloadOrElse
@@ -41,6 +43,10 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel, FragmentSplitScre
         val navHostFragment = childFragmentManager.findFragmentById(R.id.mainNavHost) as NavHostFragment
 
         navHostFragment.navController
+    }
+
+    override fun applyInsets(rootView: View) {
+        // Implemented to not consume insets for nested fragments
     }
 
     override fun createBinding() = FragmentSplitScreenBinding.inflate(layoutInflater)
@@ -88,42 +94,46 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel, FragmentSplitScre
             }
             binder.dappEntryPointText.text = model.title
         }
-        manageImeInsets()
+        manageInsets()
     }
 
     /**
      * Since we have a dAppEntryPoint we must change ime insets for main container and its children
      * to avoid extra bottom space when keyboard is shown
      */
-    private fun manageImeInsets() {
-        // We change this value when dappEntryPoint is shown/hidden
+    private fun manageInsets() {
+        binder.dappEntryPoint.applyNavigationBarInsets()
+
+        var dappEntryPointShown = false
         var dappEntryPointHeight = 0
 
         // Inset listener that provides a custom insets to its children
         ViewCompat.setOnApplyWindowInsetsListener(binder.mainNavHost) { _, insets ->
-            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val insetsBuilder = WindowInsetsCompat.Builder(insets)
+            // We need to remove height from ime inset to don't show dapp entry point when keyboard is shown
+            insetsBuilder.setInsets(Type.ime(), insets.getInsets(Type.ime()).withoutBottom(dappEntryPointHeight))
 
-            val changedImeInsets = Insets.of(
-                imeInsets.left,
-                imeInsets.top,
-                imeInsets.right,
-                (imeInsets.bottom - dappEntryPointHeight).coerceAtLeast(0)
-            )
-
-            WindowInsetsCompat.Builder(insets)
-                .setInsets(WindowInsetsCompat.Type.ime(), changedImeInsets)
-                .build()
+            // We also remove other navigation ans gestures insets since dappEntryPoint must use them instead of any nested fragment
+            insetsBuilder.setInsets(Type.navigationBars(), insets.getInsets(Type.navigationBars()).removeBottom(dappEntryPointShown))
+            insetsBuilder.setInsets(Type.systemGestures(), insets.getInsets(Type.systemGestures()).removeBottom(dappEntryPointShown))
+            insetsBuilder.build()
         }
 
-        // Subscribe to get dAppEntryPoint height
+        // Subscribe to change insets when dappEntryPoint changes its visibility
         viewModel.dappTabsVisible.observe {
+            // Change this instantly to avoid delays until dappEntryPoint will be measured
+            dappEntryPointShown = it
+            ViewCompat.requestApplyInsets(binder.mainNavHost)
+
+            // Change this only after dappEntryPoint will be measured to setup a keyboard insets
             binder.dappEntryPoint.post {
                 dappEntryPointHeight = if (binder.dappEntryPoint.isVisible) {
                     binder.dappEntryPoint.height + binder.dappEntryPoint.marginTop
                 } else {
                     0
                 }
-                ViewCompat.requestApplyInsets(binder.mainNavHost) // Request new insets to trigger inset listener
+
+                ViewCompat.requestApplyInsets(binder.mainNavHost)
             }
         }
     }
