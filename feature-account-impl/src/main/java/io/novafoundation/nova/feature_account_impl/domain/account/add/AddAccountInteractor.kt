@@ -9,12 +9,14 @@ import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.TrustWalletAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 
 class AddAccountInteractor(
     private val mnemonicAddAccountRepository: MnemonicAddAccountRepository,
     private val jsonAddAccountRepository: JsonAddAccountRepository,
     private val seedAddAccountRepository: SeedAddAccountRepository,
+    private val trustWalletAddAccountRepository: TrustWalletAddAccountRepository,
     private val accountRepository: AccountRepository,
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor
 ) {
@@ -78,6 +80,14 @@ class AddAccountInteractor(
                 password = password,
                 addAccountType = addAccountType
             )
+        )
+    }
+
+    suspend fun importFromTrustWallet(mnemonic: String, addAccountType: AddAccountType.MetaAccount): Result<Unit> {
+        return addAccount(
+           addAccountType =  addAccountType,
+            addAccountRepository = trustWalletAddAccountRepository,
+            payload = TrustWalletAddAccountRepository.Payload(mnemonic, addAccountType)
         )
     }
 

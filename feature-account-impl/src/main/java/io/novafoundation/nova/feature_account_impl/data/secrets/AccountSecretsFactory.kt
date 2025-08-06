@@ -124,7 +124,7 @@ class AccountSecretsFactory(
 
         val secrets = MetaAccountSecrets(
             entropy = substrateSecrets[ChainAccountSecrets.Entropy],
-            seed = substrateSecrets[ChainAccountSecrets.Seed],
+            substrateSeed = substrateSecrets[ChainAccountSecrets.Seed],
             substrateKeyPair = mapKeypairStructToKeypair(substrateSecrets[ChainAccountSecrets.Keypair]),
             substrateDerivationPath = substrateDerivationPath,
             ethereumKeypair = ethereumKeypair,

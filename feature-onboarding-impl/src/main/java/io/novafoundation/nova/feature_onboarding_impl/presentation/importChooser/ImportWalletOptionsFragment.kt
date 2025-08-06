@@ -22,6 +22,7 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel, F
 
         binder.importOptionPassphraseBig.setOnClickListener { importMnemonicClicked() }
         binder.importOptionPassphraseSmall.setOnClickListener { importMnemonicClicked() }
+        binder.importOptionTrustWallet.setOnClickListener { viewModel.importTrustWalletClicked() }
         binder.importOptionCloud.setOnClickListener { viewModel.importCloudClicked() }
         binder.importOptionHardware.setOnClickListener { viewModel.importHardwareClicked() }
         binder.importOptionWatchOnly.setOnClickListener { viewModel.importWatchOnlyClicked() }
