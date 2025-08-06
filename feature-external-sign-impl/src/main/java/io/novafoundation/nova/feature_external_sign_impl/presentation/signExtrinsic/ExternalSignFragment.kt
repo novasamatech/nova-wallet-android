@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.blockBackPressing
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.postToSelf
 import io.novafoundation.nova.common.utils.setVisible
@@ -45,8 +44,6 @@ class ExternalSignFragment : BaseFragment<ExternalSignViewModel, FragmentConfirm
     lateinit var imageLoader: ImageLoader
 
     override fun initViews() {
-        binder.confirmSignExtinsicToolbar.applyStatusBarInsets()
-
         blockBackPressing()
 
         binder.confirmDAppActionAllow.prepareForProgress(viewLifecycleOwner)

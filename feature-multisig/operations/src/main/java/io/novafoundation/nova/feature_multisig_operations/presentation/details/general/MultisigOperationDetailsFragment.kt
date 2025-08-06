@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.bindWithHideShowButton
@@ -48,8 +47,6 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SignatoriesAdapter(viewModel::onSignatoryClicked) }
 
     override fun initViews() {
-        binder.multisigPendingOperationDetailsContainer.applyStatusBarInsets()
-
         binder.multisigPendingOperationDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.multisigOperationSignatories.adapter = adapter

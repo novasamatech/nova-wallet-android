@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.importChoose
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.observeConfirmationAction
@@ -17,7 +16,6 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel, F
     override fun createBinding() = FragmentImportWalletOptionsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.importOptionsToolbar.applyStatusBarInsets()
         binder.importOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.importOptionPassphraseBig.setOnClickListener { importMnemonicClicked() }

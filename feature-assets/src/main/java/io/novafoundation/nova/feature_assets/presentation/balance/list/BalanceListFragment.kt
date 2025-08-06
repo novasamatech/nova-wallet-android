@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
+import android.view.View
 import androidx.recyclerview.widget.ConcatAdapter
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.EditablePlaceholderAdapter
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
@@ -76,13 +77,11 @@ class BalanceListFragment :
         ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter)
     }
 
-    override fun initViews() {
-        binder.balanceListAssets.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
+    override fun applyInsets(rootView: View) {
+        binder.balanceListAssets.applyStatusBarInsets()
+    }
 
+    override fun initViews() {
         hideKeyboard()
 
         setupRecyclerView()

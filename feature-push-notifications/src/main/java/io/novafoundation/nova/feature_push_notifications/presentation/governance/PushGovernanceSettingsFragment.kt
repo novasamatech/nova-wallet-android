@@ -7,7 +7,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.observe
 import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushGovernanceSettingsBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
@@ -40,7 +39,6 @@ class PushGovernanceSettingsFragment :
     }
 
     override fun initViews() {
-        binder.pushGovernanceToolbar.applyStatusBarInsets()
         binder.pushGovernanceToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.pushGovernanceToolbar.setRightActionClickListener { viewModel.clearClicked() }
         onBackPressed { viewModel.backClicked() }

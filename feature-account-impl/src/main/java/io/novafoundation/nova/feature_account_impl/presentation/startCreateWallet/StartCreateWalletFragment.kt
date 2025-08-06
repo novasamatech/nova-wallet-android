@@ -7,7 +7,6 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.setState
@@ -30,7 +29,6 @@ class StartCreateWalletFragment : BaseFragment<StartCreateWalletViewModel, Fragm
     override fun createBinding() = FragmentStartCreateWalletBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.startCreateWalletToolbar.applyStatusBarInsets()
         binder.startCreateWalletToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.startCreateWalletConfirmName.setOnClickListener { viewModel.confirmNameClicked() }

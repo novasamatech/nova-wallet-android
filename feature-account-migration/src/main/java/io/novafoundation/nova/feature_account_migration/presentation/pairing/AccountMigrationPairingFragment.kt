@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_account_migration.R
 import io.novafoundation.nova.feature_account_migration.databinding.FragmentAccountMigrationPairingBinding
@@ -20,7 +19,6 @@ class AccountMigrationPairingFragment : BaseFragment<AccountMigrationPairingView
     override fun createBinding() = FragmentAccountMigrationPairingBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.accountMigrationSkipContainer.applyStatusBarInsets()
         binder.accountMigrationSkip.background = getRoundedCornerDrawable(R.color.button_background_secondary, cornerSizeDp = 10)
             .withRippleMask(getRippleMask(cornerSizeDp = 10))
         binder.accountMigrationSkip.setOnClickListener { viewModel.close() }

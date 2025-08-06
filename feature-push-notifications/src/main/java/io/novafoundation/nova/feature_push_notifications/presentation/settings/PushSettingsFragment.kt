@@ -5,7 +5,6 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushSettingsBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
@@ -18,7 +17,6 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
     override fun initViews() {
         onBackPressed { viewModel.backClicked() }
 
-        binder.pushSettingsToolbar.applyStatusBarInsets()
         binder.pushSettingsToolbar.setRightActionClickListener { viewModel.saveClicked() }
         binder.pushSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
 

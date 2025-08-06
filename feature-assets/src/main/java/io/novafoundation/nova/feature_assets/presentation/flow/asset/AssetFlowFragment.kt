@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.flow.asset
 
+import android.view.View
 import androidx.annotation.StringRes
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
 import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -42,14 +44,13 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
         binder.assetFlowToolbar.setTitle(titleRes)
     }
 
-    override fun initViews() {
+    override fun applyInsets(rootView: View) {
         binder.assetFlowToolbar.applyStatusBarInsets()
+        binder.assetFlowList.applyNavigationBarInsets(imeInsets = true)
+    }
+
+    override fun initViews() {
         binder.assetFlowToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.assetFlowSearchContainer.applyInsetter {
-            type(ime = true) {
-                padding()
-            }
-        }
 
         with(binder.assetFlowList) {
             setHasFixedSize(true)

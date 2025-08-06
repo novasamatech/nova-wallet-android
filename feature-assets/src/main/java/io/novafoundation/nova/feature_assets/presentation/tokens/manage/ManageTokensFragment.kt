@@ -1,11 +1,12 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.manage
 
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -32,14 +33,12 @@ class ManageTokensFragment :
         ManageTokensAdapter(imageLoader, this)
     }
 
-    override fun initViews() {
-        binder.manageTokensToolbar.applyStatusBarInsets()
-        binder.manageTokensContainer.applyInsetter {
-            type(ime = true) {
-                padding()
-            }
-        }
+    override fun applyInsets(rootView: View) {
+        binder.manageTokensToolbarContainer.applyStatusBarInsets()
+        binder.manageTokensList.applyNavigationBarInsets(consume = false, imeInsets = true)
+    }
 
+    override fun initViews() {
         binder.manageTokensList.setHasFixedSize(true)
         binder.manageTokensList.adapter = tokensAdapter
 
