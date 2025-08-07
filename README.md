@@ -19,9 +19,9 @@ git clone git@github.com:novasamatech/nova-wallet-android.git
 
 #### Install NDK
 
-Instal NDK version `26.1.10909125` from SDK Manager by going to Tools -> SDK Mmanager -> Sdk Tools -> NDK (Side by Side)
+Install NDK version `26.1.10909125` from SDK Manager by going to Tools -> SDK Manager -> Sdk Tools -> NDK (Side by Side)
 
-#### Instal Rust
+#### Install Rust
 
 Install Rust by following [official instruction](https://www.rust-lang.org/tools/install). Use "Using rustup" option. On MacOS you can also install rust with [brew](https://formulae.brew.sh/formula/rust)
 

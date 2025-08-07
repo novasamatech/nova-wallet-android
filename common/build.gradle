@@ -1,16 +1,10 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
 
         buildConfigField "String", "WEBSITE_URL", "\"https://novawallet.io\""
         buildConfigField "String", "PRIVACY_URL", "\"https://novawallet.io/privacy\""
@@ -71,16 +65,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
     namespace 'io.novafoundation.nova.common'
 
     buildFeatures {
@@ -116,10 +100,10 @@ dependencies {
     implementation viewModelKtxDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     implementation retrofitDep
     api gsonConvertedDep

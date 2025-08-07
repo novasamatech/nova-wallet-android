@@ -58,6 +58,14 @@
                 android:layout_marginTop="8dp">
 
                 <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/multisigPendingOperationDetailsCallHash"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:primaryValueEndIcon="@drawable/ic_info"
+                    app:title="@string/common_call_hash" />
+
+                <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/multisigPendingOperationDetailsCallData"
                     style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                     android:layout_width="match_parent"

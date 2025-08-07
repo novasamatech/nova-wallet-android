@@ -140,14 +140,17 @@ class MultisigSigner(
         )
 
         val requestBusPayload = MultisigExtrinsicValidationRequestBus.Request(validationPayload)
-        val validationResponse = multisigExtrinsicValidationEventBus.handle(requestBusPayload)
-
-        val validationStatus = validationResponse.validationResult.getOrNull()
-        if (validationStatus !is ValidationStatus.NotValid) return
-
-        multisigSigningPresenter.presentValidationFailure(validationStatus.reason)
-
-        throw SigningCancelledException()
+        multisigExtrinsicValidationEventBus.handle(requestBusPayload)
+            .validationResult
+            .onSuccess {
+                if (it is ValidationStatus.NotValid) {
+                    multisigSigningPresenter.presentValidationFailure(it.reason)
+                    throw SigningCancelledException()
+                }
+            }
+            .onFailure {
+                throw it
+            }
     }
 
     context(ExtrinsicBuilder)

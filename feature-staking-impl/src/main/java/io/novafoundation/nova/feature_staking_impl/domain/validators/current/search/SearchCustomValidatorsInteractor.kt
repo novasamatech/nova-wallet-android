@@ -16,10 +16,10 @@ class SearchCustomValidatorsInteractor(
 
     @SuppressLint("DefaultLocale")
     suspend fun searchValidator(query: String, localValidators: Collection<Validator>): List<Validator> = withContext(Dispatchers.Default) {
-        val queryLower = query.toLowerCase()
+        val queryLower = query.lowercase()
 
         val searchInLocal = localValidators.filter {
-            val foundInIdentity = it.identity?.display?.toLowerCase()?.contains(queryLower) ?: false
+            val foundInIdentity = it.identity?.display?.lowercase()?.contains(queryLower) ?: false
 
             it.address.startsWith(query) || foundInIdentity
         }

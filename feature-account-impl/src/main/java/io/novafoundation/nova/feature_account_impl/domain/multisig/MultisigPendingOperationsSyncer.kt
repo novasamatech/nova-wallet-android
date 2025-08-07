@@ -157,6 +157,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
                 val offChainInfo = offChainInfos[callHash]
 
                 PendingMultisigOperation.from(
+                    multisigMetaId = multisig.id,
                     onChainMultisig = onChainOperation ?: return@mapValues null,
                     callData = realtimeCallDatas[realtimeKey] ?: offChainInfo?.callData,
                     chain = chain,
@@ -167,12 +168,14 @@ internal class RealMultisigChainPendingOperationsSyncer(
     }
 
     private fun PendingMultisigOperation.Companion.from(
+        multisigMetaId: Long,
         onChainMultisig: OnChainMultisig,
         callData: GenericCall.Instance?,
         chain: Chain,
         timestamp: Duration
     ): PendingMultisigOperation {
         return PendingMultisigOperation(
+            multisigMetaId = multisigMetaId,
             call = callData,
             callHash = onChainMultisig.callHash,
             chain = chain,

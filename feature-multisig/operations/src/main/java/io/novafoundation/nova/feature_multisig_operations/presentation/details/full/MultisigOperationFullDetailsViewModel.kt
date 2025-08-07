@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.full
 
+import io.novafoundation.nova.common.address.toHexWithPrefix
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
+import io.novafoundation.nova.common.mixin.copy.showCopyCallHash
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.ellipsizeMiddle
 import io.novafoundation.nova.common.utils.launchUnit
@@ -56,7 +58,7 @@ class MultisigOperationFullDetailsViewModel(
     }.shareInBackground()
 
     val depositorAccountModel = operationFlow.map {
-        accountUIUseCase.getAccountModel(it.depositor.value, it.chain)
+        accountUIUseCase.getAccountModel(it.depositor, it.chain)
     }.withSafeLoading()
         .shareInBackground()
 
@@ -74,6 +76,14 @@ class MultisigOperationFullDetailsViewModel(
         operation.call?.let { interactor.callDetails(it) }
     }.shareInBackground()
 
+    private val callHash = operationFlow.map { operation ->
+        operation.callHash.toHexWithPrefix()
+    }.shareInBackground()
+
+    val ellipsizedCallHash = callHash.map {
+        it.ellipsizeMiddle(CALL_HASH_SHOWN_SYMBOLS)
+    }.shareInBackground()
+
     fun onDepositorClicked() = launchUnit {
         val chain = operationFlow.first().chain
         depositorAccountModel.first().onLoaded {
@@ -81,7 +91,7 @@ class MultisigOperationFullDetailsViewModel(
         }
     }
 
-    fun callHashClicked() = launchUnit {
+    fun callDataClicked() = launchUnit {
         val callDataEllipsized = ellipsizedCallData.first() ?: return@launchUnit
         val callData = callDataFlow.first() ?: return@launchUnit
         copyTextLauncher.showCopyTextDialog(
@@ -99,5 +109,9 @@ class MultisigOperationFullDetailsViewModel(
             titleRes = R.string.multisig_deposit,
             descriptionRes = R.string.multisig_deposit_description
         )
+    }
+
+    fun callHashClicked() = launchUnit {
+        copyTextLauncher.showCopyCallHash(resourceManager, callHash.first())
     }
 }

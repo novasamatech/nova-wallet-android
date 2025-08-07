@@ -1,18 +1,12 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
 
         buildConfigField "String", "NOVA_CARD_WIDGET_ID", "\"4ce98182-ed76-4933-ba1b-b85e4a51d75a\""
     }
@@ -23,16 +17,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
+    
     namespace 'io.novafoundation.nova.feature_assets'
 
     packagingOptions {
@@ -80,13 +65,13 @@ dependencies {
 
     implementation daggerDep
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation roomDep
-    kapt roomKapt
+    ksp roomCompiler
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     implementation bouncyCastleDep
 

@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.InflationPredicti
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.erasStartSessionIndex
@@ -43,7 +42,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -75,7 +73,6 @@ class StakingRepositoryImpl(
     private val localStorage: StorageDataSource,
     private val walletConstants: WalletConstants,
     private val chainRegistry: ChainRegistry,
-    private val stakingStoriesDataSource: StakingStoriesDataSource,
     private val storageCache: StorageCache,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
 ) : StakingRepository {
@@ -294,10 +291,6 @@ class StakingRepositoryImpl(
                 chainId = chainId
             )
         }
-    }
-
-    override fun stakingStoriesFlow(): Flow<List<StakingStory>> {
-        return stakingStoriesDataSource.getStoriesFlow()
     }
 
     override fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger> {

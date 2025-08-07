@@ -165,7 +165,9 @@
 
     <declare-styleable name="PlaceholderView">
         <attr name="android:text" />
+        <attr name="showButton" format="boolean" />
         <attr name="image" format="color|reference" />
+        <attr name="imageTint" format="color" />
         <attr name="placeholderBackgroundStyle" format="enum">
             <enum name="dark" value="0" />
             <enum name="light" value="1" />
