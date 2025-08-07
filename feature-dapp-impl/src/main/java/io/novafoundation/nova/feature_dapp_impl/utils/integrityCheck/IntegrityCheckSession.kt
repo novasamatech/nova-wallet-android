@@ -35,7 +35,7 @@ class IntegrityCheckSession(
     private val integrityCheckApi: IntegrityCheckApi,
     private val preferences: Preferences,
     private val integrityService: IntegrityService,
-    private var callback: Callback?
+    private val callback: Callback?
 ) {
 
     interface Callback {
