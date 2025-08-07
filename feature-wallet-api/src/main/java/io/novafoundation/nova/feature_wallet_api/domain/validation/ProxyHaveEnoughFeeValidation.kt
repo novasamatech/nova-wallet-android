@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -25,17 +25,17 @@ class ProxyHaveEnoughFeeValidationFactory @Inject constructor(
 ) {
     fun <P, E> create(
         proxyAccountId: (P) -> AccountId,
-        metaAccount: (P) -> MetaAccount,
-        call: (P) -> GenericCall.Instance,
+        proxiedMetaAccount: (P) -> ProxiedMetaAccount,
+        proxiedCall: (P) -> GenericCall.Instance,
         chainWithAsset: (P) -> ChainWithAsset,
         proxyNotEnoughFee: (payload: P, availableBalance: Balance, fee: Fee) -> E,
     ): ProxyHaveEnoughFeeValidation<P, E> {
         return ProxyHaveEnoughFeeValidation(
             assetSourceRegistry,
             extrinsicService,
-            metaAccount,
+            proxiedMetaAccount,
             proxyAccountId,
-            call,
+            proxiedCall,
             chainWithAsset,
             proxyNotEnoughFee
         )
@@ -45,9 +45,9 @@ class ProxyHaveEnoughFeeValidationFactory @Inject constructor(
 class ProxyHaveEnoughFeeValidation<P, E>(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val extrinsicService: ExtrinsicService,
-    private val metaAccount: (P) -> MetaAccount,
+    private val proxiedMetaAccount: (P) -> ProxiedMetaAccount,
     private val proxyAccountId: (P) -> AccountId,
-    private val call: (P) -> GenericCall.Instance,
+    private val proxiedCall: (P) -> GenericCall.Instance,
     private val chainWithAsset: (P) -> ChainWithAsset,
     private val proxyNotEnoughFee: (payload: P, availableBalance: Balance, fee: Fee) -> E,
 ) : Validation<P, E> {
@@ -55,7 +55,7 @@ class ProxyHaveEnoughFeeValidation<P, E>(
     override suspend fun validate(value: P): ValidationStatus<E> {
         val chain = chainWithAsset(value).chain
         val chainAsset = chainWithAsset(value).asset
-        val fee = calculateFee(metaAccount(value), chain, call(value))
+        val fee = calculateFee(proxiedMetaAccount(value), chain, proxiedCall(value))
 
         val assetSource = assetSourceRegistry.sourceFor(chainAsset)
         val assetBalanceSource = assetSource.balance
@@ -70,26 +70,30 @@ class ProxyHaveEnoughFeeValidation<P, E>(
         }
     }
 
-    private suspend fun calculateFee(metaAccount: MetaAccount, chain: Chain, callInstance: GenericCall.Instance): Fee {
-        return extrinsicService.estimateFee(chain, metaAccount.intoOrigin()) {
-            call(callInstance)
+    private suspend fun calculateFee(
+        proxiedMetaAccount: ProxiedMetaAccount,
+        chain: Chain,
+        proxiedCall: GenericCall.Instance
+    ): Fee {
+        return extrinsicService.estimateFee(chain, proxiedMetaAccount.intoOrigin()) {
+            call(proxiedCall)
         }
     }
 }
 
 fun <P, E> ValidationSystemBuilder<P, E>.proxyHasEnoughFeeValidation(
     factory: ProxyHaveEnoughFeeValidationFactory,
-    metaAccount: (P) -> MetaAccount,
+    proxiedMetaAccount: (P) -> ProxiedMetaAccount,
     proxyAccountId: (P) -> AccountId,
-    call: (P) -> GenericCall.Instance,
+    proxiedCall: (P) -> GenericCall.Instance,
     chainWithAsset: (P) -> ChainWithAsset,
     proxyNotEnoughFee: (payload: P, availableBalance: Balance, fee: Fee) -> E,
 ) = validate(
     factory.create(
-        proxyAccountId,
-        metaAccount,
-        call,
-        chainWithAsset,
-        proxyNotEnoughFee
+        proxyAccountId = proxyAccountId,
+        proxiedMetaAccount = proxiedMetaAccount,
+        proxiedCall = proxiedCall,
+        chainWithAsset = chainWithAsset,
+        proxyNotEnoughFee = proxyNotEnoughFee
     )
 )

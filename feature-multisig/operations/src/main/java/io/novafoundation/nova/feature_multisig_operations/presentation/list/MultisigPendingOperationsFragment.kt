@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.list
 
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -46,6 +47,7 @@ class MultisigPendingOperationsFragment :
     override fun subscribe(viewModel: MultisigPendingOperationsViewModel) {
         viewModel.pendingOperationsFlow.observe {
             it.onLoaded { data ->
+                binder.multisigPendingOperationsPlaceholder.isVisible = data.isEmpty()
                 binder.multisigPendingOperationsProgress.makeGone()
                 binder.multisigPendingOperationsList.makeVisible()
                 adapter.submitList(data)

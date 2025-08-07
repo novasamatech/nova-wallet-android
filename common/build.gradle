@@ -1,16 +1,10 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
 
         buildConfigField "String", "WEBSITE_URL", "\"https://novawallet.io\""
         buildConfigField "String", "PRIVACY_URL", "\"https://novawallet.io/privacy\""
@@ -49,6 +43,8 @@ android {
         buildConfigField "String", "ASSET_WHITE_ICON_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/icons/tokens/white/v1\""
 
         buildConfigField "String", "UNIFIED_ADDRESS_ARTICLE", "\"https://docs.novawallet.io/nova-wallet-wiki/asset-management/how-to-receive-tokens#unified-and-legacy-addresses\""
+
+        buildConfigField "long", "CLOUD_PROJECT_NUMBER", "171267697857L"
     }
 
     buildTypes {
@@ -58,6 +54,8 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "long", "CLOUD_PROJECT_NUMBER", "802342409053L"
         }
 
         releaseGithub {
@@ -65,16 +63,6 @@ android {
             matchingFallbacks = ['release']
             buildConfigField "String", "APP_UPDATE_SOURCE_LINK", "\"https://github.com/novasamatech/nova-wallet-android/releases\""
         }
-    }
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     namespace 'io.novafoundation.nova.common'
@@ -92,7 +80,6 @@ dependencies {
     api project(":core-api")
 
     implementation kotlinDep
-
 
     implementation androidDep
     implementation cardViewDep
@@ -113,10 +100,10 @@ dependencies {
     implementation viewModelKtxDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     implementation retrofitDep
     api gsonConvertedDep
@@ -140,6 +127,8 @@ dependencies {
     api coroutinesRxDep
 
     implementation shimmerDep
+
+    implementation playIntegrity
 
     testImplementation jUnitDep
     testImplementation mockitoDep

@@ -20,7 +20,6 @@ import io.novafoundation.nova.common.utils.onFailureInstance
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core.updater.Updater
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
@@ -54,8 +53,7 @@ class RootViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val toastMessageManager: ToastMessageManager,
-    val multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin
+    private val toastMessageManager: ToastMessageManager
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -106,6 +104,7 @@ class RootViewModel(
 
     private fun observeBusEvents() {
         compoundRequestBusHandler.observe()
+            .launchIn(this)
     }
 
     private fun subscribeDeepLinkCallback() {

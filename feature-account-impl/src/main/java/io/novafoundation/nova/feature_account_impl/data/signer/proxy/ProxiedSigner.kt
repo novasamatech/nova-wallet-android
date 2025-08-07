@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.composeCall
-import io.novafoundation.nova.common.utils.getChainIdOrThrow
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationFailure.ProxyNotEnoughFee
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxiedExtrinsicValidationPayload
@@ -22,14 +21,15 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
+import io.novafoundation.nova.feature_account_impl.data.signer.LeafSigner
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.commissionAsset
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
@@ -38,7 +38,6 @@ import javax.inject.Inject
 
 @FeatureScope
 class ProxiedSignerFactory @Inject constructor(
-    private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val proxySigningPresenter: ProxySigningPresenter,
     private val getProxyRepository: GetProxyRepository,
@@ -48,7 +47,6 @@ class ProxiedSignerFactory @Inject constructor(
 
     fun create(metaAccount: ProxiedMetaAccount, signerProvider: SignerProvider, isRoot: Boolean): ProxiedSigner {
         return ProxiedSigner(
-            chainRegistry = chainRegistry,
             accountRepository = accountRepository,
             signerProvider = signerProvider,
             proxySigningPresenter = proxySigningPresenter,
@@ -63,7 +61,6 @@ class ProxiedSignerFactory @Inject constructor(
 
 class ProxiedSigner(
     private val proxiedMetaAccount: ProxiedMetaAccount,
-    private val chainRegistry: ChainRegistry,
     private val accountRepository: AccountRepository,
     private val signerProvider: SignerProvider,
     private val proxySigningPresenter: ProxySigningPresenter,
@@ -99,21 +96,26 @@ class ProxiedSigner(
 
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForSubmission(context: SigningContext) {
-        wrapCallsInProxyForSubmission()
+        if (isRootSigner) {
+            acknowledgeProxyOperation(proxyMetaAccount())
+        }
+
+        val proxiedCall = getWrappedCall()
+
+        validateExtrinsic(context.chain, proxyMetaAccount = proxyMetaAccount(), proxiedCall = proxiedCall)
+
+        wrapCallsInProxyForSubmission(context.chain, proxiedCall = proxiedCall)
 
         Log.d("Signer", "ProxiedSigner: wrapped proxy calls for submission")
 
         delegateSigner().setSignerDataForSubmission(context)
-
-        if (isRootSigner) {
-            acknowledgeProxyOperation(proxyMetaAccount())
-            validateExtrinsic(context.chain)
-        }
     }
 
     context(ExtrinsicBuilder)
     override suspend fun setSignerDataForFee(context: SigningContext) {
-        wrapCallsInProxyForFee()
+        val proxiedCall = getWrappedCall()
+
+        wrapCallsInProxyForFee(context.chain, proxiedCall = proxiedCall)
 
         Log.d("Signer", "ProxiedSigner: wrapped proxy calls for fee")
 
@@ -129,36 +131,38 @@ class ProxiedSigner(
     }
 
     context(ExtrinsicBuilder)
-    private suspend fun validateExtrinsic(chain: Chain) {
-        val proxyAccountId = submissionSignerAccountId(chain)
-        val proxyAccount = accountRepository.findMetaAccount(proxyAccountId, chain.id) ?: throw IllegalStateException("Proxy account is not found")
+    private suspend fun validateExtrinsic(
+        chain: Chain,
+        proxyMetaAccount: MetaAccount,
+        proxiedCall: GenericCall.Instance,
+    ) {
+        if (!proxyPaysFees()) return
 
         val validationPayload = ProxiedExtrinsicValidationPayload(
-            proxyMetaAccount = proxyAccount,
-            proxyAccountId = proxyAccountId,
+            proxiedMetaAccount = proxiedMetaAccount,
+            proxyMetaAccount = proxyMetaAccount,
             chainWithAsset = ChainWithAsset(chain, chain.commissionAsset),
-            call = getWrappedCall()
+            proxiedCall = proxiedCall
         )
 
         val requestBusPayload = ProxyExtrinsicValidationRequestBus.Request(validationPayload)
-        val validationResponse = proxyExtrinsicValidationEventBus.handle(requestBusPayload)
+        proxyExtrinsicValidationEventBus.handle(requestBusPayload)
+            .validationResult
+            .onSuccess {
+                if (it is ValidationStatus.NotValid && it.reason is ProxyNotEnoughFee) {
+                    val reason = it.reason as ProxyNotEnoughFee
+                    proxySigningPresenter.notEnoughFee(reason.proxy, reason.asset, reason.availableBalance, reason.fee)
 
-        val validationStatus = validationResponse.validationResult.getOrNull()
-        if (validationStatus is ValidationStatus.NotValid && validationStatus.reason is ProxyNotEnoughFee) {
-            val reason = validationStatus.reason as ProxyNotEnoughFee
-            proxySigningPresenter.notEnoughFee(reason.metaAccount, reason.asset, reason.availableBalance, reason.fee)
-
-            throw SigningCancelledException()
-        }
+                    throw SigningCancelledException()
+                }
+            }
+            .onFailure {
+                throw it
+            }
     }
 
     context(ExtrinsicBuilder)
-    private suspend fun wrapCallsInProxyForSubmission() {
-        val chainId = getChainIdOrThrow()
-        val chain = chainRegistry.getChain(chainId)
-
-        val call = getWrappedCall()
-
+    private suspend fun wrapCallsInProxyForSubmission(chain: Chain, proxiedCall: GenericCall.Instance) {
         val proxyAccountId = proxyMetaAccount().requireAccountIdIn(chain)
         val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
 
@@ -168,27 +172,26 @@ class ProxiedSigner(
             proxyAccountId = proxyAccountId
         )
 
-        val proxyType = proxyCallFilterFactory.getFirstMatchedTypeOrNull(call, availableProxyTypes)
+        val proxyType = proxyCallFilterFactory.getFirstMatchedTypeOrNull(proxiedCall, availableProxyTypes)
             ?: notEnoughPermission(proxyMetaAccount(), availableProxyTypes)
 
         return wrapCallsIntoProxy(
             proxiedAccountId = proxiedAccountId,
             proxyType = proxyType,
+            proxiedCall = proxiedCall
         )
     }
 
     // Wrap without verifying proxy permissions and hardcode proxy type
     // to speed up fee calculation
     context(ExtrinsicBuilder)
-    private suspend fun wrapCallsInProxyForFee() {
-        val chainId = getChainIdOrThrow()
-        val chain = chainRegistry.getChain(chainId)
-
+    private fun wrapCallsInProxyForFee(chain: Chain, proxiedCall: GenericCall.Instance) {
         val proxiedAccountId = proxiedMetaAccount.requireAccountIdIn(chain)
 
         return wrapCallsIntoProxy(
             proxiedAccountId = proxiedAccountId,
             proxyType = ProxyType.Any,
+            proxiedCall = proxiedCall
         )
     }
 
@@ -196,16 +199,15 @@ class ProxiedSigner(
     private fun wrapCallsIntoProxy(
         proxiedAccountId: AccountId,
         proxyType: ProxyType,
+        proxiedCall: GenericCall.Instance,
     ) {
-        val call = getWrappedCall()
-
         val proxyCall = runtime.composeCall(
             moduleName = Modules.PROXY,
             callName = "proxy",
             arguments = mapOf(
                 "real" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, proxiedAccountId),
                 "force_proxy_type" to DictEnum.Entry(proxyType.name, null),
-                "call" to call
+                "call" to proxiedCall
             )
         )
 
@@ -233,5 +235,10 @@ class ProxiedSigner(
     private suspend fun signingNotSupported(): Nothing {
         proxySigningPresenter.signingIsNotSupported()
         throw SigningCancelledException()
+    }
+
+    private suspend fun proxyPaysFees(): Boolean {
+        // Our direct proxy only pay fees it is a leaf. Otherwise fees paid by proxy's own delegate
+        return delegateSigner() is LeafSigner
     }
 }

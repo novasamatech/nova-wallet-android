@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.R
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchRequester
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
+import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckProviderFactory
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.BrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.createAndSelectTab
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.CurrentTabState

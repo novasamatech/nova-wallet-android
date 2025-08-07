@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.relevantEllipsizeMode
 import io.novafoundation.nova.feature_multisig_operations.databinding.ItemMultisigSignatoryAccountBinding
 
 class SignatoriesAdapter(
@@ -38,9 +39,10 @@ class SignatoryViewHolder(
 
     fun bind(item: SignatoryRvItem) = with(binder) {
         root.setOnClickListener { itemHandler.onSignatoryClicked(item) }
-        itemSignatoryAccountIcon.setImageDrawable(item.address.image)
+        itemSignatoryAccountIcon.setImageDrawable(item.accountModel.drawable())
         itemSignatoryAccountSelected.setVisible(item.isApproved, falseState = View.INVISIBLE)
-        itemSignatoryAccountTitle.text = item.address.nameOrAddress
+        itemSignatoryAccountTitle.text = item.accountModel.nameOrAddress()
+        itemSignatoryAccountTitle.ellipsize = item.accountModel.relevantEllipsizeMode()
         itemSignatoryAccountSubtitle.setTextOrHide(item.subtitle)
     }
 
@@ -54,7 +56,7 @@ class SignatoryViewHolder(
 class SignatoriesDiffCallback : DiffUtil.ItemCallback<SignatoryRvItem>() {
 
     override fun areItemsTheSame(oldItem: SignatoryRvItem, newItem: SignatoryRvItem): Boolean {
-        return oldItem.address == newItem.address
+        return oldItem.accountModel == newItem.accountModel
     }
 
     override fun areContentsTheSame(oldItem: SignatoryRvItem, newItem: SignatoryRvItem): Boolean {

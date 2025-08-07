@@ -1,6 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="alert_nova_has_selected_ms_wallet">Nova has automatically switched to your multisig wallet so you can view pending transactions.</string>
+
+    <string name="multisig_notification_rejected_transaction_title">Transaction rejected</string>
+    <string name="multisig_notification_rejected_transaction_message">Rejected by: %s.</string>
+
+    <string name="multisig_notification_executed_transaction_title">Transaction executed</string>
+    <string name="multisig_notification_executed_transaction_message">Signed and executed by: %s.</string>
+
+    <string name="multisig_notification_new_approval_title_additional_message">%d of %d signatures collected.</string>
+    <string name="multisig_notification_new_approval_title">%s signed transaction</string>
+
+    <string name="multisig_notification_init_transaction_title">Your signature requested</string>
+    <string name="multisig_notification_init_transaction_message_transfer">%1$s → %2$s on %3$s.</string>
+    <string name="multisig_notification_init_transaction_message">%s on %s.</string>
+    <string name="multisig_notification_executed_transaction_message_header">Signed and executed by: %s.</string>
+    <string name="multisig_notification_review_footer">👉 Open app to review.</string>
+    <string name="multisig_notification_sign_footer">👉 Open app to sign.</string>
+    <string name="multisig_notification_message_header">Wallet: %s</string>
+
+    <string name="multisigs_notification_channel_name">Multisig Transactions Notification Channel</string>
+    <string name="multisigs_notification_channel_id" translatable="false">multisigs_notification_channel_id</string>
+
+    <!--<string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>-->
+    <string name="push_wallets_title">Select up to %d wallets to be notified when wallet has activity</string>
+
+    <string name="push_settings_multisig_operations">Multisig transactions</string>
+
+    <string name="invalid_call_data_format_message">The call data you provided is invalid or has the wrong format. Please ensure it is correct and try again.</string>
+
+    <string name="multisig_operations_placeholder">No transactions yet.\nSigning requests will show up here</string>
+
+    <string name="proxied_card_not_supported_title">Debit Card is not supported for this Proxied wallet</string>
+    <string name="proxied_card_not_supported_message">To manage your Debit Card, please switch to a different wallet with Polkadot network.</string>
+
     <!--<string name="referendum_full_details_hash">Call hash</string>-->
     <string name="common_call_hash">Call hash</string>
 
@@ -816,7 +850,6 @@
     <string name="common_clear">Clear</string>
 
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
-    <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
 
     <string name="push_settings_staking_rewards">Staking rewards</string>
     <string name="push_settings_others">Others</string>

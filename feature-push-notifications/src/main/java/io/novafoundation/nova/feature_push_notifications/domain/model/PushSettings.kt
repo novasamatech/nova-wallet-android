@@ -7,6 +7,7 @@ data class PushSettings(
     val announcementsEnabled: Boolean,
     val sentTokensEnabled: Boolean,
     val receivedTokensEnabled: Boolean,
+    val multisigTransactionsEnabled: Boolean,
     val subscribedMetaAccounts: Set<Long>,
     val stakingReward: ChainFeature,
     val governance: Map<ChainId, GovernanceState>

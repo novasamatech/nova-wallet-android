@@ -98,6 +98,8 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedBottomSheet
+import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedPayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -915,7 +917,8 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openMainWithFinishMultisigTransaction() {
-        openSplitScreenWithInstantAction(R.id.action_open_multisigCreatedDialog, nestedActionExtras = null)
+    override fun openMainWithFinishMultisigTransaction(accountWasSwitched: Boolean) {
+        val payload = MultisigCreatedBottomSheet.createPayload(MultisigCreatedPayload(accountWasSwitched))
+        openSplitScreenWithInstantAction(R.id.action_open_multisigCreatedDialog, nestedActionExtras = payload)
     }
 }

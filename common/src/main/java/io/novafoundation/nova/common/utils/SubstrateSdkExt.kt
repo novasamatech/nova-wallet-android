@@ -11,6 +11,7 @@ import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
+import io.novasama.substrate_sdk_android.encrypt.vByte
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
 import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -21,7 +22,9 @@ import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
+import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
@@ -32,6 +35,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.findExplicitOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.signer
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
+import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliasesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.getGenesisHashOrThrow
@@ -94,6 +98,11 @@ val SS58Encoder.GENERIC_ADDRESS_PREFIX: Short
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
 fun StorageEntry.defaultInHex() = default.toHexString(withPrefix = true)
+
+fun DictEnum.getOrNull(name: String): Type<*>? {
+    val element = elements.values.find { it.name == name } ?: return null
+    return element.value.skipAliasesOrNull()?.value
+}
 
 fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.runtimeConfiguration.addressByte)
 
@@ -528,14 +537,48 @@ fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
 
     val r = signature.copyOfRange(0, 32)
     val s = signature.copyOfRange(32, 64)
-    val v = signature[64].ensureValidVByteFormat()
+    val v = signature[64].convertToWeb3jCompatibleVByte()
 
     return SignatureWrapper.Ecdsa(v = byteArrayOf(v), r = r, s = s)
 }
 
+/**
+ * Ensure this signature is compatible with external signers and verifiers (dapps)
+ * We need to do that due to differences in ECDSA v-byte format
+ */
+fun SignatureWrapper.convertToExternalCompatibleFormat(): SignatureWrapper {
+    return when (this) {
+        is SignatureWrapper.Ecdsa -> convertToExternalCompatibleVByteFormat()
+        is SignatureWrapper.Sr25519, is SignatureWrapper.Ed25519 -> this
+    }
+}
+
+private fun SignatureWrapper.Ecdsa.convertToExternalCompatibleVByteFormat(): SignatureWrapper.Ecdsa {
+    return SignatureWrapper.Ecdsa(
+        v = byteArrayOf(vByte.convertToExternalCompatibleVByte()),
+        r = r,
+        s = s
+    )
+}
+
+/**
+ * @see convertToWeb3jCompatibleVByte
+ */
+private fun Byte.convertToExternalCompatibleVByte(): Byte {
+    if (this in 0..7) {
+        return this
+    }
+
+    if (this in 27..34) {
+        return (this - 27).toByte()
+    }
+
+    throw IllegalArgumentException("Invalid vByte: $this")
+}
+
 // Web3j supports only one format - when vByte is between [27..34]
 // However, there is a second format - when vByte is between [0..7] - e.g. Ledger and Parity Signer
-private fun Byte.ensureValidVByteFormat(): Byte {
+private fun Byte.convertToWeb3jCompatibleVByte(): Byte {
     if (this in 27..34) {
         return this
     }

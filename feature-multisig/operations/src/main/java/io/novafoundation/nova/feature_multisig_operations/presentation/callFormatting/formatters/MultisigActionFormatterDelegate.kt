@@ -11,6 +11,8 @@ interface MultisigActionFormatterDelegate {
     suspend fun formatPreview(visit: CallVisit, chain: Chain): MultisigActionFormatterDelegatePreviewResult?
 
     suspend fun formatDetails(visit: CallVisit, chain: Chain): MultisigActionFormatterDelegateDetailsResult?
+
+    suspend fun formatPushNotificationMessage(visit: CallVisit, chain: Chain): String?
 }
 
 class MultisigActionFormatterDelegatePreviewResult(

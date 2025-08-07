@@ -96,7 +96,7 @@
                 android:background="@drawable/bg_block_12"
                 android:paddingTop="12dp"
                 app:chevronId="@+id/multisigOperationShowHideButtonIcon"
-                app:expandableId="@+id/multisigOperationSignatories"
+                app:expandableId="@+id/multisigOperationSignatoriesExpandablePart"
                 app:supportAnimation="false">
 
                 <TextView
@@ -140,17 +140,40 @@
                     android:layout_height="12dp"
                     app:layout_constraintTop_toBottomOf="@+id/multisigOperationShowHideButtonIcon" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/multisigOperationSignatories"
+                <FrameLayout
+                    android:id="@+id/multisigOperationSignatoriesExpandablePart"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:overScrollMode="never"
-                    android:paddingBottom="8dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:layout_constraintTop_toBottomOf="@+id/multisigOperationShowHideButtonIcon"
-                    tools:itemCount="4"
-                    tools:listitem="@layout/item_multisig_signatory_account" />
+                    app:layout_constraintTop_toBottomOf="@+id/multisigOperationShowHideButtonIcon">
+
+                    <LinearLayout
+                        android:id="@+id/multisigOperationSignatoriesShimmering"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <include layout="@layout/item_signatory_shimmering" />
+
+                        <include layout="@layout/item_signatory_shimmering" />
+
+                        <include layout="@layout/item_signatory_shimmering" />
+
+                        <include layout="@layout/item_signatory_shimmering" />
+
+                    </LinearLayout>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/multisigOperationSignatories"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:overScrollMode="never"
+                        android:paddingBottom="8dp"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                        tools:itemCount="4"
+                        tools:listitem="@layout/item_multisig_signatory_account" />
+
+                </FrameLayout>
 
             </io.novafoundation.nova.common.view.ExpandableView>
 
