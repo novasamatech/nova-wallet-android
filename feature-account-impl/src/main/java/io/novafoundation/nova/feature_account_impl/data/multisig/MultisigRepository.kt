@@ -2,13 +2,6 @@ package io.novafoundation.nova.feature_account_impl.data.multisig
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.FindMultisigsApi
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.FindMultisigsRequest
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.request.OffChainPendingMultisigInfoRequest
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.AccountMultisigRemote
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.FindMultisigsResponse
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetPedingMultisigOperationsResponse
-import io.novafoundation.nova.feature_account_impl.data.multisig.api.response.GetPedingMultisigOperationsResponse.OperationRemote
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.DiscoveredMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
