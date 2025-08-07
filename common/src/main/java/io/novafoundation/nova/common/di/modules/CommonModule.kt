@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import com.google.android.play.core.integrity.IntegrityManagerFactory
+import com.google.android.play.core.integrity.StandardIntegrityManager
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
@@ -68,6 +70,7 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.CopyValueMixin
+import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
 import io.novafoundation.nova.common.utils.RealToastMessageManager
@@ -402,6 +405,13 @@ class CommonModule {
     @ApplicationScope
     fun provideToastMessageManager(): ToastMessageManager {
         return RealToastMessageManager()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideIntegrityService(context: Context): IntegrityService {
+        val integrityManager = IntegrityManagerFactory.createStandard(context)
+        return IntegrityService(BuildConfig.CLOUD_PROJECT_NUMBER, integrityManager)
     }
 
     @Provides

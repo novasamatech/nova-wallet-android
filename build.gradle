@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '10.1.4'
-        versionCode = 221
+        versionName = '10.1.5'
+        versionCode = 228
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -222,6 +222,8 @@ buildscript {
         branchIo = "io.branch.sdk.android:library:5.18.0"
 
         playServiceIdentifier = "com.google.android.gms:play-services-ads-identifier:18.2.0"
+
+        playIntegrity = "com.google.android.play:integrity:1.4.0"
     }
 
     repositories {
