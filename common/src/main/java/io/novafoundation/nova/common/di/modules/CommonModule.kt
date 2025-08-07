@@ -409,10 +409,6 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideCopyTextMixin(): CopyTextLauncher.Presentation = RealCopyTextLauncher()
-
-    @Provides
-    @ApplicationScope
     fun provideIntegrityService(context: Context): IntegrityService {
         val integrityManager = IntegrityManagerFactory.createStandard(context)
         return IntegrityService(BuildConfig.CLOUD_PROJECT_NUMBER, integrityManager)
