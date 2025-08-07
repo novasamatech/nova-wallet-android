@@ -27,7 +27,7 @@ class FindMultisigsRequest(
                     signatoryId
                   }
                 }
-                id
+                accountId
               }
             }
           }

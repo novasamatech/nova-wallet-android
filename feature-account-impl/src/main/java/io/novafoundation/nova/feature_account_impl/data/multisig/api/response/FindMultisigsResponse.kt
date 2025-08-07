@@ -12,7 +12,7 @@ class AccountMultisigRemote(
 ) {
 
     class MultisigRemote(
-        val id: HexString,
+        val accountId: HexString,
         val threshold: Int,
         val signatories: SubQueryNodes<SignatoryRemote>
     )
