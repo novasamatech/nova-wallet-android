@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVari
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType.Mnemonic.Origin
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.errorHandling.mapCheckBackupAvailableFailureToUi
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.mixin.CloudBackupChangingWarningMixinFactory
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
@@ -48,6 +49,10 @@ class ImportWalletOptionsViewModel(
 
     fun importMnemonicClicked() {
         openImportType(ImportType.Mnemonic())
+    }
+
+    fun importTrustWalletClicked() {
+        openImportType(ImportType.Mnemonic(origin = Origin.TRUST_WALLET))
     }
 
     fun importCloudClicked() = launch {

@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncom
 import io.novafoundation.nova.core.model.Node
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
-import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
 import io.novasama.substrate_sdk_android.encrypt.vByte
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
@@ -410,8 +409,6 @@ context(RuntimeContext)
 fun StorageEntry.createStorageKey(keyArguments: Array<out Any?>): String {
     return createStorageKey(*keyArguments)
 }
-
-fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
 
 fun SeedFactory.deriveSeed32(mnemonicWords: String, password: String?) = cropSeedTo32Bytes(deriveSeed(mnemonicWords, password))
 

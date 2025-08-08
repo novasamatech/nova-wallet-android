@@ -32,7 +32,6 @@ class ImportSourceFactory(
         return when (importType) {
             is ImportType.Mnemonic -> MnemonicImportSource(
                 addAccountInteractor = addAccountInteractor,
-                addAccountPayload = payload,
                 advancedEncryptionInteractor = advancedEncryptionInteractor,
                 advancedEncryptionSelectionStoreProvider = advancedEncryptionSelectionStoreProvider,
                 importType = importType,

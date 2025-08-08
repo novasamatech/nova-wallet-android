@@ -3,11 +3,10 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
-import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryption
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryption
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.common.AdvancedEncryptionSelectionStoreProvider
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountViewModel
@@ -23,7 +22,6 @@ import kotlinx.coroutines.launch
 
 class MnemonicImportSource(
     private val addAccountInteractor: AddAccountInteractor,
-    private val addAccountPayload: AddAccountPayload,
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     private val advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
     private val importType: ImportType.Mnemonic,
@@ -32,7 +30,7 @@ class MnemonicImportSource(
 
     private var advancedEncryptionSelectionStore = async { advancedEncryptionSelectionStoreProvider.getSelectionStore(coroutineScope) }
 
-    override val encryptionOptionsAvailable: Boolean = true
+    override val encryptionOptionsAvailable: Boolean = importType.origin == ImportType.Mnemonic.Origin.DEFAULT
 
     val mnemonicContentFlow = MutableStateFlow("")
 
@@ -58,10 +56,23 @@ class MnemonicImportSource(
     }
 
     override suspend fun performImport(addAccountType: AddAccountType): Result<Unit> {
+        return when (importType.origin) {
+            ImportType.Mnemonic.Origin.DEFAULT -> performImportFromDefaultOrigin(addAccountType)
+            ImportType.Mnemonic.Origin.TRUST_WALLET -> performImportFromTrustWallet(addAccountType)
+        }
+    }
+
+    private suspend fun performImportFromDefaultOrigin(addAccountType: AddAccountType): Result<Unit> {
         val advancedEncryption = advancedEncryptionSelectionStore().getCurrentSelection()
             ?: advancedEncryptionInteractor.getRecommendedAdvancedEncryption()
 
         return addAccountInteractor.importFromMnemonic(mnemonicContentFlow.value, advancedEncryption, addAccountType)
+    }
+
+    private suspend fun performImportFromTrustWallet(addAccountType: AddAccountType): Result<Unit> {
+        require(addAccountType is AddAccountType.MetaAccount) { "Cannot import chain account from Trust Wallet passphrase" }
+
+        return addAccountInteractor.importFromTrustWallet(mnemonicContentFlow.value, addAccountType)
     }
 
     override fun handleError(throwable: Throwable): ImportError? {
