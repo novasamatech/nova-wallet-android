@@ -39,11 +39,15 @@ object IntegrityCheckKeyPairService {
     }
 
     fun getPublicKey(alias: String): ByteArray {
+        ensureKeyPairGenerated(alias)
+
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         return keyStore.getCertificate(alias).publicKey.encoded
     }
 
     fun signData(alias: String, data: ByteArray): ByteArray {
+        ensureKeyPairGenerated(alias)
+
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val privateKey = keyStore.getKey(alias, null) as PrivateKey
 
@@ -55,6 +59,8 @@ object IntegrityCheckKeyPairService {
     }
 
     fun verifySignature(alias: String, data: ByteArray, signatureBytes: ByteArray): Boolean {
+        ensureKeyPairGenerated(alias)
+
         val keyStore = KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
         val publicKey = keyStore.getCertificate(alias).publicKey
 
@@ -76,10 +82,10 @@ object IntegrityCheckKeyPairService {
 
         return signature.verify(signatureBytes)
     }
-}
 
-fun IntegrityCheckKeyPairService.ensureKeyPairGenerated(alias: String) {
-    if (!isKeyPairGenerated(alias)) {
-        generateKeyPair(alias)
+    private fun ensureKeyPairGenerated(alias: String) {
+        if (!isKeyPairGenerated(alias)) {
+            generateKeyPair(alias)
+        }
     }
 }

@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.BrowserTabI
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealPageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealBrowserTabService
 import io.novafoundation.nova.feature_dapp_impl.data.repository.tabs.RealBrowserTabRepository
-import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckProviderFactory
+import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckJSBridgeFactory
 import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckSessionFactory
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.PageSnapshotBuilder
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.RealTabMemoryRestrictionService
@@ -74,16 +74,16 @@ class BrowserTabsModule {
     @Provides
     fun provideIntegrityCheckProviderFactory(
         integrityCheckSessionFactory: IntegrityCheckSessionFactory
-    ) = IntegrityCheckProviderFactory(integrityCheckSessionFactory)
+    ) = IntegrityCheckJSBridgeFactory(integrityCheckSessionFactory)
 
     @FeatureScope
     @Provides
     fun providePageSessionFactory(
         compoundWeb3Injector: CompoundWeb3Injector,
         contextManager: ContextManager,
-        integrityCheckProviderFactory: IntegrityCheckProviderFactory
+        integrityCheckJSBridgeFactory: IntegrityCheckJSBridgeFactory
     ): BrowserTabSessionFactory {
-        return BrowserTabSessionFactory(compoundWeb3Injector, contextManager, integrityCheckProviderFactory)
+        return BrowserTabSessionFactory(compoundWeb3Injector, contextManager, integrityCheckJSBridgeFactory)
     }
 
     @FeatureScope
