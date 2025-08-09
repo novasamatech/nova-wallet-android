@@ -44,7 +44,7 @@ class RealAddStakingProxyInteractor(
                 addProxyCall(proxyAccountId, ProxyType.Staking)
             }
 
-            result.awaitInBlock().also { externalAccountsSyncService.sync(chain) }
+            result.awaitInBlock().also { externalAccountsSyncService.sync() }
         }
     }
 

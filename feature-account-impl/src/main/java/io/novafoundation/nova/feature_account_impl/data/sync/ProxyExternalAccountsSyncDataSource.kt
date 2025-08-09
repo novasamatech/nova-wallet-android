@@ -1,10 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.sync
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.buildMultiMapList
-import io.novafoundation.nova.common.utils.put
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
@@ -14,36 +11,37 @@ import io.novafoundation.nova.feature_account_api.domain.account.identity.Identi
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
-import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
+import io.novafoundation.nova.feature_account_impl.data.proxy.repository.MultiChainProxyRepository
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novafoundation.nova.runtime.multiNetwork.findChainsById
 import javax.inject.Inject
 
 @FeatureScope
 internal class ProxyAccountsSyncDataSourceFactory @Inject constructor(
-    private val getProxyRepository: GetProxyRepository,
+    private val multiChainProxyRepository: MultiChainProxyRepository,
     private val accountDao: MetaAccountDao,
+    private val chainRegistry: ChainRegistry
 ) : ExternalAccountsSyncDataSource.Factory {
 
-    override fun create(chain: Chain): ExternalAccountsSyncDataSource? {
-        return if (chain.supportProxy) {
-            ProxyExternalAccountsSyncDataSource(getProxyRepository, accountDao, chain)
-        } else {
-            null
-        }
+    override suspend fun create(): ExternalAccountsSyncDataSource {
+        val proxyChains = chainRegistry.findChainsById { it.supportProxy }
+
+        return ProxyExternalAccountsSyncDataSource(multiChainProxyRepository, accountDao, proxyChains)
     }
 }
 
 private class ProxyExternalAccountsSyncDataSource(
-    private val getProxyRepository: GetProxyRepository,
+    private val multiChainProxyRepository: MultiChainProxyRepository,
     private val accountDao: MetaAccountDao,
-    private val chain: Chain,
+    private val proxyChains: ChainsById
 ) : ExternalAccountsSyncDataSource {
 
-    private val proxiedsByProxy = SingleValueCache {
-        fetchProxiedsByProxy()
+    override fun supportedChains(): Collection<Chain> {
+        return proxyChains.values
     }
 
     override suspend fun isCreatedFromDataSource(metaAccount: MetaAccount): Boolean {
@@ -59,59 +57,42 @@ private class ProxyExternalAccountsSyncDataSource(
     }
 
     override suspend fun getControllableExternalAccounts(accountIdsToQuery: Set<AccountIdKey>): List<ExternalControllableAccount> {
-        return accountIdsToQuery.flatMap { proxyCandidate ->
-            val proxieds = proxiedsByProxy()[proxyCandidate] ?: return@flatMap emptyList()
-
-            proxieds.map { proxied ->
+        return multiChainProxyRepository.getProxies(accountIdsToQuery)
+            .mapNotNull {
                 ProxiedExternalAccount(
-                    accountId = proxied.proxiedAccountId,
-                    controllerAccountId = proxyCandidate,
-                    proxyType = proxied.proxyType,
-                    chain = chain
+                    chain = proxyChains[it.chainId] ?: return@mapNotNull null,
+                    accountId = it.proxied,
+                    proxyType = it.proxyType,
+                    controllerAccountId = it.proxy
                 )
             }
-        }
     }
-
-    private suspend fun fetchProxiedsByProxy(): Map<AccountIdKey, List<ProxyLink>> {
-        val allProxiesByProxied = getProxyRepository.getAllProxies(chain.id)
-
-        return buildMultiMapList {
-            allProxiesByProxied.forEach { (proxied, proxies) ->
-                proxies.proxies.forEach innerProxiesLoop@{ proxy ->
-                    if (proxy.delay.isPositive()) return@innerProxiesLoop
-
-                    val proxyLink = ProxyLink(
-                        proxiedAccountId = proxied,
-                        proxyType = proxy.proxyType
-                    )
-                    put(proxy.proxy, proxyLink)
-                }
-            }
-        }
-    }
-
-    private class ProxyLink(
-        val proxiedAccountId: AccountIdKey,
-        val proxyType: ProxyType
-    )
 
     private inner class ProxiedExternalAccount(
         override val accountId: AccountIdKey,
         override val controllerAccountId: AccountIdKey,
         private val proxyType: ProxyType,
-        override val chain: Chain
+        private val chain: Chain
     ) : ExternalControllableAccount {
 
         override fun isRepresentedBy(localAccount: MetaAccount): Boolean {
             return localAccount is ProxiedMetaAccount && localAccount.proxy.proxyType == proxyType
         }
 
+        override fun isAvailableOn(chain: Chain): Boolean {
+            return chain.id == this.chain.id
+        }
+
         override suspend fun addControlledAccount(
             controller: MetaAccount,
             identity: Identity?,
-            position: Int
+            position: Int,
+            missingAccountChain: Chain
         ): AddAccountResult.AccountAdded {
+            require(missingAccountChain.id == chain.id) {
+                "Wrong chain requested for ProxiedExternalAccount.addControlledAccount. Expected: ${chain.name}, got: ${missingAccountChain.name}"
+            }
+
             val metaId = accountDao.insertProxiedMetaAccount(
                 metaAccount = createMetaAccount(controller.id, identity, position),
                 chainAccount = { proxiedMetaId -> createChainAccount(proxiedMetaId) },

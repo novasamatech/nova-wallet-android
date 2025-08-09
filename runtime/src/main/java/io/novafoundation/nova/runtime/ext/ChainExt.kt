@@ -453,6 +453,9 @@ object ChainGeneses {
     const val POLKADOT_ASSET_HUB = "68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
 
     const val UNIQUE_NETWORK = "84322d9cddbf35088f1e54e9a85c967a41a56a4f43445768125e61af166c7d31"
+
+    const val POLKADOT_PEOPLE = "67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008"
+    const val KUSAMA_PEOPLE = "c1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f"
 }
 
 object ChainIds {

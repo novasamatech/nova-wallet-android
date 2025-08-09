@@ -570,6 +570,17 @@ inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fo
     acc
 }
 
+inline fun <T, K> Iterable<T>.groupByToSet(keySelector: (T) -> K): MultiMap<K, T> {
+    val destination = mutableMultiMapOf<K, T>()
+
+    for (element in this) {
+        val key = keySelector(element)
+        destination.put(key, element)
+    }
+
+    return destination
+}
+
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
 fun <T> Collection<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }

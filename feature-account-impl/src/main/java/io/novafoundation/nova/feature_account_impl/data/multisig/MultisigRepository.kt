@@ -12,7 +12,7 @@ interface MultisigRepository {
 
     fun supportsMultisigSync(chain: Chain): Boolean
 
-    suspend fun findMultisigAccounts(chain: Chain, accountIds: Set<AccountIdKey>): List<DiscoveredMultisig>
+    suspend fun findMultisigAccounts(accountIds: Set<AccountIdKey>): List<DiscoveredMultisig>
 
     suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): Set<CallHash>
 

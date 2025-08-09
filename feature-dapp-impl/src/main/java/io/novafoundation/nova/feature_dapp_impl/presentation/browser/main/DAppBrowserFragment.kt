@@ -30,7 +30,6 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.favourites.setupRemoveFavouritesConfirmation
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.BrowserTabSession
-import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3WebViewClient
@@ -38,7 +37,6 @@ import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChoos
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.WebViewHolder
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAsker
 import io.novafoundation.nova.common.utils.webView.WebViewRequestInterceptor
-import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.dialog.infoDialog
 import io.novafoundation.nova.feature_dapp_impl.utils.tabs.models.SessionCallback
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
