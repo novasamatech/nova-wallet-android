@@ -7,7 +7,6 @@ import android.graphics.Color
 import coil.ImageLoader
 import coil.decode.SvgDecoder
 import com.google.android.play.core.integrity.IntegrityManagerFactory
-import com.google.android.play.core.integrity.StandardIntegrityManager
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
