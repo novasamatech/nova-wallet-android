@@ -14,11 +14,9 @@ interface IntegrityCheckApi {
 
 class ChallengeResponse(val challenge: String)
 
-
 class AttestRequest(
     val appIntegrityId: String,
     val publicKey: String,
     val integrityToken: String,
     val challenge: String
 )
-
