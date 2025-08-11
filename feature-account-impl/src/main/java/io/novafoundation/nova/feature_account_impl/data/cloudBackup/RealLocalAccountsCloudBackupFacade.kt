@@ -455,7 +455,7 @@ class RealLocalAccountsCloudBackupFacade(
     private fun CloudBackup.WalletPrivateInfo.getLocalMetaAccountSecrets(): EncodableStruct<MetaAccountSecrets>? {
         return MetaAccountSecrets(
             entropy = entropy,
-            seed = substrate?.seed,
+            substrateSeed = substrate?.seed,
             // Keypair is optional in backup since Ledger backup has base substrate derivation path but doesn't have keypair
             // MetaAccountSecrets, however, require substrateKeyPair to be non-null, so we return null here in case of null keypair
             // Which is a expected behavior in case of Ledger secrets
