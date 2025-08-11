@@ -50,8 +50,6 @@ class ValidationExecutor : Validatable {
                 onFailure = {
                     progressConsumer?.invoke(false)
 
-                    it.printStackTrace()
-
                     errorDisplayer(it)
                 },
                 onInvalid = {
