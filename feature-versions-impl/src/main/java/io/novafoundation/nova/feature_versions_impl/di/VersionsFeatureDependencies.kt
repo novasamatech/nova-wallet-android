@@ -4,7 +4,6 @@ import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 
 interface VersionsFeatureDependencies {
@@ -18,6 +17,4 @@ interface VersionsFeatureDependencies {
     fun preferences(): Preferences
 
     fun context(): Context
-
-    fun appVersionProvider(): AppVersionProvider
 }

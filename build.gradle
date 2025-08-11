@@ -8,9 +8,9 @@ buildscript {
         releaseApplicationSuffix = "market"
 
         // SDK and tools
-        compileSdkVersion = 36
+        compileSdkVersion = 34
         minSdkVersion = 24
-        targetSdkVersion = 36
+        targetSdkVersion = 34
 
         kotlinVersion = '2.1.0'
 
