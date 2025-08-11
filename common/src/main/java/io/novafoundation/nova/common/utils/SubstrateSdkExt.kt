@@ -404,12 +404,6 @@ fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
     }
 }
 
-context(RuntimeContext)
-@JvmName("createStorageKeyArray")
-fun StorageEntry.createStorageKey(keyArguments: Array<out Any?>): String {
-    return createStorageKey(*keyArguments)
-}
-
 fun SeedFactory.deriveSeed32(mnemonicWords: String, password: String?) = cropSeedTo32Bytes(deriveSeed(mnemonicWords, password))
 
 private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Result {
