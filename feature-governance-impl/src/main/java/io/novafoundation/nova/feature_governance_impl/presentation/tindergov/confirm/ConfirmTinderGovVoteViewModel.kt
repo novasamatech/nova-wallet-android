@@ -158,7 +158,7 @@ class ConfirmTinderGovVoteViewModel(
     private suspend fun onVoteSuccess(basket: List<TinderGovBasketItem>) {
         awaitVotedReferendaStateUpdate(basket)
 
-        showMessage(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, basket.size))
+        showToast(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, basket.size))
         tinderGovBasketInteractor.clearBasket()
         router.backToTinderGovCards()
     }

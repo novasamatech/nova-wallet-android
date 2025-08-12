@@ -167,7 +167,7 @@ class ConfirmGovernanceUnlockViewModel(
         interactor.unlock(claimable)
             .onFailure(::showError)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero) }
             }

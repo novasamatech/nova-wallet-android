@@ -332,7 +332,7 @@ class MultisigOperationDetailsViewModel(
         interactor.performAction(operationFlow.first())
             .onFailure(::showError)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 extrinsicNavigationWrapper.startNavigation(it.submissionHierarchy) {
                     val isLeastOperation = isLastOperationFlow.first()

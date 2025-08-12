@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+
+    <string name="multisig_transaction_executed_dialog_title">Multisig Transaction Executed</string>
+    <string name="multisig_transaction_rejected_dialog_title">Multisig Transaction Rejected</string>
+
+    <string name="multisig_transaction_rejected_dialog_message">%s on %s.\nRejected by %s.\nNo further actions are required from you.</string>
+    <string name="multisig_transaction_executed_dialog_message">%s on %s.\nNo further actions are required from you.</string>
+
+    <string name="multisig_transaction_dialog_message_unknown_call">Transaction without initial on-chain information (call data) was rejected</string>
+
     <string name="alert_nova_has_selected_ms_wallet">Nova has automatically switched to your multisig wallet so you can view pending transactions.</string>
 
     <string name="multisig_notification_rejected_transaction_title">Transaction rejected</string>

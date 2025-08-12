@@ -49,10 +49,6 @@ suspend fun AccountRepository.getMultisigForPayload(chain: Chain, payload: Multi
         .getActorExcept(payload.signatory)
 }
 
-suspend fun IdentityProvider.getNameOrAddress(account: AddressWithAccountId, chain: Chain): String {
-    return identityFor(account.accountId.value, chain.id)?.name ?: account.address.ellipsizeAddress()
-}
-
 fun List<MultisigMetaAccount>.getActorExcept(signatory: AddressWithAccountId): MultisigMetaAccount? {
     return firstOrNull { it.signatoryAccountId != signatory.accountId }
 }
@@ -60,12 +56,15 @@ fun List<MultisigMetaAccount>.getActorExcept(signatory: AddressWithAccountId): M
 fun multisigOperationDeepLinkData(
     metaAccount: MultisigMetaAccount,
     chain: Chain,
-    payload: MultisigNotificationPayload
+    payload: MultisigNotificationPayload,
+    operationState: MultisigOperationDeepLinkData.State?
 ): MultisigOperationDeepLinkData {
     return MultisigOperationDeepLinkData(
         chain.id,
         metaAccount.requireAddressIn(chain),
         chain.addressOf(metaAccount.signatoryAccountId),
-        payload.callHashString
+        payload.callHashString,
+        payload.callData,
+        operationState
     )
 }

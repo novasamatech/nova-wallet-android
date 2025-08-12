@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.applyDeepLink
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.deeplink.MultisigOperationDeepLinkData
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
@@ -59,7 +60,10 @@ class MultisigTransactionInitiatedNotificationHandler(
                 context,
                 resourceManager.getString(R.string.multisig_notification_init_transaction_title),
                 getMessage(chain, payload, footer = signFooter()),
-                activityIntent().applyDeepLink(configurator, multisigOperationDeepLinkData(multisigAccount, chain, payload))
+                activityIntent().applyDeepLink(
+                    configurator,
+                    multisigOperationDeepLinkData(multisigAccount, chain, payload, MultisigOperationDeepLinkData.State.Active)
+                )
             ).build()
 
         notify(notification)

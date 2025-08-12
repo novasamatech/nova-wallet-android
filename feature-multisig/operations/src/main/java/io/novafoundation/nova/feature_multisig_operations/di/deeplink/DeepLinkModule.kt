@@ -5,10 +5,12 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.details.d
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.deeplink.MultisigOperationDetailsDeepLinkHandler
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -29,13 +31,17 @@ class DeepLinkModule {
         router: MultisigOperationsRouter,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        automaticInteractionGate: AutomaticInteractionGate
+        automaticInteractionGate: AutomaticInteractionGate,
+        dialogMessageManager: DialogMessageManager,
+        multisigCallFormatter: MultisigCallFormatter,
     ): MultisigOperationDetailsDeepLinkHandler {
         return MultisigOperationDetailsDeepLinkHandler(
             router,
             accountRepository,
             chainRegistry,
-            automaticInteractionGate
+            automaticInteractionGate,
+            dialogMessageManager,
+            multisigCallFormatter
         )
     }
 

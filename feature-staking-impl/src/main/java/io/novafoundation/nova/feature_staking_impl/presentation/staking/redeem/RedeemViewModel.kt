@@ -126,7 +126,7 @@ class RedeemViewModel(
     private fun sendTransaction(redeemValidationPayload: RedeemValidationPayload) = launch {
         redeemInteractor.redeem(accountStakingFlow.first(), redeemValidationPayload.asset)
             .onSuccess { (submissionResult, redeemConsequences) ->
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
             }
