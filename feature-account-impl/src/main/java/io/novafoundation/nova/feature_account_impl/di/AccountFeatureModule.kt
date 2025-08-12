@@ -165,8 +165,8 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonEncoder
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
 import javax.inject.Named
 
@@ -276,13 +276,13 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideJsonDecoder(jsonMapper: Gson) = JsonSeedDecoder(jsonMapper)
+    fun provideJsonDecoder(jsonMapper: Gson) = JsonDecoder(jsonMapper)
 
     @Provides
     @FeatureScope
     fun provideJsonEncoder(
         jsonMapper: Gson,
-    ) = JsonSeedEncoder(jsonMapper)
+    ) = JsonEncoder(jsonMapper)
 
     @Provides
     @FeatureScope
@@ -300,7 +300,7 @@ class AccountFeatureModule {
         accountDataSource: AccountDataSource,
         accountDao: AccountDao,
         nodeDao: NodeDao,
-        jsonSeedEncoder: JsonSeedEncoder,
+        JsonEncoder: JsonEncoder,
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
         secretStoreV2: SecretStoreV2,
@@ -310,7 +310,7 @@ class AccountFeatureModule {
             accountDataSource,
             accountDao,
             nodeDao,
-            jsonSeedEncoder,
+            JsonEncoder,
             languagesHolder,
             accountSubstrateSource,
             secretStoreV2,
@@ -485,8 +485,8 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAccountSecretsFactory(
-        jsonSeedDecoder: JsonSeedDecoder
-    ) = AccountSecretsFactory(jsonSeedDecoder)
+        JsonDecoder: JsonDecoder
+    ) = AccountSecretsFactory(JsonDecoder)
 
     @Provides
     @FeatureScope
