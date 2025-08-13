@@ -730,26 +730,3 @@ fn calculate_pool_trade_fee(amount: String, fee_nominator: String, fee_denominat
         error()
     }
 }
-
-fn main() {
-    // Prepare the inputs exactly as your JNI layer would give them
-    let reserves = r#"[{"amount":"62951131366120550","decimals":10,"asset_id":15},{"amount":"59482566905497078","decimals":10,"asset_id":1001}]"#.to_string();
-    let shares = "10000000000000000000".to_string(); // amountIn
-    let asset_out = 1001u32;
-    let amplification = "1000".to_string();
-    let share_issuance = "15256717018155156153447038".to_string();
-    let withdraw_fee = "0.00069".to_string();
-    let limits = r#"[["1","1"], ["1","1"]]"#.to_string(); // pegs
-
-    let result = calculate_liquidity_out_one_asset(
-        reserves,
-        shares,
-        asset_out,
-        amplification,
-        share_issuance,
-        withdraw_fee,
-        limits,
-    );
-
-    println!("Result: {}", result);
-}

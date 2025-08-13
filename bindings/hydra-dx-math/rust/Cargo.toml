@@ -27,7 +27,3 @@ crate_type = ["cdylib"]
 default = ["std"]
 std = ["sp-arithmetic/std"]
 stableswap = []
-
-[[bin]]
-name = "test_pairs"
-path = "src/lib.rs"
