@@ -22,7 +22,7 @@ interface MultisigCallFormatter {
         call: GenericCall.Instance?,
         initialOrigin: AccountIdKey,
         chain: Chain
-    ): String
+    ): MultisigCallPushNotificationModel
 
     suspend fun formatExecutedOperationMessage(
         call: GenericCall.Instance?,

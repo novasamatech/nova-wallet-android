@@ -42,22 +42,16 @@ abstract class MultisigBaseNotificationHandler(
     suspend fun getMessage(
         chain: Chain,
         payload: MultisigNotificationPayload,
-        additionalMessage: String? = null,
-        footer: String? = null
+        footer: String?
     ): String {
         val runtime = chainRegistry.getRuntime(chain.id)
         val call = payload.callData?.let { GenericCall.fromHex(runtime, payload.callData) }
 
         return buildString {
-            append(multisigCallFormatter.formatPushNotificationMessage(call, payload.signatory.accountId, chain))
-            if (additionalMessage != null) {
-                appendLine()
-                append(additionalMessage)
-            }
-            if (footer != null) {
-                appendLine()
-                append(footer)
-            }
+            val formattedCall = multisigCallFormatter.formatPushNotificationMessage(call, payload.signatory.accountId, chain)
+            append(formattedCall.text)
+            formattedCall.onBehalfOf?.let { appendLine().append(it) }
+            footer?.let { appendLine().append(it) }
         }
     }
 }
