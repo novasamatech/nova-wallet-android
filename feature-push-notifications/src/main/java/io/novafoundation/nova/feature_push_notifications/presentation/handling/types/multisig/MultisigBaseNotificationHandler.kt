@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_push_notifications.presentation.handling.
 
 import androidx.core.app.NotificationManagerCompat
 import com.google.gson.Gson
+import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -50,8 +51,12 @@ abstract class MultisigBaseNotificationHandler(
         return buildString {
             val formattedCall = multisigCallFormatter.formatPushNotificationMessage(call, payload.signatory.accountId, chain)
             append(formattedCall.text)
-            formattedCall.onBehalfOf?.let { appendLine().append(it) }
+            formattedCall.onBehalfOf?.let { appendLine().append(formatOnBehalfOf(it)) }
             footer?.let { appendLine().append(it) }
         }
+    }
+
+    private fun formatOnBehalfOf(addressMode: AddressModel): String {
+        return resourceManager.getString(R.string.multisig_notification_on_behalf_of, addressMode.nameOrAddress)
     }
 }
