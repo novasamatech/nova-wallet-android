@@ -128,7 +128,7 @@ class RemoveVotesViewModel(
     private fun removeVotes() = launch {
         interactor.removeTrackVotes(payload.trackIds)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { router.back() }
             }

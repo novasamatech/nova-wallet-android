@@ -163,7 +163,7 @@ class ConfirmChangeValidatorsViewModel(
             stakingState = stashFlow.first(),
             validatorAccountIds = prepareNominations(),
         ).onSuccess {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+            showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
             setupStakingSharedState.reset()
 

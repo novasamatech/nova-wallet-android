@@ -250,7 +250,7 @@ class ConfirmSendViewModel(
     ) = launch {
         sendInteractor.performTransfer(transfer, originFee, crossChainFee, viewModelScope)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { finishSendFlow() }
             }.onFailure(::showError)

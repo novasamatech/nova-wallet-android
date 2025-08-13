@@ -13,6 +13,10 @@ interface MultisigActionFormatterDelegate {
     suspend fun formatDetails(visit: CallVisit, chain: Chain): MultisigActionFormatterDelegateDetailsResult?
 
     suspend fun formatPushNotificationMessage(visit: CallVisit, chain: Chain): String?
+
+    suspend fun formatExecutedMessage(visit: CallVisit, chain: Chain): String?
+
+    suspend fun formatRejectedMessage(visit: CallVisit, chain: Chain, rejectedAccountName: String): String?
 }
 
 class MultisigActionFormatterDelegatePreviewResult(

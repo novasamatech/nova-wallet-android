@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.Flow
 interface MultisigPendingOperationsService {
 
     context(ComputationalScope)
+    fun operationAvailableFlow(id: PendingMultisigOperationId): Flow<Boolean>
+
+    context(ComputationalScope)
     fun performMultisigOperationsSync(): Flow<Unit>
 
     context(ComputationalScope)

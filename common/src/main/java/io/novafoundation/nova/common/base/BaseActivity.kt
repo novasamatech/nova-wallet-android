@@ -53,8 +53,6 @@ abstract class BaseActivity<T : BaseViewModel, B : ViewBinding> :
 
         viewModel.errorLiveData.observeEvent(::showError)
 
-        viewModel.messageLiveData.observeEvent(::showMessage)
-
         viewModel.toastLiveData.observeEvent { showToast(it) }
     }
 

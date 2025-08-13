@@ -31,22 +31,11 @@ open class BaseViewModel :
     private val _errorWithTitleLiveData = MutableLiveData<Event<TitleAndMessage>>()
     val errorWithTitleLiveData: LiveData<Event<TitleAndMessage>> = _errorWithTitleLiveData
 
-    private val _messageLiveData = MutableLiveData<Event<String>>()
-    val messageLiveData: LiveData<Event<String>> = _messageLiveData
-
     private val _toastLiveData = MutableLiveData<Event<String>>()
     val toastLiveData: LiveData<Event<String>> = _toastLiveData
 
-    fun showRetryDialog(text: String) {
-        _messageLiveData.postValue(Event(text))
-    }
-
     fun showToast(text: String) {
         _toastLiveData.postValue(Event(text))
-    }
-
-    fun showMessage(text: String) {
-        _messageLiveData.postValue(Event(text))
     }
 
     fun showError(title: String, text: CharSequence) {

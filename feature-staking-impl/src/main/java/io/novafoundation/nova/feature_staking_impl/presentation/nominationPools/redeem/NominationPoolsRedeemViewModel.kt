@@ -128,7 +128,7 @@ class NominationPoolsRedeemViewModel(
     private fun sendTransaction() = launch {
         interactor.redeem(poolMemberFlow.first())
             .onSuccess { (submissionResult, redeemConsequences) ->
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
             }

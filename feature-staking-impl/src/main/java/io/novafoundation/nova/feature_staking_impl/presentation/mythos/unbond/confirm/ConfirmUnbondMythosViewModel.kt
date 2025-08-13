@@ -135,7 +135,7 @@ class ConfirmUnbondMythosViewModel(
         interactor.unbond(validPayload.delegatorState, validPayload.collator.accountId)
             .onFailure(::showError)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }

@@ -129,7 +129,7 @@ class MythosClaimRewardsViewModel(
 
         interactor.claimRewards(pendingRewards, shouldRestake)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }

@@ -155,7 +155,7 @@ class ConfirmRewardDestinationViewModel(
     ) = launch {
         rewardDestinationInteractor.changeRewardDestination(stashState, rewardDestination)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }

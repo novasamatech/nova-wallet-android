@@ -132,7 +132,7 @@ class ParachainStakingRedeemViewModel(
         interactor.redeem(delegatorState.first())
             .onFailure(::showError)
             .onSuccess { (submissionResult, redeemConsequences) ->
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
             }

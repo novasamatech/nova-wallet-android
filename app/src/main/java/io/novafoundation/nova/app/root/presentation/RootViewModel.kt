@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
@@ -53,12 +54,15 @@ class RootViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val toastMessageManager: ToastMessageManager
+    private val toastMessageManager: ToastMessageManager,
+    private val dialogMessageManager: DialogMessageManager
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     val toastMessagesEvents = toastMessageManager.toastMessagesEvents
+
+    val dialogMessageEvents = dialogMessageManager.dialogMessagesEvents
 
     val walletConnectErrorsLiveData = walletConnectService.onPairErrorLiveData
         .mapEvent { it.message }
@@ -116,7 +120,7 @@ class RootViewModel(
     private fun handleDeepLinkCallbackEvent(event: CallbackEvent) {
         when (event) {
             is CallbackEvent.Message -> {
-                showMessage(event.message)
+                showToast(event.message)
             }
         }
     }

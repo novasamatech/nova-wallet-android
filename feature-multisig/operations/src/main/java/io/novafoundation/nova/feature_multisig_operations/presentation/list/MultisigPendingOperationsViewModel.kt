@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdK
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.fromOperationId
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationHeaderModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel.SigningAction
@@ -56,8 +58,8 @@ class MultisigPendingOperationsViewModel(
     }
 
     fun operationClicked(model: PendingMultisigOperationModel) {
-        val payload = MultisigOperationDetailsPayload(model.id)
-        router.openMultisigOperationDetails(payload)
+        val operationPayload = MultisigOperationPayload.fromOperationId(model.id)
+        router.openMultisigOperationDetails(MultisigOperationDetailsPayload(operationPayload))
     }
 
     private suspend fun PendingMultisigOperation.toUi(selectedAccount: MetaAccount): PendingMultisigOperationModel {
@@ -65,7 +67,7 @@ class MultisigPendingOperationsViewModel(
         val formattedCall = multisigCallFormatter.formatPreview(call, initialOrigin, chain)
 
         return PendingMultisigOperationModel(
-            id = identifier,
+            id = operationId,
             chain = mapChainToUi(chain),
             action = formatAction(),
             call = formattedCall,

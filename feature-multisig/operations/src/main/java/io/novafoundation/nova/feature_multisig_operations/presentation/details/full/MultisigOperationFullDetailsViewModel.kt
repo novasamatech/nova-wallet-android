@@ -17,7 +17,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.toOperationId
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.fullId
@@ -35,7 +36,7 @@ class MultisigOperationFullDetailsViewModel(
     private val interactor: MultisigOperationDetailsInteractor,
     private val multisigOperationsService: MultisigPendingOperationsService,
     private val externalActions: ExternalActions.Presentation,
-    private val payload: MultisigOperationDetailsPayload,
+    private val payload: MultisigOperationPayload,
     private val accountUIUseCase: AccountUIUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val copyTextLauncher: CopyTextLauncher.Presentation,
@@ -49,7 +50,7 @@ class MultisigOperationFullDetailsViewModel(
         router.back()
     }
 
-    private val operationFlow = multisigOperationsService.pendingOperationFlow(payload.operationId)
+    private val operationFlow = multisigOperationsService.pendingOperationFlow(payload.toOperationId())
         .filterNotNull()
         .shareInBackground()
 

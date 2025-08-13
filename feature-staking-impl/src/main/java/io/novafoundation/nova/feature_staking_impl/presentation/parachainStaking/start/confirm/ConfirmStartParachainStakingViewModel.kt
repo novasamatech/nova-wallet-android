@@ -144,7 +144,7 @@ class ConfirmStartParachainStakingViewModel(
                 stakingStartedDetectionService.activateDetection(viewModelScope)
             }
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { finishFlow() }
             }

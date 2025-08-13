@@ -53,7 +53,9 @@ class SelectGovernanceTracksViewModel(
             if (selectedTracks.size >= payload.minTracks) {
                 super.trackClicked(position)
             } else {
-                showToast(resourceManager.getQuantityString(R.plurals.governance_select_tracks_min_tracks_error, payload.minTracks, payload.minTracks))
+                showToast(
+                    resourceManager.getQuantityString(R.plurals.governance_select_tracks_min_tracks_error, payload.minTracks, payload.minTracks)
+                )
             }
         }
     }

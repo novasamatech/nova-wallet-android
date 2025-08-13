@@ -89,6 +89,39 @@ class RealMultisigCallFormatter @Inject constructor(
         )
     }
 
+    override suspend fun formatExecutedOperationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): String {
+        return formatCall(
+            call = call,
+            initialOrigin = initialOrigin,
+            chain = chain,
+            formatUnknown = { formatUnknownCallExecutedMessage(chain) },
+            formatDefault = { formatDefaultExecutedMessage(chain, it) },
+            formatSpecific = { delegate, callVisit -> delegate.formatExecutedMessage(callVisit, chain) },
+            constructFinalResult = { delegateResult, _ -> delegateResult }
+        )
+    }
+
+    override suspend fun formatRejectedOperationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        rejectedAccountName: String,
+        chain: Chain
+    ): String {
+        return formatCall(
+            call = call,
+            initialOrigin = initialOrigin,
+            chain = chain,
+            formatUnknown = { formatUnknownCallRejectedMessage(chain, rejectedAccountName) },
+            formatDefault = { formatDefaultRejectedMessage(chain, it, rejectedAccountName) },
+            formatSpecific = { delegate, callVisit -> delegate.formatRejectedMessage(callVisit, chain, rejectedAccountName) },
+            constructFinalResult = { delegateResult, _ -> delegateResult }
+        )
+    }
+
     private suspend fun <D : Any, R> formatCall(
         call: GenericCall.Instance?,
         initialOrigin: AccountIdKey,
@@ -246,9 +279,47 @@ class RealMultisigCallFormatter @Inject constructor(
     private fun formatDefaultPushNotification(chain: Chain, call: GenericCall.Instance): String {
         return resourceManager.getString(
             R.string.multisig_notification_init_transaction_message,
-            "${call.module.name.capitalize()} ${call.function.name.capitalize()}",
+            call.format(),
             chain.name
         )
+    }
+
+    private fun formatUnknownCallExecutedMessage(chain: Chain): String {
+        return resourceManager.getString(
+            R.string.multisig_transaction_executed_dialog_message,
+            resourceManager.getString(R.string.multisig_transaction_dialog_message_unknown_call),
+            chain.name
+        )
+    }
+
+    private fun formatUnknownCallRejectedMessage(chain: Chain, rejectedAccountName: String): String {
+        return resourceManager.getString(
+            R.string.multisig_transaction_rejected_dialog_message,
+            resourceManager.getString(R.string.multisig_transaction_dialog_message_unknown_call),
+            chain.name,
+            rejectedAccountName
+        )
+    }
+
+    private fun formatDefaultExecutedMessage(chain: Chain, call: GenericCall.Instance): String {
+        return resourceManager.getString(
+            R.string.multisig_transaction_rejected_dialog_message,
+            call.format(),
+            chain.name
+        )
+    }
+
+    private fun formatDefaultRejectedMessage(chain: Chain, call: GenericCall.Instance, rejectedAccountName: String): String {
+        return resourceManager.getString(
+            R.string.multisig_transaction_rejected_dialog_message,
+            call.format(),
+            chain.name,
+            rejectedAccountName
+        )
+    }
+
+    private fun GenericCall.Instance.format(): String {
+        return "${module.name.capitalize()} ${function.name.capitalize()}"
     }
 }
 

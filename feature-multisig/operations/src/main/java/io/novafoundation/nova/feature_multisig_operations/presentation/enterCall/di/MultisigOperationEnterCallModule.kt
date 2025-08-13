@@ -14,8 +14,8 @@ import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingO
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.domain.details.RealMultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.di.MultisigOperationDetailsModule.BindsModule
-import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallViewModel
 
 @Module(includes = [ViewModelModule::class, BindsModule::class])
@@ -35,7 +35,7 @@ class MultisigOperationEnterCallModule {
         router: MultisigOperationsRouter,
         interactor: MultisigOperationDetailsInteractor,
         multisigOperationsService: MultisigPendingOperationsService,
-        payload: MultisigOperationEnterCallPayload,
+        payload: MultisigOperationPayload,
         resourceManager: ResourceManager
     ): ViewModel {
         return MultisigOperationEnterCallViewModel(

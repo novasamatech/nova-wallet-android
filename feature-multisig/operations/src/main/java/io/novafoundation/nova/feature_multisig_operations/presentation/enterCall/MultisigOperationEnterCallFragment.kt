@@ -13,10 +13,11 @@ import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationEnterCallBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 
 class MultisigOperationEnterCallFragment : BaseFragment<MultisigOperationEnterCallViewModel, FragmentMultisigOperationEnterCallBinding>() {
 
-    companion object : PayloadCreator<MultisigOperationEnterCallPayload> by FragmentPayloadCreator()
+    companion object : PayloadCreator<MultisigOperationPayload> by FragmentPayloadCreator()
 
     override fun createBinding() = FragmentMultisigOperationEnterCallBinding.inflate(layoutInflater)
 

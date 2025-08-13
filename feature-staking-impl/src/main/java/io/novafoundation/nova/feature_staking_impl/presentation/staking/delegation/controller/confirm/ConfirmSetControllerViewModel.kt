@@ -116,7 +116,7 @@ class ConfirmSetControllerViewModel(
             stashAccountAddress = payload.stashAddress,
             controllerAccountAddress = payload.controllerAddress
         ).onSuccess {
-            showMessage(resourceManager.getString(R.string.staking_controller_change_success))
+            showToast(resourceManager.getString(R.string.staking_controller_change_success))
 
             router.returnToStakingMain()
         }
