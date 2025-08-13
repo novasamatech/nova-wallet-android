@@ -33,7 +33,7 @@ class MultiChainSyncer(
     }
 }
 
-class NoOpMultiChainSyncer : MultisigPendingOperationsSyncer {
+class NoOpSyncer : MultisigPendingOperationsSyncer {
     override val pendingOperationsCount: Flow<Int> = flowOf(0)
 
     override val pendingOperations: Flow<List<PendingMultisigOperation>> = flowOf(emptyList())

@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.Mult
 import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.MultisigCallDataWatcherFactory
 import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.MultisigChainPendingOperationsSyncerFactory
 import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.MultisigPendingOperationsSyncer
-import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.NoOpMultiChainSyncer
+import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.NoOpSyncer
 import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.MultiChainSyncer
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
@@ -103,7 +103,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
         return if (account is MultisigMetaAccount) {
             createMultisigSynced(account, callDataWatcher, scope)
         } else {
-            NoOpMultiChainSyncer()
+            NoOpSyncer()
         }
     }
 

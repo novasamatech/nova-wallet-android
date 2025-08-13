@@ -146,7 +146,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
         callDataWatcher.newMultisigEvents
             .filter { it.multisig == accountId && it.chainId == chain.id }
             .onEach {
-                pendingCallHashesFlow.updateWithReplyCache { pendingCallHashesFlow -> pendingCallHashesFlow.orEmpty() + it.callHash }
+                pendingCallHashesFlow.updateWithReplyCache { pendingCallHashes -> pendingCallHashes.orEmpty() + it.callHash }
             }.launchIn(this)
     }
 

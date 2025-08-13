@@ -77,7 +77,7 @@ class TradeWebViewModel(
                 TradeProviderFlowType.BUY -> R.string.buy_order_completed_message
                 TradeProviderFlowType.SELL -> R.string.sell_order_completed_message
             }
-            this@TradeWebViewModel.showToast(resourceManager.getString(messageResId))
+            showToast(resourceManager.getString(messageResId))
 
             when (payload.onSuccessfulTradeStrategyType) {
                 OnSuccessfulTradeStrategyType.OPEN_ASSET -> router.openAssetDetails(payload.asset)

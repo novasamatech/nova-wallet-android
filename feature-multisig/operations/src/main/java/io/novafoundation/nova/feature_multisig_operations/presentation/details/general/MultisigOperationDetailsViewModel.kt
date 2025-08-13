@@ -358,9 +358,7 @@ class MultisigOperationDetailsViewModel(
 
     private fun sendTransaction() = launch {
         interactor.performAction(operationFlow.first())
-            .onFailure {
-                showError(it)
-            }
+            .onFailure(::showError)
             .onSuccess {
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 

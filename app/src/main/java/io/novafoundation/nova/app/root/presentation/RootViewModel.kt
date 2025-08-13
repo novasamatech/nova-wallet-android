@@ -120,7 +120,7 @@ class RootViewModel(
     private fun handleDeepLinkCallbackEvent(event: CallbackEvent) {
         when (event) {
             is CallbackEvent.Message -> {
-                toastMessageManager.showToast(event.message)
+                showToast(event.message)
             }
         }
     }
