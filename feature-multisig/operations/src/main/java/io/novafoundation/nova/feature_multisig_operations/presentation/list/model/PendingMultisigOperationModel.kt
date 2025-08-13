@@ -2,11 +2,12 @@ package io.novafoundation.nova.feature_multisig_operations.presentation.list.mod
 
 import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.presentation.ColoredText
+import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperationId
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallPreviewModel
 
 data class PendingMultisigOperationModel(
-    val id: String,
+    val id: PendingMultisigOperationId,
     val chain: ChainUi,
     val action: SigningAction?,
     val call: MultisigCallPreviewModel,

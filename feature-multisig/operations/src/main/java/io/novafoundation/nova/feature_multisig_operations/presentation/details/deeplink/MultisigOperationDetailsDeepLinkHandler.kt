@@ -5,20 +5,20 @@ import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
-import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
-import io.novafoundation.nova.feature_account_api.data.multisig.model.createIdentifier
+import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperationId
+import io.novafoundation.nova.feature_account_api.data.multisig.model.create
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.fromOperationId
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsPayload
 import io.novafoundation.nova.runtime.ext.ChainGeneses
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.toAccountIdKey
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -66,8 +66,14 @@ class MultisigOperationDetailsDeepLinkHandler(
         when (operationState) {
             null,
             MultisigOperationDeepLinkData.State.Active -> {
-                val operationIdentifier = PendingMultisigOperation.createIdentifier(multisigMetaAccount.id, chain, callHash.removeHexPrefix())
-                router.openMultisigOperationDetails(MultisigOperationDetailsPayload(operationIdentifier))
+                val operationIdentifier = PendingMultisigOperationId.create(multisigMetaAccount, chain, callHash.removeHexPrefix())
+                val operationPayload = MultisigOperationPayload.fromOperationId(operationIdentifier)
+                router.openMultisigOperationDetails(
+                    MultisigOperationDetailsPayload(
+                        operationPayload,
+                        navigationButtonMode = MultisigOperationDetailsPayload.NavigationButtonMode.CLOSE
+                    )
+                )
             }
 
             is MultisigOperationDeepLinkData.State.Executed -> showDialog(

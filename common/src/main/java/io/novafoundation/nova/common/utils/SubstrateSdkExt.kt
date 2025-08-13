@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncom
 import io.novafoundation.nova.core.model.Node
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
-import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
 import io.novasama.substrate_sdk_android.encrypt.vByte
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId

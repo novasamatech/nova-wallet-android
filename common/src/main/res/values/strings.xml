@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+
+    <string name="multisig_operation_details_not_found_title">Signing is over</string>
+    <string name="multisig_operation_details_not_found_message">Transaction has already been executed or rejected.</string>
+
+    <string name="loading_transaction_details">Loading transaction details…</string>
+
     <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
 
     <string name="multisig_transaction_executed_dialog_title">Multisig Transaction Executed</string>

@@ -40,6 +40,7 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -53,6 +54,8 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.coroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.time.Duration
@@ -105,6 +108,10 @@ fun <T> MutableStateFlow<T>.setter(): (T) -> Unit {
 
 fun <T> MutableStateFlow<T>.updateValue(updater: (T) -> T) {
     value = updater(value)
+}
+
+suspend fun <T> MutableSharedFlow<T>.updateWithReplyCache(updater: (T?) -> T) {
+    emit(updater(replayCache.firstOrNull()))
 }
 
 fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
@@ -634,11 +641,13 @@ fun <T> Collection<Flow<T>>.accumulate(): Flow<List<T>> {
 fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
     val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }
     val resultOfFlows = MutableList<T?>(flowsList.size) { null }
+    val lock = Mutex()
+
     return flowsList
         .merge()
         .map {
-            resultOfFlows[it.first] = it.second.first()
-            resultOfFlows.filterNotNull()
+            lock.withLock { resultOfFlows[it.first] = it.second.first() }
+            resultOfFlows.filterNotNull().toList()
         }
 }
 

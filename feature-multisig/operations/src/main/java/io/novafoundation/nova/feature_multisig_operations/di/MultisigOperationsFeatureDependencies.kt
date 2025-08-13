@@ -5,6 +5,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.DialogMessageManager
@@ -104,6 +105,8 @@ interface MultisigOperationsFeatureDependencies {
     val linkBuilderFactory: LinkBuilderFactory
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     fun dialogMessageManager(): DialogMessageManager
 

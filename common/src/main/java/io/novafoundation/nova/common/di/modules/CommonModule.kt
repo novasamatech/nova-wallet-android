@@ -414,7 +414,6 @@ class CommonModule {
         return RealDialogMessageManager()
     }
 
-
     @Provides
     @ApplicationScope
     fun provideIntegrityService(context: Context): IntegrityService {
