@@ -673,4 +673,5 @@ object Modules {
     const val COLLATOR_STAKING = "CollatorStaking"
 
     const val EVM = "EVM"
+
 }

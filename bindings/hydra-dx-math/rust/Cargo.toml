@@ -7,17 +7,12 @@ repository = 'https://github.com/nova-wallet/nova-wallet-android'
 version = "0.1.0"
 
 [dependencies]
-#wee_alloc = "0.4.5"
 serde = { version = "1.0.169", features = ["derive"] }
 serde_json = "1.0.100"
 serde-aux = "4.2.0"
-sp-arithmetic = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
-hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", rev="9e733374233e2bdef039d5b3e73c5e939d7512f4"}
+sp-arithmetic = { git = "https://github.com/galacticcouncil/polkadot-sdk", branch = "stable2409-patch6", default-features = false }
+hydra-dx-math = { git = "https://github.com/galacticcouncil/HydraDX-node", version="10.3.0"}
 jni = { version = "0.17.0", default-features = false }
-
-[dev-dependencies]
-sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false}
-sp-runtime  = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.38", default-features = false }
 
 [profile.release]
 strip = true
@@ -30,5 +25,9 @@ crate_type = ["cdylib"]
 
 [features]
 default = ["std"]
-std = ["sp-arithmetic/std", "sp-runtime/std"]
+std = ["sp-arithmetic/std"]
 stableswap = []
+
+[[bin]]
+name = "test_pairs"
+path = "src/lib.rs"

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap
+package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindInt
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
@@ -8,6 +8,7 @@ import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1
 import io.novafoundation.nova.runtime.storage.source.query.api.storage1
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 
@@ -19,12 +20,19 @@ val RuntimeMetadata.assetRegistry: AssetRegistryApi
     get() = AssetRegistryApi(assetRegistry())
 
 context(StorageQueryContext)
-val AssetRegistryApi.assetMetadataMap: QueryableStorageEntry1<HydraDxAssetId, Int?>
-    get() = storage1(
-        name = "Assets",
-        binding = { decoded, _ -> bindMetadataDecimals(decoded) },
-    )
+val AssetRegistryApi.assets: QueryableStorageEntry1<HydraDxAssetId, HydrationAssetMetadata>
+    get() = storage1(name = "Assets", binding = ::bindHydrationAssetMetadata)
 
-private fun bindMetadataDecimals(decoded: Any): Int? {
-    return decoded.castToStruct().get<Any?>("decimals")?.let(::bindInt)
+
+private fun bindHydrationAssetMetadata(
+    decoded: Any,
+    assetId: HydraDxAssetId
+): HydrationAssetMetadata {
+    val asStruct = decoded.castToStruct()
+
+    return HydrationAssetMetadata(
+        assetId = assetId,
+        decimals = bindInt(asStruct["decimals"]),
+        assetType = asStruct.get<DictEnum.Entry<*>>("assetType")!!.name
+    )
 }
