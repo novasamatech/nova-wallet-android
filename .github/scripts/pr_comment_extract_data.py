@@ -1,11 +1,14 @@
 import os
 import sys
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 import requests
 
 
 ALLOWED_SEVERITIES = {"Major", "Critical", "Normal"}
+
+# Matches: "Release severity: <value>" (case-insensitive, flexible spaces)
+SEVERITY_LINE_RE = re.compile(r"^release\s+severity\s*:\s*(.+)$", re.IGNORECASE)
 
 
 def parse_base_params(comment_link: str) -> None:
@@ -38,10 +41,8 @@ def parse_base_params(comment_link: str) -> None:
 
     severity_raw = ""
 
-    sev_re = re.compile(r"^release\s+severity\s*:\s*(.+)$", re.IGNORECASE)
-
     for line in lines:
-        m = sev_re.match(line)
+        m = SEVERITY_LINE_RE.match(line)
         if m:
             severity_raw = m.group(1).strip()
             break
@@ -55,8 +56,8 @@ def parse_base_params(comment_link: str) -> None:
         sys.exit(1)
 
     severity = severity_raw
-    
-    time_iso = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    time_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     try:
         with open(env_file, "a", encoding="utf-8") as f:
