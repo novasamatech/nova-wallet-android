@@ -103,7 +103,13 @@ data class Chain(
                 val currencyIdType: String,
                 val existentialDeposit: BigInteger,
                 val transfersEnabled: Boolean,
-            ) : Type()
+                val subType: SubType
+            ) : Type() {
+
+                enum class SubType {
+                    DEFAULT, HYDRATION_EVM
+                }
+            }
 
             data class EvmErc20(
                 val contractAddress: String
