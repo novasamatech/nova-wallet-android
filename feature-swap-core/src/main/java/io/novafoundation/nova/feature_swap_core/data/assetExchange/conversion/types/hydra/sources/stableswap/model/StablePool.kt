@@ -26,7 +26,7 @@ class StablePool(
 
     companion object {
         fun getDefaultPegs(size: Int): List<List<BigInteger>> {
-            return (0..<size).map {
+            return (0 until size).map {
                 listOf(BigInteger.ONE, BigInteger.ONE)
             }
         }
