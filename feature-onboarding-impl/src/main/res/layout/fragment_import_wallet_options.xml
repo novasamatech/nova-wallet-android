@@ -78,7 +78,7 @@
                     android:layout_columnWeight="1"
                     android:layout_margin="6dp"
                     android:src="@drawable/ic_import_option_trust_wallet"
-                    android:text="@string/import_wallet_options_mnemonic_subtitle"
+                    android:text="@string/account_welcome_trust_wallet_subtitle"
                     app:title="@string/account_welcome_trust_wallet_title" />
 
 
