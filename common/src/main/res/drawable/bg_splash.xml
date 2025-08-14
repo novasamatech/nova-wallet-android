@@ -20,10 +20,10 @@
         android:top="60dp" />
 
     <item
+        android:id="@+id/loadingScreenDevelopedBy"
         android:width="124dp"
         android:height="60dp"
         android:bottom="58dp"
         android:drawable="@drawable/ic_loading_screen_developed_by"
         android:gravity="center_horizontal|bottom" />
-
 </layer-list>

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegat
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -21,7 +20,6 @@ class AddStakingProxyFragment : BaseFragment<AddStakingProxyViewModel, FragmentA
     override fun createBinding() = FragmentAddStakingProxyBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.setStakingProxyContainer.applyStatusBarInsets(consume = false)
         binder.addProxyToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.addStakingProxyButton.prepareForProgress(this)
 

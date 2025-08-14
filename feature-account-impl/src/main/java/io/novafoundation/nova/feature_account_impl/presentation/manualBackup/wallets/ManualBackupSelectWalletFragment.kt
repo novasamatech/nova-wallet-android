@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.holders.AccountHolder
@@ -46,7 +45,6 @@ class ManualBackupSelectWalletFragment :
     }
 
     override fun initViews() {
-        binder.manualBackupWalletsToolbar.applyStatusBarInsets()
         binder.manualBackupWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.manualBackupWalletsList.adapter = adapter

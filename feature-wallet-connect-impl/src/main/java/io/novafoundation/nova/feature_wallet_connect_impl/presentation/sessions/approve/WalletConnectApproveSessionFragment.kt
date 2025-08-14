@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.showValueOrHide
@@ -28,7 +27,6 @@ class WalletConnectApproveSessionFragment : BaseFragment<WalletConnectApproveSes
         onBackPressed { viewModel.exit() }
 
         binder.wcApproveSessionToolbar.setHomeButtonListener { viewModel.exit() }
-        binder.wcApproveSessionToolbar.applyStatusBarInsets()
 
         binder.wcApproveSessionReject.setOnClickListener { viewModel.rejectClicked() }
         binder.wcApproveSessionReject.prepareForProgress(viewLifecycleOwner)

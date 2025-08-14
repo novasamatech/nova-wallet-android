@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.currentS
 import androidx.annotation.CallSuper
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentCurrentValidatorsBinding
@@ -18,8 +17,6 @@ abstract class CurrentStakeTargetsFragment<V : CurrentStakeTargetsViewModel> :
     lateinit var adapter: CurrentStakeTargetAdapter
 
     override fun initViews() {
-        binder.currentValidatorsContainer.applyStatusBarInsets()
-
         adapter = CurrentStakeTargetAdapter(this)
         binder.currentValidatorsList.adapter = adapter
 

@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -39,14 +38,6 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel, F
     override fun createBinding() = FragmentContributeBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.crowdloanContributeContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-
-            consume(true)
-        }
-
         binder.crowdloanContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.crowdloanContributeContinue.prepareForProgress(viewLifecycleOwner)
         binder.crowdloanContributeContinue.setOnClickListener { viewModel.nextClicked() }
