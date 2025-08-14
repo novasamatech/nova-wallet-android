@@ -171,6 +171,8 @@
     <string name="account_watch_only">yalnızca-izle</string>
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Ledger veya Parity Signer kullanın</string>
     <string name="account_welcome_hardware_wallet_title">Donanım cüzdanı bağlayın</string>
+    <string name="account_welcome_trust_wallet_subtitle">Nova’da Trust Wallet hesaplarınızı kullanın</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">%s hesabını ekle</string>
     <string name="accounts_add_wallet">Cüzdan ekle</string>
     <string name="accounts_change_chain_account">%s hesabını değiştir</string>

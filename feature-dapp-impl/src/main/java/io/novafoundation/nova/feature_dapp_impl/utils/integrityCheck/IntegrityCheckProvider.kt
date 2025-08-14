@@ -97,7 +97,6 @@ class IntegrityCheckProvider(
         }
     }
 
-
     private fun log(message: String) = launchUnit(Dispatchers.Main) {
         Log.e(LOG_TAG, message)
         webView.evaluateJavascript("console.log('$message')", null)

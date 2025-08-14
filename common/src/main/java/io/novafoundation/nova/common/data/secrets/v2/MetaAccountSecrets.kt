@@ -18,7 +18,7 @@ object KeyPairSchema : Schema<KeyPairSchema>() {
 
 object MetaAccountSecrets : Schema<MetaAccountSecrets>() {
     val Entropy by byteArray().optional()
-    val Seed by byteArray().optional()
+    val SubstrateSeed by byteArray().optional()
 
     val SubstrateKeypair by schema(KeyPairSchema)
     val SubstrateDerivationPath by string().optional()
@@ -38,13 +38,13 @@ object ChainAccountSecrets : Schema<ChainAccountSecrets>() {
 fun MetaAccountSecrets(
     substrateKeyPair: Keypair,
     entropy: ByteArray? = null,
-    seed: ByteArray? = null,
+    substrateSeed: ByteArray? = null,
     substrateDerivationPath: String? = null,
     ethereumKeypair: Keypair? = null,
     ethereumDerivationPath: String? = null,
 ): EncodableStruct<MetaAccountSecrets> = MetaAccountSecrets { secrets ->
     secrets[Entropy] = entropy
-    secrets[Seed] = seed
+    secrets[SubstrateSeed] = substrateSeed
 
     secrets[SubstrateKeypair] = KeyPairSchema { keypair ->
         keypair[PublicKey] = substrateKeyPair.publicKey
@@ -90,7 +90,7 @@ val EncodableStruct<MetaAccountSecrets>.entropy
     get() = get(MetaAccountSecrets.Entropy)
 
 val EncodableStruct<MetaAccountSecrets>.seed
-    get() = get(MetaAccountSecrets.Seed)
+    get() = get(MetaAccountSecrets.SubstrateSeed)
 
 val EncodableStruct<MetaAccountSecrets>.substrateKeypair
     get() = get(MetaAccountSecrets.SubstrateKeypair)

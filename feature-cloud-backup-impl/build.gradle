@@ -1,18 +1,12 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../scripts/secrets.gradle'
 
 android {
     namespace 'io.novafoundation.nova.feature_cloud_backup_impl'
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
 
         buildConfigField "String", "GOOGLE_OAUTH_ID", readStringSecret("DEBUG_GOOGLE_OAUTH_ID")
     }
@@ -21,11 +15,6 @@ android {
         release {
             buildConfigField "String", "GOOGLE_OAUTH_ID", readStringSecret("RELEASE_GOOGLE_OAUTH_ID")
         }
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     packagingOptions {
@@ -52,7 +41,7 @@ dependencies {
     implementation androidDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerCompiler
 
     
     implementation androidDep
