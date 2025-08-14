@@ -21,7 +21,6 @@ val RemoteAndLocalId.remoteId
 val RemoteAndLocalId.localId
     get() = second
 
-
 fun HydraRemoteToLocalMapping.matchId(remoteId: HydraDxAssetId): RemoteAndLocalId? {
     return get(remoteId)?.fullId?.let { remoteId to it }
 }

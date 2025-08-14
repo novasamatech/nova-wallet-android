@@ -32,7 +32,6 @@ val StableSwapApi.pools: QueryableStorageEntry1<HydraDxAssetId, StableSwapPoolIn
         binding = ::bindStablePoolInfo,
     )
 
-
 context(StorageQueryContext)
 val StableSwapApi.poolPegs: QueryableStorageEntry1<HydraDxAssetId, StalbeSwapPoolPegInfo>
     get() = storage1(

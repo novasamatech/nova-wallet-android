@@ -17,7 +17,7 @@ class HydrationEvmAssetTransfers @Inject constructor(
     extrinsicServiceFactory: ExtrinsicService.Factory,
     phishingValidationFactory: PhishingValidationFactory,
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
-): OrmlAssetTransfers(
+) : OrmlAssetTransfers(
     chainRegistry = chainRegistry,
     assetSourceRegistry = assetSourceRegistry,
     extrinsicServiceFactory = extrinsicServiceFactory,

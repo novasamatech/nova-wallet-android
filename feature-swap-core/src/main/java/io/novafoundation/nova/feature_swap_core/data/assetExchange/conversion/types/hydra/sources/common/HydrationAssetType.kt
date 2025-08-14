@@ -15,7 +15,6 @@ sealed class HydrationAssetType {
     class Erc20(val assetId: HydraDxAssetId) : HydrationAssetType()
 }
 
-
 fun HydrationAssetType.Companion.fromAsset(chainAsset: Chain.Asset, hydrationAssetId: HydraDxAssetId): HydrationAssetType {
     return when (val type = chainAsset.type) {
         is Chain.Asset.Type.Native -> HydrationAssetType.Native

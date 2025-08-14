@@ -39,7 +39,7 @@ class HydraDxConversionModule {
 
     @Provides
     @IntoSet
-    fun provideAavePoolQuotingSourceFactory(implementation: AaveSwapQuotingSourceFactory) : HydraDxQuotingSource.Factory<*> {
+    fun provideAavePoolQuotingSourceFactory(implementation: AaveSwapQuotingSourceFactory): HydraDxQuotingSource.Factory<*> {
         return implementation
     }
 

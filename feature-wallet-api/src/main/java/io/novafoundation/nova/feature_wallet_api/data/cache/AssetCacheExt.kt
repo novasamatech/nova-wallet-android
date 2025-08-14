@@ -57,14 +57,14 @@ suspend fun AssetCache.updateFromChainBalance(
 }
 
 fun TransferableMode.toLocal(): TransferableModeLocal {
-    return when(this) {
+    return when (this) {
         TransferableMode.REGULAR -> TransferableModeLocal.REGULAR
         TransferableMode.HOLDS_AND_FREEZES -> TransferableModeLocal.HOLDS_AND_FREEZES
     }
 }
 
 fun EDCountingMode.toLocal(): EDCountingModeLocal {
-    return when(this) {
+    return when (this) {
         EDCountingMode.TOTAL -> EDCountingModeLocal.TOTAL
         EDCountingMode.FREE -> EDCountingModeLocal.FREE
     }

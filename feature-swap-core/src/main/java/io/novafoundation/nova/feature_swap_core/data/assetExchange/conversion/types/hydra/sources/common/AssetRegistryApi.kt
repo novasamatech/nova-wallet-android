@@ -23,7 +23,6 @@ context(StorageQueryContext)
 val AssetRegistryApi.assets: QueryableStorageEntry1<HydraDxAssetId, HydrationAssetMetadata>
     get() = storage1(name = "Assets", binding = ::bindHydrationAssetMetadata)
 
-
 private fun bindHydrationAssetMetadata(
     decoded: Any,
     assetId: HydraDxAssetId

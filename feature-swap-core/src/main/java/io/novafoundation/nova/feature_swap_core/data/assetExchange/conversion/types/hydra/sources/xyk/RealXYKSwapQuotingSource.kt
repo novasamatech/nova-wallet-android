@@ -55,7 +55,6 @@ class XYKSwapQuotingSourceFactory @Inject constructor(
     }
 
     override fun create(chain: Chain, host: SwapQuoting.QuotingHost): XYKSwapQuotingSource {
-
         return RealXYKSwapQuotingSource(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
