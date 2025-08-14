@@ -18,8 +18,8 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel, F
     override fun initViews() {
         binder.importOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
-        binder.importOptionPassphraseBig.setOnClickListener { importMnemonicClicked() }
-        binder.importOptionPassphraseSmall.setOnClickListener { importMnemonicClicked() }
+        binder.importOptionPassphrase.setOnClickListener { viewModel.importMnemonicClicked() }
+        binder.importOptionTrustWallet.setOnClickListener { viewModel.importTrustWalletClicked() }
         binder.importOptionCloud.setOnClickListener { viewModel.importCloudClicked() }
         binder.importOptionHardware.setOnClickListener { viewModel.importHardwareClicked() }
         binder.importOptionWatchOnly.setOnClickListener { viewModel.importWatchOnlyClicked() }
@@ -46,12 +46,6 @@ class ImportWalletOptionsFragment : BaseFragment<ImportWalletOptionsViewModel, F
 
         viewModel.showImportViaCloudButton.observe {
             binder.importOptionCloud.setVisible(it)
-            binder.importOptionPassphraseSmall.setVisible(it)
-            binder.importOptionPassphraseBig.setVisible(!it)
         }
-    }
-
-    private fun importMnemonicClicked() {
-        viewModel.importMnemonicClicked()
     }
 }

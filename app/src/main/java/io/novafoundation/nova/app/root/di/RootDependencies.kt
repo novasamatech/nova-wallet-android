@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchI
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
+import io.novafoundation.nova.feature_multisig_operations.di.deeplink.MultisigDeepLinks
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
@@ -104,6 +105,8 @@ interface RootDependencies {
     val multisigPendingOperationsService: MultisigPendingOperationsService
 
     val accountMigrationDeepLinks: AccountMigrationDeepLinks
+
+    val multisigDeepLinks: MultisigDeepLinks
 
     val deepLinkingPreferences: DeepLinkingPreferences
 

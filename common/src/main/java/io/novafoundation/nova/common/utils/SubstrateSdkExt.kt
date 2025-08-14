@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncom
 import io.novafoundation.nova.core.model.Node
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
-import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
+import io.novasama.substrate_sdk_android.encrypt.vByte
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
 import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -404,14 +404,6 @@ fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
     }
 }
 
-context(RuntimeContext)
-@JvmName("createStorageKeyArray")
-fun StorageEntry.createStorageKey(keyArguments: Array<out Any?>): String {
-    return createStorageKey(*keyArguments)
-}
-
-fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
-
 fun SeedFactory.deriveSeed32(mnemonicWords: String, password: String?) = cropSeedTo32Bytes(deriveSeed(mnemonicWords, password))
 
 private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Result {
@@ -536,14 +528,48 @@ fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
 
     val r = signature.copyOfRange(0, 32)
     val s = signature.copyOfRange(32, 64)
-    val v = signature[64].ensureValidVByteFormat()
+    val v = signature[64].convertToWeb3jCompatibleVByte()
 
     return SignatureWrapper.Ecdsa(v = byteArrayOf(v), r = r, s = s)
 }
 
+/**
+ * Ensure this signature is compatible with external signers and verifiers (dapps)
+ * We need to do that due to differences in ECDSA v-byte format
+ */
+fun SignatureWrapper.convertToExternalCompatibleFormat(): SignatureWrapper {
+    return when (this) {
+        is SignatureWrapper.Ecdsa -> convertToExternalCompatibleVByteFormat()
+        is SignatureWrapper.Sr25519, is SignatureWrapper.Ed25519 -> this
+    }
+}
+
+private fun SignatureWrapper.Ecdsa.convertToExternalCompatibleVByteFormat(): SignatureWrapper.Ecdsa {
+    return SignatureWrapper.Ecdsa(
+        v = byteArrayOf(vByte.convertToExternalCompatibleVByte()),
+        r = r,
+        s = s
+    )
+}
+
+/**
+ * @see convertToWeb3jCompatibleVByte
+ */
+private fun Byte.convertToExternalCompatibleVByte(): Byte {
+    if (this in 0..7) {
+        return this
+    }
+
+    if (this in 27..34) {
+        return (this - 27).toByte()
+    }
+
+    throw IllegalArgumentException("Invalid vByte: $this")
+}
+
 // Web3j supports only one format - when vByte is between [27..34]
 // However, there is a second format - when vByte is between [0..7] - e.g. Ledger and Parity Signer
-private fun Byte.ensureValidVByteFormat(): Byte {
+private fun Byte.convertToWeb3jCompatibleVByte(): Byte {
     if (this in 27..34) {
         return this
     }

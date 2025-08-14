@@ -1,36 +1,14 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'io.novafoundation.nova.feature_multisig_operations'
 
-    compileSdkVersion rootProject.compileSdkVersion
-
-    defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-    }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     buildFeatures {
@@ -43,6 +21,7 @@ dependencies {
     implementation project(':runtime')
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 
@@ -60,10 +39,10 @@ dependencies {
     implementation lifeCycleKtxDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep

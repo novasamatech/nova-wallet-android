@@ -1,18 +1,12 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
 
         buildConfigField "String", "EHTERSCAN_API_KEY_MOONBEAM", readStringSecret("EHTERSCAN_API_KEY_MOONBEAM")
         buildConfigField "String", "EHTERSCAN_API_KEY_MOONRIVER", readStringSecret("EHTERSCAN_API_KEY_MOONRIVER")
@@ -30,16 +24,6 @@ android {
             buildConfigField "String", "LEGACY_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v7/transfers.json\""
             buildConfigField "String", "DYNAMIC_CROSS_CHAIN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/xcm/v7/transfers_dynamic.json\""
         }
-    }
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_wallet_impl'
 
@@ -75,13 +59,13 @@ dependencies {
 
     implementation daggerDep
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation roomDep
-    kapt roomKapt
+    ksp roomCompiler
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     implementation bouncyCastleDep
 

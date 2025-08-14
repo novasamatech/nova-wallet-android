@@ -33,6 +33,10 @@ fun Graph<*, *>.numberOfEdges(): Int {
     return adjacencyList.values.sumOf { it.size }
 }
 
+fun <N, E : Edge<N>> Graph<N, E>.allEdges(): List<E> {
+    return adjacencyList.values.flatten()
+}
+
 fun interface EdgeVisitFilter<E : Edge<*>> {
 
     suspend fun shouldVisit(edge: E, pathPredecessor: E?): Boolean

@@ -106,5 +106,5 @@ interface AccountRouter : SecureRouter, ReturnableRouter {
 
     fun openAddGenericEvmAddressSelectLedger(metaId: Long)
 
-    fun openMainWithFinishMultisigTransaction()
+    fun openMainWithFinishMultisigTransaction(accountWasSwitched: Boolean)
 }

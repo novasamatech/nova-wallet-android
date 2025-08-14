@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZe
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
+import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.createStorageKey
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -133,13 +134,13 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): V {
-        val storageKey = createStorageKey(keyArguments)
+        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
         val scaleResult = queryKey(storageKey, at)
         return decodeStorageValue(scaleResult, binding)
     }
 
     override suspend fun StorageEntry.queryRaw(vararg keyArguments: Any?): String? {
-        val storageKey = createStorageKey(keyArguments)
+        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
 
         return queryKey(storageKey, at)
     }
@@ -148,7 +149,7 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<V> {
-        val storageKey = createStorageKey(keyArguments)
+        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
 
         return observeKey(storageKey).map { storageUpdate ->
             decodeStorageValue(storageUpdate.value, binding)
@@ -159,7 +160,7 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<WithRawValue<V>> {
-        val storageKey = createStorageKey(keyArguments)
+        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
 
         return observeKey(storageKey).map { storageUpdate ->
             val decoded = decodeStorageValue(storageUpdate.value, binding)
@@ -264,6 +265,11 @@ abstract class BaseStorageQueryContext(
                 null
             }
         }
+    }
+
+    context(RuntimeContext)
+    private fun StorageEntry.createStorageKeyFromArrayArgs(keyArguments: Array<out Any?>): String {
+        return createStorageKey(*keyArguments)
     }
 
     protected class StorageUpdate(

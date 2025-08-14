@@ -50,6 +50,9 @@ class MultisigOperationEnterCallViewModel(
             resourceManager.getString(R.string.invalid_call_data_message, callHash)
         )
     } catch (e: Exception) {
-        showError(resourceManager.getString(R.string.invalid_call_data_title))
+        showError(
+            resourceManager.getString(R.string.invalid_call_data_title),
+            resourceManager.getString(R.string.invalid_call_data_format_message)
+        )
     }
 }
