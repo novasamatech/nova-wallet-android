@@ -370,6 +370,10 @@ fun RuntimeMetadata.firstExistingCall(vararg options: Pair<String, String>): Met
     return requireNotNull(result)
 }
 
+fun RuntimeMetadata.firstExistingCall(options: List<Pair<String, String>>): MetadataFunction {
+    return firstExistingCall(*options.toTypedArray())
+}
+
 fun RuntimeMetadata.firstExistingModuleOrNull(vararg options: String): Module? {
     return options.tryFindNonNull { moduleOrNull(it) }
 }

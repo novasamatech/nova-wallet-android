@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.orml.hydrationEvm.HydrationEvmOrmlAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.orml.OrmlAssetHistory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml.OrmlAssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.orml.hydrationEvm.HydrationEvmAssetTransfers
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 
@@ -17,10 +18,11 @@ class OrmlAssetSourceFactory @Inject constructor(
     defaultTransfers: OrmlAssetTransfers,
 
     hydrationEvmOrmlAssetBalance: HydrationEvmOrmlAssetBalance,
+    hydrationEvmAssetTransfers: HydrationEvmAssetTransfers
 ) {
 
     private val defaultSource = StaticAssetSource(defaultTransfers, defaultBalance, defaultHistory)
-    private val hydrationEvmSource = StaticAssetSource(defaultTransfers, hydrationEvmOrmlAssetBalance, defaultHistory)
+    private val hydrationEvmSource = StaticAssetSource(hydrationEvmAssetTransfers, hydrationEvmOrmlAssetBalance, defaultHistory)
 
     fun allSources(): List<AssetSource> {
         return listOf(defaultSource, hydrationEvmSource)
