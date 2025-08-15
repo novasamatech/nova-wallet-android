@@ -35,7 +35,7 @@ class ExtrinsicBuildingContext(
     val chain: Chain
 )
 
-private val DEFAULT_BATCH_MODE = BatchMode.BATCH_ALL
+private val DEFAULT_BATCH_MODE = BatchMode.BATCH
 
 interface ExtrinsicService {
 

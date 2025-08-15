@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -94,6 +95,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
 
     override val pendingOperationsCount = pendingCallHashesFlow
         .map { it.size }
+        .distinctUntilChanged()
         .onEach {
             Log.d("RealMultisigChainPendingOperationsSyncer", "# of operations for ${multisig.name} in ${chain.name}: $it")
         }.shareInBackground()
@@ -101,6 +103,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     override val pendingOperations = pendingCallHashesFlow.flatMapLatest(::observePendingOperations)
         .onEach(::cleanInactiveOperations)
         .map { it.values.filterNotNull() }
+        .distinctUntilChanged()
         .catch { Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to sync pendingOperations", it) }
         .onEach { Log.d("RealMultisigChainPendingOperationsSyncer", "Operations for ${multisig.name} in ${chain.name}: $it") }
         .shareInBackground()
