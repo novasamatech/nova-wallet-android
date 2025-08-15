@@ -65,11 +65,11 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.WeightBreakdown
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegmentQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegmentQuotedAmount
-import io.novafoundation.nova.feature_swap_core_api.data.paths.model.weightBreakdown
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.BuildConfig
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
@@ -737,7 +737,7 @@ internal class RealSwapService(
 
     private suspend fun formatTrade(trade: QuotedTrade): String {
         return buildString {
-            val weightBreakdown = trade.weightBreakdown()
+            val weightBreakdown = WeightBreakdown.fromQuotedPath(trade)
 
             trade.path.zip(weightBreakdown.individualWeights).onEachIndexed { index, (quotedSwapEdge, weight) ->
                 val amountIn: Balance

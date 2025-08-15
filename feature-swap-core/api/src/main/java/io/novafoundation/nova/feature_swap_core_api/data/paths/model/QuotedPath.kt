@@ -24,25 +24,29 @@ class QuotedPath<E>(
     }
 }
 
-class WeightBreakdown(
+class WeightBreakdown private constructor(
     val individualWeights: List<Int>,
     val total: Int
-)
+) {
 
-fun <N, E : WeightedEdge<N>> QuotedPath<E>.weightBreakdown(): WeightBreakdown {
-    val weightedPath = mutableListOf<E>()
-    val individualWeights = mutableListOf<Int>()
-    var weight = 0
+    companion object {
 
-    path.forEach { quotedEdge ->
-        val edgeWeight = quotedEdge.edge.weightForAppendingTo(weightedPath)
+        fun <N, E : WeightedEdge<N>> fromQuotedPath(path: QuotedPath<E>): WeightBreakdown {
+            val weightedPath = mutableListOf<E>()
+            val individualWeights = mutableListOf<Int>()
+            var weight = 0
 
-        weight += edgeWeight
-        weightedPath += quotedEdge.edge
-        individualWeights += edgeWeight
+            path.path.forEach { quotedEdge ->
+                val edgeWeight = quotedEdge.edge.weightForAppendingTo(weightedPath)
+
+                weight += edgeWeight
+                weightedPath += quotedEdge.edge
+                individualWeights += edgeWeight
+            }
+
+            return WeightBreakdown(individualWeights, weight)
+        }
     }
-
-    return WeightBreakdown(individualWeights, weight)
 }
 
 val QuotedPath<*>.quote: BigInteger
