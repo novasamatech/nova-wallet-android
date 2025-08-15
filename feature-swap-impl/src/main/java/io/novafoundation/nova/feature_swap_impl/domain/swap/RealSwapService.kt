@@ -856,8 +856,8 @@ internal class RealSwapService(
             // First path segments don't have any extra restrictions
             if (pathPredecessor == null) return true
 
-            //
-            if (callExecutionType.get() == CallExecutionType.DELAYED) return false
+            // Second and subsequent edges are subject to checking whether we can execute them one by one immediately
+            if (!canExecuteIntermediateEdgeSequentially(edge, pathPredecessor)) return false
 
             // We don't (yet) handle edges that doesn't allow to transfer whole account balance out
             if (!edge.canTransferOutWholeAccountBalance()) return false
@@ -881,6 +881,15 @@ internal class RealSwapService(
 
             return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId) &&
                 edge.canPayNonNativeFeesInIntermediatePosition()
+        }
+
+        private suspend fun canExecuteIntermediateEdgeSequentially(edge: SwapGraphEdge, predecessor: SwapGraphEdge): Boolean {
+            // If account can execute operations immediately - we can execute anything sequentially
+            if (callExecutionType.get() == CallExecutionType.IMMEDIATE) return true
+
+            // Otherwise it is only possible to do when the edges is merged with predecessor. If it does not - it will require a separate operation
+            // And doing a separate operation is not possible since execution type is DELAYED
+            return edge.canAppendToPredecessor(predecessor)
         }
 
         private fun isSufficient(chainAndAsset: ChainWithAsset): Boolean {
