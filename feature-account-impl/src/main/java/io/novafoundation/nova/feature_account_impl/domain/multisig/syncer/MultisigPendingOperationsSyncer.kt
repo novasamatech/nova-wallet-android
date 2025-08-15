@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.domain.multisig.syncer
 
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.flowOf
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccou
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
+import io.novafoundation.nova.feature_account_api.domain.multisig.intoCallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.Mult
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.blockDurationEstimatorFromRemote
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -112,7 +115,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     }
 
     override suspend fun operationAvailableFlow(operationId: PendingMultisigOperationId): Flow<Boolean> {
-        return pendingCallHashesFlow.map { set -> set.any { it.toHex() == operationId.callHash } }
+        return pendingCallHashesFlow.map { set -> operationId.callHash.intoCallHash() in set }
     }
 
     private fun startOffChainRefreshJob() {

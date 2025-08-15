@@ -90,7 +90,7 @@ class TransferMultisigActionFormatter @Inject constructor(
         val parsedTransfer = tryParseTransfer(visit, chain) ?: return null
 
         val accountName = identityProvider.getNameOrAddress(parsedTransfer.destination, chain)
-        val formattedAmount = parsedTransfer.amount.formatPlanks().ellipsizeAddress()
+        val formattedAmount = parsedTransfer.amount.formatPlanks()
 
         return resourceManager.getString(
             R.string.multisig_transaction_rejected_dialog_message,
