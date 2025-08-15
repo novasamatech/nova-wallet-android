@@ -110,9 +110,7 @@ fun <T> MutableStateFlow<T>.updateValue(updater: (T) -> T) {
 }
 
 suspend fun <T> MutableSharedFlow<T>.updateWithReplyCache(updater: (T?) -> T) {
-    val currentState = replayCache.firstOrNull()
-    val newState = updater(currentState)
-    emit(newState)
+    emit(updater(replayCache.firstOrNull()))
 }
 
 fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
