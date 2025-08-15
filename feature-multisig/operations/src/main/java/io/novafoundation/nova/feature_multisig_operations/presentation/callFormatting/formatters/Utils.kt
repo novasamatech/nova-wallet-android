@@ -6,5 +6,4 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIc
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
-
 fun AssetIconProvider.multisigFormatAssetIcon(chain: Chain) = getAssetIconOrFallback(chain.utilityAsset, AssetIconMode.WHITE)
