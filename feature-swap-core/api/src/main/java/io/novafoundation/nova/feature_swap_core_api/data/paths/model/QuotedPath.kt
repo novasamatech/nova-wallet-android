@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_core_api.data.paths.model
 
 import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import java.math.BigInteger
 
@@ -22,6 +23,28 @@ class QuotedPath<E>(
         }
     }
 }
+
+class WeightBreakdown(
+    val individualWeights: List<Int>,
+    val total: Int
+)
+
+fun <N, E : WeightedEdge<N>> QuotedPath<E>.weightBreakdown() : WeightBreakdown {
+    val weightedPath = mutableListOf<E>()
+    val individualWeights = mutableListOf<Int>()
+    var weight = 0
+
+    path.forEach { quotedEdge ->
+        val edgeWeight = quotedEdge.edge.weightForAppendingTo(weightedPath)
+
+        weight += edgeWeight
+        weightedPath += quotedEdge.edge
+        individualWeights += edgeWeight
+    }
+
+    return WeightBreakdown(individualWeights, weight)
+}
+
 
 val QuotedPath<*>.quote: BigInteger
     get() = when (direction) {

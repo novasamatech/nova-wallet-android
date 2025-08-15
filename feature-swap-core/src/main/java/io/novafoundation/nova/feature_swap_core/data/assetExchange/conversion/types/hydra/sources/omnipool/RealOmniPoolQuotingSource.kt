@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool
 
 import io.novafoundation.nova.common.utils.dynamicFees
+import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
+import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.omnipool
 import io.novafoundation.nova.common.utils.orZero
@@ -8,6 +11,7 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.OmniPool
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.OmniPoolFees
@@ -30,7 +34,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
-import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -205,8 +208,9 @@ private class RealOmniPoolQuotingSource(
 
         override val to: FullChainAssetId = toAsset.second.fullId
 
-        override val weight: Int
-            get() = Weights.Hydra.OMNIPOOL
+        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
+            return weightAppendingToPath(path, Weights.Hydra.OMNIPOOL)
+        }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val omniPool = omniPoolFlow.first()
