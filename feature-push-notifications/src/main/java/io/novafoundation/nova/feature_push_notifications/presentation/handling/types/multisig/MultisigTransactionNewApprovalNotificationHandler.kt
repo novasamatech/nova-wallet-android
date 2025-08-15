@@ -67,8 +67,7 @@ class MultisigTransactionNewApprovalNotificationHandler(
         val messageText = getMessage(
             chain,
             payload,
-            footer = reviewFooter(),
-            additionalMessage = approvals?.let {
+            footer = approvals?.let {
                 resourceManager.getString(
                     R.string.multisig_notification_new_approval_title_additional_message,
                     it.size,
@@ -93,6 +92,4 @@ class MultisigTransactionNewApprovalNotificationHandler(
 
         return true
     }
-
-    private fun reviewFooter() = resourceManager.getString(R.string.multisig_notification_review_footer)
 }

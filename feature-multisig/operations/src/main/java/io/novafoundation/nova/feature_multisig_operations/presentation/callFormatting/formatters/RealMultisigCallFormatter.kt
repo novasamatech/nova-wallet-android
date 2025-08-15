@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallPreviewModel
+import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallPushNotificationModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -77,7 +78,7 @@ class RealMultisigCallFormatter @Inject constructor(
         call: GenericCall.Instance?,
         initialOrigin: AccountIdKey,
         chain: Chain
-    ): String {
+    ): MultisigCallPushNotificationModel {
         return formatCall(
             call = call,
             initialOrigin = initialOrigin,
@@ -85,7 +86,7 @@ class RealMultisigCallFormatter @Inject constructor(
             formatUnknown = { formatUnknownPushNotification(chain) },
             formatDefault = { formatDefaultPushNotification(chain, it) },
             formatSpecific = { delegate, callVisit -> delegate.formatPushNotificationMessage(callVisit, chain) },
-            constructFinalResult = { delegateResult, _ -> delegateResult }
+            constructFinalResult = { delegateResult, onBehalfOf -> MultisigCallPushNotificationModel(delegateResult, onBehalfOf) }
         )
     }
 
@@ -268,19 +269,25 @@ class RealMultisigCallFormatter @Inject constructor(
         )
     }
 
-    private fun formatUnknownPushNotification(chain: Chain): String {
-        return resourceManager.getString(
-            R.string.multisig_notification_init_transaction_message,
-            resourceManager.getString(R.string.multisig_operations_unknown_calldata),
-            chain.name
+    private fun formatUnknownPushNotification(chain: Chain): MultisigCallPushNotificationModel {
+        return MultisigCallPushNotificationModel(
+            resourceManager.getString(
+                R.string.multisig_notification_init_transaction_message,
+                resourceManager.getString(R.string.multisig_operations_unknown_calldata),
+                chain.name
+            ),
+            onBehalfOf = null
         )
     }
 
-    private fun formatDefaultPushNotification(chain: Chain, call: GenericCall.Instance): String {
-        return resourceManager.getString(
-            R.string.multisig_notification_init_transaction_message,
-            call.format(),
-            chain.name
+    private fun formatDefaultPushNotification(chain: Chain, call: GenericCall.Instance): MultisigCallPushNotificationModel {
+        return MultisigCallPushNotificationModel(
+            resourceManager.getString(
+                R.string.multisig_notification_init_transaction_message,
+                call.format(),
+                chain.name
+            ),
+            onBehalfOf = null
         )
     }
 

@@ -234,6 +234,7 @@ class NotificationHandlersModule {
         gson: Gson,
         notificationManager: NotificationManagerCompat,
         resourceManager: ResourceManager,
+        @LocalWithOnChainIdentity identityProvider: IdentityProvider
     ): NotificationHandler {
         return MultisigTransactionInitiatedNotificationHandler(
             context,
@@ -241,6 +242,7 @@ class NotificationHandlersModule {
             multisigCallFormatter,
             configurator,
             chainRegistry,
+            identityProvider,
             activityIntentProvider,
             notificationIdProvider,
             gson,
