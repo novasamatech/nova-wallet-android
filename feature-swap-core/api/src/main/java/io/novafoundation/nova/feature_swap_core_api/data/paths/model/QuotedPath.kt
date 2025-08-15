@@ -29,7 +29,7 @@ class WeightBreakdown(
     val total: Int
 )
 
-fun <N, E : WeightedEdge<N>> QuotedPath<E>.weightBreakdown() : WeightBreakdown {
+fun <N, E : WeightedEdge<N>> QuotedPath<E>.weightBreakdown(): WeightBreakdown {
     val weightedPath = mutableListOf<E>()
     val individualWeights = mutableListOf<Int>()
     var weight = 0
@@ -44,7 +44,6 @@ fun <N, E : WeightedEdge<N>> QuotedPath<E>.weightBreakdown() : WeightBreakdown {
 
     return WeightBreakdown(individualWeights, weight)
 }
-
 
 val QuotedPath<*>.quote: BigInteger
     get() = when (direction) {

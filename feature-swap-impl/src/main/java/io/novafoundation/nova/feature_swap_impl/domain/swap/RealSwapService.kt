@@ -768,7 +768,7 @@ internal class RealSwapService(
                     }
                 }
 
-                append(" --- ${quotedSwapEdge.edge.debugLabel()} (w: ${weight})---> ")
+                append(" --- ${quotedSwapEdge.edge.debugLabel()} (w: $weight)---> ")
 
                 val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
                 val outAmount = amountOut.formatPlanks(assetOut)
