@@ -4,8 +4,8 @@ import android.graphics.Bitmap
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import io.novafoundation.nova.common.resources.ContextManager
-import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckProvider
-import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckProviderFactory
+import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckJSBridge
+import io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck.IntegrityCheckJSBridgeFactory
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.PageCallback
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.Web3ChromeClient
 import io.novafoundation.nova.feature_dapp_impl.web3.webview.CompoundWeb3Injector
@@ -22,24 +22,22 @@ import kotlinx.coroutines.withContext
 class BrowserTabSessionFactory(
     private val compoundWeb3Injector: CompoundWeb3Injector,
     private val contextManager: ContextManager,
-    private val integrityCheckProviderFactory: IntegrityCheckProviderFactory
+    private val integrityCheckJSBridgeFactory: IntegrityCheckJSBridgeFactory
 ) {
 
     suspend fun create(tabId: String, startUrl: String, onPageChangedCallback: OnPageChangedCallback): BrowserTabSession {
         return withContext(Dispatchers.Main) {
-            val coroutineScope = CoroutineScope(Dispatchers.Main)
             val context = contextManager.getActivity()!!
             val webView = WebView(context)
-            val integrityCheckProvider = integrityCheckProviderFactory.create(webView, coroutineScope)
+            val integrityCheckProvider = integrityCheckJSBridgeFactory.create(webView)
 
             BrowserTabSession(
                 tabId = tabId,
                 startUrl = startUrl,
                 webView = webView,
-                integrityCheckProvider = integrityCheckProvider,
+                integrityCheckJSBridge = integrityCheckProvider,
                 compoundWeb3Injector = compoundWeb3Injector,
-                onPageChangedCallback = onPageChangedCallback,
-                coroutineScope = coroutineScope
+                onPageChangedCallback = onPageChangedCallback
             )
         }
     }
@@ -51,9 +49,8 @@ class BrowserTabSession(
     val webView: WebView,
     compoundWeb3Injector: CompoundWeb3Injector,
     private val onPageChangedCallback: OnPageChangedCallback,
-    private val integrityCheckProvider: IntegrityCheckProvider,
-    private val coroutineScope: CoroutineScope
-) : PageCallback {
+    private val integrityCheckJSBridge: IntegrityCheckJSBridge
+) : PageCallback, CoroutineScope by CoroutineScope(Dispatchers.Main) {
 
     val webViewClient: Web3WebViewClient = Web3WebViewClient(
         webView = webView,
@@ -69,9 +66,9 @@ class BrowserTabSession(
         webView.loadUrl(startUrl)
         compoundWeb3Injector.initialInject(webView)
 
-        integrityCheckProvider.errorFlow
+        integrityCheckJSBridge.errorFlow
             .onEach { sessionCallback?.onPageError(it) }
-            .launchIn(coroutineScope)
+            .launchIn(this)
     }
 
     fun attachToHost(
@@ -104,11 +101,12 @@ class BrowserTabSession(
     }
 
     override fun onPageFinished(view: WebView, url: String?) {
-        integrityCheckProvider.onPageFinished()
+        integrityCheckJSBridge.onPageFinished()
     }
 
     fun destroy() {
-        coroutineScope.cancel()
+        cancel() // Cancel coroutine scope
+        integrityCheckJSBridge.onDestroy()
         webView.uninjectWeb3()
         webView.destroy()
     }
