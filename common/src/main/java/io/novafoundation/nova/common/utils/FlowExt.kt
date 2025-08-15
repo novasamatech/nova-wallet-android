@@ -40,7 +40,6 @@ import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -111,7 +110,9 @@ fun <T> MutableStateFlow<T>.updateValue(updater: (T) -> T) {
 }
 
 suspend fun <T> MutableSharedFlow<T>.updateWithReplyCache(updater: (T?) -> T) {
-    emit(updater(replayCache.firstOrNull()))
+    val currentState = replayCache.firstOrNull()
+    val newState = updater(currentState)
+    emit(newState)
 }
 
 fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
