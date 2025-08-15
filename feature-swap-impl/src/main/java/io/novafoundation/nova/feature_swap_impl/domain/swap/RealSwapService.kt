@@ -65,6 +65,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.WeightBreakdown
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegmentQuote
@@ -736,7 +737,9 @@ internal class RealSwapService(
 
     private suspend fun formatTrade(trade: QuotedTrade): String {
         return buildString {
-            trade.path.onEachIndexed { index, quotedSwapEdge ->
+            val weightBreakdown = WeightBreakdown.fromQuotedPath(trade)
+
+            trade.path.zip(weightBreakdown.individualWeights).onEachIndexed { index, (quotedSwapEdge, weight) ->
                 val amountIn: Balance
                 val amountOut: Balance
 
@@ -765,7 +768,7 @@ internal class RealSwapService(
                     }
                 }
 
-                append(" --- " + quotedSwapEdge.edge.debugLabel() + " ---> ")
+                append(" --- ${quotedSwapEdge.edge.debugLabel()} (w: $weight)---> ")
 
                 val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
                 val outAmount = amountOut.formatPlanks(assetOut)
@@ -777,7 +780,7 @@ internal class RealSwapService(
                         val roughFeesInAssetOut = trade.roughFeeEstimation.inAssetOut
                         val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatPlanks(assetOut)
 
-                        append(" (-$roughFeesInAssetOutAmount fees)")
+                        append(" (-$roughFeesInAssetOutAmount fees, w: ${weightBreakdown.total})")
                     }
                 }
             }
