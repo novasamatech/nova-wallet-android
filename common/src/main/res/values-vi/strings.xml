@@ -171,6 +171,8 @@
     <string name="account_watch_only">chỉ xem</string>
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Parity Signer hoặc Ledger</string>
     <string name="account_welcome_hardware_wallet_title">Ví cứng</string>
+    <string name="account_welcome_trust_wallet_subtitle">Sử dụng tài khoản Trust Wallet của bạn trong Nova</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">Thêm tài khoản %s</string>
     <string name="accounts_add_wallet">Thêm ví</string>
     <string name="accounts_change_chain_account">Thay đổi tài khoản %s</string>

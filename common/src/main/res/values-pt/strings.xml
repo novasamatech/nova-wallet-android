@@ -171,6 +171,8 @@
     <string name="account_watch_only">somente visualização</string>
     <string name="account_welcome_hardware_wallet_subtitle">Use Polkadot Vault, Ledger ou Parity Signer</string>
     <string name="account_welcome_hardware_wallet_title">Conectar carteira de hardware</string>
+    <string name="account_welcome_trust_wallet_subtitle">Use suas contas do Trust Wallet no Nova</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">Adicionar conta %s</string>
     <string name="accounts_add_wallet">Adicionar carteira</string>
     <string name="accounts_change_chain_account">Alterar conta %s</string>

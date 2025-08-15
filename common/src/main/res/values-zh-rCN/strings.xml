@@ -171,6 +171,8 @@
     <string name="account_watch_only">仅查看</string>
     <string name="account_welcome_hardware_wallet_subtitle">使用Polkadot Vault、Ledger或Parity Signer</string>
     <string name="account_welcome_hardware_wallet_title">连接硬件钱包</string>
+    <string name="account_welcome_trust_wallet_subtitle">在 Nova 中使用您的 Trust Wallet 账户</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">添加%s帐户</string>
     <string name="accounts_add_wallet">添加钱包</string>
     <string name="accounts_change_chain_account">更改%s帐户</string>

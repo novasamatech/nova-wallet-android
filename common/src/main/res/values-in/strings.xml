@@ -171,6 +171,8 @@
     <string name="account_watch_only">hanya untuk ditonton</string>
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Parity Signer, atau Ledger</string>
     <string name="account_welcome_hardware_wallet_title">Dompet hardware</string>
+    <string name="account_welcome_trust_wallet_subtitle">Gunakan akun Trust Wallet Anda di Nova</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">Tambah akun %s</string>
     <string name="accounts_add_wallet">Tambah dompet</string>
     <string name="accounts_change_chain_account">Ubah akun %s</string>
