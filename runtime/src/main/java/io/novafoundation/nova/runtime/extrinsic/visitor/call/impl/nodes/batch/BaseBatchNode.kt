@@ -15,7 +15,7 @@ internal abstract class BaseBatchNode : NestedCallVisitNode {
 
         context.logger.info("Visiting ${this::class.simpleName} with ${innerCalls.size} inner calls")
 
-        val batchVisit = RealBatchCallVisit(call, innerCalls, context.origin)
+        val batchVisit = RealBatchCallVisit(context.depth, call, innerCalls, context.origin)
         context.visit(batchVisit)
 
         innerCalls.forEach { inner ->
@@ -25,6 +25,7 @@ internal abstract class BaseBatchNode : NestedCallVisitNode {
     }
 
     private class RealBatchCallVisit(
+        override val depth: Int,
         override val call: GenericCall.Instance,
         override val batchedCalls: List<GenericCall.Instance>,
         override val callOrigin: AccountIdKey

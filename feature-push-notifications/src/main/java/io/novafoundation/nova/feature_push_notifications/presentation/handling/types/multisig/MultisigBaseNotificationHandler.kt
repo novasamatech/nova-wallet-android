@@ -50,7 +50,7 @@ abstract class MultisigBaseNotificationHandler(
 
         return buildString {
             val formattedCall = multisigCallFormatter.formatPushNotificationMessage(call, payload.signatory.accountId, chain)
-            append(formattedCall.text)
+            append(formattedCall.formattedCall)
             formattedCall.onBehalfOf?.let { appendLine().append(formatOnBehalfOf(it)) }
             footer?.let { appendLine().append(it) }
         }

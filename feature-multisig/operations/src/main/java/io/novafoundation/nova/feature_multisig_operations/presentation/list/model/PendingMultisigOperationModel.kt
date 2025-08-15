@@ -15,7 +15,7 @@ data class PendingMultisigOperationModel(
     val progress: String
 ) {
 
-    class SigningAction(
+    data class SigningAction(
         val text: ColoredText,
         val icon: ColoredDrawable?
     )
