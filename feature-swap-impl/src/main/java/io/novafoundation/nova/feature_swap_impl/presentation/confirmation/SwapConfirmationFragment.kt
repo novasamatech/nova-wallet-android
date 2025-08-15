@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_swap_impl.presentation.confirmation
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.setProgressState
@@ -21,7 +20,6 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
     override fun createBinding() = FragmentSwapConfirmationBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.swapConfirmationToolbar.applyStatusBarInsets()
         binder.swapConfirmationToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.swapConfirmationButton.prepareForProgress(this)
 

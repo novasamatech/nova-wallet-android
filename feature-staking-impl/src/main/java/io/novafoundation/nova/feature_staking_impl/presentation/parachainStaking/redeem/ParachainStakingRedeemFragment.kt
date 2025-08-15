@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.showLoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -18,8 +17,6 @@ class ParachainStakingRedeemFragment : BaseFragment<ParachainStakingRedeemViewMo
     override fun createBinding() = FragmentParachainStakingRedeemBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.parachainStakingRedeemContainer.applyStatusBarInsets()
-
         binder.parachainStakingRedeemToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.parachainStakingRedeemExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }

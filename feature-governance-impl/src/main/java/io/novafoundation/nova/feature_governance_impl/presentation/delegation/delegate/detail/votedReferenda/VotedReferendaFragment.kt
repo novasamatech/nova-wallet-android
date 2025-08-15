@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.recyclerview.widget.ConcatAdapter
 
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentVotedReferendaBinding
@@ -30,7 +29,6 @@ class VotedReferendaFragment : BaseReferendaListFragment<VotedReferendaViewModel
     override fun initViews() {
         viewModel.payload.overriddenTitle?.let { binder.votedReferendaToolbar.setTitle(it) }
         binder.votedReferendaToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.votedReferendaToolbar.applyStatusBarInsets()
 
         binder.votedReferendaList.itemAnimator = null
         binder.votedReferendaList.adapter = ConcatAdapter(shimmeringAdapter, placeholderAdapter, referendaListAdapter)

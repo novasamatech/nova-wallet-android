@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
+import android.view.View
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
@@ -44,8 +45,11 @@ class MainDAppFragment :
 
     private val dappCategoriesListAdapter by lazy(LazyThreadSafetyMode.NONE) { DappCategoryListAdapter(this) }
 
-    override fun initViews() {
+    override fun applyInsets(rootView: View) {
         binder.dappRecyclerViewCatalog.applyStatusBarInsets()
+    }
+
+    override fun initViews() {
         binder.dappRecyclerViewCatalog.adapter = ConcatAdapter(headerAdapter, bannerAdapter, favoritesAdapter, dappsShimmering, dappCategoriesListAdapter)
         binder.dappRecyclerViewCatalog.itemAnimator = null
         setupRecyclerViewSpacing()

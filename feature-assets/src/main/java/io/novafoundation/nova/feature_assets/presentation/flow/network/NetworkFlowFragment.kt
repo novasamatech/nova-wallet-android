@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.flow.network
 
+import android.view.View
 import androidx.recyclerview.widget.ConcatAdapter
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.applySystemBarInsets
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentNetworkFlowBinding
@@ -36,8 +38,12 @@ abstract class NetworkFlowFragment<T : NetworkFlowViewModel> :
         ConcatAdapter(titleAdapter, networkAdapter)
     }
 
+    override fun applyInsets(rootView: View) {
+        binder.networkFlowToolbar.applySystemBarInsets()
+        binder.networkFlowList.applyNavigationBarInsets()
+    }
+
     override fun initViews() {
-        binder.networkFlowToolbar.applyStatusBarInsets()
         binder.networkFlowToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.networkFlowList.setHasFixedSize(true)

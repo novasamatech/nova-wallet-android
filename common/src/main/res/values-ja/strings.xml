@@ -171,6 +171,8 @@
     <string name="account_watch_only">閲覧専用</string>
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault、Parity SignerまたはLedgerを使用</string>
     <string name="account_welcome_hardware_wallet_title">ハードウェアウォレット</string>
+    <string name="account_welcome_trust_wallet_subtitle">NovaでTrust Walletアカウントを使用する</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">%s アカウントを追加</string>
     <string name="accounts_add_wallet">ウォレットを追加</string>
     <string name="accounts_change_chain_account">%s アカウントを変更</string>

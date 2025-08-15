@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
+    <string name="account_welcome_trust_wallet_subtitle">Use your Trust Wallet accounts in Nova</string>
 
     <string name="alert_nova_has_selected_ms_wallet">Nova has automatically switched to your multisig wallet so you can view pending transactions.</string>
 

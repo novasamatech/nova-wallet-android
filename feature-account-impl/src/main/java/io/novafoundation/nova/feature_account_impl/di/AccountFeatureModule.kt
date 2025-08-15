@@ -54,6 +54,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -80,6 +82,7 @@ import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicS
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
+import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigApprovalsRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.repository.RealMultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
@@ -88,6 +91,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.AccountReposi
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.TrustWalletAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.RealSecretsMetaAccountLocalFactory
@@ -130,9 +134,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.addressA
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
-import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
-import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
-import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigApprovalsRepository
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealMultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
@@ -166,8 +167,8 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonEncoder
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
 import javax.inject.Named
 
@@ -280,13 +281,13 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideJsonDecoder(jsonMapper: Gson) = JsonSeedDecoder(jsonMapper)
+    fun provideJsonDecoder(jsonMapper: Gson) = JsonDecoder(jsonMapper)
 
     @Provides
     @FeatureScope
     fun provideJsonEncoder(
         jsonMapper: Gson,
-    ) = JsonSeedEncoder(jsonMapper)
+    ) = JsonEncoder(jsonMapper)
 
     @Provides
     @FeatureScope
@@ -304,7 +305,7 @@ class AccountFeatureModule {
         accountDataSource: AccountDataSource,
         accountDao: AccountDao,
         nodeDao: NodeDao,
-        jsonSeedEncoder: JsonSeedEncoder,
+        JsonEncoder: JsonEncoder,
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
         secretStoreV2: SecretStoreV2,
@@ -314,7 +315,7 @@ class AccountFeatureModule {
             accountDataSource,
             accountDao,
             nodeDao,
-            jsonSeedEncoder,
+            JsonEncoder,
             languagesHolder,
             accountSubstrateSource,
             secretStoreV2,
@@ -489,8 +490,8 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAccountSecretsFactory(
-        jsonSeedDecoder: JsonSeedDecoder
-    ) = AccountSecretsFactory(jsonSeedDecoder)
+        JsonDecoder: JsonDecoder
+    ) = AccountSecretsFactory(JsonDecoder)
 
     @Provides
     @FeatureScope
@@ -498,12 +499,14 @@ class AccountFeatureModule {
         mnemonicAddAccountRepository: MnemonicAddAccountRepository,
         jsonAddAccountRepository: JsonAddAccountRepository,
         seedAddAccountRepository: SeedAddAccountRepository,
+        trustWalletAddAccountRepository: TrustWalletAddAccountRepository,
         accountRepository: AccountRepository,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor
     ) = AddAccountInteractor(
         mnemonicAddAccountRepository,
         jsonAddAccountRepository,
         seedAddAccountRepository,
+        trustWalletAddAccountRepository,
         accountRepository,
         advancedEncryptionInteractor
     )

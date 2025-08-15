@@ -171,6 +171,8 @@
     <string name="account_watch_only">csak nézhető</string>
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Ledger vagy Parity Signer használata</string>
     <string name="account_welcome_hardware_wallet_title">Hardver tárca csatlakoztatása</string>
+    <string name="account_welcome_trust_wallet_subtitle">Használd a Trust Wallet fiókjaidat a Novában</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">%s fiók hozzáadása</string>
     <string name="accounts_add_wallet">Tárca hozzáadása</string>
     <string name="accounts_change_chain_account">%s fiók módosítása</string>

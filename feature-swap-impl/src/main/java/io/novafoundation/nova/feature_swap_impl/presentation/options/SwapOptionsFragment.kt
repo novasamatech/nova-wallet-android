@@ -4,7 +4,6 @@ import androidx.lifecycle.viewModelScope
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.validation.observeErrors
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
@@ -20,7 +19,6 @@ class SwapOptionsFragment : BaseFragment<SwapOptionsViewModel, FragmentSwapOptio
     override fun createBinding() = FragmentSwapOptionsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.swapOptionsToolbar.applyStatusBarInsets()
         binder.swapOptionsToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.swapOptionsToolbar.setRightActionClickListener { viewModel.resetClicked() }
         binder.swapOptionsApplyButton.setOnClickListener { viewModel.applyClicked() }
