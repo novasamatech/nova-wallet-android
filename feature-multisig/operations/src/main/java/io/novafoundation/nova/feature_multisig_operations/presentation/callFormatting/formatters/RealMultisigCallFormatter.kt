@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToA
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.collect
-import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.isLeaf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
