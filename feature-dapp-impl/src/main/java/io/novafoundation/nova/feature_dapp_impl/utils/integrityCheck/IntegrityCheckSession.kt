@@ -35,7 +35,7 @@ class IntegrityCheckSession(
     private val integrityCheckApi: IntegrityCheckApi,
     private val preferences: Preferences,
     private val integrityService: IntegrityService,
-    private val callback: Callback?
+    private val callback: Callback
 ) {
 
     interface Callback {
@@ -82,7 +82,7 @@ class IntegrityCheckSession(
         val requestHash = createRequestHash(challengeResponse.challenge + appIntegrityId)
         val signature = IntegrityCheckKeyPairService.signData(appIntegrityId, requestHash)
 
-        callback?.sendVerificationRequest(
+        callback.sendVerificationRequest(
             appIntegrityId = appIntegrityId,
             challenge = challengeResponse.challenge,
             signature = signature.toBase64()

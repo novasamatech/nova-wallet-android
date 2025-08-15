@@ -5,7 +5,10 @@ import com.google.android.play.core.integrity.StandardIntegrityManager
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenProvider
 import com.google.android.play.core.integrity.StandardIntegrityManager.StandardIntegrityTokenRequest
 import com.google.android.play.core.integrity.model.StandardIntegrityErrorCode.INTEGRITY_TOKEN_PROVIDER_INVALID
-import kotlinx.coroutines.flow.MutableStateFlow
+import io.novafoundation.nova.common.utils.coroutines.RootScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -20,13 +23,19 @@ private sealed interface ProviderState {
 
 class IntegrityService(
     private val cloudProjectNumber: Long,
-    private var standardIntegrityManager: StandardIntegrityManager
+    private var standardIntegrityManager: StandardIntegrityManager,
+    private val rootScope: RootScope
 ) {
 
-    private var state: MutableStateFlow<ProviderState> = MutableStateFlow(ProviderState.Preparing)
+    private var providerState: ProviderState = ProviderState.Preparing
+    private val prepareProviderMutex = Mutex()
 
     init {
-        prepareTokenProvider()
+        rootScope.launch {
+            prepareProviderMutex.withLock {
+                providerState = prepareTokenProvider()
+            }
+        }
     }
 
     suspend fun getIntegrityToken(requestHash: String): String {
@@ -36,7 +45,7 @@ class IntegrityService(
             requestIntegrityToken(requestHash)
         } catch (e: StandardIntegrityException) {
             if (e.statusCode == INTEGRITY_TOKEN_PROVIDER_INVALID) {
-                prepareTokenProvider()
+                providerState = prepareTokenProvider()
                 ensureProviderIsReady()
                 requestIntegrityToken(requestHash)
             } else {
@@ -45,33 +54,27 @@ class IntegrityService(
         }
     }
 
-    private suspend fun ensureProviderIsReady(retry: Int = 0) {
-        if (retry >= RECEIVING_PROVIDER_MAX_RETRY) return
-        if (state.value is ProviderState.Ready) return
+    private suspend fun ensureProviderIsReady() {
+        if (providerState is ProviderState.Ready) return
 
-        if (state.value is ProviderState.Preparing) {
-            state.collect {
-                if (it is ProviderState.Ready) return@collect
-                if (it is ProviderState.ReceivingError) return@collect
+        prepareProviderMutex.withLock {
+            if (providerState is ProviderState.Ready) return@withLock
+
+            repeat(RECEIVING_PROVIDER_MAX_RETRY) {
+                providerState = prepareTokenProvider()
+                if (providerState is ProviderState.Ready) return@repeat
             }
         }
-
-        if (state.value is ProviderState.Ready) return
-        if (state.value is ProviderState.ReceivingError) {
-            prepareTokenProvider()
-            ensureProviderIsReady(retry + 1)
-        }
     }
 
-    private fun prepareTokenProvider() {
-        state.value = ProviderState.Preparing
+    private suspend fun prepareTokenProvider() = suspendCoroutine { continuation ->
         standardIntegrityManager.prepareIntegrityToken(providerRequest())
-            .addOnSuccessListener { state.value = ProviderState.Ready(it) }
-            .addOnFailureListener { state.value = ProviderState.ReceivingError }
-            .addOnCanceledListener { state.value = ProviderState.ReceivingError }
+            .addOnSuccessListener { continuation.resume(ProviderState.Ready(it)) }
+            .addOnFailureListener { continuation.resume(ProviderState.ReceivingError) }
+            .addOnCanceledListener { continuation.resume(ProviderState.ReceivingError) }
     }
 
-    private fun getIntegrityTokenProvider() = (state.value as? ProviderState.Ready)?.provider
+    private fun getIntegrityTokenProvider() = (providerState as? ProviderState.Ready)?.provider
 
     private suspend fun requestIntegrityToken(requestHash: String): String {
         val provider = getIntegrityTokenProvider() ?: throw IllegalStateException("Token provider is not initialized")
