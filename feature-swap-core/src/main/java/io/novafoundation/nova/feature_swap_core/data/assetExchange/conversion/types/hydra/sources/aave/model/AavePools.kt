@@ -5,7 +5,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import java.math.BigInteger
 
-class AavePools(
+data class AavePools(
     val pools: List<AavePool>
 ) {
 
@@ -17,7 +17,7 @@ class AavePools(
     ): BalanceOf? {
         val pool = findPool(assetIdIn, assetIdOut) ?: return null
 
-        return pool.quote(assetIdIn, assetIdOut, amount, direction)
+        return pool.quote(assetIdOut, amount, direction)
     }
 
     private fun findPool(assetIdIn: HydraDxAssetId, assetIdOut: HydraDxAssetId): AavePool? {
@@ -25,7 +25,7 @@ class AavePools(
     }
 }
 
-class AavePool(
+data class AavePool(
     val reserve: HydraDxAssetId,
     val atoken: HydraDxAssetId,
     val liqudityIn: BalanceOf,
@@ -37,21 +37,19 @@ class AavePool(
     }
 
     fun quote(
-        assetIdIn: HydraDxAssetId,
         assetIdOut: HydraDxAssetId,
         amount: BigInteger,
         direction: SwapDirection
     ): BalanceOf? {
         return when (direction) {
-            SwapDirection.SPECIFIED_IN -> calculateOutGivenIn(assetIdIn, assetIdOut, amount)
-            SwapDirection.SPECIFIED_OUT -> calculateInGivenOut(assetIdIn, assetIdOut, amount)
+            SwapDirection.SPECIFIED_IN -> calculateOutGivenIn(assetIdOut, amount)
+            SwapDirection.SPECIFIED_OUT -> calculateInGivenOut(assetIdOut, amount)
         }
     }
 
     // Here and in calculateInGivenOut we always validate amount out (either specified or calculated) against
     // assetIdOut liquidity since that's the asset that will be removed from the pool
     private fun calculateOutGivenIn(
-        assetIdIn: HydraDxAssetId,
         assetIdOut: HydraDxAssetId,
         amountIn: BigInteger,
     ): BalanceOf? {
@@ -62,7 +60,6 @@ class AavePool(
     }
 
     private fun calculateInGivenOut(
-        assetIdIn: HydraDxAssetId,
         assetIdOut: HydraDxAssetId,
         amountOut: BigInteger,
     ): BalanceOf? {
