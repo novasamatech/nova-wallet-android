@@ -883,7 +883,7 @@ internal class RealSwapService(
                 edge.canPayNonNativeFeesInIntermediatePosition()
         }
 
-        private suspend fun canExecuteIntermediateEdgeSequentially(edge: SwapGraphEdge, predecessor: SwapGraphEdge) : Boolean {
+        private suspend fun canExecuteIntermediateEdgeSequentially(edge: SwapGraphEdge, predecessor: SwapGraphEdge): Boolean {
             // If account can execute operations immediately - we can execute anything sequentially
             if (callExecutionType.get() == CallExecutionType.IMMEDIATE) return true
 
