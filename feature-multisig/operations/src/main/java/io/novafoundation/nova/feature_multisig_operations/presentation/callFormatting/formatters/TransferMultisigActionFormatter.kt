@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.formatters
 
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
