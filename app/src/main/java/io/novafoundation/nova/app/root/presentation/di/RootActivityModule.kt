@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
@@ -59,7 +60,8 @@ class RootActivityModule {
         pushNotificationsInteractor: PushNotificationsInteractor,
         externalServiceInitializer: ExternalServiceInitializer,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
-        toastMessageManager: ToastMessageManager
+        toastMessageManager: ToastMessageManager,
+        dialogMessageManager: DialogMessageManager
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -80,7 +82,8 @@ class RootActivityModule {
             pushNotificationsInteractor,
             externalServiceInitializer,
             actionBottomSheetLauncher,
-            toastMessageManager
+            toastMessageManager,
+            dialogMessageManager
         )
     }
 

@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUse
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.full.MultisigOperationFullDetailsViewModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.di.MultisigOperationDetailsModule.BindsModule
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
@@ -33,7 +33,7 @@ class MultisigOperationFullDetailsModule {
         interactor: MultisigOperationDetailsInteractor,
         multisigOperationsService: MultisigPendingOperationsService,
         externalActions: ExternalActions.Presentation,
-        payload: MultisigOperationDetailsPayload,
+        payload: MultisigOperationPayload,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         copyTextLauncher: CopyTextLauncher.Presentation,
         accountUIUseCase: AccountUIUseCase,

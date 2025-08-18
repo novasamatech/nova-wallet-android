@@ -69,9 +69,11 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.CopyValueMixin
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
+import io.novafoundation.nova.common.utils.RealDialogMessageManager
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
@@ -404,6 +406,12 @@ class CommonModule {
     @ApplicationScope
     fun provideToastMessageManager(): ToastMessageManager {
         return RealToastMessageManager()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideDialogMessageManager(): DialogMessageManager {
+        return RealDialogMessageManager()
     }
 
     @Provides

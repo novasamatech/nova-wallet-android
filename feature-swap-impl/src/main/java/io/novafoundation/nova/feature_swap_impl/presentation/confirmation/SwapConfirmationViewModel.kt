@@ -264,7 +264,7 @@ class SwapConfirmationViewModel(
             .onSuccess {
                 _validationInProgress.value = false
 
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+                this.showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) {
                     val asset = assetOutFlow.first()

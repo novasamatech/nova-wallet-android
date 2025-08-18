@@ -13,12 +13,12 @@ import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ContextManager
-import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.showToast
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
+import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 
@@ -119,14 +119,9 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
             binder.rootNetworkBar.setVisible(show)
         }
 
-        viewModel.messageLiveData.observe(
-            this,
-            EventObserver {
-                showToast(it)
-            }
-        )
-
         viewModel.toastMessagesEvents.observeEvent { showToast(it) }
+
+        viewModel.dialogMessageEvents.observeEvent { dialog(this, decorator = it) }
 
         viewModel.walletConnectErrorsLiveData.observeEvent { it?.let { showError(it) } }
     }

@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.full.MultisigOperationFullDetailsFragment
 
 @Subcomponent(
@@ -20,7 +20,7 @@ interface MultisigOperationFullDetailsComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: MultisigOperationDetailsPayload,
+            @BindsInstance payload: MultisigOperationPayload,
         ): MultisigOperationFullDetailsComponent
     }
 

@@ -9,6 +9,8 @@ import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingO
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.toOperationId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 
@@ -16,7 +18,7 @@ class MultisigOperationEnterCallViewModel(
     private val router: MultisigOperationsRouter,
     private val interactor: MultisigOperationDetailsInteractor,
     private val multisigOperationsService: MultisigPendingOperationsService,
-    private val payload: MultisigOperationEnterCallPayload,
+    private val payload: MultisigOperationPayload,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -34,7 +36,7 @@ class MultisigOperationEnterCallViewModel(
     }
 
     fun approve() = launchUnit {
-        val operation = multisigOperationsService.pendingOperation(payload.operationId) ?: return@launchUnit
+        val operation = multisigOperationsService.pendingOperation(payload.toOperationId()) ?: return@launchUnit
         if (interactor.isCallValid(operation, enteredCall.value)) {
             interactor.setCall(operation, enteredCall.value)
             router.back()

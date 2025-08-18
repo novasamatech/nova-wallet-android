@@ -3,6 +3,13 @@ package io.novafoundation.nova.feature_multisig_operations.presentation.details.
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.base.TitleAndMessage
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.fromRes
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -42,9 +49,8 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.toOperationId
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoryRvItem
-import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -81,13 +87,16 @@ class MultisigOperationDetailsViewModel(
     private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val accountInteractor: AccountInteractor,
     private val accountUIUseCase: AccountUIUseCase,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
 
-    private val operationFlow = multisigOperationsService.pendingOperationFlow(payload.operationId)
+    val operationNotFoundAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
+
+    private val operationFlow = multisigOperationsService.pendingOperationFlow(payload.operation.toOperationId())
         .filterNotNull()
         .shareInBackground()
 
@@ -203,12 +212,30 @@ class MultisigOperationDetailsViewModel(
 
     val actionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
 
+    private val isOperationAvailableFlow = multisigOperationsService.operationAvailableFlow(payload.operation.toOperationId())
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val isOperationLoadingFlow = operationFlow.withLoadingShared()
+        .map { it.isLoading }
+        .shareInBackground()
+
     init {
+        checkOperationAvailability()
+
         loadFee()
     }
 
+    private fun checkOperationAvailability() = launchUnit {
+        val isOperationAvailable = isOperationAvailableFlow.first()
+
+        if (!isOperationAvailable) {
+            showErrorAndCloseScreen()
+        }
+    }
+
     fun enterCallDataClicked() {
-        router.openEnterCallDetails(MultisigOperationEnterCallPayload(payload.operationId))
+        router.openEnterCallDetails(payload.operation)
     }
 
     fun actionClicked() {
@@ -266,7 +293,7 @@ class MultisigOperationDetailsViewModel(
     }
 
     fun callDetailsClicked() = launch {
-        router.openMultisigFullDetails(payload)
+        router.openMultisigFullDetails(payload.operation)
     }
 
     private fun loadFee() {
@@ -332,7 +359,7 @@ class MultisigOperationDetailsViewModel(
         interactor.performAction(operationFlow.first())
             .onFailure(::showError)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 extrinsicNavigationWrapper.startNavigation(it.submissionHierarchy) {
                     val isLeastOperation = isLastOperationFlow.first()
@@ -373,7 +400,29 @@ class MultisigOperationDetailsViewModel(
         externalActions.showAddressActions(metaAccount, chain)
     }
 
+    fun getNavigationIconRes() = when (payload.navigationButtonMode) {
+        MultisigOperationDetailsPayload.NavigationButtonMode.BACK -> R.drawable.ic_arrow_back
+        MultisigOperationDetailsPayload.NavigationButtonMode.CLOSE -> R.drawable.ic_close
+    }
+
     private suspend fun showAddressActionForOriginChain(address: String) {
         externalActions.showAddressActions(address, chainFlow.first())
     }
+
+    private suspend fun showErrorAndCloseScreen() {
+        val confirmationInfo = ConfirmationDialogInfo.fromRes(
+            resourceManager,
+            title = R.string.multisig_operation_details_not_found_title,
+            message = R.string.multisig_operation_details_not_found_message,
+            positiveButton = R.string.common_got_it,
+            negativeButton = null
+        )
+        operationNotFoundAwaitableAction.awaitAction(confirmationInfo)
+        router.back()
+    }
+
+    private fun isOperationWasExecuted(
+        old: ExtendedLoadingState<Boolean>,
+        new: ExtendedLoadingState<Boolean>
+    ) = old.dataOrNull == true && new.dataOrNull == false
 }

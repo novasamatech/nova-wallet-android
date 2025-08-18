@@ -136,7 +136,7 @@ class ConfirmPayoutViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
+                showToast(resourceManager.getString(R.string.make_payout_transaction_sent))
 
                 startNavigation(it.submissionHierarchy()) { router.returnToStakingMain() }
             },
