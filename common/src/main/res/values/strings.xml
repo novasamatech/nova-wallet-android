@@ -3,7 +3,6 @@
     <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="account_welcome_trust_wallet_subtitle">Use your Trust Wallet accounts in Nova</string>
 
-
     <string name="multisig_operation_details_not_found_title">Signing is over</string>
     <string name="multisig_operation_details_not_found_message">Transaction has already been executed or rejected.</string>
 
@@ -14,28 +13,27 @@
     <string name="multisig_transaction_executed_dialog_title">Multisig Transaction Executed</string>
     <string name="multisig_transaction_rejected_dialog_title">Multisig Transaction Rejected</string>
 
-    <string name="multisig_transaction_rejected_dialog_message">%s on %s.\nRejected by %s.\nNo further actions are required from you.</string>
+    <string name="multisig_transaction_rejected_dialog_message">%s on %s.\nRejected by: %s.\nNo further actions are required from you.</string>
     <string name="multisig_transaction_executed_dialog_message">%s on %s.\nNo further actions are required from you.</string>
 
     <string name="multisig_transaction_dialog_message_unknown_call">Transaction without initial on-chain information (call data) was rejected</string>
 
     <string name="alert_nova_has_selected_ms_wallet">Nova has automatically switched to your multisig wallet so you can view pending transactions.</string>
 
-    <string name="multisig_notification_rejected_transaction_title">Transaction rejected</string>
-    <string name="multisig_notification_rejected_transaction_message">Rejected by: %s.</string>
+    <string name="multisig_notification_on_behalf_of">On behalf of %s.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ Multisig transaction rejected</string>
+    <string name="multisig_notification_rejected_transaction_message">Rejected by %s.</string>
 
-    <string name="multisig_notification_executed_transaction_title">Transaction executed</string>
-    <string name="multisig_notification_executed_transaction_message">Signed and executed by: %s.</string>
+    <string name="multisig_notification_executed_transaction_title">✅ Multisig transaction executed</string>
+    <string name="multisig_notification_executed_transaction_message">Signed and executed by %s.</string>
 
     <string name="multisig_notification_new_approval_title_additional_message">%d of %d signatures collected.</string>
-    <string name="multisig_notification_new_approval_title">%s signed transaction</string>
+    <string name="multisig_notification_new_approval_title">Signed by %s</string>
 
-    <string name="multisig_notification_init_transaction_title">Your signature requested</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 Your signature requested </string>
     <string name="multisig_notification_init_transaction_message_transfer">%1$s → %2$s on %3$s.</string>
     <string name="multisig_notification_init_transaction_message">%s on %s.</string>
-    <string name="multisig_notification_executed_transaction_message_header">Signed and executed by: %s.</string>
-    <string name="multisig_notification_review_footer">👉 Open app to review.</string>
-    <string name="multisig_notification_sign_footer">👉 Open app to sign.</string>
+    <string name="multisig_notification_initiator_footer">Initiated by %s.</string>
     <string name="multisig_notification_message_header">Wallet: %s</string>
 
     <string name="multisigs_notification_channel_name">Multisig Transactions Notification Channel</string>

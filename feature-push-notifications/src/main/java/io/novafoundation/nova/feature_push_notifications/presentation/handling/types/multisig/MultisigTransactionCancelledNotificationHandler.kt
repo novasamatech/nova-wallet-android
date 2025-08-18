@@ -62,7 +62,7 @@ class MultisigTransactionCancelledNotificationHandler(
         val messageText = getMessage(
             chain,
             payload,
-            additionalMessage = resourceManager.getString(R.string.multisig_notification_rejected_transaction_message, rejecterIdentity)
+            footer = resourceManager.getString(R.string.multisig_notification_rejected_transaction_message, rejecterIdentity)
         )
 
         val notification = NotificationCompat.Builder(context, channelId)

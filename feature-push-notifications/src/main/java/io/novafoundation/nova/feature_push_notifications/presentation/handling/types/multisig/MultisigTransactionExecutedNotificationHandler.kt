@@ -62,7 +62,7 @@ class MultisigTransactionExecutedNotificationHandler(
         val messageText = getMessage(
             chain,
             payload,
-            additionalMessage = resourceManager.getString(R.string.multisig_notification_executed_transaction_message, approverIdentity)
+            footer = resourceManager.getString(R.string.multisig_notification_executed_transaction_message, approverIdentity)
         )
 
         val notification = NotificationCompat.Builder(context, channelId)
