@@ -130,12 +130,12 @@ class RealMultisigCallFormatter @Inject constructor(
     ): R {
         if (call == null) return formatUnknown()
 
-        val singleFormattedVisit = callTraversal.collect(call, initialOrigin)
+        val firstFormattedCall = callTraversal.collect(call, initialOrigin)
             .map { formatCallVisit(it) { delegate -> formatSpecific(delegate, it) } }
-            .ensureSingleFormattedVisit()
+            .getFirstFormated()
 
-        return if (singleFormattedVisit != null) {
-            val (singleMatch, singleMatchVisit) = singleFormattedVisit
+        return if (firstFormattedCall != null) {
+            val (singleMatch, singleMatchVisit) = firstFormattedCall
 
             val onBehalfOf = createOnBehalfOf(singleMatchVisit, initialOrigin, chain)
             return constructFinalResult(singleMatch!!, onBehalfOf)
@@ -146,21 +146,8 @@ class RealMultisigCallFormatter @Inject constructor(
 
     private fun DelegateResultWithVisit<*>.isFormatted() = first != null
 
-    private fun <T> List<DelegateResultWithVisit<T>>.ensureSingleFormattedVisit(): DelegateResultWithVisit<T>? {
-        // We try to find the first successfully formatted call if it is the only one for depth
-        val groupedCalls = groupBy { it.second.depth }.toSortedMap()
-        groupedCalls.forEach { (_, calls) ->
-            val isSingleCallForDepth = calls.size == 1
-            if (isSingleCallForDepth) {
-                val singleCall = calls.first()
-                val isFirstCallFormatted = singleCall.isFormatted()
-                if (isFirstCallFormatted) return singleCall
-            } else {
-                return@forEach
-            }
-        }
-
-        return null
+    private fun <T> List<DelegateResultWithVisit<T>>.getFirstFormated(): DelegateResultWithVisit<T>? {
+        return firstOrNull { it.isFormatted() }
     }
 
     private fun createCallPreview(

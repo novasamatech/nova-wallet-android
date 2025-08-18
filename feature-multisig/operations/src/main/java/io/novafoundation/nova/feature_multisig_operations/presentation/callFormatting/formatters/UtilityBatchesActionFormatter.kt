@@ -11,7 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 
 @FeatureScope
-class UtilityBatchActionFormatter @Inject constructor(
+class UtilityBatchesActionFormatter @Inject constructor(
     private val assetIconProvider: AssetIconProvider,
     private val resourceManager: ResourceManager,
 ) : MultisigActionFormatterDelegate {
@@ -20,10 +20,10 @@ class UtilityBatchActionFormatter @Inject constructor(
         visit: CallVisit,
         chain: Chain
     ): MultisigActionFormatterDelegatePreviewResult? {
-        if (visit.isNotUtilityBatchCall()) return null
+        val batchCallFormat = visit.formatCall() ?: return null
 
         return MultisigActionFormatterDelegatePreviewResult(
-            title = resourceManager.getString(R.string.multisig_operation_utility_batch_title),
+            title = batchCallFormat,
             subtitle = visit.call.module.name.capitalize(),
             primaryValue = null,
             icon = assetIconProvider.multisigFormatAssetIcon(chain)
@@ -31,30 +31,33 @@ class UtilityBatchActionFormatter @Inject constructor(
     }
 
     override suspend fun formatDetails(visit: CallVisit, chain: Chain): MultisigActionFormatterDelegateDetailsResult? {
-        if (visit.isNotUtilityBatchCall()) return null
+        val batchCallFormat = visit.formatCall() ?: return null
 
         return MultisigActionFormatterDelegateDetailsResult(
-            title = resourceManager.getString(R.string.multisig_operation_utility_batch_title),
+            title = batchCallFormat,
             primaryAmount = null,
             tableEntries = emptyList()
         )
     }
 
     override suspend fun formatMessageCall(visit: CallVisit, chain: Chain): String? {
-        if (visit.isNotUtilityBatchCall()) return null
+        val batchCallFormat = visit.formatCall() ?: return null
 
         return resourceManager.getString(
             R.string.multisig_operation_default_call_format,
             visit.call.module.name.capitalize(),
-            resourceManager.getString(R.string.multisig_operation_utility_batch_title)
+            batchCallFormat
         )
     }
 
-    private fun CallVisit.isNotUtilityBatchCall(): Boolean = !isUtilityBatchCall()
+    private fun CallVisit.formatCall(): String? {
+        if (call.module.name != Modules.UTILITY) return null
 
-    private fun CallVisit.isUtilityBatchCall(): Boolean {
-        val module = call.module.name
-        val call = call.function.name
-        return module == Modules.UTILITY && call == "batch"
+        return when (call.function.name) {
+            "batch" -> resourceManager.getString(R.string.multisig_operation_utility_batch_title)
+            "batch_all" -> resourceManager.getString(R.string.multisig_operation_utility_batch_all_title)
+            "force_batch" -> resourceManager.getString(R.string.multisig_operation_utility_force_batch_title)
+            else -> null
+        }
     }
 }
