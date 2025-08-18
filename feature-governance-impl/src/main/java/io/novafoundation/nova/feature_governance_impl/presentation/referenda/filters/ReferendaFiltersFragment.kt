@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.fi
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendaFiltersBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
@@ -12,7 +11,6 @@ class ReferendaFiltersFragment : BaseFragment<ReferendaFiltersViewModel, Fragmen
     override fun createBinding() = FragmentReferendaFiltersBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.referendaFiltersToolbar.applyStatusBarInsets()
         binder.referendaFiltersToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
         binder.referendaFiltersToolbar.setRightActionClickListener { binder.referendaFilterAll.isChecked = true }
 

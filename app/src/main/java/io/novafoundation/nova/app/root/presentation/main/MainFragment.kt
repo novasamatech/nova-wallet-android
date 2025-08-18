@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.presentation.main
 
 import android.graphics.RectF
+import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -14,9 +15,9 @@ import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.blur.SweetBlur
 import io.novafoundation.nova.common.utils.setBackgroundColorRes
-import io.novafoundation.nova.common.utils.updatePadding
 
 import javax.inject.Inject
 
@@ -43,23 +44,6 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
     }
 
     override fun initViews() {
-        binder.bottomNavigationView.setOnApplyWindowInsetsListener { _, insets ->
-            // overwrite BottomNavigation behavior and ignore insets
-            insets
-        }
-
-        binder.bottomNavHost.setOnApplyWindowInsetsListener { v, insets ->
-            val systemWindowInsetBottom = insets.systemWindowInsetBottom
-
-            // post to prevent bottomNavigationView.height being 0 if callback is called before view has been measured
-            v.post {
-                val padding = (systemWindowInsetBottom - binder.bottomNavigationView.height).coerceAtLeast(0)
-                v.updatePadding(bottom = padding)
-            }
-
-            insets
-        }
-
         val nestedNavHostFragment = childFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
 
         navController = nestedNavHostFragment.navController
@@ -75,6 +59,10 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
         }
 
         startBlur()
+    }
+
+    override fun applyInsets(rootView: View) {
+        binder.bottomNavigationView.applyNavigationBarInsets()
     }
 
     override fun inject() {

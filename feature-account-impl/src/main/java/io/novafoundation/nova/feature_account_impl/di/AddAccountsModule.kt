@@ -22,7 +22,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.di.AddAccountsModule.BindsModule
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
 
 @Module(includes = [BindsModule::class])
 class AddAccountsModule {
@@ -61,13 +61,13 @@ class AddAccountsModule {
     fun provideJsonAddAccountRepository(
         accountDataSource: AccountDataSource,
         accountSecretsFactory: AccountSecretsFactory,
-        jsonSeedDecoder: JsonSeedDecoder,
+        JsonDecoder: JsonDecoder,
         chainRegistry: ChainRegistry,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = JsonAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
-        jsonSeedDecoder,
+        JsonDecoder,
         chainRegistry,
         metaAccountChangesEventBus
     )

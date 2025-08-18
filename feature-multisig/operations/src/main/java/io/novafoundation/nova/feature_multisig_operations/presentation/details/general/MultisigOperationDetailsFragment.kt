@@ -47,7 +47,6 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SignatoriesAdapter(viewModel::onSignatoryClicked) }
 
     override fun initViews() {
-        binder.multisigPendingOperationDetailsToolbar.applyStatusBarInsets()
         binder.multisigPendingOperationDetailsToolbar.setHomeButtonIcon(viewModel.getNavigationIconRes())
         binder.multisigPendingOperationDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 

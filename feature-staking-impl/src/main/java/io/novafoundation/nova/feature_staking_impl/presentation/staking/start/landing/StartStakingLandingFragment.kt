@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitableActionFlow
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -44,7 +43,6 @@ class StartStakingLandingFragment :
     private val adapter = ConcatAdapter(shimmeringAdapter, headerAdapter, conditionsAdapter, footerAdapter)
 
     override fun initViews() {
-        binder.startStakingLandingToolbar.applyStatusBarInsets()
         binder.startStakingLandingToolbar.setHomeButtonListener { viewModel.back() }
         binder.startStakingLandingList.adapter = adapter
         binder.startStakingLandingList.itemAnimator = null

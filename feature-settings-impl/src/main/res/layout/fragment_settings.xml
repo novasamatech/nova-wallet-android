@@ -6,17 +6,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/secondary_screen_background"
+    android:clipToPadding="false"
     android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="25dp"
         android:layout_marginEnd="16dp"
         android:clipToPadding="false"
         android:orientation="vertical"
-        android:paddingBottom="96dp">
+        android:paddingTop="25dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -115,7 +115,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_settings_appearance"
-                app:title="@string/appearance_title"/>
+                app:title="@string/appearance_title" />
 
         </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
@@ -280,6 +280,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="32dp"
             android:textColor="@color/text_secondary"
             tools:text="Nova Wallet v2.0" />
     </LinearLayout>

@@ -14,9 +14,11 @@ import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.allEdges
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
+import io.novafoundation.nova.common.utils.graph.numberOfEdges
 import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.lazyAsync
@@ -112,6 +114,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -480,7 +483,27 @@ internal class RealSwapService(
                 .accumulateLists()
                 .filter { it.isNotEmpty() }
                 .map { Graph.create(it) }
+                .onEach { printGraphStats(it) }
         }
+    }
+
+    private fun printGraphStats(graph: SwapGraph) {
+        if (!BuildConfig.DEBUG) return
+
+        val allEdges = graph.numberOfEdges()
+        val edgesByType = graph.allEdges().groupBy { it::class.simpleName }
+        val edgesByTypeStats = edgesByType.entries.joinToString { (type, typeEdges) ->
+            "$type: ${typeEdges.size}"
+        }
+
+        val message = """
+            === Swap Graph Stats ===
+            All swap directions: $allEdges
+            $edgesByTypeStats
+            === Swap Graph Stats ===
+        """.trimIndent()
+
+        Log.d("SwapService", message)
     }
 
     private suspend fun exchangeRegistry(computationScope: CoroutineScope): ExchangeRegistry {

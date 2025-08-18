@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.data.repository
 
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
-import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.networkType
@@ -35,7 +34,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.getMetaAccountTypeOrThrow
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonEncoder
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -50,7 +49,7 @@ class AccountRepositoryImpl(
     private val accountDataSource: AccountDataSource,
     private val accountDao: AccountDao,
     private val nodeDao: NodeDao,
-    private val jsonSeedEncoder: JsonSeedEncoder,
+    private val JsonEncoder: JsonEncoder,
     private val languagesHolder: LanguagesHolder,
     private val accountSubstrateSource: AccountSubstrateSource,
     private val secretStoreV2: SecretStoreV2,
@@ -241,9 +240,8 @@ class AccountRepositoryImpl(
 
             val secrets = secretStoreV2.getAccountSecrets(metaAccount.id, accountId)
 
-            jsonSeedEncoder.generate(
+            JsonEncoder.generate(
                 keypair = secrets.keypair(chain),
-                seed = secrets.seed(),
                 password = password,
                 name = metaAccount.name,
                 multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
@@ -260,9 +258,8 @@ class AccountRepositoryImpl(
         return withContext(Dispatchers.Default) {
             val secrets = secretStoreV2.getMetaAccountSecrets(metaAccount.id)!!
 
-            jsonSeedEncoder.generate(
+            JsonEncoder.generate(
                 keypair = secrets.keypair(ethereum = false),
-                seed = secrets.seed,
                 password = password,
                 name = metaAccount.name,
                 multiChainEncryption = metaAccount.substrateMultiChainEncryption()!!,
