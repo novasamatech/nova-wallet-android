@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.enterCall
 
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
-import io.novafoundation.nova.common.utils.applyImeInsetts
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.applySystemBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.common.view.setState
@@ -31,10 +31,12 @@ class MultisigOperationEnterCallFragment : BaseFragment<MultisigOperationEnterCa
             .inject(this)
     }
 
+    override fun applyInsets(rootView: View) {
+        binder.root.applySystemBarInsets(imeInsets = true)
+    }
+
     override fun initViews() {
-        binder.multisigOperationEnterCallToolbar.applyStatusBarInsets()
         binder.multisigOperationEnterCallToolbar.setHomeButtonListener { viewModel.back() }
-        binder.root.applyImeInsetts()
 
         binder.multisigOperationEnterCallAction.setOnClickListener { viewModel.approve() }
     }

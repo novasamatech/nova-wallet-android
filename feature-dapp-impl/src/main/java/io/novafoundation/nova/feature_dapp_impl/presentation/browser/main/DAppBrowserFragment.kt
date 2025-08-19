@@ -16,6 +16,7 @@ import androidx.lifecycle.viewModelScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -104,9 +105,12 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
             }
     }
 
-    override fun initViews() {
+    override fun applyInsets(rootView: View) {
         binder.dappBrowserAddressBarGroup.applyStatusBarInsets()
+        binder.dappBrowserBottomNavigation.applyNavigationBarInsets()
+    }
 
+    override fun initViews() {
         binder.dappBrowserHide.setOnClickListener { viewModel.closeClicked() }
 
         binder.dappBrowserBack.setOnClickListener { backClicked() }

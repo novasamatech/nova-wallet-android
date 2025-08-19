@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
+import android.view.View
 import androidx.recyclerview.widget.ConcatAdapter
 
 import io.novafoundation.nova.common.base.BaseFragment
@@ -46,8 +47,11 @@ class StakingDashboardFragment :
             .inject(this)
     }
 
-    override fun initViews() {
+    override fun applyInsets(rootView: View) {
         binder.stakingDashboardContent.applyStatusBarInsets()
+    }
+
+    override fun initViews() {
         binder.stakingDashboardContent.setHasFixedSize(true)
 
         binder.stakingDashboardContent.adapter = ConcatAdapter(

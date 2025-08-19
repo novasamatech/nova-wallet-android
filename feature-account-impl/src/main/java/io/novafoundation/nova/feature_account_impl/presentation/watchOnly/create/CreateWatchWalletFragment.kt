@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create
 
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.applySystemBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
 import io.novafoundation.nova.common.view.ChipActionsAdapter
@@ -23,20 +23,17 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
 
     override fun createBinding() = FragmentCreateWatchWalletBinding.inflate(layoutInflater)
 
+    override fun applyInsets(rootView: View) {
+        binder.createWatchWalletContainer.applySystemBarInsets(imeInsets = true)
+    }
+
     override fun initViews() {
-        binder.createWatchWalletToolbar.applyStatusBarInsets()
         binder.createWatchWalletToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
         binder.createWatchWalletPresets.adapter = suggestionsAdapter
         binder.createWatchWalletPresets.setHasFixedSize(true)
 
         binder.createWatchWalletContinue.setOnClickListener { viewModel.nextClicked() }
-
-        binder.createWatchWalletContainer.applyInsetter {
-            type(ime = true) {
-                padding()
-            }
-        }
 
         binder.createWatchWalletScrollArea.scrollOnFocusTo(
             binder.createWatchWalletName,

@@ -216,9 +216,8 @@ class MultisigOperationDetailsViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
-    val isOperationLoadingFlow = isOperationAvailableFlow.withLoadingShared()
-        .distinctUntilChanged(::isOperationWasExecuted) // Doesn't emmit new value if operation was executed while we are on the screen
-        .map { it.isLoading || it.dataOrNull == false }
+    val isOperationLoadingFlow = operationFlow.withLoadingShared()
+        .map { it.isLoading }
         .shareInBackground()
 
     init {

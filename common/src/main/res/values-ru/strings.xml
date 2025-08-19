@@ -171,6 +171,8 @@
     <string name="account_watch_only">watch-only</string>
     <string name="account_welcome_hardware_wallet_subtitle">Использовать Polkadot Vault, Ledger или Parity Signer</string>
     <string name="account_welcome_hardware_wallet_title">Аппаратный кошелёк</string>
+    <string name="account_welcome_trust_wallet_subtitle">Используйте свои аккаунты Trust Wallet в Nova</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">Добавить %s аккаунт</string>
     <string name="accounts_add_wallet">Добавить кошелёк</string>
     <string name="accounts_change_chain_account">Изменить аккаунт %s</string>

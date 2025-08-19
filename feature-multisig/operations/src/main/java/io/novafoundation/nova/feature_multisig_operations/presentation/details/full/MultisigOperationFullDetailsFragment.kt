@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.copy.setupCopyText
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.showValueOrHide
@@ -24,8 +23,6 @@ class MultisigOperationFullDetailsFragment : BaseFragment<MultisigOperationFullD
     override fun createBinding() = FragmentMultisigOperationFullDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.root.applyStatusBarInsets()
-
         binder.multisigPendingOperationFullDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.multisigPendingOperationDetailsDepositor.setOnClickListener { viewModel.onDepositorClicked() }
         binder.multisigPendingOperationDetailsDeposit.setOnClickListener { viewModel.depositClicked() }

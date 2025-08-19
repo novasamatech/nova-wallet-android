@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
+    <string name="account_welcome_trust_wallet_subtitle">Use your Trust Wallet accounts in Nova</string>
 
     <string name="multisig_operation_utility_batch_title">Batch (executes until error)</string>
     <string name="multisig_operation_utility_batch_all_title">Batch All (reverts on error)</string>

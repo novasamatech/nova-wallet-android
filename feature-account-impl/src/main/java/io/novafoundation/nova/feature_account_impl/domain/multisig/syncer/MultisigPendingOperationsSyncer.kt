@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.domain.multisig.syncer
 
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
@@ -18,6 +17,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccou
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
+import io.novafoundation.nova.feature_account_api.domain.multisig.intoCallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
@@ -115,7 +115,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     }
 
     override suspend fun operationAvailableFlow(operationId: PendingMultisigOperationId): Flow<Boolean> {
-        return pendingCallHashesFlow.map { set -> set.any { it.toHex() == operationId.callHash } }
+        return pendingCallHashesFlow.map { set -> operationId.callHash.intoCallHash() in set }
     }
 
     private fun startOffChainRefreshJob() {

@@ -47,6 +47,7 @@ import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.XcmPaymentApi
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -107,6 +108,8 @@ interface WalletFeatureDependencies {
     val xcmBuilderFactory: XcmBuilder.Factory
 
     val multisigValidationsRepository: MultisigValidationsRepository
+
+    val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
 
     fun preferences(): Preferences
 
