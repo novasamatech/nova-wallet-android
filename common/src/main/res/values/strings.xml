@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="no_ms_accounts_found_dialog_title">No multisig wallets</string>
+    <string name="no_ms_accounts_found_dialog_message">You haven’t added or selected any multisig wallets in Nova. Add and select at least one to receive multisig push notifications.</string>
+
     <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="account_welcome_trust_wallet_subtitle">Use your Trust Wallet accounts in Nova</string>
 
+    <string name="multisig_push_settings_initial_switcher">Your signature requested</string>
+    <string name="multisig_push_settings_approval_switcher">Signed by signatory</string>
+    <string name="multisig_push_settings_executed_switcher">Multisig transaction executed</string>
+    <string name="multisig_push_settings_rejected_switcher">Multisig transaction rejected</string>
     <string name="multisig_operation_details_not_found_title">Signing is over</string>
     <string name="multisig_operation_details_not_found_message">Transaction has already been executed or rejected.</string>
 

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.settings
 
 import androidx.core.view.isVisible
-
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
