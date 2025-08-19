@@ -15,6 +15,6 @@ class PushMultisigSettingsCommunicatorImpl(private val router: PushNotifications
     override fun openRequest(request: PushMultisigSettingsRequester.Request) {
         super.openRequest(request)
 
-        router.openPushGovernanceSettings(PushMultisigSettingsFragment.createPayload(request))
+        router.openPushMultisigsSettings(PushMultisigSettingsFragment.createPayload(request))
     }
 }

@@ -119,6 +119,9 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
+    @Query("SELECT * FROM meta_accounts WHERE id IN (:metaIds)")
+    suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<RelationJoinedMetaAccountInfo>
+
     @Query("SELECT * FROM meta_accounts WHERE id = :id")
     suspend fun getMetaAccount(id: Long): MetaAccountLocal?
 

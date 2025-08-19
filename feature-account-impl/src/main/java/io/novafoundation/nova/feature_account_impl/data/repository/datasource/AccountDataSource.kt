@@ -97,6 +97,8 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun getAllMetaAccounts(): List<MetaAccount>
 
+    suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount>
+
     fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean>
 
     suspend fun getActiveMetaAccountsQuantity(): Int
@@ -104,6 +106,7 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun hasSecretsAccounts(): Boolean
 
     suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
+
 }
 
 suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {

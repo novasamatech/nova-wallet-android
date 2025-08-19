@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_push_notifications.data.PushTokenCache
 import io.novafoundation.nova.feature_push_notifications.data.RealPushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.RealPushPermissionRepository
 import io.novafoundation.nova.feature_push_notifications.data.RealPushTokenCache
+import io.novafoundation.nova.feature_push_notifications.data.repository.PushSettingsRepository
+import io.novafoundation.nova.feature_push_notifications.data.repository.RealPushSettingsRepository
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsSerializer
 import io.novafoundation.nova.feature_push_notifications.data.settings.RealPushSettingsProvider
@@ -111,12 +113,19 @@ class PushNotificationsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun providePushSettingsRepository(preferences: Preferences): PushSettingsRepository {
+        return RealPushSettingsRepository(preferences)
+    }
+
+    @Provides
+    @FeatureScope
     fun providePushNotificationsInteractor(
         pushNotificationsService: PushNotificationsService,
         pushSettingsProvider: PushSettingsProvider,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        pushSettingsRepository: PushSettingsRepository
     ): PushNotificationsInteractor {
-        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider, accountRepository)
+        return RealPushNotificationsInteractor(pushNotificationsService, pushSettingsProvider, accountRepository, pushSettingsRepository)
     }
 
     @Provides

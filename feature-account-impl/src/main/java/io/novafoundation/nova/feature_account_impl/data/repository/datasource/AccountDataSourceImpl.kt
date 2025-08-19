@@ -151,6 +151,11 @@ class AccountDataSourceImpl(
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
+    override suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount> {
+        val localMetaAccounts = metaAccountDao.getMetaAccountsByIds(metaIds)
+        return accountMappers.mapMetaAccountsLocalToMetaAccounts(localMetaAccounts)
+    }
+
     override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
         return metaAccountDao.hasMetaAccountsCountOfTypeFlow(mapMetaAccountTypeToLocal(type)).distinctUntilChanged()
     }

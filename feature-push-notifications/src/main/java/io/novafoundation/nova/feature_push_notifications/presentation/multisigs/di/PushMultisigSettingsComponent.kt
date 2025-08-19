@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.
 
 @Subcomponent(
     modules = [
-        PushMultisigSettingsViewModel::class
+        PushMultisigSettingsModule::class
     ]
 )
 @ScreenScope

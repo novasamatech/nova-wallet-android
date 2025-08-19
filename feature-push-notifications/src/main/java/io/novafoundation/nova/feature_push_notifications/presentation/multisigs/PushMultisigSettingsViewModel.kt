@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
+import io.novafoundation.nova.feature_push_notifications.domain.model.disableIfAllTypesDisabled
+import io.novafoundation.nova.feature_push_notifications.domain.model.isAllTypesDisabled
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -20,7 +22,7 @@ class PushMultisigSettingsViewModel(
     private val appLinksProvider: AppLinksProvider
 ) : BaseViewModel(), Browserable {
 
-    private val settingsState = MutableStateFlow(request.settings)
+    private val settingsState = MutableStateFlow(request.settings.toDomain())
 
     val isMultisigNotificationsEnabled = settingsState.map { it.isEnabled }
         .distinctUntilChanged()
@@ -43,7 +45,7 @@ class PushMultisigSettingsViewModel(
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     fun backClicked() {
-        pushMultisigSettingsResponder.respond(PushMultisigSettingsResponder.Response(settingsState.value))
+        pushMultisigSettingsResponder.respond(PushMultisigSettingsResponder.Response(settingsState.value.toModel()))
         router.back()
     }
 
@@ -91,13 +93,5 @@ class PushMultisigSettingsViewModel(
 
     fun learnMoreClicked() {
         openBrowserEvent.value = Event(appLinksProvider.multisigsWikiUrl)
-    }
-
-    private fun PushMultisigSettingsModel.isAllTypesDisabled(): Boolean {
-        return !isInitiatingEnabled && !isApprovingEnabled && !isExecutionEnabled && !isRejectionEnabled
-    }
-
-    private fun PushMultisigSettingsModel.disableIfAllTypesDisabled(): PushMultisigSettingsModel {
-        return if (isAllTypesDisabled()) copy(isEnabled = false) else this
     }
 }

@@ -135,4 +135,6 @@ interface AccountRepository {
     suspend fun hasSecretsAccounts(): Boolean
 
     suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
+
+    suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount>
 }

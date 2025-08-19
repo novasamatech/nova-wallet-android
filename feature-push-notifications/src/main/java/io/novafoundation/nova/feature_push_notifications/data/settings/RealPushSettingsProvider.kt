@@ -32,10 +32,10 @@ class RealPushSettingsProvider(
             announcementsEnabled = true,
             sentTokensEnabled = true,
             receivedTokensEnabled = true,
-            multisigTransactionsEnabled = false,
             subscribedMetaAccounts = setOf(accountRepository.getSelectedMetaAccount().id),
             stakingReward = PushSettings.ChainFeature.All,
-            governance = emptyMap()
+            governance = emptyMap(),
+            multisigs = PushSettings.MultisigsState.disabled()
         )
     }
 
