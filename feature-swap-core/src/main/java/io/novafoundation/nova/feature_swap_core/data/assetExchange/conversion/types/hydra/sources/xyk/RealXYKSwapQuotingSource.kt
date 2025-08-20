@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.combine
+import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.xyk
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -188,8 +190,9 @@ private class RealXYKSwapQuotingSource(
 
         override val to: FullChainAssetId = toAsset.second
 
-        override val weight: Int
-            get() = Weights.Hydra.XYK
+        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
+            return weightAppendingToPath(path, Weights.Hydra.XYK)
+        }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = xykPools.first()

@@ -67,6 +67,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.WeightBreakdown
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegmentQuote
@@ -759,7 +760,9 @@ internal class RealSwapService(
 
     private suspend fun formatTrade(trade: QuotedTrade): String {
         return buildString {
-            trade.path.onEachIndexed { index, quotedSwapEdge ->
+            val weightBreakdown = WeightBreakdown.fromQuotedPath(trade)
+
+            trade.path.zip(weightBreakdown.individualWeights).onEachIndexed { index, (quotedSwapEdge, weight) ->
                 val amountIn: Balance
                 val amountOut: Balance
 
@@ -788,7 +791,7 @@ internal class RealSwapService(
                     }
                 }
 
-                append(" --- " + quotedSwapEdge.edge.debugLabel() + " ---> ")
+                append(" --- ${quotedSwapEdge.edge.debugLabel()} (w: $weight)---> ")
 
                 val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
                 val outAmount = amountOut.formatPlanks(assetOut)
@@ -800,7 +803,7 @@ internal class RealSwapService(
                         val roughFeesInAssetOut = trade.roughFeeEstimation.inAssetOut
                         val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatPlanks(assetOut)
 
-                        append(" (-$roughFeesInAssetOutAmount fees)")
+                        append(" (-$roughFeesInAssetOutAmount fees, w: ${weightBreakdown.total})")
                     }
                 }
             }
@@ -876,8 +879,8 @@ internal class RealSwapService(
             // First path segments don't have any extra restrictions
             if (pathPredecessor == null) return true
 
-            //
-            if (callExecutionType.get() == CallExecutionType.DELAYED) return false
+            // Second and subsequent edges are subject to checking whether we can execute them one by one immediately
+            if (!canExecuteIntermediateEdgeSequentially(edge, pathPredecessor)) return false
 
             // We don't (yet) handle edges that doesn't allow to transfer whole account balance out
             if (!edge.canTransferOutWholeAccountBalance()) return false
@@ -901,6 +904,15 @@ internal class RealSwapService(
 
             return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId) &&
                 edge.canPayNonNativeFeesInIntermediatePosition()
+        }
+
+        private suspend fun canExecuteIntermediateEdgeSequentially(edge: SwapGraphEdge, predecessor: SwapGraphEdge): Boolean {
+            // If account can execute operations immediately - we can execute anything sequentially
+            if (callExecutionType.get() == CallExecutionType.IMMEDIATE) return true
+
+            // Otherwise it is only possible to do when the edges is merged with predecessor. If it does not - it will require a separate operation
+            // And doing a separate operation is not possible since execution type is DELAYED
+            return edge.canAppendToPredecessor(predecessor)
         }
 
         private fun isSufficient(chainAndAsset: ChainWithAsset): Boolean {

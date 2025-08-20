@@ -49,10 +49,10 @@ import io.novafoundation.nova.feature_swap_api.domain.model.fee.SubmissionOnlyAt
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.acceptedCurrencies
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.accountCurrencyMap
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.multiTransactionPayment
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.HydraDxQuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrThrow
-import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
@@ -239,7 +239,7 @@ private class HydraDxAssetExchange(
 
     private inner class HydraDxSwapEdge(
         private val sourceQuotableEdge: HydraDxSourceEdge,
-    ) : SwapGraphEdge, QuotableEdge by sourceQuotableEdge {
+    ) : SwapGraphEdge, HydraDxQuotableEdge by sourceQuotableEdge {
 
         override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
             return HydraDxOperation(sourceQuotableEdge, args)
