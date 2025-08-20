@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node

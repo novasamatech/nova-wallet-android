@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.utils.mapList
-import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.networkType
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
