@@ -342,7 +342,9 @@ class PushSettingsViewModel(
     private fun isMultisigsStillWasNotEnabled() = !pushNotificationsInteractor.isMultisigsWasEnabledFirstTime()
 
     private fun enableSwitcherOnStartIfRequested() {
-        pushEnabledState.value = true
+        if (payload.enableSwitcherOnStart) {
+            pushEnabledState.value = true
+        }
     }
 
     private fun openWalletSelectionIfRequested() {
