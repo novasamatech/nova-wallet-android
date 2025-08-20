@@ -109,15 +109,29 @@ class PushSettingsViewModel(
     val savingInProgress: Flow<Boolean> = _savingInProgress
 
     init {
-        launch {
-            pushSettingsState.value = oldPushSettingsState.first()
-        }
+        initFirstState()
 
         subscribeOnSelectWallets()
         subscribeOnGovernanceSettings()
         subscribeOnStakingSettings()
         subscribeMultisigSettings()
         disableNotificationsIfPushSettingsEmpty()
+    }
+
+    private fun initFirstState() {
+        launch {
+            val settings = oldPushSettingsState.first()
+            val currentlyEnabledAccounts = settings.subscribedMetaAccounts
+            val unavailableMetaIds = pushNotificationsInteractor.filterUnavailableMetaIds(currentlyEnabledAccounts)
+            if (unavailableMetaIds.isNotEmpty()) {
+                // Remove already unavailable accounts from list
+                val availableAccountIds = currentlyEnabledAccounts - unavailableMetaIds
+                val multisigsState = getValidMultisigsStateForAccounts(availableAccountIds)
+                pushSettingsState.value = settings.copy(subscribedMetaAccounts = availableAccountIds, multisigs = multisigsState)
+            } else {
+                pushSettingsState.value = settings
+            }
+        }
     }
 
     fun backClicked() {

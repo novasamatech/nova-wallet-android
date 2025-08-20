@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.multisigs
 
-
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents

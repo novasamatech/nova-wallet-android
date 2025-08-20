@@ -44,10 +44,10 @@ suspend fun AccountRepository.getMultisigForPayload(chain: Chain, payload: Multi
     return getActiveMetaAccounts()
         .filterIsInstance<MultisigMetaAccount>()
         .filter { it.accountIdKeyIn(chain) == payload.multisig.accountId }
-        .getActorExcept(payload.signatory)
+        .getFirstActorExcept(payload.signatory)
 }
 
-fun List<MultisigMetaAccount>.getActorExcept(signatory: AddressWithAccountId): MultisigMetaAccount? {
+fun List<MultisigMetaAccount>.getFirstActorExcept(signatory: AddressWithAccountId): MultisigMetaAccount? {
     return firstOrNull { it.signatoryAccountId != signatory.accountId }
 }
 

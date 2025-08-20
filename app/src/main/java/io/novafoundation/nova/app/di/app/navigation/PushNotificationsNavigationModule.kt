@@ -35,7 +35,6 @@ class PushNotificationsNavigationModule {
         navigationHoldersRegistry: NavigationHoldersRegistry
     ): PushStakingSettingsCommunicator = PushStakingSettingsCommunicatorImpl(router, navigationHoldersRegistry)
 
-
     @Provides
     @ApplicationScope
     fun providePushMultisigSettingsCommunicator(

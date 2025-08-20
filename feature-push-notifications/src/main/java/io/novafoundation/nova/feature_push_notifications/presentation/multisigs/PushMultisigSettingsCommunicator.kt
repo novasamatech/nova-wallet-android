@@ -18,4 +18,3 @@ interface PushMultisigSettingsResponder : InterScreenResponder<PushMultisigSetti
 }
 
 interface PushMultisigSettingsCommunicator : PushMultisigSettingsRequester, PushMultisigSettingsResponder
-

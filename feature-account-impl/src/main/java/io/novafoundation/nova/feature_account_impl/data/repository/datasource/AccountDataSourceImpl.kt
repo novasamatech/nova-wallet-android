@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapList
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
@@ -144,6 +145,10 @@ class AccountDataSourceImpl(
     override suspend fun getActiveMetaAccounts(): List<MetaAccount> {
         val local = metaAccountDao.getMetaAccountsByStatus(MetaAccountLocal.Status.ACTIVE)
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
+    }
+
+    override suspend fun getActiveMetaIds(): Set<Long> {
+        return withContext(Dispatchers.IO) { metaAccountDao.getMetaAccountsIdsByStatus(MetaAccountLocal.Status.ACTIVE).toSet() }
     }
 
     override suspend fun getAllMetaAccounts(): List<MetaAccount> {

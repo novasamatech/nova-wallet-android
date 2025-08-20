@@ -36,6 +36,8 @@ interface PushNotificationsInteractor {
     fun isPushNotificationsAvailable(): Boolean
 
     suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>)
+
+    suspend fun filterUnavailableMetaIds(metaIds: Set<Long>): Set<Long>
 }
 
 class RealPushNotificationsInteractor(
@@ -111,5 +113,9 @@ class RealPushNotificationsInteractor(
                 pushNotificationsService.updatePushSettings(notificationsEnabled, newPushSettings)
             }
         }
+    }
+
+    override suspend fun filterUnavailableMetaIds(metaIds: Set<Long>): Set<Long> {
+        return accountRepository.getUnavailableMetaIdsFromSet(metaIds)
     }
 }
