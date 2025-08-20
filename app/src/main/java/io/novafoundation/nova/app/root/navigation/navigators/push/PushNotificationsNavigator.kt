@@ -15,6 +15,12 @@ class PushNotificationsNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openPushMultisigsSettings(args: Bundle) {
+        navigationBuilder().action(R.id.action_pushSettings_to_multisigSettings)
+            .setArgs(args)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openPushGovernanceSettings(args: Bundle) {
         navigationBuilder().action(R.id.action_pushSettings_to_governanceSettings)
             .setArgs(args)

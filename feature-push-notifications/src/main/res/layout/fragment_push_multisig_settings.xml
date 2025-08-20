@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/pushMultisigsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/push_settings_multisig_operations" />
+
+    <io.novafoundation.nova.common.view.settings.SettingsGroupView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp">
+
+        <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+            android:id="@+id/pushMultisigSettingsSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/push_settings_enable" />
+
+    </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+    <io.novafoundation.nova.common.view.settings.SettingsGroupView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp">
+
+        <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+            android:id="@+id/pushMultisigInitiatingSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/multisig_push_settings_initial_switcher" />
+
+        <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+            android:id="@+id/pushMultisigApprovalSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/multisig_push_settings_approval_switcher" />
+
+        <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+            android:id="@+id/pushMultisigExecutedSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/multisig_push_settings_executed_switcher" />
+
+        <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+            android:id="@+id/pushMultisigRejectedSwitcher"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/multisig_push_settings_rejected_switcher" />
+    </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+</LinearLayout>

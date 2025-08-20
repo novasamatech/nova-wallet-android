@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.settings
 
 import androidx.core.view.isVisible
-
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
@@ -24,7 +23,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
         binder.pushSettingsWallets.setOnClickListener { viewModel.walletsClicked() }
         binder.pushSettingsAnnouncements.setOnClickListener { viewModel.announementsClicked() }
         binder.pushSettingsSentTokens.setOnClickListener { viewModel.sentTokensClicked() }
-        binder.pushSettingsMultisigOperations.setOnClickListener { viewModel.multisigOperationsClicked() }
+        binder.pushSettingsMultisigs.setOnClickListener { viewModel.multisigOperationsClicked() }
         binder.pushSettingsReceivedTokens.setOnClickListener { viewModel.receivedTokensClicked() }
         binder.pushSettingsGovernance.setOnClickListener { viewModel.governanceClicked() }
         binder.pushSettingsStakingRewards.setOnClickListener { viewModel.stakingRewardsClicked() }
@@ -48,6 +47,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
             binder.pushSettingsAnnouncements.setEnabled(enabled)
             binder.pushSettingsSentTokens.setEnabled(enabled)
             binder.pushSettingsReceivedTokens.setEnabled(enabled)
+            binder.pushSettingsMultisigs.setEnabled(enabled)
             binder.pushSettingsGovernance.setEnabled(enabled)
             binder.pushSettingsStakingRewards.setEnabled(enabled)
         }
@@ -57,7 +57,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
         viewModel.pushAnnouncements.observe { binder.pushSettingsAnnouncements.setChecked(it) }
         viewModel.pushSentTokens.observe { binder.pushSettingsSentTokens.setChecked(it) }
         viewModel.pushReceivedTokens.observe { binder.pushSettingsReceivedTokens.setChecked(it) }
-        viewModel.pushMultisigTransactions.observe { binder.pushSettingsMultisigOperations.setChecked(it) }
+        viewModel.pushMultisigsState.observe { binder.pushSettingsMultisigs.setValue(it) }
         viewModel.pushGovernanceState.observe { binder.pushSettingsGovernance.setValue(it) }
         viewModel.pushStakingRewardsState.observe { binder.pushSettingsStakingRewards.setValue(it) }
     }

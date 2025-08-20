@@ -119,6 +119,9 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
+    @Query("SELECT * FROM meta_accounts WHERE id IN (:metaIds)")
+    suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<RelationJoinedMetaAccountInfo>
+
     @Query("SELECT * FROM meta_accounts WHERE id = :id")
     suspend fun getMetaAccount(id: Long): MetaAccountLocal?
 
@@ -139,6 +142,9 @@ interface MetaAccountDao {
 
     @Query("SELECT * FROM meta_accounts WHERE status = :status")
     fun getJoinedMetaAccountsInfoByStatusFlow(status: MetaAccountLocal.Status): Flow<List<RelationJoinedMetaAccountInfo>>
+
+    @Query("SELECT id FROM meta_accounts WHERE status = :status")
+    fun getMetaAccountsIdsByStatus(status: MetaAccountLocal.Status): List<Long>
 
     @Query(META_ACCOUNTS_WITH_BALANCE_QUERY)
     fun metaAccountsWithBalanceFlow(): Flow<List<MetaAccountWithBalanceLocal>>

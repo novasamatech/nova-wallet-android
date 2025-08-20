@@ -104,6 +104,15 @@ class AccountRepositoryImpl(
         return accountDataSource.getSelectedMetaAccount()
     }
 
+    override suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount> {
+        return accountDataSource.getMetaAccountsByIds(metaIds)
+    }
+
+    override suspend fun getUnavailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long> {
+        val availableMetaIds = accountDataSource.getActiveMetaIds()
+        return metaIds - availableMetaIds
+    }
+
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
         return accountDataSource.getMetaAccount(metaId)
     }

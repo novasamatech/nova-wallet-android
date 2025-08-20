@@ -28,9 +28,9 @@ class PushSettingsCacheV1(
             sentTokensEnabled = sentTokensEnabled,
             receivedTokensEnabled = receivedTokensEnabled,
             subscribedMetaAccounts = subscribedMetaAccounts,
-            multisigTransactionsEnabled = false,
             stakingReward = stakingReward.toDomain(),
-            governance = governance.mapValues { (_, value) -> value.toDomain() }
+            governance = governance.mapValues { (_, value) -> value.toDomain() },
+            multisigs = PushSettings.MultisigsState.disabled()
         )
     }
 }
