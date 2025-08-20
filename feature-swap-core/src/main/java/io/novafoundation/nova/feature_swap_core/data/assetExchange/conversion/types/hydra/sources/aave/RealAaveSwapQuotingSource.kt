@@ -7,9 +7,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.aave.model.AavePool
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.aave.model.AavePools
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalId
@@ -143,8 +146,9 @@ private class RealAaveSwapQuotingSource(
 
         override val to: FullChainAssetId = toAsset.second
 
-        override val weight: Int
-            get() = Weights.Hydra.AAVE
+        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
+            return weightAppendingToPath(path, Weights.Hydra.AAVE)
+        }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = aavePools.first()

@@ -4,6 +4,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.assetConversionAssetIdType
+import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.assetConversionOrNull
 import io.novafoundation.nova.feature_account_api.data.conversion.assethub.pools
@@ -223,8 +225,9 @@ private class AssetConversionExchange(
             ) ?: throw SwapQuoteException.NotEnoughLiquidity
         }
 
-        override val weight: Int
-            get() = Weights.AssetConversion.SWAP
+        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
+            return Weights.AssetConversion.SWAP
+        }
     }
 
     inner class AssetConversionOperationPrototype(override val fromChain: ChainId) : AtomicSwapOperationPrototype {
