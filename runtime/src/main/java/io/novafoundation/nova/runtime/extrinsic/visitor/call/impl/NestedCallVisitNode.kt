@@ -14,8 +14,6 @@ internal interface NestedCallVisitNode {
 
 internal interface CallVisitingContext {
 
-    val depth: Int
-
     val origin: AccountIdKey
 
     val logger: ExtrinsicVisitorLogger

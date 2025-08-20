@@ -13,17 +13,11 @@ interface CallVisit {
      * Origin's account id that this call has been dispatched with
      */
     val callOrigin: AccountIdKey
-
-    /**
-     * The depth of currently visiting call
-     */
-    val depth: Int
 }
 
 class LeafCallVisit(
     override val call: GenericCall.Instance,
-    override val callOrigin: AccountIdKey,
-    override val depth: Int
+    override val callOrigin: AccountIdKey
 ) : CallVisit
 
 val CallVisit.isLeaf: Boolean

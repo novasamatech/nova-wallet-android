@@ -23,7 +23,6 @@ internal class ProxyCallNode : NestedCallVisitNode {
         context.logger.info("Visiting proxy")
 
         val proxyVisit = RealProxyVisit(
-            depth = context.depth,
             call = call,
             proxied = innerOrigin(call),
             nestedCall = innerCall(call),
@@ -46,7 +45,6 @@ internal class ProxyCallNode : NestedCallVisitNode {
         override val call: GenericCall.Instance,
         override val proxied: AccountIdKey,
         override val nestedCall: GenericCall.Instance,
-        override val callOrigin: AccountIdKey,
-        override val depth: Int
+        override val callOrigin: AccountIdKey
     ) : ProxyCallVisit
 }

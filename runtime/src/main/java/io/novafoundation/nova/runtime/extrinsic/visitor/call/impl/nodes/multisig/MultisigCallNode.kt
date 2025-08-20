@@ -26,7 +26,6 @@ internal class MultisigCallNode : NestedCallVisitNode {
         val innerCall = extractInnerMultisigCall(call)
 
         val multisigVisit = RealMultisigCallVisit(
-            context.depth + 1,
             call = call,
             callOrigin = context.origin,
             otherSignatories = innerOriginInfo.otherSignatories,
@@ -55,7 +54,6 @@ internal class MultisigCallNode : NestedCallVisitNode {
     )
 
     private class RealMultisigCallVisit(
-        override val depth: Int,
         override val call: GenericCall.Instance,
         override val callOrigin: AccountIdKey,
         override val otherSignatories: List<AccountIdKey>,
