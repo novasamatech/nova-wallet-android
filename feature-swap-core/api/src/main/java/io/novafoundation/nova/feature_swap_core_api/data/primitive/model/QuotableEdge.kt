@@ -5,11 +5,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
 
 interface QuotableEdge : WeightedEdge<FullChainAssetId> {
-
     companion object {
 
-        // Allow [0..10] precision for smaller weights
-        const val DEFAULT_SEGMENT_WEIGHT = 10
+        // Allow [0..100] precision for smaller weights
+        const val DEFAULT_SEGMENT_WEIGHT = 100
     }
 
     suspend fun quote(

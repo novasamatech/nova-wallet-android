@@ -24,6 +24,8 @@ import io.novafoundation.nova.feature_push_notifications.data.repository.Multisi
 import io.novafoundation.nova.feature_push_notifications.data.repository.PushSettingsRepository
 import io.novafoundation.nova.feature_push_notifications.data.repository.RealMultisigPushAlertRepository
 import io.novafoundation.nova.feature_push_notifications.data.repository.RealPushSettingsRepository
+import io.novafoundation.nova.feature_push_notifications.data.repository.PushSettingsRepository
+import io.novafoundation.nova.feature_push_notifications.data.repository.RealPushSettingsRepository
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsSerializer
 import io.novafoundation.nova.feature_push_notifications.data.settings.RealPushSettingsProvider
