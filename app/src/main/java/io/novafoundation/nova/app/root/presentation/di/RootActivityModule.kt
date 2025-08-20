@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixin
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
@@ -61,7 +62,8 @@ class RootActivityModule {
         externalServiceInitializer: ExternalServiceInitializer,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
         toastMessageManager: ToastMessageManager,
-        dialogMessageManager: DialogMessageManager
+        dialogMessageManager: DialogMessageManager,
+        multisigPushNotificationsAlertMixin: MultisigPushNotificationsAlertMixin
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -83,7 +85,8 @@ class RootActivityModule {
             externalServiceInitializer,
             actionBottomSheetLauncher,
             toastMessageManager,
-            dialogMessageManager
+            dialogMessageManager,
+            multisigPushNotificationsAlertMixin
         )
     }
 

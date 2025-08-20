@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.navigation.ReturnableRouter
 
 interface PushNotificationsRouter : ReturnableRouter {
 
-    fun openPushSettings()
+    fun openPushSettingsWithAccounts()
 
     fun openPushMultisigsSettings(args: Bundle)
 

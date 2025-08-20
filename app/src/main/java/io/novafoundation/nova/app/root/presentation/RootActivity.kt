@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.observeEnableMultisigPushesAlert
 import io.novafoundation.nova.splash.presentation.SplashBackgroundHolder
 
 import javax.inject.Inject
@@ -114,6 +115,7 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
 
     override fun subscribe(viewModel: RootViewModel) {
         observeActionBottomSheet(viewModel)
+        observeEnableMultisigPushesAlert(viewModel.multisigPushNotificationsAlertMixin)
 
         viewModel.showConnectingBarLiveData.observe(this) { show ->
             binder.rootNetworkBar.setVisible(show)

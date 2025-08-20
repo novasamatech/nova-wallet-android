@@ -223,6 +223,9 @@ interface MetaAccountDao {
     @Query("SELECT EXISTS(SELECT id FROM meta_accounts WHERE type = :type)")
     fun hasMetaAccountsCountOfTypeFlow(type: MetaAccountLocal.Type): Flow<Boolean>
 
+    @Query("SELECT * FROM meta_accounts WHERE type = :type")
+    fun observeMetaAccountsByTypeFlow(type: MetaAccountLocal.Type): Flow<List<RelationJoinedMetaAccountInfo>>
+
     @Query(
         """
         DELETE FROM meta_accounts

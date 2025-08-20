@@ -17,4 +17,6 @@ interface MetaAccountsUpdatesRegistry {
     fun hasUpdates(): Boolean
 
     fun observeUpdatesExist(): Flow<Boolean>
+
+    fun observeConsumedUpdatesMetaIds(): Flow<Set<Long>>
 }

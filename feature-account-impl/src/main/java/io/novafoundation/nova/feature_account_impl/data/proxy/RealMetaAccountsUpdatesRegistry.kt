@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_account_impl.data.proxy
 
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
 class RealMetaAccountsUpdatesRegistry(
@@ -55,6 +58,13 @@ class RealMetaAccountsUpdatesRegistry(
     override fun observeUpdatesExist(): Flow<Boolean> {
         return preferences.keyFlow(KEY)
             .map { hasUpdates() }
+    }
+
+    override fun observeConsumedUpdatesMetaIds(): Flow<Set<Long>> {
+        return observeUpdates().zipWithPrevious()
+            .filter { (old, new) -> !old.isNullOrEmpty() && new.isEmpty() } // Check if updates was consumed
+            .map { (old, _) -> old.orEmpty() } // Emmit old ids as consumed updates
+            .distinctUntilChanged()
     }
 
     override fun hasUpdates(): Boolean {

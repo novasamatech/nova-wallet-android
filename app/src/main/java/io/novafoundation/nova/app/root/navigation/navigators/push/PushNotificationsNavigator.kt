@@ -5,13 +5,17 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
+import io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsFragment
+import io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsPayload
+import io.novafoundation.nova.feature_push_notifications.presentation.settings.withWalletSelection
 
 class PushNotificationsNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry
 ) : BaseNavigator(navigationHoldersRegistry), PushNotificationsRouter {
 
-    override fun openPushSettings() {
-        navigationBuilder().action(R.id.action_pushWelcome_to_pushSettings)
+    override fun openPushSettingsWithAccounts() {
+        navigationBuilder().action(R.id.action_open_pushNotificationsSettings)
+            .setArgs(PushSettingsFragment.createPayload(PushSettingsPayload.withWalletSelection(enableSwitcherOnStart = true)))
             .navigateInFirstAttachedContext()
     }
 

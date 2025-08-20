@@ -9,15 +9,20 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
+import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.PushPermissionRepository
 import io.novafoundation.nova.feature_push_notifications.data.PushTokenCache
 import io.novafoundation.nova.feature_push_notifications.data.RealPushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.data.RealPushPermissionRepository
 import io.novafoundation.nova.feature_push_notifications.data.RealPushTokenCache
+import io.novafoundation.nova.feature_push_notifications.data.repository.MultisigPushAlertRepository
 import io.novafoundation.nova.feature_push_notifications.data.repository.PushSettingsRepository
+import io.novafoundation.nova.feature_push_notifications.data.repository.RealMultisigPushAlertRepository
 import io.novafoundation.nova.feature_push_notifications.data.repository.RealPushSettingsRepository
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsSerializer
@@ -25,13 +30,17 @@ import io.novafoundation.nova.feature_push_notifications.data.settings.RealPushS
 import io.novafoundation.nova.feature_push_notifications.data.subscription.PushSubscriptionService
 import io.novafoundation.nova.feature_push_notifications.data.subscription.RealPushSubscriptionService
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.GovernancePushSettingsInteractor
+import io.novafoundation.nova.feature_push_notifications.domain.interactor.MultisigPushAlertInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealGovernancePushSettingsInteractor
+import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealMultisigPushAlertInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealPushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealStakingPushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealWelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.StakingPushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixin
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.RealMultisigPushNotificationsAlertMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Qualifier
 
@@ -153,5 +162,43 @@ class PushNotificationsFeatureModule {
     @FeatureScope
     fun provideStakingPushSettingsInteractor(chainRegistry: ChainRegistry): StakingPushSettingsInteractor {
         return RealStakingPushSettingsInteractor(chainRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMultisigPushAlertRepository(
+        preferences: Preferences
+    ): MultisigPushAlertRepository {
+        return RealMultisigPushAlertRepository(preferences)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMultisigPushAlertInteractor(
+        pushSettingsProvider: PushSettingsProvider,
+        accountRepository: AccountRepository,
+        multisigPushAlertRepository: MultisigPushAlertRepository
+    ): MultisigPushAlertInteractor {
+        return RealMultisigPushAlertInteractor(
+            pushSettingsProvider,
+            accountRepository,
+            multisigPushAlertRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMultisigPushNotificationsAlertMixin(
+        automaticInteractionGate: AutomaticInteractionGate,
+        interactor: MultisigPushAlertInteractor,
+        metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+        router: PushNotificationsRouter
+    ): MultisigPushNotificationsAlertMixin {
+        return RealMultisigPushNotificationsAlertMixin(
+            automaticInteractionGate,
+            interactor,
+            metaAccountsUpdatesRegistry,
+            router
+        )
     }
 }

@@ -13,8 +13,10 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -71,6 +73,10 @@ interface PushNotificationsFeatureDependencies {
     val multisigCallFormatter: MultisigCallFormatter
 
     val multisigApprovalsRepository: MultisigApprovalsRepository
+
+    val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
+
+    val automaticInteractionGate: AutomaticInteractionGate
 
     fun buildTypeProvider(): BuildTypeProvider
 
