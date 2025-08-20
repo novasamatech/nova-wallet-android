@@ -79,7 +79,8 @@ private fun AssetTransfers.getDestination(destinationChainId: ChainId): Transfer
 private fun TransferDestination.getTransferFeatures(): DynamicCrossChainTransferFeatures {
     return DynamicCrossChainTransferFeatures(
         hasDeliveryFee = hasDeliveryFee,
-        supportsXcmExecute = supportsXcmExecute
+        supportsXcmExecute = supportsXcmExecute,
+        usesTeleport = usesTeleport
     )
 }
 

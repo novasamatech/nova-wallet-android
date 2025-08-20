@@ -5,6 +5,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.filterNotNull
+import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
@@ -16,6 +18,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcherFactory
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.assetRegistry
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.assets
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalIdOptional
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.flatten
@@ -321,8 +324,9 @@ private class RealStableSwapQuotingSource(
 
         override val to: FullChainAssetId = toAsset.second
 
-        override val weight: Int
-            get() = Weights.Hydra.STABLESWAP
+        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
+            return weightAppendingToPath(path, Weights.Hydra.STABLESWAP)
+        }
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = stablePools.first()

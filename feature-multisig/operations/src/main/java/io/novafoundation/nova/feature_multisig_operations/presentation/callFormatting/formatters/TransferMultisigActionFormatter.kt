@@ -58,44 +58,16 @@ class TransferMultisigActionFormatter @Inject constructor(
         )
     }
 
-    override suspend fun formatPushNotificationMessage(visit: CallVisit, chain: Chain): String? {
+    override suspend fun formatMessageCall(visit: CallVisit, chain: Chain): String? {
         val parsedTransfer = tryParseTransfer(visit, chain) ?: return null
 
         val accountName = identityProvider.getNameOrAddress(parsedTransfer.destination, chain)
         val formattedAmount = parsedTransfer.amount.formatPlanks()
 
         return resourceManager.getString(
-            R.string.multisig_notification_init_transaction_message_transfer,
+            R.string.multisig_transaction_message_transfer,
             formattedAmount,
-            accountName,
-            chain.name
-        )
-    }
-
-    override suspend fun formatExecutedMessage(visit: CallVisit, chain: Chain): String? {
-        val parsedTransfer = tryParseTransfer(visit, chain) ?: return null
-
-        val accountName = identityProvider.getNameOrAddress(parsedTransfer.destination, chain)
-        val formattedAmount = parsedTransfer.amount.formatPlanks()
-
-        return resourceManager.getString(
-            R.string.multisig_transaction_executed_dialog_message,
-            resourceManager.getString(R.string.multisig_transaction_message_transfer, formattedAmount, accountName),
-            chain.name
-        )
-    }
-
-    override suspend fun formatRejectedMessage(visit: CallVisit, chain: Chain, rejectedAccountName: String): String? {
-        val parsedTransfer = tryParseTransfer(visit, chain) ?: return null
-
-        val accountName = identityProvider.getNameOrAddress(parsedTransfer.destination, chain)
-        val formattedAmount = parsedTransfer.amount.formatPlanks()
-
-        return resourceManager.getString(
-            R.string.multisig_transaction_rejected_dialog_message,
-            resourceManager.getString(R.string.multisig_transaction_message_transfer, formattedAmount, accountName),
-            chain.name,
-            rejectedAccountName
+            accountName
         )
     }
 
