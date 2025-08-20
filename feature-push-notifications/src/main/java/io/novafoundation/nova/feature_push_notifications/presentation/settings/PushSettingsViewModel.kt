@@ -158,14 +158,18 @@ class PushSettingsViewModel(
             val pushSettings = pushSettingsState.value ?: return@launch
             pushNotificationsInteractor.updatePushSettings(pushEnabledState.value, pushSettings)
                 .onSuccess {
-                    if (pushSettings.multisigs.isEnabled && isMultisigsStillWasNotEnabled()) {
-                        pushNotificationsInteractor.setMultisigsWasEnabledFirstTime()
-                    }
+                    enableMultisigWalletIfAtLeastOneSelected(pushSettings)
                     router.back()
                 }
                 .onFailure { showError(it) }
 
             _savingInProgress.value = false
+        }
+    }
+
+    private fun enableMultisigWalletIfAtLeastOneSelected(pushSettings: PushSettings) {
+        if (pushSettings.multisigs.isEnabled && isMultisigsStillWasNotEnabled()) {
+            pushNotificationsInteractor.setMultisigsWasEnabledFirstTime()
         }
     }
 
@@ -243,6 +247,13 @@ class PushSettingsViewModel(
             .launchIn(this)
     }
 
+    /**
+     * Since we need to manage multisig notifications state depends on selected accounts we follow this rules to achieve that
+     * - If no multisig wallets was selected - we always disable multisig notifications
+     * - If current multisig settings was enabled - do nothing
+     * - If current multisig state is disabled and we never enabled multisigs notifications - enable multisig notifications automatically
+     * - Otherwise - return current state
+     */
     private suspend fun getValidMultisigsStateForAccounts(newSelectedAccounts: Set<Long>): PushSettings.MultisigsState {
         val noOneMultisigWasSelected = !newSelectedAccounts.atLeastOneMultisigWalletEnabled()
         if (noOneMultisigWasSelected) return PushSettings.MultisigsState.disabled()
@@ -250,8 +261,8 @@ class PushSettingsViewModel(
         val currentMultisigsSettings = pushSettingsState.value?.multisigs ?: return PushSettings.MultisigsState.disabled()
         if (currentMultisigsSettings.isEnabled) return currentMultisigsSettings
 
-        val enableMultisigsFirstTime = !pushNotificationsInteractor.isMultisigsWasEnabledFirstTime()
-        return if (enableMultisigsFirstTime) {
+        val multisigNotificationsStillWasNotEnabled = !pushNotificationsInteractor.isMultisigsWasEnabledFirstTime()
+        return if (multisigNotificationsStillWasNotEnabled) {
             PushSettings.MultisigsState.enabled()
         } else {
             currentMultisigsSettings

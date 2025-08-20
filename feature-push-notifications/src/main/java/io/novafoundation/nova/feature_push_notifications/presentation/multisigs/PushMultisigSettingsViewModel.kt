@@ -50,16 +50,22 @@ class PushMultisigSettingsViewModel(
     }
 
     fun switchMultisigNotificationsState() {
-        if (request.isAtLeastOneMultisigWalletSelected) {
-            settingsState.update {
-                if (!it.isEnabled && it.isAllTypesDisabled()) {
-                    it.copy(isEnabled = true, isInitiatingEnabled = true, isApprovingEnabled = true, isExecutionEnabled = true, isRejectionEnabled = true)
-                } else {
-                    it.copy(isEnabled = !it.isEnabled)
-                }
-            }
-        } else {
+        val noMultisigWalletSelected = !request.isAtLeastOneMultisigWalletSelected
+        if (noMultisigWalletSelected) {
             _noOneMultisigWalletSelectedEvent.sendEvent()
+            return
+        }
+
+        toggleMultisigEnablingState()
+    }
+
+    private fun toggleMultisigEnablingState() {
+        settingsState.update {
+            if (!it.isEnabled && it.isAllTypesDisabled()) {
+                it.copy(isEnabled = true, isInitiatingEnabled = true, isApprovingEnabled = true, isExecutionEnabled = true, isRejectionEnabled = true)
+            } else {
+                it.copy(isEnabled = !it.isEnabled)
+            }
         }
     }
 
