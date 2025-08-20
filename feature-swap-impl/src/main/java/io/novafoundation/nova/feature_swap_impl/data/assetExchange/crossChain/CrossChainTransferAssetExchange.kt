@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain
 import io.novafoundation.nova.common.utils.firstNotNull
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.graph.Edge
+import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.common.utils.mapError
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.orZero
@@ -117,9 +119,6 @@ class CrossChainTransferAssetExchange(
 
         private var canUseXcmExecute: Boolean? = null
 
-        override val weight: Int
-            get() = Weights.CrossChainTransfer.TRANSFER
-
         override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
             return CrossChainTransferOperation(args, this)
         }
@@ -164,6 +163,10 @@ class CrossChainTransferAssetExchange(
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             return amount
+        }
+
+        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
+            return Weights.CrossChainTransfer.TRANSFER
         }
 
         private suspend fun canUseXcmExecute(): Boolean {

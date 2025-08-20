@@ -19,5 +19,6 @@ class DynamicCrossChainTransfersConfiguration(
         val fullChainAssetId: FullChainAssetId,
         val hasDeliveryFee: Boolean,
         val supportsXcmExecute: Boolean,
+        val usesTeleport: Boolean
     )
 }
