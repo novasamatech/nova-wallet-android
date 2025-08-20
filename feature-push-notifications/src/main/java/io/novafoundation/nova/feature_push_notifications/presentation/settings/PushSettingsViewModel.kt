@@ -119,7 +119,6 @@ class PushSettingsViewModel(
         disableNotificationsIfPushSettingsEmpty()
 
         enableSwitcherOnStartIfRequested()
-        openWalletSelectionIfRequested()
     }
 
     private fun initFirstState() {
@@ -135,6 +134,8 @@ class PushSettingsViewModel(
             } else {
                 pushSettingsState.value = settings
             }
+
+            openWalletSelectionIfRequested()
         }
     }
 
