@@ -98,7 +98,7 @@ class StableSwapTest {
         "1000",
         "64839594451719860",
         "0",
-            ""
+        ""
         )
 
         assertEquals("371541351762585", result.toString())
