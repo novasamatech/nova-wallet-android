@@ -188,17 +188,29 @@ interface MetaAccountDao {
 
     @Query(
         """
-        WITH RECURSIVE accounts_to_delete AS (
-            SELECT id, parentMetaId FROM meta_accounts WHERE id = :metaId
-            UNION ALL
-            SELECT m.id, m.parentMetaId
-            FROM meta_accounts m
-            JOIN accounts_to_delete r ON m.parentMetaId = r.id
-        )
-        DELETE FROM meta_accounts WHERE id IN (SELECT id FROM accounts_to_delete)
+    WITH RECURSIVE accounts_to_delete AS (
+        SELECT id, parentMetaId FROM meta_accounts WHERE id = :metaId
+        UNION ALL
+        SELECT m.id, m.parentMetaId
+        FROM meta_accounts m
+        JOIN accounts_to_delete r ON m.parentMetaId = r.id
+    )
+    SELECT id FROM accounts_to_delete
     """
     )
-    suspend fun delete(metaId: Long)
+    suspend fun findIdsToDelete(metaId: Long): List<Long>
+
+    @Query("DELETE FROM meta_accounts WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<Long>)
+
+    @Transaction
+    suspend fun delete(metaId: Long): List<Long> {
+        val ids = findIdsToDelete(metaId)
+        if (ids.isNotEmpty()) {
+            deleteByIds(ids)
+        }
+        return ids
+    }
 
     @Query(
         """

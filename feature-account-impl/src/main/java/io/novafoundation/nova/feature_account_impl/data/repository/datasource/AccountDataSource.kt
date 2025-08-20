@@ -68,7 +68,7 @@ interface AccountDataSource : SecretStoreV1 {
     fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
-    suspend fun deleteMetaAccount(metaId: Long)
+    suspend fun deleteMetaAccount(metaId: Long): List<Long>
 
     /**
      * @return id of inserted meta account

@@ -250,12 +250,13 @@ class AccountDataSourceImpl(
         metaAccountDao.updateName(metaId, newName)
     }
 
-    override suspend fun deleteMetaAccount(metaId: Long) {
+    override suspend fun deleteMetaAccount(metaId: Long): List<Long> {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)
 
-        metaAccountDao.delete(metaId)
+        val allAffectedMetaIds = metaAccountDao.delete(metaId)
         secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
+        return allAffectedMetaIds
     }
 
     override suspend fun insertMetaAccountFromSecrets(

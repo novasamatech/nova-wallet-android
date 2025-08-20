@@ -173,9 +173,10 @@ class AccountRepositoryImpl(
     override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
         val metaAccountType = accountDataSource.getMetaAccountTypeOrThrow(metaId)
 
-        accountDataSource.deleteMetaAccount(metaId)
+        val allAffectedMetaIds = accountDataSource.deleteMetaAccount(metaId)
 
-        metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId, metaAccountType), source = null)
+        val deleteEvents = allAffectedMetaIds.map { Event.AccountRemoved(it, metaAccountType) }
+        metaAccountChangesEventBus.notify(Event.BatchUpdate(deleteEvents), source = null)
     }
 
     override suspend fun getAccounts(): List<Account> {
