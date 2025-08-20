@@ -2,11 +2,9 @@ package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.isMultisig
 import io.novafoundation.nova.feature_push_notifications.data.repository.MultisigPushAlertRepository
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
-import kotlinx.coroutines.flow.Flow
 
 interface MultisigPushAlertInteractor {
 

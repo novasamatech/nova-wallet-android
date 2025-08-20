@@ -35,7 +35,7 @@ class RealMultisigPushNotificationsAlertMixin(
     override fun subscribeToShowAlert(coroutineScope: CoroutineScope) = coroutineScope.launchUnit {
         if (interactor.isAlertWasAlreadyShown()) return@launchUnit
 
-        //We should get this state before multisigs will be discovered so we call this method before interaction gate
+        // We should get this state before multisigs will be discovered so we call this method before interaction gate
         val allowedToShowAlertAtStart = interactor.allowedToShowAlertAtStart()
 
         automaticInteractionGate.awaitInteractionAllowed()
