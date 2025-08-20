@@ -3,6 +3,6 @@ package io.novafoundation.nova.feature_multisig_operations.presentation.callForm
 import io.novafoundation.nova.common.address.AddressModel
 
 class MultisigCallPushNotificationModel(
-    val text: String,
+    val formattedCall: String,
     val onBehalfOf: AddressModel?
 )

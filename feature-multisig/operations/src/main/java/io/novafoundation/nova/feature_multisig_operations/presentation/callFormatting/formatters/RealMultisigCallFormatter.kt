@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_multisig_operations.presentation.callForm
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.data.model.AssetIconMode
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -13,7 +12,6 @@ import io.novafoundation.nova.common.utils.splitAndCapitalizeWords
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
@@ -21,11 +19,9 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.callForma
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallPushNotificationModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.collect
-import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.isLeaf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -68,7 +64,7 @@ class RealMultisigCallFormatter @Inject constructor(
             initialOrigin = initialOrigin,
             chain = chain,
             formatUnknown = ::formatUnknownDetails,
-            formatDefault = { formatDefaultDetails(it) },
+            formatDefault = { formatDetails(it) },
             formatSpecific = { delegate, callVisit -> delegate.formatDetails(callVisit, chain) },
             constructFinalResult = { delegateResult, onBehalfOf -> createCallDetails(delegateResult, onBehalfOf) }
         )
@@ -83,10 +79,10 @@ class RealMultisigCallFormatter @Inject constructor(
             call = call,
             initialOrigin = initialOrigin,
             chain = chain,
-            formatUnknown = { formatUnknownPushNotification(chain) },
-            formatDefault = { formatDefaultPushNotification(chain, it) },
-            formatSpecific = { delegate, callVisit -> delegate.formatPushNotificationMessage(callVisit, chain) },
-            constructFinalResult = { delegateResult, onBehalfOf -> MultisigCallPushNotificationModel(delegateResult, onBehalfOf) }
+            formatUnknown = { formatPushNotification(chain, pushUnknownCall()) },
+            formatDefault = { formatPushNotification(chain, it.format()) },
+            formatSpecific = { delegate, callVisit -> delegate.formatMessageCall(callVisit, chain) },
+            constructFinalResult = { delegateResult, onBehalfOf -> formatPushNotification(chain, delegateResult, onBehalfOf) }
         )
     }
 
@@ -99,10 +95,10 @@ class RealMultisigCallFormatter @Inject constructor(
             call = call,
             initialOrigin = initialOrigin,
             chain = chain,
-            formatUnknown = { formatUnknownCallExecutedMessage(chain) },
-            formatDefault = { formatDefaultExecutedMessage(chain, it) },
-            formatSpecific = { delegate, callVisit -> delegate.formatExecutedMessage(callVisit, chain) },
-            constructFinalResult = { delegateResult, _ -> delegateResult }
+            formatUnknown = { formatExecutedMessage(chain, dialogUnknownCall()) },
+            formatDefault = { formatExecutedMessage(chain, it.format()) },
+            formatSpecific = { delegate, callVisit -> delegate.formatMessageCall(callVisit, chain) },
+            constructFinalResult = { delegateResult, _ -> formatExecutedMessage(chain, delegateResult) }
         )
     }
 
@@ -116,10 +112,10 @@ class RealMultisigCallFormatter @Inject constructor(
             call = call,
             initialOrigin = initialOrigin,
             chain = chain,
-            formatUnknown = { formatUnknownCallRejectedMessage(chain, rejectedAccountName) },
-            formatDefault = { formatDefaultRejectedMessage(chain, it, rejectedAccountName) },
-            formatSpecific = { delegate, callVisit -> delegate.formatRejectedMessage(callVisit, chain, rejectedAccountName) },
-            constructFinalResult = { delegateResult, _ -> delegateResult }
+            formatUnknown = { formatRejectedMessage(chain, dialogUnknownCall(), rejectedAccountName) },
+            formatDefault = { formatRejectedMessage(chain, it.format(), rejectedAccountName) },
+            formatSpecific = { delegate, callVisit -> delegate.formatMessageCall(callVisit, chain) },
+            constructFinalResult = { delegateResult, _ -> formatRejectedMessage(chain, delegateResult, rejectedAccountName) }
         )
     }
 
@@ -134,12 +130,12 @@ class RealMultisigCallFormatter @Inject constructor(
     ): R {
         if (call == null) return formatUnknown()
 
-        val singleFormattedVisit = callTraversal.collect(call, initialOrigin)
+        val firstFormattedCall = callTraversal.collect(call, initialOrigin)
             .map { formatCallVisit(it) { delegate -> formatSpecific(delegate, it) } }
-            .ensureSingleFormattedVisit()
+            .getFirstFormated()
 
-        return if (singleFormattedVisit != null) {
-            val (singleMatch, singleMatchVisit) = singleFormattedVisit
+        return if (firstFormattedCall != null) {
+            val (singleMatch, singleMatchVisit) = firstFormattedCall
 
             val onBehalfOf = createOnBehalfOf(singleMatchVisit, initialOrigin, chain)
             return constructFinalResult(singleMatch!!, onBehalfOf)
@@ -148,20 +144,10 @@ class RealMultisigCallFormatter @Inject constructor(
         }
     }
 
-    private fun <T> List<DelegateResultWithVisit<T>>.ensureSingleFormattedVisit(): DelegateResultWithVisit<T>? {
-        // We do not want to present a formatted call when there was at least one not resolved leaf - it might make signers not notice unformatted part whatsoever
-        // So, we always forbid formatting if some leaf was not resolved
-        val hasUnformattedLeafs = any { (formatResult, callVisit) -> formatResult == null && callVisit.isLeaf }
-        // We do not have a meaningful way to concat multiple formatted visits, so we only format when there is only single successfully one
-        val successfullyFormattedVisits = filter { it.first != null }
+    private fun DelegateResultWithVisit<*>.isFormatted() = first != null
 
-        val canShowFormattedResult = !hasUnformattedLeafs && successfullyFormattedVisits.size == 1
-
-        return if (canShowFormattedResult) {
-            successfullyFormattedVisits.single()
-        } else {
-            null
-        }
+    private fun <T> List<DelegateResultWithVisit<T>>.getFirstFormated(): DelegateResultWithVisit<T>? {
+        return firstOrNull { it.isFormatted() }
     }
 
     private fun createCallPreview(
@@ -236,7 +222,7 @@ class RealMultisigCallFormatter @Inject constructor(
             title = call.function.name.splitAndCapitalizeWords(),
             subtitle = call.module.name.splitAndCapitalizeWords(),
             primaryValue = null,
-            icon = assetIconProvider.getAssetIconOrFallback(chain.utilityAsset, AssetIconMode.WHITE),
+            icon = assetIconProvider.multisigFormatAssetIcon(chain),
             onBehalfOf = null
         )
     }
@@ -251,7 +237,7 @@ class RealMultisigCallFormatter @Inject constructor(
         )
     }
 
-    private fun formatDefaultDetails(call: GenericCall.Instance): MultisigCallDetailsModel {
+    private fun formatDetails(call: GenericCall.Instance): MultisigCallDetailsModel {
         return MultisigCallDetailsModel(
             title = "${call.module.name}.${call.function.name}",
             primaryAmount = null,
@@ -269,64 +255,40 @@ class RealMultisigCallFormatter @Inject constructor(
         )
     }
 
-    private fun formatUnknownPushNotification(chain: Chain): MultisigCallPushNotificationModel {
+    private fun formatPushNotification(chain: Chain, formattedCall: String, onBehalfOf: AddressModel? = null): MultisigCallPushNotificationModel {
         return MultisigCallPushNotificationModel(
             resourceManager.getString(
                 R.string.multisig_notification_init_transaction_message,
-                resourceManager.getString(R.string.multisig_operations_unknown_calldata),
+                formattedCall,
                 chain.name
             ),
-            onBehalfOf = null
+            onBehalfOf = onBehalfOf
         )
     }
 
-    private fun formatDefaultPushNotification(chain: Chain, call: GenericCall.Instance): MultisigCallPushNotificationModel {
-        return MultisigCallPushNotificationModel(
-            resourceManager.getString(
-                R.string.multisig_notification_init_transaction_message,
-                call.format(),
-                chain.name
-            ),
-            onBehalfOf = null
-        )
-    }
-
-    private fun formatUnknownCallExecutedMessage(chain: Chain): String {
+    private fun formatExecutedMessage(chain: Chain, formattedCall: String): String {
         return resourceManager.getString(
             R.string.multisig_transaction_executed_dialog_message,
-            resourceManager.getString(R.string.multisig_transaction_dialog_message_unknown_call),
+            formattedCall,
             chain.name
         )
     }
 
-    private fun formatUnknownCallRejectedMessage(chain: Chain, rejectedAccountName: String): String {
+    private fun formatRejectedMessage(chain: Chain, formattedCall: String, rejectedAccountName: String): String {
         return resourceManager.getString(
             R.string.multisig_transaction_rejected_dialog_message,
-            resourceManager.getString(R.string.multisig_transaction_dialog_message_unknown_call),
+            formattedCall,
             chain.name,
             rejectedAccountName
         )
     }
 
-    private fun formatDefaultExecutedMessage(chain: Chain, call: GenericCall.Instance): String {
-        return resourceManager.getString(
-            R.string.multisig_transaction_rejected_dialog_message,
-            call.format(),
-            chain.name
-        )
-    }
+    private fun pushUnknownCall() = resourceManager.getString(R.string.multisig_operations_unknown_calldata)
 
-    private fun formatDefaultRejectedMessage(chain: Chain, call: GenericCall.Instance, rejectedAccountName: String): String {
-        return resourceManager.getString(
-            R.string.multisig_transaction_rejected_dialog_message,
-            call.format(),
-            chain.name,
-            rejectedAccountName
-        )
-    }
+    private fun dialogUnknownCall() = resourceManager.getString(R.string.multisig_transaction_dialog_message_unknown_call)
 
     private fun GenericCall.Instance.format(): String {
-        return "${module.name.capitalize()} ${function.name.capitalize()}"
+        return resourceManager.getString(R.string.multisig_operation_default_call_format, module.name.capitalize(), function.name.capitalize())
     }
 }
 
