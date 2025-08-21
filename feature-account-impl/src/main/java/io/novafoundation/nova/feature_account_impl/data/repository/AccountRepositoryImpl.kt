@@ -302,6 +302,14 @@ class AccountRepositoryImpl(
         return accountDataSource.hasMetaAccountsCountOfTypeFlow(type)
     }
 
+    override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
+        return accountDataSource.hasMetaAccountsByType(type)
+    }
+
+    override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
+        return accountDataSource.metaAccountsByTypeFlow(type)
+    }
+
     override suspend fun hasSecretsAccounts(): Boolean {
         return accountDataSource.hasSecretsAccounts()
     }

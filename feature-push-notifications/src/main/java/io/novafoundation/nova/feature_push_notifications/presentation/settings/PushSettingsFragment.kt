@@ -4,12 +4,17 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
+import io.novafoundation.nova.common.utils.FragmentPayloadCreator
+import io.novafoundation.nova.common.utils.PayloadCreator
+import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushSettingsBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
 
 class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSettingsBinding>() {
+
+    companion object : PayloadCreator<PushSettingsPayload> by FragmentPayloadCreator()
 
     override fun createBinding() = FragmentPushSettingsBinding.inflate(layoutInflater)
 
@@ -32,7 +37,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
     override fun inject() {
         FeatureUtils.getFeature<PushNotificationsFeatureComponent>(requireContext(), PushNotificationsFeatureApi::class.java)
             .pushSettingsComponentFactory()
-            .create(this)
+            .create(this, payload())
             .inject(this)
     }
 

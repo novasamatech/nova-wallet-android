@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="mutisigs_push_notifications_warning_enable">Enable in Settings</string>
+
+    <string name="mutisigs_push_notifications_warning_title">Multisig push notifications are here!</string>
+    <string name="mutisigs_push_notifications_warning_message">Get notified about signing requests, new signatures, and completed transactions — so you’re always in control. Manage anytime in Settings.</string>
+
     <string name="no_ms_accounts_found_dialog_title">No multisig wallets</string>
     <string name="no_ms_accounts_found_dialog_message">You haven’t added or selected any multisig wallets in Nova. Add and select at least one to receive multisig push notifications.</string>
 

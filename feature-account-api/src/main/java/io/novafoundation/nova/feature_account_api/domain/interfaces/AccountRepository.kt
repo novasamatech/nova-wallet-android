@@ -48,6 +48,8 @@ interface AccountRepository {
 
     fun activeMetaAccountsFlow(): Flow<List<MetaAccount>>
 
+    fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>>
+
     fun metaAccountBalancesFlow(): Flow<List<MetaAccountAssetBalance>>
 
     fun metaAccountBalancesFlow(metaId: Long): Flow<List<MetaAccountAssetBalance>>
@@ -129,6 +131,8 @@ interface AccountRepository {
     suspend fun getActiveMetaAccountsQuantity(): Int
 
     fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean>
+
+    suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean
 
     suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
 

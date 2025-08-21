@@ -61,6 +61,7 @@ class PushSettingsViewModel(
     private val pushMultisigSettingsRequester: PushMultisigSettingsRequester,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val permissionsAsker: PermissionsAsker.Presentation,
+    private val payload: PushSettingsPayload
 ) : BaseViewModel() {
 
     val closeConfirmationAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -116,6 +117,8 @@ class PushSettingsViewModel(
         subscribeOnStakingSettings()
         subscribeMultisigSettings()
         disableNotificationsIfPushSettingsEmpty()
+
+        enableSwitcherOnStartIfRequested()
     }
 
     private fun initFirstState() {
@@ -131,6 +134,8 @@ class PushSettingsViewModel(
             } else {
                 pushSettingsState.value = settings
             }
+
+            openWalletSelectionIfRequested()
         }
     }
 
@@ -192,14 +197,7 @@ class PushSettingsViewModel(
     }
 
     fun walletsClicked() {
-        walletRequester.openRequest(
-            SelectMultipleWalletsRequester.Request(
-                titleText = resourceManager.getString(R.string.push_wallets_title, MAX_WALLETS),
-                currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
-                min = MIN_WALLETS,
-                max = MAX_WALLETS
-            )
-        )
+        selectWallets()
     }
 
     fun announementsClicked() {
@@ -353,4 +351,27 @@ class PushSettingsViewModel(
     }
 
     private fun isMultisigsStillWasNotEnabled() = !pushNotificationsInteractor.isMultisigsWasEnabledFirstTime()
+
+    private fun enableSwitcherOnStartIfRequested() {
+        if (payload.enableSwitcherOnStart) {
+            pushEnabledState.value = true
+        }
+    }
+
+    private fun openWalletSelectionIfRequested() {
+        if (payload.navigation is PushSettingsPayload.InstantNavigation.WithWalletSelection) {
+            selectWallets()
+        }
+    }
+
+    private fun selectWallets() {
+        walletRequester.openRequest(
+            SelectMultipleWalletsRequester.Request(
+                titleText = resourceManager.getString(R.string.push_wallets_title, MAX_WALLETS),
+                currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
+                min = MIN_WALLETS,
+                max = MAX_WALLETS
+            )
+        )
+    }
 }
