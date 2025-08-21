@@ -13,8 +13,6 @@ interface AutomaticInteractionGate {
 
     val isInteractionAllowedFlow: Flow<Boolean>
 
-    fun isInteractionAllowed(): Boolean
-
     fun initialPinPassed()
 
     fun wentToBackground()
@@ -33,7 +31,7 @@ internal class RealAutomaticInteractionGate : AutomaticInteractionGate, Coroutin
     private val backgroundCheckPassed = MutableStateFlow(false)
 
     override val isInteractionAllowedFlow = combine(initialPinPassed, backgroundCheckPassed) { initialCheck, backgroundCheck ->
-        isInteractionAllowed(initialPinPassed = initialCheck, backgroundCheckPassed = backgroundCheck)
+        initialCheck && backgroundCheck
     }
         .stateIn(this, SharingStarted.Eagerly, initialValue = false)
 
@@ -47,13 +45,5 @@ internal class RealAutomaticInteractionGate : AutomaticInteractionGate, Coroutin
 
     override fun foregroundCheckPassed() {
         backgroundCheckPassed.value = true
-    }
-
-    override fun isInteractionAllowed(): Boolean {
-        return isInteractionAllowed(initialPinPassed = initialPinPassed.value, backgroundCheckPassed = backgroundCheckPassed.value)
-    }
-
-    private fun isInteractionAllowed(initialPinPassed: Boolean, backgroundCheckPassed: Boolean): Boolean {
-        return initialPinPassed && backgroundCheckPassed
     }
 }

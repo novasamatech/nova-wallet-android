@@ -25,7 +25,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixin
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
@@ -63,7 +63,7 @@ class RootActivityModule {
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
         toastMessageManager: ToastMessageManager,
         dialogMessageManager: DialogMessageManager,
-        multisigPushNotificationsAlertMixin: MultisigPushNotificationsAlertMixin
+        multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -86,7 +86,7 @@ class RootActivityModule {
             actionBottomSheetLauncher,
             toastMessageManager,
             dialogMessageManager,
-            multisigPushNotificationsAlertMixin
+            multisigPushNotificationsAlertMixinFactory
         )
     }
 

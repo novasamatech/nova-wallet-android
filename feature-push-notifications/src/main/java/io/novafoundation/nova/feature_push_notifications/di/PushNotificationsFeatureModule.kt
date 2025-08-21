@@ -24,8 +24,6 @@ import io.novafoundation.nova.feature_push_notifications.data.repository.Multisi
 import io.novafoundation.nova.feature_push_notifications.data.repository.PushSettingsRepository
 import io.novafoundation.nova.feature_push_notifications.data.repository.RealMultisigPushAlertRepository
 import io.novafoundation.nova.feature_push_notifications.data.repository.RealPushSettingsRepository
-import io.novafoundation.nova.feature_push_notifications.data.repository.PushSettingsRepository
-import io.novafoundation.nova.feature_push_notifications.data.repository.RealPushSettingsRepository
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsSerializer
 import io.novafoundation.nova.feature_push_notifications.data.settings.RealPushSettingsProvider
@@ -41,8 +39,7 @@ import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealS
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealWelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.StakingPushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixin
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.RealMultisigPushNotificationsAlertMixin
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Qualifier
 
@@ -195,8 +192,8 @@ class PushNotificationsFeatureModule {
         interactor: MultisigPushAlertInteractor,
         metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
         router: PushNotificationsRouter
-    ): MultisigPushNotificationsAlertMixin {
-        return RealMultisigPushNotificationsAlertMixin(
+    ): MultisigPushNotificationsAlertMixinFactory {
+        return MultisigPushNotificationsAlertMixinFactory(
             automaticInteractionGate,
             interactor,
             metaAccountsUpdatesRegistry,
