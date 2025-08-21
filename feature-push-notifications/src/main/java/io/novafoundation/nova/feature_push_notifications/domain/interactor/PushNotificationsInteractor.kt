@@ -96,7 +96,7 @@ class RealPushNotificationsInteractor(
     }
 
     override suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>) {
-        if (changed.isEmpty() || deleted.isEmpty()) return
+        if (changed.isEmpty() && deleted.isEmpty()) return
 
         val notificationsEnabled = pushSettingsProvider.isPushNotificationsEnabled()
         val noAccounts = accountRepository.getActiveMetaAccountsQuantity() == 0
@@ -109,8 +109,11 @@ class RealPushNotificationsInteractor(
             notificationsEnabled && noAccounts -> pushNotificationsService.updatePushSettings(enabled = false, pushSettings = null)
             noAccounts -> pushSettingsProvider.updateSettings(pushWalletSettings = null)
             subscribedAccountsAffected -> {
-                val newPushSettings = pushSettings.copy(subscribedMetaAccounts = pushSettings.subscribedMetaAccounts - deleted.toSet())
-                pushNotificationsService.updatePushSettings(notificationsEnabled, newPushSettings)
+                val newSubscribedMetaAccounts = pushSettings.subscribedMetaAccounts - deleted.toSet()
+                val newEnabledState = notificationsEnabled && newSubscribedMetaAccounts.isNotEmpty()
+                val newPushSettingsOrNull = pushSettings.copy(subscribedMetaAccounts = newSubscribedMetaAccounts)
+                    .takeIf { newEnabledState }
+                pushNotificationsService.updatePushSettings(enabled = newEnabledState, pushSettings = newPushSettingsOrNull)
             }
         }
     }
