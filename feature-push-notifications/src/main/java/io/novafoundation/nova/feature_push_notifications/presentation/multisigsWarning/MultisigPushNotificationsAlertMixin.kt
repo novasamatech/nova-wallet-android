@@ -70,7 +70,8 @@ class RealMultisigPushNotificationsAlertMixin(
                 if (interactor.isAlertAlreadyShown()) return@onEach
 
                 if (interactor.hasMultisigWallets(consumedMetaIdsUpdates.toList())) {
-                    automaticInteractionGate.awaitInteractionAllowed() // We need to check interaction again since app may went to background before consuming updates
+                    // We need to check interaction again since app may went to background before consuming updates
+                    automaticInteractionGate.awaitInteractionAllowed()
                     showAlert()
                 }
             }
