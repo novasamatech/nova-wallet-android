@@ -16,7 +16,11 @@
     <string name="multisig_push_settings_approval_switcher">Signed by signatory</string>
     <string name="multisig_push_settings_executed_switcher">Multisig transaction executed</string>
     <string name="multisig_push_settings_rejected_switcher">Multisig transaction rejected</string>
+    <string name="multisig_operation_utility_batch_title">Batch (executes until error)</string>
+    <string name="multisig_operation_utility_batch_all_title">Batch All (reverts on error)</string>
+    <string name="multisig_operation_utility_force_batch_title">Force Batch (ignores errors)</string>
     <string name="multisig_operation_details_not_found_title">Signing is over</string>
+
     <string name="multisig_operation_details_not_found_message">Transaction has already been executed or rejected.</string>
 
     <string name="loading_transaction_details">Loading transaction details…</string>
@@ -44,8 +48,8 @@
     <string name="multisig_notification_new_approval_title">Signed by %s</string>
 
     <string name="multisig_notification_init_transaction_title">✍🏻 Your signature requested </string>
-    <string name="multisig_notification_init_transaction_message_transfer">%1$s → %2$s on %3$s.</string>
     <string name="multisig_notification_init_transaction_message">%s on %s.</string>
+    <string name="multisig_operation_default_call_format">%s: %s</string>
     <string name="multisig_notification_initiator_footer">Initiated by %s.</string>
     <string name="multisig_notification_message_header">Wallet: %s</string>
 

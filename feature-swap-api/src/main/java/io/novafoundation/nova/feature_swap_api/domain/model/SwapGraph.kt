@@ -45,6 +45,14 @@ interface SwapGraphEdge : QuotableEdge {
     fun predecessorHandlesFees(predecessor: SwapGraphEdge): Boolean
 
     /**
+     * This indicates whether this segment can be appended to the previous one to form a single transaction
+     * It defaults to [predecessorHandlesFees] since ultimately they do the same thing, just under different name
+     */
+    fun canAppendToPredecessor(predecessor: SwapGraphEdge): Boolean {
+        return predecessorHandlesFees(predecessor)
+    }
+
+    /**
      * Can be used to define additional restrictions on top of default one, "is able to pay submission fee on origin"
      * This will only be called for intermediate hops for non-utility assets since other cases are always payable
      */

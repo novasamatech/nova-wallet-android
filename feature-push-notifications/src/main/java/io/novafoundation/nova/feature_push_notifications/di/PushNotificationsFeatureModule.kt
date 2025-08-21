@@ -39,8 +39,7 @@ import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealS
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.RealWelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.StakingPushSettingsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixin
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.RealMultisigPushNotificationsAlertMixin
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import javax.inject.Qualifier
 
@@ -193,8 +192,8 @@ class PushNotificationsFeatureModule {
         interactor: MultisigPushAlertInteractor,
         metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
         router: PushNotificationsRouter
-    ): MultisigPushNotificationsAlertMixin {
-        return RealMultisigPushNotificationsAlertMixin(
+    ): MultisigPushNotificationsAlertMixinFactory {
+        return MultisigPushNotificationsAlertMixinFactory(
             automaticInteractionGate,
             interactor,
             metaAccountsUpdatesRegistry,

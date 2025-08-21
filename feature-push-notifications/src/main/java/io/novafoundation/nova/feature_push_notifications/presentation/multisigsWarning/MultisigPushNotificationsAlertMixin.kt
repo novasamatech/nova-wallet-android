@@ -14,11 +14,28 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
+class MultisigPushNotificationsAlertMixinFactory(
+    private val automaticInteractionGate: AutomaticInteractionGate,
+    private val interactor: MultisigPushAlertInteractor,
+    private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
+    private val router: PushNotificationsRouter
+) {
+    fun create(coroutineScope: CoroutineScope): MultisigPushNotificationsAlertMixin {
+        return RealMultisigPushNotificationsAlertMixin(
+            automaticInteractionGate,
+            interactor,
+            metaAccountsUpdatesRegistry,
+            router,
+            coroutineScope
+        )
+    }
+}
+
 interface MultisigPushNotificationsAlertMixin {
 
-    val showWarningEvent: LiveData<Event<Unit>>
+    val showAlertEvent: LiveData<Event<Unit>>
 
-    fun subscribeToShowAlert(coroutineScope: CoroutineScope)
+    fun subscribeToShowAlert()
 
     fun showPushSettings()
 }
@@ -27,13 +44,14 @@ class RealMultisigPushNotificationsAlertMixin(
     private val automaticInteractionGate: AutomaticInteractionGate,
     private val interactor: MultisigPushAlertInteractor,
     private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-    private val router: PushNotificationsRouter
+    private val router: PushNotificationsRouter,
+    private val coroutineScope: CoroutineScope
 ) : MultisigPushNotificationsAlertMixin {
 
-    override val showWarningEvent = MutableLiveData<Event<Unit>>()
+    override val showAlertEvent = MutableLiveData<Event<Unit>>()
 
-    override fun subscribeToShowAlert(coroutineScope: CoroutineScope) = coroutineScope.launchUnit {
-        if (interactor.isAlertWasAlreadyShown()) return@launchUnit
+    override fun subscribeToShowAlert() = coroutineScope.launchUnit {
+        if (interactor.isAlertAlreadyShown()) return@launchUnit
 
         // We should get this state before multisigs will be discovered so we call this method before interaction gate
         val allowedToShowAlertAtStart = interactor.allowedToShowAlertAtStart()
@@ -41,28 +59,31 @@ class RealMultisigPushNotificationsAlertMixin(
         automaticInteractionGate.awaitInteractionAllowed()
 
         if (allowedToShowAlertAtStart) {
-            interactor.setAlertWasAlreadyShown()
-            showWarningEvent.sendEvent()
+            showAlert()
             return@launchUnit
         }
 
         // We have to show alert after user saw new multisigs in account list so we subscribed to its update states
         // And show alert when at least one multisig update was consumed
-        metaAccountsUpdatesRegistry.observeConsumedUpdatesMetaIds()
+        metaAccountsUpdatesRegistry.observeLastConsumedUpdatesMetaIds()
             .onEach { consumedMetaIdsUpdates ->
-                if (interactor.isAlertWasAlreadyShown()) return@onEach
+                if (interactor.isAlertAlreadyShown()) return@onEach
 
                 if (interactor.hasMultisigWallets(consumedMetaIdsUpdates.toList())) {
-                    interactor.setAlertWasAlreadyShown()
-                    showWarningEvent.sendEvent()
+                    // We need to check interaction again since app may went to background before consuming updates
+                    automaticInteractionGate.awaitInteractionAllowed()
+                    showAlert()
                 }
             }
             .launchIn(coroutineScope)
     }
 
+    private fun showAlert() {
+        interactor.setAlertWasAlreadyShown()
+        showAlertEvent.sendEvent()
+    }
+
     override fun showPushSettings() {
-        if (automaticInteractionGate.isInteractionAllowed()) {
-            router.openPushSettingsWithAccounts()
-        }
+        router.openPushSettingsWithAccounts()
     }
 }

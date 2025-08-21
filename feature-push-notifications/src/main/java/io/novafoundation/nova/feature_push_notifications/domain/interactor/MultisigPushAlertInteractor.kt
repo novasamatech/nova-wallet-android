@@ -10,7 +10,7 @@ interface MultisigPushAlertInteractor {
 
     fun isPushNotificationsEnabled(): Boolean
 
-    fun isAlertWasAlreadyShown(): Boolean
+    fun isAlertAlreadyShown(): Boolean
 
     fun setAlertWasAlreadyShown()
 
@@ -33,7 +33,7 @@ class RealMultisigPushAlertInteractor(
         return pushSettingsProvider.isPushNotificationsEnabled()
     }
 
-    override fun isAlertWasAlreadyShown(): Boolean {
+    override fun isAlertAlreadyShown(): Boolean {
         return multisigPushAlertRepository.isMultisigsPushAlertWasShown()
     }
 

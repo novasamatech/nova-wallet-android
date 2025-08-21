@@ -48,7 +48,10 @@ private fun DynamicCrossChainTransferConfiguration.shouldUseTeleport(): Boolean 
     val relayToSystem = originChain.isRelay() && destinationChain.isSystemChain()
     val systemToSystem = originChain.isSystemChain() && destinationChain.isSystemChain()
 
-    return systemToRelay || relayToSystem || systemToSystem
+    // We keep our hard-coded logic of determining teleports for system chains just in case
+    // Script that detects `features.usesTeleport` breaks for some reason -
+    // we will still be able to serve system chain transfers
+    return systemToRelay || relayToSystem || systemToSystem || features.usesTeleport
 }
 
 fun DynamicCrossChainTransferConfiguration.destinationChainLocationOnOrigin(): RelativeMultiLocation {

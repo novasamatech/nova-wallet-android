@@ -44,7 +44,7 @@ import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeep
 import io.novafoundation.nova.feature_multisig_operations.di.deeplink.MultisigDeepLinks
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixin
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -122,7 +122,7 @@ interface RootDependencies {
 
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
-    val multisigPushNotificationsAlertMixin: MultisigPushNotificationsAlertMixin
+    val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 

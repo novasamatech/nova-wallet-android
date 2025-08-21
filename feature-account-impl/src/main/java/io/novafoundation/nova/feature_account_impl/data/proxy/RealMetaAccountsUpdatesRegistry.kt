@@ -60,7 +60,7 @@ class RealMetaAccountsUpdatesRegistry(
             .map { hasUpdates() }
     }
 
-    override fun observeConsumedUpdatesMetaIds(): Flow<Set<Long>> {
+    override fun observeLastConsumedUpdatesMetaIds(): Flow<Set<Long>> {
         return observeUpdates().zipWithPrevious()
             .filter { (old, new) -> !old.isNullOrEmpty() && new.isEmpty() } // Check if updates was consumed
             .map { (old, _) -> old.orEmpty() } // Emmit old ids as consumed updates
