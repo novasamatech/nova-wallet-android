@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
+import io.novafoundation.nova.feature_account_api.data.events.combineBusEvents
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
@@ -176,7 +177,9 @@ class AccountRepositoryImpl(
         val allAffectedMetaIds = accountDataSource.deleteMetaAccount(metaId)
 
         val deleteEvents = allAffectedMetaIds.map { Event.AccountRemoved(it, metaAccountType) }
-        metaAccountChangesEventBus.notify(Event.BatchUpdate(deleteEvents), source = null)
+            .combineBusEvents() ?: return@withContext
+
+        metaAccountChangesEventBus.notify(deleteEvents, source = null)
     }
 
     override suspend fun getAccounts(): List<Account> {
