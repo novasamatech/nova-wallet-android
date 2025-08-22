@@ -192,6 +192,7 @@
     <string name="add_proxy_maximum_reached_error_title">최대 프록시 수에 도달했습니다</string>
     <string name="added_networks_empty_placeholder">추가된 사용자 정의 네트워크는 여기에 나타납니다</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">Nova가 자동으로 귀하의 멀티시그 지갑으로 전환되어, 대기 중인 거래를 확인할 수 있습니다.</string>
     <string name="appearance_colored_icon_title">컬러</string>
     <string name="appearance_title">외관</string>
     <string name="appearance_token_assets_title">토큰 아이콘</string>
@@ -346,6 +347,7 @@
     <string name="common_bonus">보너스</string>
     <string name="common_call">호출</string>
     <string name="common_call_data">호출 데이터</string>
+    <string name="common_call_hash">호출 해시</string>
     <string name="common_cancel">취소</string>
     <string name="common_cancel_operation_warning">이 작업을 취소하시겠습니까?</string>
     <string name="common_cannot_find_app">죄송합니다, 이 요청을 처리할 올바른 앱이 없습니다</string>
@@ -824,6 +826,7 @@
     <string name="integrate_networks_banner_description">당신이 구축하고 있는 네트워크의 모든 기능을 Nova Wallet에 통합하여 모든 사람이 접근할 수 있게 만드세요.</string>
     <string name="integrate_networks_banner_link">네트워크 통합</string>
     <string name="integrate_networks_banner_title">Polkadot을 위해 개발 중인가요?</string>
+    <string name="invalid_call_data_format_message">제공된 호출 데이터가 유효하지 않거나 형식이 잘못되었습니다. 올바른지 확인하고 다시 시도하십시오.</string>
     <string name="invalid_call_data_message">이 호출 데이터는 호출 해시 %s의 다른 작업에 대한 것입니다</string>
     <string name="invalid_call_data_title">잘못된 호출 데이터</string>
     <string name="invalid_proxy_address_message">프록시 주소는 유효한 %s 주소여야 합니다</string>
@@ -871,6 +874,7 @@
     <string name="ledger_wallet_details_description">이 지갑은 Ledger와 연동되어 있습니다. Nova는 원하는 모든 작업을 생성하는 데 도움을 줄 것이며, Ledger를 사용하여 서명하라는 요청을 받을 것입니다.</string>
     <string name="ledher_import_select_address_title">지갑에 추가할 계정을 선택하세요</string>
     <string name="loading_network_info">네트워크 정보를 불러오는 중...</string>
+    <string name="loading_transaction_details">거래 세부 정보 로딩 중...</string>
     <string name="loocking_backup_progress">백업을 찾고 있습니다...</string>
     <string name="make_payout_transaction_sent">출금 거래가 전송되었습니다</string>
     <string name="manage_assets_add_token">토큰 추가</string>
@@ -915,18 +919,40 @@
     <string name="multisig_deposit">다중 서명 예치금</string>
     <string name="multisig_deposit_description">예치금은 다중 서명 작업이 실행되거나 거부될 때까지 입금자 계정에 잠겨 있습니다.</string>
     <string name="multisig_extrinsic_details_subtitle">작업이 올바른지 확인하십시오</string>
+    <string name="multisig_notification_executed_transaction_message">%s에 의해 서명 및 실행되었습니다.</string>
+    <string name="multisig_notification_executed_transaction_title">✅ 멀티시그 거래 실행 완료</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s에서 %s.</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 귀하의 서명이 요청되었습니다</string>
+    <string name="multisig_notification_initiator_footer">%s에 의해 시작됨.</string>
+    <string name="multisig_notification_message_header">지갑: %s</string>
+    <string name="multisig_notification_new_approval_title">%s에 의해 서명됨</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">%d개의 서명 중 %d개가 수집되었습니다.</string>
+    <string name="multisig_notification_on_behalf_of">%s를 대신하여.</string>
+    <string name="multisig_notification_rejected_transaction_message">%s에 의해 거부됨.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ 멀티시그 거래 거부됨</string>
     <string name="multisig_on_behalf_of">다른 사람을 대신하여</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s: %s</string>
     <string name="multisig_operation_details_approve">승인</string>
     <string name="multisig_operation_details_approve_and_execute">승인 및 실행</string>
     <string name="multisig_operation_details_call_data_not_found">세부 정보를 보려면 호출 데이터를 입력하십시오</string>
+    <string name="multisig_operation_details_not_found_message">거래가 이미 실행되었거나 거부되었습니다.</string>
+    <string name="multisig_operation_details_not_found_title">서명이 종료됨</string>
     <string name="multisig_operation_details_reject">거부</string>
     <string name="multisig_operation_details_signatories" formatted="false">서명자 (%d 중 %d)</string>
+    <string name="multisig_operation_utility_batch_all_title">모두 묶음 (오류 시 되돌림)</string>
+    <string name="multisig_operation_utility_batch_title">묶음 (오류 발생 시까지 실행)</string>
+    <string name="multisig_operation_utility_force_batch_title">강제 묶음 (오류 무시)</string>
     <string name="multisig_operations_created">귀하에 의해 생성됨</string>
+    <string name="multisig_operations_placeholder">아직 거래가 없습니다.\n서명 요청이 여기에 표시됩니다</string>
     <string name="multisig_operations_progress" formatted="false">서명 중 (%s 중 %s)</string>
     <string name="multisig_operations_signed">귀하에 의해 서명됨</string>
     <string name="multisig_operations_unknown_calldata">알 수 없는 작업</string>
     <string name="multisig_pending_operations">서명할 거래</string>
     <string name="multisig_pending_operations_on_behalf_of">다른 사람을 대신하여:</string>
+    <string name="multisig_push_settings_approval_switcher">서명자에 의해 서명됨</string>
+    <string name="multisig_push_settings_executed_switcher">멀티시그 거래 실행 완료</string>
+    <string name="multisig_push_settings_initial_switcher">귀하의 서명이 요청되었습니다</string>
+    <string name="multisig_push_settings_rejected_switcher">멀티시그 거래 거부됨</string>
     <string name="multisig_sell_not_supported_message">암호화폐를 법정 화폐로 판매하려면 다른 종류의 지갑으로 전환하십시오.</string>
     <string name="multisig_sell_not_supported_title">다중 서명에는 판매가 지원되지 않음</string>
     <string name="multisig_signatory">서명자:</string>
@@ -942,9 +968,19 @@
     <string name="multisig_transaction_created_subtitle_highlight">서명할 거래</string>
     <string name="multisig_transaction_created_title">다중 서명 거래 생성됨</string>
     <string name="multisig_transaction_created_view_details">세부 사항 보기</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">체인 상의 초기 정보(호출 데이터)가 없는 거래가 거부되었습니다</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s에서 %s.\n더 이상의 추가 작업이 필요 없습니다.</string>
+    <string name="multisig_transaction_executed_dialog_title">멀티시그 거래 실행 완료</string>
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s에서 %s.\n거부됨: %s.\n더 이상의 추가 작업이 필요 없습니다.</string>
+    <string name="multisig_transaction_rejected_dialog_title">멀티시그 거래 거부됨</string>
     <string name="multisig_wallet_details_info_warning">이 지갑의 거래는 여러 서명자의 승인이 필요합니다. 귀하의 계정은 서명자 중 하나입니다:</string>
     <string name="multisig_wallet_details_info_warning_other_signatories">다른 서명자:</string>
     <string name="multisig_wallet_details_info_warning_title" formatted="false">임계값 %d 중 %d</string>
+    <string name="multisigs_notification_channel_name">멀티시그 거래 알림 채널</string>
+    <string name="mutisigs_push_notifications_warning_enable">설정에서 활성화</string>
+    <string name="mutisigs_push_notifications_warning_message">서명 요청, 새로운 서명 및 완료된 거래에 대한 알림을 받아 항상 제어할 수 있습니다. 설정에서 언제든지 관리하세요.</string>
+    <string name="mutisigs_push_notifications_warning_title">멀티시그 푸시 알림이 여기에 있습니다!</string>
     <string name="network_already_exist_failure_title">이 노드가 이미 존재합니다</string>
     <string name="network_fee">네트워크 수수료</string>
     <string name="network_info_address">노드 주소</string>
@@ -963,6 +999,8 @@
     <string name="nft_owned_by">소유자</string>
     <string name="nft_price_not_listed">가격 미정</string>
     <string name="nft_your_nfts">당신의 NFT</string>
+    <string name="no_ms_accounts_found_dialog_message">Nova에 멀티시그 지갑을 추가하거나 선택하지 않았습니다. 멀티시그 푸시 알림을 받으려면 최소 한 개를 추가하고 선택하세요.</string>
+    <string name="no_ms_accounts_found_dialog_title">멀티시그 지갑 없음</string>
     <string name="node_already_exist_failure_message">입력된 URL이 \\\"%s\\\" 노드로 이미 존재합니다.</string>
     <string name="node_already_exist_failure_title">이 노드가 이미 존재합니다</string>
     <string name="node_not_alive_message">입력된 노드 URL이 응답하지 않거나 잘못된 형식을 포함하고 있습니다. URL 형식은 \"wss://\"로 시작해야 합니다.</string>
@@ -1040,6 +1078,8 @@
     <string name="profile_settings_pin_code_verification_title">PIN으로 승인</string>
     <string name="profile_settings_safe_mode_title">안전 모드</string>
     <string name="profile_settings_title">설정</string>
+    <string name="proxied_card_not_supported_message">데빗 카드를 관리하려면 다른 월렛으로 전환해주세요. Polkadot 네트워크에서 사용하세요.</string>
+    <string name="proxied_card_not_supported_title">이 프록시드 월렛에서는 데빗 카드가 지원되지 않습니다</string>
     <string name="proxied_wallet_details_info_warning">이 계정은 다음 계정에 거래를 수행할 수 있는 권한을 부여했습니다:</string>
     <string name="proxy_access_type_staking_operations">Staking 작업</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">위임된 계정 %s에 네트워크 수수료 %s를 결제할 충분한 잔액이 없습니다. 결제 가능한 잔액: %s</string>
@@ -1067,6 +1107,7 @@
     <string name="push_settings_announcements">Nova 공지사항</string>
     <string name="push_settings_balances">잔액</string>
     <string name="push_settings_enable">알림 활성화</string>
+    <string name="push_settings_multisig_operations">다중 서명 거래</string>
     <string name="push_settings_no_selected_wallets">지갑을 선택하지 않았기 때문에 지갑 활동(잔액, Staking)에 대한 알림을 받지 못합니다</string>
     <string name="push_settings_others">기타</string>
     <string name="push_settings_received_tokens">받은 토큰</string>
@@ -1084,7 +1125,7 @@
     <string name="push_token_sent_message" formatted="false">%s 네트워크의 %s에게 %s을(를) 보냈습니다</string>
     <string name="push_token_sent_no_account_name_title">💸 보낸 토큰</string>
     <string name="push_token_sent_title">💸 보낸 토큰 %s</string>
-    <string name="push_wallets_title">활동이 있을 때 알림을 받을 지갑을 최대 3개 선택하세요</string>
+    <string name="push_wallets_title">최대 %d개의 월렛을 선택하여 활동이 있을 때 알림 받기</string>
     <string name="push_welcome_enable_button">푸시 알림 활성화</string>
     <string name="push_welcome_message">지갑 작업, 거버넌스 업데이트, Staking 활동 및 보안에 대한 알림을 받아 항상 최신 정보를 유지하세요</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">푸시 알림을 활성화함으로써 귀하는 우리의 %s 및 %s에 동의하게 됩니다</string>
@@ -1123,7 +1164,6 @@
     <string name="referendum_full_details_beneficiary">수혜자</string>
     <string name="referendum_full_details_deposit">예치금</string>
     <string name="referendum_full_details_electorate">유권자</string>
-    <string name="referendum_full_details_hash">호출 해시</string>
     <string name="referendum_full_details_long_for_preview">미리 보기에는 너무 깁니다</string>
     <string name="referendum_full_details_parameters_json">파라미터 JSON</string>
     <string name="referendum_full_details_proposer">제안자</string>

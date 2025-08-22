@@ -192,6 +192,7 @@
     <string name="add_proxy_maximum_reached_error_title">Đã đạt đến số lượng proxy tối đa</string>
     <string name="added_networks_empty_placeholder">Các mạng tùy chỉnh đã thêm\nsẽ xuất hiện ở đây</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">Nova đã tự động chuyển sang ví multisig của bạn để bạn có thể xem các giao dịch đang chờ xử lý.</string>
     <string name="appearance_colored_icon_title">Đã tô màu</string>
     <string name="appearance_title">Giao diện</string>
     <string name="appearance_token_assets_title">biểu tượng token</string>
@@ -346,6 +347,7 @@
     <string name="common_bonus">Tiền thưởng</string>
     <string name="common_call">Gọi</string>
     <string name="common_call_data">Dữ liệu cuộc gọi</string>
+    <string name="common_call_hash">Mã băm cuộc gọi</string>
     <string name="common_cancel">Hủy</string>
     <string name="common_cancel_operation_warning">Bạn có chắc chắn muốn hủy thao tác này?</string>
     <string name="common_cannot_find_app">Rất tiếc, bạn không có ứng dụng phù hợp để xử lý yêu cầu này</string>
@@ -824,6 +826,7 @@
     <string name="integrate_networks_banner_description">Tích hợp tất cả các tính năng của mạng bạn đang xây dựng vào Nova Wallet, làm cho nó trở nên dễ tiếp cận với mọi người.</string>
     <string name="integrate_networks_banner_link">Tích hợp mạng của bạn</string>
     <string name="integrate_networks_banner_title">Xây dựng cho Polkadot?</string>
+    <string name="invalid_call_data_format_message">Dữ liệu cuộc gọi bạn cung cấp không hợp lệ hoặc sai định dạng. Vui lòng đảm bảo chính xác và thử lại.</string>
     <string name="invalid_call_data_message">Dữ liệu cuộc gọi này cho thao tác khác với call hash %s</string>
     <string name="invalid_call_data_title">Dữ liệu cuộc gọi không hợp lệ</string>
     <string name="invalid_proxy_address_message">Địa chỉ proxy phải là địa chỉ %s hợp lệ</string>
@@ -871,6 +874,7 @@
     <string name="ledger_wallet_details_description">Ví này đã được ghép đôi với Ledger. Nova sẽ giúp bạn thực hiện bất kỳ thao tác nào bạn muốn, và bạn sẽ được yêu cầu ký chúng bằng Ledger</string>
     <string name="ledher_import_select_address_title">Chọn tài khoản để thêm vào ví</string>
     <string name="loading_network_info">Đang tải thông tin mạng...</string>
+    <string name="loading_transaction_details">Đang tải chi tiết giao dịch…</string>
     <string name="loocking_backup_progress">Đang tìm kiếm bản sao lưu của bạn...</string>
     <string name="make_payout_transaction_sent">Giao dịch thanh toán đã được gửi</string>
     <string name="manage_assets_add_token">Thêm token</string>
@@ -915,18 +919,40 @@
     <string name="multisig_deposit">Đặt cọc đa chữ ký</string>
     <string name="multisig_deposit_description">Khoản đặt cọc sẽ bị khóa trên tài khoản của người gửi tiền cho đến khi thao tác đa chữ ký được thực hiện hoặc bị từ chối.</string>
     <string name="multisig_extrinsic_details_subtitle">Hãy chắc chắn rằng thao tác là đúng</string>
+    <string name="multisig_notification_executed_transaction_message">Đã ký và thực hiện bởi %s.</string>
+    <string name="multisig_notification_executed_transaction_title">✅ Giao dịch multisig đã thực hiện</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s trên %s.</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 Yêu cầu chữ ký của bạn</string>
+    <string name="multisig_notification_initiator_footer">Được khởi xướng bởi %s.</string>
+    <string name="multisig_notification_message_header">Ví: %s</string>
+    <string name="multisig_notification_new_approval_title">Được ký bởi %s</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">%d trong số %d chữ ký đã thu thập.</string>
+    <string name="multisig_notification_on_behalf_of">Thay mặt cho %s.</string>
+    <string name="multisig_notification_rejected_transaction_message">Bị từ chối bởi %s.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ Giao dịch multisig bị từ chối</string>
     <string name="multisig_on_behalf_of">Thay mặt cho</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s: %s</string>
     <string name="multisig_operation_details_approve">Phê duyệt</string>
     <string name="multisig_operation_details_approve_and_execute">Phê duyệt &amp; Thực hiện</string>
     <string name="multisig_operation_details_call_data_not_found">Nhập dữ liệu cuộc gọi để xem chi tiết</string>
+    <string name="multisig_operation_details_not_found_message">Giao dịch đã thực hiện hoặc bị từ chối.</string>
+    <string name="multisig_operation_details_not_found_title">Đã kết thúc ký kết</string>
     <string name="multisig_operation_details_reject">Từ chối</string>
     <string name="multisig_operation_details_signatories" formatted="false">Người ký (%d của %d)</string>
+    <string name="multisig_operation_utility_batch_all_title">Batch All (khôi phục khi có lỗi)</string>
+    <string name="multisig_operation_utility_batch_title">Batch (thực thi cho đến khi có lỗi)</string>
+    <string name="multisig_operation_utility_force_batch_title">Force Batch (bỏ qua lỗi)</string>
     <string name="multisig_operations_created">Được tạo bởi bạn</string>
+    <string name="multisig_operations_placeholder">Chưa có giao dịch nào.\nYêu cầu ký sẽ xuất hiện ở đây</string>
     <string name="multisig_operations_progress" formatted="false">Ký (%s của %s)</string>
     <string name="multisig_operations_signed">Được bạn ký</string>
     <string name="multisig_operations_unknown_calldata">Thao tác không rõ</string>
     <string name="multisig_pending_operations">Giao dịch cần ký</string>
     <string name="multisig_pending_operations_on_behalf_of">Thay mặt cho:</string>
+    <string name="multisig_push_settings_approval_switcher">Được ký bởi người ký</string>
+    <string name="multisig_push_settings_executed_switcher">Giao dịch multisig đã thực hiện</string>
+    <string name="multisig_push_settings_initial_switcher">Yêu cầu chữ ký của bạn</string>
+    <string name="multisig_push_settings_rejected_switcher">Giao dịch multisig bị từ chối</string>
     <string name="multisig_sell_not_supported_message">Để bán tiền điện tử lấy tiền pháp định, vui lòng chuyển sang loại ví khác.</string>
     <string name="multisig_sell_not_supported_title">Bán không được hỗ trợ cho Đa chữ ký</string>
     <string name="multisig_signatory">Người ký:</string>
@@ -942,9 +968,19 @@
     <string name="multisig_transaction_created_subtitle_highlight">Các giao dịch cần ký</string>
     <string name="multisig_transaction_created_title">Giao dịch Đa chữ ký đã được tạo</string>
     <string name="multisig_transaction_created_view_details">Xem chi tiết</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">Giao dịch không có thông tin trên chuỗi ban đầu (dữ liệu cuộc gọi) đã bị từ chối</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s trên %s.\nKhông cần thêm hành động nào từ bạn.</string>
+    <string name="multisig_transaction_executed_dialog_title">Giao dịch Multisig Đã Thực Hiện</string>
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s trên %s.\nBị từ chối bởi: %s.\nKhông cần thêm hành động nào từ bạn.</string>
+    <string name="multisig_transaction_rejected_dialog_title">Giao dịch Multisig Bị Từ Chối</string>
     <string name="multisig_wallet_details_info_warning">Các giao dịch từ ví này yêu cầu sự chấp thuận từ nhiều người ký. Tài khoản của bạn là một trong những người ký:</string>
     <string name="multisig_wallet_details_info_warning_other_signatories">Các người ký khác:</string>
     <string name="multisig_wallet_details_info_warning_title" formatted="false">Ngưỡng %d trên %d</string>
+    <string name="multisigs_notification_channel_name">Kênh Thông Báo Giao Dịch Multisig</string>
+    <string name="mutisigs_push_notifications_warning_enable">Kích hoạt trong Cài đặt</string>
+    <string name="mutisigs_push_notifications_warning_message">Nhận thông báo về các yêu cầu ký, chữ ký mới và giao dịch đã hoàn thành — để bạn luôn kiểm soát được mọi thứ. Quản lý bất cứ lúc nào trong Cài đặt.</string>
+    <string name="mutisigs_push_notifications_warning_title">Thông báo đẩy Multisig đã có mặt!</string>
     <string name="network_already_exist_failure_title">Node này đã tồn tại</string>
     <string name="network_fee">Phí mạng</string>
     <string name="network_info_address">Địa chỉ nút</string>
@@ -963,6 +999,8 @@
     <string name="nft_owned_by">Sở hữu bởi</string>
     <string name="nft_price_not_listed">Chưa niêm yết</string>
     <string name="nft_your_nfts">NFT của bạn</string>
+    <string name="no_ms_accounts_found_dialog_message">Bạn chưa thêm hoặc chọn bất kỳ ví multisig nào trong Nova. Thêm và chọn ít nhất một cái để nhận thông báo đẩy multisig.</string>
+    <string name="no_ms_accounts_found_dialog_title">Không có ví multisig</string>
     <string name="node_already_exist_failure_message">URL bạn nhập đã tồn tại dưới dạng Node \"%s\".</string>
     <string name="node_already_exist_failure_title">Node này đã tồn tại</string>
     <string name="node_not_alive_message">URL Node bạn nhập không phản hồi hoặc chứa định dạng không chính xác. Định dạng URL phải bắt đầu với \"wss://\".</string>
@@ -1040,6 +1078,8 @@
     <string name="profile_settings_pin_code_verification_title">Xác nhận bằng mã PIN</string>
     <string name="profile_settings_safe_mode_title">Chế độ an toàn</string>
     <string name="profile_settings_title">Cài đặt</string>
+    <string name="proxied_card_not_supported_message">Để quản lý Thẻ Ghi Nợ của bạn, vui lòng chuyển sang một ví khác trên mạng Polkadot.</string>
+    <string name="proxied_card_not_supported_title">Thẻ Ghi Nợ không được hỗ trợ cho ví Ủy Quyền này</string>
     <string name="proxied_wallet_details_info_warning">Tài khoản này đã cấp quyền thực hiện giao dịch cho tài khoản sau:</string>
     <string name="proxy_access_type_staking_operations">Giao dịch Staking</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Tài khoản được ủy quyền %s không có đủ số dư để trả phí mạng là %s. Số dư có sẵn để trả phí: %s</string>
@@ -1067,6 +1107,7 @@
     <string name="push_settings_announcements">Thông báo từ Nova</string>
     <string name="push_settings_balances">Số dư</string>
     <string name="push_settings_enable">Bật thông báo</string>
+    <string name="push_settings_multisig_operations">Giao dịch multisig</string>
     <string name="push_settings_no_selected_wallets">Bạn sẽ không nhận được thông báo về Hoạt động Ví (Số dư, Staking) vì bạn chưa chọn bất kỳ ví nào</string>
     <string name="push_settings_others">Khác</string>
     <string name="push_settings_received_tokens">Nhận token</string>
@@ -1084,7 +1125,7 @@
     <string name="push_token_sent_message" formatted="false">Gửi %s đến %s trong %s</string>
     <string name="push_token_sent_no_account_name_title">💸 Đã gửi</string>
     <string name="push_token_sent_title">💸 Đã gửi %s</string>
-    <string name="push_wallets_title">Chọn tối đa 3 ví để được thông báo khi ví có hoạt động</string>
+    <string name="push_wallets_title">Chọn tối đa %d ví để được thông báo khi ví có hoạt động</string>
     <string name="push_welcome_enable_button">Bật thông báo đẩy</string>
     <string name="push_welcome_message">Nhận thông báo về các hoạt động của ví, cập nhật Quản trị, hoạt động Staking và Bảo mật để bạn luôn nắm bắt được thông tin</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Bằng việc bật thông báo đẩy, bạn đồng ý với %s và %s của chúng tôi</string>
@@ -1123,7 +1164,6 @@
     <string name="referendum_full_details_beneficiary">Người thụ hưởng</string>
     <string name="referendum_full_details_deposit">Đặt cọc</string>
     <string name="referendum_full_details_electorate">Cử tri</string>
-    <string name="referendum_full_details_hash">Gọi hash</string>
     <string name="referendum_full_details_long_for_preview">Quá dài để xem trước</string>
     <string name="referendum_full_details_parameters_json">Tham số JSON</string>
     <string name="referendum_full_details_proposer">Người đề xuất</string>
