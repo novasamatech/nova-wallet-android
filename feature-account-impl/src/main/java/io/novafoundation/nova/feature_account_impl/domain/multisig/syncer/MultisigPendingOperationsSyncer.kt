@@ -87,7 +87,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
 
     private val offChainInfos = MutableStateFlow(emptyMap<CallHash, OffChainPendingMultisigOperationInfo>())
 
-    override val pendingOperationsCount = this.pendingCallHashesFlow
+    override val pendingOperationsCount = pendingCallHashesFlow
         .map { it.size }
         .onEach {
             Log.d("RealMultisigChainPendingOperationsSyncer", "# of operations for ${multisig.name} in ${chain.name}: $it")
