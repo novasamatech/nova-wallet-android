@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -262,7 +262,7 @@ class NotificationHandlersModule {
         notificationIdProvider: NotificationIdProvider,
         multisigCallFormatter: MultisigCallFormatter,
         configurator: MultisigOperationDeepLinkConfigurator,
-        multisigApprovalsRepository: MultisigApprovalsRepository,
+        multisigDetailsRepository: MultisigDetailsRepository,
         gson: Gson,
         notificationManager: NotificationManagerCompat,
         resourceManager: ResourceManager,
@@ -270,7 +270,7 @@ class NotificationHandlersModule {
         return MultisigTransactionNewApprovalNotificationHandler(
             context,
             accountRepository,
-            multisigApprovalsRepository,
+            multisigDetailsRepository,
             multisigCallFormatter,
             configurator,
             identityProvider,

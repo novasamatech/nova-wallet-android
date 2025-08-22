@@ -34,7 +34,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
@@ -82,7 +82,7 @@ import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicS
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
-import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigDetailsRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.repository.RealMultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
@@ -212,7 +212,7 @@ class AccountFeatureModule {
         fun bindMultisigFormatter(real: RealMultisigFormatter): MultisigFormatter
 
         @Binds
-        fun bindMultisigApprovalsRepository(real: RealMultisigApprovalsRepository): MultisigApprovalsRepository
+        fun bindMultisigApprovalsRepository(real: RealMultisigDetailsRepository): MultisigDetailsRepository
     }
 
     @Provides

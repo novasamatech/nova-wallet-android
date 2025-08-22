@@ -212,10 +212,6 @@ class MultisigOperationDetailsViewModel(
 
     val actionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
 
-    private val isOperationAvailableFlow = multisigOperationsService.operationAvailableFlow(payload.operation.toOperationId())
-        .distinctUntilChanged()
-        .shareInBackground()
-
     val isOperationLoadingFlow = operationFlow.withLoadingShared()
         .map { it.isLoading }
         .shareInBackground()
@@ -227,7 +223,7 @@ class MultisigOperationDetailsViewModel(
     }
 
     private fun checkOperationAvailability() = launchUnit {
-        val isOperationAvailable = isOperationAvailableFlow.first()
+        val isOperationAvailable = interactor.isOperationAvailable(payload.operation.toOperationId())
 
         if (!isOperationAvailable) {
             showErrorAndCloseScreen()
