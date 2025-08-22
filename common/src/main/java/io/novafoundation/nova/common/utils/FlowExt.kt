@@ -109,10 +109,6 @@ fun <T> MutableStateFlow<T>.updateValue(updater: (T) -> T) {
     value = updater(value)
 }
 
-suspend fun <T> MutableSharedFlow<T>.updateWithReplyCache(updater: (T?) -> T) {
-    emit(updater(replayCache.firstOrNull()))
-}
-
 fun <T> Flow<T>.withItemScope(parentScope: CoroutineScope): Flow<Pair<T, CoroutineScope>> {
     var currentScope: CoroutineScope? = null
 
