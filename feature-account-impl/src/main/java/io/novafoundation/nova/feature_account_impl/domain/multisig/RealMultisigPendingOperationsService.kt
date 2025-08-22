@@ -43,11 +43,6 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
 ) : SharedComputation(computationalCache), MultisigPendingOperationsService {
 
     context(ComputationalScope)
-    override fun operationAvailableFlow(id: PendingMultisigOperationId): Flow<Boolean> {
-        return getCachedSyncer().flatMapLatest { it.operationAvailableFlow(id) }
-    }
-
-    context(ComputationalScope)
     override fun performMultisigOperationsSync(): Flow<Unit> {
         return getCachedSyncer().map { }
     }

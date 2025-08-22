@@ -8,7 +8,7 @@ import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.getNameOrAddress
@@ -28,7 +28,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 class MultisigTransactionNewApprovalNotificationHandler(
     private val context: Context,
     private val accountRepository: AccountRepository,
-    private val multisigApprovalsRepository: MultisigApprovalsRepository,
+    private val multisigDetailsRepository: MultisigDetailsRepository,
     private val multisigCallFormatter: MultisigCallFormatter,
     private val configurator: MultisigOperationDeepLinkConfigurator,
     @LocalWithOnChainIdentity private val identityProvider: IdentityProvider,
@@ -62,7 +62,7 @@ class MultisigTransactionNewApprovalNotificationHandler(
 
         val approverIdentity = identityProvider.getNameOrAddress(payload.signatory.accountId, chain)
 
-        val approvals = multisigApprovalsRepository.getApprovals(chain, payload.multisig.accountId, payload.callHash)
+        val approvals = multisigDetailsRepository.getApprovals(chain, payload.multisig.accountId, payload.callHash)
 
         val messageText = getMessage(
             chain,

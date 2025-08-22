@@ -10,14 +10,12 @@ import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.updateWithReplyCache
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
-import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperationId
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
-import io.novafoundation.nova.feature_account_api.domain.multisig.intoCallHash
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.model.OnChainMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
@@ -74,8 +72,6 @@ interface MultisigPendingOperationsSyncer {
     val pendingOperationsCount: Flow<Int>
 
     val pendingOperations: Flow<List<PendingMultisigOperation>>
-
-    suspend fun operationAvailableFlow(operationId: PendingMultisigOperationId): Flow<Boolean>
 }
 
 internal class RealMultisigChainPendingOperationsSyncer(
@@ -112,10 +108,6 @@ internal class RealMultisigChainPendingOperationsSyncer(
         observePendingCallHashes()
 
         startOffChainRefreshJob()
-    }
-
-    override suspend fun operationAvailableFlow(operationId: PendingMultisigOperationId): Flow<Boolean> {
-        return pendingCallHashesFlow.map { set -> operationId.callHash.intoCallHash() in set }
     }
 
     private fun startOffChainRefreshJob() {

@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
@@ -107,6 +108,8 @@ interface MultisigOperationsFeatureDependencies {
     val automaticInteractionGate: AutomaticInteractionGate
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val multisigDetailsRepository: MultisigDetailsRepository
 
     fun dialogMessageManager(): DialogMessageManager
 
