@@ -18,7 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
@@ -80,6 +80,6 @@ interface PushNotificationsFeatureDependencies {
 
     fun buildTypeProvider(): BuildTypeProvider
 
-    @LocalWithOnChainIdentity
-    fun localWithOnChainIdentityProvider(): IdentityProvider
+    @LocalIdentity
+    fun localWithIdentityProvider(): IdentityProvider
 }

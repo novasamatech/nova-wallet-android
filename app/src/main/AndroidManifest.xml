@@ -198,6 +198,10 @@
             android:name="io.novafoundation.nova.staking_notification_channel_id"
             android:value="@string/staking_notification_channel_id" />
 
+        <meta-data
+            android:name="io.novafoundation.nova.multisigs_notification_channel_id"
+            android:value="@string/multisigs_notification_channel_id" />
+
         <meta-data android:name="io.branch.sdk.BranchKey" android:value="key_live_dsxlmUqNhbtOYX6e7cfgrpkbqsjGPYBf" />
 
         <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
