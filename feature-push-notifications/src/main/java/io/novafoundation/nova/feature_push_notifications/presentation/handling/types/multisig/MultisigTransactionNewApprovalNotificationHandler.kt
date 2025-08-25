@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_push_notifications.data.NotificationTypes
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationIdProvider
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.PushChainRegestryHolder
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.buildWithDefaults
+import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.requireType
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -57,23 +58,20 @@ class MultisigTransactionNewApprovalNotificationHandler(
         require(chain.isEnabled)
 
         val payload = content.extractMultisigPayload(signatoryRole = "approver", chain)
+        val approvals = content.extractPayloadFieldsWithPath<Double?>("approvals")?.toInt() ?: return true
 
         val multisigAccount = accountRepository.getMultisigForPayload(chain, payload) ?: return true
 
         val approverIdentity = identityProvider.getNameOrAddress(payload.signatory.accountId, chain)
 
-        val approvals = multisigDetailsRepository.getApprovals(chain, payload.multisig.accountId, payload.callHash)
-
         val messageText = getMessage(
             chain,
             payload,
-            footer = approvals?.let {
-                resourceManager.getString(
-                    R.string.multisig_notification_new_approval_title_additional_message,
-                    it.size,
-                    multisigAccount.threshold
-                )
-            }
+            footer = resourceManager.getString(
+                R.string.multisig_notification_new_approval_title_additional_message,
+                approvals,
+                multisigAccount.threshold
+            )
         )
 
         val notification = NotificationCompat.Builder(context, channelId)
