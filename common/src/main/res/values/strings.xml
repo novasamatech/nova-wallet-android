@@ -56,7 +56,6 @@
     <string name="multisigs_notification_channel_name">Multisig Transactions Notification Channel</string>
     <string name="multisigs_notification_channel_id" translatable="false">multisigs_notification_channel_id</string>
 
-    <!--<string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>-->
     <string name="push_wallets_title">Select up to %d wallets to be notified when wallet has activity</string>
 
     <string name="push_settings_multisig_operations">Multisig transactions</string>
@@ -68,7 +67,6 @@
     <string name="proxied_card_not_supported_title">Debit Card is not supported for this Proxied wallet</string>
     <string name="proxied_card_not_supported_message">To manage your Debit Card, please switch to a different wallet with Polkadot network.</string>
 
-    <!--<string name="referendum_full_details_hash">Call hash</string>-->
     <string name="common_call_hash">Call hash</string>
 
     <string name="common_copy_call_data">Copy call data</string>

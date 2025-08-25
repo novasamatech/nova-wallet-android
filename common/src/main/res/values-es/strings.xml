@@ -192,6 +192,7 @@
     <string name="add_proxy_maximum_reached_error_title">Se ha alcanzado el número máximo de proxies</string>
     <string name="added_networks_empty_placeholder">Las redes personalizadas agregadas\naquí aparecerán</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">Nova ha cambiado automáticamente a tu billetera multisig para que puedas ver las transacciones pendientes.</string>
     <string name="appearance_colored_icon_title">Coloreado</string>
     <string name="appearance_title">Apariencia</string>
     <string name="appearance_token_assets_title">iconos de token</string>
@@ -346,6 +347,7 @@
     <string name="common_bonus">Bono</string>
     <string name="common_call">Llamar</string>
     <string name="common_call_data">Datos de la llamada</string>
+    <string name="common_call_hash">Hash de la llamada</string>
     <string name="common_cancel">Cancelar</string>
     <string name="common_cancel_operation_warning">¿Estás seguro de que quieres cancelar esta operación?</string>
     <string name="common_cannot_find_app">Lo siento, no tienes la aplicación correcta para procesar esta solicitud</string>
@@ -831,6 +833,7 @@
     <string name="integrate_networks_banner_description">Integre todas las funciones de la red que está construyendo en Nova Wallet, haciéndola accesible para todos.</string>
     <string name="integrate_networks_banner_link">Integre su red</string>
     <string name="integrate_networks_banner_title">¿Construyendo para Polkadot?</string>
+    <string name="invalid_call_data_format_message">Los datos de la llamada que proporcionaste son inválidos o tienen el formato incorrecto. Por favor asegúrate de que sean correctos e inténtalo de nuevo.</string>
     <string name="invalid_call_data_message">Estos datos de la llamada son para otra operación con hash de llamada %s</string>
     <string name="invalid_call_data_title">Datos de la llamada no válidos</string>
     <string name="invalid_proxy_address_message">La dirección proxy debe ser una dirección %s válida</string>
@@ -878,6 +881,7 @@
     <string name="ledger_wallet_details_description">Esta cartera está emparejada con Ledger. Nova te ayudará a formar cualquier operación que desees, y se te solicitará firmarlas usando un dispositivo Ledger</string>
     <string name="ledher_import_select_address_title">Selecciona una cuenta para agregar a la cartera</string>
     <string name="loading_network_info">Cargando información de la red...</string>
+    <string name="loading_transaction_details">Cargando detalles de la transacción…</string>
     <string name="loocking_backup_progress">Buscando tu copia de seguridad...</string>
     <string name="make_payout_transaction_sent">Transacción de pago enviada</string>
     <string name="manage_assets_add_token">Agregar token</string>
@@ -923,18 +927,40 @@
     <string name="multisig_deposit">Depósito multisig</string>
     <string name="multisig_deposit_description">El depósito permanece bloqueado en la cuenta del depositante hasta que la operación multisig sea ejecutada o rechazada.</string>
     <string name="multisig_extrinsic_details_subtitle">Asegúrate de que la operación es correcta</string>
+    <string name="multisig_notification_executed_transaction_message">Firmado y ejecutado por %s.</string>
+    <string name="multisig_notification_executed_transaction_title">✅ Transacción multisig ejecutada</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s en %s.</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 Tu firma solicitada</string>
+    <string name="multisig_notification_initiator_footer">Iniciado por %s.</string>
+    <string name="multisig_notification_message_header">Billetera: %s</string>
+    <string name="multisig_notification_new_approval_title">Firmado por %s</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">%d de %d firmas recogidas.</string>
+    <string name="multisig_notification_on_behalf_of">En nombre de %s.</string>
+    <string name="multisig_notification_rejected_transaction_message">Rechazado por %s.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ Transacción multisig rechazada</string>
     <string name="multisig_on_behalf_of">En nombre de</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s: %s</string>
     <string name="multisig_operation_details_approve">Aprobar</string>
     <string name="multisig_operation_details_approve_and_execute">Aprobar y Ejecutar</string>
     <string name="multisig_operation_details_call_data_not_found">Ingresa datos de la llamada para ver detalles</string>
+    <string name="multisig_operation_details_not_found_message">La transacción ya ha sido ejecutada o rechazada.</string>
+    <string name="multisig_operation_details_not_found_title">El firmado ha terminado</string>
     <string name="multisig_operation_details_reject">Rechazar</string>
     <string name="multisig_operation_details_signatories" formatted="false">Firmantes (%d de %d)</string>
+    <string name="multisig_operation_utility_batch_all_title">Batch All (revierte en caso de error)</string>
+    <string name="multisig_operation_utility_batch_title">Batch (ejecuta hasta el error)</string>
+    <string name="multisig_operation_utility_force_batch_title">Force Batch (ignora errores)</string>
     <string name="multisig_operations_created">Creado por ti</string>
+    <string name="multisig_operations_placeholder">Aún no hay transacciones.\nLas solicitudes de firma aparecerán aquí</string>
     <string name="multisig_operations_progress" formatted="false">Firmando (%s de %s)</string>
     <string name="multisig_operations_signed">Firmado por ti</string>
     <string name="multisig_operations_unknown_calldata">Operación desconocida</string>
     <string name="multisig_pending_operations">Transacciones a firmar</string>
     <string name="multisig_pending_operations_on_behalf_of">En nombre de:</string>
+    <string name="multisig_push_settings_approval_switcher">Firmado por signatario</string>
+    <string name="multisig_push_settings_executed_switcher">Transacción multisig ejecutada</string>
+    <string name="multisig_push_settings_initial_switcher">Tu firma solicitada</string>
+    <string name="multisig_push_settings_rejected_switcher">Transacción multisig rechazada</string>
     <string name="multisig_sell_not_supported_message">Para vender cripto por fiat, por favor cambia a un tipo diferente de billetera.</string>
     <string name="multisig_sell_not_supported_title">La venta no es compatible para Multisig</string>
     <string name="multisig_signatory">Firmante:</string>
@@ -950,9 +976,19 @@
     <string name="multisig_transaction_created_subtitle_highlight">Transacciones a firmar</string>
     <string name="multisig_transaction_created_title">Transacción multifirma creada</string>
     <string name="multisig_transaction_created_view_details">Ver detalles</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">Transacción sin información inicial en cadena (datos de la llamada) fue rechazada</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s en %s.\nNo se requieren más acciones de tu parte.</string>
+    <string name="multisig_transaction_executed_dialog_title">Transacción Multisig Ejecutada</string>
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s en %s.\nRechazado por: %s.\nNo se requieren más acciones de tu parte.</string>
+    <string name="multisig_transaction_rejected_dialog_title">Transacción Multisig Rechazada</string>
     <string name="multisig_wallet_details_info_warning">Las transacciones de esta billetera requieren aprobación de múltiples firmantes. Tu cuenta es uno de los firmantes:</string>
     <string name="multisig_wallet_details_info_warning_other_signatories">Otros firmantes:</string>
     <string name="multisig_wallet_details_info_warning_title" formatted="false">Umbral %d de %d</string>
+    <string name="multisigs_notification_channel_name">Canal de Notificaciones de Transacciones Multisig</string>
+    <string name="mutisigs_push_notifications_warning_enable">Activar en Configuración</string>
+    <string name="mutisigs_push_notifications_warning_message">Recibe notificaciones sobre solicitudes de firma, nuevas firmas y transacciones completadas, para que siempre tengas el control. Adminístralo en cualquier momento desde Configuración.</string>
+    <string name="mutisigs_push_notifications_warning_title">¡Notificaciones push multisig están aquí!</string>
     <string name="network_already_exist_failure_title">Este Nodo ya existe</string>
     <string name="network_fee">Comisión de red</string>
     <string name="network_info_address">Dirección del nodo</string>
@@ -971,6 +1007,8 @@
     <string name="nft_owned_by">Propiedad de</string>
     <string name="nft_price_not_listed">Sin precio</string>
     <string name="nft_your_nfts">Tus NFTs</string>
+    <string name="no_ms_accounts_found_dialog_message">No has añadido o seleccionado ninguna billetera multisig en Nova. Añade y selecciona al menos una para recibir notificaciones push multisig.</string>
+    <string name="no_ms_accounts_found_dialog_title">No hay billeteras multisig</string>
     <string name="node_already_exist_failure_message">La URL que ingresaste ya existe como el Nodo \"%s\".</string>
     <string name="node_already_exist_failure_title">Este Nodo ya existe</string>
     <string name="node_not_alive_message">La URL del Nodo que ingresaste no está respondiendo o contiene un formato incorrecto. El formato de la URL debe comenzar con \"wss://\".</string>
@@ -1048,6 +1086,8 @@
     <string name="profile_settings_pin_code_verification_title">Aprobar con PIN</string>
     <string name="profile_settings_safe_mode_title">Modo seguro</string>
     <string name="profile_settings_title">Configuración</string>
+    <string name="proxied_card_not_supported_message">Para administrar tu Tarjeta de Débito, por favor cambia a una billetera diferente con la red Polkadot.</string>
+    <string name="proxied_card_not_supported_title">La Tarjeta de Débito no es compatible con esta billetera Proxied</string>
     <string name="proxied_wallet_details_info_warning">Esta cuenta otorgó acceso para realizar transacciones a la siguiente cuenta:</string>
     <string name="proxy_access_type_staking_operations">Operaciones de staking</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">La cuenta delegada %s no tiene suficiente saldo para pagar la tarifa de red de %s. Saldo disponible para pagar la tarifa: %s</string>
@@ -1075,6 +1115,7 @@
     <string name="push_settings_announcements">Anuncios de Nova</string>
     <string name="push_settings_balances">Balances</string>
     <string name="push_settings_enable">Activar notificaciones</string>
+    <string name="push_settings_multisig_operations">Transacciones de multisig</string>
     <string name="push_settings_no_selected_wallets">No recibirás notificaciones sobre Actividades de Carteras (Balances, Staking) porque no has seleccionado ninguna cartera</string>
     <string name="push_settings_others">Otros</string>
     <string name="push_settings_received_tokens">Tokens recibidos</string>
@@ -1092,7 +1133,7 @@
     <string name="push_token_sent_message" formatted="false">Enviado %s a %s en %s</string>
     <string name="push_token_sent_no_account_name_title">💸 Enviado</string>
     <string name="push_token_sent_title">💸 Enviado %s</string>
-    <string name="push_wallets_title">Seleccione hasta 3 billeteras para ser notificado cuando la billetera tenga actividad</string>
+    <string name="push_wallets_title">Selecciona hasta %d billeteras para ser notificado cuando la billetera tenga actividad</string>
     <string name="push_welcome_enable_button">Habilitar notificaciones push</string>
     <string name="push_welcome_message">Reciba notificaciones sobre operaciones de Wallet, actualizaciones de Gobernanza, actividad de Staking y Seguridad, para que siempre esté informado</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Al habilitar las notificaciones push, acepta nuestros %s y %s</string>
@@ -1131,7 +1172,6 @@
     <string name="referendum_full_details_beneficiary">Beneficiario</string>
     <string name="referendum_full_details_deposit">Depósito</string>
     <string name="referendum_full_details_electorate">Electorado</string>
-    <string name="referendum_full_details_hash">Hash de llamada</string>
     <string name="referendum_full_details_long_for_preview">Demasiado largo para previsualización</string>
     <string name="referendum_full_details_parameters_json">Parámetros JSON</string>
     <string name="referendum_full_details_proposer">Propositor</string>
