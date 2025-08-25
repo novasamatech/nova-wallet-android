@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.getNameOrAddress
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.applyDeepLink
@@ -31,7 +31,7 @@ class MultisigTransactionNewApprovalNotificationHandler(
     private val multisigDetailsRepository: MultisigDetailsRepository,
     private val multisigCallFormatter: MultisigCallFormatter,
     private val configurator: MultisigOperationDeepLinkConfigurator,
-    @LocalWithOnChainIdentity private val identityProvider: IdentityProvider,
+    @LocalIdentity private val identityProvider: IdentityProvider,
     override val chainRegistry: ChainRegistry,
     activityIntentProvider: ActivityIntentProvider,
     notificationIdProvider: NotificationIdProvider,

@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
@@ -234,7 +234,7 @@ class NotificationHandlersModule {
         gson: Gson,
         notificationManager: NotificationManagerCompat,
         resourceManager: ResourceManager,
-        @LocalWithOnChainIdentity identityProvider: IdentityProvider
+        @LocalIdentity identityProvider: IdentityProvider
     ): NotificationHandler {
         return MultisigTransactionInitiatedNotificationHandler(
             context,
@@ -257,12 +257,12 @@ class NotificationHandlersModule {
         context: Context,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        multisigDetailsRepository: MultisigDetailsRepository,
+        @LocalIdentity identityProvider: IdentityProvider,
         activityIntentProvider: ActivityIntentProvider,
         notificationIdProvider: NotificationIdProvider,
         multisigCallFormatter: MultisigCallFormatter,
         configurator: MultisigOperationDeepLinkConfigurator,
-        multisigDetailsRepository: MultisigDetailsRepository,
         gson: Gson,
         notificationManager: NotificationManagerCompat,
         resourceManager: ResourceManager,
@@ -290,7 +290,7 @@ class NotificationHandlersModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         configurator: MultisigOperationDeepLinkConfigurator,
-        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        @LocalIdentity identityProvider: IdentityProvider,
         activityIntentProvider: ActivityIntentProvider,
         notificationIdProvider: NotificationIdProvider,
         multisigCallFormatter: MultisigCallFormatter,
@@ -320,7 +320,7 @@ class NotificationHandlersModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         configurator: MultisigOperationDeepLinkConfigurator,
-        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        @LocalIdentity identityProvider: IdentityProvider,
         activityIntentProvider: ActivityIntentProvider,
         notificationIdProvider: NotificationIdProvider,
         multisigCallFormatter: MultisigCallFormatter,
