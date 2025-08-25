@@ -18,10 +18,6 @@ class RealMultisigDetailsRepository @Inject constructor(
     @Named(REMOTE_STORAGE_SOURCE) private val remoteStorageSource: StorageDataSource
 ) : MultisigDetailsRepository {
 
-    override suspend fun getApprovals(chain: Chain, accountIdKey: AccountIdKey, callHash: CallHash): List<AccountIdKey>? {
-        return getOnChainMultisig(chain, accountIdKey, callHash)?.approvals
-    }
-
     override suspend fun hasMultisigOperation(chain: Chain, accountIdKey: AccountIdKey, callHash: CallHash): Boolean {
         return getOnChainMultisig(chain, accountIdKey, callHash) != null
     }
