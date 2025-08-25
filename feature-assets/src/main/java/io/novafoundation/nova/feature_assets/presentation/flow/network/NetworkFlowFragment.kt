@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.applySystemBarInsets
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentNetworkFlowBinding
@@ -39,7 +39,7 @@ abstract class NetworkFlowFragment<T : NetworkFlowViewModel> :
     }
 
     override fun applyInsets(rootView: View) {
-        binder.networkFlowToolbar.applySystemBarInsets()
+        binder.networkFlowToolbar.applyStatusBarInsets()
         binder.networkFlowList.applyNavigationBarInsets()
     }
 

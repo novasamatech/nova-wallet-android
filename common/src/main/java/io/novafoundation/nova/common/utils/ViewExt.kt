@@ -26,6 +26,8 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.getColorOrThrow
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -352,7 +354,7 @@ fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
 }
 
 fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(navigationBars = true, systemGestures = true, ime = imeInsets) {
+    type(navigationBars = true, ime = imeInsets) {
         padding(bottom = true)
     }
 
@@ -360,7 +362,7 @@ fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = 
 }
 
 fun View.applySystemBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(statusBars = true, navigationBars = true, systemGestures = true, ime = imeInsets) {
+    type(statusBars = true, navigationBars = true, ime = imeInsets) {
         padding(top = true, bottom = true)
     }
 

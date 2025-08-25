@@ -2,7 +2,7 @@ package io.novafoundation.nova.app.root.presentation.splitScreen
 
 import androidx.core.graphics.Insets
 
-fun Insets.withoutBottom(bottomInset: Int): Insets {
+fun Insets.decreaseBottom(bottomInset: Int): Insets {
     return Insets.of(
         left,
         top,

@@ -41,7 +41,7 @@ class AssetSearchFragment :
 
     override fun applyInsets(rootView: View) {
         binder.searchAssetSearch.applyStatusBarInsets()
-        binder.searchAssetContainer.applyNavigationBarInsets(consume = false, imeInsets = true)
+        binder.searchAssetList.applyNavigationBarInsets(imeInsets = true)
     }
 
     override fun initViews() {

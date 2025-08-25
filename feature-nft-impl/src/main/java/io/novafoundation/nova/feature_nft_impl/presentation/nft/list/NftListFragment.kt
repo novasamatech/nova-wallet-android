@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_nft_impl.presentation.nft.list
 
+import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_nft_impl.databinding.FragmentNftListBinding
@@ -18,6 +21,11 @@ class NftListFragment : BaseFragment<NftListViewModel, FragmentNftListBinding>()
     lateinit var imageLoader: ImageLoader
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { NftAdapter(imageLoader, this) }
+
+    override fun applyInsets(rootView: View) {
+        binder.nftListToolbar.applyStatusBarInsets()
+        binder.nftListNfts.applyNavigationBarInsets()
+    }
 
     override fun initViews() {
         binder.nftListBack.setOnClickListener { viewModel.backClicked() }
