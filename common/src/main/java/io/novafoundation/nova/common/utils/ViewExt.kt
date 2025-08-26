@@ -26,8 +26,6 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StyleableRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.res.getColorOrThrow
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.widget.TextViewCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.LinearLayoutManager
