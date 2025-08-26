@@ -352,7 +352,7 @@ fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
 }
 
 fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(navigationBars = true, systemGestures = true, ime = imeInsets) {
+    type(navigationBars = true, ime = imeInsets) {
         padding(bottom = true)
     }
 
@@ -360,7 +360,7 @@ fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = 
 }
 
 fun View.applySystemBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(statusBars = true, navigationBars = true, systemGestures = true, ime = imeInsets) {
+    type(statusBars = true, navigationBars = true, ime = imeInsets) {
         padding(top = true, bottom = true)
     }
 

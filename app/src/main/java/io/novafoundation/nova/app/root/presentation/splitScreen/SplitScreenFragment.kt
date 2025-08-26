@@ -110,11 +110,10 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel, FragmentSplitScre
         ViewCompat.setOnApplyWindowInsetsListener(binder.mainNavHost) { _, insets ->
             val insetsBuilder = WindowInsetsCompat.Builder(insets)
             // We need to remove height from ime inset to don't show dapp entry point when keyboard is shown
-            insetsBuilder.setInsets(Type.ime(), insets.getInsets(Type.ime()).withoutBottom(dappEntryPointHeight))
+            insetsBuilder.setInsets(Type.ime(), insets.getInsets(Type.ime()).decreaseBottom(dappEntryPointHeight))
 
             // We also remove other navigation ans gestures insets since dappEntryPoint must use them instead of any nested fragment
             insetsBuilder.setInsets(Type.navigationBars(), insets.getInsets(Type.navigationBars()).removeBottom(dappEntryPointShown))
-            insetsBuilder.setInsets(Type.systemGestures(), insets.getInsets(Type.systemGestures()).removeBottom(dappEntryPointShown))
             insetsBuilder.build()
         }
 
