@@ -51,15 +51,16 @@
             android:id="@+id/enableMultisigPushesNotNow"
             style="@style/Widget.Nova.MaterialButton.Secondary"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginEnd="6dp"
             android:layout_weight="1"
             android:text="@string/common_not_now" />
 
-        <io.novafoundation.nova.common.view.PrimaryButton
+        <io.novafoundation.nova.common.view.PrimaryButtonV2
             android:id="@+id/enableMultisigPushesEnable"
+            style="@style/Widget.Nova.MaterialButton.Primary"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginStart="6dp"
             android:layout_weight="1"
             android:text="@string/mutisigs_push_notifications_warning_enable" />
