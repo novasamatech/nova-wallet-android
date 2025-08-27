@@ -63,7 +63,7 @@
             android:layout_height="match_parent"
             android:layout_marginStart="6dp"
             android:layout_weight="1"
-            android:text="@string/mutisigs_push_notifications_warning_enable" />
+            android:text="@string/common_enable" />
 
     </LinearLayout>
 
