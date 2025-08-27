@@ -37,7 +37,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.allSignatories
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
-import io.novafoundation.nova.feature_account_api.domain.model.requireMultisigAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
