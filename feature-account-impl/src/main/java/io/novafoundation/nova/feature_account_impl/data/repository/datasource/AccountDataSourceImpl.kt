@@ -173,6 +173,10 @@ class AccountDataSourceImpl(
         return metaAccountDao.hasMetaAccountsByType(mapMetaAccountTypeToLocal(type))
     }
 
+    override suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: LightMetaAccount.Type): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(metaIds, mapMetaAccountTypeToLocal(type))
+    }
+
     override suspend fun getActiveMetaAccountsQuantity(): Int {
         return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
     }
