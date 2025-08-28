@@ -268,6 +268,9 @@ interface MetaAccountDao {
     @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE type = :type)")
     suspend fun hasMetaAccountsByType(type: MetaAccountLocal.Type): Boolean
 
+    @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE id IN (:metaIds) AND type = :type)")
+    suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: MetaAccountLocal.Type): Boolean
+
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)
 

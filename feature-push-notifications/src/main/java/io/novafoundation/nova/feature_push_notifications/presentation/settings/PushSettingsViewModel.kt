@@ -45,7 +45,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 private const val MIN_WALLETS = 1
@@ -124,16 +123,7 @@ class PushSettingsViewModel(
     private fun initFirstState() {
         launch {
             val settings = oldPushSettingsState.first()
-            val currentlyEnabledAccounts = settings.subscribedMetaAccounts
-            val unavailableMetaIds = pushNotificationsInteractor.filterUnavailableMetaIds(currentlyEnabledAccounts)
-            if (unavailableMetaIds.isNotEmpty()) {
-                // Remove already unavailable accounts from list
-                val availableAccountIds = currentlyEnabledAccounts - unavailableMetaIds
-                val multisigsState = getValidMultisigsStateForAccounts(availableAccountIds)
-                pushSettingsState.value = settings.copy(subscribedMetaAccounts = availableAccountIds, multisigs = multisigsState)
-            } else {
-                pushSettingsState.value = settings
-            }
+            pushSettingsState.value = pushNotificationsInteractor.filterAvailableMetaIdsAndGetNewState(settings)
 
             openWalletSelectionIfRequested()
         }
@@ -238,33 +228,12 @@ class PushSettingsViewModel(
     private fun subscribeOnSelectWallets() {
         walletRequester.responseFlow
             .onEach { response ->
-                val multisigsState = getValidMultisigsStateForAccounts(response.selectedMetaIds)
+                val currentState = pushSettingsState.value ?: return@onEach
+                val newPushSettingsState = pushNotificationsInteractor.getNewStateForChangedMetaAccounts(currentState, response.selectedMetaIds)
 
-                pushSettingsState.update { pushSettingsState.value?.copy(subscribedMetaAccounts = response.selectedMetaIds, multisigs = multisigsState) }
+                pushSettingsState.value = newPushSettingsState
             }
             .launchIn(this)
-    }
-
-    /**
-     * Since we need to manage multisig notifications state depends on selected accounts we follow this rules to achieve that
-     * - If no multisig wallets was selected - we always disable multisig notifications
-     * - If current multisig settings was enabled - do nothing
-     * - If current multisig state is disabled and we never enabled multisigs notifications - enable multisig notifications automatically
-     * - Otherwise - return current state
-     */
-    private suspend fun getValidMultisigsStateForAccounts(newSelectedAccounts: Set<Long>): PushSettings.MultisigsState {
-        val noOneMultisigWasSelected = !newSelectedAccounts.atLeastOneMultisigWalletEnabled()
-        if (noOneMultisigWasSelected) return PushSettings.MultisigsState.disabled()
-
-        val currentMultisigsSettings = pushSettingsState.value?.multisigs ?: return PushSettings.MultisigsState.disabled()
-        if (currentMultisigsSettings.isEnabled) return currentMultisigsSettings
-
-        val multisigNotificationsStillWasNotEnabled = !pushNotificationsInteractor.isMultisigsWasEnabledFirstTime()
-        return if (multisigNotificationsStillWasNotEnabled) {
-            PushSettings.MultisigsState.enabled()
-        } else {
-            currentMultisigsSettings
-        }
     }
 
     private fun subscribeOnGovernanceSettings() {

@@ -112,6 +112,8 @@ interface AccountDataSource : SecretStoreV1 {
     fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>>
 
     suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean
+
+    suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: LightMetaAccount.Type): Boolean
 }
 
 suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {

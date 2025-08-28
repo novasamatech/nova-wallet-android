@@ -134,6 +134,8 @@ interface AccountRepository {
 
     suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean
 
+    suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: LightMetaAccount.Type): Boolean
+
     suspend fun generateRestoreJson(metaAccount: MetaAccount, password: String): String
 
     suspend fun hasSecretsAccounts(): Boolean
@@ -142,5 +144,5 @@ interface AccountRepository {
 
     suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount>
 
-    suspend fun getUnavailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long>
+    suspend fun getAvailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long>
 }

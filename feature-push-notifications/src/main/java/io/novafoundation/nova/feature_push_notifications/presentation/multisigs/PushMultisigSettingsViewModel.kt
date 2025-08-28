@@ -51,13 +51,15 @@ class PushMultisigSettingsViewModel(
 
     fun switchMultisigNotificationsState() {
         val noMultisigWalletSelected = !request.isAtLeastOneMultisigWalletSelected
-        if (noMultisigWalletSelected) {
+        if (isMultisigNotificationsDisabled() && noMultisigWalletSelected) {
             _noOneMultisigWalletSelectedEvent.sendEvent()
             return
         }
 
         toggleMultisigEnablingState()
     }
+
+    private fun isMultisigNotificationsDisabled() = !settingsState.value.isEnabled
 
     private fun toggleMultisigEnablingState() {
         settingsState.update {

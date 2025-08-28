@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsAvailabilityState
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
@@ -37,7 +38,9 @@ interface PushNotificationsInteractor {
 
     suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>)
 
-    suspend fun filterUnavailableMetaIds(metaIds: Set<Long>): Set<Long>
+    suspend fun filterAvailableMetaIdsAndGetNewState(pushSettings: PushSettings): PushSettings
+
+    suspend fun getNewStateForChangedMetaAccounts(currentSettings: PushSettings, newMetaIds: Set<Long>): PushSettings
 }
 
 class RealPushNotificationsInteractor(
@@ -111,14 +114,30 @@ class RealPushNotificationsInteractor(
             subscribedAccountsAffected -> {
                 val newSubscribedMetaAccounts = pushSettings.subscribedMetaAccounts - deleted.toSet()
                 val newEnabledState = notificationsEnabled && newSubscribedMetaAccounts.isNotEmpty()
-                val newPushSettingsOrNull = pushSettings.copy(subscribedMetaAccounts = newSubscribedMetaAccounts)
-                    .takeIf { newEnabledState }
-                pushNotificationsService.updatePushSettings(enabled = newEnabledState, pushSettings = newPushSettingsOrNull)
+                val newPushSettings = getNewStateForChangedMetaAccounts(pushSettings, newSubscribedMetaAccounts)
+                pushNotificationsService.updatePushSettings(enabled = newEnabledState, pushSettings = newPushSettings)
             }
         }
     }
 
-    override suspend fun filterUnavailableMetaIds(metaIds: Set<Long>): Set<Long> {
-        return accountRepository.getUnavailableMetaIdsFromSet(metaIds)
+    override suspend fun filterAvailableMetaIdsAndGetNewState(pushSettings: PushSettings): PushSettings {
+        val availableMetaIds = accountRepository.getAvailableMetaIdsFromSet(pushSettings.subscribedMetaAccounts)
+        if (availableMetaIds == pushSettings.subscribedMetaAccounts) return pushSettings
+
+        return getNewStateForChangedMetaAccounts(pushSettings, availableMetaIds)
+    }
+
+    override suspend fun getNewStateForChangedMetaAccounts(currentSettings: PushSettings, newMetaIds: Set<Long>): PushSettings {
+        val noMultisigWalletsForNewAccounts = !accountRepository.hasMetaAccountsByType(newMetaIds, LightMetaAccount.Type.MULTISIG)
+        if (noMultisigWalletsForNewAccounts) {
+            val disabledMultisigSettings = PushSettings.MultisigsState.disabled()
+            return currentSettings.copy(subscribedMetaAccounts = newMetaIds, multisigs = disabledMultisigSettings)
+        }
+
+        return if (!currentSettings.multisigs.isEnabled) {
+            currentSettings.copy(subscribedMetaAccounts = newMetaIds, multisigs = PushSettings.MultisigsState.enabled())
+        } else {
+            currentSettings.copy(subscribedMetaAccounts = newMetaIds)
+        }
     }
 }

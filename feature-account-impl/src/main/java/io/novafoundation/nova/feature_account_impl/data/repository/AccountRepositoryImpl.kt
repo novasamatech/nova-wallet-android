@@ -109,9 +109,9 @@ class AccountRepositoryImpl(
         return accountDataSource.getMetaAccountsByIds(metaIds)
     }
 
-    override suspend fun getUnavailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long> {
+    override suspend fun getAvailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long> {
         val availableMetaIds = accountDataSource.getActiveMetaIds()
-        return metaIds - availableMetaIds
+        return metaIds.intersect(availableMetaIds)
     }
 
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
@@ -308,6 +308,10 @@ class AccountRepositoryImpl(
 
     override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
         return accountDataSource.hasMetaAccountsByType(type)
+    }
+
+    override suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: LightMetaAccount.Type): Boolean {
+        return accountDataSource.hasMetaAccountsByType(metaIds, type)
     }
 
     override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
