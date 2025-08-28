@@ -5,8 +5,9 @@ import androidx.lifecycle.lifecycleScope
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applySystemBarInsets
+import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
 import io.novafoundation.nova.common.view.ChipActionsAdapter
 import io.novafoundation.nova.common.view.setState
@@ -24,7 +25,7 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
     override fun createBinding() = FragmentCreateWatchWalletBinding.inflate(layoutInflater)
 
     override fun applyInsets(rootView: View) {
-        binder.createWatchWalletContainer.applySystemBarInsets(imeInsets = true)
+        binder.createWatchWalletContainer.applySystemBarInsets(imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
     }
 
     override fun initViews() {

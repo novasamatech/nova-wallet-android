@@ -10,9 +10,10 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.onLoaded
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.view.dialog.warningDialog
@@ -46,7 +47,7 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
 
     override fun applyInsets(rootView: View) {
         binder.searchDappSearch.applyStatusBarInsets()
-        binder.searchDappSearhContainer.applyNavigationBarInsets(consume = false, imeInsets = true)
+        binder.searchDappSearhContainer.applyNavigationBarInsets(consume = false, imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
     }
 
     override fun initViews() {

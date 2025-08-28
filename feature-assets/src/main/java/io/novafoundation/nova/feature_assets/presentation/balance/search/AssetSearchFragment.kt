@@ -5,9 +5,10 @@ import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
@@ -41,7 +42,7 @@ class AssetSearchFragment :
 
     override fun applyInsets(rootView: View) {
         binder.searchAssetSearch.applyStatusBarInsets()
-        binder.searchAssetList.applyNavigationBarInsets(imeInsets = true)
+        binder.searchAssetList.applyNavigationBarInsets(imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
     }
 
     override fun initViews() {

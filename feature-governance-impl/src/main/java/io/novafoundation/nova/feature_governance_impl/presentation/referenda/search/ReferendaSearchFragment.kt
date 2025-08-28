@@ -6,9 +6,10 @@ import androidx.recyclerview.widget.ConcatAdapter
 
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
@@ -27,7 +28,7 @@ class ReferendaSearchFragment : BaseReferendaListFragment<ReferendaSearchViewMod
 
     override fun applyInsets(rootView: View) {
         binder.searchReferendaToolbar.applyStatusBarInsets()
-        binder.root.applyNavigationBarInsets(consume = false, imeInsets = true)
+        binder.root.applyNavigationBarInsets(consume = false, imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
     }
 
     override fun initViews() {

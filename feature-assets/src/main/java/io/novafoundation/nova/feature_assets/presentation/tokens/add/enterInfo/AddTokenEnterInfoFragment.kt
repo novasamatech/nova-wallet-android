@@ -8,8 +8,9 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applySystemBarInsets
+import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_assets.databinding.FragmentAddTokenEnterInfoBinding
@@ -32,7 +33,7 @@ class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel, Fragm
     lateinit var imageLoader: ImageLoader
 
     override fun applyInsets(rootView: View) {
-        binder.root.applySystemBarInsets(imeInsets = true)
+        binder.root.applySystemBarInsets(imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
     }
 
     override fun initViews() {
