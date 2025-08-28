@@ -351,10 +351,20 @@ fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
     consume(consume)
 }
 
-fun View.applyImeInsetts() = applyInsetter {
-    type(ime = true) {
-        padding()
+fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
+    type(navigationBars = true, ime = imeInsets) {
+        padding(bottom = true)
     }
+
+    consume(consume)
+}
+
+fun View.applySystemBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
+    type(statusBars = true, navigationBars = true, ime = imeInsets) {
+        padding(top = true, bottom = true)
+    }
+
+    consume(consume)
 }
 
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))

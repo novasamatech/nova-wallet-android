@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChai
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_assets.databinding.FragmentAddTokenSelectChainBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -24,8 +23,6 @@ class AddTokenSelectChainFragment :
     }
 
     override fun initViews() {
-        binder.addTokenSelectChainToolbar.applyStatusBarInsets()
-
         binder.addTokenSelectChainChains.setHasFixedSize(true)
         binder.addTokenSelectChainChains.adapter = chainsAdapter
 

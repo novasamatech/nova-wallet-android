@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_push_notifications.domain.interactor
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsAvailabilityState
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
+import io.novafoundation.nova.feature_push_notifications.data.repository.PushSettingsRepository
 import io.novafoundation.nova.feature_push_notifications.data.settings.PushSettingsProvider
 import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
 import kotlinx.coroutines.flow.Flow
@@ -21,19 +23,28 @@ interface PushNotificationsInteractor {
 
     suspend fun getDefaultSettings(): PushSettings
 
+    suspend fun getMetaAccounts(metaIds: List<Long>): List<MetaAccount>
+
     fun isPushNotificationsEnabled(): Boolean
+
+    fun isMultisigsWasEnabledFirstTime(): Boolean
+
+    fun setMultisigsWasEnabledFirstTime()
 
     fun pushNotificationsAvailabilityState(): PushNotificationsAvailabilityState
 
     fun isPushNotificationsAvailable(): Boolean
 
     suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>)
+
+    suspend fun filterUnavailableMetaIds(metaIds: Set<Long>): Set<Long>
 }
 
 class RealPushNotificationsInteractor(
     private val pushNotificationsService: PushNotificationsService,
     private val pushSettingsProvider: PushSettingsProvider,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val pushSettingsRepository: PushSettingsRepository
 ) : PushNotificationsInteractor {
 
     override suspend fun initialSyncSettings() {
@@ -60,8 +71,20 @@ class RealPushNotificationsInteractor(
         return pushSettingsProvider.getDefaultPushSettings()
     }
 
+    override suspend fun getMetaAccounts(metaIds: List<Long>): List<MetaAccount> {
+        return accountRepository.getMetaAccountsByIds(metaIds)
+    }
+
     override fun isPushNotificationsEnabled(): Boolean {
         return pushSettingsProvider.isPushNotificationsEnabled()
+    }
+
+    override fun isMultisigsWasEnabledFirstTime(): Boolean {
+        return pushSettingsRepository.isMultisigsWasEnabledFirstTime()
+    }
+
+    override fun setMultisigsWasEnabledFirstTime() {
+        pushSettingsRepository.setMultisigsWasEnabledFirstTime()
     }
 
     override fun isPushNotificationsAvailable(): Boolean {
@@ -73,7 +96,7 @@ class RealPushNotificationsInteractor(
     }
 
     override suspend fun onMetaAccountChange(changed: List<Long>, deleted: List<Long>) {
-        if (changed.isEmpty() || deleted.isEmpty()) return
+        if (changed.isEmpty() && deleted.isEmpty()) return
 
         val notificationsEnabled = pushSettingsProvider.isPushNotificationsEnabled()
         val noAccounts = accountRepository.getActiveMetaAccountsQuantity() == 0
@@ -86,9 +109,16 @@ class RealPushNotificationsInteractor(
             notificationsEnabled && noAccounts -> pushNotificationsService.updatePushSettings(enabled = false, pushSettings = null)
             noAccounts -> pushSettingsProvider.updateSettings(pushWalletSettings = null)
             subscribedAccountsAffected -> {
-                val newPushSettings = pushSettings.copy(subscribedMetaAccounts = pushSettings.subscribedMetaAccounts - deleted.toSet())
-                pushNotificationsService.updatePushSettings(notificationsEnabled, newPushSettings)
+                val newSubscribedMetaAccounts = pushSettings.subscribedMetaAccounts - deleted.toSet()
+                val newEnabledState = notificationsEnabled && newSubscribedMetaAccounts.isNotEmpty()
+                val newPushSettingsOrNull = pushSettings.copy(subscribedMetaAccounts = newSubscribedMetaAccounts)
+                    .takeIf { newEnabledState }
+                pushNotificationsService.updatePushSettings(enabled = newEnabledState, pushSettings = newPushSettingsOrNull)
             }
         }
+    }
+
+    override suspend fun filterUnavailableMetaIds(metaIds: Set<Long>): Set<Long> {
+        return accountRepository.getUnavailableMetaIdsFromSet(metaIds)
     }
 }

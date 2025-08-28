@@ -67,8 +67,6 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.RealStakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.DirectStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
@@ -184,15 +182,10 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingStoriesDataSource(): StakingStoriesDataSource = StakingStoriesDataSourceImpl()
-
-    @Provides
-    @FeatureScope
     fun provideStakingRepository(
         accountStakingDao: AccountStakingDao,
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        stakingStoriesDataSource: StakingStoriesDataSource,
         walletConstants: WalletConstants,
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
@@ -201,7 +194,6 @@ class StakingFeatureModule {
         accountStakingDao = accountStakingDao,
         remoteStorage = remoteStorageSource,
         localStorage = localStorageSource,
-        stakingStoriesDataSource = stakingStoriesDataSource,
         walletConstants = walletConstants,
         chainRegistry = chainRegistry,
         storageCache = storageCache,

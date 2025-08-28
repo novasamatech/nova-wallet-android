@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool
 
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.dynamicFees
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.WeightedEdge
@@ -11,6 +12,10 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationAssetType
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcher
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcherFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.fromAsset
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.OmniPool
@@ -20,13 +25,13 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteIdAndLocalAsset
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.feeParamsConstant
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.quote
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.subscribeToTransferableBalance
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -43,11 +48,16 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
+import javax.inject.Inject
+import javax.inject.Named
 
-class OmniPoolQuotingSourceFactory(
+@FeatureScope
+class OmniPoolQuotingSourceFactory @Inject constructor(
+    @Named(REMOTE_STORAGE_SOURCE)
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val hydrationBalanceFetcherFactory: HydrationBalanceFetcherFactory
 ) : HydraDxQuotingSource.Factory<OmniPoolQuotingSource> {
 
     companion object {
@@ -60,6 +70,7 @@ class OmniPoolQuotingSourceFactory(
             remoteStorageSource = remoteStorageSource,
             chainRegistry = chainRegistry,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
+            hydrationBalanceFetcher = hydrationBalanceFetcherFactory.create(host),
             chain = chain,
         )
     }
@@ -69,6 +80,7 @@ private class RealOmniPoolQuotingSource(
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val hydrationBalanceFetcher: HydrationBalanceFetcher,
     private val chain: Chain,
 ) : OmniPoolQuotingSource {
 
@@ -121,7 +133,9 @@ private class RealOmniPoolQuotingSource(
         val poolAccountId = omniPoolAccountId()
 
         val omniPoolBalancesFlow = pooledAssets.map { (omniPoolTokenId, chainAsset) ->
-            remoteStorageSource.subscribeToTransferableBalance(chainAsset, poolAccountId, subscriptionBuilder).map {
+            val hydrationAssetType = HydrationAssetType.fromAsset(chainAsset, omniPoolTokenId)
+
+            hydrationBalanceFetcher.subscribeToTransferableBalance(chainAsset.chainId, hydrationAssetType, poolAccountId, subscriptionBuilder).map {
                 omniPoolTokenId to it
             }
         }

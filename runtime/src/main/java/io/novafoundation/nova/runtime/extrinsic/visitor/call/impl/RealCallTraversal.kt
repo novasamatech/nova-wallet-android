@@ -42,13 +42,12 @@ internal class RealCallTraversal(
             origin = initialOrigin
         )
 
-        nestedVisit(visitor, rootVisit, depth = 0)
+        nestedVisit(visitor, rootVisit)
     }
 
     private fun nestedVisit(
         visitor: CallVisitor,
-        visitedCall: NestedCallVisit,
-        depth: Int,
+        visitedCall: NestedCallVisit
     ) {
         val nestedNode = findNestedNode(visitedCall.call)
 
@@ -58,16 +57,15 @@ internal class RealCallTraversal(
             val call = visitedCall.call
             val display = "${call.module.name}.${call.function.name}"
             val origin = visitedCall.origin
-            val newLogger = IndentVisitorLogger(indent = depth + 1)
+            val newLogger = IndentVisitorLogger()
 
             newLogger.info("Visited leaf: $display, origin: ${origin.value.toAddress(42)}")
 
             visitor.visit(publicVisit)
         } else {
-            val newLogger = IndentVisitorLogger(indent = depth)
+            val newLogger = IndentVisitorLogger()
 
             val context = RealCallVisitingContext(
-                depth = depth,
                 origin = visitedCall.origin,
                 visitor = visitor,
                 logger = newLogger,
@@ -86,14 +84,13 @@ internal class RealCallTraversal(
     }
 
     private inner class RealCallVisitingContext(
-        private val depth: Int,
         override val origin: AccountIdKey,
         override val logger: ExtrinsicVisitorLogger,
         private val visitor: CallVisitor
     ) : CallVisitingContext {
 
         override fun nestedVisit(visit: NestedCallVisit) {
-            return this@RealCallTraversal.nestedVisit(visitor, visit, depth + 1)
+            return this@RealCallTraversal.nestedVisit(visitor, visit)
         }
 
         override fun visit(visit: CallVisit) {

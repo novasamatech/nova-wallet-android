@@ -10,12 +10,14 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -27,7 +29,7 @@ import io.novafoundation.nova.feature_multisig_operations.domain.details.validat
 import io.novafoundation.nova.feature_multisig_operations.domain.details.validations.approveMultisigOperation
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsViewModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.SignatoryListFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.di.MultisigOperationDetailsModule.BindsModule
@@ -73,6 +75,8 @@ class MultisigOperationDetailsModule {
         multisigCallFormatter: MultisigCallFormatter,
         actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         accountInteractor: AccountInteractor,
+        accountUIUseCase: AccountUIUseCase,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     ): ViewModel {
         return MultisigOperationDetailsViewModel(
             router = router,
@@ -90,7 +94,9 @@ class MultisigOperationDetailsModule {
             signatoryListFormatter = signatoryListFormatter,
             multisigCallFormatter = multisigCallFormatter,
             actionBottomSheetLauncherFactory = actionBottomSheetLauncherFactory,
-            accountInteractor = accountInteractor
+            accountInteractor = accountInteractor,
+            accountUIUseCase = accountUIUseCase,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory
         )
     }
 

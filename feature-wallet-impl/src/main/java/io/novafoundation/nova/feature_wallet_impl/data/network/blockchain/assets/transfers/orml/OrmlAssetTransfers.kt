@@ -29,7 +29,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuil
 import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import java.math.BigInteger
 
-class OrmlAssetTransfers(
+open class OrmlAssetTransfers(
     chainRegistry: ChainRegistry,
     assetSourceRegistry: AssetSourceRegistry,
     extrinsicServiceFactory: ExtrinsicService.Factory,
@@ -37,7 +37,7 @@ class OrmlAssetTransfers(
     enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
 ) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
 
-    private val transferFunctions = listOf(
+    open val transferFunctions = listOf(
         Modules.CURRENCIES to "transfer",
         Modules.TOKENS to "transfer"
     )
@@ -82,10 +82,7 @@ class OrmlAssetTransfers(
         target: AccountId,
         amount: BigInteger
     ) {
-        val (moduleIndex, callIndex) = runtime.metadata.firstExistingCall(
-            Modules.TOKENS to "transfer",
-            Modules.CURRENCIES to "transfer"
-        ).index
+        val (moduleIndex, callIndex) = runtime.metadata.firstExistingCall(transferFunctions).index
 
         call(
             moduleIndex = moduleIndex,

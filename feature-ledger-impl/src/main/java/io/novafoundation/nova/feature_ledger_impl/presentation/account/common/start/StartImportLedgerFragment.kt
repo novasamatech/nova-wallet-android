@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -21,7 +20,6 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> :
 
     override fun initViews() {
         binder.startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.startImportLedgerToolbar.applyStatusBarInsets()
 
         binder.startImportLedgerContinue.setOnClickListener {
             when (binder.startImportLedgerConnectionModePages.currentItem) {

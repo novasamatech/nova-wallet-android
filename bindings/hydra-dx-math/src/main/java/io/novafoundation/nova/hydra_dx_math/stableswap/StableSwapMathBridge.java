@@ -12,7 +12,8 @@ public class StableSwapMathBridge {
         int asset_out,
         String amount_in,
         String amplification,
-        String fee
+        String fee,
+        String pegs
     );
 
     public static native String calculate_in_given_out(
@@ -21,7 +22,8 @@ public class StableSwapMathBridge {
         int asset_out,
         String amount_out,
         String amplification,
-        String fee
+        String fee,
+        String pegs
     );
 
     public static native String calculate_amplification(
@@ -37,7 +39,8 @@ public class StableSwapMathBridge {
         String assets,
         String amplification,
         String share_issuance,
-        String fee
+        String fee,
+        String pegs
     );
 
     public static native String calculate_shares_for_amount(
@@ -46,7 +49,8 @@ public class StableSwapMathBridge {
         String amount,
         String amplification,
         String share_issuance,
-        String fee
+        String fee,
+        String pegs
     );
 
     public static native String calculate_add_one_asset(
@@ -55,7 +59,8 @@ public class StableSwapMathBridge {
         int asset_in,
         String amplification,
         String share_issuance,
-        String fee
+        String fee,
+        String pegs
     );
 
     public static native String calculate_liquidity_out_one_asset(
@@ -64,6 +69,7 @@ public class StableSwapMathBridge {
         int asset_out,
         String amplification,
         String share_issuance,
-        String withdraw_fee
+        String withdraw_fee,
+        String pegs
     );
 }

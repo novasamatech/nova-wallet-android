@@ -3,13 +3,16 @@ package io.novafoundation.nova.feature_account_api.data.multisig.model
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.utils.Identifiable
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import java.math.BigInteger
 import kotlin.time.Duration
 
 class PendingMultisigOperation(
+    val multisigMetaId: Long,
     val call: GenericCall.Instance?,
     val callHash: CallHash,
     val chain: Chain,
@@ -23,7 +26,9 @@ class PendingMultisigOperation(
     val timestamp: Duration,
 ) : Identifiable {
 
-    override val identifier: PendingMultisigOperationId = "${chain.id}.${callHash.toHex()}.${timePoint.height}.${timePoint.extrinsicIndex}"
+    val operationId = PendingMultisigOperationId(multisigMetaId, chain.id, callHash.toHex())
+
+    override val identifier: String = operationId.identifier()
 
     override fun toString(): String {
         val callFormatted = if (call != null) {
@@ -38,7 +43,13 @@ class PendingMultisigOperation(
     companion object
 }
 
-typealias PendingMultisigOperationId = String
+data class PendingMultisigOperationId(
+    val metaId: Long,
+    val chainId: ChainId,
+    val callHash: String,
+) {
+    companion object;
+}
 
 fun PendingMultisigOperation.userAction(): MultisigAction {
     return when (signatoryAccountId) {
@@ -49,4 +60,10 @@ fun PendingMultisigOperation.userAction(): MultisigAction {
 
         else -> MultisigAction.Signed
     }
+}
+
+fun PendingMultisigOperationId.identifier() = toString()
+
+fun PendingMultisigOperationId.Companion.create(metaAccount: MetaAccount, chain: Chain, callHash: String): PendingMultisigOperationId {
+    return PendingMultisigOperationId(metaAccount.id, chain.id, callHash)
 }

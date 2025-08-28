@@ -119,6 +119,9 @@ interface MetaAccountDao {
     @Query("SELECT * FROM meta_accounts")
     suspend fun getMetaAccounts(): List<MetaAccountLocal>
 
+    @Query("SELECT * FROM meta_accounts WHERE id IN (:metaIds)")
+    suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<RelationJoinedMetaAccountInfo>
+
     @Query("SELECT * FROM meta_accounts WHERE id = :id")
     suspend fun getMetaAccount(id: Long): MetaAccountLocal?
 
@@ -139,6 +142,9 @@ interface MetaAccountDao {
 
     @Query("SELECT * FROM meta_accounts WHERE status = :status")
     fun getJoinedMetaAccountsInfoByStatusFlow(status: MetaAccountLocal.Status): Flow<List<RelationJoinedMetaAccountInfo>>
+
+    @Query("SELECT id FROM meta_accounts WHERE status = :status")
+    fun getMetaAccountsIdsByStatus(status: MetaAccountLocal.Status): List<Long>
 
     @Query(META_ACCOUNTS_WITH_BALANCE_QUERY)
     fun metaAccountsWithBalanceFlow(): Flow<List<MetaAccountWithBalanceLocal>>
@@ -182,17 +188,29 @@ interface MetaAccountDao {
 
     @Query(
         """
-        WITH RECURSIVE accounts_to_delete AS (
-            SELECT id, parentMetaId FROM meta_accounts WHERE id = :metaId
-            UNION ALL
-            SELECT m.id, m.parentMetaId
-            FROM meta_accounts m
-            JOIN accounts_to_delete r ON m.parentMetaId = r.id
-        )
-        DELETE FROM meta_accounts WHERE id IN (SELECT id FROM accounts_to_delete)
+    WITH RECURSIVE accounts_to_delete AS (
+        SELECT id, parentMetaId FROM meta_accounts WHERE id = :metaId
+        UNION ALL
+        SELECT m.id, m.parentMetaId
+        FROM meta_accounts m
+        JOIN accounts_to_delete r ON m.parentMetaId = r.id
+    )
+    SELECT id FROM accounts_to_delete
     """
     )
-    suspend fun delete(metaId: Long)
+    suspend fun findIdsToDelete(metaId: Long): List<Long>
+
+    @Query("DELETE FROM meta_accounts WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<Long>)
+
+    @Transaction
+    suspend fun delete(metaId: Long): List<Long> {
+        val ids = findIdsToDelete(metaId)
+        if (ids.isNotEmpty()) {
+            deleteByIds(ids)
+        }
+        return ids
+    }
 
     @Query(
         """
@@ -216,6 +234,9 @@ interface MetaAccountDao {
 
     @Query("SELECT EXISTS(SELECT id FROM meta_accounts WHERE type = :type)")
     fun hasMetaAccountsCountOfTypeFlow(type: MetaAccountLocal.Type): Flow<Boolean>
+
+    @Query("SELECT * FROM meta_accounts WHERE type = :type")
+    fun observeMetaAccountsByTypeFlow(type: MetaAccountLocal.Type): Flow<List<RelationJoinedMetaAccountInfo>>
 
     @Query(
         """

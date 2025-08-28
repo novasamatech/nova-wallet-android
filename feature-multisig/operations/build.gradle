@@ -21,6 +21,7 @@ dependencies {
     implementation project(':runtime')
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
+    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 
@@ -45,6 +46,8 @@ dependencies {
 
     testImplementation jUnitDep
     testImplementation mockitoDep
+
+    implementation shimmerDep
 
     implementation gsonDep
 

@@ -7,7 +7,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushStakingSettingsBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureComponent
@@ -37,7 +36,6 @@ class PushStakingSettingsFragment : BaseFragment<PushStakingSettingsViewModel, F
     }
 
     override fun initViews() {
-        binder.pushStakingToolbar.applyStatusBarInsets()
         binder.pushStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.pushStakingToolbar.setRightActionClickListener { viewModel.clearClicked() }
         onBackPressed { viewModel.backClicked() }

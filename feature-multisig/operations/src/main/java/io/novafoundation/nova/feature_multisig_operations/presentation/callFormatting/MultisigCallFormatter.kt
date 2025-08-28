@@ -17,4 +17,23 @@ interface MultisigCallFormatter {
         initialOrigin: AccountIdKey,
         chain: Chain
     ): MultisigCallDetailsModel
+
+    suspend fun formatPushNotificationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): MultisigCallPushNotificationModel
+
+    suspend fun formatExecutedOperationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): String
+
+    suspend fun formatRejectedOperationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        rejectedAccountName: String,
+        chain: Chain
+    ): String
 }

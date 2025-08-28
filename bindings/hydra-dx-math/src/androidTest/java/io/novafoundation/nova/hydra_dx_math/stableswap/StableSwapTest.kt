@@ -29,7 +29,8 @@ class StableSwapTest {
         1,
         "1000000000",
         "1",
-        "0"
+        "0",
+        ""
         )
 
         assertEquals("999500248", result)
@@ -57,7 +58,8 @@ class StableSwapTest {
             1,
             "1000000000",
             "1",
-            "0"
+            "0",
+            ""
         )
 
         assertNotEquals("-1", result)
@@ -95,7 +97,8 @@ class StableSwapTest {
         assets,
         "1000",
         "64839594451719860",
-        "0"
+        "0",
+        ""
         )
 
         assertEquals("371541351762585", result.toString())
@@ -139,7 +142,8 @@ class StableSwapTest {
             "100000000000000",
             "100",
             "20000000000000000000000",
-            "0"
+            "0",
+            ""
         )
 
         assertEquals("40001593768209443008", result.toString())
@@ -184,7 +188,8 @@ class StableSwapTest {
             2,
             "100",
             "20000000000000000000000",
-            "0"
+            "0",
+            ""
         )
 
         assertEquals("1000000000000001", result.toString())
@@ -228,7 +233,8 @@ class StableSwapTest {
             0,
             "100",
             "20000000000000000000000",
-            "0"
+            "0",
+            ""
         )
 
         assertEquals("99999999999999", result.toString())
@@ -246,7 +252,8 @@ class StableSwapTest {
             10,
             "100",
             "4502091550542833181457210",
-            "0.00040"
+            "0.00040",
+            ""
         )
 
         assertEquals("99999999999999", result.toString())
@@ -263,7 +270,8 @@ class StableSwapTest {
             "10",
             "320",
             "1662219218861236418723363",
-            "0.00040"
+            "0.00040",
+            ""
         )
 
         assertEquals("99999999999999", result.toString())

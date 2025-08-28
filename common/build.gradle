@@ -44,6 +44,8 @@ android {
 
         buildConfigField "String", "UNIFIED_ADDRESS_ARTICLE", "\"https://docs.novawallet.io/nova-wallet-wiki/asset-management/how-to-receive-tokens#unified-and-legacy-addresses\""
 
+        buildConfigField "String", "MULTISIGS_WIKI_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/multisig-wallets\""
+
         buildConfigField "long", "CLOUD_PROJECT_NUMBER", "171267697857L"
     }
 

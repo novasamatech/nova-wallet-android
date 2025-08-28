@@ -3,11 +3,14 @@ package io.novafoundation.nova.common.view
 import android.content.Context
 import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
+import android.view.Gravity
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewAlertBinding
 import io.novafoundation.nova.common.databinding.ViewAlertMessageBinding
@@ -49,14 +52,19 @@ class AlertView @JvmOverloads constructor(
         WARNING, ERROR, INFO
     }
 
-    class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int, @ColorRes val iconTintRes: Int? = null) {
+    data class Style(
+        @DrawableRes val iconRes: Int,
+        @ColorRes val backgroundColorRes: Int,
+        @ColorRes val iconTintRes: Int? = null,
+        val iconGravity: Int = Gravity.TOP
+    ) {
 
         companion object {
 
-            fun fromPreset(preset: StylePreset) = when (preset) {
-                StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background)
-                StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background)
-                StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background)
+            fun fromPreset(preset: StylePreset, iconGravity: Int = Gravity.TOP) = when (preset) {
+                StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background, iconGravity = iconGravity)
+                StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background, iconGravity = iconGravity)
+                StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background, iconGravity = iconGravity)
             }
         }
     }
@@ -71,7 +79,7 @@ class AlertView @JvmOverloads constructor(
 
     fun setStyle(style: Style) {
         setStyleBackground(style.backgroundColorRes)
-        setStyleIcon(style.iconRes, style.iconTintRes)
+        setStyleIcon(style.iconRes, style.iconTintRes, style.iconGravity)
     }
 
     fun setStylePreset(preset: StylePreset) {
@@ -114,9 +122,10 @@ class AlertView @JvmOverloads constructor(
         background = getRoundedCornerDrawable(fillColorRes = colorRes)
     }
 
-    private fun setStyleIcon(@DrawableRes iconRes: Int, iconTintRes: Int? = null) {
+    private fun setStyleIcon(@DrawableRes iconRes: Int, iconTintRes: Int? = null, iconGravity: Int) {
         binder.alertIcon.setImageResource(iconRes)
         binder.alertIcon.setImageTintRes(iconTintRes)
+        binder.alertIcon.updateLayoutParams<FrameLayout.LayoutParams> { gravity = iconGravity }
     }
 
     private fun createSubMessageView(text: CharSequence): TextView {

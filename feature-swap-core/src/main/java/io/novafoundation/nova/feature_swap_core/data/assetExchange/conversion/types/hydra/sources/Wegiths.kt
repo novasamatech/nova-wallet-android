@@ -26,6 +26,8 @@ object Weights {
         const val STABLESWAP = QuotableEdge.DEFAULT_SEGMENT_WEIGHT - 10
 
         const val XYK = QuotableEdge.DEFAULT_SEGMENT_WEIGHT + 10
+
+        const val AAVE = STABLESWAP
     }
 
     object AssetConversion {

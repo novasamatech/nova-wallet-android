@@ -53,6 +53,8 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.coroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.time.Duration
@@ -634,11 +636,13 @@ fun <T> Collection<Flow<T>>.accumulate(): Flow<List<T>> {
 fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
     val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }
     val resultOfFlows = MutableList<T?>(flowsList.size) { null }
+    val lock = Mutex()
+
     return flowsList
         .merge()
         .map {
-            resultOfFlows[it.first] = it.second.first()
-            resultOfFlows.filterNotNull()
+            lock.withLock { resultOfFlows[it.first] = it.second.first() }
+            resultOfFlows.filterNotNull().toList()
         }
 }
 

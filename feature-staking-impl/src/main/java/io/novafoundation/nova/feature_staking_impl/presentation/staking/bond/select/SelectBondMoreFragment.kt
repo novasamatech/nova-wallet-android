@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.se
 
 import android.os.Bundle
 
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -28,14 +27,6 @@ class SelectBondMoreFragment : BaseFragment<SelectBondMoreViewModel, FragmentBon
     override fun createBinding() = FragmentBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.bondMoreContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-
-            consume(true)
-        }
-
         binder.bondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.bondMoreContinue.prepareForProgress(viewLifecycleOwner)
         binder.bondMoreContinue.setOnClickListener { viewModel.nextClicked() }

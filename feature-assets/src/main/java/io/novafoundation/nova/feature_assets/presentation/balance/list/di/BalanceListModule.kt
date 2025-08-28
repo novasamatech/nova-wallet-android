@@ -22,8 +22,8 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -94,7 +94,7 @@ class BalanceListModule {
         amountFormatter: AmountFormatter,
         buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
         multisigPendingOperationsService: MultisigPendingOperationsService,
-        multisigRestrictionCheckMixin: MultisigRestrictionCheckMixin
+        novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -112,7 +112,7 @@ class BalanceListModule {
             amountFormatter = amountFormatter,
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             multisigPendingOperationsService = multisigPendingOperationsService,
-            multisigRestrictionCheckMixin = multisigRestrictionCheckMixin
+            novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin
         )
     }
 

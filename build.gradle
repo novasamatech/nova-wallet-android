@@ -1,16 +1,16 @@
 buildscript {
     ext {
         // App version
-        versionName = '10.2.1'
-        versionCode = 231
+        versionName = '10.3.0'
+        versionCode = 233
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
 
         // SDK and tools
-        compileSdkVersion = 34
+        compileSdkVersion = 36
         minSdkVersion = 24
-        targetSdkVersion = 34
+        targetSdkVersion = 36
 
         kotlinVersion = '2.1.0'
 
@@ -70,8 +70,6 @@ buildscript {
         insetterVersion = "0.5.0"
 
         shimmerVersion = '0.5.0'
-
-        storiesVersion = '3.0.0'
 
         coilVersion = '1.2.1'
 
@@ -172,8 +170,6 @@ buildscript {
         wsDep = "com.neovisionaries:nv-websocket-client:$wsVersion"
 
         shimmerDep = "com.facebook.shimmer:shimmer:$shimmerVersion"
-
-        storiesDep = "com.github.shts:StoriesProgressView:$storiesVersion"
 
         jUnitDep = "junit:junit:$junitVersion"
         mockitoDep = "org.mockito:mockito-core:$mockitoVersion"

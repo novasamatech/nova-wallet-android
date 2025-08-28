@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
+import io.novafoundation.nova.common.utils.applySystemBarInsets
 import javax.inject.Inject
 
 abstract class BaseFragment<T : BaseViewModel, B : ViewBinding> : Fragment(), BaseFragmentMixin<T> {
@@ -30,7 +31,11 @@ abstract class BaseFragment<T : BaseViewModel, B : ViewBinding> : Fragment(), Ba
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        applyInsets(view)
         delegate.onViewCreated(view, savedInstanceState)
+    }
+
+    open fun applyInsets(rootView: View) {
+        rootView.applySystemBarInsets()
     }
 }

@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.full
 
+import io.novafoundation.nova.common.address.toHexWithPrefix
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
+import io.novafoundation.nova.common.mixin.copy.showCopyCallHash
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.ellipsizeMiddle
 import io.novafoundation.nova.common.utils.launchUnit
@@ -15,7 +17,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.domain.details.MultisigOperationDetailsInteractor
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.toOperationId
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.fullId
@@ -33,7 +36,7 @@ class MultisigOperationFullDetailsViewModel(
     private val interactor: MultisigOperationDetailsInteractor,
     private val multisigOperationsService: MultisigPendingOperationsService,
     private val externalActions: ExternalActions.Presentation,
-    private val payload: MultisigOperationDetailsPayload,
+    private val payload: MultisigOperationPayload,
     private val accountUIUseCase: AccountUIUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val copyTextLauncher: CopyTextLauncher.Presentation,
@@ -47,7 +50,7 @@ class MultisigOperationFullDetailsViewModel(
         router.back()
     }
 
-    private val operationFlow = multisigOperationsService.pendingOperationFlow(payload.operationId)
+    private val operationFlow = multisigOperationsService.pendingOperationFlow(payload.toOperationId())
         .filterNotNull()
         .shareInBackground()
 
@@ -56,7 +59,7 @@ class MultisigOperationFullDetailsViewModel(
     }.shareInBackground()
 
     val depositorAccountModel = operationFlow.map {
-        accountUIUseCase.getAccountModel(it.depositor.value, it.chain)
+        accountUIUseCase.getAccountModel(it.depositor, it.chain)
     }.withSafeLoading()
         .shareInBackground()
 
@@ -74,6 +77,14 @@ class MultisigOperationFullDetailsViewModel(
         operation.call?.let { interactor.callDetails(it) }
     }.shareInBackground()
 
+    private val callHash = operationFlow.map { operation ->
+        operation.callHash.toHexWithPrefix()
+    }.shareInBackground()
+
+    val ellipsizedCallHash = callHash.map {
+        it.ellipsizeMiddle(CALL_HASH_SHOWN_SYMBOLS)
+    }.shareInBackground()
+
     fun onDepositorClicked() = launchUnit {
         val chain = operationFlow.first().chain
         depositorAccountModel.first().onLoaded {
@@ -81,7 +92,7 @@ class MultisigOperationFullDetailsViewModel(
         }
     }
 
-    fun callHashClicked() = launchUnit {
+    fun callDataClicked() = launchUnit {
         val callDataEllipsized = ellipsizedCallData.first() ?: return@launchUnit
         val callData = callDataFlow.first() ?: return@launchUnit
         copyTextLauncher.showCopyTextDialog(
@@ -99,5 +110,9 @@ class MultisigOperationFullDetailsViewModel(
             titleRes = R.string.multisig_deposit,
             descriptionRes = R.string.multisig_deposit_description
         )
+    }
+
+    fun callHashClicked() = launchUnit {
+        copyTextLauncher.showCopyCallHash(resourceManager, callHash.first())
     }
 }

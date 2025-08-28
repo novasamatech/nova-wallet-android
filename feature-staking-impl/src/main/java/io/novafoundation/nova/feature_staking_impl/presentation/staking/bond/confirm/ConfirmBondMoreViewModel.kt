@@ -128,7 +128,7 @@ class ConfirmBondMoreViewModel(
 
         bondMoreInteractor.bondMore(payload.stashAddress, amountInPlanks)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { finishFlow() }
             }.onFailure {

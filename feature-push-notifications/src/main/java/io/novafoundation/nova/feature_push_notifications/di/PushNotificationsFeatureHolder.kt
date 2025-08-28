@@ -7,8 +7,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsCommunicator
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.PushMultisigSettingsCommunicator
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
@@ -20,7 +22,8 @@ class PushNotificationsFeatureHolder @Inject constructor(
     private val selectMultipleWalletsCommunicator: SelectMultipleWalletsCommunicator,
     private val selectTracksCommunicator: SelectTracksCommunicator,
     private val pushGovernanceSettingsCommunicator: PushGovernanceSettingsCommunicator,
-    private val pushStakingSettingsCommunicator: PushStakingSettingsCommunicator
+    private val pushStakingSettingsCommunicator: PushStakingSettingsCommunicator,
+    private val pushMultisigSettingsCommunicator: PushMultisigSettingsCommunicator
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -31,6 +34,7 @@ class PushNotificationsFeatureHolder @Inject constructor(
             .governanceFeatureApi(getFeature(GovernanceFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .assetsFeatureApi(getFeature(AssetsFeatureApi::class.java))
+            .multisigOperationsFeatureApi(getFeature(MultisigOperationsFeatureApi::class.java))
             .build()
 
         return DaggerPushNotificationsFeatureComponent.factory()
@@ -40,6 +44,7 @@ class PushNotificationsFeatureHolder @Inject constructor(
                 selectTracksCommunicator,
                 pushGovernanceSettingsCommunicator,
                 pushStakingSettingsCommunicator,
+                pushMultisigSettingsCommunicator,
                 dependencies
             )
     }

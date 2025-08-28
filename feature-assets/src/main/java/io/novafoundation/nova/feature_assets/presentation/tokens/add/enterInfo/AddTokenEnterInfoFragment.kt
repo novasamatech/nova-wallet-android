@@ -1,14 +1,14 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo
 
+import android.view.View
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.applySystemBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
 import io.novafoundation.nova.common.view.setState
@@ -31,15 +31,12 @@ class AddTokenEnterInfoFragment : BaseFragment<AddTokenEnterInfoViewModel, Fragm
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun initViews() {
-        binder.addTokenEnterInfoToolbar.applyStatusBarInsets()
-        binder.addTokenEnterInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
+    override fun applyInsets(rootView: View) {
+        binder.root.applySystemBarInsets(imeInsets = true)
+    }
 
-        binder.addTokenEnterInfoContainer.applyInsetter {
-            type(ime = true) {
-                padding()
-            }
-        }
+    override fun initViews() {
+        binder.addTokenEnterInfoToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.addTokenEnterInfoScrollArea.scrollOnFocusTo(
             binder.addTokenEnterInfoAddressInput,

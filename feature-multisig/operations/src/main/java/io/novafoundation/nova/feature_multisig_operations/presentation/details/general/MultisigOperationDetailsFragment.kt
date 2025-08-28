@@ -3,12 +3,18 @@ package io.novafoundation.nova.feature_multisig_operations.presentation.details.
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import androidx.core.os.bundleOf
+import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.onLoaded
+import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.FragmentPayloadCreator
+import io.novafoundation.nova.common.utils.PayloadCreator
+import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.bindWithHideShowButton
@@ -22,31 +28,25 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showAddressOrHide
 import io.novafoundation.nova.feature_account_api.view.showChain
+import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationDetailsBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallDetailsModel
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoriesAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setAmountOrHide
 
 class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsViewModel, FragmentMultisigOperationDetailsBinding>() {
 
-    companion object {
-
-        private const val PAYLOAD = "MultisigOperationDetailsFragment.Payload"
-
-        fun getBundle(payload: MultisigOperationDetailsPayload) = bundleOf(PAYLOAD to payload)
-    }
+    companion object : PayloadCreator<MultisigOperationDetailsPayload> by FragmentPayloadCreator()
 
     override fun createBinding() = FragmentMultisigOperationDetailsBinding.inflate(layoutInflater)
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SignatoriesAdapter(viewModel::onSignatoryClicked) }
 
     override fun initViews() {
-        binder.multisigPendingOperationDetailsContainer.applyStatusBarInsets()
-
+        binder.multisigPendingOperationDetailsToolbar.setHomeButtonIcon(viewModel.getNavigationIconRes())
         binder.multisigPendingOperationDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.multisigOperationSignatories.adapter = adapter
@@ -73,7 +73,7 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
             MultisigOperationsFeatureApi::class.java
         )
             .multisigOperationDetails()
-            .create(this, argument(PAYLOAD))
+            .create(this, payload())
             .inject(this)
     }
 
@@ -82,6 +82,12 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         setupExternalActions(viewModel)
         setupFeeLoading(viewModel.feeLoaderMixin, binder.multisigPendingOperationDetailsFee)
         observeActionBottomSheet(viewModel.actionBottomSheetLauncher)
+        setupConfirmationDialog(R.style.AccentAlertDialogTheme, viewModel.operationNotFoundAwaitableAction)
+
+        viewModel.isOperationLoadingFlow.observe {
+            binder.multisigPendingOperationProgress.isVisible = it
+            binder.multisigPendingOperationDetailsContainer.isGone = it
+        }
 
         viewModel.showCallButtonState.observe(binder.multisigPendingOperationDetailsEnterCallData::isVisible::set)
         viewModel.actionButtonState.observe(binder.multisigPendingOperationDetailsAction::setState)
@@ -101,7 +107,11 @@ class MultisigOperationDetailsFragment : BaseFragment<MultisigOperationDetailsVi
         viewModel.signatoryAccount.observe(binder.multisigPendingOperationDetailsSignatory::showWallet)
 
         viewModel.signatoriesTitle.observe(binder.multisigOperationSignatoriesTitle::setText)
-        viewModel.signatories.observe { adapter.submitList(it) }
+        viewModel.formattedSignatories.observe { signatoriesLoadingState ->
+            binder.multisigOperationSignatoriesShimmering.isVisible = signatoriesLoadingState.isLoading
+            binder.multisigOperationSignatories.isVisible = signatoriesLoadingState.isLoaded()
+            signatoriesLoadingState.onLoaded { adapter.submitList(it) }
+        }
 
         viewModel.callDetailsVisible.observe(binder.multisigPendingOperationCallDetails::setVisible)
     }

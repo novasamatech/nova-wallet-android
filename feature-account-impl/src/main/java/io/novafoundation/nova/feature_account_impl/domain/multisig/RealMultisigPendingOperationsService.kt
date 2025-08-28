@@ -4,26 +4,28 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.data.memory.SharedComputation
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.combine
 import io.novafoundation.nova.common.utils.findById
 import io.novafoundation.nova.common.utils.parentCancellableFlowScope
-import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperationId
+import io.novafoundation.nova.feature_account_api.data.multisig.model.identifier
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.MultisigCallDataWatcher
 import io.novafoundation.nova.feature_account_impl.domain.multisig.calldata.MultisigCallDataWatcherFactory
+import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.MultisigChainPendingOperationsSyncerFactory
+import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.MultisigPendingOperationsSyncer
+import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.NoOpSyncer
+import io.novafoundation.nova.feature_account_impl.domain.multisig.syncer.MultiChainSyncer
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -62,7 +64,7 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
 
     context(ComputationalScope)
     override fun pendingOperationFlow(id: PendingMultisigOperationId): Flow<PendingMultisigOperation?> {
-        return pendingOperations().map { it.findById(id) }
+        return pendingOperations().map { it.findById(id.identifier()) }
     }
 
     context(ComputationalScope)
@@ -107,32 +109,8 @@ internal class RealMultisigPendingOperationsService @Inject constructor(
     ): MultisigPendingOperationsSyncer {
         val multisigChainSyncers = chainRegistry.enabledChains()
             .filter { chain -> multisigRepository.supportsMultisigSync(chain) }
-            .map { chain -> syncerFactory.create(chain, account, callDataWatcher, scope) }
+            .associate { chain -> chain.id to syncerFactory.create(chain, account, callDataWatcher, scope) }
 
         return MultiChainSyncer(multisigChainSyncers, scope)
-    }
-
-    private inner class MultiChainSyncer(
-        chainDelegates: List<MultisigPendingOperationsSyncer>,
-        scope: CoroutineScope
-    ) : MultisigPendingOperationsSyncer, CoroutineScope by scope {
-
-        override val pendingOperationsCount: Flow<Int> = chainDelegates
-            .map { it.pendingOperationsCount }
-            .combine()
-            .map(List<Int>::sum)
-            .shareInBackground()
-
-        override val pendingOperations: Flow<List<PendingMultisigOperation>> = chainDelegates
-            .map { it.pendingOperations }
-            .combine()
-            .map { it.flatten() }
-            .shareInBackground()
-    }
-
-    private inner class NoOpSyncer : MultisigPendingOperationsSyncer {
-        override val pendingOperationsCount: Flow<Int> = flowOf(0)
-
-        override val pendingOperations: Flow<List<PendingMultisigOperation>> = flowOf(emptyList())
     }
 }

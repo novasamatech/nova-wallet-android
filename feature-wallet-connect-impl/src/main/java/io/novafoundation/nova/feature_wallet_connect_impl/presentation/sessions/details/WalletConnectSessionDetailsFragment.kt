@@ -5,7 +5,6 @@ import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showValueOrHide
 import io.novafoundation.nova.feature_account_api.view.showWallet
@@ -34,7 +33,6 @@ class WalletConnectSessionDetailsFragment : BaseFragment<WalletConnectSessionDet
 
     override fun initViews() {
         binder.wcSessionDetailsToolbar.setHomeButtonListener { viewModel.exit() }
-        binder.wcSessionDetailsToolbar.applyStatusBarInsets()
 
         binder.wcSessionDetailsDisconnect.setOnClickListener { viewModel.disconnect() }
         binder.wcSessionDetailsDisconnect.prepareForProgress(viewLifecycleOwner)

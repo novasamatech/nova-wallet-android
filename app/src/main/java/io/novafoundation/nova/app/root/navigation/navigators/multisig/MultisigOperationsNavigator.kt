@@ -6,10 +6,10 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsFragment
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.full.MultisigOperationFullDetailsFragment
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallFragment
-import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
 
 class MultisigOperationsNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
@@ -26,18 +26,20 @@ class MultisigOperationsNavigator(
     }
 
     override fun openMultisigOperationDetails(payload: MultisigOperationDetailsPayload) {
-        navigationBuilder().action(R.id.action_multisigPendingOperationsFragment_to_multisigOperationDetailsFragment)
-            .setArgs(MultisigOperationDetailsFragment.getBundle(payload))
+        navigationBuilder().cases()
+            .addCase(R.id.multisigPendingOperationsFragment, R.id.action_multisigPendingOperationsFragment_to_multisigOperationDetailsFragment)
+            .setFallbackCase(R.id.action_multisigOperationDetailsFragment)
+            .setArgs(MultisigOperationDetailsFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 
-    override fun openMultisigFullDetails(payload: MultisigOperationDetailsPayload) {
+    override fun openMultisigFullDetails(payload: MultisigOperationPayload) {
         navigationBuilder().action(R.id.action_multisigOperationDetailsFragment_to_externalExtrinsicDetailsFragment)
             .setArgs(MultisigOperationFullDetailsFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
 
-    override fun openEnterCallDetails(payload: MultisigOperationEnterCallPayload) {
+    override fun openEnterCallDetails(payload: MultisigOperationPayload) {
         navigationBuilder().action(R.id.action_multisigOperationDetailsFragment_to_enterCallDetails)
             .setArgs(MultisigOperationEnterCallFragment.createPayload(payload))
             .navigateInFirstAttachedContext()

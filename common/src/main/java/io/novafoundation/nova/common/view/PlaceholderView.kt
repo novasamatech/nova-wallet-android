@@ -11,6 +11,7 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewPlaceholderBinding
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.getColorOrNull
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.inflater
@@ -52,6 +53,12 @@ class PlaceholderView @JvmOverloads constructor(
 
         val image = typedArray.getResourceIdOrNull(R.styleable.PlaceholderView_image)
         image?.let(::setImage)
+
+        val imageTint = typedArray.getColorOrNull(R.styleable.PlaceholderView_imageTint)
+        imageTint?.let(::setImageTint)
+
+        val showButton = typedArray.getBoolean(R.styleable.PlaceholderView_showButton, true)
+        binder.viewPlaceholderButton.isVisible = showButton
     }
 
     fun setStyle(style: Style) {

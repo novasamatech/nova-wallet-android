@@ -9,7 +9,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.RangeDateValidator
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -23,7 +22,6 @@ class StakingPeriodFragment : BaseFragment<StakingPeriodViewModel, FragmentPerio
     override fun createBinding() = FragmentPeriodStakingBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.stakingPeriodToolbar.applyStatusBarInsets()
         binder.stakingPeriodToolbar.setRightActionClickListener { viewModel.onSaveClick() }
         binder.stakingPeriodToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.customStakingPeriodStart.setOnClickListener { viewModel.openStartDatePicker() }

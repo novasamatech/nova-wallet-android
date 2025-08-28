@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.optionalNumberConstant
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.common.utils.timestampOrNull
+import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -116,7 +117,18 @@ class ChainStateRepository(
 
     fun currentBlockNumberFlow(chainId: ChainId): Flow<BlockNumber> = localStorage.observeBlockNumber(chainId)
 
-    fun currentRemoteBlockNumberFlow(chainId: ChainId): Flow<BlockNumber> = remoteStorage.observeBlockNumber(chainId)
+    fun currentRemoteBlockNumberFlow(
+        chainId: ChainId,
+    ): Flow<BlockNumber> = remoteStorage.observeBlockNumber(chainId)
+
+    suspend fun currentRemoteBlockNumberFlow(
+        chainId: ChainId,
+        sharedRequestsBuilder: SharedRequestsBuilder
+    ): Flow<BlockNumber> {
+        return remoteStorage.subscribe(chainId, subscriptionBuilder = sharedRequestsBuilder) {
+            metadata.system.number.observeNonNull()
+        }
+    }
 
     suspend fun currentRemoteBlock(chainId: ChainId) = remoteStorage.query(chainId) {
         metadata.system.number.queryNonNull()
@@ -134,6 +146,17 @@ class ChainStateRepository(
         } else {
             FALLBACK_BLOCK_TIME_MILLIS_RELAYCHAIN
         }
+    }
+}
+
+suspend fun ChainStateRepository.currentRemoteBlockNumberFlow(
+    chainId: ChainId,
+    sharedRequestsBuilder: SharedRequestsBuilder?
+): Flow<BlockNumber> {
+    return if (sharedRequestsBuilder != null) {
+        currentRemoteBlockNumberFlow(chainId, sharedRequestsBuilder)
+    } else {
+        currentRemoteBlockNumberFlow(chainId)
     }
 }
 

@@ -5,18 +5,23 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.DialogMessageManager
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
@@ -26,6 +31,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.common.l
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
@@ -97,8 +103,21 @@ interface MultisigOperationsFeatureDependencies {
 
     val accountUIUseCase: AccountUIUseCase
 
+    val linkBuilderFactory: LinkBuilderFactory
+
+    val automaticInteractionGate: AutomaticInteractionGate
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val multisigDetailsRepository: MultisigDetailsRepository
+
+    fun dialogMessageManager(): DialogMessageManager
+
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider
+
+    @LocalWithOnChainIdentity
+    fun localWithOnChainIdentityProvider(): IdentityProvider
 
     @ExtrinsicSerialization
     fun extrinsicGson(): Gson

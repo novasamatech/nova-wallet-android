@@ -570,6 +570,17 @@ inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fo
     acc
 }
 
+inline fun <T, K> Iterable<T>.groupByToSet(keySelector: (T) -> K): MultiMap<K, T> {
+    val destination = mutableMultiMapOf<K, T>()
+
+    for (element in this) {
+        val key = keySelector(element)
+        destination.put(key, element)
+    }
+
+    return destination
+}
+
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
 fun <T> Collection<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
@@ -720,6 +731,26 @@ fun Int.collectionIndexOrNull(): Int? {
 
 fun <T> Set<T>.hasIntersectionWith(other: Set<T>): Boolean {
     return this.any { it in other }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T1, T2, T3, T4, T5, T6, R> combine(
+    flow: Flow<T1>,
+    flow2: Flow<T2>,
+    flow3: Flow<T3>,
+    flow4: Flow<T4>,
+    flow5: Flow<T5>,
+    flow6: Flow<T6>,
+    transform: suspend (T1, T2, T3, T4, T5, T6) -> R
+): Flow<R> = kotlinx.coroutines.flow.combine(flow, flow2, flow3, flow4, flow5, flow6) { args: Array<*> ->
+    transform(
+        args[0] as T1,
+        args[1] as T2,
+        args[2] as T3,
+        args[3] as T4,
+        args[4] as T5,
+        args[5] as T6
+    )
 }
 
 typealias LazyGet<T> = () -> T

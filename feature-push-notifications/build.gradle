@@ -26,6 +26,7 @@ dependencies {
     implementation project(':feature-currency-api')
     implementation project(':feature-assets')
     implementation project(':feature-deep-linking')
+    implementation project(':feature-multisig:operations')
 
     implementation kotlinDep
 
