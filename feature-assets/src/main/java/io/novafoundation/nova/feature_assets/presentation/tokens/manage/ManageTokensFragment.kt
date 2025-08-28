@@ -6,9 +6,10 @@ import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
@@ -35,7 +36,7 @@ class ManageTokensFragment :
 
     override fun applyInsets(rootView: View) {
         binder.manageTokensToolbarContainer.applyStatusBarInsets()
-        binder.manageTokensList.applyNavigationBarInsets(consume = false, imeInsets = true)
+        binder.manageTokensList.applyNavigationBarInsets(consume = false, imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
     }
 
     override fun initViews() {

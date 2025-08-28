@@ -4,7 +4,7 @@ import android.view.View
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
