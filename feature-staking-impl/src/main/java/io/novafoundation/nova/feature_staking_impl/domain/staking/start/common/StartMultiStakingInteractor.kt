@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.start.common
 import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
-import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -18,7 +18,7 @@ interface StartMultiStakingInteractor {
 
     suspend fun calculateFee(selection: StartMultiStakingSelection): Fee
 
-    suspend fun startStaking(selection: StartMultiStakingSelection): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
+    suspend fun startStaking(selection: StartMultiStakingSelection): Result<ExtrinsicExecutionResult>
 }
 
 class RealStartMultiStakingInteractor(
@@ -34,13 +34,12 @@ class RealStartMultiStakingInteractor(
         }
     }
 
-    override suspend fun startStaking(selection: StartMultiStakingSelection): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
+    override suspend fun startStaking(selection: StartMultiStakingSelection): Result<ExtrinsicExecutionResult> {
         return withContext(Dispatchers.IO) {
             extrinsicService.submitExtrinsicAndAwaitExecution(selection.stakingOption.chain, TransactionOrigin.SelectedWallet) {
                 startStaking(selection)
             }
-                .flattenDispatchFailure()
-                .coerceToUnit()
+                .requireOk()
         }
     }
 
