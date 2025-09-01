@@ -35,7 +35,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
@@ -336,36 +335,6 @@ inline fun Context.useAttributes(
 fun TypedArray.getResourceIdOrNull(@StyleableRes index: Int) = getResourceId(index, 0).takeIf { it != 0 }
 
 fun TypedArray.getColorOrNull(@StyleableRes index: Int) = runCatching { getColorOrThrow(index) }.getOrNull()
-
-fun View.applyBarMargin() = applyInsetter {
-    type(statusBars = true) {
-        margin()
-    }
-}
-
-fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
-    type(statusBars = true) {
-        padding()
-    }
-
-    consume(consume)
-}
-
-fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(navigationBars = true, ime = imeInsets) {
-        padding(bottom = true)
-    }
-
-    consume(consume)
-}
-
-fun View.applySystemBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(statusBars = true, navigationBars = true, ime = imeInsets) {
-        padding(top = true, bottom = true)
-    }
-
-    consume(consume)
-}
 
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
 
