@@ -3,9 +3,7 @@ package io.novafoundation.nova.feature_account_impl.data.events
 import io.novafoundation.nova.common.utils.bus.BaseEventBus
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.allAffectedMetaAccountTypes
-import io.novafoundation.nova.feature_account_api.data.events.collect
-import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
-import io.novafoundation.nova.feature_account_api.domain.model.isProxied
+import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupAccountsModificationsTracker
 
 /**
@@ -13,7 +11,7 @@ import io.novafoundation.nova.feature_account_impl.data.cloudBackup.CloudBackupA
  * Components from external modules can subscribe to this event bus on the upper level
  */
 class RealMetaAccountChangesEventBus(
-    private val proxySyncService: dagger.Lazy<ProxySyncService>,
+    private val externalAccountsSyncService: dagger.Lazy<ExternalAccountsSyncService>,
     private val cloudBackupAccountsModificationsTracker: CloudBackupAccountsModificationsTracker
 ) : BaseEventBus<MetaAccountChangesEventBus.Event>(), MetaAccountChangesEventBus {
 
@@ -21,18 +19,6 @@ class RealMetaAccountChangesEventBus(
         super.notify(event, source)
 
         cloudBackupAccountsModificationsTracker.recordAccountModified(event.allAffectedMetaAccountTypes())
-
-        if (event.shouldTriggerProxySync()) {
-            proxySyncService.get().startSyncing()
-        }
-    }
-
-    private fun MetaAccountChangesEventBus.Event.shouldTriggerProxySync(): Boolean {
-        val potentialTriggers = collect(
-            onAdd = { it.metaAccountType },
-            onStructureChanged = { it.metaAccountType }
-        )
-
-        return potentialTriggers.any { !it.isProxied }
+        externalAccountsSyncService.get().syncOnAccountChange(event, source)
     }
 }

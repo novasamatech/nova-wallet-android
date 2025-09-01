@@ -1,5 +1,7 @@
 package io.novafoundation.nova.common.data.network.runtime.binding
 
+import io.novafoundation.nova.common.domain.balance.EDCountingMode
+import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.system
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -51,6 +53,22 @@ value class AccountDataFlags(val value: BigInteger) {
 
     @Suppress("SameParameterValue")
     private fun flagEnabled(flag: BigInteger) = value and flag == flag
+}
+
+fun AccountDataFlags.transferableMode(): TransferableMode {
+    return if (holdsAndFreezesEnabled()) {
+        TransferableMode.HOLDS_AND_FREEZES
+    } else {
+        TransferableMode.REGULAR
+    }
+}
+
+fun AccountDataFlags.edCountingMode(): EDCountingMode {
+    return if (holdsAndFreezesEnabled()) {
+        EDCountingMode.FREE
+    } else {
+        EDCountingMode.TOTAL
+    }
 }
 
 class AccountInfo(

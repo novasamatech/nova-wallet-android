@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.data.repository
 
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
-import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.networkType
@@ -16,6 +15,7 @@ import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
+import io.novafoundation.nova.feature_account_api.data.events.combineBusEvents
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetB
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.defaultSubstrateAddress
+import io.novafoundation.nova.feature_account_api.domain.model.multiChainEncryptionIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.domain.model.substrateMultiChainEncryption
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
@@ -34,7 +35,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.getMetaAccountTypeOrThrow
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonEncoder
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -49,7 +50,7 @@ class AccountRepositoryImpl(
     private val accountDataSource: AccountDataSource,
     private val accountDao: AccountDao,
     private val nodeDao: NodeDao,
-    private val jsonSeedEncoder: JsonSeedEncoder,
+    private val JsonEncoder: JsonEncoder,
     private val languagesHolder: LanguagesHolder,
     private val accountSubstrateSource: AccountSubstrateSource,
     private val secretStoreV2: SecretStoreV2,
@@ -104,6 +105,15 @@ class AccountRepositoryImpl(
         return accountDataSource.getSelectedMetaAccount()
     }
 
+    override suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount> {
+        return accountDataSource.getMetaAccountsByIds(metaIds)
+    }
+
+    override suspend fun getUnavailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long> {
+        val availableMetaIds = accountDataSource.getActiveMetaIds()
+        return metaIds - availableMetaIds
+    }
+
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
         return accountDataSource.getMetaAccount(metaId)
     }
@@ -122,10 +132,6 @@ class AccountRepositoryImpl(
 
     override suspend fun accountNameFor(accountId: AccountId, chainId: String): String? {
         return accountDataSource.accountNameFor(accountId, chainId)
-    }
-
-    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
-        return accountDataSource.allLightMetaAccounts()
     }
 
     override suspend fun hasActiveMetaAccounts(): Boolean {
@@ -168,9 +174,12 @@ class AccountRepositoryImpl(
     override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
         val metaAccountType = accountDataSource.getMetaAccountTypeOrThrow(metaId)
 
-        accountDataSource.deleteMetaAccount(metaId)
+        val allAffectedMetaIds = accountDataSource.deleteMetaAccount(metaId)
 
-        metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId, metaAccountType), source = null)
+        val deleteEvents = allAffectedMetaIds.map { Event.AccountRemoved(it, metaAccountType) }
+            .combineBusEvents() ?: return@withContext
+
+        metaAccountChangesEventBus.notify(deleteEvents, source = null)
     }
 
     override suspend fun getAccounts(): List<Account> {
@@ -244,9 +253,8 @@ class AccountRepositoryImpl(
 
             val secrets = secretStoreV2.getAccountSecrets(metaAccount.id, accountId)
 
-            jsonSeedEncoder.generate(
+            JsonEncoder.generate(
                 keypair = secrets.keypair(chain),
-                seed = secrets.seed(),
                 password = password,
                 name = metaAccount.name,
                 multiChainEncryption = metaAccount.multiChainEncryptionIn(chain)!!,
@@ -263,9 +271,8 @@ class AccountRepositoryImpl(
         return withContext(Dispatchers.Default) {
             val secrets = secretStoreV2.getMetaAccountSecrets(metaAccount.id)!!
 
-            jsonSeedEncoder.generate(
+            JsonEncoder.generate(
                 keypair = secrets.keypair(ethereum = false),
-                seed = secrets.seed,
                 password = password,
                 name = metaAccount.name,
                 multiChainEncryption = metaAccount.substrateMultiChainEncryption()!!,
@@ -287,12 +294,24 @@ class AccountRepositoryImpl(
         return accountDataSource.getActiveMetaAccounts()
     }
 
+    override suspend fun getAllMetaAccounts(): List<MetaAccount> {
+        return accountDataSource.getAllMetaAccounts()
+    }
+
     override suspend fun getActiveMetaAccountsQuantity(): Int {
         return accountDataSource.getActiveMetaAccountsQuantity()
     }
 
-    override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
-        return accountDataSource.getMetaAccountIdsByType(type)
+    override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
+        return accountDataSource.hasMetaAccountsCountOfTypeFlow(type)
+    }
+
+    override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
+        return accountDataSource.hasMetaAccountsByType(type)
+    }
+
+    override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
+        return accountDataSource.metaAccountsByTypeFlow(type)
     }
 
     override suspend fun hasSecretsAccounts(): Boolean {

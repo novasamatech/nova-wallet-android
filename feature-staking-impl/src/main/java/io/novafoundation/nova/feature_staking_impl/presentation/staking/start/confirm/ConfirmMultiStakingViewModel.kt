@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
@@ -56,9 +57,11 @@ class ConfirmMultiStakingViewModel(
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -158,9 +161,9 @@ class ConfirmMultiStakingViewModel(
 
         interactor.startStaking(validationPayload.selection)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                finishFlow()
+                startNavigation(it.submissionHierarchy) { finishFlow() }
             }
             .onFailure {
                 showError(it)

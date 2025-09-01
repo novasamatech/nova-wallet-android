@@ -7,7 +7,7 @@ import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.TableView
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewGenericExtrinsicInformationBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay

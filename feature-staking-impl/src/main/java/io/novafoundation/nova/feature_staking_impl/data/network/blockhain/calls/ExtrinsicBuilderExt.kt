@@ -7,7 +7,8 @@ import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindRewardDestination
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import java.math.BigInteger
 
 fun ExtrinsicBuilder.setController(controllerAddress: MultiAddress): ExtrinsicBuilder {

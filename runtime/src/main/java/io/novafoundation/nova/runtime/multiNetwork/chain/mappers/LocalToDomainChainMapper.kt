@@ -25,14 +25,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.EVM_TRANS
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.GovernanceReferendaParameters
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.SUBSTRATE_TRANSFER_PARAMETER
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.utils.TransferParameters
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.TradeProviderArguments
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.TradeProviderId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ConnectionState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.AutoBalanceStrategy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Nodes.NodeSelectionStrategy
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.TradeProviderArguments
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.TradeProviderId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type.Orml.SubType as OrmlSubType
 
 private fun mapStakingTypeFromLocal(stakingTypesLocal: String): List<Chain.Asset.StakingType> {
     if (stakingTypesLocal.isEmpty()) return emptyList()
@@ -67,12 +67,13 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
             Chain.Asset.Type.Statemine(id, palletName, isSufficient)
         }
 
-        ASSET_ORML -> {
+        ASSET_ORML, ASSET_ORML_HYDRATION_EVM -> {
             Chain.Asset.Type.Orml(
                 currencyIdScale = typeExtras!![ORML_EXTRAS_CURRENCY_ID_SCALE] as String,
                 currencyIdType = typeExtras[ORML_EXTRAS_CURRENCY_TYPE] as String,
                 existentialDeposit = (typeExtras[ORML_EXTRAS_EXISTENTIAL_DEPOSIT] as String).toBigInteger(),
                 transfersEnabled = typeExtras[ORML_EXTRAS_TRANSFERS_ENABLED] as Boolean? ?: ORML_TRANSFERS_ENABLED_DEFAULT,
+                subType = determineOrmlSubtype(type)
             )
         }
 
@@ -90,10 +91,11 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
     }
 }
 
-private fun mapStatemineAssetIdToRaw(statemineAssetId: StatemineAssetId): String {
-    return when (statemineAssetId) {
-        is StatemineAssetId.Number -> statemineAssetId.value.toString()
-        is StatemineAssetId.ScaleEncoded -> statemineAssetId.scaleHex
+private fun determineOrmlSubtype(type: String): OrmlSubType {
+    return when (type) {
+        ASSET_ORML -> OrmlSubType.DEFAULT
+        ASSET_ORML_HYDRATION_EVM -> OrmlSubType.HYDRATION_EVM
+        else -> error("Unknown orml token subtype: $type")
     }
 }
 
@@ -157,6 +159,10 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
 
         ApiType.REFERENDUM_SUMMARY -> {
             ExternalApi.ReferendumSummary(externalApiLocal.url)
+        }
+
+        ApiType.MULTISIG -> {
+            ExternalApi.Multisig(externalApiLocal.url)
         }
 
         ApiType.UNKNOWN -> null

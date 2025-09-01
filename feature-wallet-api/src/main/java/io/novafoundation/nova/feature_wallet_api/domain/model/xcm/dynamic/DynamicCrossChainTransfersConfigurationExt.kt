@@ -3,14 +3,11 @@ package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemote
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.TransferDestination
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
-import io.novafoundation.nova.feature_xcm_api.chain.absoluteLocation
-import io.novafoundation.nova.feature_xcm_api.chain.isRelay
-import io.novafoundation.nova.feature_xcm_api.chain.isSystemChain
-import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 fun DynamicCrossChainTransfersConfiguration.availableOutDestinations(origin: Chain.Asset): List<FullChainAssetId> {
@@ -47,46 +44,44 @@ fun DynamicCrossChainTransfersConfiguration.availableInDestinations(): List<Edge
     }
 }
 
+fun DynamicCrossChainTransfersConfiguration.transferFeatures(
+    originAsset: FullChainAssetId,
+    destinationChainId: ChainId
+): DynamicCrossChainTransferFeatures? {
+    return outComingAssetTransfers(originAsset)?.getDestination(destinationChainId)?.getTransferFeatures()
+}
+
 suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     originXcmChain: XcmChain,
     originAsset: Chain.Asset,
     destinationXcmChain: XcmChain,
 ): DynamicCrossChainTransferConfiguration? {
     val destinationChain = destinationXcmChain.chain
-    val originChain = originXcmChain.chain
 
     val assetTransfers = outComingAssetTransfers(originAsset.fullId) ?: return null
-    val targetTransfer = assetTransfers.destinations.find { it.fullChainAssetId.chainId == destinationChain.id } ?: return null
+    val targetTransfer = assetTransfers.getDestination(destinationChain.id) ?: return null
 
     val reserve = reserveRegistry.getReserve(originAsset)
 
-    val originChainLocation = originXcmChain.absoluteLocation()
-    val assetLocationOnOrigin = reserve.tokenLocation.fromPointOfViewOf(originChainLocation)
-
-    val shouldUseReserveTransfers = originXcmChain.shouldUseReserveTransferTo(destinationXcmChain)
-
-    val remoteReserveChainLocation = if (shouldUseReserveTransfers && reserve.isRemote(originChain.id, destinationChain.id)) {
-        reserve.reserveChainLocation
-    } else {
-        null
-    }
-
     return DynamicCrossChainTransferConfiguration(
-        assetLocationOnOrigin = assetLocationOnOrigin,
-        originChainLocation = ChainLocation(originChain.id, originChainLocation),
-        destinationChainLocation = ChainLocation(destinationChain.id, destinationXcmChain.absoluteLocation()),
-        remoteReserveChainLocation = remoteReserveChainLocation,
+        originChain = originXcmChain,
+        destinationChain = destinationXcmChain,
+        originChainAsset = originAsset,
+        reserve = reserve,
+        features = targetTransfer.getTransferFeatures(),
     )
 }
 
-private fun XcmChain.shouldUseReserveTransferTo(destination: XcmChain): Boolean {
-    return !shouldUseTeleportTo(destination)
+private fun AssetTransfers.getDestination(destinationChainId: ChainId): TransferDestination? {
+    return destinations.find { it.fullChainAssetId.chainId == destinationChainId }
 }
 
-private fun XcmChain.shouldUseTeleportTo(destination: XcmChain): Boolean {
-    return isRelay() && destination.isSystemChain() ||
-        isSystemChain() && destination.isRelay() ||
-        isSystemChain() && destination.isSystemChain()
+private fun TransferDestination.getTransferFeatures(): DynamicCrossChainTransferFeatures {
+    return DynamicCrossChainTransferFeatures(
+        hasDeliveryFee = hasDeliveryFee,
+        supportsXcmExecute = supportsXcmExecute,
+        usesTeleport = usesTeleport
+    )
 }
 
 /**

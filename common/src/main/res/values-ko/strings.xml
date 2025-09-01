@@ -77,27 +77,34 @@
     <string name="account_ledger_import_fill_description">Ledger Live 앱을 사용하여 Ledger 장치에 Network 앱이 설치되어 있는지 확인하십시오. Ledger 장치에서 네트워크 앱을 여십시오.</string>
     <string name="account_ledger_import_fill_disabled_hint">계정을 적어도 하나 추가하십시오</string>
     <string name="account_ledger_import_fill_title">지갑에 계정을 추가하십시오</string>
+    <string name="account_ledger_import_start_guide">Ledger 연결 가이드</string>
     <string name="account_ledger_import_start_step_1">Ledger Live 앱을 사용하여 Ledger 기기에 %s 있는지 확인하십시오</string>
     <string name="account_ledger_import_start_step_1_highlighted">네트워크 앱이 설치되었습니다</string>
     <string name="account_ledger_import_start_step_2">Ledger 기기에서 %s</string>
     <string name="account_ledger_import_start_step_2_highlighted">네트워크 앱을 여세요</string>
     <string name="account_ledger_import_start_step_3">%s에 대한 Nova Wallet 접근을 허용하십시오</string>
-    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 및 위치</string>
+    <string name="account_ledger_import_start_step_3_highlighted">Bluetooth 접근</string>
     <string name="account_ledger_import_start_step_4">지갑에 추가하려면 %s</string>
     <string name="account_ledger_import_start_step_4_highlighted">계정을 선택</string>
     <string name="account_ledger_import_start_step_otg">%s 전화 설정에서</string>
     <string name="account_ledger_import_start_step_otg_highlighted">OTG 활성화</string>
+    <string name="account_ledger_import_start_title">Ledger 연결</string>
     <string name="account_ledger_legacy_warning_message">작업을 서명하고 계정을 새로운 Generic Ledger 앱으로 마이그레이션하려면 Migration 앱을 설치하고 여십시오. 레거시 구형 및 Migration Ledger 앱은 더 이상 지원되지 않을 것입니다.</string>
     <string name="account_ledger_legacy_warning_title">새로운 Ledger 앱이 출시되었습니다</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 앱은 곧 사용 불가능할 것입니다. 자금을 잃지 않기 위해 새 Ledger 앱으로 계정을 마이그레이션하세요.</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_legacy">레저 레거시</string>
     <string name="account_ledger_select_device_all_description">Ledger를 Bluetooth로 사용하는 경우, 두 기기에서 Bluetooth를 활성화하고 Nova Bluetooth 및 위치 권한을 부여하세요. USB를 사용하려면, 전화 설정에서 OTG를 활성화하세요.</string>
     <string name="account_ledger_select_device_description">전화 설정에서 Bluetooth를 활성화하고 Ledger 장치를 여십시오. Ledger 장치를 잠금 해제하고 %s 앱을 여십시오.</string>
     <string name="account_ledger_select_device_title">Ledger 장치를 선택하십시오</string>
     <string name="account_ledger_select_device_usb_description">Ledger 장치를 활성화해주세요. Ledger 장치를 잠금 해제하고 %s 앱을 여세요.</string>
+    <string name="account_migration_subtitle">거의 다 왔어요! 🎉\n 아래를 탭하여 설정을 완료하고 Polkadot 앱과 Nova Wallet에서 계정을 원활하게 사용하세요</string>
+    <string name="account_migration_title">Nova에 오신 것을 환영합니다!</string>
     <string name="account_mnmonic_length_variants">12, 15, 18, 21 또는 24 단어 구</string>
+    <string name="account_multisig">다중 서명</string>
+    <string name="account_multisig_group_label">공유 제어 (다중 서명)</string>
     <string name="account_needed_message">이 네트워크에 사용할 계정이 없습니다. 계정을 생성하거나 가져올 수 있습니다.</string>
     <string name="account_needed_title">계정 필요</string>
     <string name="account_no_chain_projection">계정을 찾을 수 없습니다</string>
@@ -134,6 +141,7 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault가 %s합니다</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">스캔할 QR 코드</string>
     <string name="account_private_key">개인 키</string>
+    <string name="account_proxied">프록시됨</string>
     <string name="account_proxieds">위임된 사용(프록시됨)</string>
     <string name="account_proxy_type_any">어떤 동작이든</string>
     <string name="account_proxy_type_auction">경매</string>
@@ -163,11 +171,15 @@
     <string name="account_watch_only">보기 전용</string>
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault, Parity Signer 또는 Ledger 사용</string>
     <string name="account_welcome_hardware_wallet_title">하드웨어 지갑</string>
+    <string name="account_welcome_trust_wallet_subtitle">Nova에서 Trust Wallet 계정을 사용하세요</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">%s 계정 추가</string>
     <string name="accounts_add_wallet">지갑 추가</string>
     <string name="accounts_change_chain_account">%s 계정 변경</string>
     <string name="accounts_change_chain_secrets">계정 변경</string>
     <string name="accounts_ledger_legacy">Ledger (Legacy)</string>
+    <string name="accounts_update_proxieds_title">귀하에게 위임됨</string>
+    <string name="active_multisig_title">공유 제어</string>
     <string name="add_custom_node">사용자 정의 노드 추가</string>
     <string name="add_delegation_missing_account_message">위임하기 위해 지갑에 %s 계정을 추가해야 합니다</string>
     <string name="add_network_title">네트워크 세부사항 입력</string>
@@ -180,6 +192,7 @@
     <string name="add_proxy_maximum_reached_error_title">최대 프록시 수에 도달했습니다</string>
     <string name="added_networks_empty_placeholder">추가된 사용자 정의 네트워크는 여기에 나타납니다</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">Nova가 자동으로 귀하의 멀티시그 지갑으로 전환되어, 대기 중인 거래를 확인할 수 있습니다.</string>
     <string name="appearance_colored_icon_title">컬러</string>
     <string name="appearance_title">외관</string>
     <string name="appearance_token_assets_title">토큰 아이콘</string>
@@ -333,6 +346,8 @@
     <string name="common_balance">잔액</string>
     <string name="common_bonus">보너스</string>
     <string name="common_call">호출</string>
+    <string name="common_call_data">호출 데이터</string>
+    <string name="common_call_hash">호출 해시</string>
     <string name="common_cancel">취소</string>
     <string name="common_cancel_operation_warning">이 작업을 취소하시겠습니까?</string>
     <string name="common_cannot_find_app">죄송합니다, 이 요청을 처리할 올바른 앱이 없습니다</string>
@@ -360,17 +375,21 @@
     <string name="common_continue">계속</string>
     <string name="common_copied">클립보드에 복사됨</string>
     <string name="common_copy_address">주소 복사</string>
+    <string name="common_copy_call_data">호출 데이터 복사</string>
+    <string name="common_copy_hash">해시 복사</string>
     <string name="common_copy_id">ID 복사</string>
     <string name="common_crypto_type">키페어 암호화 유형</string>
     <string name="common_date">날짜</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s 및 %s</string>
     <string name="common_delete">삭제</string>
+    <string name="common_depositor">입금자</string>
     <string name="common_details">세부 사항</string>
     <string name="common_disabled">비활성화됨</string>
     <string name="common_disconnect">연결 끊기</string>
     <string name="common_do_not_close_app">앱을 닫지 마세요!</string>
     <string name="common_done">완료</string>
-    <string name="common_dont_show_again">다시 표시하지 않기</string>
+    <string name="common_dry_run_failed_message">Nova는 오류를 방지하기 위해 거래를 사전에 시뮬레이션합니다. 이 시뮬레이션이 성공하지 못했습니다. 나중에 다시 시도하거나 더 높은 금액으로 시도하십시오. 문제가 지속되면, 설정의 Nova Wallet 지원팀에 문의하십시오.</string>
+    <string name="common_dry_run_failed_title">거래 시뮬레이션 실패</string>
     <string name="common_edit">편집</string>
     <string name="common_element_and_more_format" formatted="false">%s (+%s 더)</string>
     <string name="common_email_chooser_title">이메일 앱 선택</string>
@@ -401,10 +420,12 @@
     </plurals>
     <string name="common_frequency_days_daily">매일</string>
     <string name="common_frequency_days_everyday">매일</string>
+    <string name="common_full_details">전체 세부 정보</string>
     <string name="common_get_token_format">%s 받기</string>
     <string name="common_got_it">알겠습니다</string>
     <string name="common_governance">거버넌스</string>
     <string name="common_hexadecimal_string">16진수 문자열</string>
+    <string name="common_hide">숨기기</string>
     <plurals name="common_hours_format">
         <item quantity="other">%d 시간</item>
     </plurals>
@@ -490,8 +511,12 @@
     <string name="common_see_all">모두 보기</string>
     <string name="common_settings">설정</string>
     <string name="common_share">공유</string>
+    <string name="common_share_call_data">호출 데이터 공유</string>
+    <string name="common_share_hash">해시 공유</string>
+    <string name="common_show">표시</string>
     <string name="common_sign_in">로그인</string>
     <string name="common_sign_request">서명 요청</string>
+    <string name="common_signatory">서명자</string>
     <string name="common_signature_invalid">서명이 유효하지 않습니다</string>
     <string name="common_skip">건너뛰기</string>
     <string name="common_skip_process">프로세스 건너뛰기</string>
@@ -684,8 +709,8 @@
     <string name="delegate_search_hint">주소나 이름으로 검색</string>
     <string name="delegate_search_placeholder_empty">주소 형식이 잘못되었습니다. 주소가 올바른 네트워크에 속하는지 확인하세요</string>
     <string name="delegate_search_result_count">검색 결과: %d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova Wallet은 자동으로 위탁한 권한(프록시)을 별도의 카테고리에 추가합니다. 설정에서 언제든지 지갑을 관리할 수 있습니다.</string>
-    <string name="delegated_accounts_fragment_title">위임된 계정 업데이트</string>
+    <string name="delegated_accounts_fragment_explanation">프록시 및 다중 서명 계정이 자동으로 감지 및 구성되었습니다. 설정에서 언제든지 관리할 수 있습니다.</string>
+    <string name="delegated_accounts_fragment_title">지갑 목록이 업데이트되었습니다</string>
     <string name="delegation_all_votes">전체 시간 동안 투표됨</string>
     <string name="delegation_delegate">Delegate</string>
     <string name="delegation_delegate_filter_all">모든 계정</string>
@@ -722,6 +747,7 @@
     <string name="delegation_tracks_governance_preset">Governance</string>
     <string name="delegation_tracks_treasury_preset">Treasury</string>
     <string name="delegation_undelegating_period">Unstaking 기간</string>
+    <string name="delegation_updates_deactivated_title">더 이상 유효하지 않음</string>
     <string name="delegation_your_delegation">귀하의 위임</string>
     <string name="delegation_your_delegations">귀하의 위임들</string>
     <string name="delegations_filter">표시</string>
@@ -738,6 +764,7 @@
     <string name="ed25519_selection_subtitle">ed25519 (대안)</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">백업 비밀번호</string>
+    <string name="enter_call_data_title">호출 데이터 입력</string>
     <string name="error_not_enough_to_pay_fee_title">수수료를 지불할 충분한 토큰이 없습니다</string>
     <string name="ethereum_contract">컨트랙트</string>
     <string name="ethereum_contract_call">컨트랙트 호출</string>
@@ -799,6 +826,9 @@
     <string name="integrate_networks_banner_description">당신이 구축하고 있는 네트워크의 모든 기능을 Nova Wallet에 통합하여 모든 사람이 접근할 수 있게 만드세요.</string>
     <string name="integrate_networks_banner_link">네트워크 통합</string>
     <string name="integrate_networks_banner_title">Polkadot을 위해 개발 중인가요?</string>
+    <string name="invalid_call_data_format_message">제공된 호출 데이터가 유효하지 않거나 형식이 잘못되었습니다. 올바른지 확인하고 다시 시도하십시오.</string>
+    <string name="invalid_call_data_message">이 호출 데이터는 호출 해시 %s의 다른 작업에 대한 것입니다</string>
+    <string name="invalid_call_data_title">잘못된 호출 데이터</string>
     <string name="invalid_proxy_address_message">프록시 주소는 유효한 %s 주소여야 합니다</string>
     <string name="invalid_proxy_address_title">유효하지 않은 프록시 주소</string>
     <string name="invalid_token_symbol_message">입력한 통화 기호(%1$s)가 네트워크(%2$s)와 일치하지 않습니다. 올바른 통화 기호를 사용하시겠습니까?</string>
@@ -844,6 +874,7 @@
     <string name="ledger_wallet_details_description">이 지갑은 Ledger와 연동되어 있습니다. Nova는 원하는 모든 작업을 생성하는 데 도움을 줄 것이며, Ledger를 사용하여 서명하라는 요청을 받을 것입니다.</string>
     <string name="ledher_import_select_address_title">지갑에 추가할 계정을 선택하세요</string>
     <string name="loading_network_info">네트워크 정보를 불러오는 중...</string>
+    <string name="loading_transaction_details">거래 세부 정보 로딩 중...</string>
     <string name="loocking_backup_progress">백업을 찾고 있습니다...</string>
     <string name="make_payout_transaction_sent">출금 거래가 전송되었습니다</string>
     <string name="manage_assets_add_token">토큰 추가</string>
@@ -879,6 +910,77 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">최소 %d 개의 지갑을 선택하세요</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">이 거래는 이미 거부되었거나 실행되었습니다.</string>
+    <string name="multisig_approve_transaction_unavailable_title">이 거래를 수행할 수 없음</string>
+    <string name="multisig_callhash_exists_message">%s가 동일 작업을 이미 시작했으며, 다른 서명자의 서명을 기다리고 있습니다.</string>
+    <string name="multisig_callhash_exists_title">작업이 이미 존재합니다</string>
+    <string name="multisig_card_not_supported_message">데빗 카드를 관리하려면 다른 종류의 지갑으로 전환하십시오.</string>
+    <string name="multisig_card_not_supported_title">다중 서명에는 데빗 카드가 지원되지 않음</string>
+    <string name="multisig_deposit">다중 서명 예치금</string>
+    <string name="multisig_deposit_description">예치금은 다중 서명 작업이 실행되거나 거부될 때까지 입금자 계정에 잠겨 있습니다.</string>
+    <string name="multisig_extrinsic_details_subtitle">작업이 올바른지 확인하십시오</string>
+    <string name="multisig_notification_executed_transaction_message">%s에 의해 서명 및 실행되었습니다.</string>
+    <string name="multisig_notification_executed_transaction_title">✅ 멀티시그 거래 실행 완료</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s에서 %s.</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 귀하의 서명이 요청되었습니다</string>
+    <string name="multisig_notification_initiator_footer">%s에 의해 시작됨.</string>
+    <string name="multisig_notification_message_header">지갑: %s</string>
+    <string name="multisig_notification_new_approval_title">%s에 의해 서명됨</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">%d개의 서명 중 %d개가 수집되었습니다.</string>
+    <string name="multisig_notification_on_behalf_of">%s를 대신하여.</string>
+    <string name="multisig_notification_rejected_transaction_message">%s에 의해 거부됨.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ 멀티시그 거래 거부됨</string>
+    <string name="multisig_on_behalf_of">다른 사람을 대신하여</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s: %s</string>
+    <string name="multisig_operation_details_approve">승인</string>
+    <string name="multisig_operation_details_approve_and_execute">승인 및 실행</string>
+    <string name="multisig_operation_details_call_data_not_found">세부 정보를 보려면 호출 데이터를 입력하십시오</string>
+    <string name="multisig_operation_details_not_found_message">거래가 이미 실행되었거나 거부되었습니다.</string>
+    <string name="multisig_operation_details_not_found_title">서명이 종료됨</string>
+    <string name="multisig_operation_details_reject">거부</string>
+    <string name="multisig_operation_details_signatories" formatted="false">서명자 (%d 중 %d)</string>
+    <string name="multisig_operation_utility_batch_all_title">모두 묶음 (오류 시 되돌림)</string>
+    <string name="multisig_operation_utility_batch_title">묶음 (오류 발생 시까지 실행)</string>
+    <string name="multisig_operation_utility_force_batch_title">강제 묶음 (오류 무시)</string>
+    <string name="multisig_operations_created">귀하에 의해 생성됨</string>
+    <string name="multisig_operations_placeholder">아직 거래가 없습니다.\n서명 요청이 여기에 표시됩니다</string>
+    <string name="multisig_operations_progress" formatted="false">서명 중 (%s 중 %s)</string>
+    <string name="multisig_operations_signed">귀하에 의해 서명됨</string>
+    <string name="multisig_operations_unknown_calldata">알 수 없는 작업</string>
+    <string name="multisig_pending_operations">서명할 거래</string>
+    <string name="multisig_pending_operations_on_behalf_of">다른 사람을 대신하여:</string>
+    <string name="multisig_push_settings_approval_switcher">서명자에 의해 서명됨</string>
+    <string name="multisig_push_settings_executed_switcher">멀티시그 거래 실행 완료</string>
+    <string name="multisig_push_settings_initial_switcher">귀하의 서명이 요청되었습니다</string>
+    <string name="multisig_push_settings_rejected_switcher">멀티시그 거래 거부됨</string>
+    <string name="multisig_sell_not_supported_message">암호화폐를 법정 화폐로 판매하려면 다른 종류의 지갑으로 전환하십시오.</string>
+    <string name="multisig_sell_not_supported_title">다중 서명에는 판매가 지원되지 않음</string>
+    <string name="multisig_signatory">서명자:</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s는 %s의 다중 서명 예치금을 마련할 충분한 잔액이 없습니다. 잔액에 %s를 더 추가해야 합니다</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s는 %s의 네트워크 수수료를 지불하고 %s의 다중 서명 예치금을 마련할 충분한 잔액이 없습니다. 잔액에 %s를 더 추가해야 합니다</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s는 이 거래 수수료를 지불하고 최소 네트워크 잔액 이상을 유지하기 위해 최소 %s가 필요합니다. 현재 잔액: %s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">%s는 %s의 네트워크 수수료를 지불할 충분한 잔액이 없습니다. 잔액에 %s를 더 추가해야 합니다</string>
+    <string name="multisig_signing_is_not_supported_message">멀티시그 지갑은 임의 메시지 서명을 지원하지 않으며, 거래만 가능합니다</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">거래가 거부됩니다. 멀티시그 예치금은 %s에게 반환됩니다.</string>
+    <string name="multisig_signing_warning_message">멀티시그 거래는 %s에 의해 시작됩니다. 시작자는 네트워크 수수료를 지불하고 멀티시그 예치를 예약하며, 거래가 실행되면 해제됩니다.</string>
+    <string name="multisig_signing_warning_title">다중 서명 거래</string>
+    <string name="multisig_transaction_created_subtitle">다른 서명자가 이제 거래를 확인할 수 있습니다.\n%s에서 상태를 추적할 수 있습니다.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">서명할 거래</string>
+    <string name="multisig_transaction_created_title">다중 서명 거래 생성됨</string>
+    <string name="multisig_transaction_created_view_details">세부 사항 보기</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">체인 상의 초기 정보(호출 데이터)가 없는 거래가 거부되었습니다</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s에서 %s.\n더 이상의 추가 작업이 필요 없습니다.</string>
+    <string name="multisig_transaction_executed_dialog_title">멀티시그 거래 실행 완료</string>
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s에서 %s.\n거부됨: %s.\n더 이상의 추가 작업이 필요 없습니다.</string>
+    <string name="multisig_transaction_rejected_dialog_title">멀티시그 거래 거부됨</string>
+    <string name="multisig_wallet_details_info_warning">이 지갑의 거래는 여러 서명자의 승인이 필요합니다. 귀하의 계정은 서명자 중 하나입니다:</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">다른 서명자:</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">임계값 %d 중 %d</string>
+    <string name="multisigs_notification_channel_name">멀티시그 거래 알림 채널</string>
+    <string name="mutisigs_push_notifications_warning_enable">설정에서 활성화</string>
+    <string name="mutisigs_push_notifications_warning_message">서명 요청, 새로운 서명 및 완료된 거래에 대한 알림을 받아 항상 제어할 수 있습니다. 설정에서 언제든지 관리하세요.</string>
+    <string name="mutisigs_push_notifications_warning_title">멀티시그 푸시 알림이 여기에 있습니다!</string>
     <string name="network_already_exist_failure_title">이 노드가 이미 존재합니다</string>
     <string name="network_fee">네트워크 수수료</string>
     <string name="network_info_address">노드 주소</string>
@@ -897,6 +999,8 @@
     <string name="nft_owned_by">소유자</string>
     <string name="nft_price_not_listed">가격 미정</string>
     <string name="nft_your_nfts">당신의 NFT</string>
+    <string name="no_ms_accounts_found_dialog_message">Nova에 멀티시그 지갑을 추가하거나 선택하지 않았습니다. 멀티시그 푸시 알림을 받으려면 최소 한 개를 추가하고 선택하세요.</string>
+    <string name="no_ms_accounts_found_dialog_title">멀티시그 지갑 없음</string>
     <string name="node_already_exist_failure_message">입력된 URL이 \\\"%s\\\" 노드로 이미 존재합니다.</string>
     <string name="node_already_exist_failure_title">이 노드가 이미 존재합니다</string>
     <string name="node_not_alive_message">입력된 노드 URL이 응답하지 않거나 잘못된 형식을 포함하고 있습니다. URL 형식은 \"wss://\"로 시작해야 합니다.</string>
@@ -974,9 +1078,9 @@
     <string name="profile_settings_pin_code_verification_title">PIN으로 승인</string>
     <string name="profile_settings_safe_mode_title">안전 모드</string>
     <string name="profile_settings_title">설정</string>
+    <string name="proxied_card_not_supported_message">데빗 카드를 관리하려면 다른 월렛으로 전환해주세요. Polkadot 네트워크에서 사용하세요.</string>
+    <string name="proxied_card_not_supported_title">이 프록시드 월렛에서는 데빗 카드가 지원되지 않습니다</string>
     <string name="proxied_wallet_details_info_warning">이 계정은 다음 계정에 거래를 수행할 수 있는 권한을 부여했습니다:</string>
-    <string name="proxieds_updates_deactivated_title">더 이상 유효하지 않음</string>
-    <string name="proxy_about">프록시란 무엇인가요?</string>
     <string name="proxy_access_type_staking_operations">Staking 작업</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">위임된 계정 %s에 네트워크 수수료 %s를 결제할 충분한 잔액이 없습니다. 결제 가능한 잔액: %s</string>
     <string name="proxy_signing_is_not_supported_message">프록시 지갑은 임의 메시지 서명을 지원하지 않습니다 — 오직 거래만</string>
@@ -1003,6 +1107,7 @@
     <string name="push_settings_announcements">Nova 공지사항</string>
     <string name="push_settings_balances">잔액</string>
     <string name="push_settings_enable">알림 활성화</string>
+    <string name="push_settings_multisig_operations">다중 서명 거래</string>
     <string name="push_settings_no_selected_wallets">지갑을 선택하지 않았기 때문에 지갑 활동(잔액, Staking)에 대한 알림을 받지 못합니다</string>
     <string name="push_settings_others">기타</string>
     <string name="push_settings_received_tokens">받은 토큰</string>
@@ -1020,7 +1125,7 @@
     <string name="push_token_sent_message" formatted="false">%s 네트워크의 %s에게 %s을(를) 보냈습니다</string>
     <string name="push_token_sent_no_account_name_title">💸 보낸 토큰</string>
     <string name="push_token_sent_title">💸 보낸 토큰 %s</string>
-    <string name="push_wallets_title">활동이 있을 때 알림을 받을 지갑을 최대 3개 선택하세요</string>
+    <string name="push_wallets_title">최대 %d개의 월렛을 선택하여 활동이 있을 때 알림 받기</string>
     <string name="push_welcome_enable_button">푸시 알림 활성화</string>
     <string name="push_welcome_message">지갑 작업, 거버넌스 업데이트, Staking 활동 및 보안에 대한 알림을 받아 항상 최신 정보를 유지하세요</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">푸시 알림을 활성화함으로써 귀하는 우리의 %s 및 %s에 동의하게 됩니다</string>
@@ -1052,16 +1157,13 @@
     <string name="referendum_aye_format">찬성: %s</string>
     <string name="referendum_dapp_list_title">Nova DApp 브라우저 사용</string>
     <string name="referendum_description_fallback">제안자만 이 설명과 제목을 수정할 수 있습니다. 제안자의 계정을 소유하고 있다면, Polkassembly에 방문하여 제안에 대한 정보를 입력하세요.</string>
-    <string name="referendum_details_full_details">전체 세부 정보</string>
     <string name="referendum_details_requested_amount">요청된 금액</string>
     <string name="referendum_details_timeline">일정</string>
     <string name="referendum_details_your_vote">당신의 투표:</string>
     <string name="referendum_full_details_approve_threshold">승인 곡선</string>
     <string name="referendum_full_details_beneficiary">수혜자</string>
-    <string name="referendum_full_details_copy_hash">해시 복사</string>
     <string name="referendum_full_details_deposit">예치금</string>
     <string name="referendum_full_details_electorate">유권자</string>
-    <string name="referendum_full_details_hash">호출 해시</string>
     <string name="referendum_full_details_long_for_preview">미리 보기에는 너무 깁니다</string>
     <string name="referendum_full_details_parameters_json">파라미터 JSON</string>
     <string name="referendum_full_details_proposer">제안자</string>
@@ -1572,6 +1674,7 @@
     <string name="state_removed">제거됨</string>
     <string name="swap_custom_fee_selector_description">네트워크 수수료를 지불할 토큰</string>
     <string name="swap_custom_fee_selector_footer">입력한 금액 외에 네트워크 수수료가 추가됩니다</string>
+    <string name="swap_dry_run_failed_inline_message">스왑 단계 시뮬레이션 실패</string>
     <string name="swap_error_pair_not_supported">이 페어는 지원되지 않습니다</string>
     <string name="swap_execution_failure" formatted="false">작업 #%s (%s) 실패</string>
     <string name="swap_execution_failure_swap_label" formatted="false">%s에서 %s로의 스왑 %s</string>
@@ -1585,6 +1688,7 @@
     <string name="swap_execution_time">실행 시간</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">충분하지 않은 토큰을 보유하고 있으므로 %s의 네트워크 수수료를 지불한 후 최소 %s을(를) 유지해야 합니다</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">%s 토큰을 받기 위해 최소 %s을(를) 유지해야 합니다</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">%s 토큰을 받으려면 %s에 최소 %s가 있어야 합니다</string>
     <string name="swap_failure_insufficient_balance_message">네트워크 수수료로 %2$s를 지불해야 하므로 최대 %1$s까지 교환할 수 있습니다.</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">네트워크 수수료로 %2$s를 지불하고 %3$s을(를) %4$s으로 변환하여 %5$s 최소 잔액을 유지해야 하므로 최대 %1$s까지 교환할 수 있습니다.</string>
     <string name="swap_failure_swap_max_button">최대 교환</string>

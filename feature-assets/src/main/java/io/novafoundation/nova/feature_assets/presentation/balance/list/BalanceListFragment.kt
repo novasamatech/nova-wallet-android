@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
+import android.view.View
 import androidx.recyclerview.widget.ConcatAdapter
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.EditablePlaceholderAdapter
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
@@ -76,13 +77,11 @@ class BalanceListFragment :
         ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter)
     }
 
-    override fun initViews() {
-        binder.balanceListAssets.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
+    override fun applyInsets(rootView: View) {
+        binder.balanceListAssets.applyStatusBarInsets()
+    }
 
+    override fun initViews() {
         hideKeyboard()
 
         setupRecyclerView()
@@ -119,7 +118,7 @@ class BalanceListFragment :
 
         viewModel.assetListMixin.assetModelsFlow.observe {
             assetsAdapter.submitList(it) {
-                binder.balanceListAssets?.invalidateItemDecorations()
+                binder.balanceListAssets.invalidateItemDecorations()
             }
         }
 
@@ -153,12 +152,9 @@ class BalanceListFragment :
             balanceBreakdownBottomSheet?.show()
         }
 
-        viewModel.walletConnectAccountSessionsUI.observe {
-            headerAdapter.setWalletConnectModel(it)
-        }
-
+        viewModel.walletConnectAccountSessionsUI.observe(headerAdapter::setWalletConnectModel)
+        viewModel.pendingOperationsCountModel.observe(headerAdapter::setPendingOperationsCountModel)
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
-
         viewModel.assetViewModeModelFlow.observe { manageAssetsAdapter.setAssetViewModeModel(it) }
     }
 
@@ -215,6 +211,10 @@ class BalanceListFragment :
 
     override fun novaCardClick() {
         viewModel.novaCardClicked()
+    }
+
+    override fun pendingOperationsClicked() {
+        viewModel.pendingOperationsClicked()
     }
 
     override fun assetViewModeClicked() {

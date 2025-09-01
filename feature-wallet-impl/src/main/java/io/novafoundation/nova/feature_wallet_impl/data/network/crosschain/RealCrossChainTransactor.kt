@@ -4,42 +4,25 @@ import android.util.Log
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.flatMap
 import io.novafoundation.nova.common.utils.instanceOf
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.transformResult
 import io.novafoundation.nova.common.utils.wrapInResult
-import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdatePoint
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.tryDetectDeposit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
-import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.doNotCrossExistentialDepositInUsedAsset
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInCommissionAsset
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notDeadRecipientInUsedAsset
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.notPhishingRecipient
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.recipientIsNotSystemAccount
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientCommissionBalanceToStayAboveED
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.sufficientTransferableBalanceToPayOriginFee
-import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.validAddress
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.canPayCrossChainFee
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.cannotDropBelowEdBeforePayingDeliveryFee
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.findRelayChainOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.BlockEvents
@@ -48,7 +31,7 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.hasEvent
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
@@ -62,37 +45,12 @@ import kotlin.time.Duration.Companion.seconds
 
 class RealCrossChainTransactor(
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val phishingValidationFactory: PhishingValidationFactory,
-    private val enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory,
     private val eventsRepository: EventsRepository,
     private val chainStateRepository: ChainStateRepository,
     private val chainRegistry: ChainRegistry,
     private val dynamic: DynamicCrossChainTransactor,
-    private val legacy: LegacyCrossChainTransactor
+    private val legacy: LegacyCrossChainTransactor,
 ) : CrossChainTransactor {
-
-    override val validationSystem: AssetTransfersValidationSystem = ValidationSystem {
-        positiveAmount()
-        recipientIsNotSystemAccount()
-
-        validAddress()
-        notPhishingRecipient(phishingValidationFactory)
-
-        notDeadRecipientInCommissionAsset(assetSourceRegistry)
-        notDeadRecipientInUsedAsset(assetSourceRegistry)
-
-        sufficientCommissionBalanceToStayAboveED(enoughTotalToStayAboveEDValidationFactory)
-
-        sufficientTransferableBalanceToPayOriginFee()
-        canPayCrossChainFee()
-
-        cannotDropBelowEdBeforePayingDeliveryFee(assetSourceRegistry)
-
-        doNotCrossExistentialDepositInUsedAsset(
-            assetSourceRegistry = assetSourceRegistry,
-            extraAmount = { it.transfer.amount + it.crossChainFee?.decimalAmount.orZero() }
-        )
-    }
 
     context(ExtrinsicService)
     override suspend fun estimateOriginFee(
@@ -127,8 +85,11 @@ class RealCrossChainTransactor(
         }
     }
 
-    override suspend fun requiredRemainingAmountAfterTransfer(sendingAsset: Chain.Asset, originChain: Chain): Balance {
-        return assetSourceRegistry.sourceFor(sendingAsset).balance.existentialDeposit(sendingAsset)
+    override suspend fun requiredRemainingAmountAfterTransfer(configuration: CrossChainTransferConfiguration): Balance {
+        return when (configuration) {
+            is CrossChainTransferConfiguration.Dynamic -> dynamic.requiredRemainingAmountAfterTransfer(configuration.config)
+            is CrossChainTransferConfiguration.Legacy -> legacy.requiredRemainingAmountAfterTransfer(configuration.config)
+        }
     }
 
     context(ExtrinsicService)
@@ -150,6 +111,13 @@ class RealCrossChainTransactor(
 
                 balancesUpdates.awaitCrossChainArrival(transfer)
             }
+    }
+
+    override suspend fun supportsXcmExecute(
+        originChainId: ChainId,
+        features: DynamicCrossChainTransferFeatures
+    ): Boolean {
+        return dynamic.supportsXcmExecute(originChainId, features)
     }
 
     override suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration {
@@ -179,18 +147,13 @@ class RealCrossChainTransactor(
         return toProduceBlockOnOrigin + toProduceBlockOnRelay + toProduceBlockOnDestination
     }
 
-    private suspend fun Flow<Result<TransferableBalanceUpdate>>.awaitCrossChainArrival(transfer: AssetTransferBase): Result<Balance> {
+    private suspend fun Flow<Result<TransferableBalanceUpdatePoint>>.awaitCrossChainArrival(transfer: AssetTransferBase): Result<Balance> {
         return runCatching {
             withTimeout(60.seconds) {
                 transformResult { balanceUpdate ->
                     Log.d("CrossChain", "Destination balance update detected: $balanceUpdate")
 
                     val updatedAt = balanceUpdate.updatedAt
-
-                    if (updatedAt == null) {
-                        Log.w("CrossChain", "Update block hash was not present, maybe wrong datasource is used?")
-                        return@transformResult
-                    }
 
                     val blockEvents = eventsRepository.getBlockEvents(transfer.destinationChain.id, updatedAt)
 
@@ -252,14 +215,13 @@ class RealCrossChainTransactor(
         }
     }
 
-    private suspend fun observeTransferableBalance(transfer: AssetTransferBase): Flow<TransferableBalanceUpdate> {
+    private suspend fun observeTransferableBalance(transfer: AssetTransferBase): Flow<TransferableBalanceUpdatePoint> {
         val destinationAssetBalances = assetSourceRegistry.sourceFor(transfer.destinationChainAsset)
 
-        return destinationAssetBalances.balance.subscribeTransferableAccountBalance(
+        return destinationAssetBalances.balance.subscribeAccountBalanceUpdatePoint(
             chain = transfer.destinationChain,
             chainAsset = transfer.destinationChainAsset,
             accountId = transfer.recipientAccountId.value,
-            sharedSubscriptionBuilder = null
         )
     }
 

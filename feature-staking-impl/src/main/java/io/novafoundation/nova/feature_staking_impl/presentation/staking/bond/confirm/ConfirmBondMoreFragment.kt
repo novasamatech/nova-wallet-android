@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.co
 
 import android.os.Bundle
 
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -27,12 +26,6 @@ class ConfirmBondMoreFragment : BaseFragment<ConfirmBondMoreViewModel, FragmentC
     override fun createBinding() = FragmentConfirmBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.confirmBondMoreToolbar.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
-
         binder.confirmBondMoreExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         binder.confirmBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }

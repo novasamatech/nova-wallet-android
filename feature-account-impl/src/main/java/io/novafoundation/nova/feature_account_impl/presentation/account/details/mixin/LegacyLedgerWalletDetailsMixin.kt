@@ -44,7 +44,7 @@ class LegacyLedgerWalletDetailsMixin(
                 subMessage = resourceManager.getString(R.string.account_ledger_legacy_warning_message),
                 action = AlertModel.ActionModel(
                     text = resourceManager.getString(R.string.common_find_out_more),
-                    listener = { host.browserableDelegate.showBrowser(appLinksProvider.ledgerMigrationArticle) }
+                    listener = { host.externalActions.showBrowser(appLinksProvider.ledgerMigrationArticle) }
                 )
             )
         } else {
@@ -63,7 +63,7 @@ class LegacyLedgerWalletDetailsMixin(
         val chains = interactor.getAllChains()
             .filter { it.id in ledgerSupportedChainIds }
 
-        interactor.chainProjectionsFlow(
+        interactor.chainProjectionsBySourceFlow(
             metaAccount.id,
             chains,
             hasAccountComparator().withChainComparator()

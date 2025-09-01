@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
+import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
@@ -70,7 +71,7 @@ class RealDelegatorStateRepository(
                 binding = { dynamicInstance, collatorId -> bindDelegationRequests(dynamicInstance, collatorId.fromHex()) }
             )
         }
-            .map { delegationRequestsByCollator -> delegationRequestsByCollator.byDelegator(delegatorState.accountId).values }
+            .map { delegationRequestsByCollator -> delegationRequestsByCollator.filterNotNull().byDelegator(delegatorState.accountId).values }
     }
 
     override suspend fun scheduledDelegationRequest(delegatorState: DelegatorState.Delegator, collatorId: AccountId): ScheduledDelegationRequest? {

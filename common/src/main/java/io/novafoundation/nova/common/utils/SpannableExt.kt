@@ -14,6 +14,7 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.style.ImageSpan
 import android.text.style.MetricAffectingSpan
+import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.view.View
 import androidx.annotation.FontRes
@@ -24,6 +25,10 @@ import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatt
 
 fun CharSequence.toSpannable(span: Any): Spannable {
     return this.toSpannable().setFullSpan(span)
+}
+
+fun CharSequence.bold(): Spannable {
+    return toSpannable(boldSpan())
 }
 
 fun Spannable.setFullSpan(span: Any): Spannable {
@@ -80,6 +85,8 @@ fun fontSpan(typeface: Typeface?): CharacterStyle {
         else -> CustomTypefaceSpan(typeface)
     }
 }
+
+fun boldSpan() = StyleSpan(Typeface.BOLD)
 
 fun drawableSpan(drawable: Drawable) = ImageSpan(drawable)
 

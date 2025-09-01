@@ -1,24 +1,24 @@
 package io.novafoundation.nova.feature_proxy_api.domain.model
 
-sealed class ProxyType(val name: String, val controllableFrom: List<ProxyType>) {
+sealed class ProxyType(open val name: String) {
 
-    object Any : ProxyType("Any", emptyList())
+    data object Any : ProxyType("Any")
 
-    object NonTransfer : ProxyType("NonTransfer", listOf(Any))
+    data object NonTransfer : ProxyType("NonTransfer")
 
-    object Governance : ProxyType("Governance", listOf(Any, NonTransfer))
+    data object Governance : ProxyType("Governance")
 
-    object Staking : ProxyType("Staking", listOf(Any, NonTransfer))
+    data object Staking : ProxyType("Staking")
 
-    object IdentityJudgement : ProxyType("IdentityJudgement", listOf(Any, NonTransfer))
+    data object IdentityJudgement : ProxyType("IdentityJudgement")
 
-    object CancelProxy : ProxyType("CancelProxy", listOf(Any, NonTransfer))
+    data object CancelProxy : ProxyType("CancelProxy")
 
-    object Auction : ProxyType("Auction", listOf(Any, NonTransfer))
+    data object Auction : ProxyType("Auction")
 
-    object NominationPools : ProxyType("NominationPools", listOf(Any, NonTransfer, Staking))
+    data object NominationPools : ProxyType("NominationPools")
 
-    class Other(name: String) : ProxyType(name, listOf(Any))
+    data class Other(override val name: String) : ProxyType(name)
 
     companion object
 }
@@ -35,13 +35,4 @@ fun ProxyType.Companion.fromString(name: String): ProxyType {
         "NominationPools" -> ProxyType.NominationPools
         else -> ProxyType.Other(name)
     }
-}
-
-fun ProxyType.isControllableFrom(proxyType: ProxyType): Boolean {
-    return name == proxyType.name || controllableFrom.contains(proxyType)
-}
-
-fun ProxyType.Companion.min(first: ProxyType, second: ProxyType): ProxyType? {
-    return first.takeIf { it.isControllableFrom(second) }
-        ?: second.takeIf { it.isControllableFrom(first) }
 }

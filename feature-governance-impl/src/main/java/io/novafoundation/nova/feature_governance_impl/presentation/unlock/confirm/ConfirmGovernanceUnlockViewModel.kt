@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.absoluteDifference
@@ -57,10 +59,12 @@ class ConfirmGovernanceUnlockViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val validationSystem: UnlockReferendumValidationSystem,
     private val hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -163,9 +167,9 @@ class ConfirmGovernanceUnlockViewModel(
         interactor.unlock(claimable)
             .onFailure(::showError)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero)
+                startNavigation(it.submissionHierarchy) { router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero) }
             }
 
         submissionInProgress.value = false

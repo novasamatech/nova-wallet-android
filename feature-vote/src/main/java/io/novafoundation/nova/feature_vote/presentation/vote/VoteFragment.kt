@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_vote.presentation.vote
 
+import android.view.View
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
@@ -18,8 +19,11 @@ class VoteFragment : BaseFragment<VoteViewModel, FragmentVoteBinding>() {
     @Inject
     lateinit var router: VoteRouter
 
-    override fun initViews() {
+    override fun applyInsets(rootView: View) {
         binder.voteContainer.applyStatusBarInsets()
+    }
+
+    override fun initViews() {
         val adapter = VotePagerAdapter(this, router)
         binder.voteViewPager.adapter = adapter
         binder.voteTabs.setupWithViewPager2(binder.voteViewPager, adapter::getPageTitle)

@@ -14,6 +14,13 @@ fun TransferableMode.calculateTransferable(free: BigInteger, frozen: BigInteger,
     }
 }
 
+fun TransferableMode.calculateReservable(free: BigInteger, frozen: BigInteger, ed: BigInteger): BigInteger {
+    return when (this) {
+        TransferableMode.REGULAR -> legacyReservable(free, frozen, ed)
+        TransferableMode.HOLDS_AND_FREEZES -> holdsAndFreezesReservable(free, ed)
+    }
+}
+
 fun TransferableMode.calculateTransferable(accountBalance: AccountBalance): BigInteger {
     return calculateTransferable(accountBalance.free, accountBalance.frozen, accountBalance.reserved)
 }

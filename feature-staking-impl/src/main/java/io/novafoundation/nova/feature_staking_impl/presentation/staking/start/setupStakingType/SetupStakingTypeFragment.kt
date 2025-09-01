@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSetupStakingTypeBinding
@@ -32,7 +31,6 @@ class SetupStakingTypeFragment : BaseFragment<SetupStakingTypeViewModel, Fragmen
     private val adapter = SetupStakingTypeAdapter(this)
 
     override fun initViews() {
-        binder.setupStakingTypeToolbar.applyStatusBarInsets()
         binder.setupStakingTypeToolbar.setRightActionClickListener { viewModel.donePressed() }
         binder.setupStakingTypeToolbar.setHomeButtonListener { viewModel.backPressed() }
         binder.setupStakingTypeList.adapter = adapter

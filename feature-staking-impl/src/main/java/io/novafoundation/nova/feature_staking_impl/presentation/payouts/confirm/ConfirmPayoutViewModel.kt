@@ -12,10 +12,13 @@ import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.submissionHierarchy
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -48,12 +51,14 @@ class ConfirmPayoutViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
 ) : BaseViewModel(),
     ExternalActions.Presentation by externalActions,
     FeeLoaderMixin by feeLoaderMixin,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val assetFlow = interactor.currentAssetFlow()
         .share()
@@ -131,8 +136,9 @@ class ConfirmPayoutViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
-                router.returnToStakingMain()
+                showToast(resourceManager.getString(R.string.make_payout_transaction_sent))
+
+                startNavigation(it.submissionHierarchy()) { router.returnToStakingMain() }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }

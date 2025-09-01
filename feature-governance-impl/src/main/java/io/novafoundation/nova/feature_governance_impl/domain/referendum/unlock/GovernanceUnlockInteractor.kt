@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.OnChainReferendum
@@ -41,7 +42,7 @@ import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -52,9 +53,9 @@ import kotlinx.coroutines.withContext
 
 interface GovernanceUnlockInteractor {
 
-    suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee
+    suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee?
 
-    suspend fun unlock(claimable: UnlockChunk.Claimable?): Result<ExtrinsicStatus.InBlock>
+    suspend fun unlock(claimable: UnlockChunk.Claimable?): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
     fun locksOverviewFlow(scope: CoroutineScope): Flow<GovernanceLocksOverview>
 
@@ -80,11 +81,11 @@ class RealGovernanceUnlockInteractor(
     private val extrinsicService: ExtrinsicService,
 ) : GovernanceUnlockInteractor {
 
-    override suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee {
+    override suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee? {
         val governanceSelectedOption = selectedAssetState.selectedOption()
         val chain = governanceSelectedOption.assetWithChain.chain
 
-        if (claimable == null) return extrinsicService.zeroFee(chain, TransactionOrigin.SelectedWallet)
+        if (claimable == null) return null
 
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val origin = metaAccount.accountIdIn(chain)!!
@@ -98,10 +99,10 @@ class RealGovernanceUnlockInteractor(
         val governanceSelectedOption = selectedAssetState.selectedOption()
         val chain = governanceSelectedOption.assetWithChain.chain
 
-        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { origin ->
+        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { buildingContext ->
             if (claimable == null) error("Nothing to claim")
 
-            executeUnlock(accountIdToUnlock = origin.executingAccount, governanceSelectedOption, claimable)
+            executeUnlock(accountIdToUnlock = buildingContext.submissionOrigin.executingAccount, governanceSelectedOption, claimable)
         }.awaitInBlock()
     }
 

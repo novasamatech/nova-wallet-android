@@ -76,8 +76,8 @@ fun Context.makePendingIntent(intent: Intent): PendingIntent {
 
 fun NotificationCompat.Builder.buildWithDefaults(
     context: Context,
-    title: String,
-    message: String,
+    title: CharSequence,
+    message: CharSequence,
     contentIntent: Intent
 ): NotificationCompat.Builder {
     return setContentTitle(title)

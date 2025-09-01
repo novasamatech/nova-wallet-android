@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.CrowdloanContributeInteractor
@@ -58,9 +59,11 @@ class ConfirmContributeViewModel(
     private val customContributeManager: CustomContributeManager,
     private val externalActions: ExternalActions.Presentation,
     private val assetSharedState: SingleAssetSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -203,9 +206,9 @@ class ConfirmContributeViewModel(
             )
                 .onFailure(::showError)
                 .onSuccess {
-                    showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                    showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                    router.returnToMain()
+                    startNavigation(it.submissionHierarchy) { router.returnToMain() }
                 }
 
             _showNextProgress.value = false

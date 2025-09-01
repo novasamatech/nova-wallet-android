@@ -23,7 +23,8 @@ import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction.PayFees
 import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction.TransferReserveAsset
 import io.novafoundation.nova.feature_xcm_api.message.XcmInstruction.WithdrawAsset
 import io.novafoundation.nova.feature_xcm_api.message.XcmMessage
-import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.AssetLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior.Here
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
 import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
@@ -31,6 +32,9 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.toMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
+import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -47,14 +51,15 @@ class RealXcmBuilderTest {
 
     val recipient = ByteArray(32) { 1 }.intoKey()
 
-    val polkadot = Here.asLocation()
-    val pah = ParachainId(1000).asLocation()
-    val hydration = ParachainId(2034).asLocation()
+    val polkadot = ChainLocation(Chain.Geneses.POLKADOT, Here.asLocation())
+    val pah = ChainLocation(Chain.Geneses.POLKADOT_ASSET_HUB, ParachainId(1000).asLocation())
+    val hydration = ChainLocation(Chain.Geneses.HYDRA_DX, ParachainId(2034).asLocation())
 
-    val dot = Here.asLocation()
-    val dotOnPolkadot = MultiAssetId(dot.fromPointOfViewOf(polkadot))
-    val dotOnPah = MultiAssetId(dot.fromPointOfViewOf(pah))
-    val dotOnHydration = MultiAssetId(dot.fromPointOfViewOf(hydration))
+    val dot =  Here.asLocation()
+    val dotLocation = AssetLocation(FullChainAssetId(Chain.Geneses.POLKADOT, 0), dot)
+    val dotOnPolkadot = MultiAssetId(dot.fromPointOfViewOf(polkadot.location))
+    val dotOnPah = MultiAssetId(dot.fromPointOfViewOf(pah.location))
+    val dotOnHydration = MultiAssetId(dot.fromPointOfViewOf(hydration.location))
 
 
     val xcmVersion = XcmVersion.V4
@@ -92,7 +97,7 @@ class RealXcmBuilderTest {
         val expectedOnPolkadot = XcmMessage(
             TransferReserveAsset(
                 assets = dotOnPolkadot.withAmount(amount).intoMultiAssets(),
-                dest = hydration.fromPointOfViewOf(polkadot),
+                dest = hydration.location.fromPointOfViewOf(polkadot.location),
                 xcm = forwardedToHydration
             )
         )
@@ -119,7 +124,7 @@ class RealXcmBuilderTest {
             BuyExecution(dotOnPolkadot.withAmount(buyExecutionFees), WeightLimit.Unlimited),
             DepositReserveAsset(
                 assets = All,
-                dest = hydration.fromPointOfViewOf(polkadot),
+                dest = hydration.location.fromPointOfViewOf(polkadot.location),
                 xcm = forwardedToHydration
             )
         )
@@ -127,7 +132,7 @@ class RealXcmBuilderTest {
             WithdrawAsset(dotOnPah.withAmount(amount).intoMultiAssets()),
             InitiateReserveWithdraw(
                 assets = All,
-                reserve = polkadot.fromPointOfViewOf(pah),
+                reserve = polkadot.location.fromPointOfViewOf(pah.location),
                 xcm = forwardedToPolkadot
             )
         )
@@ -176,7 +181,7 @@ class RealXcmBuilderTest {
         )
 
         val result = createBuilder(polkadot, validateMeasuringMessage = expectedForMeasure).apply {
-            payFeesIn(dot)
+            payFeesIn(dotLocation)
             depositAllAssetsTo(recipient)
         }.build()
 
@@ -188,7 +193,7 @@ class RealXcmBuilderTest {
     }
 
     private fun createBuilder(
-        origin: AbsoluteMultiLocation,
+        origin: ChainLocation,
         validateMeasuringMessage: XcmMessage? = null
     ): XcmBuilder {
         return RealXcmBuilder(origin, XcmVersion.V4, TestMeasureFees(validateMeasuringMessage))
@@ -200,8 +205,8 @@ class RealXcmBuilderTest {
 
         override suspend fun measureFees(
             message: VersionedXcmMessage,
-            feeAsset: MultiAssetId,
-            chainLocation: AbsoluteMultiLocation
+            feeAsset: AssetLocation,
+            chainLocation: ChainLocation
         ): BalanceOf {
             validateMeasuringMessage?.let { assertXcmMessageEquals(validateMeasuringMessage, message) }
             return testMeasuredFees

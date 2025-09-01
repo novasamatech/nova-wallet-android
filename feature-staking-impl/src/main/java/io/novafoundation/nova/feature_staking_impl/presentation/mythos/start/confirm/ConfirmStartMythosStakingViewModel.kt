@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -65,6 +67,7 @@ class ConfirmStartMythosStakingViewModel(
     private val stakingBlockNumberUseCase: StakingBlockNumberUseCase,
     private val mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val interactor: StartMythosStakingInteractor,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     mythosSharedComputation: MythosSharedComputation,
     walletUiUseCase: WalletUiUseCase,
 ) : ConfirmStartSingleTargetStakingViewModel<MythosConfirmStartStakingState>(
@@ -88,7 +91,8 @@ class ConfirmStartMythosStakingViewModel(
     assetUseCase = assetUseCase,
     walletUiUseCase = walletUiUseCase,
     payload = payload,
-) {
+),
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     override val hintsMixin = NoHintsMixin()
 
@@ -135,9 +139,9 @@ class ConfirmStartMythosStakingViewModel(
                 stakingStartedDetectionService.activateDetection(viewModelScope)
             }
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                finishFlow(currentState)
+                startNavigation(it.submissionHierarchy) { finishFlow(currentState) }
             }
 
         _showNextProgress.value = false

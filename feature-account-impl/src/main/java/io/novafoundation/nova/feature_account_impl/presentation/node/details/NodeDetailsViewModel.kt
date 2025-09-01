@@ -47,7 +47,7 @@ class NodeDetailsViewModel(
         nodeModelLiveData.value?.let {
             clipboardManager.addToClipboard(it.link)
 
-            showMessage(resourceManager.getString(R.string.common_copied))
+            showToast(resourceManager.getString(R.string.common_copied))
         }
     }
 

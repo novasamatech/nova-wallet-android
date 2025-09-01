@@ -1,12 +1,15 @@
 package io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers
 
+import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.utils.amountFromPlanks
+import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -15,9 +18,9 @@ import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import org.jetbrains.annotations.ApiStatus.Internal
 import java.math.BigDecimal
 
 interface AssetTransferDirection {
@@ -144,6 +147,9 @@ fun AssetTransfer.recipientOrNull(): AccountId? {
     return destinationChain.accountIdOrNull(recipient)
 }
 
+val AssetTransfer.senderAccountId: AccountIdKey
+    get() = sender.requireAccountIdKeyIn(originChain)
+
 interface AssetTransfers {
 
     fun getValidationSystem(coroutineScope: CoroutineScope): AssetTransfersValidationSystem
@@ -156,13 +162,22 @@ interface AssetTransfers {
         return true
     }
 
-    fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
-        return flowOf(true)
-    }
-
     suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean
 
     suspend fun recipientCanAcceptTransfer(chainAsset: Chain.Asset, recipient: AccountId): Boolean {
         return true
     }
+
+    /**
+     * Parses the transfer from the given call
+     * This function might throw - do not use it directly. For fail-safe version use [tryParseTransfer]
+     */
+    @Internal
+    suspend fun parseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall?
+}
+
+suspend fun AssetTransfers.tryParseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall? {
+    return runCatching { parseTransfer(call, chain) }
+        .onFailure { Log.e(LOG_TAG, "Failed to parse call: $call", it) }
+        .getOrNull()
 }

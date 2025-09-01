@@ -2,7 +2,11 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.fu
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
+import io.novafoundation.nova.common.mixin.copy.showCopyCallHash
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createIdentityAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -32,7 +36,11 @@ class ReferendumFullDetailsViewModel(
     private val governanceSharedState: GovernanceSharedState,
     private val tokenUseCase: TokenUseCase,
     private val externalActions: ExternalActions.Presentation,
-) : BaseViewModel(), ExternalActions by externalActions {
+    private val copyTextLauncher: CopyTextLauncher.Presentation,
+    private val resourceManager: ResourceManager
+) : BaseViewModel(),
+    ExternalActions by externalActions,
+    CopyTextLauncher by copyTextLauncher {
 
     private val payloadFlow = flowOf { payload }
 
@@ -61,7 +69,7 @@ class ReferendumFullDetailsViewModel(
     val approveThreshold = payload.approveThreshold
     val supportThreshold = payload.supportThreshold
     val preImage = mapPreimage(payload.preImage)
-    val callHash = payload.hash?.toHexString()
+    val callHash = payload.hash?.toHexString(withPrefix = true)
 
     val turnoutAmount = payloadFlow
         .map { payload -> payload.turnout?.let { mapAmountToAmountModel(it, getToken()) } }
@@ -136,5 +144,11 @@ class ReferendumFullDetailsViewModel(
         val address = chain.addressOf(accountId)
 
         externalActions.showAddressActions(address, chain)
+    }
+
+    fun copyCallHash() = launchUnit {
+        val callHash = callHash ?: return@launchUnit
+
+        copyTextLauncher.showCopyCallHash(resourceManager, callHash)
     }
 }

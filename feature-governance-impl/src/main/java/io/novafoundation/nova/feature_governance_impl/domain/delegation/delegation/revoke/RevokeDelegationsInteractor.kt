@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
@@ -31,7 +32,7 @@ interface RevokeDelegationsInteractor {
 
     suspend fun calculateFee(trackIds: Collection<TrackId>): Fee
 
-    suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicStatus.InBlock>
+    suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
     fun revokeDelegationDataFlow(trackIds: Collection<TrackId>): Flow<RevokeDelegationData>
 }
@@ -53,7 +54,7 @@ class RealRevokeDelegationsInteractor(
         }
     }
 
-    override suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicStatus.InBlock> {
+    override suspend fun revokeDelegations(trackIds: Collection<TrackId>): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
         val (chain, source) = useSelectedGovernance()
 
         return extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) {

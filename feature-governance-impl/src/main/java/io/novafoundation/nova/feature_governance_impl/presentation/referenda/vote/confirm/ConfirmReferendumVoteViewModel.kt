@@ -9,6 +9,8 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.AccountVote
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.constructAccountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
@@ -58,6 +60,7 @@ class ConfirmReferendumVoteViewModel(
     private val resourceManager: ResourceManager,
     private val referendumFormatter: ReferendumFormatter,
     private val locksChangeFormatter: LocksChangeFormatter,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -69,7 +72,8 @@ class ConfirmReferendumVoteViewModel(
     addressIconGenerator,
     assetUseCase,
     validationExecutor
-) {
+),
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     override val titleFlow: Flow<String> = flowOf {
         val formattedNumber = referendumFormatter.formatId(payload.referendumId)
@@ -131,8 +135,9 @@ class ConfirmReferendumVoteViewModel(
         }
 
         result.onSuccess {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-            router.backToReferendumDetails()
+            showToast(resourceManager.getString(R.string.common_transaction_submitted))
+
+            startNavigation(it.submissionHierarchy) { router.backToReferendumDetails() }
         }
             .onFailure(::showError)
 

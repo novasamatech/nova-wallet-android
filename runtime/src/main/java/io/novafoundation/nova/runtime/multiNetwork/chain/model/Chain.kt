@@ -104,7 +104,13 @@ data class Chain(
                 val currencyIdType: String,
                 val existentialDeposit: BigInteger,
                 val transfersEnabled: Boolean,
-            ) : Type()
+                val subType: SubType
+            ) : Type() {
+
+                enum class SubType {
+                    DEFAULT, HYDRATION_EVM
+                }
+            }
 
             data class EvmErc20(
                 val contractAddress: String
@@ -208,6 +214,8 @@ data class Chain(
         data class GovernanceDelegations(override val url: String) : ExternalApi()
 
         data class ReferendumSummary(override val url: String) : ExternalApi()
+
+        data class Multisig(override val url: String) : ExternalApi()
     }
 
     enum class Governance {
