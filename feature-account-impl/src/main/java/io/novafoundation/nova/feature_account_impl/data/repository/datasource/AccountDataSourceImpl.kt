@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
+import io.novafoundation.nova.feature_account_api.domain.model.MetaIdWithType
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeToLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
@@ -254,13 +255,13 @@ class AccountDataSourceImpl(
         metaAccountDao.updateName(metaId, newName)
     }
 
-    override suspend fun deleteMetaAccount(metaId: Long): List<Long> {
+    override suspend fun deleteMetaAccount(metaId: Long): List<MetaIdWithType> {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)
 
-        val allAffectedMetaIds = metaAccountDao.delete(metaId)
+        val allAffectedMetaAccounts = metaAccountDao.delete(metaId)
         secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
-        return allAffectedMetaIds
+        return allAffectedMetaAccounts.map { MetaIdWithType(it.id, accountMappers.mapMetaAccountTypeFromLocal(it.type)) }
     }
 
     override suspend fun insertMetaAccountFromSecrets(
