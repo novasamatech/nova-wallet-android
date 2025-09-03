@@ -1,7 +1,6 @@
 package io.novafoundation.nova.core_db.model.chain.account
 
 import androidx.room.ColumnInfo
-import androidx.room.DatabaseView
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
