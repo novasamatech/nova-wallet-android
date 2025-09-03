@@ -3,12 +3,13 @@ package io.novafoundation.nova.feature_account_impl.data.sync
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.associateMutableBy
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.filterToSet
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.mapToSet
-import io.novafoundation.nova.common.utils.mutableMultiListMapOf
 import io.novafoundation.nova.common.utils.put
+import io.novafoundation.nova.common.utils.toMutableMultiMapList
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
@@ -138,12 +139,13 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         .onFailure { Log.d("ExternalAccountsDiscovery", "Failed to sync external accounts", it) }
         .onSuccess { Log.d("ExternalAccountsDiscovery", "Finished syncing external accounts ") }
 
-    private suspend fun notifyAboutAddedAccounts(added: List<AddAccountResult.AccountAdded>) {
+    private suspend fun notifyAboutAddedAccounts(added: List<AddAccountResult.AccountAdded>, deactivatedMetaIds: Set<Long>) {
         added.map { it.toAccountBusEvent() }
             .combineBusEvents()
             ?.let { eventBus.notify(it, source = ACCOUNTS_CHANGED_SOURCE) }
 
-        metaAccountsUpdatesRegistry.addMetaIds(added.map { it.metaId })
+        val updatedAccountsIds = deactivatedMetaIds.toList() + added.map { it.metaId }
+        metaAccountsUpdatesRegistry.addMetaIds(updatedAccountsIds)
     }
 
     private fun constructReachabilityReport(
@@ -184,10 +186,12 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
         // Find universal account that every chain reported as non-reachable
         val notReachable = notReachableUniversalPerChain.reduce { a, b -> a.intersect(b) }
+            .toList()
 
         if (notReachable.isNotEmpty()) {
             Log.d("ExternalAccountsDiscovery", "Disabling ${notReachable.size} non-reachable universal accounts: $notReachable")
-            accountDao.changeAccountsStatus(notReachable.toList(), MetaAccountLocal.Status.DEACTIVATED)
+            accountDao.changeAccountsStatus(notReachable, MetaAccountLocal.Status.DEACTIVATED)
+            metaAccountsUpdatesRegistry.addMetaIds(notReachable)
         } else {
             Log.d("ExternalAccountsDiscovery", "No universal accounts to disable found")
         }
@@ -221,7 +225,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
                 val reachabilityReport = constructReachabilityReport(allAccountsAvailableOnChain, reachableExistingMetaIds)
 
                 updateAccountStatusesForSingleChain(reachabilityReport, chain)
-                notifyAboutAddedAccounts(added)
+                notifyAboutAddedAccounts(added, deactivatedMetaIds = reachabilityReport.singleChainNonReachable)
 
                 reachabilityReport.universalNonReachable
             }
@@ -244,15 +248,9 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         val existingAccountsByAccountId = allAccounts.groupBy { it.requireAccountIdKeyIn(chain) }
         val existingAccountsByParentId = allAccounts.groupBy { it.parentMetaId }
 
-        val controllersByAccountId = mutableMultiListMapOf<AccountIdKey, MetaAccount>()
-        existingAccountsByAccountId.onEach { (accountId, metaAccounts) ->
-            controllersByAccountId.put(accountId, metaAccounts)
-        }
-
-        val controllersById = mutableMapOf<Long, MetaAccount>()
-        allAccounts.onEach { metaAccount ->
-            controllersById[metaAccount.id] = metaAccount
-        }
+        val controllersByParentId = existingAccountsByParentId.toMutableMultiMapList()
+        val controllersByAccountId = existingAccountsByAccountId.toMutableMultiMapList()
+        val controllersById = allAccounts.associateMutableBy { it.id }
 
         fun signingPath(metaAccount: MetaAccount): List<AccountIdKey> {
             val path = mutableListOf(metaAccount.requireAccountIdKeyIn(chain))
@@ -300,7 +298,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
                     return@controllersLoop
                 }
 
-                val existingControlledAccounts = existingAccountsByParentId[controller.id].orEmpty()
+                val existingControlledAccounts = controllersByParentId[controller.id].orEmpty()
 
                 val existingAccountRepresentedByExternal = existingControlledAccounts.find { existingAccount ->
                     val existingAccountId = existingAccount.requireAccountIdKeyIn(chain)
@@ -317,6 +315,8 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
                     position++
                     controllersByAccountId.put(externalAccount.accountId, newMetaAccount)
+                    controllersByParentId.put(controller.id, newMetaAccount)
+
                     controllersById[newMetaAccount.id] = newMetaAccount
                     added.add(addResult)
                 }

@@ -5,6 +5,14 @@ typealias MutableMultiMapList<K, V> = MutableMap<K, MutableList<V>>
 typealias MultiMap<K, V> = Map<K, Set<V>>
 typealias MultiMapList<K, V> = Map<K, List<V>>
 
+fun <K, V> Map<K, List<V>>.toMutableMultiMapList(): MutableMultiMapList<K, V> {
+    val mutableMultiMap = mutableMultiListMapOf<K, V>()
+    onEach { (key, value) ->
+        mutableMultiMap.put(key, value)
+    }
+    return mutableMultiMap
+}
+
 fun <K, V> mutableMultiMapOf(): MutableMultiMap<K, V> = mutableMapOf()
 
 fun <K, V> mutableMultiListMapOf(): MutableMultiMapList<K, V> = mutableMapOf()
