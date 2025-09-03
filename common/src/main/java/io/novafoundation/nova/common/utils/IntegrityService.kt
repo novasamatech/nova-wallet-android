@@ -31,11 +31,7 @@ class IntegrityService(
     private val prepareProviderMutex = Mutex()
 
     init {
-        rootScope.launch {
-            prepareProviderMutex.withLock {
-                providerState = prepareTokenProvider()
-            }
-        }
+        rootScope.launch { ensureProviderIsReady() }
     }
 
     suspend fun getIntegrityToken(requestHash: String): String {
@@ -45,7 +41,7 @@ class IntegrityService(
             requestIntegrityToken(requestHash)
         } catch (e: StandardIntegrityException) {
             if (e.statusCode == INTEGRITY_TOKEN_PROVIDER_INVALID) {
-                providerState = prepareTokenProvider()
+                resetProviderState()
                 ensureProviderIsReady()
                 requestIntegrityToken(requestHash)
             } else {
@@ -65,6 +61,10 @@ class IntegrityService(
                 if (providerState is ProviderState.Ready) return@repeat
             }
         }
+    }
+
+    private fun resetProviderState() {
+        providerState = ProviderState.Preparing
     }
 
     private suspend fun prepareTokenProvider() = suspendCoroutine { continuation ->
