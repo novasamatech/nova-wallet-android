@@ -76,6 +76,7 @@ import io.novafoundation.nova.common.utils.RealCopyValueMixin
 import io.novafoundation.nova.common.utils.RealDialogMessageManager
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpReceiverApi
@@ -416,9 +417,9 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideIntegrityService(context: Context): IntegrityService {
+    fun provideIntegrityService(context: Context, rootScope: RootScope): IntegrityService {
         val integrityManager = IntegrityManagerFactory.createStandard(context)
-        return IntegrityService(BuildConfig.CLOUD_PROJECT_NUMBER, integrityManager)
+        return IntegrityService(BuildConfig.CLOUD_PROJECT_NUMBER, integrityManager, rootScope)
     }
 
     @Provides
