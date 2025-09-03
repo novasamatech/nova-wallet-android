@@ -146,13 +146,31 @@ class AccountDataSourceImpl(
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
+    override suspend fun getActiveMetaIds(): Set<Long> {
+        return withContext(Dispatchers.IO) { metaAccountDao.getMetaAccountsIdsByStatus(MetaAccountLocal.Status.ACTIVE).toSet() }
+    }
+
     override suspend fun getAllMetaAccounts(): List<MetaAccount> {
         val local = metaAccountDao.getFullMetaAccounts()
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
+    override suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount> {
+        val localMetaAccounts = metaAccountDao.getMetaAccountsByIds(metaIds)
+        return accountMappers.mapMetaAccountsLocalToMetaAccounts(localMetaAccounts)
+    }
+
     override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
         return metaAccountDao.hasMetaAccountsCountOfTypeFlow(mapMetaAccountTypeToLocal(type)).distinctUntilChanged()
+    }
+
+    override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
+        return metaAccountDao.observeMetaAccountsByTypeFlow(mapMetaAccountTypeToLocal(type))
+            .map { accountMappers.mapMetaAccountsLocalToMetaAccounts(it) }
+    }
+
+    override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(mapMetaAccountTypeToLocal(type))
     }
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {
@@ -232,12 +250,13 @@ class AccountDataSourceImpl(
         metaAccountDao.updateName(metaId, newName)
     }
 
-    override suspend fun deleteMetaAccount(metaId: Long) {
+    override suspend fun deleteMetaAccount(metaId: Long): List<Long> {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)
 
-        metaAccountDao.delete(metaId)
+        val allAffectedMetaIds = metaAccountDao.delete(metaId)
         secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
+        return allAffectedMetaIds
     }
 
     override suspend fun insertMetaAccountFromSecrets(

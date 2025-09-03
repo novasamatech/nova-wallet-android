@@ -13,12 +13,12 @@ import io.novafoundation.nova.feature_account_api.view.showAccountWithLoading
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationFullDetailsBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
 class MultisigOperationFullDetailsFragment : BaseFragment<MultisigOperationFullDetailsViewModel, FragmentMultisigOperationFullDetailsBinding>() {
 
-    companion object : PayloadCreator<MultisigOperationDetailsPayload> by FragmentPayloadCreator()
+    companion object : PayloadCreator<MultisigOperationPayload> by FragmentPayloadCreator()
 
     override fun createBinding() = FragmentMultisigOperationFullDetailsBinding.inflate(layoutInflater)
 

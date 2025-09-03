@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -43,6 +44,7 @@ import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeep
 import io.novafoundation.nova.feature_multisig_operations.di.deeplink.MultisigDeepLinks
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -120,6 +122,8 @@ interface RootDependencies {
 
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
+    val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
+
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
     fun contributionsInteractor(): ContributionsInteractor
@@ -165,4 +169,6 @@ interface RootDependencies {
     fun context(): Context
 
     fun toastMessageManager(): ToastMessageManager
+
+    fun dialogMessageManager(): DialogMessageManager
 }

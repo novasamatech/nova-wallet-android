@@ -192,6 +192,7 @@
     <string name="add_proxy_maximum_reached_error_title">Maksimum proxy sayısına ulaşıldı</string>
     <string name="added_networks_empty_placeholder">Eklenen özel ağlar\nburada görünecek</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">Nova, bekleyen işlemleri görüntülemeniz için otomatik olarak multisig cüzdanınıza geçti.</string>
     <string name="appearance_colored_icon_title">Renkli</string>
     <string name="appearance_title">Görünüm</string>
     <string name="appearance_token_assets_title">token simgeleri</string>
@@ -346,6 +347,7 @@
     <string name="common_bonus">Bonus</string>
     <string name="common_call">Ara</string>
     <string name="common_call_data">Arama verisi</string>
+    <string name="common_call_hash">Çağrı karma</string>
     <string name="common_cancel">İptal et</string>
     <string name="common_cancel_operation_warning">Bu işlemi iptal etmek istediğinizden emin misiniz?</string>
     <string name="common_cannot_find_app">Üzgünüz, bu isteği işlemek için doğru uygulamanız yok</string>
@@ -831,6 +833,7 @@
     <string name="integrate_networks_banner_description">Nova Wallet\'ta geliştirdiğiniz ağın tüm özelliklerini entegre edin ve herkesin erişebilmesini sağlayın.</string>
     <string name="integrate_networks_banner_link">Ağınızı entegre edin</string>
     <string name="integrate_networks_banner_title">Polkadot için mi geliştiriyorsunuz?</string>
+    <string name="invalid_call_data_format_message">Sağladığınız çağrı verileri geçersiz veya yanlış biçimde. Doğru olduğundan emin olun ve tekrar deneyin.</string>
     <string name="invalid_call_data_message">Bu arama verisi, çağrı hash %s ile başka bir işlem için</string>
     <string name="invalid_call_data_title">Geçersiz arama verisi</string>
     <string name="invalid_proxy_address_message">Proxy adresi geçerli bir %s adresi olmalıdır</string>
@@ -878,6 +881,7 @@
     <string name="ledger_wallet_details_description">Bu cüzdan Ledger ile eşleştirildi. Nova istediğiniz herhangi bir işlemi oluşturmanıza yardımcı olacak ve bunları Ledger kullanarak imzalamanız istenecektir.</string>
     <string name="ledher_import_select_address_title">Cüzdana eklemek için hesap seçin</string>
     <string name="loading_network_info">Ağ bilgisi yükleniyor...</string>
+    <string name="loading_transaction_details">İşlem detayları yükleniyor...</string>
     <string name="loocking_backup_progress">Yedeklemenizi arıyor...</string>
     <string name="make_payout_transaction_sent">Ödeme işlemi gönderildi</string>
     <string name="manage_assets_add_token">Token ekle</string>
@@ -923,18 +927,40 @@
     <string name="multisig_deposit">Çoklu imza depozitosu</string>
     <string name="multisig_deposit_description">Depozito, çoklu imza işlemi gerçekleşene veya reddedilene kadar yatıranın hesabında kilitli kalır.</string>
     <string name="multisig_extrinsic_details_subtitle">İşlemin doğru olduğundan emin olun</string>
+    <string name="multisig_notification_executed_transaction_message">%s tarafından imzalandı ve yürütüldü.</string>
+    <string name="multisig_notification_executed_transaction_title">✅ Multisig işlemi gerçekleştirildi</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s üzerinde %s.</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 İmzanız talep ediliyor</string>
+    <string name="multisig_notification_initiator_footer">%s tarafından başlatıldı.</string>
+    <string name="multisig_notification_message_header">Cüzdan: %s</string>
+    <string name="multisig_notification_new_approval_title">%s tarafından imzalandı</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">%d/%d imza toplandı.</string>
+    <string name="multisig_notification_on_behalf_of">%s adına.</string>
+    <string name="multisig_notification_rejected_transaction_message">%s tarafından reddedildi.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ Multisig işlemi reddedildi</string>
     <string name="multisig_on_behalf_of">Adına</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s: %s</string>
     <string name="multisig_operation_details_approve">Onayla</string>
     <string name="multisig_operation_details_approve_and_execute">Onayla ve Gerçekleştir</string>
     <string name="multisig_operation_details_call_data_not_found">Detayları görmek için arama verisi girin</string>
+    <string name="multisig_operation_details_not_found_message">İşlem zaten gerçekleştirilmiş veya reddedilmiş.</string>
+    <string name="multisig_operation_details_not_found_title">İmza süresi doldu</string>
     <string name="multisig_operation_details_reject">Reddet</string>
     <string name="multisig_operation_details_signatories" formatted="false">İmza yetkilileri (%d / %d)</string>
+    <string name="multisig_operation_utility_batch_all_title">Toplu Hepsi (hata durumunda geri alır)</string>
+    <string name="multisig_operation_utility_batch_title">Toplu (hata olana kadar yürütür)</string>
+    <string name="multisig_operation_utility_force_batch_title">Zorla Toplu (hataları görmezden gelir)</string>
     <string name="multisig_operations_created">Sizin tarafınızdan oluşturuldu</string>
+    <string name="multisig_operations_placeholder">Henüz işlem yok.\nİmza talepleri burada görünecek</string>
     <string name="multisig_operations_progress" formatted="false">İmzalanıyor (%s / %s)</string>
     <string name="multisig_operations_signed">Sizin tarafınızdan imzalandı</string>
     <string name="multisig_operations_unknown_calldata">Bilinmeyen işlem</string>
     <string name="multisig_pending_operations">İmzalanacak işlemler</string>
     <string name="multisig_pending_operations_on_behalf_of">Adına:</string>
+    <string name="multisig_push_settings_approval_switcher">İmzalayan kişi tarafından imzalandı</string>
+    <string name="multisig_push_settings_executed_switcher">Multisig işlemi gerçekleştirildi</string>
+    <string name="multisig_push_settings_initial_switcher">İmzanız talep ediliyor</string>
+    <string name="multisig_push_settings_rejected_switcher">Multisig işlemi reddedildi</string>
     <string name="multisig_sell_not_supported_message">Kriptoyu fiat ile satmak için lütfen farklı bir cüzdan türüne geçin.</string>
     <string name="multisig_sell_not_supported_title">Satış, Çoklu İmza için desteklenmiyor</string>
     <string name="multisig_signatory">İmza Sahibi:</string>
@@ -950,9 +976,19 @@
     <string name="multisig_transaction_created_subtitle_highlight">İmzalanacak işlemler</string>
     <string name="multisig_transaction_created_title">Çoklu İmza işlemi oluşturuldu</string>
     <string name="multisig_transaction_created_view_details">Detayları Görüntüle</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">İlk zincir üstü bilgi (çağrı verisi) olmadan işlem reddedildi</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s üzerinde %s.\nSizden başka bir işlem gerekmemektedir.</string>
+    <string name="multisig_transaction_executed_dialog_title">Multisig İşlemi Gerçekleştirildi</string>
+    <string name="multisig_transaction_message_transfer">%1$s  → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s üzerinde %s.\nTarafından reddedildi: %s.\nSizden başka bir işlem gerekmemektedir.</string>
+    <string name="multisig_transaction_rejected_dialog_title">Multisig İşlemi Reddedildi</string>
     <string name="multisig_wallet_details_info_warning">Bu cüzdandan yapılan işlemler birden fazla imza sahibinin onayını gerektirir. Hesabınız bu imza sahiplerinden biridir:</string>
     <string name="multisig_wallet_details_info_warning_other_signatories">Diğer imza yetkilileri:</string>
     <string name="multisig_wallet_details_info_warning_title" formatted="false">Eşik %d / %d</string>
+    <string name="multisigs_notification_channel_name">Multisig İşlemleri Bildirim Kanalı</string>
+    <string name="mutisigs_push_notifications_warning_enable">Ayarlar\'da Etkinleştir</string>
+    <string name="mutisigs_push_notifications_warning_message">İmza talepleri, yeni imzalar ve tamamlanan işlemler hakkında bildirim alın  Böylece her zaman kontrol sizde olur. İstediğiniz zaman Ayarlar\'dan yönetin.</string>
+    <string name="mutisigs_push_notifications_warning_title">Multisig bildirimleri burada!</string>
     <string name="network_already_exist_failure_title">Bu Düğüm zaten mevcut</string>
     <string name="network_fee">Ağ ücreti</string>
     <string name="network_info_address">Düğüm adresi</string>
@@ -971,6 +1007,8 @@
     <string name="nft_owned_by">Sahibi</string>
     <string name="nft_price_not_listed">Listelenmemiş</string>
     <string name="nft_your_nfts">Senin NFT\'lerin</string>
+    <string name="no_ms_accounts_found_dialog_message">Nova\'da herhangi bir multisig cüzdan eklemediniz veya seçmediniz. Multisig bildirimlerini alabilmek için en az bir tane ekleyin ve seçin.</string>
+    <string name="no_ms_accounts_found_dialog_title">Multisig cüzdan yok</string>
     <string name="node_already_exist_failure_message">Girdiğiniz URL zaten \"%s\" Düğümü olarak mevcut.</string>
     <string name="node_already_exist_failure_title">Bu Düğüm zaten mevcut</string>
     <string name="node_not_alive_message">Girdiğiniz Düğüm URL\'si ya yanıt vermiyor ya da yanlış biçimde. URL biçimi \"wss://\" ile başlamalıdır.</string>
@@ -1048,6 +1086,8 @@
     <string name="profile_settings_pin_code_verification_title">PIN ile onayla</string>
     <string name="profile_settings_safe_mode_title">Güvenli mod</string>
     <string name="profile_settings_title">Ayarlar</string>
+    <string name="proxied_card_not_supported_message">Debit Kartınızı yönetmek için Polkadot ağına sahip farklı bir cüzdana geçin.</string>
+    <string name="proxied_card_not_supported_title">Bu Vekil cüzdan için Debit Kart desteklenmiyor</string>
     <string name="proxied_wallet_details_info_warning">Bu hesap aşağıdaki hesaba işlem yapma yetkisi verdi:</string>
     <string name="proxy_access_type_staking_operations">Staking operasyonları</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Temsil edilen hesap %s, %s tutarındaki ağ ücretini ödemek için yeterli bakiyeye sahip değil. Ücreti ödemek için kullanılabilir bakiye: %s</string>
@@ -1075,6 +1115,7 @@
     <string name="push_settings_announcements">Nova duyuruları</string>
     <string name="push_settings_balances">Bakiyeler</string>
     <string name="push_settings_enable">Bildirimleri etkinleştir</string>
+    <string name="push_settings_multisig_operations">Çok imzalı işlemler</string>
     <string name="push_settings_no_selected_wallets">Herhangi bir cüzdan seçmediğiniz için Cüzdan Aktiviteleri (Bakiyeler, Staking) hakkında bildirim almayacaksınız</string>
     <string name="push_settings_others">Diğerleri</string>
     <string name="push_settings_received_tokens">Alınan Tokenlar</string>
@@ -1092,7 +1133,7 @@
     <string name="push_token_sent_message" formatted="false">%s, %s\'a %s üzerinde gönderildi</string>
     <string name="push_token_sent_no_account_name_title">💸 Gönderildi</string>
     <string name="push_token_sent_title">💸 %s Gönderildi</string>
-    <string name="push_wallets_title">Cüzdanınızın aktivitesi olduğunda bildirim almak için en fazla 3 cüzdan seçin</string>
+    <string name="push_wallets_title">Cüzdan aktivite gösterdiğinde bildirilecek en fazla %d cüzdan seçin</string>
     <string name="push_welcome_enable_button">Bildirimleri Etkinleştir</string>
     <string name="push_welcome_message">Cüzdan işlemleri, Yönetim güncellemeleri, Staking aktivitesi ve Güvenlik hakkında bilgilendirilerek her zaman haberdar olun</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Bildirimleri etkinleştirmekle, %s ve %s kabul etmiş olursunuz</string>
@@ -1131,7 +1172,6 @@
     <string name="referendum_full_details_beneficiary">Yararlanıcı</string>
     <string name="referendum_full_details_deposit">Depozito</string>
     <string name="referendum_full_details_electorate">Seçmen</string>
-    <string name="referendum_full_details_hash">Çağrı hash\'i</string>
     <string name="referendum_full_details_long_for_preview">Önizleme için çok uzun</string>
     <string name="referendum_full_details_parameters_json">Parametreler JSON</string>
     <string name="referendum_full_details_proposer">Teklif Eden</string>

@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
@@ -59,7 +61,9 @@ class RootActivityModule {
         pushNotificationsInteractor: PushNotificationsInteractor,
         externalServiceInitializer: ExternalServiceInitializer,
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
-        toastMessageManager: ToastMessageManager
+        toastMessageManager: ToastMessageManager,
+        dialogMessageManager: DialogMessageManager,
+        multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -80,7 +84,9 @@ class RootActivityModule {
             pushNotificationsInteractor,
             externalServiceInitializer,
             actionBottomSheetLauncher,
-            toastMessageManager
+            toastMessageManager,
+            dialogMessageManager,
+            multisigPushNotificationsAlertMixinFactory
         )
     }
 

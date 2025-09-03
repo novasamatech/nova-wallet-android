@@ -192,6 +192,7 @@
     <string name="add_proxy_maximum_reached_error_title">Достигнуто максимальное количество прокси</string>
     <string name="added_networks_empty_placeholder">Добавленные пользовательские сети\nпоявятся здесь</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">Nova автоматически переключилась на ваш мультисига кошелек, чтобы вы могли просматривать ожидающие транзакции.</string>
     <string name="appearance_colored_icon_title">Цветной</string>
     <string name="appearance_title">Внешний вид</string>
     <string name="appearance_token_assets_title">иконки токенов</string>
@@ -346,6 +347,7 @@
     <string name="common_bonus">Бонус</string>
     <string name="common_call">Вызов</string>
     <string name="common_call_data">Данные вызова</string>
+    <string name="common_call_hash">Хеш вызова</string>
     <string name="common_cancel">Отмена</string>
     <string name="common_cancel_operation_warning">Вы уверены, что хотите отменить операцию?</string>
     <string name="common_cannot_find_app">К сожалению, у вас нет подходящего приложения для обработки этого запроса</string>
@@ -845,6 +847,7 @@
     <string name="integrate_networks_banner_description">Интегрируйте все функции сети, которую вы создаете, в Nova Wallet, чтобы сделать ее доступной для всех.</string>
     <string name="integrate_networks_banner_link">Интегрировать вашу сеть</string>
     <string name="integrate_networks_banner_title">Создаете для Polkadot?</string>
+    <string name="invalid_call_data_format_message">Предоставленные вами данные вызова неверны или имеют неверный формат. Пожалуйста, убедитесь, что они правильные, и попробуйте снова.</string>
     <string name="invalid_call_data_message">Эти данные вызова для другой операции с хэшом вызова %s</string>
     <string name="invalid_call_data_title">Некорректные данные вызова</string>
     <string name="invalid_proxy_address_message">Адрес прокси должен быть действительным адресом %s</string>
@@ -892,6 +895,7 @@
     <string name="ledger_wallet_details_description">Этот кошелёк добавлен из Ledger устройства. Nova Wallet поможет создать любую операцию, и вам будет необходимо подписать ее с помощью Ledger устройства</string>
     <string name="ledher_import_select_address_title">Выберите аккаунт для добавления в кошелёк</string>
     <string name="loading_network_info">Загрузка информации о сети...</string>
+    <string name="loading_transaction_details">Загрузка деталей транзакции…</string>
     <string name="loocking_backup_progress">В процессе поиска вашего бэкапа...</string>
     <string name="make_payout_transaction_sent">Транзакция на выплату отправлена</string>
     <string name="manage_assets_add_token">Добавить</string>
@@ -939,18 +943,40 @@
     <string name="multisig_deposit">Депозит мультиподписи</string>
     <string name="multisig_deposit_description">Депозит остаётся заблокированным на счету депозита до тех пор, пока операция мультиподписи не будет выполнена или отклонена.</string>
     <string name="multisig_extrinsic_details_subtitle">Убедитесь, что операция корректна</string>
+    <string name="multisig_notification_executed_transaction_message">Подписано и выполнено %s.</string>
+    <string name="multisig_notification_executed_transaction_title">✅ Мультисиг транзакция выполнена</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s на %s.</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 Требуется ваша подпись</string>
+    <string name="multisig_notification_initiator_footer">Инициатор: %s.</string>
+    <string name="multisig_notification_message_header">Кошелек: %s</string>
+    <string name="multisig_notification_new_approval_title">Подписано %s</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">Собрано подписей: %d из %d.</string>
+    <string name="multisig_notification_on_behalf_of">От имени %s.</string>
+    <string name="multisig_notification_rejected_transaction_message">Отклонено %s.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ Мультисиг транзакция отклонена</string>
     <string name="multisig_on_behalf_of">От имени</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s: %s</string>
     <string name="multisig_operation_details_approve">Одобрить</string>
     <string name="multisig_operation_details_approve_and_execute">Одобрить и выполнить</string>
     <string name="multisig_operation_details_call_data_not_found">Введите данные вызова, чтобы просмотреть детали</string>
+    <string name="multisig_operation_details_not_found_message">Транзакция уже была выполнена или отклонена.</string>
+    <string name="multisig_operation_details_not_found_title">Подписание завершено</string>
     <string name="multisig_operation_details_reject">Отклонить</string>
     <string name="multisig_operation_details_signatories" formatted="false">Подписанты (%d из %d)</string>
+    <string name="multisig_operation_utility_batch_all_title">Пакет Все (откатывается при ошибке)</string>
+    <string name="multisig_operation_utility_batch_title">Пакет (выполняется до ошибки)</string>
+    <string name="multisig_operation_utility_force_batch_title">Принудительный Пакет (игнорирует ошибки)</string>
     <string name="multisig_operations_created">Создано вами</string>
+    <string name="multisig_operations_placeholder">Пока нет транзакций.\nЗапросы на подписание будут отображаться здесь</string>
     <string name="multisig_operations_progress" formatted="false">Подписание (%s из %s)</string>
     <string name="multisig_operations_signed">Подписано вами</string>
     <string name="multisig_operations_unknown_calldata">Неизвестная операция</string>
     <string name="multisig_pending_operations">Транзакции для подписи</string>
     <string name="multisig_pending_operations_on_behalf_of">От имени:</string>
+    <string name="multisig_push_settings_approval_switcher">Подписано участником</string>
+    <string name="multisig_push_settings_executed_switcher">Мультисиг транзакция выполнена</string>
+    <string name="multisig_push_settings_initial_switcher">Требуется ваша подпись</string>
+    <string name="multisig_push_settings_rejected_switcher">Мультисиг транзакция отклонена</string>
     <string name="multisig_sell_not_supported_message">Чтобы продать криптовалюту за фиат, пожалуйста, переключитесь на другой тип кошелька.</string>
     <string name="multisig_sell_not_supported_title">Продажа не поддерживается для мультиподписей</string>
     <string name="multisig_signatory">Подписант:</string>
@@ -966,9 +992,19 @@
     <string name="multisig_transaction_created_subtitle_highlight">Транзакции для подписи</string>
     <string name="multisig_transaction_created_title">Мультисиг транзакция создана</string>
     <string name="multisig_transaction_created_view_details">Просмотреть детали</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">Транзакция без начальной информации в цепочке (данные вызова) была отклонена</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s на %s.\nБольше не требуется никаких действий с вашей стороны.</string>
+    <string name="multisig_transaction_executed_dialog_title">Мультисиг транзакция выполнена</string>
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s на %s.\nОтклонено: %s.\nБольше не требуется никаких действий с вашей стороны.</string>
+    <string name="multisig_transaction_rejected_dialog_title">Мультисиг транзакция отклонена</string>
     <string name="multisig_wallet_details_info_warning">Транзакции с этого кошелька требуют одобрения от нескольких подписантов. Ваш аккаунт — один из подписантов:</string>
     <string name="multisig_wallet_details_info_warning_other_signatories">Другие подписанты:</string>
     <string name="multisig_wallet_details_info_warning_title" formatted="false">Порог %d из %d</string>
+    <string name="multisigs_notification_channel_name">Канал уведомлений о мультисиг транзакциях</string>
+    <string name="mutisigs_push_notifications_warning_enable">Включить в настройках</string>
+    <string name="mutisigs_push_notifications_warning_message">Получайте уведомления о запросах на подпись, новых подписях и завершенных транзакциях — чтобы всегда контролировать процесс. Управляйте в любое время в Настройках.</string>
+    <string name="mutisigs_push_notifications_warning_title">Пуш-уведомления о мультисиг транзакциях здесь!</string>
     <string name="network_already_exist_failure_title">Эта нода уже существует</string>
     <string name="network_fee">Комиссия сети</string>
     <string name="network_info_address">Адрес ноды</string>
@@ -987,6 +1023,8 @@
     <string name="nft_owned_by">Владелец</string>
     <string name="nft_price_not_listed">Без цены</string>
     <string name="nft_your_nfts">Ваши NFT</string>
+    <string name="no_ms_accounts_found_dialog_message">Вы не добавили и не выбрали ни одного мультисиг кошелька в Nova. Добавьте и выберите хотя бы один, чтобы получать пуш-уведомления о мультисиг транзакциях.</string>
+    <string name="no_ms_accounts_found_dialog_title">Нет мультисиг кошельков</string>
     <string name="node_already_exist_failure_message">Введенный вами URL уже существует как \"%s\" нода.</string>
     <string name="node_already_exist_failure_title">Этот Узел уже существует</string>
     <string name="node_not_alive_message">Введенный вами URL Узла либо не отвечает, либо имеет неверный формат. Формат URL должен начинаться с \"wss://\".</string>
@@ -1064,6 +1102,8 @@
     <string name="profile_settings_pin_code_verification_title">Подтверждение с PIN</string>
     <string name="profile_settings_safe_mode_title">Безопасный режим</string>
     <string name="profile_settings_title">Настройки</string>
+    <string name="proxied_card_not_supported_message">Для управления вашей Дебетовой Картой, пожалуйста, переключитесь на другой кошелек с сетью Polkadot.</string>
+    <string name="proxied_card_not_supported_title">Дебетовая карта не поддерживается для этого Проксируемого кошелька</string>
     <string name="proxied_wallet_details_info_warning">Этот аккаунт предоставил доступ для выполнения транзакций следующему аккаунту:</string>
     <string name="proxy_access_type_staking_operations">Операции стейкинга</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">Делегированный аккаунт %s не имеет достаточного баланса для оплаты сетевой комиссии %s. Доступный баланс для оплаты комиссии: %s</string>
@@ -1091,6 +1131,7 @@
     <string name="push_settings_announcements">Объявления Nova</string>
     <string name="push_settings_balances">Балансы</string>
     <string name="push_settings_enable">Включить уведомления</string>
+    <string name="push_settings_multisig_operations">Транзакции Multisig</string>
     <string name="push_settings_no_selected_wallets">Вы не будете получать уведомления о деятельности кошелька (балансы, стейкинг), поскольку вы не выбрали ни один кошелек.</string>
     <string name="push_settings_others">Прочее</string>
     <string name="push_settings_received_tokens">Полученные токены</string>
@@ -1108,7 +1149,7 @@
     <string name="push_token_sent_message" formatted="false">Отправлено %s на %s в сети %s</string>
     <string name="push_token_sent_no_account_name_title">💸 Отправлено</string>
     <string name="push_token_sent_title">💸 Отправлено %s</string>
-    <string name="push_wallets_title">Выберите до 3 кошельков для которых вы будете получать уведомления о событиях кошелька</string>
+    <string name="push_wallets_title">Выберите до %d кошельков, чтобы получать уведомления об активности кошелька</string>
     <string name="push_welcome_enable_button">Включить push-уведомления</string>
     <string name="push_welcome_message">Получайте уведомления об операциях кошелька, обновлениях демократии, наград стейкинга и безопасности, чтобы всегда быть в куре событий</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">Включая push-уведомления, вы соглашаетесь с нашими %s и %s</string>
@@ -1147,7 +1188,6 @@
     <string name="referendum_full_details_beneficiary">Получатель</string>
     <string name="referendum_full_details_deposit">Депозит</string>
     <string name="referendum_full_details_electorate">Электорат</string>
-    <string name="referendum_full_details_hash">Хэш вызова</string>
     <string name="referendum_full_details_long_for_preview">Слишком большая длина для просмотра</string>
     <string name="referendum_full_details_parameters_json">Параметры JSON</string>
     <string name="referendum_full_details_proposer">Автор</string>

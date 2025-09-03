@@ -11,11 +11,12 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitt
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigValidationsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationRequestBus
+import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
@@ -126,7 +127,9 @@ interface AccountFeatureApi {
 
     val accountUIUseCase: AccountUIUseCase
 
-    val multisigApprovalsRepository: MultisigApprovalsRepository
+    val multisigDetailsRepository: MultisigDetailsRepository
+
+    val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

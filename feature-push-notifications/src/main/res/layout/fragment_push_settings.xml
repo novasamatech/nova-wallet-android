@@ -97,12 +97,6 @@
                     android:layout_height="wrap_content"
                     app:title="@string/push_settings_received_tokens" />
 
-                <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
-                    android:id="@+id/pushSettingsMultisigOperations"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/push_settings_multisig_operations" />
-
             </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
             <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView
@@ -113,6 +107,13 @@
             <io.novafoundation.nova.common.view.settings.SettingsGroupView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.settings.SettingsItemView
+                    android:id="@+id/pushSettingsMultisigs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:title="@string/push_settings_multisig_operations"
+                    tools:settingValue="On" />
 
                 <io.novafoundation.nova.common.view.settings.SettingsItemView
                     android:id="@+id/pushSettingsGovernance"

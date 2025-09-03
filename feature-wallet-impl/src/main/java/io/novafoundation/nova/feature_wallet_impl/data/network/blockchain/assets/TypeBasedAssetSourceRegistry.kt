@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.events.AssetEventDetector
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.orml.OrmlAssetSourceFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.UnsupportedEventDetector
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.evmErc20.EvmErc20EventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml.OrmlAssetEventDetectorFactory
@@ -24,7 +25,7 @@ class StaticAssetSource(
 class TypeBasedAssetSourceRegistry(
     private val nativeSource: Lazy<AssetSource>,
     private val statemineSource: Lazy<AssetSource>,
-    private val ormlSource: Lazy<AssetSource>,
+    private val ormlSourceFactory: Lazy<OrmlAssetSourceFactory>,
     private val evmErc20Source: Lazy<AssetSource>,
     private val evmNativeSource: Lazy<AssetSource>,
     private val equilibriumAssetSource: Lazy<AssetSource>,
@@ -37,10 +38,10 @@ class TypeBasedAssetSourceRegistry(
 ) : AssetSourceRegistry {
 
     override fun sourceFor(chainAsset: Chain.Asset): AssetSource {
-        return when (chainAsset.type) {
+        return when (val type = chainAsset.type) {
             is Chain.Asset.Type.Native -> nativeSource.get()
             is Chain.Asset.Type.Statemine -> statemineSource.get()
-            is Chain.Asset.Type.Orml -> ormlSource.get()
+            is Chain.Asset.Type.Orml -> ormlSourceFactory.get().getSourceBySubtype(type.subType)
             is Chain.Asset.Type.EvmErc20 -> evmErc20Source.get()
             is Chain.Asset.Type.EvmNative -> evmNativeSource.get()
             is Chain.Asset.Type.Equilibrium -> equilibriumAssetSource.get()
@@ -49,14 +50,14 @@ class TypeBasedAssetSourceRegistry(
     }
 
     override fun allSources(): List<AssetSource> {
-        return listOf(
-            nativeSource.get(),
-            statemineSource.get(),
-            ormlSource.get(),
-            evmNativeSource.get(),
-            evmErc20Source.get(),
-            equilibriumAssetSource.get()
-        )
+        return buildList {
+            add(nativeSource.get())
+            add(statemineSource.get())
+            addAll(ormlSourceFactory.get().allSources())
+            add(evmNativeSource.get())
+            add(evmErc20Source.get())
+            add(equilibriumAssetSource.get())
+        }
     }
 
     override suspend fun getEventDetector(chainAsset: Chain.Asset): AssetEventDetector {

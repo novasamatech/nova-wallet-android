@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_account_impl.domain.multisig
+package io.novafoundation.nova.feature_account_impl.domain.multisig.syncer
 
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -33,8 +33,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
 import javax.inject.Inject
+import kotlinx.coroutines.flow.update
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -65,7 +65,7 @@ internal class MultisigChainPendingOperationsSyncerFactory @Inject constructor(
     }
 }
 
-internal interface MultisigPendingOperationsSyncer {
+interface MultisigPendingOperationsSyncer {
 
     val pendingOperationsCount: Flow<Int>
 
@@ -83,7 +83,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     private val chainStateRepository: ChainStateRepository,
 ) : CoroutineScope by scope, MultisigPendingOperationsSyncer {
 
-    private val pendingCallHashesFlow = MutableStateFlow<Set<CallHash>>(emptySet())
+    private val pendingCallHashesFlow = MutableStateFlow(emptySet<CallHash>())
 
     private val offChainInfos = MutableStateFlow(emptyMap<CallHash, OffChainPendingMultisigOperationInfo>())
 
@@ -93,7 +93,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
             Log.d("RealMultisigChainPendingOperationsSyncer", "# of operations for ${multisig.name} in ${chain.name}: $it")
         }.shareInBackground()
 
-    override val pendingOperations = pendingCallHashesFlow.flatMapLatest(::observePendingOperations)
+    override val pendingOperations = this.pendingCallHashesFlow.flatMapLatest(::observePendingOperations)
         .onEach(::cleanInactiveOperations)
         .map { it.values.filterNotNull() }
         .catch { Log.e("RealMultisigChainPendingOperationsSyncer", "Failed to sync pendingOperations", it) }
@@ -107,7 +107,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
     }
 
     private fun startOffChainRefreshJob() {
-        pendingCallHashesFlow
+        this.pendingCallHashesFlow
             .mapLatest(::syncOffChainInfo)
             .launchIn(this)
     }
@@ -121,9 +121,9 @@ internal class RealMultisigChainPendingOperationsSyncer(
             .onSuccess { offChainInfos.value = it }
     }
 
-    private fun cleanInactiveOperations(pendingOperations: Map<CallHash, PendingMultisigOperation?>) {
+    private suspend fun cleanInactiveOperations(pendingOperations: Map<CallHash, PendingMultisigOperation?>) {
         val inactiveOperations = pendingOperations.entries.mapNotNullToSet { (key, value) -> key.takeIf { value == null } }
-        pendingCallHashesFlow.update { pendingCallHashes -> pendingCallHashes - inactiveOperations }
+        this.pendingCallHashesFlow.update { pendingCallHashes -> pendingCallHashes - inactiveOperations }
     }
 
     private fun observePendingCallHashes() = launchUnit {
@@ -137,7 +137,7 @@ internal class RealMultisigChainPendingOperationsSyncer(
         callDataWatcher.newMultisigEvents
             .filter { it.multisig == accountId && it.chainId == chain.id }
             .onEach {
-                pendingCallHashesFlow.update { pendingCallHashesFlow -> pendingCallHashesFlow + it.callHash }
+                this.pendingCallHashesFlow.update { pendingCallHashes -> pendingCallHashes + it.callHash }
             }.launchIn(this)
     }
 

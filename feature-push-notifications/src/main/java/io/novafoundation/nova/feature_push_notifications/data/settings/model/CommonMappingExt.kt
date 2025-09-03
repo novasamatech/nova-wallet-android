@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_push_notifications.data.settings.model
 
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.chain.ChainFeatureCacheV1
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.governance.GovernanceStateCacheV1
+import io.novafoundation.nova.feature_push_notifications.data.settings.model.governance.MultisigsStateCacheV1
 import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
 
 fun PushSettings.toCache(): PushSettingsCacheV2 {
@@ -9,10 +10,10 @@ fun PushSettings.toCache(): PushSettingsCacheV2 {
         announcementsEnabled = announcementsEnabled,
         sentTokensEnabled = sentTokensEnabled,
         receivedTokensEnabled = receivedTokensEnabled,
-        multisigTransactionsEnabled = multisigTransactionsEnabled,
         subscribedMetaAccounts = subscribedMetaAccounts,
         stakingReward = stakingReward.toCache(),
-        governance = governance.mapValues { (_, value) -> value.toCache() }
+        governance = governance.mapValues { (_, value) -> value.toCache() },
+        multisigs = multisigs.toCache()
     )
 }
 
@@ -29,5 +30,15 @@ fun PushSettings.GovernanceState.toCache(): GovernanceStateCacheV1 {
         referendumUpdateEnabled = referendumUpdateEnabled,
         govMyDelegateVotedEnabled = govMyDelegateVotedEnabled,
         tracks = tracks
+    )
+}
+
+fun PushSettings.MultisigsState.toCache(): MultisigsStateCacheV1 {
+    return MultisigsStateCacheV1(
+        isEnabled = isEnabled,
+        isInitialNotificationsEnabled = isInitiatingEnabled,
+        isApprovalNotificationsEnabled = isApprovingEnabled,
+        isExecutionNotificationsEnabled = isExecutionEnabled,
+        isRejectionNotificationsEnabled = isRejectionEnabled
     )
 }

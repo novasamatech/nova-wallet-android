@@ -15,6 +15,7 @@ import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.NodeLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus.Event
+import io.novafoundation.nova.feature_account_api.data.events.combineBusEvents
 import io.novafoundation.nova.feature_account_api.data.secrets.keypair
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.Account
@@ -104,6 +105,15 @@ class AccountRepositoryImpl(
         return accountDataSource.getSelectedMetaAccount()
     }
 
+    override suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount> {
+        return accountDataSource.getMetaAccountsByIds(metaIds)
+    }
+
+    override suspend fun getUnavailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long> {
+        val availableMetaIds = accountDataSource.getActiveMetaIds()
+        return metaIds - availableMetaIds
+    }
+
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
         return accountDataSource.getMetaAccount(metaId)
     }
@@ -164,9 +174,12 @@ class AccountRepositoryImpl(
     override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
         val metaAccountType = accountDataSource.getMetaAccountTypeOrThrow(metaId)
 
-        accountDataSource.deleteMetaAccount(metaId)
+        val allAffectedMetaIds = accountDataSource.deleteMetaAccount(metaId)
 
-        metaAccountChangesEventBus.notify(Event.AccountRemoved(metaId, metaAccountType), source = null)
+        val deleteEvents = allAffectedMetaIds.map { Event.AccountRemoved(it, metaAccountType) }
+            .combineBusEvents() ?: return@withContext
+
+        metaAccountChangesEventBus.notify(deleteEvents, source = null)
     }
 
     override suspend fun getAccounts(): List<Account> {
@@ -291,6 +304,14 @@ class AccountRepositoryImpl(
 
     override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
         return accountDataSource.hasMetaAccountsCountOfTypeFlow(type)
+    }
+
+    override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
+        return accountDataSource.hasMetaAccountsByType(type)
+    }
+
+    override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
+        return accountDataSource.metaAccountsByTypeFlow(type)
     }
 
     override suspend fun hasSecretsAccounts(): Boolean {

@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation
 
 import io.novafoundation.nova.common.navigation.ReturnableRouter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.common.MultisigOperationDetailsPayload
-import io.novafoundation.nova.feature_multisig_operations.presentation.enterCall.MultisigOperationEnterCallPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsPayload
 
 interface MultisigOperationsRouter : ReturnableRouter {
 
@@ -12,7 +12,7 @@ interface MultisigOperationsRouter : ReturnableRouter {
 
     fun openMultisigOperationDetails(payload: MultisigOperationDetailsPayload)
 
-    fun openMultisigFullDetails(payload: MultisigOperationDetailsPayload)
+    fun openMultisigFullDetails(payload: MultisigOperationPayload)
 
-    fun openEnterCallDetails(payload: MultisigOperationEnterCallPayload)
+    fun openEnterCallDetails(payload: MultisigOperationPayload)
 }

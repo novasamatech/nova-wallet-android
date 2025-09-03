@@ -33,7 +33,7 @@ class ScanImportParitySignerViewModel(
             .onSuccess(::openPreview)
             .onFailure {
                 val message = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_import_scan_invalid_qr, payload.variant)
-                showMessage(message)
+                showToast(message)
 
                 // wait a bit until re-enabling scanner otherwise user might experience a lot of error messages shown due to fast scanning
                 delay(1000)

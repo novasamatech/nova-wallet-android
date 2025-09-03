@@ -22,8 +22,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
+        android:paddingBottom="16dp"
         android:background="@drawable/bg_dapp_entry_point"
-        android:paddingBottom="24dp"
         android:visibility="gone"
         tools:visibility="visible">
 

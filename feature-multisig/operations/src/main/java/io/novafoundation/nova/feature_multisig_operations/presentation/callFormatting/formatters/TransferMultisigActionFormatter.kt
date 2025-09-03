@@ -4,7 +4,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.asIcon
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.getNameOrAddress
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.formatters.MultisigActionFormatterDelegateDetailsResult.TableEntry
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.formatters.MultisigActionFormatterDelegateDetailsResult.TableValue
@@ -21,7 +22,7 @@ import javax.inject.Inject
 
 @FeatureScope
 class TransferMultisigActionFormatter @Inject constructor(
-    @LocalWithOnChainIdentity private val identityProvider: IdentityProvider,
+    @LocalIdentity private val identityProvider: IdentityProvider,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val resourceManager: ResourceManager,
 ) : MultisigActionFormatterDelegate {
@@ -57,16 +58,16 @@ class TransferMultisigActionFormatter @Inject constructor(
         )
     }
 
-    override suspend fun formatPushNotificationMessage(visit: CallVisit, chain: Chain): String? {
+    override suspend fun formatMessageCall(visit: CallVisit, chain: Chain): String? {
         val parsedTransfer = tryParseTransfer(visit, chain) ?: return null
 
-        val identity = identityProvider.identityFor(parsedTransfer.destination.value, chain.id)
+        val accountName = identityProvider.getNameOrAddress(parsedTransfer.destination, chain)
+        val formattedAmount = parsedTransfer.amount.formatPlanks()
 
         return resourceManager.getString(
-            R.string.multisig_notification_init_transaction_message_transfer,
-            parsedTransfer.amount.formatPlanks(),
-            identity?.name ?: parsedTransfer.destination.value,
-            chain.name
+            R.string.multisig_transaction_message_transfer,
+            formattedAmount,
+            accountName
         )
     }
 

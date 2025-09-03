@@ -12,9 +12,9 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigApprovalsRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalWithOnChainIdentity
+import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.deeplink.AssetDetailsDeepLinkConfigurator
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
@@ -234,6 +234,7 @@ class NotificationHandlersModule {
         gson: Gson,
         notificationManager: NotificationManagerCompat,
         resourceManager: ResourceManager,
+        @LocalIdentity identityProvider: IdentityProvider
     ): NotificationHandler {
         return MultisigTransactionInitiatedNotificationHandler(
             context,
@@ -241,6 +242,7 @@ class NotificationHandlersModule {
             multisigCallFormatter,
             configurator,
             chainRegistry,
+            identityProvider,
             activityIntentProvider,
             notificationIdProvider,
             gson,
@@ -255,12 +257,12 @@ class NotificationHandlersModule {
         context: Context,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        multisigDetailsRepository: MultisigDetailsRepository,
+        @LocalIdentity identityProvider: IdentityProvider,
         activityIntentProvider: ActivityIntentProvider,
         notificationIdProvider: NotificationIdProvider,
         multisigCallFormatter: MultisigCallFormatter,
         configurator: MultisigOperationDeepLinkConfigurator,
-        multisigApprovalsRepository: MultisigApprovalsRepository,
         gson: Gson,
         notificationManager: NotificationManagerCompat,
         resourceManager: ResourceManager,
@@ -268,7 +270,7 @@ class NotificationHandlersModule {
         return MultisigTransactionNewApprovalNotificationHandler(
             context,
             accountRepository,
-            multisigApprovalsRepository,
+            multisigDetailsRepository,
             multisigCallFormatter,
             configurator,
             identityProvider,
@@ -287,7 +289,8 @@ class NotificationHandlersModule {
         context: Context,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        configurator: MultisigOperationDeepLinkConfigurator,
+        @LocalIdentity identityProvider: IdentityProvider,
         activityIntentProvider: ActivityIntentProvider,
         notificationIdProvider: NotificationIdProvider,
         multisigCallFormatter: MultisigCallFormatter,
@@ -299,6 +302,7 @@ class NotificationHandlersModule {
             context,
             accountRepository,
             multisigCallFormatter,
+            configurator,
             identityProvider,
             chainRegistry,
             activityIntentProvider,
@@ -315,7 +319,8 @@ class NotificationHandlersModule {
         context: Context,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        @LocalWithOnChainIdentity identityProvider: IdentityProvider,
+        configurator: MultisigOperationDeepLinkConfigurator,
+        @LocalIdentity identityProvider: IdentityProvider,
         activityIntentProvider: ActivityIntentProvider,
         notificationIdProvider: NotificationIdProvider,
         multisigCallFormatter: MultisigCallFormatter,
@@ -327,6 +332,7 @@ class NotificationHandlersModule {
             context,
             accountRepository,
             multisigCallFormatter,
+            configurator,
             identityProvider,
             chainRegistry,
             activityIntentProvider,
