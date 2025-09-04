@@ -194,6 +194,10 @@ fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
     return group() == StakingTypeGroup.NOMINATION_POOL
 }
 
+inline fun <reified T : Chain.ExternalApi> Chain.allExternalApis(): List<T> {
+    return externalApis.filterIsInstance<T>()
+}
+
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
 }

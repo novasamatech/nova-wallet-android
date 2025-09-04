@@ -50,22 +50,10 @@ abstract class BaseStakingRewardsDataSource(
 
     override suspend fun sync(accountId: AccountId, stakingOption: StakingOption, rewardPeriod: RewardPeriod) {
         val chain = stakingOption.assetWithChain.chain
-        val timelineChain = chain.timelineChainId()?.let { chainRegistry.getChain(it) }
 
-        val totalReward = if (timelineChain != null) {
-            // We aggregate rewards for chains that have migrated their features to AH
-            getRewardSumForChains(listOfNotNull(chain, timelineChain), accountId, rewardPeriod)
-        } else {
-            getRewardSumForChains(listOf(chain), accountId, rewardPeriod)
-        }
+        val totalReward = getTotalRewards(chain, accountId, rewardPeriod)
 
         saveTotalReward(totalReward, accountId, stakingOption)
-    }
-
-    private suspend fun getRewardSumForChains(chains: List<Chain>, accountId: AccountId, rewardPeriod: RewardPeriod): Balance {
-        return chains.sumOf { chain ->
-            getTotalRewards(chain, accountId, rewardPeriod)
-        }
     }
 
     abstract suspend fun getTotalRewards(chain: Chain, accountId: AccountId, rewardPeriod: RewardPeriod): Balance
