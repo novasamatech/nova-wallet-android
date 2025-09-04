@@ -41,7 +41,6 @@ suspend fun CrossChainTransfersConfiguration.transferConfiguration(
     originAsset: Chain.Asset,
     destinationChain: XcmChain,
 ): CrossChainTransferConfiguration? {
-
     val result = dynamic.transferConfiguration(originChain, originAsset, destinationChain)?.let(CrossChainTransferConfiguration::Dynamic)
         ?: legacy.transferConfiguration(originChain, originAsset, destinationChain)?.let(CrossChainTransferConfiguration::Legacy)
 

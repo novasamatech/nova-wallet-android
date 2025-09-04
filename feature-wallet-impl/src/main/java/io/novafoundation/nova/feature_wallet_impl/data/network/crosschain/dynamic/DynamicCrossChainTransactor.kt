@@ -135,7 +135,7 @@ class DynamicCrossChainTransactor @Inject constructor(
     ): VersionedXcmMessage {
         return xcmBuilderFactory.buildXcmWithoutFeesMeasurement(
             initial = configuration.originChainLocation,
-            xcmVersion = XcmVersion.V4
+            xcmVersion = USED_XCM_VERSION
         ) {
             depositAsset(MultiAssetFilter.singleCounted(), transfer.recipientAccountId)
         }
@@ -290,7 +290,7 @@ class DynamicCrossChainTransactor @Inject constructor(
     }
 
     private fun DynamicCrossChainTransferConfiguration.transferTypeParam(): Any {
-        return when(val type = transferType) {
+        return when (val type = transferType) {
             XcmTransferReserve.Teleport -> DictEnum.Entry("Teleport", null)
 
             XcmTransferReserve.Reserve.Destination -> DictEnum.Entry("DestinationReserve", null)

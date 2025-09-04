@@ -95,7 +95,6 @@ private fun isSystemTeleport(originXcmChain: XcmChain, destinationXcmChain: XcmC
     return systemToRelay || relayToSystem || systemToSystem
 }
 
-
 private fun AssetTransfers.getDestination(destinationChainId: ChainId): TransferDestination? {
     return destinations.find { it.fullChainAssetId.chainId == destinationChainId }
 }
