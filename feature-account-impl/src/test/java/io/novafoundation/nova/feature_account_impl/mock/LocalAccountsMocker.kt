@@ -4,6 +4,7 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountIdWithType
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -32,6 +33,8 @@ object LocalAccountsMocker {
         }
 
         whenever(dao.nextAccountPosition()).thenReturn(0)
+
+        whenever(dao.delete(any<List<Long>>())).thenReturn(listOf(MetaAccountIdWithType(0, MetaAccountLocal.Type.SECRETS)))
 
         whenever(dao.insertMetaAccount(any())).thenAnswer {
             metaAccountCounter++

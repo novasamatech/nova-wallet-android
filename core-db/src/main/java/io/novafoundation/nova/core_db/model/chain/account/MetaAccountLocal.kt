@@ -152,3 +152,8 @@ class MetaAccountPositionUpdate(
     val id: Long,
     val position: Int
 )
+
+data class MetaAccountIdWithType(
+    val id: Long,
+    val type: MetaAccountLocal.Type
+)

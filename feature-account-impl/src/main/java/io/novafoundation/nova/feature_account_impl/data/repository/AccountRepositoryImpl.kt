@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.substrateMultiCha
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapNodeLocalToNode
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
-import io.novafoundation.nova.feature_account_impl.data.repository.datasource.getMetaAccountTypeOrThrow
 import io.novafoundation.nova.runtime.ext.genesisHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.json.JsonEncoder
@@ -109,9 +108,9 @@ class AccountRepositoryImpl(
         return accountDataSource.getMetaAccountsByIds(metaIds)
     }
 
-    override suspend fun getUnavailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long> {
+    override suspend fun getAvailableMetaIdsFromSet(metaIds: Set<Long>): Set<Long> {
         val availableMetaIds = accountDataSource.getActiveMetaIds()
-        return metaIds - availableMetaIds
+        return metaIds.intersect(availableMetaIds)
     }
 
     override suspend fun getMetaAccount(metaId: Long): MetaAccount {
@@ -172,11 +171,9 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
-        val metaAccountType = accountDataSource.getMetaAccountTypeOrThrow(metaId)
+        val allAffectedMetaAccounts = accountDataSource.deleteMetaAccount(metaId)
 
-        val allAffectedMetaIds = accountDataSource.deleteMetaAccount(metaId)
-
-        val deleteEvents = allAffectedMetaIds.map { Event.AccountRemoved(it, metaAccountType) }
+        val deleteEvents = allAffectedMetaAccounts.map { Event.AccountRemoved(it.metaId, it.type) }
             .combineBusEvents() ?: return@withContext
 
         metaAccountChangesEventBus.notify(deleteEvents, source = null)
@@ -308,6 +305,10 @@ class AccountRepositoryImpl(
 
     override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
         return accountDataSource.hasMetaAccountsByType(type)
+    }
+
+    override suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: LightMetaAccount.Type): Boolean {
+        return accountDataSource.hasMetaAccountsByType(metaIds, type)
     }
 
     override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
