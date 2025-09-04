@@ -427,24 +427,20 @@ class StakingFeatureModule {
     @Provides
     @FeatureScope
     fun provideDirectStakingRewardsDataSource(
-        chainRegistry: ChainRegistry,
         stakingApi: StakingApi,
         stakingTotalRewardDao: StakingTotalRewardDao,
     ) = DirectStakingRewardsDataSource(
         stakingApi = stakingApi,
-        chainRegistry = chainRegistry,
         stakingTotalRewardDao = stakingTotalRewardDao
     )
 
     @Provides
     @FeatureScope
     fun providePoolStakingRewardsDataSource(
-        chainRegistry: ChainRegistry,
         stakingApi: StakingApi,
         stakingTotalRewardDao: StakingTotalRewardDao,
     ) = PoolStakingRewardsDataSource(
         stakingApi = stakingApi,
-        chainRegistry = chainRegistry,
         stakingTotalRewardDao = stakingTotalRewardDao
     )
 

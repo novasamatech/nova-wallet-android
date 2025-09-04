@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.atLeastZero
-import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.retryUntilDone
@@ -19,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
-import io.novafoundation.nova.runtime.ext.timelineChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

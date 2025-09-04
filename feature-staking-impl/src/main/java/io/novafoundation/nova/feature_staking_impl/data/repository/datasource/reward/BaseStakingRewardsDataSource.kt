@@ -11,8 +11,6 @@ import io.novafoundation.nova.feature_staking_impl.data.mappers.mapTotalRewardLo
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.runtime.ext.timelineChainId
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 
 abstract class BaseStakingRewardsDataSource(
-    private val chainRegistry: ChainRegistry,
     private val stakingTotalRewardDao: StakingTotalRewardDao,
 ) : StakingRewardsDataSource {
 
