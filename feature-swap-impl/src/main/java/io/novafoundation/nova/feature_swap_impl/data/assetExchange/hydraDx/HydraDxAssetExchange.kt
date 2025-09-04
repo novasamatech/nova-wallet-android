@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOutcomeOk
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability

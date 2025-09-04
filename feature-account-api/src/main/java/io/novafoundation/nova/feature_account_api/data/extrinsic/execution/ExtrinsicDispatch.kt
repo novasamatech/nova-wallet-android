@@ -29,7 +29,7 @@ fun ExtrinsicExecutionResult.requireOk(): ExtrinsicExecutionResult {
     }
 }
 
-fun Result<ExtrinsicExecutionResult>.requireOk(): Result<ExtrinsicExecutionResult> {
+fun Result<ExtrinsicExecutionResult>.flattenDispatchFailure(): Result<ExtrinsicDispatch.Ok> {
     return mapCatching { it.requireOk() }
 }
 
