@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateMetadata
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
+import io.novafoundation.nova.feature_governance_api.data.repository.common.TimePoint
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -21,12 +22,12 @@ interface DelegationsRepository {
     suspend fun isDelegationSupported(chain: Chain): Boolean
 
     suspend fun getDelegatesStats(
-        recentVotesBlockThreshold: BlockNumber,
+        timePointThreshold: TimePoint,
         chain: Chain
     ): List<DelegateStats>
 
     suspend fun getDelegatesStatsByAccountIds(
-        recentVotesBlockThreshold: BlockNumber,
+        timePointThreshold: TimePoint,
         accountIds: List<AccountId>,
         chain: Chain
     ): List<DelegateStats>
