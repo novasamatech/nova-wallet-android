@@ -7,7 +7,14 @@ class DynamicCrossChainTransfersConfigRemote(
     val assetsLocation: Map<String, DynamicReserveLocationRemote>?,
     // (ChainId, AssetId) -> ReserveId
     val reserveIdOverrides: Map<String, Map<Int, String>>,
-    val chains: List<DynamicCrossChainOriginChainRemote>?
+    val chains: List<DynamicCrossChainOriginChainRemote>?,
+    val customTeleports: List<CustomTeleportEntryRemote>?,
+)
+
+class CustomTeleportEntryRemote(
+    val originChain: String,
+    val destChain: String,
+    val originAsset: Int
 )
 
 class DynamicReserveLocationRemote(
@@ -30,5 +37,4 @@ class DynamicXcmTransferRemote(
     val assetId: Int,
     val hasDeliveryFee: Boolean?,
     val supportsXcmExecute: Boolean?,
-    val usesTeleport: Boolean?
 )

@@ -7,8 +7,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserv
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
 import io.novafoundation.nova.feature_xcm_api.chain.absoluteLocation
 import io.novafoundation.nova.feature_xcm_api.chain.chainLocation
-import io.novafoundation.nova.feature_xcm_api.chain.isRelay
-import io.novafoundation.nova.feature_xcm_api.chain.isSystemChain
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -19,6 +17,7 @@ class DynamicCrossChainTransferConfiguration(
     val originChainAsset: Chain.Asset,
     val reserve: TokenReserve,
     val features: DynamicCrossChainTransferFeatures,
+    private val usesTeleport: Boolean,
 ) : CrossChainTransferConfigurationBase {
 
     val assetAbsoluteLocation = reserve.tokenLocation
@@ -35,23 +34,12 @@ class DynamicCrossChainTransferConfiguration(
 
     private fun transferType(): XcmTransferReserve {
         return when {
-            shouldUseTeleport() -> XcmTransferReserve.Teleport
+            usesTeleport -> XcmTransferReserve.Teleport
             originChain.chain.id == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Origin
             destinationChain.chain.id == reserve.reserveChainLocation.chainId -> XcmTransferReserve.Reserve.Destination
             else -> XcmTransferReserve.Reserve.Remote(reserve.reserveChainLocation)
         }
     }
-}
-
-private fun DynamicCrossChainTransferConfiguration.shouldUseTeleport(): Boolean {
-    val systemToRelay = originChain.isSystemChain() && destinationChain.isRelay()
-    val relayToSystem = originChain.isRelay() && destinationChain.isSystemChain()
-    val systemToSystem = originChain.isSystemChain() && destinationChain.isSystemChain()
-
-    // We keep our hard-coded logic of determining teleports for system chains just in case
-    // Script that detects `features.usesTeleport` breaks for some reason -
-    // we will still be able to serve system chain transfers
-    return systemToRelay || relayToSystem || systemToSystem || features.usesTeleport
 }
 
 fun DynamicCrossChainTransferConfiguration.destinationChainLocationOnOrigin(): RelativeMultiLocation {

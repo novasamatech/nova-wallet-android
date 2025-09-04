@@ -12,10 +12,10 @@ import io.novafoundation.nova.feature_xcm_api.asset.withAmount
 import io.novafoundation.nova.feature_xcm_api.builder.fees.MeasureXcmFees
 import io.novafoundation.nova.feature_xcm_api.builder.fees.PayFeesMode
 import io.novafoundation.nova.feature_xcm_api.builder.fees.UnsupportedMeasureXcmFees
-import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AssetLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 
@@ -62,6 +62,16 @@ fun XcmBuilder.Factory.createWithoutFeesMeasurement(
     xcmVersion: XcmVersion,
 ): XcmBuilder {
     return create(initial, xcmVersion, UnsupportedMeasureXcmFees())
+}
+
+suspend fun XcmBuilder.Factory.buildXcmWithoutFeesMeasurement(
+    initial: ChainLocation,
+    xcmVersion: XcmVersion,
+    building: XcmBuilder.() -> Unit
+): VersionedXcmMessage {
+    return createWithoutFeesMeasurement(initial, xcmVersion)
+        .apply(building)
+        .build()
 }
 
 fun XcmBuilder.withdrawAsset(asset: AbsoluteMultiLocation, amount: BalanceOf) {

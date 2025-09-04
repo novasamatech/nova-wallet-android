@@ -7,6 +7,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 
 class DynamicCrossChainTransfersConfiguration(
     val reserveRegistry: TokenReserveRegistry,
+    val customTeleports: Set<CustomTeleportEntry>,
     val chains: Map<ChainId, List<AssetTransfers>>
 ) {
 
@@ -19,6 +20,7 @@ class DynamicCrossChainTransfersConfiguration(
         val fullChainAssetId: FullChainAssetId,
         val hasDeliveryFee: Boolean,
         val supportsXcmExecute: Boolean,
-        val usesTeleport: Boolean
     )
+
+    data class CustomTeleportEntry(val originChainAssetId: FullChainAssetId, val destinationChainId: ChainId)
 }
