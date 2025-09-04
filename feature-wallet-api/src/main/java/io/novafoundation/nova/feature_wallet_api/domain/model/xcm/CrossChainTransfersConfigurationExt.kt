@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model.xcm
 
+import android.util.Log
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.availableInDestinations
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.availableOutDestinations
@@ -40,6 +41,25 @@ suspend fun CrossChainTransfersConfiguration.transferConfiguration(
     originAsset: Chain.Asset,
     destinationChain: XcmChain,
 ): CrossChainTransferConfiguration? {
-    return dynamic.transferConfiguration(originChain, originAsset, destinationChain)?.let(CrossChainTransferConfiguration::Dynamic)
+
+    val result = dynamic.transferConfiguration(originChain, originAsset, destinationChain)?.let(CrossChainTransferConfiguration::Dynamic)
         ?: legacy.transferConfiguration(originChain, originAsset, destinationChain)?.let(CrossChainTransferConfiguration::Legacy)
+
+    logTransferConfiguration(originAsset, originChain, destinationChain, result)
+
+    return result
+}
+
+private fun logTransferConfiguration(
+    originAsset: Chain.Asset,
+    originChain: XcmChain,
+    destinationChain: XcmChain,
+    result: CrossChainTransferConfiguration?
+) {
+    val logDirectionLabel = "${originAsset.symbol} ${originChain.chain.name} -> ${destinationChain.chain.name}"
+    if (result == null) {
+        Log.d("CrossChainTransfersConfiguration", "Found no configuration for direction $logDirectionLabel")
+    } else {
+        Log.d("CrossChainTransfersConfiguration", "Using ${result::class.simpleName} configuration for direction $logDirectionLabel")
+    }
 }
