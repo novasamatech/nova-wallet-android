@@ -87,7 +87,7 @@ class RealMultisigRepository @Inject constructor(
 
         return kotlin.runCatching {
             val request = OffChainPendingMultisigInfoRequest(accountId, pendingCallHashes)
-            val response = api.getCallDatas("https://subquery-account-manager-stg.novasama-tech.org/", request)
+            val response = api.getCallDatas(apiConfig.url, request)
             response.toDomain(chain)
         }
             .onFailure { Log.e("RealMultisigRepository", "Failed to fetch call datas in ${chain.name}", it) }
