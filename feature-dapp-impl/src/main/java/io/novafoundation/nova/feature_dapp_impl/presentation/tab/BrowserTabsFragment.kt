@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentBrowserTabsBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
@@ -24,6 +25,8 @@ class BrowserTabsFragment : BaseFragment<BrowserTabsViewModel, FragmentBrowserTa
     override fun createBinding() = FragmentBrowserTabsBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        requireView().applyStatusBarInsets()
+
         onBackPressed { viewModel.done() }
 
         binder.browserTabsList.layoutManager = GridLayoutManager(requireContext(), 2)

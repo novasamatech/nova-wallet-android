@@ -87,6 +87,8 @@ class BaseFragmentDelegate<T : BaseViewModel>(
             showErrorWithTitle(it.first, it.second)
         }
 
+        viewModel.messageLiveData.observeEvent(::showMessage)
+
         viewModel.toastLiveData.observeEvent { view.context.showToast(it) }
     }
 }

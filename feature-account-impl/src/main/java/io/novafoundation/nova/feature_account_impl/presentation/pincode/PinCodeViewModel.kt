@@ -187,7 +187,7 @@ class PinCodeViewModel(
                     }
                     is ScreenState.Confirmation -> {
                         router.back()
-                        showToast(resourceManager.getString(R.string.pincode_changed_message))
+                        showMessage(resourceManager.getString(R.string.pincode_changed_message))
                     }
                     else -> {}
                 }

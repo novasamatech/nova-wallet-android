@@ -54,14 +54,10 @@ class RealMercuryoSellRequestInterceptor(
             val response = okHttpClient.makeRequestBlocking(requestBuilder)
             val sellStatusResponse = gson.fromJson(response.body!!.string(), SellStatusResponse::class.java)
 
-            // We should check that this data is exist in response before handling. Otherwise we will get an exception
-            val address = sellStatusResponse.getAddress() ?: error("Address must be not null")
-            val amount = sellStatusResponse.getAmount() ?: error("Amount must be not null")
-
             when {
                 sellStatusResponse.isNew() && orderId !in openedOrderIds -> {
-                    tradeSellCallback.onSellOrderCreated(orderId, address, amount)
                     openedOrderIds.add(orderId)
+                    tradeSellCallback.onSellOrderCreated(orderId, sellStatusResponse.getAddress(), sellStatusResponse.getAmount())
                 }
 
                 sellStatusResponse.isCompleted() -> onTradeOperationFinishedListener.onTradeOperationFinished(success = true)
@@ -111,30 +107,30 @@ class RealMercuryoSellRequestInterceptor(
  *     }
  * }
  */
-private class SellStatusResponse(val data: Data?) {
+private class SellStatusResponse(val data: Data) {
 
     class Data(
-        val status: String?,
-        val amounts: Amounts?,
-        val address: String?
+        val status: String,
+        val amounts: Amounts,
+        val address: String
     )
 
-    class Amounts(val request: Request?) {
+    class Amounts(val request: Request) {
 
         class Request(
-            val amount: String?,
+            val amount: String,
         )
     }
 }
 
-private fun SellStatusResponse.getAmount(): BigDecimal? {
-    return data?.amounts?.request?.amount?.toBigDecimal()
+private fun SellStatusResponse.getAmount(): BigDecimal {
+    return data.amounts.request.amount.toBigDecimal()
 }
 
-private fun SellStatusResponse.getAddress(): String? {
-    return data?.address
+private fun SellStatusResponse.getAddress(): String {
+    return data.address
 }
 
-private fun SellStatusResponse.isNew() = data?.status == "new"
+private fun SellStatusResponse.isNew() = data.status == "new"
 
-private fun SellStatusResponse.isCompleted() = data?.status == "completed"
+private fun SellStatusResponse.isCompleted() = data.status == "completed"

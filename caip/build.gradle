@@ -1,10 +1,16 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     namespace 'io.novafoundation.nova.caip'
+    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
 
-        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "SLIP_44_COINS_BASE_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/slip44.json\""
     }
 
@@ -13,6 +19,11 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 }
 
@@ -31,7 +42,7 @@ dependencies {
     implementation retrofitDep
 
     implementation daggerDep
-    ksp daggerCompiler
+    kapt daggerKapt
 
     implementation multibaseDep
 

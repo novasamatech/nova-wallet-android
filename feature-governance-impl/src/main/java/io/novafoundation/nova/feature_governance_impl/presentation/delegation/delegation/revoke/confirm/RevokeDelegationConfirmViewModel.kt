@@ -15,14 +15,11 @@ import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.submissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -68,13 +65,11 @@ class RevokeDelegationConfirmViewModel(
     private val resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
     private val delegateFormatters: DelegateMappers,
     private val delegateLabelUseCase: DelegateLabelUseCase,
-    private val partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+    private val partialRetriableMixinFactory: PartialRetriableMixin.Factory
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     WithFeeLoaderMixin,
-    ExternalActions by externalActions,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    ExternalActions by externalActions {
 
     val partialRetriableMixin = partialRetriableMixinFactory.create(this)
 
@@ -188,9 +183,8 @@ class RevokeDelegationConfirmViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
-
-                startNavigation(it.submissionHierarchy()) { router.backToYourDelegations() }
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                router.backToYourDelegations()
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.backToYourDelegations() }

@@ -5,6 +5,7 @@ import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
@@ -36,6 +37,7 @@ class FillWalletImportLedgerFragment :
     }
 
     override fun initViews() {
+        binder.fillWalletImportLedgerToolbar.applyStatusBarInsets()
         binder.fillWalletImportLedgerToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }

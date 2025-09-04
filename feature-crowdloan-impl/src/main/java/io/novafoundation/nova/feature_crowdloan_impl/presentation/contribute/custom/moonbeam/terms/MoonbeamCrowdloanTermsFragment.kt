@@ -5,6 +5,7 @@ import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
 import coil.load
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -37,6 +38,14 @@ class MoonbeamCrowdloanTermsFragment : BaseFragment<MoonbeamCrowdloanTermsViewMo
     override fun createBinding() = FragmentMoonbeamTermsBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.moonbeamTermsContainer.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+
+            consume(true)
+        }
+
         binder.moonbeamTermsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.moonbeamTermsConfirm.prepareForProgress(viewLifecycleOwner)

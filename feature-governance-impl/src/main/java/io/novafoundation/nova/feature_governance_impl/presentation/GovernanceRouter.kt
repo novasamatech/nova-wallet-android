@@ -92,6 +92,4 @@ interface GovernanceRouter : ReturnableRouter {
     fun backToTinderGovCards()
 
     fun openReferendumInfo(payload: ReferendumInfoPayload)
-
-    fun openReferendumFromDeepLink(payload: ReferendumDetailsPayload)
 }

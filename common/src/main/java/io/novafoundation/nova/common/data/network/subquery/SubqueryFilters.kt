@@ -8,10 +8,6 @@ interface SubQueryFilters {
 
     infix fun String.equalTo(value: String) = "$this: { equalTo: \"$value\" }"
 
-    infix fun String.equalTo(value: Boolean) = "$this: { equalTo: $value }"
-
-    infix fun String.equalTo(value: Int) = "$this: { equalTo: $value }"
-
     infix fun String.equalToEnum(value: String) = "$this: { equalTo: $value }"
 
     fun queryParams(
@@ -22,11 +18,6 @@ interface SubQueryFilters {
         }
 
         return "(filter: { $filter })"
-    }
-
-    infix fun String.presentIn(values: List<String>): String {
-        val queryValues = values.joinToString(separator = ",") { "\"${it}\"" }
-        return "$this: { in: [$queryValues] }"
     }
 
     fun String.containsFilter(field: String, value: String?): String {

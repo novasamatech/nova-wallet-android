@@ -53,7 +53,7 @@ interface Web3StateMachineHost {
 
     fun showError(text: String)
 
-    fun showError(title: String, message: CharSequence)
+    fun showError(title: String, message: String)
 
     fun reloadPage()
 }

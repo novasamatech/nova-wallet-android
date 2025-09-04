@@ -32,7 +32,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.StatemineAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.TypesUsage
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.hasSameId
 import io.novasama.substrate_sdk_android.encrypt.SignatureVerifier
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.Signer
@@ -159,6 +158,10 @@ fun Chain.Additional?.shouldDisableMetadataHashCheck(): Boolean {
     return this?.disabledCheckMetadataHash ?: false
 }
 
+fun Chain.Additional?.isMigrationLedgerAppSupported(): Boolean {
+    return isGenericLedgerAppSupported()
+}
+
 fun ChainId.chainIdHexPrefix16(): String {
     return removeHexPrefix()
         .take(32)
@@ -193,10 +196,6 @@ fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
 
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
-}
-
-inline fun <reified T : Chain.ExternalApi> Chain.hasExternalApi(): Boolean {
-    return externalApis.any { it is T }
 }
 
 const val UTILITY_ASSET_ID = 0
@@ -264,10 +263,6 @@ fun Chain.addressOf(accountId: ByteArray): String {
     }
 }
 
-fun Chain.addressOf(accountId: AccountIdKey): String {
-    return addressOf(accountId.value)
-}
-
 fun Chain.legacyAddressOfOrNull(accountId: ByteArray): String? {
     return if (isEthereumBased) {
         null
@@ -286,14 +281,6 @@ fun Chain.accountIdOf(address: String): ByteArray {
     } else {
         address.toAccountId()
     }
-}
-
-fun String.toAccountId(chain: Chain): ByteArray {
-    return chain.accountIdOf(this)
-}
-
-fun String.toAccountIdKey(chain: Chain): AccountIdKey {
-    return chain.accountIdKeyOf(this)
 }
 
 fun Chain.accountIdKeyOf(address: String): AccountIdKey {
@@ -451,11 +438,6 @@ object ChainGeneses {
     const val VARA = "fe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763"
 
     const val POLKADOT_ASSET_HUB = "68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
-
-    const val UNIQUE_NETWORK = "84322d9cddbf35088f1e54e9a85c967a41a56a4f43445768125e61af166c7d31"
-
-    const val POLKADOT_PEOPLE = "67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008"
-    const val KUSAMA_PEOPLE = "c1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f"
 }
 
 object ChainIds {
@@ -476,10 +458,6 @@ fun Chain.Asset.requireStatemine(): Type.Statemine {
     require(type is Type.Statemine)
 
     return type
-}
-
-fun Chain.findStatemineAssets(): List<Chain.Asset> {
-    return assets.filter { it.type is Type.Statemine }
 }
 
 fun Chain.Asset.statemineOrNull(): Type.Statemine? {
@@ -545,14 +523,6 @@ fun Chain.findAssetByOrmlCurrencyId(runtime: RuntimeSnapshot, currencyId: Any?):
         val currencyIdScale = bindOrNull { currencyType.toHexUntyped(runtime, currencyId) } ?: return@find false
 
         currencyIdScale == asset.type.currencyIdScale
-    }
-}
-
-fun Chain.findAssetByStatemineAssetId(runtime: RuntimeSnapshot, assetId: Any?): Chain.Asset? {
-    return assets.find { asset ->
-        if (asset.type !is Type.Statemine) return@find false
-
-        asset.type.hasSameId(runtime, assetId)
     }
 }
 

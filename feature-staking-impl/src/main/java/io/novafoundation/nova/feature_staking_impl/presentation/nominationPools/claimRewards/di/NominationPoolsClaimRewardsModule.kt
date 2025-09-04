@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimRewards.NominationPoolsClaimRewardsInteractor
@@ -75,7 +74,6 @@ class NominationPoolsClaimRewardsModule {
         walletUiUseCase: WalletUiUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         assetUseCase: AssetUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return NominationPoolsClaimRewardsViewModel(
             router = router,
@@ -88,8 +86,7 @@ class NominationPoolsClaimRewardsModule {
             selectedAccountUseCase = selectedAccountUseCase,
             walletUiUseCase = walletUiUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            assetUseCase = assetUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            assetUseCase = assetUseCase
         )
     }
 

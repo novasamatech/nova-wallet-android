@@ -36,7 +36,6 @@ import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import dev.chrisbanes.insetter.applyInsetter
-import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
 
@@ -171,17 +170,6 @@ fun TextView.setDrawableEnd(
         setCompoundDrawablesRelative(start, top, it, bottom)
     }
 }
-
-fun TextView.removeDrawableEnd() {
-    setDrawableEnd(null as Int?)
-}
-
-fun TextView.setDrawableEnd(
-    icon: ColoredDrawable?,
-    widthInDp: Int? = null,
-    heightInDp: Int? = widthInDp,
-    paddingInDp: Int = 0,
-) = setDrawableEnd(icon?.drawableRes, widthInDp, heightInDp, paddingInDp, icon?.iconColor)
 
 fun TextView.setDrawableStart(
     @DrawableRes drawableRes: Int? = null,
@@ -351,20 +339,10 @@ fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
     consume(consume)
 }
 
-fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(navigationBars = true, ime = imeInsets) {
-        padding(bottom = true)
+fun View.applyImeInsetts() = applyInsetter {
+    type(ime = true) {
+        padding()
     }
-
-    consume(consume)
-}
-
-fun View.applySystemBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(statusBars = true, navigationBars = true, ime = imeInsets) {
-        padding(top = true, bottom = true)
-    }
-
-    consume(consume)
 }
 
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
@@ -436,16 +414,4 @@ fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharS
 
 fun View.bounds(): Rect {
     return Rect(0, 0, width, height)
-}
-
-fun TabLayout.setTabSelectedListener(callback: (TabLayout.Tab) -> Unit) {
-    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-        override fun onTabSelected(tab: TabLayout.Tab) {
-            callback(tab)
-        }
-
-        override fun onTabUnselected(tab: TabLayout.Tab) {}
-
-        override fun onTabReselected(tab: TabLayout.Tab) {}
-    })
 }

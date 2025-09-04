@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
@@ -36,6 +37,7 @@ class PreConfiguredNetworksFragment :
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(addCustomNetworkAdapter, networksAdapter) }
 
     override fun initViews() {
+        binder.preConfiguredNetworksToolbar.applyStatusBarInsets()
         binder.preConfiguredNetworksToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.preConfiguredNetworkList.adapter = adapter
     }

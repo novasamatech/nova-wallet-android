@@ -10,8 +10,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.NominationPoolsBondMoreInteractor
@@ -45,7 +43,6 @@ class NominationPoolsConfirmBondMoreViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val stakingSharedState: StakingSharedState,
     private val payload: NominationPoolsConfirmBondMorePayload,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     poolMemberUseCase: NominationPoolMemberUseCase,
     hintsFactory: NominationPoolsBondMoreHintsFactory,
     assetUseCase: AssetUseCase,
@@ -53,8 +50,7 @@ class NominationPoolsConfirmBondMoreViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    Validatable by validationExecutor {
 
     private val submissionFee = mapFeeFromParcel(payload.fee)
 
@@ -128,9 +124,9 @@ class NominationPoolsConfirmBondMoreViewModel(
 
         interactor.bondMore(amountInPlanks)
             .onSuccess {
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                startNavigation(it.submissionHierarchy) { finishFlow() }
+                finishFlow()
             }
             .onFailure(::showError)
 

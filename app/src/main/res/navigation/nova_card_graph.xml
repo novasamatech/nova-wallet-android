@@ -26,17 +26,6 @@
         android:name="io.novafoundation.nova.feature_assets.presentation.novacard.waiting.WaitingNovaCardTopUpFragment"
         android:label="fragment_waiting_top_up"
         app:useAdd="true"
-        tools:layout="@layout/fragment_waiting_nova_card_top_up" >
-
-        <action
-            android:id="@+id/action_close_nova_card_from_waiting_dialog"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpToInclusive="true"
-            app:popUpTo="@id/novaCardFragment"/>
-
-    </dialog>
+        tools:layout="@layout/fragment_waiting_nova_card_top_up" />
 
 </navigation>

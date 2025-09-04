@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import io.novafoundation.nova.core.model.CryptoType
-import io.novafoundation.nova.core_db.model.common.SerializedJson
 import java.util.UUID
 
 /*
@@ -35,8 +34,7 @@ class MetaAccountLocal(
     val type: Type,
     @ColumnInfo(defaultValue = "ACTIVE")
     val status: Status,
-    val globallyUniqueId: String,
-    val typeExtras: SerializedJson?
+    val globallyUniqueId: String
 ) {
 
     enum class Status {
@@ -82,53 +80,10 @@ class MetaAccountLocal(
             position = position,
             type = type,
             status = status,
-            globallyUniqueId = globallyUniqueId,
-            typeExtras = typeExtras
+            globallyUniqueId = globallyUniqueId
         ).also {
             it.id = id
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is MetaAccountLocal) return false
-
-        if (id != other.id) return false
-
-        if (!substratePublicKey.contentEquals(other.substratePublicKey)) return false
-        if (substrateCryptoType != other.substrateCryptoType) return false
-        if (!substrateAccountId.contentEquals(other.substrateAccountId)) return false
-        if (!ethereumPublicKey.contentEquals(other.ethereumPublicKey)) return false
-        if (!ethereumAddress.contentEquals(other.ethereumAddress)) return false
-        if (name != other.name) return false
-        if (parentMetaId != other.parentMetaId) return false
-        if (isSelected != other.isSelected) return false
-        if (position != other.position) return false
-        if (type != other.type) return false
-        if (status != other.status) return false
-        if (globallyUniqueId != other.globallyUniqueId) return false
-        if (typeExtras != other.typeExtras) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = substratePublicKey?.contentHashCode() ?: 0
-        result = 31 * result + id.hashCode()
-        result = 31 * result + (substrateCryptoType?.hashCode() ?: 0)
-        result = 31 * result + (substrateAccountId?.contentHashCode() ?: 0)
-        result = 31 * result + (ethereumPublicKey?.contentHashCode() ?: 0)
-        result = 31 * result + (ethereumAddress?.contentHashCode() ?: 0)
-        result = 31 * result + name.hashCode()
-        result = 31 * result + (parentMetaId?.hashCode() ?: 0)
-        result = 31 * result + isSelected.hashCode()
-        result = 31 * result + position
-        result = 31 * result + type.hashCode()
-        result = 31 * result + status.hashCode()
-        result = 31 * result + globallyUniqueId.hashCode()
-        result = 31 * result + (typeExtras?.hashCode() ?: 0)
-        result = 31 * result + id.hashCode()
-        return result
     }
 
     @PrimaryKey(autoGenerate = true)
@@ -143,8 +98,7 @@ class MetaAccountLocal(
         LEDGER,
         LEDGER_GENERIC,
         POLKADOT_VAULT,
-        PROXIED,
-        MULTISIG
+        PROXIED
     }
 }
 

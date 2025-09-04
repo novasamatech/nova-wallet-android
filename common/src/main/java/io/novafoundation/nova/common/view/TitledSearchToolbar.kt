@@ -8,7 +8,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewTitledSearchToolbarBinding
 import io.novafoundation.nova.common.utils.inflater
-import io.novafoundation.nova.common.utils.setBackgroundColorRes
 
 class TitledSearchToolbar @JvmOverloads constructor(
     context: Context,
@@ -16,7 +15,7 @@ class TitledSearchToolbar @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    private val binder = ViewTitledSearchToolbarBinding.inflate(inflater(), this)
+    private val binder = ViewTitledSearchToolbarBinding.inflate(inflater(), this, true)
 
     val toolbar: Toolbar
         get() = binder.titledSearchToolbar
@@ -26,8 +25,6 @@ class TitledSearchToolbar @JvmOverloads constructor(
 
     init {
         applyAttributes(attrs)
-
-        setBackgroundColorRes(R.color.solid_navigation_background)
     }
 
     private fun applyAttributes(attrs: AttributeSet?) {

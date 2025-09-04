@@ -2,9 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.domain.validation
 
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
-import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 
@@ -45,11 +43,6 @@ sealed class SwapValidationFailure {
         val asset: Chain.Asset,
         val existentialDeposit: Balance,
         val amount: Balance
-    ) : SwapValidationFailure()
-
-    class CannotReceiveAssetOut(
-        val destination: ChainWithAsset,
-        val requiredNativeAssetOnChainOut: ChainAssetWithAmount
     ) : SwapValidationFailure()
 
     sealed class InsufficientBalance : SwapValidationFailure() {

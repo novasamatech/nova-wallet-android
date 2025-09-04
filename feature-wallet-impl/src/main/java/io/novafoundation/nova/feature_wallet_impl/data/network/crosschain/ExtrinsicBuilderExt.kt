@@ -12,8 +12,7 @@ import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.NumberType
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 

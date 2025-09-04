@@ -30,7 +30,7 @@ class SecretsWalletDetailsMixin(
     override val typeAlert: Flow<AlertModel?> = flowOf { null }
 
     override fun accountProjectionsFlow(): Flow<List<Any>> = flowOfAll {
-        interactor.chainProjectionsBySourceFlow(metaAccount.id, interactor.getAllChains(), hasAccountComparator().withChainComparator())
+        interactor.chainProjectionsFlow(metaAccount.id, interactor.getAllChains(), hasAccountComparator().withChainComparator())
             .map { accounts ->
                 val availableActions = availableAccountActions.first()
 

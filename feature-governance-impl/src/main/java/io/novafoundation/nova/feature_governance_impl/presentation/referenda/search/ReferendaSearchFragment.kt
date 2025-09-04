@@ -1,12 +1,11 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.search
 
-import android.view.View
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.applyImeInsetts
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -25,12 +24,10 @@ class ReferendaSearchFragment : BaseReferendaListFragment<ReferendaSearchViewMod
 
     override val shimmeringAdapter by lazy(LazyThreadSafetyMode.NONE) { CustomPlaceholderAdapter(R.layout.item_referenda_shimmering_no_groups) }
 
-    override fun applyInsets(rootView: View) {
-        binder.searchReferendaToolbar.applyStatusBarInsets()
-        binder.root.applyNavigationBarInsets(consume = false, imeInsets = true)
-    }
-
     override fun initViews() {
+        binder.searchReferendaToolbar.applyStatusBarInsets()
+        view?.applyImeInsetts()
+
         binder.searchedReferendaList.itemAnimator = null
         binder.searchedReferendaList.adapter = ConcatAdapter(shimmeringAdapter, placeholderAdapter, referendaListAdapter)
 

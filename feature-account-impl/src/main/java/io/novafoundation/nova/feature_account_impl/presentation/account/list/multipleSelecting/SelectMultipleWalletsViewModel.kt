@@ -84,7 +84,7 @@ class SelectMultipleWalletsViewModel(
             selected.remove(accountModel.id)
         } else {
             if (selected.size >= request.max) {
-                this.showToast(resourceManager.getString(R.string.multiple_wallets_selection_max_message, request.max))
+                showToast(resourceManager.getString(R.string.multiple_wallets_selection_max_message, request.max))
                 return
             }
 

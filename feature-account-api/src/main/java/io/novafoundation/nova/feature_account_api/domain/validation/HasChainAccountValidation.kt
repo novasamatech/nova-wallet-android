@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER_LEGACY
-import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PARITY_SIGNER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.POLKADOT_VAULT
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.PROXIED
@@ -39,8 +38,6 @@ interface NoChainAccountFoundError {
         class PolkadotVaultNotSupported(val variant: PolkadotVaultVariant) : AddAccountState()
 
         object ProxyAccountNotSupported : AddAccountState()
-
-        object MultisigNotSupported : AddAccountState()
     }
 }
 
@@ -62,7 +59,6 @@ class HasChainAccountValidation<P, E>(
             else -> when (account.type) {
                 LEDGER_LEGACY, LEDGER -> errorProducer(chain, account, AddAccountState.LedgerNotSupported).validationError()
                 PROXIED -> errorProducer(chain, account, AddAccountState.ProxyAccountNotSupported).validationError()
-                MULTISIG -> errorProducer(chain, account, AddAccountState.ProxyAccountNotSupported).validationError()
                 POLKADOT_VAULT, PARITY_SIGNER -> {
                     val variant = account.type.asPolkadotVaultVariantOrThrow()
                     errorProducer(chain, account, AddAccountState.PolkadotVaultNotSupported(variant)).validationError()
@@ -117,8 +113,7 @@ fun handleChainAccountNotFound(
             )
         }
 
-        AddAccountState.ProxyAccountNotSupported,
-        AddAccountState.MultisigNotSupported -> TransformedFailure.Default(
+        AddAccountState.ProxyAccountNotSupported -> TransformedFailure.Default(
             resourceManager.getString(R.string.common_network_not_supported, chainName) to null
         )
     }

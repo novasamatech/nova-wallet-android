@@ -21,14 +21,6 @@ object SubqueryExpressions {
         return compoundExpression("and", *innerExpressions)
     }
 
-    fun presentIn(vararg values: String): String {
-        return compoundExpression("in", *values)
-    }
-
-    fun presentIn(values: List<String>): String {
-        return presentIn(*values.toTypedArray())
-    }
-
     infix fun String.and(another: String): String {
         return and(this, another)
     }

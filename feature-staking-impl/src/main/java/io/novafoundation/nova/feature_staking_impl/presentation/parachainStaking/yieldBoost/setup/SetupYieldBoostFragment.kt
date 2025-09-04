@@ -1,12 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.setup
 
-import android.view.View
 import androidx.core.view.isVisible
 
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applySystemBarInsets
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.scrollOnFocusTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -21,11 +21,9 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel, FragmentY
 
     override fun createBinding() = FragmentYieldBoostSetupBinding.inflate(layoutInflater)
 
-    override fun applyInsets(rootView: View) {
-        binder.root.applySystemBarInsets(imeInsets = true)
-    }
-
     override fun initViews() {
+        binder.setupYieldBoostToolbar.applyStatusBarInsets()
+
         binder.setupYieldBoostToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 
@@ -36,6 +34,12 @@ class SetupYieldBoostFragment : BaseFragment<SetupYieldBoostViewModel, FragmentY
 
         binder.setupYieldBoostOn.setOnClickListener { viewModel.yieldBoostStateChanged(yieldBoostOn = true) }
         binder.setupYieldBoostOff.setOnClickListener { viewModel.yieldBoostStateChanged(yieldBoostOn = false) }
+
+        binder.setupYieldBoostContainer.applyInsetter {
+            type(ime = true) {
+                padding()
+            }
+        }
 
         binder.setupYieldBoostScrollArea.scrollOnFocusTo(binder.setupYieldBoostThreshold)
 

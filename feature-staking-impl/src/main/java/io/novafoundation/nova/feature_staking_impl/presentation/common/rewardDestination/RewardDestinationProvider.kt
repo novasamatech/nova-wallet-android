@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDe
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createSubstrateAddressModel
+import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -120,7 +120,7 @@ class RewardDestinationProvider(
     }
 
     private suspend fun generateDestinationModel(account: StakingAccount): AddressModel {
-        return addressIconGenerator.createSubstrateAddressModel(
+        return addressIconGenerator.createAddressModel(
             accountAddress = account.address,
             sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
             accountName = account.name,

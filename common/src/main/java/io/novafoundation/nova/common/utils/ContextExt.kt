@@ -151,9 +151,6 @@ fun getRippleMask(
     cornerSizeDp: Int = 12,
 ) = context.getRippleMask(cornerSizeDp)
 
-context(View)
-fun addRipple(to: Drawable, mask: Drawable? = getRippleMask()) = context.addRipple(to, mask)
-
 fun Context.launchDeepLink(url: String) {
     try {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))

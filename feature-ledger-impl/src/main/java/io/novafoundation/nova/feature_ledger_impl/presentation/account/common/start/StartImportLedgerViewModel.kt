@@ -24,6 +24,6 @@ abstract class StartImportLedgerViewModel(
     abstract fun continueWithUsb()
 
     fun guideClicked() {
-        openBrowserEvent.value = appLinksProvider.ledgerConnectionGuide.event()
+        openBrowserEvent.value = appLinksProvider.ledgerBluetoothGuide.event()
     }
 }

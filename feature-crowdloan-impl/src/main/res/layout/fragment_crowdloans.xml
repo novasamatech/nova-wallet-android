@@ -8,6 +8,7 @@
     android:clipToPadding="false"
     android:overScrollMode="never"
     android:paddingHorizontal="16dp"
+    android:paddingBottom="64dp"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     tools:itemCount="10"
     tools:listitem="@layout/item_crowdloan" />

@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -36,6 +37,14 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel, Fragm
     override fun createBinding() = FragmentContributeConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmContributeContainer.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+
+            consume(true)
+        }
+
         binder.confirmContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.confirmContributeConfirm.prepareForProgress(viewLifecycleOwner)
         binder.confirmContributeConfirm.setOnClickListener { viewModel.nextClicked() }

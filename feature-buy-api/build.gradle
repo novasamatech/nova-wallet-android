@@ -1,7 +1,25 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'io.novafoundation.nova.feature_buy_api'
+
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
 }
 
 dependencies {
@@ -10,12 +28,10 @@ dependencies {
     implementation project(":feature-account-api")
     implementation project(":feature-wallet-api")
     implementation project(":common")
-    implementation project(':feature-deep-linking')
-
     implementation materialDep
 
     implementation daggerDep
-    ksp daggerCompiler
+    kapt daggerKapt
 
     implementation substrateSdkDep
 

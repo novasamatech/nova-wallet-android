@@ -40,8 +40,8 @@ interface StorageQueryContext : RuntimeContext {
     fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V?>
-    ): Flow<Map<K, V?>>
+        binding: DynamicInstanceBinderWithKey<K, V>
+    ): Flow<Map<K, V>>
 
     suspend fun <K, V> StorageEntry.observeByPrefix(
         vararg prefixArgs: Any?,

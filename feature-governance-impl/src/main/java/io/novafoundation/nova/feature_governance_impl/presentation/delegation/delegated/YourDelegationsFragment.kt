@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.R
@@ -32,6 +33,7 @@ class YourDelegationsFragment :
         binder.yourDelegationsList.itemAnimator = null
         binder.yourDelegationsList.adapter = adapter
 
+        binder.yourDelegationsToolbar.applyStatusBarInsets()
         binder.yourDelegationsToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.yourDelegationsAddDelegationButton.setOnClickListener { viewModel.addDelegationClicked() }
     }

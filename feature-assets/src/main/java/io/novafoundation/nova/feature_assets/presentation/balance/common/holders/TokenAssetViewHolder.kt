@@ -19,7 +19,7 @@ class TokenAssetViewHolder(
     override var expandableItem: ExpandableChildItem? = null
 
     fun bind(tokenAsset: TokenAssetUi, itemHandler: BalanceListAdapter.ItemAssetHandler) = with(containerView) {
-        updateExpandableItem(tokenAsset)
+        expandableItem = tokenAsset
 
         val asset = tokenAsset.asset
         binder.itemTokenAssetImage.setTokenIcon(tokenAsset.assetIcon, imageLoader)

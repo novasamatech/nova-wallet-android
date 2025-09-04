@@ -10,8 +10,8 @@ import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
 import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerService
-import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
-import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.RemoteToDomainChainMapperFacade
@@ -24,7 +24,6 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProviderPool
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
-import io.novafoundation.nova.runtime.repository.BlockLimitsRepository
 import io.novafoundation.nova.runtime.repository.ChainNodeRepository
 import io.novafoundation.nova.runtime.repository.ChainRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -85,6 +84,8 @@ interface RuntimeApi {
 
     val totalIssuanceRepository: TotalIssuanceRepository
 
+    val extrinsicSplitter: ExtrinsicSplitter
+
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
     val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
@@ -92,8 +93,6 @@ interface RuntimeApi {
     val gasPriceProviderFactory: GasPriceProviderFactory
 
     val extrinsicWalk: ExtrinsicWalk
-
-    val callTraversal: CallTraversal
 
     val runtimeFilesCache: RuntimeFilesCache
 
@@ -114,6 +113,4 @@ interface RuntimeApi {
     val chainRepository: ChainRepository
 
     val remoteToDomainChainMapperFacade: RemoteToDomainChainMapperFacade
-
-    val blockLimitsRepository: BlockLimitsRepository
 }

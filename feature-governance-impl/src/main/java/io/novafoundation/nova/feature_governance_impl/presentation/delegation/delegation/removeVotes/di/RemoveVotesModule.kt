@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegation.removeVotes.RemoveTrackVotesInteractor
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -68,7 +67,6 @@ class RemoveVotesModule {
         validationSystem: RemoteVotesValidationSystem,
         resourceManager: ResourceManager,
         tracksUseCase: TracksUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return RemoveVotesViewModel(
             interactor = interactor,
@@ -84,8 +82,7 @@ class RemoveVotesModule {
             validationExecutor = validationExecutor,
             validationSystem = validationSystem,
             resourceManager = resourceManager,
-            tracksUseCase = tracksUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            tracksUseCase = tracksUseCase
         )
     }
 

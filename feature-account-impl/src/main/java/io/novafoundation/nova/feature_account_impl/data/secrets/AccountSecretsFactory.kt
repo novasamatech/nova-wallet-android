@@ -10,14 +10,13 @@ import io.novafoundation.nova.common.utils.deriveSeed32
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
-import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
-import io.novasama.substrate_sdk_android.encrypt.keypair.bip32.Bip32EcdsaKeypairFactory
-import io.novasama.substrate_sdk_android.encrypt.keypair.generate
+import io.novasama.substrate_sdk_android.encrypt.keypair.ethereum.EthereumKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
-import io.novasama.substrate_sdk_android.encrypt.seed.bip39.Bip39SeedFactory
+import io.novasama.substrate_sdk_android.encrypt.seed.ethereum.EthereumSeedFactory
 import io.novasama.substrate_sdk_android.encrypt.seed.substrate.SubstrateSeedFactory
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
@@ -26,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class AccountSecretsFactory(
-    private val JsonDecoder: JsonDecoder
+    private val jsonSeedDecoder: JsonSeedDecoder
 ) {
 
     sealed class AccountSource {
@@ -56,7 +55,7 @@ class AccountSecretsFactory(
         val decodedDerivationPath = decodeDerivationPath(derivationPath, ethereum = isEthereum)
 
         val decodedJson = accountSource.castOrNull<AccountSource.Json>()?.let { jsonSource ->
-            JsonDecoder.decode(jsonSource.json, jsonSource.password).also {
+            jsonSeedDecoder.decode(jsonSource.json, jsonSource.password).also {
                 // only allow Ethereum JSONs for ethereum chains
                 if (isEthereum && it.multiChainEncryption != MultiChainEncryption.Ethereum) {
                     throw SecretsError.NotValidEthereumCryptoType()
@@ -78,14 +77,14 @@ class AccountSecretsFactory(
         val seed = when (accountSource) {
             is AccountSource.Mnemonic -> deriveSeed(accountSource.mnemonic, decodedDerivationPath?.password, ethereum = isEthereum).seed
             is AccountSource.Seed -> accountSource.seed.fromHex()
-            is AccountSource.Json -> null
+            is AccountSource.Json -> decodedJson!!.seed
         }
 
         val keypair = if (seed != null) {
             val junctions = decodedDerivationPath?.junctions.orEmpty()
 
             if (isEthereum) {
-                Bip32EcdsaKeypairFactory.generate(seed, junctions)
+                EthereumKeypairFactory.generate(seed, junctions)
             } else {
                 SubstrateKeypairFactory.generate(encryptionType, seed, junctions)
             }
@@ -119,12 +118,12 @@ class AccountSecretsFactory(
 
             val seed = deriveSeed(it.mnemonic, password = decodedEthereumDerivationPath?.password, ethereum = true).seed
 
-            Bip32EcdsaKeypairFactory.generate(seed = seed, junctions = decodedEthereumDerivationPath?.junctions.orEmpty())
+            EthereumKeypairFactory.generate(seed = seed, junctions = decodedEthereumDerivationPath?.junctions.orEmpty())
         }
 
         val secrets = MetaAccountSecrets(
             entropy = substrateSecrets[ChainAccountSecrets.Entropy],
-            substrateSeed = substrateSecrets[ChainAccountSecrets.Seed],
+            seed = substrateSecrets[ChainAccountSecrets.Seed],
             substrateKeyPair = mapKeypairStructToKeypair(substrateSecrets[ChainAccountSecrets.Keypair]),
             substrateDerivationPath = substrateDerivationPath,
             ethereumKeypair = ethereumKeypair,
@@ -136,7 +135,7 @@ class AccountSecretsFactory(
 
     private fun deriveSeed(mnemonic: String, password: String?, ethereum: Boolean): SeedFactory.Result {
         return if (ethereum) {
-            Bip39SeedFactory.deriveSeed(mnemonic, password)
+            EthereumSeedFactory.deriveSeed(mnemonic, password)
         } else {
             SubstrateSeedFactory.deriveSeed32(mnemonic, password)
         }

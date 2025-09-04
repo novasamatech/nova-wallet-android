@@ -15,8 +15,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.ParachainStakingUnbondInteractor
@@ -60,7 +58,6 @@ class ParachainStakingUnbondConfirmViewModel(
     private val validationExecutor: ValidationExecutor,
     private val collatorsUseCase: CollatorsUseCase,
     private val payload: ParachainStakingUnbondConfirmPayload,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
@@ -69,8 +66,7 @@ class ParachainStakingUnbondConfirmViewModel(
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalActions by externalActions,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    ExternalActions by externalActions {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -165,9 +161,9 @@ class ParachainStakingUnbondConfirmViewModel(
         )
             .onFailure(::showError)
             .onSuccess {
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
+                router.returnToStakingMain()
             }
 
         _showNextProgress.value = false

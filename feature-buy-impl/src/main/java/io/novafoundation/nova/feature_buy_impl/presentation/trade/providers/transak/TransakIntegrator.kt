@@ -30,7 +30,7 @@ class TransakIntegrator(
         val tradeFlow: TradeTokenRegistry.TradeType
     )
 
-    override suspend fun run(using: WebView) {
+    override fun run(using: WebView) {
         using.webViewClient = TransakWebViewClient()
         using.addJavascriptInterface(TransakJsEventBridge(closeListener, sellOrderCreatedListener), JS_BRIDGE_NAME)
 

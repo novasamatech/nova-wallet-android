@@ -6,10 +6,6 @@ import io.novafoundation.nova.common.utils.recyclerView.expandable.items.Expanda
 
 interface ExpandableBaseViewHolder<T : ExpandableBaseItem> {
     var expandableItem: T?
-
-    fun updateExpandableItem(item: T) {
-        expandableItem = item
-    }
 }
 
 /**

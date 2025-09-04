@@ -6,7 +6,6 @@ import androidx.navigation.NavOptions
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedNavigation
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation
-import io.novafoundation.nova.app.root.navigation.openSplitScreenWithInstantAction
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.navigation.DelayedNavigation
 import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
@@ -98,10 +97,9 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
-import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedBottomSheet
-import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedPayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_impl.presentation.main.SwapMainSettingsFragment
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
@@ -112,7 +110,8 @@ import kotlinx.coroutines.flow.Flow
 
 class Navigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
-    private val walletConnectDelegate: WalletConnectRouter
+    private val walletConnectDelegate: WalletConnectRouter,
+    private val stakingDashboardDelegate: StakingDashboardRouter
 ) : BaseNavigator(navigationHoldersRegistry),
     SplashRouter,
     OnboardingRouter,
@@ -444,6 +443,15 @@ class Navigator(
         walletConnectDelegate.openScanPairingQrCode()
     }
 
+    override fun openStaking() {
+        if (currentDestination?.id != R.id.mainFragment) {
+            navigationBuilder().action(R.id.action_open_split_screen)
+                .navigateInFirstAttachedContext()
+        }
+
+        stakingDashboardDelegate.openStakingDashboard()
+    }
+
     override fun closeSendFlow() {
         navigationBuilder().action(R.id.action_close_send_flow)
             .navigateInFirstAttachedContext()
@@ -456,11 +464,6 @@ class Navigator(
 
     override fun openAwaitingCardCreation() {
         navigationBuilder().action(R.id.action_open_awaiting_card_creation)
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun closeNovaCard() {
-        navigationBuilder().action(R.id.action_close_nova_card_from_waiting_dialog)
             .navigateInFirstAttachedContext()
     }
 
@@ -650,10 +653,6 @@ class Navigator(
             .addCase(R.id.tradeWebFragment, R.id.action_tradeWebFragment_to_balanceDetailFragment)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
-    }
-
-    override fun openAssetDetailsFromDeepLink(payload: AssetPayload) {
-        openSplitScreenWithInstantAction(R.id.action_mainFragment_to_balanceDetailFragment, BalanceDetailFragment.getBundle(payload))
     }
 
     override fun finishTradeOperation() {
@@ -910,15 +909,5 @@ class Navigator(
     override fun finishTopUp() {
         navigationBuilder().action(R.id.action_finishTopUpFlow)
             .navigateInFirstAttachedContext()
-    }
-
-    override fun openPendingMultisigOperations() {
-        navigationBuilder().action(R.id.action_mainFragment_to_multisigPendingOperationsFlow)
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun openMainWithFinishMultisigTransaction(accountWasSwitched: Boolean) {
-        val payload = MultisigCreatedBottomSheet.createPayload(MultisigCreatedPayload(accountWasSwitched))
-        openSplitScreenWithInstantAction(R.id.action_open_multisigCreatedDialog, nestedActionExtras = payload)
     }
 }

@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.common.utils.coroutines.RootScope
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
 import io.novafoundation.nova.feature_wallet_connect_impl.BuildConfig
 import javax.inject.Inject
 
@@ -56,8 +55,6 @@ open class App : Application(), FeatureContainer {
             .build()
 
         appComponent.inject(this)
-
-        BranchIOLinkHandler.Initializer.init(this)
 
         initializeWalletConnect()
     }

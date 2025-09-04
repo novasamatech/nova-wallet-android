@@ -7,15 +7,12 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
-import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
+import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
-import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.data.PushNotificationsService
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsCommunicator
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.di.PushGovernanceSettingsComponent
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.PushMultisigSettingsCommunicator
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.di.PushMultisigSettingsComponent
 import io.novafoundation.nova.feature_push_notifications.presentation.settings.di.PushSettingsComponent
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsCommunicator
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.di.PushStakingSettingsComponent
@@ -44,8 +41,6 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
 
     fun pushStakingSettings(): PushStakingSettingsComponent.Factory
 
-    fun pushMultisigSettings(): PushMultisigSettingsComponent.Factory
-
     @Component.Factory
     interface Factory {
 
@@ -55,7 +50,6 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
             @BindsInstance selectTracksCommunicator: SelectTracksCommunicator,
             @BindsInstance pushGovernanceSettingsCommunicator: PushGovernanceSettingsCommunicator,
             @BindsInstance pushStakingSettingsCommunicator: PushStakingSettingsCommunicator,
-            @BindsInstance pushMultisigSettingsCommunicator: PushMultisigSettingsCommunicator,
             deps: PushNotificationsFeatureDependencies
         ): PushNotificationsFeatureComponent
     }
@@ -66,9 +60,8 @@ interface PushNotificationsFeatureComponent : PushNotificationsFeatureApi {
             RuntimeApi::class,
             AccountFeatureApi::class,
             GovernanceFeatureApi::class,
-            WalletFeatureApi::class,
-            AssetsFeatureApi::class,
-            MultisigOperationsFeatureApi::class
+            DeepLinkBuildingFeatureApi::class,
+            WalletFeatureApi::class
         ]
     )
     interface PushNotificationsFeatureDependenciesComponent : PushNotificationsFeatureDependencies

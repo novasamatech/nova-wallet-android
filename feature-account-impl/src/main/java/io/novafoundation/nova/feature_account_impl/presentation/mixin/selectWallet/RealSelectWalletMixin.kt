@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountListingItem
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountWithTotalBalance
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
@@ -95,10 +95,10 @@ internal class RealSelectWalletMixin(
     }
 
     private suspend fun mapSelectedMetaAccountToUi(
-        metaAccountListingItem: MetaAccountListingItem,
+        metaAccountWithTotalBalance: MetaAccountWithTotalBalance,
         selectionParams: SelectionParams
     ): SelectedWalletModel {
-        return with(metaAccountListingItem) {
+        return with(metaAccountWithTotalBalance) {
             SelectedWalletModel(
                 title = metaAccount.name,
                 subtitle = totalBalance.formatAsCurrency(currency),

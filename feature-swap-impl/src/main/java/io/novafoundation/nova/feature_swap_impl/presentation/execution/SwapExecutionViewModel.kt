@@ -9,9 +9,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapOperationSubmissionException
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
 import io.novafoundation.nova.feature_swap_api.domain.model.quotedAmount
@@ -54,10 +52,8 @@ class SwapExecutionViewModel(
     private val confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
 ) : BaseViewModel(),
-    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
 
     private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
 
@@ -146,7 +142,7 @@ class SwapExecutionViewModel(
 
     private suspend fun SwapProgress.toUi(swapState: SwapState): SwapProgressModel {
         return when (this) {
-            is SwapProgress.Done -> createCompletedStatus()
+            SwapProgress.Done -> createCompletedStatus()
             is SwapProgress.Failure -> toUi()
             is SwapProgress.StepStarted -> toUi(swapState)
         }
@@ -192,28 +188,11 @@ class SwapExecutionViewModel(
         val failedStepNumber = attemptedStep.index + 1
         val label = attemptedStep.displayData.createErrorLabel()
 
-        val genericErrorMessage = resourceManager.getString(
+        return resourceManager.getString(
             R.string.swap_execution_failure,
             failedStepNumber.format(),
             label
         )
-
-        val errorFormatted = formatThrowable()
-
-        return if (errorFormatted != null) {
-            "$genericErrorMessage: $errorFormatted"
-        } else {
-            genericErrorMessage
-        }
-    }
-
-    private fun SwapProgress.Failure.formatThrowable(): String? {
-        if (error !is SwapOperationSubmissionException) return null
-
-        // For some reason smart-cast does not work here
-        return when (error as SwapOperationSubmissionException) {
-            is SwapOperationSubmissionException.SimulationFailed -> resourceManager.getString(R.string.swap_dry_run_failed_inline_message)
-        }
     }
 
     private suspend fun AtomicOperationDisplayData.createErrorLabel(): String {

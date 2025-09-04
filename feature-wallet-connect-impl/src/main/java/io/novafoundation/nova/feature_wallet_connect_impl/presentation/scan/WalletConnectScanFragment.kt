@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.scan
 
-import android.view.View
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView
@@ -23,13 +22,10 @@ class WalletConnectScanFragment : ScanQrFragment<WalletConnectScanViewModel, Fra
             .inject(this)
     }
 
-    override fun applyInsets(rootView: View) {
-        binder.walletConnectScanToolbar.applyStatusBarInsets()
-    }
-
     override fun initViews() {
         super.initViews()
 
+        binder.walletConnectScanToolbar.applyStatusBarInsets()
         binder.walletConnectScanToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         scanView.subtitle.setDrawableStart(R.drawable.ic_wallet_connect, widthInDp = 24, paddingInDp = 2, tint = R.color.icon_primary)

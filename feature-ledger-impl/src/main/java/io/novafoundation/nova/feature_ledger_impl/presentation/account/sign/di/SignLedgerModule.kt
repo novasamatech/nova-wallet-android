@@ -17,7 +17,6 @@ import io.novafoundation.nova.common.utils.getOrThrow
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_api.data.signer.SigningSharedState
-import io.novafoundation.nova.feature_account_api.data.signer.chainId
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.LedgerDeviceDiscoveryService
@@ -57,7 +56,7 @@ class SignLedgerModule {
         signLedgerPayload: SignLedgerPayload,
         factory: LedgerMessageFormatterFactory
     ): LedgerMessageFormatter {
-        val chainId = signPayloadState.getOrThrow().payload.chainId()
+        val chainId = signPayloadState.getOrThrow().extrinsic.chainId
 
         return when (signLedgerPayload.ledgerVariant) {
             LedgerVariant.LEGACY -> factory.createLegacy(chainId, showAlerts = true)

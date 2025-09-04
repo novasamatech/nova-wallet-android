@@ -41,8 +41,9 @@ class ProxyFeatureModule {
     @Provides
     @FeatureScope
     fun provideProxyDepositCalculator(
+        chainRegistry: ChainRegistry,
         proxyConstantsRepository: ProxyConstantsRepository
     ): ProxyDepositCalculator {
-        return RealProxyDepositCalculator(proxyConstantsRepository)
+        return RealProxyDepositCalculator(chainRegistry, proxyConstantsRepository)
     }
 }

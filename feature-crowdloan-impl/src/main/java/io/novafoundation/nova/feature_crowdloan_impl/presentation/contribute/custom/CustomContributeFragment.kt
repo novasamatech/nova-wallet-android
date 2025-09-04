@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cu
 import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.ButtonState
@@ -34,6 +35,14 @@ class CustomContributeFragment : BaseFragment<CustomContributeViewModel, Fragmen
     override fun createBinding() = FragmentCustomContributeBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.customContributeContainer.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+
+            consume(true)
+        }
+
         binder.customContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.customContributeApply.prepareForProgress(viewLifecycleOwner)

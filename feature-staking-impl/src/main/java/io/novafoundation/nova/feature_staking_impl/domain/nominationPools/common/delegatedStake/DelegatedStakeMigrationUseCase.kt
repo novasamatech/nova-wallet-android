@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolDelegatedStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.shouldMigrateToDelegatedStake
 import io.novafoundation.nova.runtime.state.chain
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 
 interface DelegatedStakeMigrationUseCase {
 

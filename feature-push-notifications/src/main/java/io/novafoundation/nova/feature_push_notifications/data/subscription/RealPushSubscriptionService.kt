@@ -18,10 +18,6 @@ import io.novafoundation.nova.feature_push_notifications.BuildConfig
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.feature_push_notifications.data.PUSH_LOG_TAG
 import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
-import io.novafoundation.nova.feature_push_notifications.domain.model.isApprovingEnabledTotal
-import io.novafoundation.nova.feature_push_notifications.domain.model.isExecutionEnabledTotal
-import io.novafoundation.nova.feature_push_notifications.domain.model.isInitiatingEnabledTotal
-import io.novafoundation.nova.feature_push_notifications.domain.model.isRejectionEnabledTotal
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.chainIdHexPrefix16
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -169,11 +165,7 @@ class RealPushSubscriptionService(
             "notifications" to mapOfNotNullValues(
                 "stakingReward" to mapToFirestoreChainFeature(settings.stakingReward),
                 "tokenSent" to settings.sentTokensEnabled.mapToFirestoreChainFeatureOrNull(),
-                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull(),
-                "newMultisig" to settings.multisigs.isInitiatingEnabledTotal().mapToFirestoreChainFeatureOrNull(),
-                "multisigApproval" to settings.multisigs.isApprovingEnabledTotal().mapToFirestoreChainFeatureOrNull(),
-                "multisigExecuted" to settings.multisigs.isExecutionEnabledTotal().mapToFirestoreChainFeatureOrNull(),
-                "multisigCancelled" to settings.multisigs.isRejectionEnabledTotal().mapToFirestoreChainFeatureOrNull()
+                "tokenReceived" to settings.receivedTokensEnabled.mapToFirestoreChainFeatureOrNull()
             )
         )
     }

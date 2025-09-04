@@ -8,8 +8,6 @@ import io.novafoundation.nova.common.utils.sha256
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitStatus
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -32,10 +30,12 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.fromUtf8
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 
@@ -112,7 +112,7 @@ class MoonbeamCrowdloanInteractor(
         }
     }
 
-    suspend fun submitAgreement(parachainMetadata: ParachainMetadata): Result<ExtrinsicWatchResult<*>> = withContext(Dispatchers.Default) {
+    suspend fun submitAgreement(parachainMetadata: ParachainMetadata): Result<*> = withContext(Dispatchers.Default) {
         runCatching {
             val chain = selectedChainAssetState.chain()
             val metaAccount = accountRepository.getSelectedMetaAccount()
@@ -131,24 +131,23 @@ class MoonbeamCrowdloanInteractor(
             val agreeRemarkRequest = AgreeRemarkRequest(currentAddress, signedHash)
             val remark = httpExceptionHandler.wrap { moonbeamApi.agreeRemark(parachainMetadata, agreeRemarkRequest) }.remark
 
-            val result = extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
+            val finalizedStatus = extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
                 systemRemark(remark.encodeToByteArray())
             }
                 .getOrThrow()
-                .awaitStatus<ExtrinsicStatus.Finalized>()
+                .filterIsInstance<ExtrinsicStatus.Finalized>()
+                .first()
 
-            Log.d(this@MoonbeamCrowdloanInteractor.LOG_TAG, "Finalized ${result.status.extrinsicHash} in block ${result.status.blockHash}")
+            Log.d(this@MoonbeamCrowdloanInteractor.LOG_TAG, "Finalized ${finalizedStatus.extrinsicHash} in block ${finalizedStatus.blockHash}")
 
             val verificationRequest = VerifyRemarkRequest(
                 address = currentAddress,
-                extrinsicHash = result.status.extrinsicHash,
-                blockHash = result.status.blockHash
+                extrinsicHash = finalizedStatus.extrinsicHash,
+                blockHash = finalizedStatus.blockHash
             )
             val verificationResponse = httpExceptionHandler.wrap { moonbeamApi.verifyRemark(parachainMetadata, verificationRequest) }
 
             if (!verificationResponse.verified) throw VerificationError()
-
-            result
         }
     }
 

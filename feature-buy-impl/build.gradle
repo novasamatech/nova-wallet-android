@@ -1,14 +1,20 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
 android {
+    compileSdkVersion rootProject.compileSdkVersion
 
     namespace 'io.novafoundation.nova.feature_buy_impl'
 
     defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
 
-        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField "String", "RAMP_TOKEN", "\"n8ev677z3z7enckabyc249j84ajpc28o9tmsgob7\""
         buildConfigField "String", "RAMP_HOST", "\"ri-widget-staging.firebaseapp.com\""
@@ -50,6 +56,16 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+
     packagingOptions {
         resources.excludes.add("META-INF/NOTICE.md")
     }
@@ -66,7 +82,6 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-buy-api')
     implementation project(':runtime')
-    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 
@@ -82,13 +97,13 @@ dependencies {
     implementation lifeCycleKtxDep
 
     implementation daggerDep
-    ksp daggerCompiler
+    kapt daggerKapt
 
     implementation roomDep
-    ksp roomCompiler
+    kapt roomKapt
 
     implementation lifecycleDep
-    ksp lifecycleCompiler
+    kapt lifecycleKapt
 
     testImplementation jUnitDep
     testImplementation mockitoDep

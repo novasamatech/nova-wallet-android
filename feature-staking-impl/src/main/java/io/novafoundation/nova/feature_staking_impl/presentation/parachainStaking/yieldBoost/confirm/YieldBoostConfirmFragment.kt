@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.showValueOrHide
@@ -31,6 +32,8 @@ class YieldBoostConfirmFragment : BaseFragment<YieldBoostConfirmViewModel, Fragm
     override fun createBinding() = FragmentYieldBoostConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmYieldBoostContainer.applyStatusBarInsets()
+
         binder.confirmYieldBoostToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.confirmYieldBoostExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }

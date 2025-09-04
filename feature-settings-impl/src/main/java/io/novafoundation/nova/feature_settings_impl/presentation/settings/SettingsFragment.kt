@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_settings_impl.presentation.settings
 
 import android.content.Intent
 import android.provider.Settings
-import android.view.View
 import android.widget.Toast
 
 import io.novafoundation.nova.common.base.BaseFragment
@@ -21,11 +20,9 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
 
     override fun createBinding() = FragmentSettingsBinding.inflate(layoutInflater)
 
-    override fun applyInsets(rootView: View) {
-        binder.settingsContainer.applyStatusBarInsets()
-    }
-
     override fun initViews() {
+        binder.settingsContainer.applyStatusBarInsets()
+
         binder.accountView.setWholeClickListener { viewModel.accountActionsClicked() }
 
         binder.settingsWallets.setOnClickListener { viewModel.walletsClicked() }

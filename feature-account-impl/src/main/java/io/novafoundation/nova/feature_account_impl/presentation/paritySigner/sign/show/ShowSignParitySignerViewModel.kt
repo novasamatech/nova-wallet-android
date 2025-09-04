@@ -15,9 +15,6 @@ import io.novafoundation.nova.common.utils.reversed
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.updateFrom
 import io.novafoundation.nova.feature_account_api.data.signer.SeparateFlowSignerState
-import io.novafoundation.nova.feature_account_api.data.signer.SignerPayload
-import io.novafoundation.nova.feature_account_api.data.signer.accountId
-import io.novafoundation.nova.feature_account_api.data.signer.chainId
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
@@ -34,8 +31,9 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sig
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.ScanSignParitySignerPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.model.mapValidityPeriodToParcel
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
-import io.novafoundation.nova.runtime.extrinsic.ValidityPeriod
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
@@ -73,7 +71,7 @@ class ShowSignParitySignerViewModel(
 
     val chain = flowOf {
         val signPayload = signSharedState.getOrThrow()
-        val chainId = signPayload.payload.chainId()
+        val chainId = signPayload.extrinsic.genesisHash.toHexString()
 
         chainRegistry.getChain(chainId)
     }.shareInBackground()
@@ -89,7 +87,7 @@ class ShowSignParitySignerViewModel(
     val qrCodeSequence = selectedSigningMode.mapLatest {
         val signPayload = signSharedState.getOrThrow()
 
-        val frames = interactor.qrCodeContent(signPayload.payload, it).frames
+        val frames = interactor.qrCodeContent(signPayload.extrinsic, it).frames
 
         frames.map { qrCodeGenerator.generateQrBitmap(it) }.cycleMultiple()
     }.shareInBackground()
@@ -97,11 +95,12 @@ class ShowSignParitySignerViewModel(
     val addressModel = chain.map { chain ->
         val signPayload = signSharedState.getOrThrow()
 
-        addressIconGenerator.createAccountAddressModel(chain, signPayload.payload.accountId(), addressDisplayUseCase)
+        addressIconGenerator.createAccountAddressModel(chain, signPayload.extrinsic.accountId, addressDisplayUseCase)
     }.shareInBackground()
 
-    val validityPeriod = flowOf { determineSigningValidityPeriod() }
-        .shareInBackground()
+    val validityPeriod = flowOf {
+        extrinsicValidityUseCase.extrinsicValidityPeriod(signSharedState.getOrThrow().extrinsic)
+    }.shareInBackground()
 
     val title = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_sign_title, payload.polkadotVaultVariant)
 
@@ -118,7 +117,7 @@ class ShowSignParitySignerViewModel(
     }
 
     fun continueClicked() = launch {
-        val validityPeriodParcel = validityPeriod.first()?.let(::mapValidityPeriodToParcel)
+        val validityPeriodParcel = mapValidityPeriodToParcel(validityPeriod.first())
         val payload = ScanSignParitySignerPayload(request, validityPeriodParcel, payload.polkadotVaultVariant)
 
         router.openScanParitySignerSignature(payload)
@@ -131,7 +130,7 @@ class ShowSignParitySignerViewModel(
 
     fun timerFinished() {
         launch {
-            qrCodeExpiredPresentable.showQrCodeExpired(validityPeriod.first()!!)
+            qrCodeExpiredPresentable.showQrCodeExpired(validityPeriod.first())
         }
     }
 
@@ -140,13 +139,6 @@ class ShowSignParitySignerViewModel(
         val chain = chain.first()
 
         externalActions.showAddressActions(address, chain)
-    }
-
-    private suspend fun determineSigningValidityPeriod(): ValidityPeriod? {
-        return when (val payload = signSharedState.getOrThrow().payload) {
-            is SignerPayload.Extrinsic -> extrinsicValidityUseCase.extrinsicValidityPeriod(payload.extrinsic)
-            is SignerPayload.Raw -> null
-        }
     }
 
     private fun setInitialSigningMode() {

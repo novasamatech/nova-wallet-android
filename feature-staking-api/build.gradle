@@ -1,5 +1,26 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
     namespace 'io.novafoundation.nova.feature_staking_api'
 }
 
@@ -12,7 +33,6 @@ dependencies {
     implementation project(':runtime')
     implementation project(':common')
     implementation project(':feature-proxy-api')
-    implementation project(':feature-deep-linking')
 
     api project(":feature-wallet-api")
     api project(":feature-account-api")

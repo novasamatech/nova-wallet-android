@@ -1,9 +1,18 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 
 android {
+    compileSdkVersion rootProject.compileSdkVersion
+
     defaultConfig {
-        buildConfigField "String", "EXTERNAL_ACCOUNTS_SYNC_URL", "\"https://subquery-account-manager-stg.novasama-tech.org/\""
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -11,6 +20,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_account_impl'
 
@@ -34,7 +53,6 @@ dependencies {
     implementation project(":feature-swap-core:api")
     implementation project(":feature-xcm:api")
     implementation project(':web3names')
-    implementation project(':feature-deep-linking')
 
     implementation kotlinDep
 
@@ -59,13 +77,13 @@ dependencies {
     implementation lifeCycleKtxDep
 
     implementation daggerDep
-    ksp daggerCompiler
+    kapt daggerKapt
 
     implementation roomDep
-    ksp roomCompiler
+    kapt roomKapt
 
     implementation lifecycleDep
-    ksp lifecycleCompiler
+    kapt lifecycleKapt
 
     testImplementation jUnitDep
     testImplementation mockitoDep

@@ -11,7 +11,6 @@ fun LightMetaAccount.Type.isBackupable(): Boolean {
         LightMetaAccount.Type.LEDGER_LEGACY,
         LightMetaAccount.Type.POLKADOT_VAULT -> true
 
-        LightMetaAccount.Type.PROXIED,
-        LightMetaAccount.Type.MULTISIG -> false
+        LightMetaAccount.Type.PROXIED -> false
     }
 }

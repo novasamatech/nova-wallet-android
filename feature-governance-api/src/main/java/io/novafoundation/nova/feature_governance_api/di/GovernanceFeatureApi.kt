@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_api.di
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
-import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.delegators.DelegateDelegatorsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.DelegateListInteractor
@@ -12,7 +11,6 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendaListInteractor
 import io.novafoundation.nova.feature_governance_api.domain.referendum.voters.ReferendumVotersInteractor
 import io.novafoundation.nova.feature_governance_api.presentation.referenda.common.ReferendaStatusFormatter
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
 
 interface GovernanceFeatureApi {
 
@@ -37,8 +35,4 @@ interface GovernanceFeatureApi {
     val mutableGovernanceState: MutableGovernanceState
 
     val referendaStatusFormatter: ReferendaStatusFormatter
-
-    val governanceDeepLinks: GovernanceDeepLinks
-
-    val referendumDetailsDeepLinkConfigurator: ReferendumDetailsDeepLinkConfigurator
 }

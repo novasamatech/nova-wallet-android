@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_deep_linking.presentation.handling.common
+package io.novafoundation.nova.app.root.presentation.deepLinks.common
 
 sealed class DeepLinkHandlingException : Exception() {
 

@@ -20,7 +20,7 @@ sealed interface RewardPeriod {
         override val type: RewardPeriodType.Preset
     ) : RewardPeriod {
 
-        // Since we take the currentDate as the whole day we add 1 day to the start period using atTheNextDay()
+        // Since we take the currentDate as the whole day we add 1 day to the to the start period using atTheNextDay()
         override val start: Date
             get() = Date(System.currentTimeMillis() - offset.inWholeMilliseconds).atTheNextDay()
 

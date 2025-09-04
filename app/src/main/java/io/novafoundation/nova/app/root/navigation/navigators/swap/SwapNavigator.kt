@@ -76,10 +76,6 @@ class SwapNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openMain() {
-        commonDelegate.openMain()
-    }
-
     override fun selectAssetIn(selectedAsset: AssetPayload?) {
         val payload = SwapFlowPayload.ReselectAssetIn(selectedAsset)
         val bundle = AssetSwapFlowFragment.getBundle(payload)

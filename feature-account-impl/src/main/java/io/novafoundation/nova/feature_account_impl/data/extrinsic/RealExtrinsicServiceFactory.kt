@@ -1,12 +1,11 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic
 
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
-import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
+import io.novafoundation.nova.runtime.extrinsic.multi.ExtrinsicSplitter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -19,8 +18,7 @@ class RealExtrinsicServiceFactory(
     private val signerProvider: SignerProvider,
     private val extrinsicSplitter: ExtrinsicSplitter,
     private val eventsRepository: EventsRepository,
-    private val feePaymentProviderRegistry: FeePaymentProviderRegistry,
-    private val signingContextFactory: SigningContext.Factory,
+    private val feePaymentProviderRegistry: FeePaymentProviderRegistry
 ) : ExtrinsicService.Factory {
 
     override fun create(feeConfig: ExtrinsicService.FeePaymentConfig): ExtrinsicService {
@@ -34,8 +32,7 @@ class RealExtrinsicServiceFactory(
             extrinsicSplitter = extrinsicSplitter,
             feePaymentProviderRegistry = registry,
             eventsRepository = eventsRepository,
-            coroutineScope = feeConfig.coroutineScope,
-            signingContextFactory = signingContextFactory
+            coroutineScope = feeConfig.coroutineScope
         )
     }
 

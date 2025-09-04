@@ -4,7 +4,6 @@ import android.net.Uri
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -13,7 +12,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.runningFold
-import kotlinx.coroutines.launch
 import org.web3j.utils.Numeric
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -26,6 +24,8 @@ import java.util.Collections
 import java.util.Date
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -34,6 +34,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
@@ -57,14 +58,6 @@ inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {
     )
 }
 
-inline fun <reified E : Throwable, R> Result<R>.onFailureInstance(action: (E) -> Unit): Result<R> {
-    return onFailure {
-        if (it is E) {
-            action(it)
-        }
-    }
-}
-
 inline fun <R> Result<R>.finally(transform: () -> Unit): Result<R> {
     transform()
     return this
@@ -83,6 +76,7 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
 
 fun Result<*>.coerceToUnit(): Result<Unit> = map { }
 
+@OptIn(ExperimentalTime::class)
 inline fun <R> measureExecution(label: String, function: () -> R): R {
     val (value, time) = measureTimedValue(function)
     Log.d("Performance", "$label took $time")
@@ -199,8 +193,6 @@ fun <T> unsafeLazy(initializer: () -> T) = lazy(LazyThreadSafetyMode.NONE, initi
 fun <T> MutableSet<T>.toImmutable(): Set<T> = Collections.unmodifiableSet(this)
 
 operator fun BigInteger.times(double: Double): BigInteger = toBigDecimal().multiply(double.toBigDecimal()).toBigInteger()
-
-operator fun BigInteger.times(int: Int): BigInteger = multiply(int.toBigInteger())
 
 val BigDecimal.isZero: Boolean
     get() = signum() == 0
@@ -507,12 +499,6 @@ fun String.splitSnakeOrCamelCase() = if (contains(SNAKE_CASE_REGEX_STRING)) {
     splitCamelCase()
 }
 
-fun String.splitAndCapitalizeWords(): String {
-    val split = splitSnakeOrCamelCase()
-
-    return split.joinToString(separator = " ") { it.capitalize() }
-}
-
 /**
  * Replaces all parts in form of '{name}' to the corresponding value from values using 'name' as a key.
  *
@@ -567,10 +553,6 @@ fun <T> List<T>.modified(index: Int, modification: T): List<T> {
     return newList
 }
 
-fun <K, V> MutableMap<K, V>.put(entry: Pair<K, V>) {
-    put(entry.first, entry.second)
-}
-
 fun <T> Set<T>.added(toAdd: T): Set<T> {
     return toMutableSet().apply { add(toAdd) }
 }
@@ -581,22 +563,9 @@ fun <K, V> Map<K, V>.inserted(key: K, value: V): Map<K, V> {
 
 inline fun <T, R> Iterable<T>.mapToSet(mapper: (T) -> R): Set<R> = mapTo(mutableSetOf(), mapper)
 
-inline fun <T, R> Iterable<T>.flatMapToSet(mapper: (T) -> Iterable<R>): Set<R> = flatMapTo(mutableSetOf(), mapper)
-
 inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fold(mutableSetOf()) { acc, value ->
     acc += mapper(value)
     acc
-}
-
-inline fun <T, K> Iterable<T>.groupByToSet(keySelector: (T) -> K): MultiMap<K, T> {
-    val destination = mutableMultiMapOf<K, T>()
-
-    for (element in this) {
-        val key = keySelector(element)
-        destination.put(key, element)
-    }
-
-    return destination
 }
 
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
@@ -632,17 +601,13 @@ fun String.toUuid() = UUID.fromString(this)
 val Int.kilobytes: BigInteger
     get() = this.toBigInteger() * 1024.toBigInteger()
 
-fun ByteArray.compareTo(other: ByteArray, unsigned: Boolean): Int {
+operator fun ByteArray.compareTo(other: ByteArray): Int {
     if (size != other.size) {
         return size - other.size
     }
 
-    for (i in indices) {
-        val result = if (unsigned) {
-            this[i].toUByte().compareTo(other[i].toUByte())
-        } else {
-            this[i].compareTo(other[i])
-        }
+    for (i in 0 until size) {
+        val result = this[i].compareTo(other[i])
 
         if (result != 0) {
             return result
@@ -652,7 +617,7 @@ fun ByteArray.compareTo(other: ByteArray, unsigned: Boolean): Int {
     return 0
 }
 
-fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b, unsigned = false) }
+fun ByteArrayComparator() = Comparator<ByteArray> { a, b -> a.compareTo(b) }
 
 inline fun CoroutineScope.withChildScope(action: CoroutineScope.() -> Unit) {
     val childScope = childScope()
@@ -750,25 +715,3 @@ fun Int.collectionIndexOrNull(): Int? {
 fun <T> Set<T>.hasIntersectionWith(other: Set<T>): Boolean {
     return this.any { it in other }
 }
-
-@Suppress("UNCHECKED_CAST")
-fun <T1, T2, T3, T4, T5, T6, R> combine(
-    flow: Flow<T1>,
-    flow2: Flow<T2>,
-    flow3: Flow<T3>,
-    flow4: Flow<T4>,
-    flow5: Flow<T5>,
-    flow6: Flow<T6>,
-    transform: suspend (T1, T2, T3, T4, T5, T6) -> R
-): Flow<R> = kotlinx.coroutines.flow.combine(flow, flow2, flow3, flow4, flow5, flow6) { args: Array<*> ->
-    transform(
-        args[0] as T1,
-        args[1] as T2,
-        args[2] as T3,
-        args[3] as T4,
-        args[4] as T5,
-        args[5] as T6
-    )
-}
-
-typealias LazyGet<T> = () -> T

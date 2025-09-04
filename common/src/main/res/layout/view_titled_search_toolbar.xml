@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
+    android:background="@color/solid_navigation_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/titledSearchToolbar"
@@ -34,4 +34,4 @@
         android:background="@color/navigation_divider"
         app:layout_constraintBottom_toBottomOf="parent" />
 
-</merge>
+</androidx.constraintlayout.widget.ConstraintLayout>

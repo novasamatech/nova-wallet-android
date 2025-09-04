@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.validators.chan
 import android.os.Bundle
 import android.widget.ImageView
 
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
@@ -40,6 +41,12 @@ class SelectCustomValidatorsFragment :
     var filterAction: ImageView? = null
 
     override fun initViews() {
+        binder.selectCustomValidatorsContainer.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+        }
+
         binder.selectCustomValidatorsList.adapter = adapter
         binder.selectCustomValidatorsList.setHasFixedSize(true)
 

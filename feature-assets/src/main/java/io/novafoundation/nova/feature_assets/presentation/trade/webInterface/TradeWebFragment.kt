@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_assets.databinding.FragmentTradeWebInterfaceBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -16,6 +17,7 @@ class TradeWebFragment : BaseFragment<TradeWebViewModel, FragmentTradeWebInterfa
     override fun createBinding() = FragmentTradeWebInterfaceBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.tradeWebToolbar.applyStatusBarInsets()
         binder.tradeWebToolbar.setHomeButtonListener { viewModel.back() }
 
         binder.tradeWebView.settings.apply {

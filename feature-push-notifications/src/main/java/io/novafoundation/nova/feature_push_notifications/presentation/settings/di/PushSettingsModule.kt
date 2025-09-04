@@ -16,8 +16,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.l
 import io.novafoundation.nova.feature_push_notifications.PushNotificationsRouter
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsCommunicator
-import io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsPayload
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.PushMultisigSettingsCommunicator
 import io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsViewModel
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsCommunicator
 
@@ -43,8 +41,6 @@ class PushSettingsModule {
         pushStakingSettingsRequester: PushStakingSettingsCommunicator,
         permissionsAsker: PermissionsAsker.Presentation,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        pushMultisigSettingsCommunicator: PushMultisigSettingsCommunicator,
-        payload: PushSettingsPayload
     ): ViewModel {
         return PushSettingsViewModel(
             router,
@@ -53,10 +49,8 @@ class PushSettingsModule {
             selectMultipleWalletsCommunicator,
             pushGovernanceSettingsCommunicator,
             pushStakingSettingsRequester,
-            pushMultisigSettingsCommunicator,
             actionAwaitableMixinFactory,
-            permissionsAsker,
-            payload
+            permissionsAsker
         )
     }
 

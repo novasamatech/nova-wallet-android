@@ -5,8 +5,7 @@ import io.novafoundation.nova.common.utils.hasCall
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import java.math.BigInteger
 

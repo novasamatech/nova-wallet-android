@@ -9,7 +9,7 @@ sealed class ValidationFailureUi {
     class Default(
         val level: ValidationStatus.NotValid.Level,
         val title: String,
-        val message: CharSequence?,
+        val message: String?,
         val confirmWarning: Action,
     ) : ValidationFailureUi()
 

@@ -12,7 +12,7 @@ interface JoinedMetaAccountInfo {
     val proxyAccountLocal: ProxyAccountLocal?
 }
 
-data class RelationJoinedMetaAccountInfo(
+class RelationJoinedMetaAccountInfo(
     @Embedded
     override val metaAccount: MetaAccountLocal,
 

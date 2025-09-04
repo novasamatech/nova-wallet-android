@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -36,11 +35,7 @@ interface SwapService {
 
     suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress>
 
-    suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult>
-
     suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig
 
     fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger>
-
-    suspend fun isDeepSwapAllowed(): Boolean
 }

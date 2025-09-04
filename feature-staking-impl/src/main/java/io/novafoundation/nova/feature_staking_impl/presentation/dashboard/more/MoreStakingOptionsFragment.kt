@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more
 
-import android.view.View
 import androidx.recyclerview.widget.ConcatAdapter
 
 import io.novafoundation.nova.common.base.BaseFragment
@@ -43,11 +42,8 @@ class MoreStakingOptionsFragment :
             .inject(this)
     }
 
-    override fun applyInsets(rootView: View) {
-        binder.moreStakingOptionsToolbar.applyStatusBarInsets()
-    }
-
     override fun initViews() {
+        binder.moreStakingOptionsToolbar.applyStatusBarInsets()
         binder.moreStakingOptionsToolbar.setHomeButtonListener { viewModel.goBack() }
 
         with(binder.moreStakingOptionsContent) {
@@ -73,7 +69,6 @@ class MoreStakingOptionsFragment :
                     dAppLoadingAdapter.show(false)
                     dAppAdapter.submitList(browserStakingState.data)
                 }
-
                 else -> {
                     dAppLoadingAdapter.show(true)
                     dAppAdapter.submitList(listOf())

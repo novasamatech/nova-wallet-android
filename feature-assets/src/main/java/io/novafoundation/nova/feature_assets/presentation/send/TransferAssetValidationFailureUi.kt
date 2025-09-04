@@ -105,11 +105,6 @@ fun CoroutineScope.mapAssetTransferValidationFailureToUI(
         AssetTransferValidationFailure.RecipientIsSystemAccount -> Default(
             handleSystemAccountValidationFailure(resourceManager)
         )
-
-        AssetTransferValidationFailure.DryRunFailed -> Default(
-            resourceManager.getString(R.string.common_dry_run_failed_title) to
-                resourceManager.getString(R.string.common_dry_run_failed_message)
-        )
     }
 }
 

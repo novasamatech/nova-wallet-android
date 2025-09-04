@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:background="@drawable/drawable_background_image"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
     <io.novafoundation.nova.common.view.Toolbar
-        android:id="@+id/moreStakingOptionsToolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/blur_navigation_background"
+        android:id="@+id/moreStakingOptionsToolbar"
+        app:titleText="@string/staking_dashboard_more_options"
         app:contentBackground="@android:color/transparent"
-        app:titleText="@string/staking_dashboard_more_options" />
+        android:background="@color/blur_navigation_background"
+        android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/moreStakingOptionsContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:paddingBottom="64dp"
+        android:id="@+id/moreStakingOptionsContent"
+        android:layout_weight="1" />
 </LinearLayout>

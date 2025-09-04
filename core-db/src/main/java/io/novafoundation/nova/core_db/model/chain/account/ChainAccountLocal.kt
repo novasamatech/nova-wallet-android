@@ -31,27 +31,4 @@ class ChainAccountLocal(
     val publicKey: ByteArray?,
     val accountId: ByteArray,
     val cryptoType: CryptoType?,
-) {
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is ChainAccountLocal) return false
-
-        if (metaId != other.metaId) return false
-        if (chainId != other.chainId) return false
-        if (!publicKey.contentEquals(other.publicKey)) return false
-        if (!accountId.contentEquals(other.accountId)) return false
-        if (cryptoType != other.cryptoType) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = metaId.hashCode()
-        result = 31 * result + chainId.hashCode()
-        result = 31 * result + (publicKey?.contentHashCode() ?: 0)
-        result = 31 * result + accountId.contentHashCode()
-        result = 31 * result + (cryptoType?.hashCode() ?: 0)
-        return result
-    }
-}
+)

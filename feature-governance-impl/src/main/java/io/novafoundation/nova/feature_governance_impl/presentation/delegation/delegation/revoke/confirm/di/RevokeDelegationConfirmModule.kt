@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.label.DelegateLabelUseCase
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
@@ -82,8 +81,7 @@ class RevokeDelegationConfirmModule {
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
         delegateFormatters: DelegateMappers,
         delegateLabelUseCase: DelegateLabelUseCase,
-        partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        partialRetriableMixinFactory: PartialRetriableMixin.Factory
     ): ViewModel {
         return RevokeDelegationConfirmViewModel(
             router = router,
@@ -102,8 +100,7 @@ class RevokeDelegationConfirmModule {
             resourcesHintsMixinFactory = resourcesHintsMixinFactory,
             partialRetriableMixinFactory = partialRetriableMixinFactory,
             delegateFormatters = delegateFormatters,
-            delegateLabelUseCase = delegateLabelUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            delegateLabelUseCase = delegateLabelUseCase
         )
     }
 

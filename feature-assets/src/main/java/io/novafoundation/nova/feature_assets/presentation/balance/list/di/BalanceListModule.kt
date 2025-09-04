@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
@@ -23,7 +22,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetLi
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.BalanceListViewModel
-import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
@@ -92,9 +90,7 @@ class BalanceListModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetListMixinFactory: AssetListMixinFactory,
         amountFormatter: AmountFormatter,
-        buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
-        multisigPendingOperationsService: MultisigPendingOperationsService,
-        novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -110,9 +106,7 @@ class BalanceListModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
             amountFormatter = amountFormatter,
-            buySellSelectorMixinFactory = buySellSelectorMixinFactory,
-            multisigPendingOperationsService = multisigPendingOperationsService,
-            novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory
         )
     }
 

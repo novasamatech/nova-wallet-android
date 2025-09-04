@@ -10,7 +10,7 @@ abstract class SharedComputation(
     context(ComputationalScope)
     protected fun <T> cachedFlow(
         vararg keyArgs: String,
-        flowLazy: suspend CoroutineScope.() -> Flow<T>
+        flowLazy: suspend () -> Flow<T>
     ): Flow<T> {
         val key = keyArgs.joinToString(separator = ".")
 

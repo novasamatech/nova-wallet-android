@@ -28,11 +28,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.withContext
 
 class NovaCardViewModel(
     private val chainRegistry: ChainRegistry,
@@ -71,10 +69,6 @@ class NovaCardViewModel(
         ensureCardCreationIsBlocking()
 
         observeTopUp()
-    }
-
-    fun backClicked() {
-        assetsRouter.back()
     }
 
     override fun onSellOrderCreated(orderId: String, address: String, amount: BigDecimal) {
@@ -127,11 +121,11 @@ class NovaCardViewModel(
         topUpRequester.responseFlow
             .onEach {
                 when (it) {
-                    TopUpAddressResponder.Response.Cancel -> withContext(Dispatchers.Main) { // Use withContext to fix a bug with not opening a bottomsheet. TODO: We don't understand completaly why this fix works so let's investigate this problem
+                    TopUpAddressResponder.Response.Cancel -> {
                         assetsRouter.returnToMainScreen()
                     }
 
-                    TopUpAddressResponder.Response.Success -> withContext(Dispatchers.Main) { // Use withContext to fix a bug with not opening a bottomsheet. TODO: We don't understand completaly why this fix works so let's investigate this problem
+                    TopUpAddressResponder.Response.Success -> {
                         updateCardState()
                         updateLastTopUpTime()
                         assetsRouter.openAwaitingCardCreation()

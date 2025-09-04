@@ -17,7 +17,6 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.repository.BagListRepository
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -70,7 +69,6 @@ class RebagModule {
         resourceManager: ResourceManager,
         iconGenerator: AddressIconGenerator,
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return RebagViewModel(
             interactor = interactor,
@@ -84,8 +82,7 @@ class RebagModule {
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
             iconGenerator = iconGenerator,
-            resourcesHintsMixinFactory = resourcesHintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            resourcesHintsMixinFactory = resourcesHintsMixinFactory
         )
     }
 

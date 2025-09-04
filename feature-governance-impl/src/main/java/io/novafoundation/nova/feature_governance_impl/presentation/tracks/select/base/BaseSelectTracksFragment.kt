@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.list.NestedAdapter
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentSelectTracksBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.tracks.select.base.adapter.SelectTracksAdapter
@@ -36,6 +37,7 @@ abstract class BaseSelectTracksFragment<V : BaseSelectTracksViewModel> :
         binder.selectTracksList.itemAnimator = null
         binder.selectTracksList.adapter = adapter
 
+        binder.selectTracksToolbar.applyStatusBarInsets()
         binder.selectTracksToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 

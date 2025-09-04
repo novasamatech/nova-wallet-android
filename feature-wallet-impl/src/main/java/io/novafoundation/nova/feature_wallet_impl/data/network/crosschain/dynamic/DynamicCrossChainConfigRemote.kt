@@ -28,7 +28,5 @@ class DynamicCrossChainOriginAssetRemote(
 class DynamicXcmTransferRemote(
     val chainId: ChainId,
     val assetId: Int,
-    val hasDeliveryFee: Boolean?,
-    val supportsXcmExecute: Boolean?,
-    val usesTeleport: Boolean?
+    val hasDeliveryFee: Boolean,
 )

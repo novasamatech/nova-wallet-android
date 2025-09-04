@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProviderDsl.Companion.share
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -29,16 +28,12 @@ interface MaxActionProviderDsl {
 
     companion object : MaxActionProviderDsl
 
-    fun Flow<Asset>.providingMaxOfAsync(field: suspend (Asset) -> Balance): MaxActionProvider {
+    fun Flow<Asset>.providingMaxOf(field: suspend (Asset) -> Balance): MaxActionProvider {
         return AssetMaxActionProvider(this, field)
     }
 
     fun Flow<Asset>.providingMaxOf(field: (Asset) -> Balance): MaxActionProvider {
         return AssetMaxActionProvider(this, field)
-    }
-
-    fun Flow<ChainAssetWithAmount>.asMaxAmountProvider(): MaxActionProvider {
-        return ChainAssetWithAmountMaxActionProvider(this)
     }
 
     fun MaxActionProvider.deductEd(assetSourceRegistry: AssetSourceRegistry, deductEdFlow: Flow<Boolean>): MaxActionProvider {

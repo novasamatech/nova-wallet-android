@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.h
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
-import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.StaticAssetSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.utility.NativeAssetBalance
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.utility.NativeAssetEventDetector
@@ -40,14 +40,14 @@ class NativeAssetsModule {
     fun provideBalance(
         chainRegistry: ChainRegistry,
         assetCache: AssetCache,
-        accountInfoRepository: AccountInfoRepository,
+        substrateRemoteSource: SubstrateRemoteSource,
         @Named(REMOTE_STORAGE_SOURCE) remoteSource: StorageDataSource,
         lockDao: LockDao,
         holdsDao: HoldsDao,
     ) = NativeAssetBalance(
         chainRegistry = chainRegistry,
         assetCache = assetCache,
-        accountInfoRepository = accountInfoRepository,
+        substrateRemoteSource = substrateRemoteSource,
         remoteStorage = remoteSource,
         lockDao = lockDao,
         holdsDao = holdsDao

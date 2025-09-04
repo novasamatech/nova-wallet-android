@@ -1,8 +1,10 @@
 package io.novafoundation.nova.runtime.multiNetwork.runtime.repository
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.instanceOf
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 import java.math.BigInteger
@@ -36,6 +38,14 @@ fun ExtrinsicWithEvents.isSuccess(): Boolean {
     }
 
     return status == ExtrinsicStatus.SUCCESS
+}
+
+fun Extrinsic.Instance.signer(): AccountId {
+    val accountIdentifier = requireNotNull(signature?.accountIdentifier) {
+        "Extrinsic is unsigned"
+    }
+
+    return bindAccountIdentifier(accountIdentifier)
 }
 
 fun List<GenericEvent.Instance>.nativeFee(): BigInteger? {
@@ -81,10 +91,6 @@ fun List<GenericEvent.Instance>.hasEvent(module: String, event: String): Boolean
     return any { it.instanceOf(module, event) }
 }
 
-fun List<GenericEvent.Instance>.findEvents(module: String, event: String): List<GenericEvent.Instance> {
+fun List<GenericEvent.Instance>.findAllOfType(module: String, event: String): List<GenericEvent.Instance> {
     return filter { it.instanceOf(module, event) }
-}
-
-fun List<GenericEvent.Instance>.findEvents(module: String, vararg events: String): List<GenericEvent.Instance> {
-    return filter { it.instanceOf(module, *events) }
 }

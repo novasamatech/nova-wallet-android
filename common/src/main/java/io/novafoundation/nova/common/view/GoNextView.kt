@@ -13,7 +13,6 @@ import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewGoNextBinding
-import io.novafoundation.nova.common.utils.getColorOrNull
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -101,9 +100,6 @@ class GoNextView @JvmOverloads constructor(
 
         val textAppearance = typedArray.getResourceIdOrNull(R.styleable.GoNextView_android_textAppearance)
         textAppearance?.let(title::setTextAppearance)
-
-        val titleColor = typedArray.getColorOrNull(R.styleable.GoNextView_android_textColor)
-        titleColor?.let { title.setTextColor(it) }
 
         val actionTint = typedArray.getColor(R.styleable.GoNextView_actionTint, context.getColor(R.color.icon_primary))
         setActionTint(actionTint)

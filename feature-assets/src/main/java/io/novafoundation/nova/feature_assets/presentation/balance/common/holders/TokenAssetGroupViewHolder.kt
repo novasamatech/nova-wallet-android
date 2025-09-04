@@ -18,10 +18,10 @@ class TokenAssetGroupViewHolder(
 
     override var expandableItem: ExpandableParentItem? = null
 
-    fun bind(tokenGroup: TokenGroupUi) = with(binder) {
-        updateExpandableItem(tokenGroup)
+    fun bind(tokenGroup: TokenGroupUi) = with(containerView) {
+        expandableItem = tokenGroup
 
-        itemTokenGroupAssetImage.setTokenIcon(tokenGroup.tokenIcon, imageLoader)
+        binder.itemTokenGroupAssetImage.setTokenIcon(tokenGroup.tokenIcon, imageLoader)
 
         bindPriceRateInternal(tokenGroup)
 
@@ -31,7 +31,7 @@ class TokenAssetGroupViewHolder(
 
         updateListener(tokenGroup)
 
-        itemAssetTokenGroupToken.text = tokenGroup.tokenSymbol
+        binder.itemAssetTokenGroupToken.text = tokenGroup.tokenSymbol
     }
 
     fun bindTotal(networkAsset: TokenGroupUi) {

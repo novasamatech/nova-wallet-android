@@ -1,3 +1,5 @@
+apply from: '../jacoco.gradle'
+
 afterEvaluate {
     task runModuleTests {
         Task runTestsTask

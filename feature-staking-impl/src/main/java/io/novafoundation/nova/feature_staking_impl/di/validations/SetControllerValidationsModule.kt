@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerFeeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.controller.SetControllerValidationSystem
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughAmountToTransferValidationGeneric
 
 @Module
@@ -43,10 +43,10 @@ class SetControllerValidationsModule {
     @Provides
     fun provideZeroBalanceControllerValidation(
         stakingSharedState: StakingSharedState,
-        assetSourceRegistry: AssetSourceRegistry,
+        walletRepository: WalletRepository
     ): NotZeroBalanceValidation {
         return NotZeroBalanceValidation(
-            assetSourceRegistry = assetSourceRegistry,
+            walletRepository = walletRepository,
             stakingSharedState = stakingSharedState
         )
     }

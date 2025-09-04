@@ -35,8 +35,7 @@ class ParitySignerAddAccountRepository(
             position = accountDao.nextAccountPosition(),
             type = payload.variant.asMetaAccountTypeLocal(),
             status = MetaAccountLocal.Status.ACTIVE,
-            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId(),
-            typeExtras = null
+            globallyUniqueId = MetaAccountLocal.generateGloballyUniqueId()
         )
 
         val metaId = accountDao.insertMetaAccount(metaAccount)

@@ -13,14 +13,14 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.common.stakeablePlanks
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondMoreValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondMoreValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.bondMoreValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
-import io.novafoundation.nova.feature_wallet_api.domain.model.decimalAmount
-import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -62,11 +62,6 @@ class SelectBondMoreViewModel(
         .inBackground()
         .share()
 
-    private val stakeableBalance = assetFlow.map {
-        val amount = bondMoreInteractor.stakeableAmount(it)
-        it.token.configuration.withAmount(amount)
-    }.shareInBackground()
-
     private val selectedChainAsset = assetFlow.map { it.token.configuration }
         .shareInBackground()
 
@@ -76,7 +71,7 @@ class SelectBondMoreViewModel(
     )
 
     private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
-        stakeableBalance.asMaxAmountProvider()
+        assetFlow.providingMaxOf(Asset::stakeablePlanks)
             .deductFee(originFeeMixin)
     }
 
@@ -119,8 +114,7 @@ class SelectBondMoreViewModel(
             stashAddress = stashAddress(),
             fee = originFeeMixin.awaitFee(),
             amount = amountChooserMixin.amount.first(),
-            stashAsset = assetFlow.first(),
-            stakeable = stakeableBalance.first().decimalAmount
+            stashAsset = assetFlow.first()
         )
 
         validationExecutor.requireValid(

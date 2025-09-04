@@ -41,7 +41,6 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.BaseExterna
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationFailure
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationSystem
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
-import io.novafoundation.nova.feature_external_sign_impl.domain.sign.tryConvertHexToUtf8
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.validation.checkForFeeChanges
@@ -241,7 +240,9 @@ class EvmSignInteractor(
 
     private fun personalSignReadableContent(payload: PersonalSign): String {
         val data = payload.message.data
-        return data.tryConvertHexToUtf8()
+
+        return runCatching { data.fromHex().decodeToString(throwOnInvalidSequence = true) }
+            .getOrDefault(data)
     }
 
     private fun signTypedMessageReadableContent(payload: SignTypedMessage): String {

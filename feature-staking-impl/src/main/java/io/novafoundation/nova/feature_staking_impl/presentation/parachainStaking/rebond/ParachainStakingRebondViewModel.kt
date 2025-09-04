@@ -13,8 +13,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -53,7 +51,6 @@ class ParachainStakingRebondViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val payload: ParachainStakingRebondPayload,
     private val collatorsUseCase: CollatorsUseCase,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
@@ -62,8 +59,7 @@ class ParachainStakingRebondViewModel(
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalActions by externalActions,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    ExternalActions by externalActions {
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -152,9 +148,9 @@ class ParachainStakingRebondViewModel(
         interactor.rebond(payload.collatorId)
             .onFailure(::showError)
             .onSuccess {
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
+                router.returnToStakingMain()
             }
 
         _showNextProgress.value = false

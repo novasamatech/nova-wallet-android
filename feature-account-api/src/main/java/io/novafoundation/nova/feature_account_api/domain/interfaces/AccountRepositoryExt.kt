@@ -34,6 +34,5 @@ suspend fun AccountRepository.requireMetaAccountFor(transactionOrigin: Transacti
         TransactionOrigin.SelectedWallet -> getSelectedMetaAccount()
         is TransactionOrigin.WalletWithAccount -> findMetaAccountOrThrow(transactionOrigin.accountId, chainId)
         is TransactionOrigin.Wallet -> transactionOrigin.metaAccount
-        is TransactionOrigin.WalletWithId -> getMetaAccount(transactionOrigin.metaId)
     }
 }

@@ -23,7 +23,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_account_api.presenatation.fee.toDomain
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
@@ -77,13 +76,11 @@ class ConfirmSendViewModel(
     private val validationExecutor: ValidationExecutor,
     private val walletUiUseCase: WalletUiUseCase,
     private val hintsFactory: ConfirmSendHintsMixinFactory,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val transferDraft: TransferDraft,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    Validatable by validationExecutor {
 
     private val isCrossChain = transferDraft.origin.chainId != transferDraft.destination.chainId
 
@@ -250,15 +247,15 @@ class ConfirmSendViewModel(
     ) = launch {
         sendInteractor.performTransfer(transfer, originFee, crossChainFee, viewModelScope)
             .onSuccess {
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                startNavigation(it.submissionHierarchy) { finishSendFlow() }
+                finishSendFlow()
             }.onFailure(::showError)
 
         _transferSubmittingLiveData.value = false
     }
 
-    private fun finishSendFlow() = launch {
+    private suspend fun finishSendFlow() {
         val chain = originChain()
         val chainAsset = originAsset()
 

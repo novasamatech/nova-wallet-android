@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegat
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.presenatation.actions.CustomizableExternalActionsSheet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActionModel
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -24,6 +25,7 @@ class StakingProxyListFragment : BaseFragment<StakingProxyListViewModel, Fragmen
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { StakingProxyListAdapter(this, imageLoader) }
 
     override fun initViews() {
+        binder.stakingProxyListToolbar.applyStatusBarInsets()
         binder.stakingProxyListToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.stakingProxyListAddProxyButton.setOnClickListener { viewModel.addProxyClicked() }

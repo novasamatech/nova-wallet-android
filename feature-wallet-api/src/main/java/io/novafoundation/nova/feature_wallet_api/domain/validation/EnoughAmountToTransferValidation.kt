@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalTypeInference::class)
+
 package io.novafoundation.nova.feature_wallet_api.domain.validation
 
 import io.novafoundation.nova.common.base.TitleAndMessage
@@ -13,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
+import kotlin.experimental.ExperimentalTypeInference
 
 interface NotEnoughToPayFeesError {
     val chainAsset: Chain.Asset

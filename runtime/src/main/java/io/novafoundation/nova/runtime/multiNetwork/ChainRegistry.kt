@@ -315,8 +315,6 @@ suspend inline fun <R> ChainRegistry.withRuntime(chainId: ChainId, action: Runti
 suspend inline fun ChainRegistry.findChain(predicate: (Chain) -> Boolean): Chain? = currentChains.first().firstOrNull(predicate)
 suspend inline fun ChainRegistry.findChains(predicate: (Chain) -> Boolean): List<Chain> = currentChains.first().filter(predicate)
 
-suspend inline fun ChainRegistry.findEnabledChains(predicate: (Chain) -> Boolean): List<Chain> = enabledChains().filter(predicate)
-
 suspend inline fun ChainRegistry.findChainIds(predicate: (Chain) -> Boolean): Set<ChainId> = currentChains.first().mapNotNullToSet { chain ->
     chain.id.takeIf { predicate(chain) }
 }

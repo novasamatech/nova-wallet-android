@@ -7,9 +7,6 @@ import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PinCodeAction
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment
-import io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsFragment
-import io.novafoundation.nova.feature_push_notifications.presentation.settings.PushSettingsPayload
-import io.novafoundation.nova.feature_push_notifications.presentation.settings.default
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkMainFragment
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.add.main.AddNetworkPayload
@@ -84,7 +81,6 @@ class SettingsNavigator(
 
     override fun openPushNotificationSettings() {
         navigationBuilder().action(R.id.action_open_pushNotificationsSettings)
-            .setArgs(PushSettingsFragment.createPayload(PushSettingsPayload.default()))
             .navigateInFirstAttachedContext()
     }
 

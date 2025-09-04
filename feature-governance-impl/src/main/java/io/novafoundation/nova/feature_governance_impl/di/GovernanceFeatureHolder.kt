@@ -7,7 +7,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectTracksCommunicator
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
-import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
+import io.novafoundation.nova.feature_deep_link_building.di.DeepLinkBuildingFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
@@ -32,7 +32,7 @@ class GovernanceFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .dAppFeatureApi(getFeature(DAppFeatureApi::class.java))
             .xcmFeatureApi(getFeature(XcmFeatureApi::class.java))
-            .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
+            .deepLinkBuildingFeatureApi(getFeature(DeepLinkBuildingFeatureApi::class.java))
             .build()
 
         return DaggerGovernanceFeatureComponent.factory()

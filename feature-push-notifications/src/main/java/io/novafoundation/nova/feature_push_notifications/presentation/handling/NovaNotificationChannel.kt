@@ -14,7 +14,5 @@ enum class NovaNotificationChannel(
 
     TRANSACTIONS(R.string.transactions_notification_channel_id, R.string.transactions_notification_channel_name),
 
-    STAKING(R.string.staking_notification_channel_id, R.string.staking_notification_channel_name),
-
-    MULTISIG(R.string.multisigs_notification_channel_id, R.string.multisigs_notification_channel_name),
+    STAKING(R.string.staking_notification_channel_id, R.string.staking_notification_channel_name)
 }

@@ -37,7 +37,7 @@ class DeadRecipientValidation(
         val existentialDeposit = balanceSource.existentialDeposit(chainAsset)
         val recipientAccountId = value.transfer.destinationChain.accountIdOf(value.transfer.recipient)
 
-        val recipientBalance = balanceSource.queryAccountBalance(chain, chainAsset, recipientAccountId).countedTowardsEd
+        val recipientBalance = balanceSource.queryTotalBalance(chain, chainAsset, recipientAccountId)
 
         return validOrError(recipientBalance + addingAmount(value) >= existentialDeposit) {
             failure(value)

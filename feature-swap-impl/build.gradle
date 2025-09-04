@@ -1,12 +1,18 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 
 android {
     namespace 'io.novafoundation.nova.feature_swap_impl'
 
+    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
 
-
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -14,6 +20,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
 
     buildFeatures {
@@ -55,7 +71,7 @@ dependencies {
     implementation shimmerDep
 
     implementation daggerDep
-    ksp daggerCompiler
+    kapt daggerKapt
 
     testImplementation jUnitDep
     testImplementation mockitoDep

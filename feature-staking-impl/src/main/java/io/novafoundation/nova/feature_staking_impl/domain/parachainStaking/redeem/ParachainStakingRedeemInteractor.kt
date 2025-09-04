@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
@@ -16,9 +15,8 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
-import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novasama.substrate_sdk_android.extensions.fromHex
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
@@ -29,7 +27,7 @@ interface ParachainStakingRedeemInteractor {
 
     suspend fun redeemableAmount(delegatorState: DelegatorState): BigInteger
 
-    suspend fun redeem(delegatorState: DelegatorState): Result<Pair<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>, RedeemConsequences>>
+    suspend fun redeem(delegatorState: DelegatorState): Result<RedeemConsequences>
 }
 
 class RealParachainStakingRedeemInteractor(
@@ -50,13 +48,13 @@ class RealParachainStakingRedeemInteractor(
         return redeemableUnbondings.values.sumByBigInteger { it.action.amount }
     }
 
-    override suspend fun redeem(delegatorState: DelegatorState) = withContext(Dispatchers.Default) {
+    override suspend fun redeem(delegatorState: DelegatorState): Result<RedeemConsequences> = withContext(Dispatchers.Default) {
         extrinsicService.submitAndWatchExtrinsic(delegatorState.chain, TransactionOrigin.SelectedWallet) {
             redeem(delegatorState)
         }
             .awaitInBlock()
             .map {
-                it to RedeemConsequences(willKillStash = delegatorState.activeBonded.isZero)
+                RedeemConsequences(willKillStash = delegatorState.activeBonded.isZero)
             }
     }
 
@@ -79,7 +77,6 @@ class RealParachainStakingRedeemInteractor(
 
                 scheduledRequests.filterValues { request -> request.redeemableIn(currentRound) }
             }
-
             is DelegatorState.None -> emptyMap()
         }
     }

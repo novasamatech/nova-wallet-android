@@ -12,15 +12,15 @@ interface ActionBottomSheetLauncherFactory {
 
 interface ActionBottomSheetLauncher {
 
-    val showActionEvent: LiveData<Event<ActionBottomSheetPayload>>
+    val showActionEvent: LiveData<Event<ActionBottomSheet.Payload>>
 
     fun launchBottomSheet(
         @DrawableRes imageRes: Int,
         title: CharSequence,
         subtitle: CharSequence,
-        actionButtonPreferences: ButtonPreferences,
-        neutralButtonPreferences: ButtonPreferences? = null,
-        checkBoxPreferences: CheckBoxPreferences? = null
+        actionButtonPreferences: ActionBottomSheet.ButtonPreferences,
+        neutralButtonPreferences: ActionBottomSheet.ButtonPreferences? = null,
+        checkBoxPreferences: ActionBottomSheet.CheckBoxPreferences? = null
     )
 }
 

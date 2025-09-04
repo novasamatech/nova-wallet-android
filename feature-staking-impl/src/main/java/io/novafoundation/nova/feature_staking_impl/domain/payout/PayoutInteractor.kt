@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.model.Payout
@@ -32,7 +31,7 @@ class PayoutInteractor(
         }
     }
 
-    suspend fun makePayouts(payload: MakePayoutPayload): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
+    suspend fun makePayouts(payload: MakePayoutPayload): RetriableMultiResult<ExtrinsicStatus.InBlock> {
         return withContext(Dispatchers.IO) {
             val chain = stakingSharedState.chain()
             val accountId = chain.accountIdOf(payload.originAddress)

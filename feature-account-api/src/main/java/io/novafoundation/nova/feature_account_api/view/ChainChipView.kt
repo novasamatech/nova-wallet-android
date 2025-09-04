@@ -7,7 +7,6 @@ import coil.ImageLoader
 import coil.clear
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.inflater
-import io.novafoundation.nova.common.utils.removeDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
@@ -50,7 +49,7 @@ class ChainChipView @JvmOverloads constructor(
             binder.itemAssetGroupLabel.setDrawableEnd(R.drawable.ic_chevron_down, widthInDp = 16, paddingInDp = 4, tint = R.color.icon_accent)
         } else {
             binder.itemAssetGroupLabel.setTextColorRes(R.color.text_primary)
-            binder.itemAssetGroupLabel.removeDrawableEnd()
+            binder.itemAssetGroupLabel.setDrawableEnd(null)
         }
     }
 

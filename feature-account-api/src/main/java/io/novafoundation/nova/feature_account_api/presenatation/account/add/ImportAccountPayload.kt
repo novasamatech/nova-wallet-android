@@ -13,21 +13,7 @@ class ImportAccountPayload(
 sealed interface ImportType : Parcelable {
 
     @Parcelize
-    class Mnemonic(
-        val mnemonic: String? = null,
-        val preset: AdvancedEncryptionModel? = null,
-        val origin: Origin = Origin.DEFAULT
-    ) : ImportType {
-
-        /**
-         * A hint on which app mnemonic is imported from.
-         * Some apps might use different of deriving a keypair from passphrase
-         */
-        enum class Origin {
-            DEFAULT,
-            TRUST_WALLET
-        }
-    }
+    class Mnemonic(val mnemonic: String? = null, val preset: AdvancedEncryptionModel? = null) : ImportType
 
     @Parcelize
     object Seed : ImportType

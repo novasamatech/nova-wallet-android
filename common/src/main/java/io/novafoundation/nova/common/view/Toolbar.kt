@@ -77,10 +77,6 @@ class Toolbar @JvmOverloads constructor(
         }
     }
 
-    fun setHomeButtonIcon(@DrawableRes iconRes: Int) {
-        binder.backImg.setImageResource(iconRes)
-    }
-
     fun setHomeButtonIcon(icon: Drawable) {
         binder.backImg.setImageDrawable(icon)
     }

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.Identifiable
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentParachainStakingStartBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
@@ -21,6 +22,8 @@ abstract class StartSingleSelectStakingFragment<T, V : StartSingleSelectStakingV
 
     @CallSuper
     override fun initViews() {
+        binder.startParachainStakingContainer.applyStatusBarInsets()
+
         binder.startParachainStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 

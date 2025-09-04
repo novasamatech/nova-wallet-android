@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.
 
 import android.os.Bundle
 
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
@@ -26,6 +27,12 @@ class ConfirmUnbondFragment : BaseFragment<ConfirmUnbondViewModel, FragmentConfi
     override fun createBinding() = FragmentConfirmUnbondBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmUnbondToolbar.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+        }
+
         binder.confirmUnbondExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         binder.confirmUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }

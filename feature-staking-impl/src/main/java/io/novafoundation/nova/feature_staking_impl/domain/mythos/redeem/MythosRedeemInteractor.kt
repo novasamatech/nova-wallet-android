@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -33,7 +32,7 @@ interface MythosRedeemInteractor {
 
     suspend fun estimateFee(): Fee
 
-    suspend fun redeem(redeemAmount: Balance): Result<Pair<ExtrinsicExecutionResult, RedeemConsequences>>
+    suspend fun redeem(redeemAmount: Balance): Result<RedeemConsequences>
 }
 
 @FeatureScope
@@ -68,7 +67,7 @@ class RealMythosRedeemInteractor @Inject constructor(
         }
     }
 
-    override suspend fun redeem(redeemAmount: Balance): Result<Pair<ExtrinsicExecutionResult, RedeemConsequences>> {
+    override suspend fun redeem(redeemAmount: Balance): Result<RedeemConsequences> {
         val (chain, chainAsset) = stakingSharedState.chainAndAsset()
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val mythStakingFreezes = balanceLocksRepository.getMythosLocks(metaAccount.id, chainAsset)
@@ -79,7 +78,7 @@ class RealMythosRedeemInteractor @Inject constructor(
             .flattenDispatchFailure()
             .map {
                 val redeemedAll = mythStakingFreezes.total == redeemAmount
-                it to RedeemConsequences(willKillStash = redeemedAll)
+                RedeemConsequences(willKillStash = redeemedAll)
             }
     }
 }

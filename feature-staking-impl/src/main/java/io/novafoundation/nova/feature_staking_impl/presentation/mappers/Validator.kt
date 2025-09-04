@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createSubstrateAddressModel
+import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
@@ -50,7 +50,7 @@ suspend fun mapValidatorToValidatorModel(
 ) = mapValidatorToValidatorModel(
     chain = chain,
     validator = validator,
-    createIcon = { iconGenerator.createSubstrateAddressModel(it, ICON_SIZE_DP, validator.identity?.display, AddressIconGenerator.BACKGROUND_TRANSPARENT) },
+    createIcon = { iconGenerator.createAddressModel(it, ICON_SIZE_DP, validator.identity?.display, AddressIconGenerator.BACKGROUND_TRANSPARENT) },
     token = token,
     isChecked = isChecked,
     sorting = sorting

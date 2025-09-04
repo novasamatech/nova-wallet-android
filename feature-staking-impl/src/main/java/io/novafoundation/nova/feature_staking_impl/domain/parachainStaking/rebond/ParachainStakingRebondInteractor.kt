@@ -4,12 +4,10 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.calls.cancelDelegationRequest
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
-import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -26,7 +24,7 @@ interface ParachainStakingRebondInteractor {
         collatorId: AccountId
     ): BigInteger
 
-    suspend fun rebond(collatorId: AccountId): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
+    suspend fun rebond(collatorId: AccountId): Result<*>
 }
 
 class RealParachainStakingRebondInteractor(
@@ -52,7 +50,7 @@ class RealParachainStakingRebondInteractor(
         }
     }
 
-    override suspend fun rebond(collatorId: AccountId) = withContext(Dispatchers.IO) {
+    override suspend fun rebond(collatorId: AccountId): Result<*> = withContext(Dispatchers.IO) {
         extrinsicService.submitAndWatchExtrinsic(selectedAssetState.chain(), TransactionOrigin.SelectedWallet) {
             cancelDelegationRequest(collatorId)
         }.awaitInBlock()

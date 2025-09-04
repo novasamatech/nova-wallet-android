@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
@@ -55,7 +54,6 @@ class ConfirmChangeValidatorsModule {
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         hintsMixinFactory: ConfirmStakeHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmChangeValidatorsViewModel(
             router = router,
@@ -70,8 +68,7 @@ class ConfirmChangeValidatorsModule {
             selectedAssetState = singleAssetSharedState,
             validationExecutor = validationExecutor,
             walletUiUseCase = walletUiUseCase,
-            hintsMixinFactory = hintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 

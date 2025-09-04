@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets
 
+import android.database.sqlite.SQLiteConstraintException
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.BaseAddAccountRepository
@@ -59,7 +61,8 @@ abstract class SecretsAddAccountRepository<T>(
             accountSource = accountSource
         )
 
-        val metaId = transformingAccountInsertionErrors {
+        val metaId = transformingInsertionErrors {
+            @Suppress("DEPRECATION")
             accountDataSource.insertMetaAccountFromSecrets(
                 name = addAccountType.name,
                 substrateCryptoType = substrateCryptoType,
@@ -85,7 +88,8 @@ abstract class SecretsAddAccountRepository<T>(
             isEthereum = chain.isEthereumBased
         )
 
-        transformingAccountInsertionErrors {
+        transformingInsertionErrors {
+            @Suppress("DEPRECATION")
             accountDataSource.insertChainAccount(
                 metaId = addAccountType.metaId,
                 chain = chain,
@@ -95,5 +99,11 @@ abstract class SecretsAddAccountRepository<T>(
         }
 
         return AddAccountResult.AccountChanged(addAccountType.metaId, LightMetaAccount.Type.SECRETS)
+    }
+
+    private inline fun <R> transformingInsertionErrors(action: () -> R) = try {
+        action()
+    } catch (_: SQLiteConstraintException) {
+        throw AccountAlreadyExistsException()
     }
 }

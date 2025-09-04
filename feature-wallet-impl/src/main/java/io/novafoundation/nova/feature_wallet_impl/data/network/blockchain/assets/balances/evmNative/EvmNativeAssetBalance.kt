@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.evmNative
 
+import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
 import io.novafoundation.nova.core.ethereum.Web3Api
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -7,8 +8,7 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateNonLockableAsset
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdatePoint
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ethereum.sendSuspend
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -51,19 +51,28 @@ class EvmNativeAssetBalance(
         return BigInteger.ZERO
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
         val ethereumApi = chainRegistry.getCallEthereumApiOrThrow(chain.id)
 
         val balance = ethereumApi.getLatestNativeBalance(chain.addressOf(accountId))
-        return ChainAssetBalance.fromFree(chainAsset, balance)
+        return AccountBalance(
+            free = balance,
+            reserved = BigInteger.ZERO,
+            frozen = BigInteger.ZERO,
+        )
     }
 
-    override suspend fun subscribeAccountBalanceUpdatePoint(
+    override suspend fun subscribeTransferableAccountBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-    ): Flow<TransferableBalanceUpdatePoint> {
+        sharedSubscriptionBuilder: SharedRequestsBuilder?
+    ): Flow<TransferableBalanceUpdate> {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(

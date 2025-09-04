@@ -1,8 +1,8 @@
-package io.novafoundation.nova.feature_deep_linking.presentation.handling.common
+package io.novafoundation.nova.app.root.presentation.deepLinks.common
 
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.DAppHandlingException
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.ImportMnemonicHandlingException
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.ReferendumHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.DAppHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ImportMnemonicHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException.ReferendumHandlingException
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_deep_linking.R
 

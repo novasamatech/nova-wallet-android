@@ -108,7 +108,6 @@ fun mapMetaAccountTypeToLocal(local: LightMetaAccount.Type): MetaAccountLocal.Ty
         LightMetaAccount.Type.LEDGER -> MetaAccountLocal.Type.LEDGER_GENERIC
         LightMetaAccount.Type.POLKADOT_VAULT -> MetaAccountLocal.Type.POLKADOT_VAULT
         LightMetaAccount.Type.PROXIED -> MetaAccountLocal.Type.PROXIED
-        LightMetaAccount.Type.MULTISIG -> MetaAccountLocal.Type.MULTISIG
     }
 }
 
@@ -140,8 +139,9 @@ fun mapChainAccountFromLocal(chainAccountLocal: ChainAccountLocal): MetaAccount.
 fun mapProxyAccountFromLocal(proxyAccountLocal: ProxyAccountLocal): ProxyAccount {
     return with(proxyAccountLocal) {
         ProxyAccount(
-            proxyMetaId = proxyMetaId,
+            metaId = proxyMetaId,
             chainId = chainId,
+            proxiedAccountId = proxiedAccountId,
             proxyType = ProxyType.fromString(proxyType)
         )
     }

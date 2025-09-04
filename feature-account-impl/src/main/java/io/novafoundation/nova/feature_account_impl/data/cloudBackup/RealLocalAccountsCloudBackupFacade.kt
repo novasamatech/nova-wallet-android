@@ -111,7 +111,7 @@ class RealLocalAccountsCloudBackupFacade(
         val metaAccountsByUuid = getAllBackupableAccounts().associateBy { it.metaAccount.globallyUniqueId }
 
         val changesEvent = buildChangesEvent {
-            accountDao.runInTransaction {
+            accountDao.withTransaction {
                 addAll(applyLocalRemoval(localChangesToApply.removed, metaAccountsByUuid))
                 addAll(applyLocalAddition(localChangesToApply.added, cloudVersion))
                 addAll(
@@ -368,8 +368,7 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.WATCH_ONLY,
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
-            MetaAccountLocal.Type.PROXIED,
-            MetaAccountLocal.Type.MULTISIG -> baseSecrets.getSubstrateBackupSecrets()
+            MetaAccountLocal.Type.PROXIED -> baseSecrets.getSubstrateBackupSecrets()
         }
     }
 
@@ -395,8 +394,7 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.WATCH_ONLY,
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
-            MetaAccountLocal.Type.PROXIED,
-            MetaAccountLocal.Type.MULTISIG -> emptyList()
+            MetaAccountLocal.Type.PROXIED -> emptyList()
         }
     }
 
@@ -455,7 +453,7 @@ class RealLocalAccountsCloudBackupFacade(
     private fun CloudBackup.WalletPrivateInfo.getLocalMetaAccountSecrets(): EncodableStruct<MetaAccountSecrets>? {
         return MetaAccountSecrets(
             entropy = entropy,
-            substrateSeed = substrate?.seed,
+            seed = substrate?.seed,
             // Keypair is optional in backup since Ledger backup has base substrate derivation path but doesn't have keypair
             // MetaAccountSecrets, however, require substrateKeyPair to be non-null, so we return null here in case of null keypair
             // Which is a expected behavior in case of Ledger secrets
@@ -537,8 +535,7 @@ class RealLocalAccountsCloudBackupFacade(
             parentMetaId = null,
             isSelected = isSelected,
             position = accountPosition,
-            status = MetaAccountLocal.Status.ACTIVE,
-            typeExtras = null
+            status = MetaAccountLocal.Status.ACTIVE
         ).also {
             if (localIdOverwrite != null) {
                 it.id = localIdOverwrite
@@ -575,8 +572,7 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.LEDGER -> CloudBackup.WalletPublicInfo.Type.LEDGER
             MetaAccountLocal.Type.LEDGER_GENERIC -> CloudBackup.WalletPublicInfo.Type.LEDGER_GENERIC
             MetaAccountLocal.Type.POLKADOT_VAULT -> CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT
-
-            MetaAccountLocal.Type.PROXIED, MetaAccountLocal.Type.MULTISIG -> null
+            MetaAccountLocal.Type.PROXIED -> null
         }
     }
 

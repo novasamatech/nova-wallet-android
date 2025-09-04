@@ -1,6 +1,23 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 
 android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
     namespace 'io.novafoundation.nova.feature_wallet_api'
 
     buildFeatures {
@@ -20,7 +37,7 @@ dependencies {
 
     implementation daggerDep
     implementation project(':feature-xcm:api')
-    ksp daggerCompiler
+    kapt daggerKapt
 
     implementation substrateSdkDep
 

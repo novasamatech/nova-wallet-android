@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.startTimer
 import io.novafoundation.nova.runtime.R
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -28,15 +28,14 @@ fun ValidityPeriod.ended(): Boolean {
 
 interface ExtrinsicValidityUseCase {
 
-    suspend fun extrinsicValidityPeriod(payload: InheritedImplication): ValidityPeriod
+    suspend fun extrinsicValidityPeriod(payload: SignerPayloadExtrinsic): ValidityPeriod
 }
 
 internal class RealExtrinsicValidityUseCase(
     private val mortalityConstructor: MortalityConstructor
 ) : ExtrinsicValidityUseCase {
 
-    override suspend fun extrinsicValidityPeriod(payload: InheritedImplication): ValidityPeriod {
-        // TODO this should calculate remaining time based on Era from payload
+    override suspend fun extrinsicValidityPeriod(payload: SignerPayloadExtrinsic): ValidityPeriod {
         val timerValue = TimerValue(
             millis = mortalityConstructor.mortalPeriodMillis(),
             millisCalculatedAt = System.currentTimeMillis()

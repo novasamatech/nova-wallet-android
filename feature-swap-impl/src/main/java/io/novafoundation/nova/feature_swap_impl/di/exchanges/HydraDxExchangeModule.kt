@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuot
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.aave.AaveSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.omnipool.OmniPoolSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.HydraDxNovaReferral
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.referrals.RealHydraDxNovaReferral
@@ -36,12 +35,6 @@ class HydraDxExchangeModule {
     @IntoSet
     fun provideOmniPoolSourceFactory(): HydraDxSwapSource.Factory<*> {
         return OmniPoolSwapSourceFactory()
-    }
-
-    @Provides
-    @IntoSet
-    fun provideAaveSourceFactory(real: AaveSwapSourceFactory): HydraDxSwapSource.Factory<*> {
-        return real
     }
 
     @Provides

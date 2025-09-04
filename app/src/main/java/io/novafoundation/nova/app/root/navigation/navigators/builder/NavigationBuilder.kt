@@ -24,7 +24,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
  *   To attach the dialog to the RootNavigationHolder, call [navigateInRoot]
  * - In the latter case, we may need to add a screen that is strictly required to be opened on top of the split screen or only in the browser flow. (Such screens as entering a pin code).
  *   In this case, we need to add an action only to the root_navigation_graph
- *   To attach the fragment to the RootNavigationHolder, call [navigateInRoot]
+ *   To attach the the fragment to the RootNavigationHolder, call [navigateInRoot]
  **/
 abstract class NavigationBuilder(
     private val navigationHoldersRegistry: NavigationHoldersRegistry

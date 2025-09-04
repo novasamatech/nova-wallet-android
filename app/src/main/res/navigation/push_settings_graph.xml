@@ -12,14 +12,6 @@
         tools:layout="@layout/fragment_push_settings">
 
         <action
-            android:id="@+id/action_pushSettings_to_multisigSettings"
-            app:destination="@id/pushMultisigFragment"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit" />
-
-        <action
             android:id="@+id/action_pushSettings_to_governanceSettings"
             app:destination="@id/pushGovernanceFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -36,12 +28,6 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
     </fragment>
-
-    <fragment
-        android:id="@+id/pushMultisigFragment"
-        android:name="io.novafoundation.nova.feature_push_notifications.presentation.multisigs.PushMultisigSettingsFragment"
-        android:label="PushMultisigSettingsFragment"
-        tools:layout="@layout/fragment_push_multisig_settings" />
 
     <fragment
         android:id="@+id/pushGovernanceFragment"

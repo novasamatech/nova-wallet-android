@@ -1,24 +1,16 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap
 
 import com.google.gson.Gson
-import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
-import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.data.network.runtime.binding.orEmpty
+import io.novafoundation.nova.common.domain.balance.TransferableMode
+import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.filterNotNull
-import io.novafoundation.nova.common.utils.graph.Path
-import io.novafoundation.nova.common.utils.graph.WeightedEdge
-import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationAssetMetadataMap
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcher
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcherFactory
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.assetRegistry
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.assets
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalIdOptional
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.flatten
@@ -26,7 +18,6 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StablePool
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StablePoolAsset
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StableSwapPoolInfo
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StalbeSwapPoolPegInfo
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.quote
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
@@ -34,33 +25,30 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.common.utils.metadata
 import io.novasama.substrate_sdk_android.encrypt.json.asLittleEndianBytes
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
-import javax.inject.Inject
-import javax.inject.Named
-import io.novafoundation.nova.common.utils.combine as combine6
 
-@FeatureScope
-class StableSwapQuotingSourceFactory @Inject constructor(
-    @Named(REMOTE_STORAGE_SOURCE)
+class StableSwapQuotingSourceFactory(
     private val remoteStorageSource: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    private val hydrationBalanceFetcherFactory: HydrationBalanceFetcherFactory,
     private val gson: Gson,
 ) : HydraDxQuotingSource.Factory<StableSwapQuotingSource> {
 
@@ -73,7 +61,6 @@ class StableSwapQuotingSourceFactory @Inject constructor(
         return RealStableSwapQuotingSource(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
-            hydrationBalanceFetcher = hydrationBalanceFetcherFactory.create(host),
             chain = chain,
             gson = gson,
             host = host
@@ -84,7 +71,6 @@ class StableSwapQuotingSourceFactory @Inject constructor(
 private class RealStableSwapQuotingSource(
     private val remoteStorageSource: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    private val hydrationBalanceFetcher: HydrationBalanceFetcher,
     override val chain: Chain,
     private val gson: Gson,
     private val host: SwapQuoting.QuotingHost,
@@ -128,13 +114,10 @@ private class RealStableSwapQuotingSource(
 
         val omniPoolAccountId = omniPoolAccountId()
 
-        val allAssetIds = initialPoolsInfo.collectAllAssetIds()
-        val assetsMetadataMap = fetchAssetMetadataMap(allAssetIds)
-
         val poolSharedAssetBalanceSubscriptions = initialPoolsInfo.map { poolInfo ->
             val sharedAssetRemoteId = poolInfo.sharedAsset.first
 
-            subscribeTransferableBalance(subscriptionBuilder, omniPoolAccountId, sharedAssetRemoteId, assetsMetadataMap).map {
+            subscribeTransferableBalance(subscriptionBuilder, omniPoolAccountId, sharedAssetRemoteId).map {
                 sharedAssetRemoteId to it
             }
         }.toMultiSubscription(initialPoolsInfo.size)
@@ -145,7 +128,7 @@ private class RealStableSwapQuotingSource(
             val poolAccountId = stableSwapPoolAccountId(poolInfo.sharedAsset.first)
 
             poolInfo.poolAssets.map { poolAsset ->
-                subscribeTransferableBalance(subscriptionBuilder, poolAccountId, poolAsset.first, assetsMetadataMap).map {
+                subscribeTransferableBalance(subscriptionBuilder, poolAccountId, poolAsset.first).map {
                     val key = poolInfo.sharedAsset.first to poolAsset.first
                     key to it
                 }
@@ -160,24 +143,16 @@ private class RealStableSwapQuotingSource(
             }
         }.toMultiSubscription(initialPoolsInfo.size)
 
-        val pegsSubscriptions = initialPoolsInfo.map { poolInfo ->
-            remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
-                val poolId = poolInfo.sharedAsset.first
-                runtime.metadata.stableSwap.poolPegs.observe(poolId).map {
-                    poolId to it
-                }
-            }
-        }.toMultiSubscription(initialPoolsInfo.size)
+        val precisions = fetchAssetsPrecisionsAsync()
 
-        combine6(
+        combine(
             poolInfoSubscriptions,
             poolSharedAssetBalanceSubscriptions,
             poolParticipatingAssetsBalanceSubscription,
             totalIssuanceSubscriptions,
             host.sharedSubscriptions.blockNumber(chain.id),
-            pegsSubscriptions
-        ) { poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock, pegs ->
-            createStableSwapPool(poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock, assetsMetadataMap, pegs)
+        ) { poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock ->
+            createStableSwapPool(poolInfos, poolSharedAssetBalances, poolParticipatingAssetBalances, totalIssuances, currentBlock, precisions.await())
         }
             .onEach(stablePools::emit)
             .map { }
@@ -186,12 +161,14 @@ private class RealStableSwapQuotingSource(
     private suspend fun subscribeTransferableBalance(
         subscriptionBuilder: SharedRequestsBuilder,
         account: AccountId,
-        assetId: HydraDxAssetId,
-        assetMetadataMap: HydrationAssetMetadataMap,
+        assetId: HydraDxAssetId
     ): Flow<BigInteger> {
-        // In case token type was not possible to resolve - just return zero
-        val tokenType = assetMetadataMap.getAssetType(assetId) ?: return flowOf(BalanceOf.ZERO)
-        return hydrationBalanceFetcher.subscribeToTransferableBalance(chain.id, tokenType, account, subscriptionBuilder)
+        // We cant use AssetSource since it require Chain.Asset which might not always be present in case some stable pool assets are not yet in Nova configs
+        return remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
+            metadata.hydraTokens.accounts.observe(account, assetId).map {
+                TransferableMode.REGULAR.calculateTransferable(it.orEmpty())
+            }
+        }
     }
 
     private fun createStableSwapPool(
@@ -200,20 +177,19 @@ private class RealStableSwapQuotingSource(
         poolParticipatingAssetBalances: Map<Pair<HydraDxAssetId, HydraDxAssetId>, BigInteger>,
         totalIssuances: Map<HydraDxAssetId, BigInteger>,
         currentBlock: BlockNumber,
-        assetMetadataMap: HydrationAssetMetadataMap,
-        pegs: Map<HydraDxAssetId, StalbeSwapPoolPegInfo?>
+        precisions: Map<HydraDxAssetId, Int>
     ): List<StablePool> {
         return poolInfos.mapNotNull outer@{ (poolId, poolInfo) ->
             if (poolInfo == null) return@outer null
 
             val sharedAssetBalance = poolSharedAssetBalances[poolId].orZero()
-            val sharedChainAssetPrecision = assetMetadataMap.getDecimals(poolId) ?: return@outer null
+            val sharedChainAssetPrecision = precisions[poolId] ?: return@outer null
             val sharedAsset = StablePoolAsset(sharedAssetBalance, poolId, sharedChainAssetPrecision)
             val sharedAssetIssuance = totalIssuances[poolId].orZero()
 
             val pooledAssets = poolInfo.assets.mapNotNull { pooledAssetId ->
                 val pooledAssetBalance = poolParticipatingAssetBalances[poolId to pooledAssetId].orZero()
-                val decimals = assetMetadataMap.getDecimals(pooledAssetId) ?: return@mapNotNull null
+                val decimals = precisions[pooledAssetId] ?: return@mapNotNull null
 
                 StablePoolAsset(pooledAssetBalance, pooledAssetId, decimals)
             }
@@ -228,31 +204,16 @@ private class RealStableSwapQuotingSource(
                 fee = poolInfo.fee,
                 sharedAssetIssuance = sharedAssetIssuance,
                 gson = gson,
-                currentBlock = currentBlock,
-                pegs = pegs[poolId]?.current ?: StablePool.getDefaultPegs(pooledAssets.size)
+                currentBlock = currentBlock
             )
         }
     }
 
-    private fun Collection<PoolInitialInfo>.collectAllAssetIds(): List<HydraDxAssetId> {
-        return flatMap { pool ->
-            buildList {
-                add(pool.sharedAsset.first)
-
-                pool.poolAssets.onEach {
-                    add(it.first)
-                }
+    private fun CoroutineScope.fetchAssetsPrecisionsAsync(): Deferred<Map<HydraDxAssetId, Int>> {
+        return async {
+            remoteStorageSource.query(chain.id) {
+                metadata.assetRegistry.assetMetadataMap.entries().filterNotNull()
             }
-        }
-    }
-
-    private suspend fun fetchAssetMetadataMap(allAssetIds: List<HydraDxAssetId>): HydrationAssetMetadataMap {
-        return remoteStorageSource.query(chain.id) {
-            val assetMetadatas = metadata.assetRegistry.assets.multi(allAssetIds).filterNotNull()
-            HydrationAssetMetadataMap(
-                nativeId = hydraDxAssetIdConverter.systemAssetId,
-                metadataMap = assetMetadatas
-            )
         }
     }
 
@@ -324,9 +285,8 @@ private class RealStableSwapQuotingSource(
 
         override val to: FullChainAssetId = toAsset.second
 
-        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
-            return weightAppendingToPath(path, Weights.Hydra.STABLESWAP)
-        }
+        override val weight: Int
+            get() = Weights.Hydra.STABLESWAP
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = stablePools.first()

@@ -1,11 +1,7 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.utility
 
-import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
-import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -14,24 +10,24 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.TransferMode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.BaseAssetTransfers
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 class NativeAssetTransfers(
     chainRegistry: ChainRegistry,
@@ -42,16 +38,6 @@ class NativeAssetTransfers(
     private val storageDataSource: StorageDataSource,
     private val accountRepository: AccountRepository,
 ) : BaseAssetTransfers(chainRegistry, assetSourceRegistry, extrinsicServiceFactory, phishingValidationFactory, enoughTotalToStayAboveEDValidationFactory) {
-
-    companion object {
-
-        private const val TRANSFER_ALL = "transfer_all"
-        private const val TRANSFER = "transfer"
-        private const val TRANSFER_KEEP_ALIVE = "transfer_keep_alive"
-        private const val TRANSFER_ALLOW_DEATH = "transfer_allow_death"
-    }
-
-    private val parsableCalls = listOf(TRANSFER, TRANSFER_KEEP_ALIVE, TRANSFER_ALLOW_DEATH)
 
     override suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         val chain = chainRegistry.getChain(chainAsset.chainId)
@@ -66,15 +52,17 @@ class NativeAssetTransfers(
         return accountInfo != null && accountInfo.consumers.isZero
     }
 
-    override suspend fun parseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall? {
-        val isOurs = parsableCalls.any { call.instanceOf(Modules.BALANCES, it) }
-        if (!isOurs) return null
+    override fun totalCanDropBelowMinimumBalanceFlow(chainAsset: Chain.Asset): Flow<Boolean> {
+        return accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
+            val chain = chainRegistry.getChain(chainAsset.chainId)
 
-        val asset = chain.utilityAsset
-        val amount = bindNumber(call.arguments["value"])
-        val recipient = bindAccountIdentifier(call.arguments["dest"]).intoKey()
-
-        return TransferParsedFromCall(asset.withAmount(amount), recipient)
+            storageDataSource.observe(
+                chainAsset.chainId,
+                keyBuilder = { getAccountInfoStorageKey(metaAccount, chain, it) },
+                binder = { it, runtime -> it?.let { bindAccountInfo(it, runtime) } }
+            ).filterNotNull()
+                .map { it.consumers.isZero }
+        }
     }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
@@ -86,9 +74,9 @@ class NativeAssetTransfers(
     }
 
     override suspend fun transferFunctions(chainAsset: Chain.Asset) = listOf(
-        Modules.BALANCES to TRANSFER,
-        Modules.BALANCES to TRANSFER_ALLOW_DEATH,
-        Modules.BALANCES to TRANSFER_ALL
+        Modules.BALANCES to "transfer",
+        Modules.BALANCES to "transfer_allow_death",
+        Modules.BALANCES to "transfer_all"
     )
 
     private fun getAccountInfoStorageKey(metaAccount: MetaAccount, chain: Chain, runtime: RuntimeSnapshot): String {

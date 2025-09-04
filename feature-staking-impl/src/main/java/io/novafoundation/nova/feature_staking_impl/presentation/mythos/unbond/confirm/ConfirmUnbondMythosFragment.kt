@@ -4,6 +4,7 @@ import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -24,6 +25,8 @@ class ConfirmUnbondMythosFragment : BaseFragment<ConfirmUnbondMythosViewModel, F
     override fun createBinding() = FragmentMythosUnbondConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.mythosUnbondConfirmContainer.applyStatusBarInsets()
+
         binder.mythosUnbondConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.mythosUnbondConfirmExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }

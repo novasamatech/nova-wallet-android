@@ -6,7 +6,8 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.feature_account_api.view.showWallet
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -33,6 +34,8 @@ class ConfirmSendFragment : BaseFragment<ConfirmSendViewModel, FragmentConfirmSe
     override fun createBinding() = FragmentConfirmSendBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmSendContainer.applyStatusBarInsets()
+
         binder.confirmSendSender.setOnClickListener { viewModel.senderAddressClicked() }
         binder.confirmSendRecipient.setOnClickListener { viewModel.recipientAddressClicked() }
 

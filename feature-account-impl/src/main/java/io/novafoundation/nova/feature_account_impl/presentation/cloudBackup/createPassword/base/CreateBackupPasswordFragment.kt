@@ -4,6 +4,7 @@ import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setCompoundDrawableTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -21,6 +22,7 @@ abstract class CreateBackupPasswordFragment<T : BackupCreatePasswordViewModel> :
     abstract val subtitleRes: Int
 
     override fun initViews() {
+        binder.createCloudBackupPasswordToolbar.applyStatusBarInsets()
         binder.createCloudBackupPasswordToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.createBackupPasswordTitle.setText(titleRes)

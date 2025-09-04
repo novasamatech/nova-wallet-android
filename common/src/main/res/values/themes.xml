@@ -5,11 +5,12 @@
         <item name="colorAccent">@color/android_system_accent</item>
         <item name="colorPrimary">@color/android_system_accent</item>
 
+        <!--        <item name="android:windowTranslucentStatus">true</item>-->
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@drawable/bg_splash</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/secondary_screen_background</item>
 
         <!--text sizes-->
         <item name="textSizeH1">@dimen/text_size_h1</item>

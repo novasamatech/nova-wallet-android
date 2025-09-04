@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.star
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -27,7 +26,7 @@ interface StartParachainStakingInteractor {
 
     suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee
 
-    suspend fun delegate(amount: BigInteger, collator: AccountId): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
+    suspend fun delegate(amount: BigInteger, collator: AccountId): Result<ExtrinsicStatus.InBlock>
 
     suspend fun checkDelegationsLimit(delegatorState: DelegatorState): DelegationsLimit
 }
@@ -65,7 +64,7 @@ class RealStartParachainStakingInteractor(
         }
     }
 
-    override suspend fun delegate(amount: BigInteger, collator: AccountId) = withContext(Dispatchers.Default) {
+    override suspend fun delegate(amount: BigInteger, collator: AccountId): Result<ExtrinsicStatus.InBlock> = withContext(Dispatchers.Default) {
         runCatching {
             val (chain, chainAsset) = singleAssetSharedState.chainAndAsset()
             val metaAccount = accountRepository.getSelectedMetaAccount()
@@ -89,8 +88,7 @@ class RealStartParachainStakingInteractor(
                         delegationCount = currentDelegationState.delegationsCount.toBigInteger()
                     )
                 }
-            }.awaitInBlock()
-                .getOrThrow()
+            }.awaitInBlock().getOrThrow()
         }
     }
 

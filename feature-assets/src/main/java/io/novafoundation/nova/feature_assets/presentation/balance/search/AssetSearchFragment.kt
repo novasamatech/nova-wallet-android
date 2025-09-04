@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.search
 
-import android.view.View
 import androidx.lifecycle.lifecycleScope
+
 import coil.ImageLoader
-import io.novafoundation.nova.common.base.BaseFragment
+import dev.chrisbanes.insetter.applyInsetter
+import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -27,7 +27,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 
 class AssetSearchFragment :
-    BaseFragment<AssetSearchViewModel, FragmentAssetSearchBinding>(),
+    BaseBottomSheetFragment<AssetSearchViewModel, FragmentAssetSearchBinding>(),
     BalanceListAdapter.ItemAssetHandler {
 
     override fun createBinding() = FragmentAssetSearchBinding.inflate(layoutInflater)
@@ -39,12 +39,14 @@ class AssetSearchFragment :
         BalanceListAdapter(imageLoader, this)
     }
 
-    override fun applyInsets(rootView: View) {
-        binder.searchAssetSearch.applyStatusBarInsets()
-        binder.searchAssetList.applyNavigationBarInsets(imeInsets = true)
-    }
-
     override fun initViews() {
+        binder.searchAssetSearch.applyStatusBarInsets()
+        binder.searchAssetContainer.applyInsetter {
+            type(ime = true) {
+                padding()
+            }
+        }
+
         binder.searchAssetList.setHasFixedSize(true)
         binder.searchAssetList.adapter = assetsAdapter
 

@@ -93,8 +93,7 @@ fun LegacyCrossChainTransfersConfiguration.transferConfiguration(
         destinationChainLocation = destinationLocation(originChain, destinationXcmChain.parachainId),
         destinationFee = destinationFee,
         reserveFee = reserveFee,
-        transferType = destination.type,
-        originChainAsset = originAsset
+        transferType = destination.type
     )
 }
 

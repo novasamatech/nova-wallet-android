@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_versions_impl.data
 
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotification
 import io.novafoundation.nova.feature_versions_api.domain.Version
 import io.novafoundation.nova.feature_versions_api.domain.toUnderscoreString
@@ -131,7 +130,7 @@ class RealVersionRepository(
 
     @Suppress("DEPRECATION")
     private fun getAppVersion(): Version {
-        return appVersionProvider.versionName.toVersion()
+        return appVersionProvider.getCurrentVersionName().toVersion()
     }
 
     private fun String.toVersion(): Version {

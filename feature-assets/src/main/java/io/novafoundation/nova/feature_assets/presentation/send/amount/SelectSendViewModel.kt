@@ -534,13 +534,13 @@ class SelectSendViewModel(
         }
     }
 
-    private suspend fun getMetaAccountsFilter(origin: Chain, destination: Chain): SelectAddressAccountFilter {
-        val isCrossChain = origin.id != destination.id
+    private suspend fun getMetaAccountsFilter(origin: Chain, desination: Chain): SelectAddressAccountFilter {
+        val isCrossChain = origin.id != desination.id
 
         return if (isCrossChain) {
             SelectAddressAccountFilter.Everything()
         } else {
-            val destinationAccountId = selectedAccount.first().requireAccountIdIn(destination)
+            val destinationAccountId = selectedAccount.first().requireAccountIdIn(desination)
             val notOriginMetaAccounts = accountRepository.getActiveMetaAccounts()
                 .filter { it.accountIdIn(origin)?.intoKey() == destinationAccountId.intoKey() }
                 .map { it.id }

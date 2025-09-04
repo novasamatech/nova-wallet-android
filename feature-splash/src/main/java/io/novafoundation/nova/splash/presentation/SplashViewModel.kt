@@ -2,15 +2,13 @@ package io.novafoundation.nova.splash.presentation
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.splash.SplashRouter
 import kotlinx.coroutines.launch
 
 class SplashViewModel(
     private val router: SplashRouter,
-    private val repository: AccountRepository,
-    private val splashPassedObserver: SplashPassedObserver
+    private val repository: AccountRepository
 ) : BaseViewModel() {
 
     fun openInitialDestination() {
@@ -20,8 +18,6 @@ class SplashViewModel(
             } else {
                 openWelcomeScreen()
             }
-
-            splashPassedObserver.setSplashPassed()
         }
     }
 

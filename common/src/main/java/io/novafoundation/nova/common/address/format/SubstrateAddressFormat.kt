@@ -15,6 +15,10 @@ class SubstrateAddressFormat private constructor(
 
     companion object {
 
+        fun generic(): SubstrateAddressFormat {
+            return SubstrateAddressFormat(addressPrefix = null)
+        }
+
         fun forSS58rPrefix(prefix: Short): SubstrateAddressFormat {
             return SubstrateAddressFormat(prefix)
         }

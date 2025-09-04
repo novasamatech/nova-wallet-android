@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZe
 import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncompatible
 import io.novafoundation.nova.common.data.network.runtime.binding.incompatible
 import io.novafoundation.nova.common.utils.ComponentHolder
-import io.novafoundation.nova.common.utils.RuntimeContext
 import io.novafoundation.nova.common.utils.createStorageKey
 import io.novafoundation.nova.common.utils.mapValuesNotNull
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -134,13 +133,13 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): V {
-        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
         val scaleResult = queryKey(storageKey, at)
         return decodeStorageValue(scaleResult, binding)
     }
 
     override suspend fun StorageEntry.queryRaw(vararg keyArguments: Any?): String? {
-        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
 
         return queryKey(storageKey, at)
     }
@@ -149,7 +148,7 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<V> {
-        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
 
         return observeKey(storageKey).map { storageUpdate ->
             decodeStorageValue(storageUpdate.value, binding)
@@ -160,7 +159,7 @@ abstract class BaseStorageQueryContext(
         vararg keyArguments: Any?,
         binding: DynamicInstanceBinder<V>
     ): Flow<WithRawValue<V>> {
-        val storageKey = createStorageKeyFromArrayArgs(keyArguments)
+        val storageKey = createStorageKey(keyArguments)
 
         return observeKey(storageKey).map { storageUpdate ->
             val decoded = decodeStorageValue(storageUpdate.value, binding)
@@ -177,12 +176,12 @@ abstract class BaseStorageQueryContext(
     override fun <K, V> StorageEntry.observe(
         keysArguments: List<List<Any?>>,
         keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V?>
-    ): Flow<Map<K, V?>> {
+        binding: DynamicInstanceBinderWithKey<K, V>
+    ): Flow<Map<K, V>> {
         val storageKeys = storageKeys(runtime, keysArguments)
 
         return observeKeys(storageKeys).map { valuesByKey ->
-            applyMappersToEntriesNullable(
+            applyMappersToEntries(
                 entries = valuesByKey,
                 storageEntry = this,
                 keyExtractor = keyExtractor,
@@ -243,33 +242,6 @@ abstract class BaseStorageQueryContext(
                 null
             }
         }
-    }
-
-    private fun <K, V> applyMappersToEntriesNullable(
-        entries: Map<String, String?>,
-        storageEntry: StorageEntry,
-        keyExtractor: (StorageKeyComponents) -> K,
-        binding: DynamicInstanceBinderWithKey<K, V>,
-    ): Map<K, V?> {
-        val returnType = storageEntry.type.value ?: incompatible()
-
-        return entries.mapKeys { (key, _) ->
-            val keyComponents = ComponentHolder(storageEntry.splitKey(runtime, key))
-
-            keyExtractor(keyComponents)
-        }.mapValues { (key, value) ->
-            try {
-                val decoded = value?.let { returnType.fromHexOrIncompatible(value, runtime) }
-                binding(decoded, key)
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
-
-    context(RuntimeContext)
-    private fun StorageEntry.createStorageKeyFromArrayArgs(keyArguments: Array<out Any?>): String {
-        return createStorageKey(*keyArguments)
     }
 
     protected class StorageUpdate(

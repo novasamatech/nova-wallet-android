@@ -4,9 +4,7 @@ import io.novafoundation.nova.common.utils.MultiMapList
 
 data class SimpleEdge<N>(override val from: N, override val to: N) : WeightedEdge<N> {
 
-    override fun weightForAppendingTo(path: Path<WeightedEdge<N>>): Int {
-        return 1
-    }
+    override val weight: Int = 1
 }
 
 typealias SimpleGraph<N> = Graph<N, SimpleEdge<N>>

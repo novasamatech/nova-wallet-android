@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.staking.redeem
 
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.numberOfSlashingSpans
@@ -27,12 +26,12 @@ class RedeemInteractor(
         }
     }
 
-    suspend fun redeem(stakingState: StakingState.Stash, asset: Asset): Result<Pair<ExtrinsicSubmission, RedeemConsequences>> {
+    suspend fun redeem(stakingState: StakingState.Stash, asset: Asset): Result<RedeemConsequences> {
         return withContext(Dispatchers.IO) {
             extrinsicService.submitExtrinsic(stakingState.chain, stakingState.controllerTransactionOrigin()) {
                 withdrawUnbonded(getSlashingSpansNumber(stakingState))
             }.map {
-                it to RedeemConsequences(willKillStash = asset.isRedeemingAll())
+                RedeemConsequences(willKillStash = asset.isRedeemingAll())
             }
         }
     }

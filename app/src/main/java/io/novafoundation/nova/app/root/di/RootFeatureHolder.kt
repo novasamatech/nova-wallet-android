@@ -11,10 +11,8 @@ import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -23,10 +21,8 @@ import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
-import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
@@ -42,7 +38,6 @@ class RootFeatureHolder @Inject constructor(
     private val dAppRouter: DAppRouter,
     private val accountRouter: AccountRouter,
     private val assetsRouter: AssetsRouter,
-    private val stakingRouter: StakingRouter,
     private val stakingDashboardNavigator: StakingDashboardNavigator,
     private val delayedNavRouter: DelayedNavigationRouter,
     featureContainer: FeatureContainer
@@ -66,10 +61,6 @@ class RootFeatureHolder @Inject constructor(
             .pushNotificationsFeatureApi(getFeature(PushNotificationsFeatureApi::class.java))
             .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .ledgerFeatureApi(getFeature(LedgerFeatureApi::class.java))
-            .buyFeatureApi(getFeature(BuyFeatureApi::class.java))
-            .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
-            .accountMigrationFeatureApi(getFeature(AccountMigrationFeatureApi::class.java))
-            .multisigOperationsFeatureApi(getFeature(MultisigOperationsFeatureApi::class.java))
             .build()
 
         return DaggerRootComponent.factory()
@@ -81,7 +72,6 @@ class RootFeatureHolder @Inject constructor(
                 dAppRouter,
                 assetsRouter,
                 accountRouter,
-                stakingRouter,
                 stakingDashboardNavigator,
                 delayedNavRouter,
                 rootFeatureDependencies

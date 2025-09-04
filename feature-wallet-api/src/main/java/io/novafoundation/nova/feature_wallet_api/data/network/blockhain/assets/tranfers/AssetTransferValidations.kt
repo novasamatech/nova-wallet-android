@@ -76,8 +76,6 @@ sealed class AssetTransferValidationFailure {
     ) : AssetTransferValidationFailure(), FeeChangeDetectedFailure<SubmissionFee>
 
     object RecipientIsSystemAccount : AssetTransferValidationFailure()
-
-    object DryRunFailed : AssetTransferValidationFailure()
 }
 
 data class AssetTransferPayload(

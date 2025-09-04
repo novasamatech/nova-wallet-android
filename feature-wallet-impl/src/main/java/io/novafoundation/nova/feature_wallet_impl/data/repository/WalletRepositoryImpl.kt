@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.SubstrateRemoteSource
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -40,6 +41,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 class WalletRepositoryImpl(
+    private val substrateSource: SubstrateRemoteSource,
     private val operationDao: OperationDao,
     private val phishingApi: PhishingApi,
     private val accountRepository: AccountRepository,
@@ -206,6 +208,9 @@ class WalletRepositoryImpl(
 
         phishingAddresses.contains(accountId.toHexString(withPrefix = true))
     }
+
+    override suspend fun getAccountFreeBalance(chainId: ChainId, accountId: AccountId) =
+        substrateSource.getAccountInfo(chainId, accountId).data.free
 
     private fun createAppOperation(
         hash: String,

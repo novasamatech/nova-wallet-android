@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_external_sign_impl.ExternalSignRouter
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.evm.EvmSignInteractorFactory
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot.PolkadotSignInteractorFactory
-import io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic.ExternalSignViewModel
+import io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic.ExternaSignViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class])
@@ -39,13 +39,13 @@ class ExternalSignModule {
 
     @Provides
     @ScreenScope
-    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): ExternalSignViewModel {
-        return ViewModelProvider(fragment, factory).get(ExternalSignViewModel::class.java)
+    internal fun provideViewModel(fragment: Fragment, factory: ViewModelProvider.Factory): ExternaSignViewModel {
+        return ViewModelProvider(fragment, factory).get(ExternaSignViewModel::class.java)
     }
 
     @Provides
     @IntoMap
-    @ViewModelKey(ExternalSignViewModel::class)
+    @ViewModelKey(ExternaSignViewModel::class)
     fun provideViewModel(
         router: ExternalSignRouter,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
@@ -57,7 +57,7 @@ class ExternalSignModule {
         resourceManager: ResourceManager,
         actionAwaitableMixin: ActionAwaitableMixin.Factory
     ): ViewModel {
-        return ExternalSignViewModel(
+        return ExternaSignViewModel(
             router = router,
             interactor = interactor,
             feeLoaderMixinV2Factory = feeLoaderMixinFactory,

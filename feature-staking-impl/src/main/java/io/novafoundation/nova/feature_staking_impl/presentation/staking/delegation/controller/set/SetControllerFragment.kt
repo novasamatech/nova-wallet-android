@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.delegat
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.account.chooser.AccountChooserBottomSheetDialog
@@ -17,6 +18,8 @@ class SetControllerFragment : BaseFragment<SetControllerViewModel, FragmentSetCo
     override fun createBinding() = FragmentSetControllerAccountBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmSetControllerContainer.applyStatusBarInsets()
+
         binder.setControllerContinue.setOnClickListener { viewModel.continueClicked() }
         binder.setControllerContinue.prepareForProgress(viewLifecycleOwner)
 

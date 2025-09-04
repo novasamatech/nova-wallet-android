@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.singleSe
 
 import android.widget.ImageView
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
@@ -23,6 +24,8 @@ abstract class SingleSelectChooseTargetFragment<T, V : SingleSelectChooseTargetV
     private var filterAction: ImageView? = null
 
     override fun initViews() {
+        binder.selectCollatorContainer.applyStatusBarInsets()
+
         binder.selectCollatorList.adapter = adapter
         binder.selectCollatorList.setHasFixedSize(true)
         binder.selectCollatorList.itemAnimator = null

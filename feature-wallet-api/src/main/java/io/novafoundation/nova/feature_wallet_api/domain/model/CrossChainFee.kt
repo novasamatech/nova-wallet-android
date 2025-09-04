@@ -15,12 +15,12 @@ class CrossChainTransferFee(
      * Deducted upon initial transaction submission from the origin chain. Cannot be controlled with [FeePaymentCurrency]
      * and is always paid in native currency
      */
-    val postSubmissionByAccount: SubmissionFee?,
+    val deliveryFee: SubmissionFee?,
 
     /**
      *  Total sum of all execution and delivery fees paid from holding register throughout xcm transfer
      *  Paid (at the moment) in a sending asset. There might be multiple [Chain.Asset] that represent the same logical asset,
      *  the asset here indicates the first one, on the origin chain
      */
-    val postSubmissionFromAmount: FeeBase,
+    val executionFee: FeeBase,
 )

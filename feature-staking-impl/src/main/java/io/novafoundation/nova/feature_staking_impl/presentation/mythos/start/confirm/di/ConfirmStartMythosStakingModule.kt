@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -55,7 +54,6 @@ class ConfirmStartMythosStakingModule {
         stakingBlockNumberUseCase: StakingBlockNumberUseCase,
         mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
         interactor: StartMythosStakingInteractor,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmStartMythosStakingViewModel(
             mythosRouter = mythosRouter,
@@ -75,8 +73,7 @@ class ConfirmStartMythosStakingModule {
             validationSystem = validationSystem,
             stakingBlockNumberUseCase = stakingBlockNumberUseCase,
             mythosStakingValidationFailureFormatter = mythosStakingValidationFailureFormatter,
-            interactor = interactor,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            interactor = interactor
         )
     }
 

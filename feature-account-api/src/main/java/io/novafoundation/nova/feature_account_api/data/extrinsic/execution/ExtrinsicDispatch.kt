@@ -2,14 +2,12 @@ package io.novafoundation.nova.feature_account_api.data.extrinsic.execution
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
-import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
 
 data class ExtrinsicExecutionResult(
     val extrinsicHash: String,
     val blockHash: BlockHash,
-    val outcome: ExtrinsicDispatch,
-    val submissionHierarchy: SubmissionHierarchy
+    val outcome: ExtrinsicDispatch
 )
 
 sealed interface ExtrinsicDispatch {
@@ -21,20 +19,16 @@ sealed interface ExtrinsicDispatch {
     object Unknown : ExtrinsicDispatch
 }
 
-fun ExtrinsicExecutionResult.requireOk(): ExtrinsicExecutionResult {
+fun ExtrinsicExecutionResult.requireOk(): ExtrinsicDispatch.Ok {
     return when (outcome) {
         is ExtrinsicDispatch.Failed -> throw outcome.error
-        is ExtrinsicDispatch.Ok -> this
+        is ExtrinsicDispatch.Ok -> outcome
         ExtrinsicDispatch.Unknown -> throw IllegalArgumentException("Unknown extrinsic execution result")
     }
 }
 
 fun Result<ExtrinsicExecutionResult>.flattenDispatchFailure(): Result<ExtrinsicDispatch.Ok> {
     return mapCatching { it.requireOk() }
-}
-
-fun ExtrinsicExecutionResult.requireOutcomeOk(): ExtrinsicDispatch.Ok {
-    return requireOk().outcome as ExtrinsicDispatch.Ok
 }
 
 fun ExtrinsicDispatch.isOk(): Boolean {

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.showLoadingState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -16,6 +17,8 @@ class MythosRedeemFragment : BaseFragment<MythosRedeemViewModel, FragmentMythosR
     override fun createBinding() = FragmentMythosRedeemBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.mythosRedeemContainer.applyStatusBarInsets()
+
         binder.mythosRedeemToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.mythosRedeemExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }

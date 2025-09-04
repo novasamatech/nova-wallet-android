@@ -13,8 +13,6 @@ interface PageCallback {
     fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean
 
     fun onPageChanged(webView: WebView, url: String?, title: String?)
-
-    fun onPageFinished(view: WebView, url: String?)
 }
 
 class Web3WebViewClient(
@@ -49,10 +47,6 @@ class Web3WebViewClient(
             webView.changeUserAgentByDesktopMode(desktopMode)
             desktopModeChanged = false
         }
-    }
-
-    override fun onPageFinished(view: WebView, url: String?) {
-        pageCallback.onPageFinished(view, url)
     }
 
     override fun doUpdateVisitedHistory(view: WebView, url: String, isReload: Boolean) {

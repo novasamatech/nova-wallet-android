@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -29,6 +30,8 @@ class ConfirmPayoutFragment : BaseFragment<ConfirmPayoutViewModel, FragmentConfi
     override fun createBinding() = FragmentConfirmPayoutBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmPayoutContainer.applyStatusBarInsets()
+
         binder.confirmPayoutConfirm.setOnClickListener { viewModel.submitClicked() }
         binder.confirmPayoutConfirm.prepareForProgress(viewLifecycleOwner)
 

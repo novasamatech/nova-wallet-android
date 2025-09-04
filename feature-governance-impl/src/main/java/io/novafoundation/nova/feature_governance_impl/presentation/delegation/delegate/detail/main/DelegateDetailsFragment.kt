@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -46,6 +47,7 @@ class DelegateDetailsFragment : BaseFragment<DelegateDetailsViewModel, FragmentD
     lateinit var imageLoader: ImageLoader
 
     override fun initViews() {
+        binder.delegateDetailsToolbar.applyStatusBarInsets()
         binder.delegateDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.delegateDetailsDelegations.setOnClickListener { viewModel.delegationsClicked() }

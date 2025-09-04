@@ -5,6 +5,7 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.postToUiThread
 import io.novafoundation.nova.common.utils.setSelectionEnd
@@ -38,6 +39,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
     override fun createBinding() = FragmentMainSwapSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.swapMainSettingsToolbar.applyStatusBarInsets()
         binder.swapMainSettingsContinue.prepareForProgress(this)
         binder.swapMainSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.swapMainSettingsToolbar.setRightActionClickListener { viewModel.openOptions() }

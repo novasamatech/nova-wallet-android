@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.onLoaded
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.scrollToTopWhenItemsShuffled
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -42,6 +43,8 @@ class SelectPoolFragment : BaseFragment<SelectPoolViewModel, FragmentSelectPoolB
     }
 
     override fun initViews() {
+        binder.selectPoolToolbar.applyStatusBarInsets()
+
         binder.selectPoolToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.selectPoolToolbar.addCustomAction(R.drawable.ic_search) {
             viewModel.searchClicked()

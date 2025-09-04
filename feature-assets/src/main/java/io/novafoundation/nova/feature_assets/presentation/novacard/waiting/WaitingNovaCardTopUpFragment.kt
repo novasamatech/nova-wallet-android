@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.novacard.waiting
 
-import android.content.DialogInterface
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.startTimer
@@ -15,13 +14,8 @@ class WaitingNovaCardTopUpFragment : BaseBottomSheetFragment<WaitingNovaCardTopU
 
     override fun initViews() {
         dialog?.setCanceledOnTouchOutside(false)
+        isCancelable = false
         getBehaviour().isHideable = false
-    }
-
-    override fun onCancel(dialog: DialogInterface) {
-        viewModel.onScreenCancelled()
-
-        super.onCancel(dialog)
     }
 
     override fun inject() {

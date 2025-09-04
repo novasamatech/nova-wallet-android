@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
 import io.novafoundation.nova.feature_assets.databinding.FragmentTopUpAddressBinding
@@ -20,6 +21,8 @@ class TopUpAddressFragment : BaseFragment<TopUpAddressViewModel, FragmentTopUpAd
     override fun createBinding() = FragmentTopUpAddressBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.topUpAddressContainer.applyStatusBarInsets(false)
+
         binder.topUpAddressToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.topUpAddressContinue.prepareForProgress(viewLifecycleOwner)

@@ -41,11 +41,10 @@ internal class RealBlockDurationEstimator(
     private val blockTimeMillis: BigInteger
 ) : BlockDurationEstimator {
 
-    private val createdAt = System.currentTimeMillis()
-
     override fun durationUntil(block: BlockNumber): Duration {
         val blocksInFuture = block - currentBlock
-        return (durationOf(blocksInFuture) - timePassedSinceCreated()).coerceAtLeast(Duration.ZERO)
+
+        return durationOf(blocksInFuture)
     }
 
     override fun durationOf(blocks: BlockNumber): Duration {
@@ -60,17 +59,14 @@ internal class RealBlockDurationEstimator(
         val offsetInBlocks = block - currentBlock
         val offsetInMillis = offsetInBlocks * blockTimeMillis
 
-        return createdAt + offsetInMillis.toLong()
+        val currentTime = System.currentTimeMillis()
+
+        return currentTime + offsetInMillis.toLong()
     }
 
     override fun blockInFuture(duration: Duration): BlockNumber {
-        val totalInTheFuture = duration + timePassedSinceCreated()
-        val offsetInBlocks = totalInTheFuture.inWholeMilliseconds.toBigInteger() / blockTimeMillis
+        val offsetInBlocks = duration.inWholeMilliseconds.toBigInteger() / blockTimeMillis
 
         return currentBlock + offsetInBlocks
-    }
-
-    private fun timePassedSinceCreated(): Duration {
-        return (System.currentTimeMillis() - createdAt).milliseconds
     }
 }

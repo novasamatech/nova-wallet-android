@@ -4,7 +4,6 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.PushSettingsCacheV1
-import io.novafoundation.nova.feature_push_notifications.data.settings.model.PushSettingsCacheV2
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.VersionedPushSettingsCache
 import io.novafoundation.nova.feature_push_notifications.data.settings.model.toCache
 import io.novafoundation.nova.feature_push_notifications.domain.model.PushSettings
@@ -24,7 +23,8 @@ class RealPushSettingsProvider(
             ?.let {
                 gson.fromJson(it, VersionedPushSettingsCache::class.java)
                     .toPushSettings()
-            } ?: getDefaultPushSettings()
+            }
+            ?: getDefaultPushSettings()
     }
 
     override suspend fun getDefaultPushSettings(): PushSettings {
@@ -34,8 +34,7 @@ class RealPushSettingsProvider(
             receivedTokensEnabled = true,
             subscribedMetaAccounts = setOf(accountRepository.getSelectedMetaAccount().id),
             stakingReward = PushSettings.ChainFeature.All,
-            governance = emptyMap(),
-            multisigs = PushSettings.MultisigsState.disabled()
+            governance = emptyMap()
         )
     }
 
@@ -58,7 +57,7 @@ class RealPushSettingsProvider(
         return prefs.booleanFlow(PREFS_PUSH_NOTIFICATIONS_ENABLED, false)
     }
 
-    fun PushSettingsCacheV2.toVersionedPushSettingsCache(): VersionedPushSettingsCache {
+    fun PushSettingsCacheV1.toVersionedPushSettingsCache(): VersionedPushSettingsCache {
         return VersionedPushSettingsCache(
             version = version,
             settings = gson.toJson(this)
@@ -66,10 +65,7 @@ class RealPushSettingsProvider(
     }
 
     fun VersionedPushSettingsCache.toPushSettings(): PushSettings {
-        return when (version) {
-            PushSettingsCacheV1.VERSION -> gson.fromJson(settings, PushSettingsCacheV1::class.java)
-            PushSettingsCacheV2.VERSION -> gson.fromJson(settings, PushSettingsCacheV2::class.java)
-            else -> throw IllegalStateException("Unknown push settings version: $version")
-        }.toPushSettings()
+        return gson.fromJson(settings, PushSettingsCacheV1::class.java) // Currently we always use V1 version
+            .toPushSettings()
     }
 }

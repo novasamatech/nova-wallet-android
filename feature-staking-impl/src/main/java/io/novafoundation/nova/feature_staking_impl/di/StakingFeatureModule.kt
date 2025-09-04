@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -15,15 +14,14 @@ import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
-import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.proxy.ProxySyncService
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
@@ -67,6 +65,8 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.RealStakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
+import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.DirectStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
@@ -74,15 +74,11 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
 import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
-import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureModule.BindsModule
-import io.novafoundation.nova.feature_staking_impl.di.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
-import io.novafoundation.nova.feature_staking_impl.domain.common.RealStakingHoldsMigrationUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.common.StakingHoldsMigrationUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -94,6 +90,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.Valida
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
@@ -139,15 +136,8 @@ import javax.inject.Named
 const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
 const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
-@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class, BindsModule::class])
+@Module(includes = [AssetUseCaseModule::class])
 class StakingFeatureModule {
-
-    @Module
-    interface BindsModule {
-
-        @Binds
-        fun bindHoldsMigrationUseCase(real: RealStakingHoldsMigrationUseCase): StakingHoldsMigrationUseCase
-    }
 
     @Provides
     @FeatureScope
@@ -182,10 +172,15 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideStakingStoriesDataSource(): StakingStoriesDataSource = StakingStoriesDataSourceImpl()
+
+    @Provides
+    @FeatureScope
     fun provideStakingRepository(
         accountStakingDao: AccountStakingDao,
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        stakingStoriesDataSource: StakingStoriesDataSource,
         walletConstants: WalletConstants,
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
@@ -194,6 +189,7 @@ class StakingFeatureModule {
         accountStakingDao = accountStakingDao,
         remoteStorage = remoteStorageSource,
         localStorage = localStorageSource,
+        stakingStoriesDataSource = stakingStoriesDataSource,
         walletConstants = walletConstants,
         chainRegistry = chainRegistry,
         storageCache = storageCache,
@@ -513,6 +509,13 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideBondMoreInteractor(
+        sharedState: StakingSharedState,
+        extrinsicService: ExtrinsicService,
+    ) = BondMoreInteractor(extrinsicService, sharedState)
+
+    @Provides
+    @FeatureScope
     fun provideRedeemInteractor(
         extrinsicService: ExtrinsicService,
         stakingRepository: StakingRepository,
@@ -660,16 +663,14 @@ class StakingFeatureModule {
         proxyDepositCalculator: ProxyDepositCalculator,
         getProxyRepository: GetProxyRepository,
         proxyConstantsRepository: ProxyConstantsRepository,
-        externalAccountsSyncService: ExternalAccountsSyncService,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        proxySyncService: ProxySyncService
     ): AddStakingProxyInteractor {
         return RealAddStakingProxyInteractor(
             extrinsicService,
             proxyDepositCalculator,
             getProxyRepository,
             proxyConstantsRepository,
-            externalAccountsSyncService,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            proxySyncService
         )
     }
 
@@ -687,10 +688,10 @@ class StakingFeatureModule {
     @FeatureScope
     fun removeStakingProxyInteractor(
         extrinsicService: ExtrinsicService,
-        externalAccountsSyncService: ExternalAccountsSyncService,
+        proxySyncService: ProxySyncService
     ): RemoveStakingProxyInteractor = RealRemoveStakingProxyInteractor(
-        extrinsicService = extrinsicService,
-        externalAccountsSyncService = externalAccountsSyncService
+        extrinsicService,
+        proxySyncService
     )
 
     @Provides

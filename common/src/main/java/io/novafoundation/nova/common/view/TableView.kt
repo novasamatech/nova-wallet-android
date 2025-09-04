@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.Rect
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
@@ -22,13 +20,8 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
-import kotlin.math.roundToInt
 
 private const val SHOW_BACKGROUND_DEAULT = true
-private const val DRAW_DIVIDERS_DEAULT = false
-
-private const val PADDING_HORIZONTAL_DP = 16
-private const val PADDING_VERTICAL_DP = 4
 
 open class TableView @JvmOverloads constructor(
     context: Context,
@@ -45,10 +38,6 @@ open class TableView @JvmOverloads constructor(
     private val dividerPath = Path()
 
     private var showBackground: Boolean = SHOW_BACKGROUND_DEAULT
-
-    private var drawDividers: Boolean = DRAW_DIVIDERS_DEAULT
-
-    private var childrenPadding = Rect()
 
     init {
         orientation = VERTICAL
@@ -91,7 +80,7 @@ open class TableView @JvmOverloads constructor(
         dividerPath.reset()
         children.forEachIndexed { idx, child ->
             val isVisible = child.isVisible
-            val allowsToDrawDividers = shouldDrawDivider(child)
+            val allowsToDrawDividers = child is TableItem && child.shouldDrawDivider()
             val hasNext = idx < childCount - 1
 
             if (isVisible && allowsToDrawDividers && hasNext) {
@@ -99,16 +88,6 @@ open class TableView @JvmOverloads constructor(
                 dividerPath.lineTo(measuredWidth - childHorizontalPadding, child.bottom.toFloat())
             }
         }
-    }
-
-    private fun shouldDrawDivider(child: View) = when {
-        child is TableItem && !child.shouldDrawDivider() -> false
-        child is TableItem && child.shouldDrawDivider() -> true
-        else -> drawDividers
-    }
-
-    fun invalidateChildrenVisibility() {
-        setupTableChildrenAppearance()
     }
 
     fun setTitle(title: String?) {
@@ -127,13 +106,6 @@ open class TableView @JvmOverloads constructor(
 
     private fun noAttrsInit() {
         setTitle(null)
-
-        childrenPadding.set(
-            PADDING_HORIZONTAL_DP.dp,
-            PADDING_VERTICAL_DP.dp,
-            PADDING_HORIZONTAL_DP.dp,
-            PADDING_VERTICAL_DP.dp,
-        )
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableView) {
@@ -141,14 +113,6 @@ open class TableView @JvmOverloads constructor(
         setTitle(title)
 
         showBackground = it.getBoolean(R.styleable.TableView_showBackground, SHOW_BACKGROUND_DEAULT)
-        drawDividers = it.getBoolean(R.styleable.TableView_drawDividers, DRAW_DIVIDERS_DEAULT)
-
-        childrenPadding.set(
-            it.getDimension(R.styleable.TableView_childrenPaddingStart, PADDING_HORIZONTAL_DP.dpF).roundToInt(),
-            it.getDimension(R.styleable.TableView_childrenPaddingTop, PADDING_VERTICAL_DP.dpF).roundToInt(),
-            it.getDimension(R.styleable.TableView_childrenPaddingEnd, PADDING_HORIZONTAL_DP.dpF).roundToInt(),
-            it.getDimension(R.styleable.TableView_childrenPaddingBottom, PADDING_VERTICAL_DP.dpF).roundToInt(),
-        )
     }
 
     private fun setupTableChildrenAppearance() {
@@ -168,14 +132,14 @@ open class TableView @JvmOverloads constructor(
                 it.disableOwnDividers()
             }
 
-            it.updatePadding(start = childrenPadding.left, end = childrenPadding.right)
+            it.updatePadding(start = 16.dp, end = 16.dp)
         }
 
         tableChildren.first().apply {
-            updatePadding(top = childrenPadding.top)
+            updatePadding(top = 4.dp)
         }
         tableChildren.last().apply {
-            updatePadding(bottom = childrenPadding.bottom)
+            updatePadding(bottom = 4.dp)
         }
     }
 

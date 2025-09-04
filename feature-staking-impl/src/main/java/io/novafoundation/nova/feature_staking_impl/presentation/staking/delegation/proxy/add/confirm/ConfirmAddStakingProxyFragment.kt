@@ -5,9 +5,10 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.setProgressState
-import io.novafoundation.nova.feature_account_api.view.showWallet
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showChain
@@ -30,6 +31,8 @@ class ConfirmAddStakingProxyFragment : BaseFragment<ConfirmAddStakingProxyViewMo
     override fun createBinding() = FragmentConfirmAddStakingProxyBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmAddStakingProxyToolbar.applyStatusBarInsets()
+
         binder.confirmAddStakingProxyToolbar.setHomeButtonListener { viewModel.back() }
 
         binder.confirmAddStakingProxyButton.setOnClickListener { viewModel.confirmClicked() }

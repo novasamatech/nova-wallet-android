@@ -1,9 +1,15 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
+    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
 
-        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -18,6 +24,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
 
     sourceSets {
@@ -39,11 +55,11 @@ dependencies {
     implementation coroutinesDep
 
     implementation daggerDep
-    ksp daggerCompiler
+    kapt daggerKapt
 
     implementation roomDep
     implementation roomKtxDep
-    ksp roomCompiler
+    kapt roomKapt
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep

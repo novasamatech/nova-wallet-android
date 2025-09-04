@@ -21,16 +21,7 @@ class StablePool(
     val currentBlock: BlockNumber,
     fee: Perbill,
     val gson: Gson,
-    val pegs: List<List<BigInteger>>
 ) {
-
-    companion object {
-        fun getDefaultPegs(size: Int): List<List<BigInteger>> {
-            return (0 until size).map {
-                listOf(BigInteger.ONE, BigInteger.ONE)
-            }
-        }
-    }
 
     val sharedAssetIssuance = sharedAssetIssuance.toString()
     val fee: String = fee.value.toBigDecimal().toPlainString()
@@ -42,11 +33,6 @@ class StablePool(
 
     val amplification by lazy(LazyThreadSafetyMode.NONE) {
         calculateAmplification()
-    }
-
-    val pegsSerialized: String by lazy(LazyThreadSafetyMode.NONE) {
-        val pegsInput = pegs.map { inner -> inner.map { it.toString() } }
-        gson.toJson(pegsInput)
     }
 
     private fun calculateAmplification(): String {
@@ -112,8 +98,7 @@ private fun StablePool.calculateAddOneAsset(
         assetIn.toInt(),
         amplification,
         sharedAssetIssuance,
-        fee,
-        pegsSerialized
+        fee
     ).fromBridgeResultToBalance()
 }
 
@@ -127,8 +112,7 @@ private fun StablePool.calculateSharesForAmount(
         amountOut.toString(),
         amplification,
         sharedAssetIssuance,
-        fee,
-        pegsSerialized
+        fee
     ).fromBridgeResultToBalance()
 }
 
@@ -143,8 +127,7 @@ private fun StablePool.calculateIn(
         assetOut.toInt(),
         amountOut.toString(),
         amplification,
-        fee,
-        pegsSerialized
+        fee
     ).fromBridgeResultToBalance()
 }
 
@@ -158,8 +141,7 @@ private fun StablePool.calculateWithdrawOneAsset(
         assetOut.toInt(),
         amplification,
         sharedAssetIssuance,
-        fee,
-        pegsSerialized
+        fee
     ).fromBridgeResultToBalance()
 }
 
@@ -175,8 +157,7 @@ private fun StablePool.calculateShares(
         assetsJson,
         amplification,
         sharedAssetIssuance,
-        fee,
-        pegsSerialized
+        fee
     ).fromBridgeResultToBalance()
 }
 
@@ -191,8 +172,7 @@ private fun StablePool.calculateOut(
         assetOut.toInt(),
         amountIn.toString(),
         amplification,
-        fee,
-        pegsSerialized
+        fee
     ).fromBridgeResultToBalance()
 }
 

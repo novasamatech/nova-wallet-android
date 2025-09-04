@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
-import io.novafoundation.nova.common.utils.removeDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setTextColorRes
 
@@ -47,7 +46,7 @@ class AddressView @JvmOverloads constructor(
 
     fun setEndIcon(@DrawableRes iconRes: Int?) {
         if (iconRes == null) {
-            binder.addressValue.removeDrawableEnd()
+            binder.addressValue.setDrawableEnd(null)
         } else {
             binder.addressValue.setDrawableEnd(iconRes, widthInDp = 16, paddingInDp = 6)
         }

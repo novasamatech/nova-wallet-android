@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.onLoaded
 import io.novafoundation.nova.common.domain.onNotLoaded
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
@@ -23,6 +24,7 @@ class SwapRouteFragment : BaseFragment<SwapRouteViewModel, FragmentRouteBinding>
     private lateinit var routeAdapter: SwapRouteAdapter
 
     override fun initViews() {
+        binder.swapRouteContent.applyStatusBarInsets()
         binder.swapRouteContent.setHasFixedSize(true)
         binder.swapRouteContent.itemAnimator = null
 

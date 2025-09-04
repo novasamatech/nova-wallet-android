@@ -5,7 +5,6 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
-import io.novafoundation.nova.app.root.navigation.openSplitScreenWithInstantAction
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.utils.showBrowser
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
@@ -173,10 +172,6 @@ class GovernanceNavigator(
             .addCase(R.id.setupTinderGovBasketFragment, R.id.action_setupTinderGovBasket_to_referendumInfo)
             .setArgs(ReferendumInfoFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
-    }
-
-    override fun openReferendumFromDeepLink(payload: ReferendumDetailsPayload) {
-        openSplitScreenWithInstantAction(R.id.action_open_referendum_details, ReferendumDetailsFragment.getBundle(payload))
     }
 
     override fun openReferendaSearch() {

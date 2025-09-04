@@ -3,8 +3,10 @@ package io.novafoundation.nova.feature_account_impl.domain.account.model
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 class GenericLedgerMetaAccount(
@@ -20,7 +22,7 @@ class GenericLedgerMetaAccount(
     type: LightMetaAccount.Type,
     status: LightMetaAccount.Status,
     chainAccounts: Map<ChainId, MetaAccount.ChainAccount>,
-    parentMetaId: Long?,
+    proxy: ProxyAccount?,
     private val supportedGenericLedgerChains: Set<ChainId>
 ) : DefaultMetaAccount(
     id = id,
@@ -35,7 +37,7 @@ class GenericLedgerMetaAccount(
     type = type,
     status = status,
     chainAccounts = chainAccounts,
-    parentMetaId = parentMetaId
+    proxy = proxy
 ) {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {
@@ -63,6 +65,14 @@ class GenericLedgerMetaAccount(
     override fun publicKeyIn(chain: Chain): ByteArray? {
         return if (isSupported(chain)) {
             super.publicKeyIn(chain)
+        } else {
+            null
+        }
+    }
+
+    override fun multiChainEncryptionIn(chain: Chain): MultiChainEncryption? {
+        return if (isSupported(chain)) {
+            super.multiChainEncryptionIn(chain)
         } else {
             null
         }

@@ -12,7 +12,8 @@ interface Edge<N> {
 
 interface WeightedEdge<N> : Edge<N> {
 
-    fun weightForAppendingTo(path: Path<WeightedEdge<N>>): Int
+    // Smaller the better
+    val weight: Int
 }
 
 class Graph<N, E : Edge<N>>(
@@ -30,10 +31,6 @@ fun <N> Graph<N, *>.vertices(): Set<N> {
 
 fun Graph<*, *>.numberOfEdges(): Int {
     return adjacencyList.values.sumOf { it.size }
-}
-
-fun <N, E : Edge<N>> Graph<N, E>.allEdges(): List<E> {
-    return adjacencyList.values.flatten()
 }
 
 fun interface EdgeVisitFilter<E : Edge<*>> {
@@ -116,7 +113,7 @@ suspend fun <N, E : WeightedEdge<N>> Graph<N, E>.findDijkstraPathsBetween(
 
                 val newElement = QueueElement(
                     currentPath = minimumQueueElement.currentPath + edge,
-                    score = minimumQueueElement.score + edge.weightForAppendingTo(minimumQueueElement.currentPath)
+                    score = minimumQueueElement.score + edge.weight
                 )
 
                 heap.add(newElement)

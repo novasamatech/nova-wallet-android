@@ -460,7 +460,6 @@
 
     <style name="Widget.Nova.MaterialButton.Secondary" parent="Widget.Nova.MaterialButton">
         <item name="android:backgroundTint">@color/selector_button_background_secondary</item>
-        <item name="android:textColor">@color/text_primary</item>
     </style>
 
     <style name="Widget.Nova.MaterialButton.Secondary.HalfTransparent" parent="Widget.Nova.MaterialButton">
@@ -578,10 +577,6 @@
         <item name="colorAccent">@color/android_system_accent</item>
         <item name="android:windowMinWidthMajor">100%</item>
         <item name="android:windowMinWidthMinor">100%</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@color/bottom_sheet_background</item>
     </style>
 
     <style name="bottomSheetStyleWrapper" parent="Widget.MaterialComponents.BottomSheet.Modal">
@@ -667,9 +662,5 @@
 
     <style name="SegmentedTab.Tab" parent="TextAppearance.NovaFoundation.Regular.Footnote">
         <item name="textAllCaps">false</item>
-    </style>
-
-    <style name="GoNextTransactionDetailsTextAppearance">
-        <item name="android:textColor">@color/text_secondary</item>
     </style>
 </resources>

@@ -3,13 +3,10 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 import android.graphics.Color
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
-import android.view.View
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.clickableSpan
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
@@ -44,11 +41,6 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
     }
 
     override fun createBinding() = FragmentWelcomeBinding.inflate(layoutInflater)
-
-    override fun applyInsets(rootView: View) {
-        binder.welcomeStatus.applyStatusBarInsets()
-        binder.welcomeTerms.applyNavigationBarInsets()
-    }
 
     override fun initViews() {
         configureTermsAndPrivacy(

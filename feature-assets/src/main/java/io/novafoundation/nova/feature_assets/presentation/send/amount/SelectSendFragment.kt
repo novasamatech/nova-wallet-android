@@ -1,12 +1,11 @@
 package io.novafoundation.nova.feature_assets.presentation.send.amount
 
-import android.view.View
 import androidx.core.os.bundleOf
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applySystemBarInsets
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -38,11 +37,8 @@ class SelectSendFragment : BaseFragment<SelectSendViewModel, FragmentSelectSendB
 
     override fun createBinding() = FragmentSelectSendBinding.inflate(layoutInflater)
 
-    override fun applyInsets(rootView: View) {
-        binder.root.applySystemBarInsets(imeInsets = true)
-    }
-
     override fun initViews() {
+        binder.chooseAmountContainer.applyStatusBarInsets(false)
         binder.selectSendNext.prepareForProgress(viewLifecycleOwner)
         binder.selectSendNext.setOnClickListener { viewModel.nextClicked() }
 

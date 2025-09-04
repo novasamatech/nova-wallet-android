@@ -1,9 +1,8 @@
 package io.novafoundation.nova.runtime.extrinsic.visitor.impl
 
 import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.RealExtrinsicWalk
-import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.batch.ForceBatchNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.api.ExtrinsicWalk
+import io.novafoundation.nova.runtime.extrinsic.visitor.impl.nodes.batch.ForceBatchNode
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.RuntimeProvider
 import io.novafoundation.nova.test_shared.any
@@ -82,7 +81,7 @@ internal class ForceBatchWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
+        val visit = extrinsicWalk.walkSingle(extrinsic)
         assertEquals(true, visit.success)
         assertArrayEquals(signer, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -99,7 +98,7 @@ internal class ForceBatchWalkTest {
             events = events
         )
 
-        val visit = extrinsicWalk.walkSingleIgnoringBranches(extrinsic)
+        val visit = extrinsicWalk.walkSingle(extrinsic)
         assertEquals(false, visit.success)
         assertArrayEquals(signer, visit.origin)
         assertEquals(testInnerCall, visit.call)
@@ -125,7 +124,7 @@ internal class ForceBatchWalkTest {
             events = events
         )
 
-        val visits = extrinsicWalk.walkMultipleIgnoringBranches(extrinsic, expectedSize = 2)
+        val visits = extrinsicWalk.walkMultiple(extrinsic, expectedSize = 2)
         visits.forEach { visit ->
             assertEquals(true, visit.success)
             assertArrayEquals(signer, visit.origin)
@@ -155,7 +154,7 @@ internal class ForceBatchWalkTest {
             events = events
         )
 
-        val visits = extrinsicWalk.walkMultipleIgnoringBranches(extrinsic, expectedSize = 3)
+        val visits = extrinsicWalk.walkMultiple(extrinsic, expectedSize = 3)
 
         val expected: List<Pair<Boolean, List<GenericEvent.Instance>>> = listOf(
             true to innerBatchEvents,
@@ -202,7 +201,7 @@ internal class ForceBatchWalkTest {
             addAll(innerBatchEvents)
             add(itemCompleted())
 
-            // first level batch ends
+            // first leve batch ends
             add(batchCompleted())
             add(extrinsicSuccess())
         }
@@ -222,7 +221,7 @@ internal class ForceBatchWalkTest {
             events = events
         )
 
-        val visits = extrinsicWalk.walkMultipleIgnoringBranches(extrinsic, expectedSize = 5)
+        val visits = extrinsicWalk.walkMultiple(extrinsic, expectedSize = 5)
         visits.forEach { visit ->
             assertEquals(true, visit.success)
             assertArrayEquals(signer, visit.origin)

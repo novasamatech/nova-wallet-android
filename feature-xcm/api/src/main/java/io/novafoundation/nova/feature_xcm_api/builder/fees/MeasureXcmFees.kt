@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_xcm_api.builder.fees
 
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
+import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetId
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
-import io.novafoundation.nova.feature_xcm_api.multiLocation.AssetLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 
 /**
  * Measure fees for a given xcm message. Used by [XcmBuilder] when processing [XcmBuilder.payFees]
@@ -14,7 +14,7 @@ interface MeasureXcmFees {
 
     suspend fun measureFees(
         message: VersionedXcmMessage,
-        feeAsset: AssetLocation,
-        chainLocation: ChainLocation,
+        feeAsset: MultiAssetId,
+        chainLocation: AbsoluteMultiLocation
     ): BalanceOf
 }

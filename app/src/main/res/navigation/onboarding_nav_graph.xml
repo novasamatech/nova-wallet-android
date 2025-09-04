@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/welcomeFragment"
         android:name="io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment"
-        android:label="welcomeFragment"
+        android:label="fragment_users"
         tools:layout="@layout/fragment_welcome">
 
         <action

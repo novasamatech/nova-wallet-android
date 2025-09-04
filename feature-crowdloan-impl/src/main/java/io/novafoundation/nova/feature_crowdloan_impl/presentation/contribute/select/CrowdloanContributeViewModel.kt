@@ -58,6 +58,7 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
+import kotlin.time.milliseconds
 
 private const val DEBOUNCE_DURATION_MILLIS = 500
 

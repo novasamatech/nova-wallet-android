@@ -1,9 +1,5 @@
 package io.novafoundation.nova.common.address.format
 
-import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.utils.UNIFIED_ADDRESS_PREFIX
-import io.novasama.substrate_sdk_android.ss58.SS58Encoder
-
 interface AddressFormat {
 
     val scheme: AddressScheme
@@ -14,10 +10,10 @@ interface AddressFormat {
             return EthereumAddressFormat()
         }
 
-        fun defaultForScheme(scheme: AddressScheme, substrateAddressPrefix: Short = SS58Encoder.UNIFIED_ADDRESS_PREFIX): AddressFormat {
+        fun defaultForScheme(scheme: AddressScheme): AddressFormat {
             return when (scheme) {
                 AddressScheme.EVM -> EthereumAddressFormat()
-                AddressScheme.SUBSTRATE -> SubstrateAddressFormat.forSS58rPrefix(substrateAddressPrefix)
+                AddressScheme.SUBSTRATE -> SubstrateAddressFormat.generic()
             }
         }
     }
@@ -43,7 +39,3 @@ interface AddressFormat {
 fun ByteArray.asPublicKey() = AddressFormat.PublicKey(this)
 fun ByteArray.asAccountId() = AddressFormat.AccountId(this)
 fun String.asAddress() = AddressFormat.Address(this)
-
-fun AddressFormat.addressOf(accountIdKey: AccountIdKey): AddressFormat.Address {
-    return addressOf(accountIdKey.value.asAccountId())
-}

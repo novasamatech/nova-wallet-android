@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select
 
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -17,6 +18,14 @@ class SelectRewardDestinationFragment : BaseFragment<SelectRewardDestinationView
     override fun createBinding() = FragmentSelectRewardDestinationBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.selectRewardDestinationContainer.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+
+            consume(true)
+        }
+
         binder.selectRewardDestinationToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.selectRewardDestinationContinue.prepareForProgress(viewLifecycleOwner)

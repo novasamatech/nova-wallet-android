@@ -9,10 +9,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.watchOnly.WatchOnlyMissingKeysPresenter
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
@@ -25,7 +23,6 @@ import io.novafoundation.nova.feature_assets.data.repository.assetFilters.Prefer
 import io.novafoundation.nova.feature_assets.di.modules.AddTokenModule
 import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
-import io.novafoundation.nova.feature_assets.di.modules.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -41,9 +38,7 @@ import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
@@ -67,14 +62,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFo
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-@Module(
-    includes = [
-        SendModule::class,
-        ManageTokensCommonModule::class,
-        AddTokenModule::class,
-        DeepLinkModule::class
-    ]
-)
+@Module(includes = [SendModule::class, ManageTokensCommonModule::class, AddTokenModule::class])
 class AssetsFeatureModule {
 
     @Provides
@@ -257,49 +245,17 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBuySellRestrictionCheckMixin(
-        accountUseCase: SelectedAccountUseCase,
-        actionLauncher: ActionBottomSheetLauncher,
-        resourceManager: ResourceManager
-    ): BuySellRestrictionCheckMixin {
-        return BuySellRestrictionCheckMixin(
-            accountUseCase,
-            resourceManager,
-            actionLauncher
-        )
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideNovaCardRestrictionCheckMixin(
-        accountUseCase: SelectedAccountUseCase,
-        actionLauncher: ActionBottomSheetLauncher,
-        resourceManager: ResourceManager,
-        chainRegistry: ChainRegistry
-    ): NovaCardRestrictionCheckMixin {
-        return NovaCardRestrictionCheckMixin(
-            accountUseCase,
-            resourceManager,
-            actionLauncher,
-            chainRegistry
-        )
-    }
-
-    @Provides
-    @FeatureScope
     fun provideBuySellMixinFactory(
         router: AssetsRouter,
         tradeTokenRegistry: TradeTokenRegistry,
         chainRegistry: ChainRegistry,
-        resourceManager: ResourceManager,
-        buySellRestrictionCheckMixin: BuySellRestrictionCheckMixin
+        resourceManager: ResourceManager
     ): BuySellSelectorMixinFactory {
         return BuySellSelectorMixinFactory(
             router,
             tradeTokenRegistry,
             chainRegistry,
-            resourceManager,
-            buySellRestrictionCheckMixin
+            resourceManager
         )
     }
 }

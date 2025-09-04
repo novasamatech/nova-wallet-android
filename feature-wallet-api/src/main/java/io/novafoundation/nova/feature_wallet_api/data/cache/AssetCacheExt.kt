@@ -2,12 +2,9 @@ package io.novafoundation.nova.feature_wallet_api.data.cache
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
-import io.novafoundation.nova.common.domain.balance.EDCountingMode
-import io.novafoundation.nova.common.domain.balance.TransferableMode
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
 import io.novafoundation.nova.core_db.model.AssetLocal.TransferableModeLocal
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -38,35 +35,6 @@ suspend fun AssetCache.updateNonLockableAsset(
             transferableMode = TransferableModeLocal.REGULAR,
             edCountingMode = EDCountingModeLocal.TOTAL,
         )
-    }
-}
-
-suspend fun AssetCache.updateFromChainBalance(
-    metaId: Long,
-    chainAssetBalance: ChainAssetBalance
-) {
-    updateAsset(metaId, chainAssetBalance.chainAsset) {
-        it.copy(
-            freeInPlanks = chainAssetBalance.free,
-            frozenInPlanks = chainAssetBalance.frozen,
-            reservedInPlanks = chainAssetBalance.reserved,
-            transferableMode = chainAssetBalance.transferableMode.toLocal(),
-            edCountingMode = chainAssetBalance.edCountingMode.toLocal()
-        )
-    }
-}
-
-fun TransferableMode.toLocal(): TransferableModeLocal {
-    return when (this) {
-        TransferableMode.REGULAR -> TransferableModeLocal.REGULAR
-        TransferableMode.HOLDS_AND_FREEZES -> TransferableModeLocal.HOLDS_AND_FREEZES
-    }
-}
-
-fun EDCountingMode.toLocal(): EDCountingModeLocal {
-    return when (this) {
-        EDCountingMode.TOTAL -> EDCountingModeLocal.TOTAL
-        EDCountingMode.FREE -> EDCountingModeLocal.FREE
     }
 }
 

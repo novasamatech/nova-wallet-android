@@ -10,8 +10,6 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
@@ -47,12 +45,10 @@ class NominationPoolsRedeemViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val poolMemberUseCase: NominationPoolMemberUseCase,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     assetUseCase: AssetUseCase,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    Validatable by validationExecutor {
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
@@ -127,10 +123,10 @@ class NominationPoolsRedeemViewModel(
 
     private fun sendTransaction() = launch {
         interactor.redeem(poolMemberFlow.first())
-            .onSuccess { (submissionResult, redeemConsequences) ->
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+            .onSuccess { redeemConsequences ->
+                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
-                startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
+                router.finishRedeemFlow(redeemConsequences)
             }
             .onFailure(::showError)
 

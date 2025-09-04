@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentReceiveBinding
@@ -34,6 +35,8 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel, FragmentReceiveBinding>()
     }
 
     override fun initViews() {
+        binder.receiveToolbar.applyStatusBarInsets()
+
         binder.receiveCopyButton.setOnClickListener { viewModel.copyAddressClicked() }
 
         binder.receiveBackButton.setOnClickListener { viewModel.backClicked() }

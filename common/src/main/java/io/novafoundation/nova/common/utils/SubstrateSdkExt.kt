@@ -9,8 +9,8 @@ import io.novafoundation.nova.common.data.network.runtime.binding.fromHexOrIncom
 import io.novafoundation.nova.core.model.Node
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
+import io.novasama.substrate_sdk_android.encrypt.mnemonic.Mnemonic
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
-import io.novasama.substrate_sdk_android.encrypt.vByte
 import io.novasama.substrate_sdk_android.extensions.asEthereumAccountId
 import io.novasama.substrate_sdk_android.extensions.asEthereumAddress
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -21,35 +21,28 @@ import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.RuntimeType
-import io.novasama.substrate_sdk_android.runtime.definitions.types.Type
+import io.novasama.substrate_sdk_android.runtime.definitions.types.bytes
 import io.novasama.substrate_sdk_android.runtime.definitions.types.bytesOrNull
-import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromByteArrayOrNull
-import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHex
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.DefaultSignedExtensions
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInExtrinsic
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.ExtrasIncludedInSignature
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.findExplicitOrNull
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.signer
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
-import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliasesOrNull
-import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.getGenesisHashOrThrow
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.genesisHash
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
-import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionId
-import io.novasama.substrate_sdk_android.runtime.metadata.TransactionExtensionMetadata
+import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionId
+import io.novasama.substrate_sdk_android.runtime.metadata.SignedExtensionMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.call
 import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.method
-import io.novasama.substrate_sdk_android.runtime.metadata.methodOrNull
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Constant
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
@@ -88,20 +81,12 @@ val BIP32JunctionDecoder.DEFAULT_DERIVATION_PATH: String
 val SS58Encoder.DEFAULT_PREFIX: Short
     get() = 42.toShort()
 
-val SS58Encoder.UNIFIED_ADDRESS_PREFIX: Short
-    get() = 0.toShort()
-
 val SS58Encoder.GENERIC_ADDRESS_PREFIX: Short
     get() = DEFAULT_PREFIX
 
 fun BIP32JunctionDecoder.default() = decode(DEFAULT_DERIVATION_PATH)
 
 fun StorageEntry.defaultInHex() = default.toHexString(withPrefix = true)
-
-fun DictEnum.getOrNull(name: String): Type<*>? {
-    val element = elements.values.find { it.name == name } ?: return null
-    return element.value.skipAliasesOrNull()?.value
-}
 
 fun ByteArray.toAddress(networkType: Node.NetworkType) = toAddress(networkType.runtimeConfiguration.addressByte)
 
@@ -160,6 +145,14 @@ fun <T> DataType<T>.toByteArray(value: T): ByteArray {
     return stream.toByteArray()
 }
 
+fun SignerPayloadExtrinsic.encodedIncludedInExtrinsic(): ByteArray {
+    return ExtrasIncludedInExtrinsic.bytes(runtime, signedExtras.includedInExtrinsic)
+}
+
+fun SignerPayloadExtrinsic.encodedIncludedInSignature(): ByteArray {
+    return ExtrasIncludedInSignature.bytes(runtime, signedExtras.includedInSignature)
+}
+
 fun RuntimeType<*, *>.toHexUntypedOrNull(runtime: RuntimeSnapshot, value: Any?) =
     bytesOrNull(runtime, value)?.toHexString(withPrefix = true)
 
@@ -168,21 +161,21 @@ fun RuntimeSnapshot.isParachain() = metadata.hasModule(Modules.PARACHAIN_SYSTEM)
 fun RuntimeSnapshot.composeCall(
     moduleName: String,
     callName: String,
-    arguments: Map<String, Any?>
+    args: Map<String, Any?>
 ): GenericCall.Instance {
     val module = metadata.module(moduleName)
     val call = module.call(callName)
 
-    return GenericCall.Instance(module, call, arguments)
+    return GenericCall.Instance(module, call, args)
 }
 
 context(RuntimeContext)
 fun composeCall(
     moduleName: String,
     callName: String,
-    arguments: Map<String, Any?>
+    args: Map<String, Any?>
 ): GenericCall.Instance {
-    return runtime.composeCall(moduleName, callName, arguments)
+    return runtime.composeCall(moduleName, callName, args)
 }
 
 typealias StructBuilderWithContext<S> = S.(EncodableStruct<S>) -> Unit
@@ -227,7 +220,7 @@ fun <V> Constant.getAs(binding: (dynamicInstance: Any?) -> V): V {
 
 fun String.toHexAccountId(): String = toAccountId().toHexString()
 
-fun Extrinsic.Instance.tip(): BigInteger? = findExplicitOrNull(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
+fun Extrinsic.Instance.tip(): BigInteger? = signature?.signedExtras?.get(DefaultSignedExtensions.CHECK_TX_PAYMENT) as? BigInteger
 
 fun Module.constant(name: String) = constantOrNull(name) ?: throw NoSuchElementException()
 
@@ -239,11 +232,6 @@ fun Module.numberConstantOrNull(name: String, runtimeSnapshot: RuntimeSnapshot) 
 
 context(RuntimeContext)
 fun Module.numberConstant(name: String) = numberConstant(name, runtime)
-
-context(RuntimeContext)
-fun <D> RuntimeType<*, D>.fromHex(value: HexString): D {
-    return fromHex(runtime, value)
-}
 
 fun Module.optionalNumberConstant(name: String, runtimeSnapshot: RuntimeSnapshot) = bindNullableNumberConstant(constant(name), runtimeSnapshot)
 
@@ -261,8 +249,6 @@ fun RuntimeMetadata.voterListOrNull() = firstExistingModuleOrNull(Modules.VOTER_
 fun RuntimeMetadata.voterListName(): String = requireNotNull(voterListOrNull()).name
 
 fun RuntimeMetadata.system() = module(Modules.SYSTEM)
-
-fun RuntimeMetadata.multisig() = module(Modules.MULTISIG)
 
 fun RuntimeMetadata.balances() = module(Modules.BALANCES)
 
@@ -370,10 +356,6 @@ fun RuntimeMetadata.firstExistingCall(vararg options: Pair<String, String>): Met
     return requireNotNull(result)
 }
 
-fun RuntimeMetadata.firstExistingCall(options: List<Pair<String, String>>): MetadataFunction {
-    return firstExistingCall(*options.toTypedArray())
-}
-
 fun RuntimeMetadata.firstExistingModuleOrNull(vararg options: String): Module? {
     return options.tryFindNonNull { moduleOrNull(it) }
 }
@@ -408,6 +390,14 @@ fun StorageEntry.createStorageKey(vararg keyArguments: Any?): String {
     }
 }
 
+context(RuntimeContext)
+@JvmName("createStorageKeyArray")
+fun StorageEntry.createStorageKey(keyArguments: Array<out Any?>): String {
+    return createStorageKey(*keyArguments)
+}
+
+fun SeedFactory.createSeed32(length: Mnemonic.Length, password: String?) = cropSeedTo32Bytes(createSeed(length, password))
+
 fun SeedFactory.deriveSeed32(mnemonicWords: String, password: String?) = cropSeedTo32Bytes(deriveSeed(mnemonicWords, password))
 
 private fun cropSeedTo32Bytes(seedResult: SeedFactory.Result): SeedFactory.Result {
@@ -418,10 +408,6 @@ fun GenericCall.Instance.oneOf(vararg functionCandidates: MetadataFunction?): Bo
     return functionCandidates.any { candidate -> candidate != null && function == candidate }
 }
 
-fun Extrinsic.Instance.isSigned(): Boolean {
-    return signer() != null
-}
-
 fun GenericCall.Instance.instanceOf(functionCandidate: MetadataFunction): Boolean = function == functionCandidate
 
 fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boolean = moduleName == module.name && callName == function.name
@@ -429,8 +415,6 @@ fun GenericCall.Instance.instanceOf(moduleName: String, callName: String): Boole
 fun GenericCall.Instance.instanceOf(moduleName: String, vararg callNames: String): Boolean = moduleName == module.name && function.name in callNames
 
 fun GenericEvent.Instance.instanceOf(moduleName: String, eventName: String): Boolean = moduleName == module.name && eventName == event.name
-
-fun GenericEvent.Instance.instanceOf(moduleName: String, vararg eventNames: String): Boolean = moduleName == module.name && event.name in eventNames
 
 fun GenericEvent.Instance.instanceOf(event: Event): Boolean = event.index == this.event.index
 
@@ -441,7 +425,7 @@ fun RuntimeMetadata.assetConversionAssetIdType(): RuntimeType<*, *>? {
         .inputs.first().type
 }
 
-fun ExtrinsicMetadata.transactionExtensionOrNull(id: TransactionExtensionId): TransactionExtensionMetadata? {
+fun ExtrinsicMetadata.signedExtensionOrNull(id: SignedExtensionId): SignedExtensionMetadata? {
     return signedExtensions.find { it.id == id }
 }
 
@@ -468,12 +452,8 @@ fun emptySubstrateAccountId() = ByteArray(32) { 1 }
 
 fun emptyEthereumAddress() = emptyEthereumAccountId().ethereumAccountIdToAddress(withChecksum = false)
 
-val InheritedImplication.chainId: String
-    get() = getGenesisHashOrThrow().toHexString()
-
-fun ExtrinsicBuilder.getChainIdOrThrow(): String {
-    return getGenesisHashOrThrow().toHexString()
-}
+val SignerPayloadExtrinsic.chainId: String
+    get() = genesisHash.toHexString()
 
 fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
     ?: fallbacks.firstOrNull { modules[it] != null }
@@ -501,79 +481,19 @@ fun RuntimeMetadata.hasRuntimeApisMetadata(): Boolean {
     return apis != null
 }
 
-fun RuntimeMetadata.hasDetectedRuntimeApi(section: String, method: String): Boolean {
-    if (!hasRuntimeApisMetadata()) return false
-
-    return runtimeApiOrNull(section)?.methodOrNull(method) != null
-}
-
-fun GenericCall.Instance.toHex(runtimeSnapshot: RuntimeSnapshot): String {
-    return toByteArray(runtimeSnapshot).toHexString(withPrefix = true)
-}
-
-fun GenericCall.Instance.toByteArray(runtimeSnapshot: RuntimeSnapshot): ByteArray {
-    return GenericCall.toByteArray(runtimeSnapshot, this)
-}
-
-fun GenericCall.Instance.callHash(runtimeSnapshot: RuntimeSnapshot): ByteArray {
-    return toByteArray(runtimeSnapshot).blake2b256()
-}
-
-fun String.callHash(): ByteArray {
-    return fromHex().blake2b256()
-}
-
-fun String.callHashString(): String {
-    return callHash().toHexString(withPrefix = true)
-}
-
 fun SignatureWrapperEcdsa(signature: ByteArray): SignatureWrapper.Ecdsa {
     require(signature.size == 65)
 
     val r = signature.copyOfRange(0, 32)
     val s = signature.copyOfRange(32, 64)
-    val v = signature[64].convertToWeb3jCompatibleVByte()
+    val v = signature[64].ensureValidVByteFormat()
 
     return SignatureWrapper.Ecdsa(v = byteArrayOf(v), r = r, s = s)
 }
 
-/**
- * Ensure this signature is compatible with external signers and verifiers (dapps)
- * We need to do that due to differences in ECDSA v-byte format
- */
-fun SignatureWrapper.convertToExternalCompatibleFormat(): SignatureWrapper {
-    return when (this) {
-        is SignatureWrapper.Ecdsa -> convertToExternalCompatibleVByteFormat()
-        is SignatureWrapper.Sr25519, is SignatureWrapper.Ed25519 -> this
-    }
-}
-
-private fun SignatureWrapper.Ecdsa.convertToExternalCompatibleVByteFormat(): SignatureWrapper.Ecdsa {
-    return SignatureWrapper.Ecdsa(
-        v = byteArrayOf(vByte.convertToExternalCompatibleVByte()),
-        r = r,
-        s = s
-    )
-}
-
-/**
- * @see convertToWeb3jCompatibleVByte
- */
-private fun Byte.convertToExternalCompatibleVByte(): Byte {
-    if (this in 0..7) {
-        return this
-    }
-
-    if (this in 27..34) {
-        return (this - 27).toByte()
-    }
-
-    throw IllegalArgumentException("Invalid vByte: $this")
-}
-
 // Web3j supports only one format - when vByte is between [27..34]
 // However, there is a second format - when vByte is between [0..7] - e.g. Ledger and Parity Signer
-private fun Byte.convertToWeb3jCompatibleVByte(): Byte {
+private fun Byte.ensureValidVByteFormat(): Byte {
     if (this in 27..34) {
         return this
     }
@@ -675,6 +595,4 @@ object Modules {
     const val ASSET_REGISTRY = "AssetRegistry"
 
     const val COLLATOR_STAKING = "CollatorStaking"
-
-    const val EVM = "EVM"
 }

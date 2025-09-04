@@ -37,11 +37,3 @@ fun ResourceManager.highlightedText(mainRes: Int, vararg highlightedRes: Int): S
 
     return SpannableFormatter.format(this, mainRes, *highlighted)
 }
-
-fun ResourceManager.highlightedText(mainRes: Int, vararg highlightedString: String): SpannedString {
-    val highlighted = highlightedString.map {
-        it.toSpannable(colorSpan(getColor(R.color.text_primary)))
-    }.toTypedArray()
-
-    return SpannableFormatter.format(this, mainRes, *highlighted)
-}

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail
 
 import android.os.Bundle
 
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -28,6 +29,12 @@ class PayoutDetailsFragment : BaseFragment<PayoutDetailsViewModel, FragmentPayou
     override fun createBinding() = FragmentPayoutDetailsBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.payoutDetailsContainer.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+        }
+
         binder.payoutDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.payoutDetailsSubmit.setOnClickListener { viewModel.payoutClicked() }

@@ -8,27 +8,25 @@ import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
-import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_api.data.repository.addAccount.proxied.ProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.LocalAddMetaAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealGenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.proxied.RealProxiedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RealMnemonicAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
-import io.novafoundation.nova.feature_account_impl.di.AddAccountsModule.BindsModule
+import io.novafoundation.nova.feature_account_impl.di.modules.AccountBindsModule
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 
-@Module(includes = [BindsModule::class])
+@Module(includes = [AccountBindsModule::class])
 class AddAccountsModule {
-
-    @Module
-    interface BindsModule
 
     @Provides
     @FeatureScope
@@ -49,7 +47,7 @@ class AddAccountsModule {
         accountSecretsFactory: AccountSecretsFactory,
         chainRegistry: ChainRegistry,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
-    ): MnemonicAddAccountRepository = RealMnemonicAddAccountRepository(
+    ) = MnemonicAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
         chainRegistry,
@@ -61,13 +59,13 @@ class AddAccountsModule {
     fun provideJsonAddAccountRepository(
         accountDataSource: AccountDataSource,
         accountSecretsFactory: AccountSecretsFactory,
-        JsonDecoder: JsonDecoder,
+        jsonSeedDecoder: JsonSeedDecoder,
         chainRegistry: ChainRegistry,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = JsonAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
-        JsonDecoder,
+        jsonSeedDecoder,
         chainRegistry,
         metaAccountChangesEventBus
     )
@@ -103,6 +101,18 @@ class AddAccountsModule {
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = ParitySignerAddAccountRepository(
         accountDao,
+        metaAccountChangesEventBus
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideProxiedAddAccountRepository(
+        accountDao: MetaAccountDao,
+        chainRegistry: ChainRegistry,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus
+    ): ProxiedAddAccountRepository = RealProxiedAddAccountRepository(
+        accountDao,
+        chainRegistry,
         metaAccountChangesEventBus
     )
 

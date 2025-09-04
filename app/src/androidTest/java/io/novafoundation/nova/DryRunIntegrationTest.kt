@@ -11,8 +11,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
-import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
-import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.getByLocation
+import io.novafoundation.nova.feature_xcm_api.dryRun.model.OriginCaller
+import io.novafoundation.nova.feature_xcm_api.dryRun.model.getByLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.Junctions
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
@@ -63,7 +63,7 @@ class DryRunIntegrationTest : BaseIntegrationTest() {
         val call = polkadotRuntime.composeCall(
             moduleName =  polkadotRuntime.metadata.xcmPalletName(),
             callName = "limited_teleport_assets",
-            arguments = mapOf(
+            args = mapOf(
                 "dest" to pahVersionedLocation.toEncodableInstance(),
                 "beneficiary" to beneficiary.versionedXcm(xcmVersion).toEncodableInstance(),
                 "assets" to MultiAssets(assets).versionedXcm(xcmVersion).toEncodableInstance(),

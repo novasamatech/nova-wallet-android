@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.utils.AlphaColorFilter
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.letOrHide
-import io.novafoundation.nova.common.utils.removeDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableEnd
 import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setTextOrHide
@@ -64,7 +63,7 @@ class AccountHolder(
         if (accountModel.updateIndicator) {
             itemAccountTitle.setDrawableEnd(R.drawable.shape_account_updated_indicator, paddingInDp = 8)
         } else {
-            itemAccountTitle.removeDrawableEnd()
+            itemAccountTitle.setDrawableEnd(null)
         }
     }
 

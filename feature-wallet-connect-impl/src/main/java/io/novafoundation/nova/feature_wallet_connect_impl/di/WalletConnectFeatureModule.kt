@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.InMemo
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.RealWalletConnectPairingRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectPairingRepository
 import io.novafoundation.nova.feature_wallet_connect_impl.data.repository.WalletConnectSessionRepository
-import io.novafoundation.nova.feature_wallet_connect_impl.di.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.RealWalletConnectSessionInteractor
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.RealWalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_impl.domain.session.WalletConnectSessionInteractor
@@ -32,7 +31,7 @@ import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.RealWalletConnectSessionMapper
 import io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.common.WalletConnectSessionMapper
 
-@Module(includes = [DeepLinkModule::class])
+@Module
 class WalletConnectFeatureModule {
 
     @Provides

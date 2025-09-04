@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createSubstrateAddressModel
+import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -97,7 +97,7 @@ class NodesViewModel(
     }
 
     private suspend fun generateIconForAddress(account: Account): AddressModel {
-        return addressIconGenerator.createSubstrateAddressModel(account.address, ICON_IN_DP)
+        return addressIconGenerator.createAddressModel(account.address, ICON_IN_DP)
     }
 
     private fun handleAccountsForNetwork(nodeModel: NodeModel, selectedNode: Node, accounts: List<Account>) {

@@ -23,8 +23,6 @@
 
     <include app:graph="@navigation/sign_parity_signer_graph" />
 
-    <include app:graph="@navigation/multisig_operation_details_graph" />
-
     <action
         android:id="@+id/action_open_externalSignGraph"
         app:destination="@id/external_sign_graph"
@@ -132,28 +130,12 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
-        android:id="@+id/action_open_accountMigrationPairing"
-        app:destination="@id/accountMigrationPairingFragment"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
         android:id="@+id/action_open_select_wallet"
         app:destination="@id/selectWalletFragment" />
 
     <action
         android:id="@+id/action_openUnifiedAddressDialog"
         app:destination="@id/chainAddressesFragment" />
-
-    <action
-        android:id="@+id/action_multisigOperationDetailsFragment"
-        app:destination="@id/multisig_operation_details_graph"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
 
     <fragment
         android:id="@+id/splashFragment"
@@ -246,26 +228,10 @@
         android:label="fragment_chain_addresses"
         tools:layout="@layout/fragment_chain_address_selector">
 
-        <action
-            android:id="@+id/action_closeChainAddressesFragment"
+        <action android:id="@+id/action_closeChainAddressesFragment"
             app:popUpTo="@+id/chainAddressesFragment"
             app:popUpToInclusive="true" />
 
     </dialog>
-
-    <fragment
-        android:id="@+id/accountMigrationPairingFragment"
-        android:name="io.novafoundation.nova.feature_account_migration.presentation.pairing.AccountMigrationPairingFragment"
-        android:label="AccountMigrationPairingFragment">
-
-        <action
-            android:id="@+id/action_migration_to_pin"
-            app:destination="@id/pincodeFragment"
-            app:popEnterAnim="@anim/fragment_close_enter"
-            app:popExitAnim="@anim/fragment_close_exit"
-            app:popUpTo="@id/accountMigrationPairingFragment"
-            app:popUpToInclusive="true" />
-
-    </fragment>
 
 </navigation>

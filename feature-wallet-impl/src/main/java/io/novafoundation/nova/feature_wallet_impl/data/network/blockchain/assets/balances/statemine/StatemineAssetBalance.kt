@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.balances.statemine
 
 import io.novafoundation.nova.common.data.network.runtime.binding.AccountBalance
+import io.novafoundation.nova.common.domain.balance.TransferableMode
+import io.novafoundation.nova.common.domain.balance.calculateTransferable
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.model.AssetLocal.EDCountingModeLocal
@@ -9,10 +11,10 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.AssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.StatemineAssetDetails
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdatePoint
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.TransferableBalanceUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.transfersFrozen
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.bindAssetAccountOrEmpty
@@ -58,7 +60,7 @@ class StatemineAssetBalance(
         return queryAssetDetails(chainAsset).minimumBalance
     }
 
-    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): ChainAssetBalance {
+    override suspend fun queryAccountBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): AccountBalance {
         val statemineType = chainAsset.requireStatemine()
 
         val assetAccount = remoteStorage.query(chain.id) {
@@ -71,18 +73,18 @@ class StatemineAssetBalance(
             )
         }
 
-        val accountBalance = assetAccount.toAccountBalance()
-        return ChainAssetBalance.default(chainAsset, accountBalance)
+        return assetAccount.toAccountBalance()
     }
 
-    override suspend fun subscribeAccountBalanceUpdatePoint(
+    override suspend fun subscribeTransferableAccountBalance(
         chain: Chain,
         chainAsset: Chain.Asset,
         accountId: AccountId,
-    ): Flow<TransferableBalanceUpdatePoint> {
+        sharedSubscriptionBuilder: SharedRequestsBuilder?
+    ): Flow<TransferableBalanceUpdate> {
         val statemineType = chainAsset.requireStatemine()
 
-        return remoteStorage.subscribe(chain.id) {
+        return remoteStorage.subscribe(chain.id, sharedSubscriptionBuilder) {
             val encodableId = statemineType.prepareIdForEncoding(runtime)
 
             runtime.metadata.statemineModule(statemineType).storage("Account").observeWithRaw(
@@ -90,9 +92,14 @@ class StatemineAssetBalance(
                 accountId,
                 binding = ::bindAssetAccountOrEmpty
             ).map {
-                TransferableBalanceUpdatePoint(it.at!!)
+                val transferable = it.value.transferableBalance()
+                TransferableBalanceUpdate(transferable, updatedAt = it.at)
             }
         }
+    }
+
+    private fun AssetAccount.transferableBalance(): Balance {
+        return TransferableMode.REGULAR.calculateTransferable(toAccountBalance())
     }
 
     private fun AssetAccount.toAccountBalance(): AccountBalance {
@@ -107,6 +114,10 @@ class StatemineAssetBalance(
             reserved = BigInteger.ZERO,
             frozen = frozenBalance
         )
+    }
+
+    override suspend fun queryTotalBalance(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): BigInteger {
+        return queryAccountBalance(chain, chainAsset, accountId).free
     }
 
     override suspend fun startSyncingBalance(

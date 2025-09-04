@@ -5,6 +5,7 @@ import android.os.Bundle
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.errorDialog
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -34,6 +35,7 @@ class ScanSignParitySignerFragment : ScanQrFragment<ScanSignParitySignerViewMode
     override fun initViews() {
         super.initViews()
 
+        binder.signParitySignerScanToolbar.applyStatusBarInsets()
         binder.signParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
     }
 

@@ -7,6 +7,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.ViewSpace
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
@@ -77,6 +78,7 @@ class ChainNetworkManagementFragment :
     }
 
     override fun initViews() {
+        binder.chainNetworkManagementToolbar.applyStatusBarInsets()
         binder.chainNetworkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.chainNetworkManagementToolbar.setRightActionClickListener { viewModel.networkActionsClicked() }
 

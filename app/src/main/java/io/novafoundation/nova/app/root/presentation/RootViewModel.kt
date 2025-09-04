@@ -3,8 +3,8 @@ package io.novafoundation.nova.app.root.presentation
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.app.root.domain.RootInteractor
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.formatDeepLinkHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.DeepLinkHandlingException
+import io.novafoundation.nova.app.root.presentation.deepLinks.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
@@ -12,21 +12,18 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
-import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapEvent
-import io.novafoundation.nova.common.utils.onFailureInstance
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
-import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
-import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
@@ -49,27 +46,21 @@ class RootViewModel(
     private val updateNotificationsInteractor: UpdateNotificationsInteractor,
     private val walletConnectService: WalletConnectService,
     private val walletConnectSessionsUseCase: WalletConnectSessionsUseCase,
-    private val deepLinkHandler: RootDeepLinkHandler,
+    private val deepLinkHandler: DeepLinkHandler,
     private val rootScope: RootScope,
     private val compoundRequestBusHandler: CompoundRequestBusHandler,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val toastMessageManager: ToastMessageManager,
-    private val dialogMessageManager: DialogMessageManager,
-    private val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
+    private val toastMessageManager: ToastMessageManager
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     val toastMessagesEvents = toastMessageManager.toastMessagesEvents
 
-    val dialogMessageEvents = dialogMessageManager.dialogMessagesEvents
-
     val walletConnectErrorsLiveData = walletConnectService.onPairErrorLiveData
         .mapEvent { it.message }
-
-    val multisigPushNotificationsAlertMixin = multisigPushNotificationsAlertMixinFactory.create(this)
 
     private var willBeClearedForLanguageChange = false
 
@@ -87,7 +78,7 @@ class RootViewModel(
 
         checkForUpdates()
 
-        syncDelegatedAccounts()
+        syncProxies()
 
         syncCurrencies()
 
@@ -105,16 +96,11 @@ class RootViewModel(
 
         syncPushSettingsIfNeeded()
 
-        handlePendingDeepLink()
-
         externalServiceInitializer.initialize()
-
-        multisigPushNotificationsAlertMixin.subscribeToShowAlert()
     }
 
     private fun observeBusEvents() {
         compoundRequestBusHandler.observe()
-            .launchIn(this)
     }
 
     private fun subscribeDeepLinkCallback() {
@@ -126,7 +112,7 @@ class RootViewModel(
     private fun handleDeepLinkCallbackEvent(event: CallbackEvent) {
         when (event) {
             is CallbackEvent.Message -> {
-                showToast(event.message)
+                showMessage(event.message)
             }
         }
     }
@@ -149,10 +135,8 @@ class RootViewModel(
         launch { currencyInteractor.syncCurrencies() }
     }
 
-    private fun syncDelegatedAccounts() {
-        interactor.syncExternalAccounts()
-
-        interactor.syncPendingMultisigOperations()
+    private fun syncProxies() {
+        interactor.syncProxies()
             .inBackground()
             .launchIn(rootScope)
     }
@@ -215,21 +199,12 @@ class RootViewModel(
 
     fun handleDeepLink(data: Uri) {
         launch {
-            deepLinkHandler.handleDeepLink(data)
-                .onFailureInstance<DeepLinkHandlingException, Unit> {
-                    val errorMessage = formatDeepLinkHandlingException(resourceManager, it)
-                    showError(errorMessage)
-                }
-        }
-    }
-
-    private fun handlePendingDeepLink() {
-        launch {
-            deepLinkHandler.checkAndHandlePendingDeepLink()
-                .onFailureInstance<DeepLinkHandlingException, Unit> {
-                    val errorMessage = formatDeepLinkHandlingException(resourceManager, it)
-                    showError(errorMessage)
-                }
+            try {
+                deepLinkHandler.handleDeepLink(data)
+            } catch (e: DeepLinkHandlingException) {
+                val errorMessage = formatDeepLinkHandlingException(resourceManager, e)
+                showError(errorMessage)
+            }
         }
     }
 }

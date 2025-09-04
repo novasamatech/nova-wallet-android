@@ -14,7 +14,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
 import io.novafoundation.nova.feature_crowdloan_impl.di.validations.Confirm
@@ -45,7 +44,6 @@ class ConfirmContributeModule {
         externalActions: ExternalActions.Presentation,
         customContributeManager: CustomContributeManager,
         singleAssetSharedState: CrowdloanSharedState,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmContributeViewModel(
             assetIconProvider,
@@ -60,8 +58,7 @@ class ConfirmContributeModule {
             contributeValidations,
             customContributeManager,
             externalActions,
-            singleAssetSharedState,
-            extrinsicNavigationWrapper
+            singleAssetSharedState
         )
     }
 

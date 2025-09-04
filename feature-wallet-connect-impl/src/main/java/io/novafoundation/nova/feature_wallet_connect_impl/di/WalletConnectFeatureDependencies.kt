@@ -10,7 +10,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
-import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -52,8 +51,6 @@ interface WalletConnectFeatureDependencies {
     val selectWalletMixinFactory: SelectWalletMixin.Factory
 
     val appContext: Context
-
-    val automaticInteractionGate: AutomaticInteractionGate
 
     fun rootScope(): RootScope
 }

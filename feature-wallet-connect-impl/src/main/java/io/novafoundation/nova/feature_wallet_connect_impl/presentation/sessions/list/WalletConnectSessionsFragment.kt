@@ -5,6 +5,7 @@ import androidx.core.os.bundleOf
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_impl.databinding.FragmentWcSessionsBinding
@@ -30,6 +31,7 @@ class WalletConnectSessionsFragment : BaseFragment<WalletConnectSessionsViewMode
 
     override fun initViews() {
         binder.wcSessionsToolbar.setHomeButtonListener { viewModel.exit() }
+        binder.wcSessionsToolbar.applyStatusBarInsets()
 
         binder.wcSessionsConnectionsList.setHasFixedSize(true)
         binder.wcSessionsConnectionsList.adapter = sessionsAdapter

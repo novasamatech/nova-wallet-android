@@ -128,7 +128,7 @@ suspend fun SecretStoreV2.getAccountSecrets(
 }
 
 fun AccountSecrets.seed(): ByteArray? = fold(
-    left = { it[MetaAccountSecrets.SubstrateSeed] },
+    left = { it[MetaAccountSecrets.Seed] },
     right = { it[ChainAccountSecrets.Seed] }
 )
 

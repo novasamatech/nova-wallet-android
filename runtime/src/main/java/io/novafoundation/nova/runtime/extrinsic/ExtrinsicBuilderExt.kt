@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.extrinsic
 
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 
 fun ExtrinsicBuilder.systemRemark(remark: ByteArray): ExtrinsicBuilder {
     return call(

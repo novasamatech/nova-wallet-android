@@ -15,7 +15,8 @@ import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.Subs
 import io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.SubstrateLedgerAppCommon.getConfig
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 
 class LegacySubstrateLedgerApplication(
     private val transport: LedgerTransport,
@@ -55,9 +56,9 @@ class LegacySubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: InheritedImplication,
+        payload: SignerPayloadExtrinsic,
     ): SignatureWrapper {
-        val payloadBytes = payload.encoded()
+        val payloadBytes = payload.encodedSignaturePayload(hashBigPayloads = false)
         val applicationConfig = supportedApplications.getConfig(chainId)
 
         val derivationPath = ledgerRepository.getChainAccountDerivationPath(metaId, chainId)

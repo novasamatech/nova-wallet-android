@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.validations.UnlockReferendumValidationSystem
@@ -59,7 +58,6 @@ class ConfirmGovernanceUnlockModule {
         locksChangeFormatter: LocksChangeFormatter,
         validationSystem: UnlockReferendumValidationSystem,
         hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmGovernanceUnlockViewModel(
             router = router,
@@ -75,8 +73,7 @@ class ConfirmGovernanceUnlockModule {
             resourceManager = resourceManager,
             locksChangeFormatter = locksChangeFormatter,
             validationSystem = validationSystem,
-            hintsMixinFactory = hintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            hintsMixinFactory = hintsMixinFactory
         )
     }
 

@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.GENERIC_ADDRESS_PREFIX
 import io.novafoundation.nova.common.utils.added
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
@@ -41,7 +40,6 @@ import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.se
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectAddress.model.LedgerAccountRvItem
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -134,7 +132,7 @@ abstract class SelectAddressLedgerViewModel(
     }
 
     fun addressInfoClicked(addressModel: AddressModel, addressScheme: AddressScheme) {
-        addressActionsMixin.showAddressActions(addressModel.address, AddressFormat.defaultForScheme(addressScheme, SS58Encoder.GENERIC_ADDRESS_PREFIX))
+        addressActionsMixin.showAddressActions(addressModel.address, AddressFormat.defaultForScheme(addressScheme))
     }
 
     private fun verifyAccount(id: Int) {

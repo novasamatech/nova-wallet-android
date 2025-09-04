@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.Fraction
-import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.autoCompound
 import io.novafoundation.nova.feature_staking_impl.data.mythos.network.blockchain.api.candidateStake
@@ -109,7 +108,7 @@ class RealMythosUserStakeRepository @Inject constructor(
             val allKeys = delegationIds.map { it to userId }
 
             metadata.collatorStaking.candidateStake.observe(allKeys).map { resultMap ->
-                resultMap.filterNotNull().mapKeys { (keys, _) -> keys.first }
+                resultMap.mapKeys { (keys, _) -> keys.first }
             }
         }
     }

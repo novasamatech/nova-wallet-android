@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentNominationPoolsBondMoreBinding
@@ -16,6 +17,8 @@ class NominationPoolsSetupBondMoreFragment : BaseFragment<NominationPoolsSetupBo
     override fun createBinding() = FragmentNominationPoolsBondMoreBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.nominationPoolsBondMoreContainer.applyStatusBarInsets()
+
         binder.nominationPoolsBondMoreToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.nominationPoolsBondMoreContinue.prepareForProgress(viewLifecycleOwner)
         binder.nominationPoolsBondMoreContinue.setOnClickListener { viewModel.nextClicked() }

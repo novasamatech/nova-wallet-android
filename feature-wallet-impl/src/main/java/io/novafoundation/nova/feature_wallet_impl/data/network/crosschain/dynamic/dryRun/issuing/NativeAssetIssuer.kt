@@ -16,7 +16,7 @@ class NativeAssetIssuer(
         return runtimeSnapshot.composeCall(
             moduleName = Modules.BALANCES,
             callName = "force_set_balance",
-            arguments = mapOf(
+            args = mapOf(
                 "who" to AddressInstanceConstructor.constructInstance(runtimeSnapshot.typeRegistry, destination.value),
                 "new_free" to amount
             )

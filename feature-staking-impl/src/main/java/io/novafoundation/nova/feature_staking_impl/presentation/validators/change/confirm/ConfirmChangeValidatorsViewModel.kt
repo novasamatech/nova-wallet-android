@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createSubstrateAddressModel
+import io.novafoundation.nova.common.address.createAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -14,14 +14,13 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
@@ -58,15 +57,13 @@ class ConfirmChangeValidatorsViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
     hintsMixinFactory: ConfirmStakeHintsMixinFactory,
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalActions by externalActions,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    ExternalActions by externalActions {
 
     private val maxValidatorsPerNominator by lazyAsync {
         interactor.maxValidatorsPerNominator(setupStakingSharedState.activeStake())
@@ -159,24 +156,26 @@ class ConfirmChangeValidatorsViewModel(
     }
 
     private fun sendTransaction() = launch {
-        changeValidatorsInteractor.changeValidators(
+        val setupResult = changeValidatorsInteractor.changeValidators(
             stakingState = stashFlow.first(),
             validatorAccountIds = prepareNominations(),
-        ).onSuccess {
-            showToast(resourceManager.getString(R.string.common_transaction_submitted))
+        )
+
+        _showNextProgress.value = false
+
+        if (setupResult.isSuccess) {
+            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
 
             setupStakingSharedState.reset()
 
-            startNavigation(it.submissionHierarchy) { router.returnToCurrentValidators() }
-        }.onFailure {
-            showError(it)
+            router.returnToCurrentValidators()
+        } else {
+            showError(setupResult.requireException())
         }
-
-        _showNextProgress.value = false
     }
 
     private suspend fun generateDestinationModel(address: String, name: String?): AddressModel {
-        return addressIconGenerator.createSubstrateAddressModel(
+        return addressIconGenerator.createAddressModel(
             accountAddress = address,
             sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
             accountName = name,

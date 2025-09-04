@@ -14,8 +14,7 @@ import io.novafoundation.nova.runtime.util.constructAccountLookupInstance
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.call
 
 fun ExtrinsicBuilder.convictionVotingVote(

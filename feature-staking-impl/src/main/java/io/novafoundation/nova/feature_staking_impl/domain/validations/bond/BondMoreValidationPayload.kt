@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validations.bond
 
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import java.math.BigDecimal
 
 class BondMoreValidationPayload(
@@ -9,5 +9,4 @@ class BondMoreValidationPayload(
     val fee: Fee,
     val amount: BigDecimal,
     val stashAsset: Asset,
-    val stakeable: BigDecimal
 )

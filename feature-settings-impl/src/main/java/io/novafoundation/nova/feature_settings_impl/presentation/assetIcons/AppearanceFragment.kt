@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.assetIcons
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.databinding.FragmentAppearanceBinding
 import io.novafoundation.nova.feature_settings_impl.di.SettingsFeatureComponent
@@ -11,6 +12,7 @@ class AppearanceFragment : BaseFragment<AppearanceViewModel, FragmentAppearanceB
     override fun createBinding() = FragmentAppearanceBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.appearanceToolbar.applyStatusBarInsets()
         binder.appearanceToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.appearanceWhiteButton.setOnClickListener { viewModel.selectWhiteIcon() }

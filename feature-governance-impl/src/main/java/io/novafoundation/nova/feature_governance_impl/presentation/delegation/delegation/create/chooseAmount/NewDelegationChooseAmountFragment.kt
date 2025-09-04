@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -30,6 +31,8 @@ class NewDelegationChooseAmountFragment : BaseFragment<NewDelegationChooseAmount
     override fun createBinding() = FragmentNewDelegationChooseAmountBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.newDelegationChooseAmountContainer.applyStatusBarInsets()
+
         binder.newDelegationChooseAmountToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 

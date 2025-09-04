@@ -57,11 +57,7 @@ fun hasAccountComparator(): Comparator<AccountInChain> {
 }
 
 fun Comparator<AccountInChain>.withChainComparator(): Comparator<AccountInChain> {
-    return then(Chain.accountInChainComparator())
-}
-
-fun Chain.Companion.accountInChainComparator(): Comparator<AccountInChain> {
-    return Chain.defaultComparatorFrom(AccountInChain::chain)
+    return then(Chain.defaultComparatorFrom(AccountInChain::chain))
 }
 
 val AccountInChain.hasChainAccount

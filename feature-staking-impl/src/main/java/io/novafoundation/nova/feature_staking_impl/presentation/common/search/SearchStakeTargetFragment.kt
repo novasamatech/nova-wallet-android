@@ -6,6 +6,7 @@ import androidx.lifecycle.lifecycleScope
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.presentation.SearchState
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
@@ -35,6 +36,8 @@ abstract class SearchStakeTargetFragment<V : SearchStakeTargetViewModel<S>, S> :
     abstract val configuration: Configuration
 
     override fun initViews() {
+        binder.searchCustomValidatorsContainer.applyStatusBarInsets()
+
         binder.searchCustomValidatorsList.adapter = adapter
         binder.searchCustomValidatorsList.setHasFixedSize(true)
         binder.searchCustomValidatorsList.itemAnimator = null

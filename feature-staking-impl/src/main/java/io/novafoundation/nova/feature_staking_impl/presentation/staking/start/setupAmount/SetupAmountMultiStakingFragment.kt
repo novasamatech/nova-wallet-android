@@ -5,6 +5,7 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
 import io.novafoundation.nova.common.utils.makeGoneViews
@@ -31,6 +32,7 @@ class SetupAmountMultiStakingFragment : BaseFragment<SetupAmountMultiStakingView
     override fun createBinding() = FragmentStartMultiStakingAmountBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.startMultiStakingSetupAmountToolbar.applyStatusBarInsets()
         binder.startMultiStakingSetupAmountToolbar.setHomeButtonListener { viewModel.back() }
 
         binder.startMultiStakingSetupAmountContinue.prepareForProgress(viewLifecycleOwner)

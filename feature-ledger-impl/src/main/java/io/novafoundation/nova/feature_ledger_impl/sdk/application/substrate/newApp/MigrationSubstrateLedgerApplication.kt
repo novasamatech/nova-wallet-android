@@ -17,7 +17,7 @@ class MigrationSubstrateLedgerApplication(
     private val chainRegistry: ChainRegistry,
     private val ledgerRepository: LedgerRepository,
     private val legacyApplicationConfigs: List<SubstrateApplicationConfig> = SubstrateApplicationConfig.all()
-) : NewSubstrateLedgerApplication(transport, metadataShortenerService, chainRegistry) {
+) : NewSubstrateLedgerApplication(transport, chainRegistry, metadataShortenerService) {
 
     override val cla: UByte = GenericSubstrateLedgerApplication.CLA
 

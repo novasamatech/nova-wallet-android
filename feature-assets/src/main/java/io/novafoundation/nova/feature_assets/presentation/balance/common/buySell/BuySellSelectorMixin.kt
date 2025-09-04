@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.buySel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.mixin.restrictions.isAllowed
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -16,7 +15,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
 interface BuySellSelectorMixin {
 
@@ -37,7 +35,6 @@ interface BuySellSelectorMixin {
 }
 
 class RealBuySellSelectorMixin(
-    private val buySellRestrictionCheckMixin: BuySellRestrictionCheckMixin,
     private val router: AssetsRouter,
     private val tradeTokenRegistry: TradeTokenRegistry,
     private val chainRegistry: ChainRegistry,
@@ -72,16 +69,15 @@ class RealBuySellSelectorMixin(
         }
     }
 
-    private suspend fun openAllAssetsSelector() = BuySellSelectorMixin.SelectorPayload(
+    private fun openAllAssetsSelector() = BuySellSelectorMixin.SelectorPayload(
         buyItem(enabled = true) { router.openBuyFlow() },
-        sellItem(enabled = buySellRestrictionCheckMixin.isAllowed()) { router.openSellFlow() }
+        sellItem(enabled = true) { router.openSellFlow() }
     )
 
     private suspend fun openSpecifiedAssetSelector(selectorType: SelectorType.Asset): BuySellSelectorMixin.SelectorPayload? {
         val chainAsset = chainRegistry.asset(selectorType.chaiId, selectorType.assetId)
         val buyAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.BUY)
-        val sellAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.SELL) &&
-            buySellRestrictionCheckMixin.isAllowed()
+        val sellAvailable = tradeTokenRegistry.hasProvider(chainAsset, TradeTokenRegistry.TradeType.SELL)
 
         if (!buyAvailable && !sellAvailable) {
             showErrorMessage(R.string.trade_token_not_supported_title, R.string.trade_token_not_supported_message)
@@ -110,16 +106,8 @@ class RealBuySellSelectorMixin(
             if (enabled) R.color.icon_primary else R.color.icon_inactive,
             R.string.wallet_asset_sell_tokens,
             if (enabled) R.color.text_primary else R.color.button_text_inactive,
-            if (enabled) action else sellErrorAction()
+            if (enabled) action else errorAction(R.string.sell_token_not_supported_title, R.string.sell_token_not_supported_message)
         )
-    }
-
-    private fun sellErrorAction(): () -> Unit = {
-        coroutineScope.launch {
-            buySellRestrictionCheckMixin.checkRestrictionAndDo {
-                showErrorMessage(R.string.sell_token_not_supported_title, R.string.sell_token_not_supported_message)
-            }
-        }
     }
 
     private fun errorAction(titleRes: Int, messageRes: Int): () -> Unit = { showErrorMessage(titleRes, messageRes) }

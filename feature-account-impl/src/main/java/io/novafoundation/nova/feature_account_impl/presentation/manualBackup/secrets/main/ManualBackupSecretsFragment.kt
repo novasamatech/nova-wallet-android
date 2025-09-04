@@ -5,6 +5,7 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.decoration.ExtraSpaceItemDecoration
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentManualBackupSecretsBinding
@@ -31,6 +32,7 @@ class ManualBackupSecretsFragment : BaseFragment<ManualBackupSecretsViewModel, F
     private val adapter = ManualBackupSecretsAdapter(this)
 
     override fun initViews() {
+        binder.manualBackupSecretsToolbar.applyStatusBarInsets()
         binder.manualBackupSecretsToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.manualBackupSecretsToolbar.setRightActionClickListener { viewModel.advancedSecretsClicked() }
 

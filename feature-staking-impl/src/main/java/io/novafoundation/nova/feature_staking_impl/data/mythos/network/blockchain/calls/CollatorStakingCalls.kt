@@ -5,8 +5,7 @@ import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 
 @JvmInline
 value class CollatorStakingCalls(val builder: ExtrinsicBuilder)

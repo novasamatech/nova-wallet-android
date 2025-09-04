@@ -16,8 +16,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationSystem
@@ -56,12 +54,10 @@ class ConfirmAddStakingProxyViewModel(
     private val addStakingProxyInteractor: AddStakingProxyInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     Validatable by validationExecutor,
-    ExternalActions by externalActions,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    ExternalActions by externalActions {
 
     private val selectedMetaAccountFlow = accountRepository.selectedMetaAccountFlow()
         .shareInBackground()
@@ -135,9 +131,7 @@ class ConfirmAddStakingProxyViewModel(
 
         validationProgressFlow.value = false
 
-        result.onSuccess {
-            startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
-        }
+        result.onSuccess { router.returnToStakingMain() }
             .onFailure(::showError)
     }
 

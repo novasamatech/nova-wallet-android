@@ -109,13 +109,6 @@
                 android:layout_height="wrap_content">
 
                 <io.novafoundation.nova.common.view.settings.SettingsItemView
-                    android:id="@+id/pushSettingsMultisigs"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/push_settings_multisig_operations"
-                    tools:settingValue="On" />
-
-                <io.novafoundation.nova.common.view.settings.SettingsItemView
                     android:id="@+id/pushSettingsGovernance"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedToDynamicScaleInstance
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
-import io.novafoundation.nova.feature_xcm_api.versions.bindVersionedXcm
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import java.math.BigInteger
 
@@ -88,10 +87,6 @@ value class MultiAssets(val value: List<MultiAsset>) : VersionedToDynamicScaleIn
         fun bind(decodedInstance: Any?, xcmVersion: XcmVersion): MultiAssets {
             val assets = bindList(decodedInstance) { MultiAsset.bind(it, xcmVersion) }
             return MultiAssets(assets)
-        }
-
-        fun bindVersioned(decodedInstance: Any?): VersionedMultiAssets {
-            return bindVersionedXcm(decodedInstance, MultiAssets::bind)
         }
     }
 

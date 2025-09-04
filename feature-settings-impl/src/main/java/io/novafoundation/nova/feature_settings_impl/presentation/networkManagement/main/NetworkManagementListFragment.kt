@@ -6,6 +6,7 @@ import android.os.Looper
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.databinding.FragmentNetworkManagementBinding
@@ -27,6 +28,7 @@ class NetworkManagementListFragment : BaseFragment<NetworkManagementListViewMode
     override fun createBinding() = FragmentNetworkManagementBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.networkManagementToolbar.applyStatusBarInsets()
         binder.networkManagementToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.networkManagementToolbar.setRightActionClickListener { viewModel.addNetworkClicked() }
 

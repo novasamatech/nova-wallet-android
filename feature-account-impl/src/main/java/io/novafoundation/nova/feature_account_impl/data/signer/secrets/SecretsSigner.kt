@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.getChainAccountKeypair
 import io.novafoundation.nova.common.data.secrets.v2.getMetaAccountKeypair
-import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationResult
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -15,16 +14,14 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
-import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.KeyPairSigner
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadRaw
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
-import javax.inject.Inject
 
-@FeatureScope
-class SecretsSignerFactory @Inject constructor(
+class SecretsSignerFactory(
     private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
     private val twoFactorVerificationService: TwoFactorVerificationService
@@ -41,20 +38,17 @@ class SecretsSignerFactory @Inject constructor(
 }
 
 class SecretsSigner(
-    metaAccount: MetaAccount,
+    private val metaAccount: MetaAccount,
     private val secretStoreV2: SecretStoreV2,
     private val chainRegistry: ChainRegistry,
     private val twoFactorVerificationService: TwoFactorVerificationService,
 ) : LeafSigner(metaAccount) {
 
-    override suspend fun signInheritedImplication(
-        inheritedImplication: InheritedImplication,
-        accountId: AccountId
-    ): SignatureWrapper {
+    override suspend fun signExtrinsic(payloadExtrinsic: SignerPayloadExtrinsic): SignedExtrinsic {
         runTwoFactorVerificationIfEnabled()
 
-        val delegate = createDelegate(accountId)
-        return delegate.signInheritedImplication(inheritedImplication, accountId)
+        val delegate = createDelegate(payloadExtrinsic.accountId)
+        return delegate.signExtrinsic(payloadExtrinsic)
     }
 
     override suspend fun signRaw(payload: SignerPayloadRaw): SignedRaw {
@@ -62,10 +56,6 @@ class SecretsSigner(
 
         val delegate = createDelegate(payload.accountId)
         return delegate.signRaw(payload)
-    }
-
-    override suspend fun maxCallsPerTransaction(): Int? {
-        return null
     }
 
     private suspend fun runTwoFactorVerificationIfEnabled() {

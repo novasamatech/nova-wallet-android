@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.domain.account.model
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxyAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateApplicationConfig
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.supports
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -20,8 +21,8 @@ class LegacyLedgerMetaAccount(
     name: String,
     type: LightMetaAccount.Type,
     status: LightMetaAccount.Status,
-    chainAccounts: Map<ChainId, MetaAccount.ChainAccount>,
-    parentMetaId: Long?
+    proxy: ProxyAccount?,
+    chainAccounts: Map<ChainId, MetaAccount.ChainAccount>
 ) : DefaultMetaAccount(
     id = id,
     globallyUniqueId = globallyUniqueId,
@@ -35,7 +36,7 @@ class LegacyLedgerMetaAccount(
     type = type,
     status = status,
     chainAccounts = chainAccounts,
-    parentMetaId = parentMetaId
+    proxy = proxy
 ) {
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {

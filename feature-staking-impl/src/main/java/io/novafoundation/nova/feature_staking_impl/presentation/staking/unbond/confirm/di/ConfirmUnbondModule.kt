@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondInteractor
@@ -42,7 +41,6 @@ class ConfirmUnbondModule {
         singleAssetSharedState: StakingSharedState,
         unbondHintsMixinFactory: UnbondHintsMixinFactory,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
     ): ViewModel {
         return ConfirmUnbondViewModel(
             router = router,
@@ -56,8 +54,7 @@ class ConfirmUnbondModule {
             payload = payload,
             selectedAssetState = singleAssetSharedState,
             unbondHintsMixinFactory = unbondHintsMixinFactory,
-            walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            walletUiUseCase = walletUiUseCase
         )
     }
 

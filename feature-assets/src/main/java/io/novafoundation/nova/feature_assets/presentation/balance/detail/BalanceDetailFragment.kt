@@ -1,14 +1,12 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import android.os.Bundle
-import android.view.View
 import androidx.core.view.isGone
 import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.applyBarMargin
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceDetailBinding
@@ -42,13 +40,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    override fun applyInsets(rootView: View) {
-        binder.root.applyNavigationBarInsets(consume = false)
-        binder.balanceDetailBack.applyBarMargin()
-    }
-
     override fun initViews() {
         hideKeyboard()
+
+        binder.balanceDetailBack.applyBarMargin()
 
         binder.transfersContainer.initializeBehavior(anchorView = binder.balanceDetailContent)
 

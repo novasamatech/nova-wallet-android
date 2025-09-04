@@ -1,6 +1,27 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
 
 android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
     namespace 'io.novafoundation.nova.feature_dapp_api'
 
     buildFeatures {
@@ -12,7 +33,6 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(":feature-external-sign-api")
     implementation project(':common')
-    implementation project(':feature-deep-linking')
 
     implementation shimmerDep
 

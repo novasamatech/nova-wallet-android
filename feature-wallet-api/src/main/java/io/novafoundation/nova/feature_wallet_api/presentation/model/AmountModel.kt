@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatWithFullAmount
 import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrencyNoAbbreviation
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -68,7 +67,6 @@ fun mapAmountToAmountModel(
     estimatedFiat: Boolean = false
 ): AmountModel {
     val fiatAmount = token.amountToFiat(amount)
-        .takeIf { it != BigDecimal.ZERO || includeZeroFiat }
 
     val unsignedTokenAmount = if (useAbbreviation) {
         if (includeAssetTicker) {
@@ -86,11 +84,8 @@ fun mapAmountToAmountModel(
         }
     }
 
-    var formattedFiat = if (useAbbreviation) {
-        fiatAmount?.formatAsCurrency(token.currency, roundingMode)
-    } else {
-        fiatAmount?.formatAsCurrencyNoAbbreviation(token.currency)
-    }
+    var formattedFiat = fiatAmount.takeIf { it != BigDecimal.ZERO || includeZeroFiat }
+        ?.formatAsCurrency(token.currency, roundingMode)
 
     if (estimatedFiat && formattedFiat != null) {
         formattedFiat = "~$formattedFiat"

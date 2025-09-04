@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
-import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -68,6 +67,4 @@ interface ExternalSignFeatureDependencies {
     val rpcCalls: RpcCalls
 
     val metadataShortenerService: MetadataShortenerService
-
-    val signingContextFactory: SigningContext.Factory
 }

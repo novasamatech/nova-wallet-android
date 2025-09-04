@@ -18,12 +18,13 @@ import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerServic
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignerPayloadExtrinsic
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.encodedSignaturePayload
 
 abstract class NewSubstrateLedgerApplication(
     private val transport: LedgerTransport,
-    private val metadataShortenerService: MetadataShortenerService,
     private val chainRegistry: ChainRegistry,
+    private val metadataShortenerService: MetadataShortenerService
 ) : SubstrateLedgerApplication {
 
     abstract val cla: UByte
@@ -60,7 +61,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: InheritedImplication
+        payload: SignerPayloadExtrinsic
     ): SignatureWrapper {
         val chain = chainRegistry.getChain(chainId)
 
@@ -75,7 +76,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: InheritedImplication
+        payload: SignerPayloadExtrinsic
     ): SignatureWrapper {
         val multiSignature = sendSignChunks(device, metaId, chainId, payload, defaultCryptoScheme())
         return SubstrateLedgerAppCommon.parseMultiSignature(multiSignature)
@@ -85,7 +86,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: InheritedImplication
+        payload: SignerPayloadExtrinsic
     ): SignatureWrapper {
         val signature = sendSignChunks(device, metaId, chainId, payload, CryptoScheme.ECDSA)
         return SubstrateLedgerAppCommon.parseSignature(signature, CryptoScheme.ECDSA)
@@ -95,7 +96,7 @@ abstract class NewSubstrateLedgerApplication(
         device: LedgerDevice,
         metaId: Long,
         chainId: ChainId,
-        payload: InheritedImplication,
+        payload: SignerPayloadExtrinsic,
         cryptoScheme: CryptoScheme
     ): ByteArray {
         val chunks = prepareExtrinsicChunks(metaId, chainId, payload)
@@ -121,9 +122,9 @@ abstract class NewSubstrateLedgerApplication(
     private suspend fun prepareExtrinsicChunks(
         metaId: Long,
         chainId: ChainId,
-        payload: InheritedImplication
+        payload: SignerPayloadExtrinsic
     ): List<ByteArray> {
-        val payloadBytes = payload.encoded()
+        val payloadBytes = payload.encodedSignaturePayload(hashBigPayloads = false)
 
         val derivationPath = getDerivationPath(metaId, chainId)
         val encodedDerivationPath = encodeDerivationPath(derivationPath)

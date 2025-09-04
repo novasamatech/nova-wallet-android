@@ -7,14 +7,12 @@ import io.novafoundation.nova.common.data.secrets.v2.entropy
 import io.novafoundation.nova.common.data.secrets.v2.getAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.seed
 import io.novafoundation.nova.common.list.GroupedList
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.model.hasChainAccountIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.SecretType
 import io.novafoundation.nova.feature_account_impl.domain.account.details.AccountInChain.From
-import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.accountInChainComparator
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasChainAccount
 import io.novafoundation.nova.runtime.ext.addressScheme
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -56,7 +54,7 @@ WalletDetailsInteractor(
             }
     }
 
-    fun chainProjectionsBySourceFlow(
+    fun chainProjectionsFlow(
         metaId: Long,
         chains: List<Chain>,
         sorting: Comparator<AccountInChain>
@@ -73,17 +71,6 @@ WalletDetailsInteractor(
                     .mapValues { (_, chainAccounts) -> chainAccounts.sortedWith(sorting) }
                     .toSortedMap(compareBy(From::ordering))
             }
-    }
-
-    fun allPresentChainProjections(
-        metaAccount: MetaAccount
-    ): Flow<List<AccountInChain>> {
-        return flowOf {
-            val chains = getAllChains()
-
-            chains.mapNotNull { createAccountInChainOrNull(it, metaAccount) }
-                .sortedWith(Chain.accountInChainComparator())
-        }
     }
 
     suspend fun availableExportTypes(
@@ -125,11 +112,6 @@ WalletDetailsInteractor(
         }
 
         return AccountInChain(chain = chain, projection = projection)
-    }
-
-    private fun createAccountInChainOrNull(chain: Chain, metaAccount: MetaAccount): AccountInChain? {
-        val accountInChain = createAccountInChain(chain, metaAccount)
-        return accountInChain.takeIf { it.hasChainAccount }
     }
 }
 

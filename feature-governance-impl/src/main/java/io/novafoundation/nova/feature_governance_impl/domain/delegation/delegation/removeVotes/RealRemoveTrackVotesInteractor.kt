@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_governance_impl.domain.delegation.delegat
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
@@ -18,7 +17,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -38,11 +37,11 @@ class RealRemoveTrackVotesInteractor(
         }
     }
 
-    override suspend fun removeTrackVotes(trackIds: Collection<TrackId>): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> = withContext(Dispatchers.IO) {
+    override suspend fun removeTrackVotes(trackIds: Collection<TrackId>): Result<ExtrinsicStatus.InBlock> = withContext(Dispatchers.IO) {
         val (chain, governance) = useSelectedGovernance()
 
-        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { buildingContext ->
-            governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, accountIdToRemoveVotes = buildingContext.submissionOrigin.executingAccount)
+        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { origin ->
+            governance.removeVotes(trackIds, extrinsicBuilder = this, chain.id, accountIdToRemoveVotes = origin.executingAccount)
         }.awaitInBlock()
     }
 

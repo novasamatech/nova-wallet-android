@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.singleSe
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -16,6 +17,8 @@ abstract class ConfirmStartSingleTargetStakingFragment<V : ConfirmStartSingleTar
     override fun createBinding() = FragmentParachainStakingStartConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.confirmStartParachainStakingContainer.applyStatusBarInsets()
+
         binder.confirmStartParachainStakingToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 

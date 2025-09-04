@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.android.extensions.LayoutContainer
 
 abstract class GroupedListAdapter<GROUP, CHILD>(private val diffCallback: BaseGroupedDiffCallback<GROUP, CHILD>) :
     ListAdapter<Any, GroupedListHolder>(diffCallback) {
@@ -131,9 +132,8 @@ abstract class BaseGroupedDiffCallback<GROUP, CHILD>(private val groupClass: Cla
     internal fun isGroup(item: Any) = item::class.java == groupClass
 }
 
-// TODO containerView can be removed
-abstract class GroupedListHolder(open val containerView: View) :
-    RecyclerView.ViewHolder(containerView) {
+abstract class GroupedListHolder(override val containerView: View) :
+    RecyclerView.ViewHolder(containerView), LayoutContainer {
 
     open fun unbind() {
     }

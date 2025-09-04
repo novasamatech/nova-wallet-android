@@ -10,6 +10,7 @@ import android.os.Bundle
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.dialog
@@ -53,6 +54,7 @@ abstract class SelectLedgerFragment<V : SelectLedgerViewModel> : BaseFragment<V,
     override fun initViews() {
         binder.selectLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
+        binder.selectLedgerToolbar.applyStatusBarInsets()
 
         binder.selectLedgerGrantPermissions.setOnClickListener { viewModel.allowAvailabilityRequests() }
 

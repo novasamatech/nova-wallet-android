@@ -29,6 +29,4 @@ interface SwapRouter : ReturnableRouter {
     fun openBalanceDetails(assetPayload: AssetPayload)
 
     fun openBuyToken(chainId: String, assetId: Int)
-
-    fun openMain()
 }

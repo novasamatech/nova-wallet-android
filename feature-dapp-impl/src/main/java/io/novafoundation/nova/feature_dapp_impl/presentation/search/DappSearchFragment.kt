@@ -1,16 +1,15 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
-import android.view.View
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
-import io.novafoundation.nova.common.base.BaseFragment
+import dev.chrisbanes.insetter.applyInsetter
+import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.onLoaded
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
@@ -24,7 +23,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.DappCategoriesAdapter
 import javax.inject.Inject
 
-class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappBinding>(), SearchDappAdapter.Handler, DappCategoriesAdapter.Handler {
+class DappSearchFragment : BaseBottomSheetFragment<DAppSearchViewModel, FragmentSearchDappBinding>(), SearchDappAdapter.Handler, DappCategoriesAdapter.Handler {
 
     companion object {
 
@@ -44,12 +43,14 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
 
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { SearchDappAdapter(this) }
 
-    override fun applyInsets(rootView: View) {
-        binder.searchDappSearch.applyStatusBarInsets()
-        binder.searchDappSearhContainer.applyNavigationBarInsets(consume = false, imeInsets = true)
-    }
-
     override fun initViews() {
+        binder.searchDappSearch.applyStatusBarInsets()
+        binder.searchDappSearhContainer.applyInsetter {
+            type(ime = true) {
+                padding()
+            }
+        }
+
         binder.searchDappCategories.adapter = categoriesAdapter
         binder.searchDappList.adapter = adapter
         binder.searchDappList.setHasFixedSize(true)

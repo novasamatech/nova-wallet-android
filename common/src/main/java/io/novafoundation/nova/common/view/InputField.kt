@@ -47,8 +47,6 @@ class InputField @JvmOverloads constructor(
         val text = typedArray.getString(R.styleable.InputField_android_text)
         content.setText(text)
 
-        content.minHeight = typedArray.getDimension(R.styleable.InputField_editTextMinHeight, content.minHeight.toFloat()).roundToInt()
-
         content.setPadding(
             typedArray.getDimension(R.styleable.InputField_editTextPaddingStart, content.paddingLeft.toFloat()).roundToInt(),
             typedArray.getDimension(R.styleable.InputField_editTextPaddingTop, content.paddingTop.toFloat()).roundToInt(),

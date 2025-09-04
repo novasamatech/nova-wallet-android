@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransferConfiguration
@@ -21,8 +20,7 @@ import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
-import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
 import java.math.BigInteger
 import javax.inject.Inject
 
@@ -30,7 +28,6 @@ import javax.inject.Inject
 class LegacyCrossChainTransactor @Inject constructor(
     private val weigher: LegacyCrossChainWeigher,
     private val xcmVersionDetector: XcmVersionDetector,
-    private val assetSourceRegistry: AssetSourceRegistry,
 ) {
 
     context(ExtrinsicBuilder)
@@ -46,13 +43,6 @@ class LegacyCrossChainTransactor @Inject constructor(
             XcmTransferType.XCM_PALLET_TRANSFER_ASSETS -> xcmPalletTransferAssets(configuration, transfer, crossChainFee)
             XcmTransferType.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
         }
-    }
-
-    suspend fun requiredRemainingAmountAfterTransfer(
-        configuration: LegacyCrossChainTransferConfiguration
-    ): Balance {
-        val chainAsset = configuration.originChainAsset
-        return assetSourceRegistry.sourceFor(chainAsset).balance.existentialDeposit(chainAsset)
     }
 
     private suspend fun ExtrinsicBuilder.xTokensTransfer(

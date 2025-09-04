@@ -1,34 +1,26 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.combine
-import io.novafoundation.nova.common.utils.graph.Path
-import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.xyk
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationAssetType
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcher
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcherFactory
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.fromAsset
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.localId
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.matchId
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.remoteId
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.subscribeToTransferableBalance
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.XYKPool
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.XYKPoolAsset
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.XYKPoolInfo
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.XYKPools
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.poolFeesConstant
+import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.errors.SwapQuoteException
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -41,15 +33,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
-import javax.inject.Inject
-import javax.inject.Named
 
-@FeatureScope
-class XYKSwapQuotingSourceFactory @Inject constructor(
-    @Named(REMOTE_STORAGE_SOURCE)
+class XYKSwapQuotingSourceFactory(
     private val remoteStorageSource: StorageDataSource,
-    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    private val hydrationBalanceFetcherFactory: HydrationBalanceFetcherFactory,
+    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter
 ) : HydraDxQuotingSource.Factory<XYKSwapQuotingSource> {
 
     companion object {
@@ -61,7 +48,6 @@ class XYKSwapQuotingSourceFactory @Inject constructor(
         return RealXYKSwapQuotingSource(
             remoteStorageSource = remoteStorageSource,
             hydraDxAssetIdConverter = hydraDxAssetIdConverter,
-            hydrationBalanceFetcher = hydrationBalanceFetcherFactory.create(host),
             chain = chain
         )
     }
@@ -70,7 +56,6 @@ class XYKSwapQuotingSourceFactory @Inject constructor(
 private class RealXYKSwapQuotingSource(
     private val remoteStorageSource: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    private val hydrationBalanceFetcher: HydrationBalanceFetcher,
     private val chain: Chain
 ) : XYKSwapQuotingSource {
 
@@ -131,14 +116,8 @@ private class RealXYKSwapQuotingSource(
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<BigInteger> {
         val chainAsset = chain.assetsById.getValue(assetId.localId.assetId)
-        val hydrationAssetType = HydrationAssetType.fromAsset(chainAsset, assetId.remoteId)
 
-        return hydrationBalanceFetcher.subscribeToTransferableBalance(
-            chainId = chainAsset.chainId,
-            type = hydrationAssetType,
-            accountId = poolAddress,
-            subscriptionBuilder = subscriptionBuilder
-        )
+        return remoteStorageSource.subscribeToTransferableBalance(chainAsset, poolAddress, subscriptionBuilder)
     }
 
     private suspend fun getPools(): Map<AccountIdKey, XYKPoolInfo> {
@@ -150,11 +129,17 @@ private class RealXYKSwapQuotingSource(
     private suspend fun Map<AccountIdKey, XYKPoolInfo>.matchIdsWithLocal(): List<PoolInitialInfo> {
         val allOnChainIds = hydraDxAssetIdConverter.allOnChainIds(chain)
 
-        return mapNotNull { (poolAddress, poolInfo) ->
+        fun matchId(remoteId: HydraDxAssetId): RemoteAndLocalId? {
+            return allOnChainIds[remoteId]?.fullId?.let {
+                remoteId to it
+            }
+        }
+
+        return mapNotNull outer@{ (poolAddress, poolInfo) ->
             PoolInitialInfo(
                 poolAddress = poolAddress.value,
-                firstAsset = allOnChainIds.matchId(poolInfo.firstAsset) ?: return@mapNotNull null,
-                secondAsset = allOnChainIds.matchId(poolInfo.secondAsset) ?: return@mapNotNull null,
+                firstAsset = matchId(poolInfo.firstAsset) ?: return@outer null,
+                secondAsset = matchId(poolInfo.secondAsset) ?: return@outer null,
             )
         }
     }
@@ -191,9 +176,8 @@ private class RealXYKSwapQuotingSource(
 
         override val to: FullChainAssetId = toAsset.second
 
-        override fun weightForAppendingTo(path: Path<WeightedEdge<FullChainAssetId>>): Int {
-            return weightAppendingToPath(path, Weights.Hydra.XYK)
-        }
+        override val weight: Int
+            get() = Weights.Hydra.XYK
 
         override suspend fun quote(amount: BigInteger, direction: SwapDirection): BigInteger {
             val allPools = xykPools.first()

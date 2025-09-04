@@ -1,13 +1,35 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 
 android {
+    compileSdkVersion rootProject.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+    }
 
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        freeCompilerArgs = ["-Xcontext-receivers"]
     }
     namespace 'io.novafoundation.nova.feature_push_notifications'
 
@@ -24,9 +46,7 @@ dependencies {
     implementation project(':feature-governance-api')
     implementation project(':feature-staking-api')
     implementation project(':feature-currency-api')
-    implementation project(':feature-assets')
-    implementation project(':feature-deep-linking')
-    implementation project(':feature-multisig:operations')
+    implementation project(':feature-deep-link-building')
 
     implementation kotlinDep
 
@@ -41,8 +61,8 @@ dependencies {
     implementation coroutinesDep
 
     implementation daggerDep
-    ksp daggerCompiler
+    kapt daggerKapt
 
     implementation lifecycleDep
-    ksp lifecycleCompiler
+    kapt lifecycleKapt
 }

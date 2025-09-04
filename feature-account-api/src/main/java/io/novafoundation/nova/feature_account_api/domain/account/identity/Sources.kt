@@ -7,6 +7,3 @@ annotation class OnChainIdentity
 
 @Qualifier
 annotation class LocalIdentity
-
-@Qualifier
-annotation class LocalWithOnChainIdentity

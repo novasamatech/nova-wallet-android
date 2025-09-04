@@ -36,19 +36,19 @@ interface AddressIconGenerator {
 }
 
 @Throws(AddressFormatException::class)
-suspend fun AddressIconGenerator.createSubstrateAddressModel(
+suspend fun AddressIconGenerator.createAddressModel(
     accountAddress: String,
     sizeInDp: Int,
     accountName: String? = null,
     @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT
 ): AddressModel {
-    val icon = createSubstrateAddressIcon(accountAddress, sizeInDp, background)
+    val icon = createAddressIcon(accountAddress, sizeInDp, background)
 
     return AddressModel(accountAddress, icon, accountName)
 }
 
 @Throws(AddressFormatException::class)
-suspend fun AddressIconGenerator.createSubstrateAddressIcon(
+suspend fun AddressIconGenerator.createAddressIcon(
     accountAddress: String,
     sizeInDp: Int,
     @ColorRes background: Int = AddressIconGenerator.BACKGROUND_DEFAULT

@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
@@ -39,8 +38,7 @@ class RedeemModule {
         externalActions: ExternalActions.Presentation,
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         singleAssetSharedState: StakingSharedState,
-        walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        walletUiUseCase: WalletUiUseCase
     ): ViewModel {
         return RedeemViewModel(
             router = router,
@@ -53,8 +51,7 @@ class RedeemModule {
             feeLoaderMixin = feeLoaderMixin,
             externalActions = externalActions,
             selectedAssetState = singleAssetSharedState,
-            walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            walletUiUseCase = walletUiUseCase
         )
     }
 

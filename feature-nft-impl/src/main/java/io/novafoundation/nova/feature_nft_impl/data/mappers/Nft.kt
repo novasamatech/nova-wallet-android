@@ -16,7 +16,6 @@ fun mapNftTypeLocalToTypeKey(
     NftLocal.Type.RMRK2 -> Nft.Type.Key.RMRKV2
     NftLocal.Type.PDC20 -> Nft.Type.Key.PDC20
     NftLocal.Type.KODADOT -> Nft.Type.Key.KODADOT
-    NftLocal.Type.UNIQUE_NETWORK -> Nft.Type.Key.UNIQUE_NETWORK
 }
 
 fun nftIssuance(
@@ -31,7 +30,7 @@ fun nftIssuance(
         NftLocal.IssuanceType.LIMITED -> {
             val myEditionInt = issuanceMyEdition?.toIntOrNull()
 
-            if (issuanceTotal != null && !issuanceTotal.isZero && myEditionInt != null) {
+            if (issuanceTotal != null && issuanceTotal.isZero && myEditionInt != null) {
                 Nft.Issuance.Limited(max = issuanceTotal.toInt(), edition = myEditionInt)
             } else {
                 Nft.Issuance.Unlimited
@@ -74,7 +73,6 @@ fun mapNftLocalToNft(
         NftLocal.Type.RMRK2 -> Nft.Type.Rmrk2
         NftLocal.Type.PDC20 -> Nft.Type.Pdc20
         NftLocal.Type.KODADOT -> Nft.Type.Kodadot
-        NftLocal.Type.UNIQUE_NETWORK -> Nft.Type.UniqueNetwork
     }
 
     val details = if (nftLocal.wholeDetailsLoaded) {

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_wallet_api.domain.model
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigDecimal
@@ -86,10 +85,6 @@ data class ChainAssetWithAmount(
 
 val ChainAssetWithAmount.decimalAmount: BigDecimal
     get() = chainAsset.amountFromPlanks(amount)
-
-fun ChainAssetWithAmount.toIdWithAmount(): ChainAssetIdWithAmount {
-    return chainAsset.fullId.withAmount(amount)
-}
 
 data class ChainAssetIdWithAmount(
     val chainAssetId: FullChainAssetId,

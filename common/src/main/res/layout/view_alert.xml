@@ -12,21 +12,13 @@
     tools:paddingTop="10dp"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
-    <FrameLayout
-        android:id="@+id/alertIconContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <ImageView
+        android:id="@+id/alertIcon"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/alertIcon"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            tools:src="@drawable/ic_warning_filled" />
-
-    </FrameLayout>
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_warning_filled" />
 
     <TextView
         android:id="@+id/alertMessage"
@@ -38,7 +30,7 @@
         android:includeFontPadding="false"
         android:textColor="@color/text_primary"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/alertIconContainer"
+        app:layout_constraintStart_toEndOf="@+id/alertIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@tools:sample/lorem[20]" />
 
@@ -52,19 +44,26 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:textColor="@color/button_text_accent"
-        app:layout_constraintStart_toStartOf="@+id/alertSubMessageContainer"
-        app:layout_constraintTop_toBottomOf="@+id/alertSubMessageContainer"
+        app:layout_constraintStart_toStartOf="@+id/alertSubMessage"
+        app:layout_constraintTop_toBottomOf="@+id/alertSubMessage"
         tools:text="@string/common_how_it_works" />
 
-    <LinearLayout
-        android:id="@+id/alertSubMessageContainer"
+    <TextView
+        android:id="@+id/alertSubMessage"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginStart="12dp"
-        android:orientation="vertical"
+        android:layout_marginTop="12dp"
+        android:includeFontPadding="false"
+        android:visibility="gone"
+        android:textColor="@color/text_secondary"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@id/alertIcon"
-        app:layout_constraintTop_toBottomOf="@id/alertMessage" />
+        app:layout_constraintTop_toBottomOf="@id/alertMessage"
+        tools:text="@tools:sample/lorem[20]" />
 
     <ImageView
         android:id="@+id/alertActionArrow"

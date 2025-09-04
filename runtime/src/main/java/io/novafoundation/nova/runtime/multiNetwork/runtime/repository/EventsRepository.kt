@@ -9,15 +9,12 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.common.utils.metadata
-import io.novafoundation.nova.runtime.storage.source.query.AtBlock
-import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNullWithBlockHash
 import io.novafoundation.nova.runtime.storage.typed.events
 import io.novafoundation.nova.runtime.storage.typed.system
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import kotlinx.coroutines.flow.Flow
 
 interface EventsRepository {
 
@@ -28,8 +25,6 @@ interface EventsRepository {
     suspend fun getBlockEvents(chainId: ChainId, blockHash: BlockHash? = null): BlockEvents
 
     suspend fun getExtrinsicWithEvents(chainId: ChainId, extrinsicHash: String, blockHash: BlockHash? = null): ExtrinsicWithEvents?
-
-    fun subscribeEventRecords(chainId: ChainId): Flow<AtBlock<List<EventRecord>>>
 }
 
 internal class RemoteEventsRepository(
@@ -102,12 +97,6 @@ internal class RemoteEventsRepository(
                     events = extrinsicEvents
                 )
             }
-        }
-    }
-
-    override fun subscribeEventRecords(chainId: ChainId): Flow<AtBlock<List<EventRecord>>> {
-        return remoteStorageSource.subscribe(chainId) {
-            metadata.system.events.observeNonNullWithBlockHash()
         }
     }
 

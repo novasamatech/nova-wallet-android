@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:fitsSystemWindows="true"
     android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.Toolbar
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
-        app:titleText="@string/common_full_details" />
+        app:titleText="@string/referendum_details_full_details" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/referendumDetailsScrollView"
@@ -112,7 +112,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:primaryValueEndIcon="@drawable/ic_info"
-                    app:title="@string/common_call_hash" />
+                    app:title="@string/referendum_full_details_hash" />
 
             </io.novafoundation.nova.common.view.TableView>
 

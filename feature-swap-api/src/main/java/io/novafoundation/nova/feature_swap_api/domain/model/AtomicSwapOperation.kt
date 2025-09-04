@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.totalAmount
 import io.novafoundation.nova.feature_account_api.data.model.totalPlanksEnsuringAsset
-import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.fullId
@@ -35,9 +34,7 @@ interface AtomicSwapOperation {
      */
     suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction
 
-    suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection>
-
-    suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult>
+    suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection>
 }
 
 class AtomicSwapOperationSubmissionArgs(
@@ -80,8 +77,4 @@ fun AtomicSwapOperationFee.allFeeAssets(): List<Chain.Asset> {
 
 class SwapExecutionCorrection(
     val actualReceivedAmount: Balance
-)
-
-class SwapSubmissionResult(
-    val submissionHierarchy: SubmissionHierarchy
 )

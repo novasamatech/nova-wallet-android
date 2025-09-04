@@ -5,18 +5,14 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_DEFAULT
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.BACKGROUND_TRANSPARENT
 import io.novafoundation.nova.common.address.AddressIconGenerator.Companion.SIZE_MEDIUM
-import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.ByteArrayComparator
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount.ChainAccount
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
-import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressIcon
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapLatest
@@ -140,13 +136,5 @@ class WalletUiUseCaseImpl(
 
     private fun MetaAccount.walletIconSeed(): ByteArray {
         return walletSeed(substrateAccountId, ethereumAddress, chainAccounts.values.map(ChainAccount::accountId))
-    }
-
-    override suspend fun walletAddressModel(metaAccount: MetaAccount, chain: Chain, iconSize: Int): AddressModel {
-        return addressIconGenerator.createAccountAddressModel(
-            chain = chain,
-            account = metaAccount,
-            name = metaAccount.name
-        )
     }
 }

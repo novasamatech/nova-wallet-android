@@ -5,9 +5,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
-import io.novafoundation.nova.feature_deep_linking.presentation.configuring.DeepLinkConfigurator
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDeepLinkData
-import io.novafoundation.nova.feature_governance_api.presentation.referenda.details.deeplink.configurators.ReferendumDetailsDeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.DeepLinkConfigurator
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDeepLinkData
+import io.novafoundation.nova.feature_deep_link_building.presentation.ReferendumDetailsDeepLinkConfigurator
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_api.data.repository
 
-import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.model.AccountAddressMap
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
@@ -17,8 +16,6 @@ interface OnChainIdentityRepository {
     suspend fun getIdentitiesFromIds(accountIds: Collection<AccountId>, chainId: ChainId): AccountIdKeyMap<OnChainIdentity?>
 
     suspend fun getIdentityFromId(chainId: ChainId, accountId: AccountId): OnChainIdentity?
-
-    suspend fun getMultiChainIdentities(accountIds: Collection<AccountIdKey>): AccountIdKeyMap<OnChainIdentity?>
 
     @Deprecated("Use getIdentitiesFromIds instead to avoid extra from/to address conversions")
     suspend fun getIdentitiesFromAddresses(chain: Chain, accountAddresses: List<String>): AccountAddressMap<OnChainIdentity?>

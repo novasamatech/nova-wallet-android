@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators.change.start
 
+import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
@@ -14,6 +15,12 @@ class StartChangeValidatorsFragment : BaseFragment<StartChangeValidatorsViewMode
     override fun createBinding() = FragmentStartChangeValidatorsBinding.inflate(layoutInflater)
 
     override fun initViews() {
+        binder.startChangeValidatorsContainer.applyInsetter {
+            type(statusBars = true) {
+                padding()
+            }
+        }
+
         binder.startChangeValidatorsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 

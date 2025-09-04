@@ -3,6 +3,7 @@ package io.novafoundation.nova.app.root.presentation.requestBusHandler
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bus.EventBus
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.onEachLatest
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
@@ -15,11 +16,12 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_impl.data.cloudBackup.isBackupable
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupDestructiveChangesNotApplied
 import io.novafoundation.nova.feature_cloud_backup_api.presenter.action.launchCloudBackupDestructiveChangesNotAppliedWithoutRouting
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.launchIn
 
 class CloudBackupSyncRequestBusHandler(
     private val rootRouter: RootRouter,
+    private val scope: RootScope,
     private val resourceManager: ResourceManager,
     private val metaAccountChangesEventBus: MetaAccountChangesEventBus,
     private val applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase,
@@ -28,13 +30,13 @@ class CloudBackupSyncRequestBusHandler(
     private val automaticInteractionGate: AutomaticInteractionGate,
 ) : RequestBusHandler {
 
-    override fun observe(): Flow<*> {
-        return metaAccountChangesEventBus.observeEvent()
+    override fun observe() {
+        metaAccountChangesEventBus.observeEvent()
             .filter { it.shouldTriggerBackupSync() }
             .onEachLatest {
                 applyLocalSnapshotToCloudBackupUseCase.applyLocalSnapshotToCloudBackupIfSyncEnabled()
                     .onFailure { showDestructiveChangesNotAppliedDialog() }
-            }
+            }.launchIn(scope)
     }
 
     private fun EventBus.SourceEvent<MetaAccountChangesEventBus.Event>.shouldTriggerBackupSync(): Boolean {

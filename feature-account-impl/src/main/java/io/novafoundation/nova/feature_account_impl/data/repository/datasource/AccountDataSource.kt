@@ -46,6 +46,8 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun accountNameFor(accountId: AccountId, chainId: ChainId): String?
 
+    suspend fun allLightMetaAccounts(): List<LightMetaAccount>
+
     fun allMetaAccountsFlow(): Flow<List<MetaAccount>>
 
     fun activeMetaAccountsFlow(): Flow<List<MetaAccount>>
@@ -68,11 +70,13 @@ interface AccountDataSource : SecretStoreV1 {
     fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
-    suspend fun deleteMetaAccount(metaId: Long): List<Long>
+    suspend fun deleteMetaAccount(metaId: Long)
 
     /**
      * @return id of inserted meta account
      */
+    // TODO move it to SecretsAddAccountRepository
+    @Deprecated("Use SecretsAddAccountRepository instead")
     suspend fun insertMetaAccountFromSecrets(
         name: String,
         substrateCryptoType: CryptoType,
@@ -82,6 +86,8 @@ interface AccountDataSource : SecretStoreV1 {
     /**
      * @return id of inserted meta account
      */
+    // TODO move it to SecretsAddAccountRepository
+    @Deprecated("Use SecretsAddAccountRepository instead")
     suspend fun insertChainAccount(
         metaId: Long,
         chain: Chain,
@@ -95,23 +101,13 @@ interface AccountDataSource : SecretStoreV1 {
 
     suspend fun getActiveMetaAccounts(): List<MetaAccount>
 
-    suspend fun getActiveMetaIds(): Set<Long>
-
-    suspend fun getAllMetaAccounts(): List<MetaAccount>
-
-    suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount>
-
-    fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean>
-
     suspend fun getActiveMetaAccountsQuantity(): Int
 
     suspend fun hasSecretsAccounts(): Boolean
 
+    suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long>
+
     suspend fun deleteProxiedMetaAccountsByChain(chainId: String)
-
-    fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>>
-
-    suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean
 }
 
 suspend fun AccountDataSource.getMetaAccountTypeOrThrow(metaId: Long): LightMetaAccount.Type {

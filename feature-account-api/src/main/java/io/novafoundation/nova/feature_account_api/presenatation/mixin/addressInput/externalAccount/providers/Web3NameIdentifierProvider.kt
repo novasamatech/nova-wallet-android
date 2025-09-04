@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.emitLoaded
 import io.novafoundation.nova.common.domain.emitLoading
-import io.novafoundation.nova.common.presentation.ellipsizeAddress
+import io.novafoundation.nova.common.presentation.toShortAddressFormat
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
@@ -115,9 +115,9 @@ class Web3NameIdentifierProvider(
     private fun ResourceManager.addressWithDescription(w3nAccount: Web3NameAccount): String {
         val description = w3nAccount.description
         return if (description != null) {
-            return getString(R.string.web3names_address_with_description, w3nAccount.address.ellipsizeAddress(), description)
+            return getString(R.string.web3names_address_with_description, w3nAccount.address.toShortAddressFormat(), description)
         } else {
-            w3nAccount.address.ellipsizeAddress()
+            w3nAccount.address.toShortAddressFormat()
         }
     }
 

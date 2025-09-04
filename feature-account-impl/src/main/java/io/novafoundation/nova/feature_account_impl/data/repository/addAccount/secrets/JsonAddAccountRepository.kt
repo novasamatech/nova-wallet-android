@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaDat
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
 import io.novasama.substrate_sdk_android.encrypt.model.NetworkTypeIdentifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 class JsonAddAccountRepository(
     private val accountDataSource: AccountDataSource,
     private val accountSecretsFactory: AccountSecretsFactory,
-    private val JsonDecoder: JsonDecoder,
+    private val jsonSeedDecoder: JsonSeedDecoder,
     private val chainRegistry: ChainRegistry,
     metaAccountChangesEventBus: MetaAccountChangesEventBus
 ) : SecretsAddAccountRepository<JsonAddAccountRepository.Payload>(
@@ -43,7 +43,7 @@ class JsonAddAccountRepository(
     }
 
     suspend fun extractJsonMetadata(importJson: String): ImportJsonMetaData = withContext(Dispatchers.Default) {
-        val importAccountMeta = JsonDecoder.extractImportMetaData(importJson)
+        val importAccountMeta = jsonSeedDecoder.extractImportMetaData(importJson)
 
         with(importAccountMeta) {
             val chainId = (networkTypeIdentifier as? NetworkTypeIdentifier.Genesis)?.genesis?.removeHexPrefix()
