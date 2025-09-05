@@ -195,6 +195,8 @@ data class Chain(
 
         data class Staking(override val url: String) : ExternalApi()
 
+        data class StakingRewards(override val url: String) : ExternalApi()
+
         data class GovernanceReferenda(override val url: String, val source: Source) : ExternalApi() {
 
             sealed class Source {

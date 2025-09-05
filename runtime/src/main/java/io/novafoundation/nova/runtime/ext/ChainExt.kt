@@ -194,6 +194,10 @@ fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
     return group() == StakingTypeGroup.NOMINATION_POOL
 }
 
+inline fun <reified T : Chain.ExternalApi> Chain.allExternalApis(): List<T> {
+    return externalApis.filterIsInstance<T>()
+}
+
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
     return externalApis.findIsInstanceOrNull<T>()
 }
@@ -573,8 +577,12 @@ fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
     return externalApi<Chain.ExternalApi.ReferendumSummary>()
 }
 
+fun Chain.timelineChainId(): ChainId? {
+    return additional?.timelineChain
+}
+
 fun Chain.timelineChainIdOrSelf(): ChainId {
-    return additional?.timelineChain ?: id
+    return timelineChainId() ?: id
 }
 
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.common
 
-import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.toDuration
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
@@ -13,7 +12,6 @@ import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds

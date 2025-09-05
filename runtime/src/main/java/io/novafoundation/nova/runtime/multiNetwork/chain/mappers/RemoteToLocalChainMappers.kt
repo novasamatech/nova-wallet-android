@@ -213,6 +213,7 @@ fun mapExternalApisToLocal(chainRemote: ChainRemote): List<ChainExternalApiLocal
 private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "history" -> ApiType.TRANSFERS
     "staking" -> ApiType.STAKING
+    "staking-rewards" -> ApiType.STAKING_REWARDS
     "crowdloans" -> ApiType.CROWDLOANS
     "governance" -> ApiType.GOVERNANCE_REFERENDA
     "governance-delegations" -> ApiType.GOVERNANCE_DELEGATIONS
