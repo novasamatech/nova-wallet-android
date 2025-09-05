@@ -585,6 +585,10 @@ fun Chain.timelineChainIdOrSelf(): ChainId {
     return timelineChainId() ?: id
 }
 
+fun Chain.hasTimelineChain(): Boolean {
+    return additional?.timelineChain != null
+}
+
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)
 
 fun SignatureVerifier.verifyMultiChain(
