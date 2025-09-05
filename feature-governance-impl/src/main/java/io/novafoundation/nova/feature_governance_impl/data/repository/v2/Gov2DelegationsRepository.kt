@@ -69,7 +69,11 @@ class Gov2DelegationsRepository(
             .orEmpty()
     }
 
-    override suspend fun getDelegatesStatsByAccountIds(recentVotesDateThreshold: RecentVotesDateThreshold, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
+    override suspend fun getDelegatesStatsByAccountIds(
+        recentVotesDateThreshold: RecentVotesDateThreshold,
+        accountIds: List<AccountId>,
+        chain: Chain
+    ): List<DelegateStats> {
         return runCatching {
             val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
             val addresses = accountIds.map { chain.addressOf(it) }
