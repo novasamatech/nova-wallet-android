@@ -4,8 +4,6 @@ android {
 
     defaultConfig {
 
-
-
         buildConfigField "String", "WEBSITE_URL", "\"https://novawallet.io\""
         buildConfigField "String", "PRIVACY_URL", "\"https://novawallet.io/privacy\""
         buildConfigField "String", "TERMS_URL", "\"https://novawallet.io/terms\""
@@ -47,6 +45,8 @@ android {
         buildConfigField "String", "MULTISIGS_WIKI_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/multisig-wallets\""
 
         buildConfigField "long", "CLOUD_PROJECT_NUMBER", "171267697857L"
+
+        buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/global/config.json\""
     }
 
     buildTypes {

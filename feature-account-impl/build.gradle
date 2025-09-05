@@ -2,10 +2,6 @@ apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 
 android {
-    defaultConfig {
-        buildConfigField "String", "EXTERNAL_ACCOUNTS_SYNC_URL", "\"https://subquery-account-manager-stg.novasama-tech.org/\""
-    }
-
     buildTypes {
         release {
             minifyEnabled false
