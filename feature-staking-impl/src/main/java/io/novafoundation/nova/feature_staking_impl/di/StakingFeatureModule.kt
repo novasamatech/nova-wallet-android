@@ -48,14 +48,12 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.ParasReposito
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingVersioningRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealVaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
@@ -693,14 +691,6 @@ class StakingFeatureModule {
     @FeatureScope
     fun provideStakingGlobalConfigApi(apiCreator: NetworkApiCreator): StakingGlobalConfigApi {
         return apiCreator.create(StakingGlobalConfigApi::class.java)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideStakingGlobalConfigRepository(
-        api: StakingGlobalConfigApi
-    ): StakingGlobalConfigRepository {
-        return RealStakingGlobalConfigRepository(api)
     }
 
     @Provides

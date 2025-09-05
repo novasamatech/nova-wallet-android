@@ -4,6 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.fromHexOrNull
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.HexString
@@ -46,6 +47,7 @@ class RealMultisigRepository @Inject constructor(
     @Named(REMOTE_STORAGE_SOURCE)
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
+    private val globalConfigDataSource: GlobalConfigDataSource
 ) : MultisigRepository {
 
     override fun supportsMultisigSync(chain: Chain): Boolean {
@@ -53,8 +55,9 @@ class RealMultisigRepository @Inject constructor(
     }
 
     override suspend fun findMultisigAccounts(accountIds: Set<AccountIdKey>): List<DiscoveredMultisig> {
+        val globalConfig = globalConfigDataSource.getGlobalConfig()
         val request = FindMultisigsRequest(accountIds)
-        return api.findMultisigs(request).toDiscoveredMultisigs()
+        return api.findMultisigs(globalConfig.multisigsApiUrl, request).toDiscoveredMultisigs()
     }
 
     override suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): Set<CallHash> {
