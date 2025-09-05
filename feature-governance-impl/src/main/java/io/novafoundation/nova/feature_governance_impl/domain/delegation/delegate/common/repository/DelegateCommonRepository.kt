@@ -13,7 +13,7 @@ import io.novafoundation.nova.feature_governance_api.data.repository.getDelegate
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
-import io.novafoundation.nova.feature_governance_api.data.repository.common.TimePoint
+import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.hasTimelineChain
@@ -91,14 +91,14 @@ class RealDelegateCommonRepository(
             .groupBy { it.second.target.intoKey() }
     }
 
-    private suspend fun getTimePointThresholdForChain(chain: Chain): TimePoint {
-        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
-        val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
-
+    private suspend fun getTimePointThresholdForChain(chain: Chain): RecentVotesDateThreshold {
         return if (chain.hasTimelineChain()) {
-            TimePoint.Timestamp(blockDurationEstimator.timestampOf(recentVotesBlockThreshold))
+            val timestampMs = System.currentTimeMillis() - RECENT_VOTES_PERIOD.inWholeMilliseconds
+            RecentVotesDateThreshold.Timestamp(timestampMs)
         } else {
-            TimePoint.BlockNumber(recentVotesBlockThreshold)
+            val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
+            val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
+            RecentVotesDateThreshold.BlockNumber(recentVotesBlockThreshold)
         }
     }
 }

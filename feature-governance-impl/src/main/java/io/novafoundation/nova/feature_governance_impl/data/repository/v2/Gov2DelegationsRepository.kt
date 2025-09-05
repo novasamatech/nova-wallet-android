@@ -30,7 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.DelegatedVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.DirectVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.mapMultiVoteRemoteToAccountVote
-import io.novafoundation.nova.feature_governance_api.data.repository.common.TimePoint
+import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
@@ -55,12 +55,12 @@ class Gov2DelegationsRepository(
     }
 
     override suspend fun getDelegatesStats(
-        timePointThreshold: TimePoint,
+        recentVotesDateThreshold: RecentVotesDateThreshold,
         chain: Chain
     ): List<DelegateStats> {
         return runCatching {
             val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
-            val request = DelegateStatsRequest(timePointThreshold)
+            val request = DelegateStatsRequest(recentVotesDateThreshold)
             val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
             val delegateStats = response.data.delegates.nodes
 
@@ -69,11 +69,11 @@ class Gov2DelegationsRepository(
             .orEmpty()
     }
 
-    override suspend fun getDelegatesStatsByAccountIds(timePointThreshold: TimePoint, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
+    override suspend fun getDelegatesStatsByAccountIds(recentVotesDateThreshold: RecentVotesDateThreshold, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
         return runCatching {
             val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return emptyList()
             val addresses = accountIds.map { chain.addressOf(it) }
-            val request = DelegateStatsByAddressesRequest(timePointThreshold, addresses = addresses)
+            val request = DelegateStatsByAddressesRequest(recentVotesDateThreshold, addresses = addresses)
             val response = delegationsSubqueryApi.getDelegateStats(externalApiLink, request)
             val delegateStats = response.data.delegates.nodes
 

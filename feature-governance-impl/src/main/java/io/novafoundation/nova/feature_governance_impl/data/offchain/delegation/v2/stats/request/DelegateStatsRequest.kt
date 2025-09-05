@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request
 
-import io.novafoundation.nova.feature_governance_api.data.repository.common.TimePoint
+import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.common.createSubqueryFilter
 
-class DelegateStatsRequest(timePointThreshold: TimePoint) {
+class DelegateStatsRequest(recentVotesDateThreshold: RecentVotesDateThreshold) {
     val query = """
         query {
            delegates {
@@ -12,7 +12,7 @@ class DelegateStatsRequest(timePointThreshold: TimePoint) {
                 accountId
                 delegators
                 delegatorVotes
-                delegateVotes(filter: {${timePointThreshold.createSubqueryFilter()}}) {
+                delegateVotes(filter: {${recentVotesDateThreshold.createSubqueryFilter()}}) {
                   totalCount
                 }
               }
