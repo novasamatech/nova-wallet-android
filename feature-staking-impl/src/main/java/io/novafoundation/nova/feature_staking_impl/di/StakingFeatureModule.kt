@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.Pool
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.config.api.StakingGlobalConfigApi
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
@@ -686,12 +685,6 @@ class StakingFeatureModule {
         extrinsicService = extrinsicService,
         externalAccountsSyncService = externalAccountsSyncService
     )
-
-    @Provides
-    @FeatureScope
-    fun provideStakingGlobalConfigApi(apiCreator: NetworkApiCreator): StakingGlobalConfigApi {
-        return apiCreator.create(StakingGlobalConfigApi::class.java)
-    }
 
     @Provides
     @FeatureScope
