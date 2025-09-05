@@ -1,19 +1,24 @@
 package io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward
 
+import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.common.utils.atTheBeginningOfTheDay
 import io.novafoundation.nova.common.utils.atTheEndOfTheDay
+import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.timestamp
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.core_db.model.TotalRewardLocal
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.mappers.mapTotalRewardLocalToTotalReward
+import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.StakingPeriodRewardsResponse
+import io.novafoundation.nova.feature_staking_impl.data.network.subquery.response.totalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapStakingTypeToStakingString
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -54,6 +59,20 @@ abstract class BaseStakingRewardsDataSource(
     }
 
     abstract suspend fun getTotalRewards(chain: Chain, accountId: AccountId, rewardPeriod: RewardPeriod): Balance
+
+    protected suspend fun getAggregatedRewards(
+        externalApis: List<Chain.ExternalApi.StakingRewards>,
+        receiver: suspend (String) -> SubQueryResponse<StakingPeriodRewardsResponse>
+    ): BigInteger {
+        val urls = externalApis.map { it.url }
+        val rewardsDeferredList = urls.mapAsync { url ->
+            receiver(url)
+        }
+
+        return rewardsDeferredList.sumOf {
+            it.data.totalReward
+        }
+    }
 
     protected val RewardPeriod.startTimestamp: Long?
         get() = start?.atTheBeginningOfTheDay()?.timestamp() // Using atTheBeginningOfTheDay() to avoid invalid data

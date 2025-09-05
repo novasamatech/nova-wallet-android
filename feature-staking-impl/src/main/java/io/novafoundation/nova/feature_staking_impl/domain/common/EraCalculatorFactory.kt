@@ -102,25 +102,25 @@ class EraTimeCalculatorFactory(
         activeEraFlow: Flow<EraIndex>
     ): Flow<EraTimeCalculator> {
         val stakingChain = stakingOption.chain
-        val chainId = stakingChain.timelineChainIdOrSelf()
+        val timelineChainId = stakingChain.timelineChainIdOrSelf()
 
         val electionsSession = electionsSessionRegistry.electionsSessionFor(stakingOption)
 
-        val genesisSlot = electionsSession.genesisSlot(chainId)
-        val sessionLength = electionsSession.sessionLength(chainId)
+        val genesisSlot = electionsSession.genesisSlot(timelineChainId)
+        val sessionLength = electionsSession.sessionLength(timelineChainId)
 
         return combine(
             activeEraFlow,
-            sessionRepository.observeCurrentSessionIndex(chainId),
-            electionsSession.currentEpochIndexFlow(chainId),
-            electionsSession.currentSlotFlow(chainId),
+            sessionRepository.observeCurrentSessionIndex(timelineChainId),
+            electionsSession.currentEpochIndexFlow(timelineChainId),
+            electionsSession.currentSlotFlow(timelineChainId),
         ) { activeEra, currentSessionIndex, currentEpochIndex, currentSlot ->
-            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(chainId, activeEra)
+            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(timelineChainId, activeEra)
 
             EraTimeCalculator(
                 startTimeStamp = System.currentTimeMillis().toBigInteger(),
-                eraLength = stakingRepository.eraLength(chainId),
-                blockCreationTime = chainStateRepository.predictedBlockTime(chainId),
+                eraLength = stakingRepository.eraLength(timelineChainId),
+                blockCreationTime = chainStateRepository.predictedBlockTime(timelineChainId),
                 currentSessionIndex = currentSessionIndex,
                 currentEpochIndex = currentEpochIndex ?: currentSessionIndex,
                 sessionLength = sessionLength,
