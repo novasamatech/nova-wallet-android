@@ -102,6 +102,7 @@ class EraTimeCalculatorFactory(
         activeEraFlow: Flow<EraIndex>
     ): Flow<EraTimeCalculator> {
         val stakingChain = stakingOption.chain
+        val stakingChainId = stakingChain.id
         val timelineChainId = stakingChain.timelineChainIdOrSelf()
 
         val electionsSession = electionsSessionRegistry.electionsSessionFor(stakingOption)
@@ -115,11 +116,11 @@ class EraTimeCalculatorFactory(
             electionsSession.currentEpochIndexFlow(timelineChainId),
             electionsSession.currentSlotFlow(timelineChainId),
         ) { activeEra, currentSessionIndex, currentEpochIndex, currentSlot ->
-            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(timelineChainId, activeEra)
+            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(stakingChainId, activeEra)
 
             EraTimeCalculator(
                 startTimeStamp = System.currentTimeMillis().toBigInteger(),
-                eraLength = stakingRepository.eraLength(timelineChainId),
+                eraLength = stakingRepository.eraLength(stakingChainId),
                 blockCreationTime = chainStateRepository.predictedBlockTime(timelineChainId),
                 currentSessionIndex = currentSessionIndex,
                 currentEpochIndex = currentEpochIndex ?: currentSessionIndex,
