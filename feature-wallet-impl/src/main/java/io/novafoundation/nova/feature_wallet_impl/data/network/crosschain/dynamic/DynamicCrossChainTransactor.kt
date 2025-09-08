@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.composeCall
@@ -16,8 +15,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.destin
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferReserve
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
+import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetId
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
+import io.novafoundation.nova.feature_xcm_api.builder.buildXcmWithoutFeesMeasurement
 import io.novafoundation.nova.feature_xcm_api.builder.buyExecution
 import io.novafoundation.nova.feature_xcm_api.builder.createWithoutFeesMeasurement
 import io.novafoundation.nova.feature_xcm_api.builder.withdrawAsset
@@ -33,10 +34,10 @@ import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
-import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import java.math.BigInteger
@@ -107,19 +108,36 @@ class DynamicCrossChainTransactor @Inject constructor(
     ): GenericCall.Instance {
         val totalTransferAmount = transfer.amountPlanks + crossChainFee
         val multiAsset = MultiAsset.from(configuration.assetLocationOnOrigin, totalTransferAmount)
+        val multiAssetId = MultiAssetId(configuration.assetLocationOnOrigin)
+
+        val transferTypeParam = configuration.transferTypeParam()
 
         return chainRegistry.withRuntime(configuration.originChainId) {
             composeCall(
                 moduleName = metadata.xcmPalletName(),
-                callName = "transfer_assets",
+                callName = "transfer_assets_using_type_and_then",
                 arguments = mapOf(
                     "dest" to configuration.destinationChainLocationOnOrigin().versionedXcm().toEncodableInstance(),
-                    "beneficiary" to transfer.beneficiaryLocation().versionedXcm().toEncodableInstance(),
                     "assets" to MultiAssets(multiAsset).versionedXcm().toEncodableInstance(),
-                    "fee_asset_item" to BigInteger.ZERO,
+                    "assets_transfer_type" to transferTypeParam,
+                    "remote_fees_id" to multiAssetId.versionedXcm().toEncodableInstance(),
+                    "fees_transfer_type" to transferTypeParam,
+                    "custom_xcm_on_dest" to constructCustomXcmOnDest(configuration, transfer).toEncodableInstance(),
                     "weight_limit" to WeightLimit.Unlimited.toEncodableInstance()
                 )
             )
+        }
+    }
+
+    private suspend fun constructCustomXcmOnDest(
+        configuration: DynamicCrossChainTransferConfiguration,
+        transfer: AssetTransferBase,
+    ): VersionedXcmMessage {
+        return xcmBuilderFactory.buildXcmWithoutFeesMeasurement(
+            initial = configuration.originChainLocation,
+            xcmVersion = USED_XCM_VERSION
+        ) {
+            depositAsset(MultiAssetFilter.singleCounted(), transfer.recipientAccountId)
         }
     }
 
@@ -144,7 +162,7 @@ class DynamicCrossChainTransactor @Inject constructor(
     ): VersionedXcmMessage {
         val builder = xcmBuilderFactory.createWithoutFeesMeasurement(
             initial = configuration.originChainLocation,
-            xcmVersion = XcmVersion.V4
+            xcmVersion = USED_XCM_VERSION
         )
 
         builder.buildTransferProgram(configuration, transfer, crossChainFee)
@@ -271,6 +289,23 @@ class DynamicCrossChainTransactor @Inject constructor(
         depositAsset(MultiAssetFilter.singleCounted(), beneficiary)
     }
 
+    private fun DynamicCrossChainTransferConfiguration.transferTypeParam(): Any {
+        return when (val type = transferType) {
+            XcmTransferReserve.Teleport -> DictEnum.Entry("Teleport", null)
+
+            XcmTransferReserve.Reserve.Destination -> DictEnum.Entry("DestinationReserve", null)
+
+            XcmTransferReserve.Reserve.Origin -> DictEnum.Entry("LocalReserve", null)
+
+            is XcmTransferReserve.Reserve.Remote -> {
+                val reserveChainRelative = type.remoteReserveLocation.location.fromPointOfViewOf(originChainLocation.location)
+                val remoteReserveEncodable = reserveChainRelative.versionedXcm().toEncodableInstance()
+
+                DictEnum.Entry("RemoteReserve", remoteReserveEncodable)
+            }
+        }
+    }
+
     private fun deriveBuyExecutionUpperBoundAmount(transferringAmount: Balance): Balance {
         return transferringAmount / 2.toBigInteger()
     }
@@ -278,8 +313,7 @@ class DynamicCrossChainTransactor @Inject constructor(
     private fun <T> T.versionedXcm() = versionedXcm(USED_XCM_VERSION)
 
     private fun AssetTransferBase.beneficiaryLocation(): RelativeMultiLocation {
-        val accountId = destinationChain.accountIdOrDefault(recipient).intoKey()
-        return accountId.toMultiLocation()
+        return recipientAccountId.toMultiLocation()
     }
 
     private fun WeightLimit.Companion.one(): WeightLimit.Limited {

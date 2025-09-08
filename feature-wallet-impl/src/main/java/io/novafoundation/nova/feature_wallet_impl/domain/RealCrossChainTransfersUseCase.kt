@@ -204,7 +204,7 @@ internal class RealCrossChainTransfersUseCase(
         return crossChainTransactor.supportsXcmExecute(originChainId, features)
     }
 
-    override suspend fun transferConfigurationFor(
+    private suspend fun transferConfigurationFor(
         transfer: AssetTransferDirection,
         cachingScope: CoroutineScope?
     ): CrossChainTransferConfiguration {
