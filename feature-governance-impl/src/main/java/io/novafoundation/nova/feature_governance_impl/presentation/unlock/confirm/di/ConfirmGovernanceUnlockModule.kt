@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confir
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.hints.ConfirmGovernanceUnlockHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmGovernanceUnlockModule {
@@ -38,8 +39,9 @@ class ConfirmGovernanceUnlockModule {
     @Provides
     @ScreenScope
     fun provieHintsFactory(
-        resourceManager: ResourceManager
-    ) = ConfirmGovernanceUnlockHintsMixinFactory(resourceManager)
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
+    ) = ConfirmGovernanceUnlockHintsMixinFactory(resourceManager, amountFormatter)
 
     @Provides
     @IntoMap
@@ -59,7 +61,8 @@ class ConfirmGovernanceUnlockModule {
         locksChangeFormatter: LocksChangeFormatter,
         validationSystem: UnlockReferendumValidationSystem,
         hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmGovernanceUnlockViewModel(
             router = router,
@@ -76,7 +79,8 @@ class ConfirmGovernanceUnlockModule {
             locksChangeFormatter = locksChangeFormatter,
             validationSystem = validationSystem,
             hintsMixinFactory = hintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -33,7 +33,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.Flow
@@ -53,6 +55,7 @@ class SwapDetailViewModel(
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val assetIconProvider: AssetIconProvider,
     val operation: OperationParcelizeModel.Swap,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher {
@@ -74,7 +77,7 @@ class SwapDetailViewModel(
         .shareInBackground()
 
     val feeModel = tokenFee.map {
-        mapAmountToAmountModel(operation.amountFee.amount, it)
+        amountFormatter.formatAmountToAmountModel(operation.amountFee.amount, it)
     }
         .withSafeLoading()
         .shareInBackground()
@@ -155,7 +158,7 @@ class SwapDetailViewModel(
     ): SwapAssetView.Model {
         return SwapAssetView.Model(
             assetIcon = assetIconProvider.getAssetIconOrFallback(token.configuration),
-            amount = mapAmountToAmountModel(amount, token, estimatedFiat = true),
+            amount = amountFormatter.formatAmountToAmountModel(amount, token, AmountConfig(estimatedFiat = true)),
             chainUi = mapChainToUi(chainRegistry.getChain(token.configuration.chainId)),
             amountTextColorRes = if (income) R.color.text_positive else R.color.text_primary
         )
@@ -164,11 +167,11 @@ class SwapDetailViewModel(
     private fun amountModelFlow(): Flow<AmountModel> {
         return if (operation.amountIsAssetIn) {
             tokenIn.map {
-                mapAmountToAmountModel(operation.amountIn.amount, it, estimatedFiat = true, tokenAmountSign = AmountSign.NEGATIVE)
+                amountFormatter.formatAmountToAmountModel(operation.amountIn.amount, it, AmountConfig(estimatedFiat = true, tokenAmountSign = AmountSign.NEGATIVE))
             }
         } else {
             tokenOut.map {
-                mapAmountToAmountModel(operation.amountOut.amount, it, estimatedFiat = true, tokenAmountSign = AmountSign.POSITIVE)
+                amountFormatter.formatAmountToAmountModel(operation.amountOut.amount, it, AmountConfig(estimatedFiat = true, tokenAmountSign = AmountSign.POSITIVE))
             }
         }
     }

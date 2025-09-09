@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ReferendaListModule {
@@ -44,6 +45,7 @@ class ReferendaListModule {
         tinderGovInteractor: TinderGovInteractor,
         selectedMetaAccountUseCase: SelectedAccountUseCase,
         validationExecutor: ValidationExecutor,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -59,7 +61,8 @@ class ReferendaListModule {
             referendaSummaryInteractor = summaryInteractor,
             tinderGovInteractor = tinderGovInteractor,
             selectedMetaAccountUseCase = selectedMetaAccountUseCase,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            amountFormatter = amountFormatter
         )
     }
 

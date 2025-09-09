@@ -29,7 +29,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.v
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -47,7 +48,8 @@ class StakingDashboardViewModel(
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
-    private val dashboardUpdatePeriod: Duration = 200.milliseconds
+    private val dashboardUpdatePeriod: Duration = 200.milliseconds,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     val scrollToTopEvent = dashboardRouter.scrollToDashboardTopEvent
@@ -127,8 +129,8 @@ class StakingDashboardViewModel(
         return StakingDashboardModel.HasStakeItem(
             chainUi = mapChainToUi(hasStake.chain).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.id,
-            rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token).syncingIf(isSyncingSecondary) },
-            stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token).syncingIf(isSyncingPrimary),
+            rewards = stats.map { amountFormatter.formatAmountToAmountModel(it.rewards, hasStake.token).syncingIf(isSyncingSecondary) },
+            stake = amountFormatter.formatAmountToAmountModel(hasStake.stakingState.stake, hasStake.token).syncingIf(isSyncingPrimary),
             status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
             earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
             stakingTypeBadge = stakingTypBadge

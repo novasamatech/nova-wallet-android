@@ -36,7 +36,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeL
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -59,7 +60,8 @@ class ConfirmGovernanceUnlockViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val validationSystem: UnlockReferendumValidationSystem,
     private val hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
@@ -89,7 +91,7 @@ class ConfirmGovernanceUnlockViewModel(
         val asset = assetFlow.first()
         val amount = it.governanceLockChange.absoluteDifference()
 
-        mapAmountToAmountModel(amount, asset)
+        amountFormatter.formatAmountToAmountModel(amount, asset)
     }.shareInBackground()
 
     val currentAddressModelFlow = selectedAccountUseCase.selectedMetaAccountFlow().map { metaAccount ->

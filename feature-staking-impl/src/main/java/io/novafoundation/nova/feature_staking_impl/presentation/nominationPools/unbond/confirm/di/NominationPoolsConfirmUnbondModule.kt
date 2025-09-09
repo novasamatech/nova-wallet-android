@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class, NominationPoolsCommonUnbondModule::class])
 class NominationPoolsConfirmUnbondModule {
@@ -43,7 +44,8 @@ class NominationPoolsConfirmUnbondModule {
         externalActions: ExternalActions.Presentation,
         assetUseCase: AssetUseCase,
         hintsFactory: NominationPoolsUnbondHintsFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NominationPoolsConfirmUnbondViewModel(
             router = router,
@@ -58,7 +60,8 @@ class NominationPoolsConfirmUnbondModule {
             externalActions = externalActions,
             assetUseCase = assetUseCase,
             hintsFactory = hintsFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

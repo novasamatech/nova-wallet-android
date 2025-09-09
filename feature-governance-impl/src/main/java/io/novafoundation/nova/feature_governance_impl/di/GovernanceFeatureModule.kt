@@ -60,6 +60,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.di.common.SelectableAssetUseCaseModule
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -177,8 +178,9 @@ class GovernanceFeatureModule {
     fun provideReferendumFormatter(
         resourceManager: ResourceManager,
         trackFormatter: TrackFormatter,
-        referendaStatusFormatter: ReferendaStatusFormatter
-    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter, referendaStatusFormatter)
+        referendaStatusFormatter: ReferendaStatusFormatter,
+        amountFormatter: AmountFormatter
+    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter, referendaStatusFormatter, amountFormatter)
 
     @Provides
     @FeatureScope

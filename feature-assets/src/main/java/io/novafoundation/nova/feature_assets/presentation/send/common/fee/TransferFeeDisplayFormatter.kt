@@ -9,8 +9,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.Fe
 
 class TransferFeeDisplayFormatter(
     var crossChainFeeShown: Boolean = false,
-
-    private val componentDelegate: FeeFormatter<FeeBase, FeeDisplay> = DefaultFeeFormatter()
+    private val componentDelegate: FeeFormatter<FeeBase, FeeDisplay>
 ) : FeeFormatter<TransferFee, TransferFeeDisplay> {
 
     override suspend fun formatFee(

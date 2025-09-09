@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
-import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.formatAsChange
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
@@ -17,10 +16,9 @@ import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatBalanceWithFraction
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
     amountFormatter: AmountFormatter,
@@ -48,15 +46,16 @@ fun mapTokenAssetGroupToUi(
     val balance = groupBalance(assetGroup)
     return TokenGroupUi(
         itemId = assetGroup.groupId,
-        tokenIcon = assetIconProvider.getAssetIconOrFallback(assetGroup.token.icon),
-        rate = mapCoinRateChange(assetGroup.token.coinRate, assetGroup.token.currency),
-        recentRateChange = assetGroup.token.coinRate?.recentRateChange.orZero().formatAsChange(),
-        rateChangeColorRes = mapCoinRateChangeColorRes(assetGroup.token.coinRate),
-        tokenSymbol = assetGroup.token.symbol.value,
+        tokenIcon = assetIconProvider.getAssetIconOrFallback(assetGroup.tokenInfo.icon),
+        rate = mapCoinRateChange(assetGroup.tokenInfo.coinRate, assetGroup.tokenInfo.currency),
+        recentRateChange = assetGroup.tokenInfo.coinRate?.recentRateChange.orZero().formatAsChange(),
+        rateChangeColorRes = mapCoinRateChangeColorRes(assetGroup.tokenInfo.coinRate),
+        tokenSymbol = assetGroup.tokenInfo.symbol.value,
         singleItemGroup = assetGroup.itemsCount <= 1,
-        balance = AmountModel(
-            token = balance.amount.formatTokenAmount(),
-            fiat = balance.fiat.formatAsCurrency(assetGroup.token.currency)
+        balance = amountFormatter.formatAmountToAmountModel(
+            balance.amount,
+            assetGroup.tokenInfo.token,
+            config = AmountConfig(includeAssetTicker = false)
         ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size),
         groupType = mapType(assets)
     )

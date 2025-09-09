@@ -62,8 +62,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -222,12 +222,6 @@ class AssetsFeatureModule {
         swapSettingsStateProvider: SwapSettingsStateProvider
     ): SwapFlowExecutorFactory {
         return SwapFlowExecutorFactory(initialSwapFlowExecutor, assetsRouter, swapSettingsStateProvider)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideAmountFormatter(resourceManager: ResourceManager): AmountFormatter {
-        return RealAmountFormatter(resourceManager)
     }
 
     @Provides

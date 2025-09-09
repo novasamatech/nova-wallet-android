@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.BaseNetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoItem
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -24,6 +25,7 @@ class ParachainNetworkInfoComponentFactory(
     private val interactor: ParachainNetworkInfoInteractor,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
 ) {
 
     fun create(
@@ -34,7 +36,8 @@ class ParachainNetworkInfoComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
         stakingOption = stakingOption,
-        hostContext = hostContext
+        hostContext = hostContext,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -43,11 +46,12 @@ private val NOMINATORS_TITLE_RES = R.string.staking_active_delegators
 private class ParachainNetworkInfoComponent(
     private val interactor: ParachainNetworkInfoInteractor,
     private val delegatorStateUseCase: DelegatorStateUseCase,
+    private val amountFormatter: AmountFormatter,
     resourceManager: ResourceManager,
 
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
-) : BaseNetworkInfoComponent(resourceManager, hostContext.scope, titleRes = R.string.staking_info) {
+) : BaseNetworkInfoComponent(resourceManager, amountFormatter, hostContext.scope, titleRes = R.string.staking_info) {
 
     private val delegatorStateFlow = hostContext.selectedAccount.flatMapLatest {
         delegatorStateUseCase.delegatorStateFlow(it, stakingOption.assetWithChain.chain, stakingOption.assetWithChain.asset)

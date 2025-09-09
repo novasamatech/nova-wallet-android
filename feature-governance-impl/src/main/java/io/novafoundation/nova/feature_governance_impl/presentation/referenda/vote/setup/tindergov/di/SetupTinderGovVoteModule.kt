@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.SetupTinderGovVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.tindergov.TinderGovVoteCommunicator
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
@@ -48,7 +49,8 @@ class SetupTinderGovVoteModule {
         locksChangeFormatter: LocksChangeFormatter,
         convictionValuesProvider: ConvictionValuesProvider,
         maxActionProviderFactory: MaxActionProviderFactory,
-        locksFormatter: LocksFormatter
+        locksFormatter: LocksFormatter,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SetupTinderGovVoteViewModel(
             feeLoaderMixinFactory = feeLoaderMixinFactory,
@@ -66,7 +68,8 @@ class SetupTinderGovVoteModule {
             tinderGovInteractor = tinderGovInteractor,
             tinderGovVoteResponder = tinderGovVoteCommunicator,
             maxActionProviderFactory = maxActionProviderFactory,
-            accountRepository = accountRepository
+            accountRepository = accountRepository,
+            amountFormatter = amountFormatter
         )
     }
 

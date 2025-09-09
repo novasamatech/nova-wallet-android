@@ -40,7 +40,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,7 @@ class YieldBoostConfirmViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -204,7 +206,7 @@ class YieldBoostConfirmViewModel(
         is YieldBoostConfiguration.On -> {
             val asset = assetFlow.first()
 
-            val threshold = mapAmountToAmountModel(configuration.threshold, asset)
+            val threshold = amountFormatter.formatAmountToAmountModel(configuration.threshold, asset)
             val frequency = resourceManager.formatDaysFrequency(configuration.frequencyInDays)
 
             val termsText = resourceManager.getString(R.string.yield_boost_terms, frequency, threshold.token)

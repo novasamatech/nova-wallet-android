@@ -13,7 +13,9 @@ import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksIntera
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +31,8 @@ abstract class NetworkFlowViewModel(
     externalBalancesInteractor: ExternalBalancesInteractor,
     protected val resourceManager: ResourceManager,
     private val networkFlowPayload: NetworkFlowPayload,
-    protected val chainRegistry: ChainRegistry
+    protected val chainRegistry: ChainRegistry,
+    protected val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     val acknowledgeLedgerWarning = controllableAssetCheck.acknowledgeLedgerWarning
@@ -72,10 +75,10 @@ abstract class NetworkFlowViewModel(
                     it.asset.token.configuration.id,
                     it.chain.name,
                     it.chain.icon,
-                    mapAmountToAmountModel(
+                    amountFormatter.formatAmountToAmountModel(
                         amount = getAssetBalance(it).amount,
                         asset = it.asset,
-                        includeAssetTicker = false
+                        AmountConfig(includeAssetTicker = false)
                     )
                 )
             }

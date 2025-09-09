@@ -25,7 +25,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
@@ -49,6 +50,7 @@ class MythosRedeemViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions,
@@ -60,7 +62,9 @@ class MythosRedeemViewModel(
     private val redeemableAmountFlow = interactor.redeemAmountFlow()
         .shareInBackground()
 
-    val redeemableAmountModelFlow = combine(redeemableAmountFlow, assetFlow, ::mapAmountToAmountModel)
+    val redeemableAmountModelFlow = combine(redeemableAmountFlow, assetFlow) { amount, asset ->
+        amountFormatter.formatAmountToAmountModel(amount, asset)
+    }
         .withSafeLoading()
         .shareInBackground()
 
@@ -70,7 +74,7 @@ class MythosRedeemViewModel(
     val walletFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, selectedAssetState.selectedAssetFlow())
+    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, amountFormatter, selectedAssetState.selectedAssetFlow())
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: StateFlow<Boolean> = _showNextProgress

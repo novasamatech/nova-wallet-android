@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.runtime.types.custom.vote.Conviction
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -58,6 +59,7 @@ abstract class SetupVoteViewModel(
     private val convictionValuesProvider: ConvictionValuesProvider,
     private val locksFormatter: LocksFormatter,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -75,7 +77,7 @@ abstract class SetupVoteViewModel(
 
     private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, viewModelScope)
 
-    private val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
+    private val originFeeMixin = feeLoaderMixinFactory.createDefault(this, amountFormatter, selectedChainAsset)
 
     protected val validatingVoteType = MutableStateFlow<VoteType?>(null)
 
@@ -130,7 +132,7 @@ abstract class SetupVoteViewModel(
     val amountChips = voteAssistantFlow.map { voteAssistant ->
         val asset = selectedAsset.first()
 
-        voteAssistant.reusableLocks().map { locksFormatter.formatReusableLock(it, asset) }
+        voteAssistant.reusableLocks().map { locksFormatter.formatReusableLock(it, asset, amountFormatter) }
     }
         .shareInBackground()
 

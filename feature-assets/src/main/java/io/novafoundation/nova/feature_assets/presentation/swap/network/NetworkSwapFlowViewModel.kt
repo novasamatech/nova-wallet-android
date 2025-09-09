@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPay
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.constraintDirectionsAsset
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutor
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -33,6 +34,7 @@ class NetworkSwapFlowViewModel(
     resourceManager: ResourceManager,
     networkFlowPayload: NetworkFlowPayload,
     chainRegistry: ChainRegistry,
+    amountFormatter: AmountFormatter,
     private val swapFlowPayload: SwapFlowPayload,
     private val swapFlowExecutor: SwapFlowExecutor,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
@@ -44,7 +46,8 @@ class NetworkSwapFlowViewModel(
     externalBalancesInteractor,
     resourceManager,
     networkFlowPayload,
-    chainRegistry
+    chainRegistry,
+    amountFormatter
 ) {
 
     private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)

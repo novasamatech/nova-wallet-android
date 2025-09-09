@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.BaseNetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoItem
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -23,6 +24,7 @@ class RelaychainNetworkInfoComponentFactory(
     private val stakingInteractor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val stakingSharedComputation: StakingSharedComputation,
+    private val amountFormatter: AmountFormatter,
 ) {
 
     fun create(
@@ -33,7 +35,8 @@ class RelaychainNetworkInfoComponentFactory(
         resourceManager = resourceManager,
         stakingOption = stakingOption,
         hostContext = hostContext,
-        stakingSharedComputation = stakingSharedComputation
+        stakingSharedComputation = stakingSharedComputation,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -42,11 +45,12 @@ private val NOMINATORS_TITLE_RES = R.string.staking_main_active_nominators_title
 private class RelaychainNetworkInfoComponent(
     private val stakingInteractor: StakingInteractor,
     private val stakingSharedComputation: StakingSharedComputation,
+    private val amountFormatter: AmountFormatter,
     resourceManager: ResourceManager,
 
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
-) : BaseNetworkInfoComponent(resourceManager, hostContext.scope, titleRes = R.string.staking_info) {
+) : BaseNetworkInfoComponent(resourceManager, amountFormatter, hostContext.scope, titleRes = R.string.staking_info) {
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
         assetWithChain = stakingOption.assetWithChain,

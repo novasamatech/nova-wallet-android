@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.unbondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.transferableAmountModelOf
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -25,7 +27,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModelOf
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -41,6 +42,7 @@ class SelectUnbondViewModel(
     private val validationExecutor: ValidationExecutor,
     private val validationSystem: UnbondValidationSystem,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     unbondHintsMixinFactory: UnbondHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory
@@ -61,13 +63,14 @@ class SelectUnbondViewModel(
     private val chainAssetFlow = assetFlow.map { it.token.configuration }
         .shareInBackground()
 
-    val transferableFlow = assetFlow.mapLatest(::transferableAmountModelOf)
+    val transferableFlow = assetFlow.mapLatest { transferableAmountModelOf(amountFormatter, it) }
         .shareInBackground()
 
     val hintsMixin = unbondHintsMixinFactory.create(coroutineScope = this)
 
     val originFeeMixin = feeLoaderMixinFactory.createDefault(
         this,
+        amountFormatter,
         chainAssetFlow,
         FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
     )

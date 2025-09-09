@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.normalize
@@ -13,19 +14,21 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigDecimal
 
 class TokenAssetGroup(
-    val token: Token,
+    val tokenInfo: TokenInfo,
     val groupBalance: AssetBalance,
     val itemsCount: Int
 ) {
 
-    val groupId: String = token.symbol.value
+    val groupId: String = tokenInfo.symbol.value
 
-    data class Token(
+    data class TokenInfo(
         val icon: String?,
-        val symbol: TokenSymbol,
-        val currency: Currency,
-        val coinRate: CoinRateChange?
-    )
+        val token: Token
+    ) {
+        val symbol = token.configuration.symbol.normalize()
+        val currency = token.currency
+        val coinRate = token.coinRate
+    }
 }
 
 class AssetWithNetwork(
@@ -48,7 +51,7 @@ fun groupAndSortAssetsByToken(
         .mapValues { (_, assets) -> assets.sortedWith(assetComparator) }
         .mapKeys { (tokenWrapper, assets) ->
             TokenAssetGroup(
-                token = tokenWrapper.token,
+                tokenInfo = tokenWrapper.tokenInfo,
                 groupBalance = assets.fold(AssetBalance.ZERO) { acc, element -> acc + element.balanceWithOffChain },
                 itemsCount = assets.size
             )
@@ -69,26 +72,24 @@ fun getTokenAssetGroupBaseComparator(
 ): Comparator<TokenAssetGroup> {
     return compareByDescending(comparing)
         .thenByDescending { it.groupBalance.total.amount > BigDecimal.ZERO } // non-zero balances first
-        .then(TokenSymbol.defaultComparatorFrom { it.token.symbol })
+        .then(TokenSymbol.defaultComparatorFrom { it.tokenInfo.symbol })
 }
 
 private fun mapToTokenGroup(it: AssetWithNetwork) = TokenGroupWrapper(
-    TokenAssetGroup.Token(
+    TokenAssetGroup.TokenInfo(
         it.asset.token.configuration.icon,
-        it.asset.token.configuration.symbol.normalize(),
-        it.asset.token.currency,
-        it.asset.token.coinRate
+        it.asset.token
     )
 )
 
 // Helper class to group items by symbol only
-private class TokenGroupWrapper(val token: TokenAssetGroup.Token) {
+private class TokenGroupWrapper(val tokenInfo: TokenAssetGroup.TokenInfo) {
 
     override fun equals(other: Any?): Boolean {
-        return other is TokenGroupWrapper && token.symbol == other.token.symbol
+        return other is TokenGroupWrapper && tokenInfo.symbol == other.tokenInfo.symbol
     }
 
     override fun hashCode(): Int {
-        return token.symbol.hashCode()
+        return tokenInfo.symbol.hashCode()
     }
 }

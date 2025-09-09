@@ -47,7 +47,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.view.Governan
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.supportTinderGov
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
@@ -73,6 +74,7 @@ class ReferendaListViewModel(
     private val tinderGovInteractor: TinderGovInteractor,
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
     private val validationExecutor: ValidationExecutor,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     WithAssetSelector,
     Validatable by validationExecutor {
@@ -184,7 +186,7 @@ class ReferendaListViewModel(
 
         return GovernanceLocksModel(
             title = resourceManager.getString(R.string.wallet_balance_locked),
-            amount = mapAmountToAmountModel(locksOverview.locked, asset).token,
+            amount = amountFormatter.formatAmountToAmountModel(locksOverview.locked, asset).token,
             hasUnlockableLocks = locksOverview.hasClaimableLocks
         )
     }
@@ -192,7 +194,7 @@ class ReferendaListViewModel(
     private fun mapDelegatedToUi(delegatedState: DelegatedState, asset: Asset): GovernanceLocksModel? {
         return when (delegatedState) {
             is DelegatedState.Delegated -> GovernanceLocksModel(
-                amount = mapAmountToAmountModel(delegatedState.amount, asset).token,
+                amount = amountFormatter.formatAmountToAmountModel(delegatedState.amount, asset).token,
                 title = resourceManager.getString(R.string.delegation_your_delegations),
                 hasUnlockableLocks = false
             )

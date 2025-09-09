@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +26,8 @@ class NetworkReceiveFlowViewModel(
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
     networkFlowPayload: NetworkFlowPayload,
-    chainRegistry: ChainRegistry
+    chainRegistry: ChainRegistry,
+    amountFormatter: AmountFormatter
 ) : NetworkFlowViewModel(
     interactor,
     router,
@@ -34,7 +36,8 @@ class NetworkReceiveFlowViewModel(
     externalBalancesInteractor,
     resourceManager,
     networkFlowPayload,
-    chainRegistry
+    chainRegistry,
+    amountFormatter
 ) {
 
     override fun getAssetBalance(asset: AssetWithNetwork): PricedAmount {
