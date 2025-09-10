@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multi
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.DiscoveredMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
-import io.novafoundation.nova.runtime.ext.externalApi
 import io.novafoundation.nova.runtime.ext.hasExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -86,11 +85,11 @@ class RealMultisigRepository @Inject constructor(
         accountId: AccountIdKey,
         pendingCallHashes: Collection<CallHash>
     ): Result<Map<CallHash, OffChainPendingMultisigOperationInfo>> {
-        val apiConfig = chain.multisigApi() ?: return Result.success(emptyMap())
+        return runCatching {
+            val globalConfig = globalConfigDataSource.getGlobalConfig()
 
-        return kotlin.runCatching {
-            val request = OffChainPendingMultisigInfoRequest(accountId, pendingCallHashes)
-            val response = api.getCallDatas(apiConfig.url, request)
+            val request = OffChainPendingMultisigInfoRequest(accountId, pendingCallHashes, chain.id)
+            val response = api.getCallDatas(globalConfig.multisigsApiUrl, request)
             response.toDomain(chain)
         }
             .onFailure { Log.e("RealMultisigRepository", "Failed to fetch call datas in ${chain.name}", it) }
@@ -158,9 +157,5 @@ class RealMultisigRepository @Inject constructor(
 
     private fun Chain.hasMultisigApi(): Boolean {
         return hasExternalApi<ExternalApi.Multisig>()
-    }
-
-    private fun Chain.multisigApi(): ExternalApi.Multisig? {
-        return externalApi()
     }
 }
