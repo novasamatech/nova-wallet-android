@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -54,6 +55,11 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.RealFractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -250,8 +256,29 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAmountFormatter(resourceManager: ResourceManager): AmountFormatter {
-        return RealAmountFormatter(resourceManager)
+    fun provideFractionStylingFormatter(resourceManager: ResourceManager): FractionStylingFormatter {
+        return RealFractionStylingFormatter(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAmountFormatter(fractionStylingFormatter: FractionStylingFormatter): AmountFormatter {
+        return RealAmountFormatter(fractionStylingFormatter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMaskableAmountFormatterFactory(amountFormatter: AmountFormatter): MaskableAmountFormatterFactory {
+        return MaskableAmountFormatterFactory(amountFormatter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMaskableAmountFormatterProvider(
+        maskableAmountFormatterFactory: MaskableAmountFormatterFactory,
+        discreetModeInteractor: DiscreetModeInteractor
+    ): MaskableAmountFormatterProvider {
+        return MaskableAmountFormatterProvider(maskableAmountFormatterFactory, discreetModeInteractor)
     }
 
     @Provides

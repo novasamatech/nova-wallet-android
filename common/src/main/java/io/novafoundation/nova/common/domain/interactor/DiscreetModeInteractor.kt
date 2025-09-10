@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.domain.interactor
 import io.novafoundation.nova.common.data.model.DiscreetMode
 import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 interface DiscreetModeInteractor {
@@ -16,7 +17,9 @@ class RealDiscreetModeInteractor(
 ) : DiscreetModeInteractor {
 
     override fun observeDiscreetMode(): Flow<DiscreetMode> {
-        return observeDiscreetModeEnabled().map { toDiscreetMode(it) }
+        return observeDiscreetModeEnabled()
+            .map { toDiscreetMode(it) }
+            .distinctUntilChanged()
     }
 
     private fun observeDiscreetModeEnabled() = toggleFeatureRepository.observe(DISCREET_MODE_FEATURE, false)

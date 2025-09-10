@@ -47,13 +47,6 @@ fun CharSequence.formatBalanceWithFraction(formatter: AmountFormatter, @DimenRes
     return formatter.formatBalanceWithFraction(this, floatAmountSize)
 }
 
-fun AmountModel.formatBalanceWithFraction(amountFormatter: AmountFormatter, @DimenRes floatAmountSize: Int): AmountModel {
-    return AmountModel(
-        token = token.formatBalanceWithFraction(amountFormatter, floatAmountSize),
-        fiat = fiat
-    )
-}
-
 fun Asset.transferableAmountModel(amountFormatter: AmountFormatter) = amountFormatter.formatAmountToAmountModel(transferable, this)
 
 fun transferableAmountModelOf(amountFormatter: AmountFormatter, asset: Asset) = amountFormatter.formatAmountToAmountModel(asset.transferable, asset)

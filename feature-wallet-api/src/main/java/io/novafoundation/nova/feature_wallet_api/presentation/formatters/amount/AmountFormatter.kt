@@ -1,56 +1,24 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount
 
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.ForegroundColorSpan
-import androidx.annotation.DimenRes
-import io.novafoundation.nova.common.resources.ResourceManager
+import androidx.core.text.buildSpannedString
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatWithFullAmount
-import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrencyNoAbbreviation
-import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 import java.math.BigDecimal
 
-interface AmountFormatter {
-    fun formatBalanceWithFraction(unformattedAmount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence
-
-    fun formatAmountToAmountModel(amount: BigDecimal, token: TokenBase, config: AmountConfig = AmountConfig()): AmountModel
-}
+interface AmountFormatter : GenericAmountFormatter<AmountModel>
 
 class RealAmountFormatter(
-    private val resourceManager: ResourceManager
+    private val fractionStylingFormatter: FractionStylingFormatter
 ) : AmountFormatter {
-
-    override fun formatBalanceWithFraction(unformattedAmount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence {
-        val amountWithFraction = unformattedAmount.toAmountWithFraction()
-
-        val textColor = resourceManager.getColor(R.color.text_secondary)
-        val colorSpan = ForegroundColorSpan(textColor)
-        val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(floatAmountSize))
-
-        return with(amountWithFraction) {
-            val decimalAmount = amountWithFraction.amount
-
-            val spannableBuilder = SpannableStringBuilder()
-                .append(decimalAmount)
-            if (fraction != null) {
-                spannableBuilder.append(separator + fraction)
-                val startIndex = decimalAmount.length
-                val endIndex = decimalAmount.length + separator.length + fraction!!.length
-                spannableBuilder.setSpan(colorSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                spannableBuilder.setSpan(sizeSpan, startIndex, endIndex, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-            }
-            spannableBuilder
-        }
-    }
 
     override fun formatAmountToAmountModel(
         amount: BigDecimal,
@@ -58,7 +26,10 @@ class RealAmountFormatter(
         config: AmountConfig
     ): AmountModel {
         return AmountModel(
-            token = config.tokenAmountSign.signSymbol + formatAmount(config, amount, token),
+            token = buildSpannedString {
+                append(config.tokenAmountSign.signSymbol)
+                append(formatAmount(config, amount, token))
+            },
             fiat = formatFiat(amount, token, config)
         )
     }
@@ -67,7 +38,7 @@ class RealAmountFormatter(
         config: AmountConfig,
         amount: BigDecimal,
         token: TokenBase
-    ): String {
+    ): CharSequence {
         val unsignedTokenAmount = if (config.useAbbreviation) {
             if (config.includeAssetTicker) {
                 amount.formatTokenAmount(token.configuration, config.roundingMode)
@@ -83,7 +54,8 @@ class RealAmountFormatter(
                 unformattedAmount
             }
         }
-        return unsignedTokenAmount
+
+        return unsignedTokenAmount.applyFractionStyling(config.tokenFractionStylingSize)
     }
 
     private fun formatFiat(
@@ -105,5 +77,12 @@ class RealAmountFormatter(
         }
 
         return formattedFiat
+    }
+
+    private fun CharSequence.applyFractionStyling(fractionStylingSize: FractionStylingSize): CharSequence {
+        return when (fractionStylingSize) {
+            FractionStylingSize.Default -> this
+            is FractionStylingSize.AbsoluteSize -> fractionStylingFormatter.formatFraction(this, fractionStylingSize.sizeRes)
+        }
     }
 }
