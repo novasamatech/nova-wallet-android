@@ -49,7 +49,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.chainAsset
 import kotlinx.coroutines.Dispatchers
@@ -82,7 +83,8 @@ class NewDelegationConfirmViewModel(
     private val delegateFormatters: DelegateMappers,
     private val delegateLabelUseCase: DelegateLabelUseCase,
     private val partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     WithFeeLoaderMixin,
@@ -106,7 +108,7 @@ class NewDelegationConfirmViewModel(
         .shareInBackground()
 
     val amountModelFlow = assetFlow.map {
-        mapAmountToAmountModel(payload.amount, it)
+        amountFormatter.formatAmountToAmountModel(payload.amount, it)
     }.shareInBackground()
 
     val currentAddressModelFlow = selectedAccountUseCase.selectedAddressModelFlow { governanceSharedState.chain() }

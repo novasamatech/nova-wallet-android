@@ -16,8 +16,10 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactF
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.model.SwapConfirmationDetailsModel
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -36,6 +38,7 @@ class RealSwapConfirmationDetailsFormatter(
     private val swapRateFormatter: SwapRateFormatter,
     private val priceImpactFormatter: PriceImpactFormatter,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : SwapConfirmationDetailsFormatter {
 
     override suspend fun format(quote: SwapQuote, slippage: Fraction): SwapConfirmationDetailsModel {
@@ -81,6 +84,6 @@ class RealSwapConfirmationDetailsFormatter(
 
     private suspend fun formatAmount(chainAsset: Chain.Asset, amount: BigInteger): AmountModel {
         val token = tokenRepository.getToken(chainAsset)
-        return mapAmountToAmountModel(amount, token, includeZeroFiat = false, estimatedFiat = true)
+        return amountFormatter.formatAmountToAmountModel(amount, token, AmountConfig(includeZeroFiat = false, estimatedFiat = true))
     }
 }

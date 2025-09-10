@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.RewardDestinationParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.select.rewardDestinationValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -52,6 +53,7 @@ class ConfirmRewardDestinationViewModel(
     private val payload: ConfirmRewardDestinationPayload,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -85,7 +87,7 @@ class ConfirmRewardDestinationViewModel(
         .shareInBackground()
 
     val feeStatusFlow = controllerAssetFlow.map {
-        FeeStatus.Loaded(mapFeeToFeeModel(decimalFee, it.token))
+        FeeStatus.Loaded(mapFeeToFeeModel(decimalFee, it.token, amountFormatter = amountFormatter))
     }
         .shareInBackground()
 

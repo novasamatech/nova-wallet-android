@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTra
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -224,6 +225,7 @@ class SwapFeatureModule {
         swapRateFormatter: SwapRateFormatter,
         priceImpactFormatter: PriceImpactFormatter,
         resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ): SwapConfirmationDetailsFormatter {
         return RealSwapConfirmationDetailsFormatter(
             chainRegistry = chainRegistry,
@@ -232,7 +234,8 @@ class SwapFeatureModule {
             swapRouteFormatter = swapRouteFormatter,
             swapRateFormatter = swapRateFormatter,
             priceImpactFormatter = priceImpactFormatter,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            amountFormatter = amountFormatter
         )
     }
 

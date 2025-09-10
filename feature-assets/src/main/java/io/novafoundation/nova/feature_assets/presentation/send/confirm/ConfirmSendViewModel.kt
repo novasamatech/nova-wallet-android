@@ -46,7 +46,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.DefaultFeeFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -80,6 +83,7 @@ class ConfirmSendViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val transferDraft: TransferDraft,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -101,7 +105,7 @@ class ConfirmSendViewModel(
         .inBackground()
         .share()
 
-    private val formatter = TransferFeeDisplayFormatter(crossChainFeeShown = isCrossChain)
+    private val formatter = TransferFeeDisplayFormatter(crossChainFeeShown = isCrossChain, componentDelegate = DefaultFeeFormatter(amountFormatter))
     val feeMixin = feeLoaderMixinFactory.createForTransfer(
         originChainAsset = flowOf { originAsset() },
         formatter = formatter,
@@ -135,7 +139,7 @@ class ConfirmSendViewModel(
         .share()
 
     val amountModel = assetFlow.map { asset ->
-        mapAmountToAmountModel(transferDraft.amount, asset, tokenAmountSign = AmountSign.NEGATIVE)
+        amountFormatter.formatAmountToAmountModel(transferDraft.amount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
     }
 
     val transferDirectionModel = flowOf { createTransferDirectionModel() }

@@ -14,7 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -24,7 +25,8 @@ class ParachainUserRewardsComponentFactory(
     private val interactor: ParachainStakingUserRewardsInteractor,
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -36,7 +38,8 @@ class ParachainUserRewardsComponentFactory(
         stakingOption = stakingOption,
         hostContext = hostContext,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -46,7 +49,8 @@ private class ParachainUserRewardsComponent(
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : BaseRewardComponent(hostContext) {
 
     private val rewardPeriodState = rewardPeriodsInteractor.observeRewardPeriod(stakingOption)
@@ -78,7 +82,7 @@ private class ParachainUserRewardsComponent(
         interactor.observeRewards(delegatorState, stakingOption),
         hostContext.assetFlow
     ) { totalReward, asset ->
-        mapAmountToAmountModel(totalReward, asset)
+        amountFormatter.formatAmountToAmountModel(totalReward, asset)
     }
 
     private fun syncStakingRewards(delegatorState: DelegatorState.Delegator) {

@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapAssetToAssetModel
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -60,6 +61,7 @@ class ConfirmContributeViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val assetSharedState: SingleAssetSharedState,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions,
@@ -91,7 +93,7 @@ class ConfirmContributeViewModel(
     val selectedAmount = payload.amount.toString()
 
     val feeFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token, amountFormatter = amountFormatter)
 
         FeeStatus.Loaded(feeModel)
     }

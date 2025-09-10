@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.va
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.SetupStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup.rewards.MythosStakingRewardsComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
@@ -53,6 +54,7 @@ class SetupStartMythosStakingModule {
         validationSystem: StartMythosStakingValidationSystem,
         blockNumberUseCase: StakingBlockNumberUseCase,
         validationFailureFormatter: MythosStakingValidationFailureFormatter,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SetupStartMythosStakingViewModel(
             router = router,
@@ -72,7 +74,8 @@ class SetupStartMythosStakingModule {
             selectCollatorInterScreenRequester = selectCollatorInterScreenCommunicator,
             validationSystem = validationSystem,
             mythosStakingValidationFailureFormatter = validationFailureFormatter,
-            stakingBlockNumberUseCase = blockNumberUseCase
+            stakingBlockNumberUseCase = blockNumberUseCase,
+            amountFormatter = amountFormatter
         )
     }
 

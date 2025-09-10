@@ -18,7 +18,8 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.callForma
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallPreviewModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallPushNotificationModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.collect
@@ -36,6 +37,7 @@ class RealMultisigCallFormatter @Inject constructor(
     private val addressIconGenerator: AddressIconGenerator,
     private val assetIconProvider: AssetIconProvider,
     private val tokenUseCase: ArbitraryTokenUseCase,
+    private val amountFormatter: AmountFormatter
 ) : MultisigCallFormatter {
 
     override suspend fun formatPreview(
@@ -165,7 +167,7 @@ class RealMultisigCallFormatter @Inject constructor(
             title = delegateResult.title,
             primaryAmount = delegateResult.primaryAmount?.let {
                 val token = tokenUseCase.getToken(it.chainAssetId)
-                mapAmountToAmountModel(it.amount, token)
+                amountFormatter.formatAmountToAmountModel(it.amount, token)
             },
             tableEntries = delegateResult.tableEntries.map { it.toUi() },
             onBehalfOf = onBehalfOf

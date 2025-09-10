@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVotePayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.referenda.SetupReferendumVoteViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
@@ -45,6 +46,7 @@ class SetupReferendumVoteModule {
         convictionValuesProvider: ConvictionValuesProvider,
         maxActionProviderFactory: MaxActionProviderFactory,
         locksFormatter: LocksFormatter,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SetupReferendumVoteViewModel(
             feeLoaderMixinFactory = feeLoaderMixinFactory,
@@ -61,6 +63,7 @@ class SetupReferendumVoteModule {
             convictionValuesProvider = convictionValuesProvider,
             maxActionProviderFactory = maxActionProviderFactory,
             locksFormatter = locksFormatter,
+            amountFormatter = amountFormatter
         )
     }
 

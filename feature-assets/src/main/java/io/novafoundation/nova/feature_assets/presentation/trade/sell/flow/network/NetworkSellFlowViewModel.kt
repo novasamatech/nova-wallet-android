@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFl
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 
@@ -25,7 +26,8 @@ class NetworkSellFlowViewModel(
     accountUseCase: SelectedAccountUseCase,
     resourceManager: ResourceManager,
     networkFlowPayload: NetworkFlowPayload,
-    chainRegistry: ChainRegistry
+    chainRegistry: ChainRegistry,
+    amountFormatter: AmountFormatter
 ) : NetworkFlowViewModel(
     interactor,
     router,
@@ -34,7 +36,8 @@ class NetworkSellFlowViewModel(
     externalBalancesInteractor,
     resourceManager,
     networkFlowPayload,
-    chainRegistry
+    chainRegistry,
+    amountFormatter
 ) {
 
     override fun getAssetBalance(asset: AssetWithNetwork): PricedAmount {

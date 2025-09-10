@@ -18,9 +18,10 @@ import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegme
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel.FeeOperationModel
 import io.novafoundation.nova.feature_swap_impl.presentation.fee.model.SwapSegmentFeeModel.SwapComponentFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.toFeeDisplay
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -30,6 +31,7 @@ class SwapFeeViewModel(
     private val swapInteractor: SwapInteractor,
     private val chainRegistry: ChainRegistry,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
     swapStateStoreProvider: SwapStateStoreProvider
 ) : BaseViewModel() {
 
@@ -67,7 +69,7 @@ class SwapFeeViewModel(
                 label = feeDisplaySegment.type.formatLabel(),
                 individualFees = feeDisplaySegment.fees.map { individualFee ->
                     val token = tokens.getValue(individualFee.asset.fullId)
-                    mapAmountToAmountModel(individualFee.amount, token).toFeeDisplay()
+                    amountFormatter.formatAmountToAmountModel(individualFee.amount, token).toFeeDisplay()
                 }
             )
         }

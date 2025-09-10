@@ -28,7 +28,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.r
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
@@ -52,6 +53,7 @@ class ConfirmRebondViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     hintsMixinFactory: ResourcesHintsMixinFactory,
     walletUiUseCase: WalletUiUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     FeeLoaderMixin by feeLoaderMixin,
@@ -81,7 +83,7 @@ class ConfirmRebondViewModel(
         .shareInBackground()
 
     val amountModelFlow = assetFlow.map { asset ->
-        mapAmountToAmountModel(payload.amount, asset)
+        amountFormatter.formatAmountToAmountModel(payload.amount, asset)
     }
         .shareInBackground()
 

@@ -30,11 +30,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -61,6 +62,7 @@ class ConfirmReferendumVoteViewModel(
     private val referendumFormatter: ReferendumFormatter,
     private val locksChangeFormatter: LocksChangeFormatter,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -81,7 +83,7 @@ class ConfirmReferendumVoteViewModel(
     }.shareInBackground()
 
     override val amountModelFlow: Flow<AmountModel> = assetFlow.map {
-        mapAmountToAmountModel(payload.vote.amount, it)
+        amountFormatter.formatAmountToAmountModel(payload.vote.amount, it)
     }.shareInBackground()
 
     private val accountVoteFlow = assetFlow.map(::constructAccountVote)

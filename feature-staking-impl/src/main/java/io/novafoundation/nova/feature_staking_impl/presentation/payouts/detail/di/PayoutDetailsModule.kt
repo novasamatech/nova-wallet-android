@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class PayoutDetailsModule {
@@ -30,7 +31,8 @@ class PayoutDetailsModule {
         addressIconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         resourceManager: ResourceManager,
-        selectedAssetState: StakingSharedState
+        selectedAssetState: StakingSharedState,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return PayoutDetailsViewModel(
             interactor,
@@ -39,7 +41,8 @@ class PayoutDetailsModule {
             addressIconGenerator,
             externalActions,
             resourceManager,
-            selectedAssetState
+            selectedAssetState,
+            amountFormatter
         )
     }
 

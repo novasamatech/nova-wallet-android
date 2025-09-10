@@ -49,7 +49,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balance
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novasama.substrate_sdk_android.hash.isPositive
@@ -80,7 +82,8 @@ class BalanceDetailViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetIconProvider: AssetIconProvider,
     private val chartsInteractor: ChartsInteractor,
-    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     TransactionHistoryUi by transactionHistoryMixin {
 
@@ -252,9 +255,9 @@ class BalanceDetailViewModel(
 
         return AssetDetailsModel(
             token = mapTokenToTokenModel(asset.token),
-            total = mapAmountToAmountModel(asset.total + totalContributed, asset, useAbbreviation = false),
-            transferable = mapAmountToAmountModel(asset.transferable, asset),
-            locked = mapAmountToAmountModel(asset.locked + totalContributed, asset),
+            total = amountFormatter.formatAmountToAmountModel(asset.total + totalContributed, asset, AmountConfig(useAbbreviation = false)),
+            transferable = amountFormatter.formatAmountToAmountModel(asset.transferable, asset),
+            locked = amountFormatter.formatAmountToAmountModel(asset.locked + totalContributed, asset),
             assetIcon = assetIconProvider.getAssetIconOrFallback(asset.token.configuration)
         )
     }
@@ -268,14 +271,14 @@ class BalanceDetailViewModel(
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.id.value),
-                mapAmountToAmountModel(it.amountInPlanks, asset)
+                amountFormatter.formatAmountToAmountModel(it.amountInPlanks, asset)
             )
         }
 
         val mappedHolds = holds.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.identifier),
-                mapAmountToAmountModel(it.amountInPlanks, asset)
+                amountFormatter.formatAmountToAmountModel(it.amountInPlanks, asset)
             )
         }
 
@@ -283,13 +286,13 @@ class BalanceDetailViewModel(
 
         val reservedBalance = BalanceLocksModel.Lock(
             resourceManager.getString(R.string.wallet_balance_reserved),
-            mapAmountToAmountModel(unlabeledReserves, asset)
+            amountFormatter.formatAmountToAmountModel(unlabeledReserves, asset)
         )
 
         val external = externalBalances.map { externalBalance ->
             BalanceLocksModel.Lock(
                 name = mapBalanceIdToUi(resourceManager, externalBalance.type.balanceId),
-                amount = mapAmountToAmountModel(externalBalance.amount, asset)
+                amount = amountFormatter.formatAmountToAmountModel(externalBalance.amount, asset)
             )
         }
 

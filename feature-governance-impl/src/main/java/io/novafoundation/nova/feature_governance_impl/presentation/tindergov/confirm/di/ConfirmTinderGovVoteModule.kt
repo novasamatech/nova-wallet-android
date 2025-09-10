@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm.ConfirmTinderGovVoteViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmTinderGovVoteModule {
@@ -61,7 +62,8 @@ class ConfirmTinderGovVoteModule {
         tinderGovInteractor: TinderGovInteractor,
         tinderGovBasketInteractor: TinderGovBasketInteractor,
         partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmTinderGovVoteViewModel(
             router = router,
@@ -81,7 +83,8 @@ class ConfirmTinderGovVoteModule {
             tinderGovInteractor = tinderGovInteractor,
             tinderGovBasketInteractor = tinderGovBasketInteractor,
             partialRetriableMixinFactory = partialRetriableMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

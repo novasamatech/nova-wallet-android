@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.rewardDest
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.ConfirmRewardDestinationViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmRewardDestinationModule {
@@ -40,7 +41,8 @@ class ConfirmRewardDestinationModule {
         payload: ConfirmRewardDestinationPayload,
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmRewardDestinationViewModel(
             router = router,
@@ -54,7 +56,8 @@ class ConfirmRewardDestinationModule {
             payload = payload,
             selectedAssetState = singleAssetSharedState,
             walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

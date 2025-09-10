@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.G
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.GovernanceLocksOverviewViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class GovernanceLocksOverviewModule {
@@ -25,12 +26,14 @@ class GovernanceLocksOverviewModule {
         interactor: GovernanceUnlockInteractor,
         tokenUseCase: TokenUseCase,
         resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return GovernanceLocksOverviewViewModel(
             router = router,
             interactor = interactor,
             tokenUseCase = tokenUseCase,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            amountFormatter = amountFormatter
         )
     }
 

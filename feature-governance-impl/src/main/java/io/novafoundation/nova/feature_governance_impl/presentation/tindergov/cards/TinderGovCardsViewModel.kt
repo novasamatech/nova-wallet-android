@@ -38,7 +38,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,6 +62,7 @@ class TinderGovCardsViewModel(
     private val referendaSummaryInteractor: ReferendaSummaryInteractor,
     private val tokenUseCase: TokenUseCase,
     private val cardsMarkdown: Markwon,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     companion object {
@@ -316,7 +318,7 @@ class TinderGovCardsViewModel(
         val treasuryRequest = interactor.getReferendumAmount(this)
         return treasuryRequest?.let {
             val token = tokenUseCase.getToken(treasuryRequest.chainAsset.fullId)
-            mapAmountToAmountModel(treasuryRequest.amount, token)
+            amountFormatter.formatAmountToAmountModel(treasuryRequest.amount, token)
         }
     }
 

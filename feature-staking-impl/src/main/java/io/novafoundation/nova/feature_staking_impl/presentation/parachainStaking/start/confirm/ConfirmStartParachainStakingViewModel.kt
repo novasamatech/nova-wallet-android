@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -75,6 +76,7 @@ class ConfirmStartParachainStakingViewModel(
     private val payload: ConfirmStartParachainStakingPayload,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : ConfirmStartSingleTargetStakingViewModel<ParachainConfirmStartStakingState>(
     stateFactory = { computationalScope ->
@@ -96,6 +98,7 @@ class ConfirmStartParachainStakingViewModel(
     assetUseCase = assetUseCase,
     walletUiUseCase = walletUiUseCase,
     payload = payload,
+    amountFormatter = amountFormatter,
 ),
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
@@ -113,7 +116,7 @@ class ConfirmStartParachainStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager, amountFormatter) },
             progressConsumer = _showNextProgress.progressConsumer()
         ) {
             sendTransaction(amount, payload.collator)

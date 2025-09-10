@@ -36,12 +36,15 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface MultisigOperationsFeatureDependencies {
+
+    val amountFormatter: AmountFormatter
 
     val assetIconProvider: AssetIconProvider
 

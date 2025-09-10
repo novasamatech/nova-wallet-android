@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -23,6 +24,7 @@ class MythosUnbondingComponentFactory(
     private val mythosSharedComputation: MythosSharedComputation,
     private val interactor: MythosUnbondingInteractor,
     private val router: MythosStakingRouter,
+    private val amountFormatter: AmountFormatter,
 ) {
 
     fun create(
@@ -34,12 +36,14 @@ class MythosUnbondingComponentFactory(
         mythosSharedComputation = mythosSharedComputation,
         interactor = interactor,
         router = router,
+        amountFormatter = amountFormatter
     )
 }
 
 private class MythosUnbondingComponent(
     private val mythosSharedComputation: MythosSharedComputation,
     private val interactor: MythosUnbondingInteractor,
+    private val amountFormatter: AmountFormatter,
 
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
@@ -68,7 +72,7 @@ private class MythosUnbondingComponent(
             interactor.unbondingsFlow(delegatorState, stakingOption),
             hostContext.assetFlow,
         ) { unbondings, asset ->
-            UnbondingState.from(unbondings, asset)
+            UnbondingState.from(unbondings, asset, amountFormatter)
         }
     }
 }

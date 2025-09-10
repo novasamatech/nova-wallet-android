@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -24,6 +25,7 @@ class NominationPoolsUnbondingComponentFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolUnbondingsInteractor,
     private val router: NominationPoolsRouter,
+    private val amountFormatter: AmountFormatter,
 ) {
 
     fun create(
@@ -34,7 +36,8 @@ class NominationPoolsUnbondingComponentFactory(
         interactor = interactor,
         hostContext = hostContext,
         stakingOption = stakingOption,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -42,6 +45,7 @@ private class NominationPoolsUnbondingComponent(
     private val router: NominationPoolsRouter,
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolUnbondingsInteractor,
+    private val amountFormatter: AmountFormatter,
 
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
@@ -72,7 +76,7 @@ private class NominationPoolsUnbondingComponent(
             interactor.unbondingsFlow(poolMember, stakingOption, hostContext.scope),
             hostContext.assetFlow,
         ) { unbondings, asset ->
-            UnbondingState.from(unbondings, asset)
+            UnbondingState.from(unbondings, asset, amountFormatter)
         }
     }
 

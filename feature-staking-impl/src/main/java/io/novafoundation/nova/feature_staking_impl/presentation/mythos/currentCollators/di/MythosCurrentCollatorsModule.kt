@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.currentCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.currentCollators.MythosCurrentCollatorsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class MythosCurrentCollatorsModule {
@@ -31,6 +32,7 @@ class MythosCurrentCollatorsModule {
         stakingSharedState: StakingSharedState,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         tokenUseCase: TokenUseCase,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return MythosCurrentCollatorsViewModel(
             router = router,
@@ -39,7 +41,8 @@ class MythosCurrentCollatorsModule {
             currentCollatorsInteractor = currentCollatorsInteractor,
             stakingSharedState = stakingSharedState,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
-            tokenUseCase = tokenUseCase
+            tokenUseCase = tokenUseCase,
+            amountFormatter = amountFormatter
         )
     }
 

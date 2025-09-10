@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.main.validations.mai
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.main.CrowdloanViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 
 @Module(includes = [ViewModelModule::class])
@@ -45,14 +46,16 @@ class CrowdloanModule {
         crowdloanInteractor: CrowdloanInteractor,
         contributionsInteractor: ContributionsInteractor,
         selectedAccountUseCase: SelectedAccountUseCase,
-        assetUseCase: AssetUseCase
+        assetUseCase: AssetUseCase,
+        amountFormatter: AmountFormatter
     ): StatefulCrowdloanMixin.Factory {
         return StatefulCrowdloanProviderFactory(
             singleAssetSharedState = crowdloanSharedState,
             crowdloanInteractor = crowdloanInteractor,
             contributionsInteractor = contributionsInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
-            assetUseCase = assetUseCase
+            assetUseCase = assetUseCase,
+            amountFormatter = amountFormatter
         )
     }
 

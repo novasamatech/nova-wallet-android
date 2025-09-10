@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRou
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsPayload
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.full.ReferendumFullDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ReferendumFullDetailsModule {
@@ -34,7 +35,8 @@ class ReferendumFullDetailsModule {
         tokenUseCase: TokenUseCase,
         externalAction: ExternalActions.Presentation,
         copyTextLauncher: CopyTextLauncher.Presentation,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ReferendumFullDetailsViewModel(
             router,
@@ -45,7 +47,8 @@ class ReferendumFullDetailsModule {
             tokenUseCase,
             externalAction,
             copyTextLauncher,
-            resourceManager
+            resourceManager,
+            amountFormatter
         )
     }
 

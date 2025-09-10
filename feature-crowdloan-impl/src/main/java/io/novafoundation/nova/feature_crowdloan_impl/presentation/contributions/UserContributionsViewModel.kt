@@ -14,7 +14,8 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.model.generateCrowdloanIcon
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
@@ -28,7 +29,8 @@ class UserContributionsViewModel(
     private val selectedAssetState: SingleAssetSharedState,
     private val resourceManager: ResourceManager,
     private val router: CrowdloanRouter,
-    private val tokenUseCase: TokenUseCase
+    private val tokenUseCase: TokenUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     private val tokenFlow = tokenUseCase.currentTokenFlow()
@@ -49,7 +51,7 @@ class UserContributionsViewModel(
         .shareInBackground()
 
     val totalContributedAmountFlow = combine(contributionsWitTotalAmountFlow, tokenFlow) { contributionsWitTotalAmount, token ->
-        mapAmountToAmountModel(contributionsWitTotalAmount.totalContributed, token)
+        amountFormatter.formatAmountToAmountModel(contributionsWitTotalAmount.totalContributed, token)
     }
         .shareInBackground()
 
@@ -68,7 +70,7 @@ class UserContributionsViewModel(
         return ContributionModel(
             title = contributionTitle,
             icon = generateCrowdloanIcon(contributionWithMetadata.metadata.parachainMetadata, depositorAddress, iconGenerator),
-            amount = mapAmountToAmountModel(contributionWithMetadata.contribution.amountInPlanks, token),
+            amount = amountFormatter.formatAmountToAmountModel(contributionWithMetadata.contribution.amountInPlanks, token),
             returnsIn = contributionWithMetadata.metadata.returnsIn
         )
     }

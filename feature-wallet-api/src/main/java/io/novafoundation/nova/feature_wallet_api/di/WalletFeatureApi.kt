@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.MultisigExtri
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -79,6 +80,8 @@ interface WalletFeatureApi {
     val multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
 
     val accountInfoRepository: AccountInfoRepository
+
+    val amountFormatter: AmountFormatter
 
     fun provideWalletRepository(): WalletRepository
 

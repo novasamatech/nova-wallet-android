@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -23,13 +23,15 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onStart
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.flow.transformLatest
 
 class RelaychainUserRewardsComponentFactory(
     private val stakingInteractor: StakingInteractor,
     private val stakingSharedComputation: StakingSharedComputation,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -41,7 +43,8 @@ class RelaychainUserRewardsComponentFactory(
         hostContext = hostContext,
         stakingSharedComputation = stakingSharedComputation,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -51,7 +54,8 @@ private class RelaychainUserRewardsComponent(
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : BaseRewardComponent(hostContext) {
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
@@ -94,7 +98,7 @@ private class RelaychainUserRewardsComponent(
         stakingInteractor.observeUserRewards(stakingState, stakingOption),
         hostContext.assetFlow
     ) { totalReward, asset ->
-        mapAmountToAmountModel(totalReward, asset)
+        amountFormatter.formatAmountToAmountModel(totalReward, asset)
     }.withLoading()
 
     private fun syncStakingRewards() {

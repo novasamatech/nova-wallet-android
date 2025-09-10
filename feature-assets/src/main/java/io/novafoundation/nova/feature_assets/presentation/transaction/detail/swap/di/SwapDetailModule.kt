@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.detail.swa
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class SwapDetailModule {
@@ -36,7 +37,8 @@ class SwapDetailModule {
         walletUiUseCase: WalletUiUseCase,
         swapRateFormatter: SwapRateFormatter,
         assetIconProvider: AssetIconProvider,
-        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher
+        descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SwapDetailViewModel(
             router = router,
@@ -48,7 +50,8 @@ class SwapDetailModule {
             walletUiUseCase = walletUiUseCase,
             swapRateFormatter = swapRateFormatter,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            amountFormatter = amountFormatter
         )
     }
 

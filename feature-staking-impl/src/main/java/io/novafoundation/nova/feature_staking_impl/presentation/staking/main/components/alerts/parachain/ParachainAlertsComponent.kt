@@ -18,7 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.parachainStaking.loadDelegatingState
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -27,8 +28,8 @@ class ParachainAlertsComponentFactory(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val interactor: ParachainStakingAlertsInteractor,
     private val resourceManager: ResourceManager,
-    private val router: ParachainStakingRouter
-
+    private val router: ParachainStakingRouter,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -40,7 +41,8 @@ class ParachainAlertsComponentFactory(
         resourceManager = resourceManager,
         stakingOption = stakingOption,
         hostContext = hostContext,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -48,6 +50,7 @@ private class ParachainAlertsComponent(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val interactor: ParachainStakingAlertsInteractor,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
 
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
@@ -85,7 +88,7 @@ private class ParachainAlertsComponent(
             )
 
             is ParachainStakingAlert.RedeemTokens -> {
-                val amount = mapAmountToAmountModel(alert.redeemableAmount, asset).token
+                val amount = amountFormatter.formatAmountToAmountModel(alert.redeemableAmount, asset).token
 
                 AlertModel(
                     title = resourceManager.getString(R.string.staking_alert_redeem_title),

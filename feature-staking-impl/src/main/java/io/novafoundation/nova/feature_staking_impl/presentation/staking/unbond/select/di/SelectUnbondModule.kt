@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.s
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class SelectUnbondModule {
@@ -36,7 +37,8 @@ class SelectUnbondModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         maxActionProviderFactory: MaxActionProviderFactory,
         unbondHintsMixinFactory: UnbondHintsMixinFactory,
-        amountChooserMixinFactory: AmountChooserMixin.Factory
+        amountChooserMixinFactory: AmountChooserMixin.Factory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SelectUnbondViewModel(
             router = router,
@@ -48,7 +50,8 @@ class SelectUnbondModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             maxActionProviderFactory = maxActionProviderFactory,
             unbondHintsMixinFactory = unbondHintsMixinFactory,
-            amountChooserMixinFactory = amountChooserMixinFactory
+            amountChooserMixinFactory = amountChooserMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

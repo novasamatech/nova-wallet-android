@@ -31,7 +31,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.relaychain
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -58,6 +59,7 @@ class CurrentValidatorsViewModel(
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val validationExecutor: ValidationExecutor,
     private val assetUseCase: AssetUseCase,
+    private val amountFormatter: AmountFormatter
 ) : CurrentStakeTargetsViewModel(), Validatable by validationExecutor {
 
     private val stashFlow = stakingInteractor.selectedAccountStakingStateFlow(viewModelScope)
@@ -161,7 +163,7 @@ class CurrentValidatorsViewModel(
         val validator = nominatedValidator.validator
 
         val nominationAmount = (nominatedValidator.status as? NominatedValidator.Status.Active)?.let { activeStatus ->
-            mapAmountToAmountModel(activeStatus.nomination, token)
+            amountFormatter.formatAmountToAmountModel(activeStatus.nomination, token)
         }
 
         val validatorAddress = chain.addressOf(validator.accountIdHex.fromHex())

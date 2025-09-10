@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.GenericFeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.DefaultFeeFormatter
@@ -29,13 +30,14 @@ internal class GenericFeeLoaderProviderPresentation(
     interactor: FeeInteractor,
     resourceManager: ResourceManager,
     configuration: GenericFeeLoaderMixin.Configuration<Fee>,
-    tokenFlow: Flow<Token?>
+    tokenFlow: Flow<Token?>,
+    amountFormatter: AmountFormatter
 ) : GenericFeeLoaderProvider<Fee>(
     resourceManager = resourceManager,
     interactor = interactor,
     configuration = configuration,
     tokenFlow = tokenFlow,
-    feeFormatter = DefaultFeeFormatter()
+    feeFormatter = DefaultFeeFormatter(amountFormatter)
 ),
     FeeLoaderMixin.Presentation
 

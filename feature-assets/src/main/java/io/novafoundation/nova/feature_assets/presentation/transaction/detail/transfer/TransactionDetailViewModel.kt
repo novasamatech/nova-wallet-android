@@ -18,7 +18,8 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.launch
@@ -32,6 +33,7 @@ class TransactionDetailViewModel(
     val operation: OperationParcelizeModel.Transfer,
     private val externalActions: ExternalActions.Presentation,
     private val arbitraryTokenUseCase: ArbitraryTokenUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions {
 
@@ -62,7 +64,7 @@ class TransactionDetailViewModel(
         val commissionAsset = chain.await().commissionAsset
 
         val token = arbitraryTokenUseCase.historicalToken(commissionAsset, operation.time.milliseconds)
-        mapAmountToAmountModel(fee, token)
+        amountFormatter.formatAmountToAmountModel(fee, token)
     }
         .withSafeLoading()
         .shareInBackground()

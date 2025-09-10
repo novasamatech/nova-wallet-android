@@ -52,6 +52,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -240,9 +242,16 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideFeeLoaderMixinFactory(
         resourceManager: ResourceManager,
-        feeInteractor: FeeInteractor
+        feeInteractor: FeeInteractor,
+        amountFormatter: AmountFormatter
     ): FeeLoaderMixin.Factory {
-        return FeeLoaderProviderFactory(resourceManager, feeInteractor)
+        return FeeLoaderProviderFactory(resourceManager, feeInteractor, amountFormatter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAmountFormatter(resourceManager: ResourceManager): AmountFormatter {
+        return RealAmountFormatter(resourceManager)
     }
 
     @Provides

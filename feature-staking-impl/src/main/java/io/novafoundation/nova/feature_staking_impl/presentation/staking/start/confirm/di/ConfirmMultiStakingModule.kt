@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.types.ConfirmMultiStakingTypeFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.types.RealConfirmMultiStakingTypeFactory
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class, CommonMultiStakingModule::class])
 class ConfirmMultiStakingModule {
@@ -66,7 +67,8 @@ class ConfirmMultiStakingModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         selectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
         stakingStartedDetectionService: StakingStartedDetectionService,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmMultiStakingViewModel(
             router = router,
@@ -82,7 +84,8 @@ class ConfirmMultiStakingModule {
             selectedAccountUseCase = selectedAccountUseCase,
             selectionTypeProviderFactory = selectionTypeProviderFactory,
             stakingStartedDetectionService = stakingStartedDetectionService,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

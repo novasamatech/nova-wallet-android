@@ -19,7 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsAction
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -32,7 +33,8 @@ class NominationPoolUserRewardsComponentFactory(
     private val nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val interactor: NominationPoolsUserRewardsInteractor,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -45,7 +47,8 @@ class NominationPoolUserRewardsComponentFactory(
         hostContext = hostContext,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
         resourceManager = resourceManager,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -56,7 +59,8 @@ private class NominationPoolUserRewardsComponent(
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : BaseRewardComponent(hostContext) {
 
     private val poolMemberDiffing = { old: PoolMember?, new: PoolMember? ->
@@ -95,12 +99,12 @@ private class NominationPoolUserRewardsComponent(
         if (rewardsState == null) return@combine null
 
         val total = rewardsState.flatMap { poolRewards ->
-            poolRewards.total.map { total -> mapAmountToAmountModel(total, asset) }
+            poolRewards.total.map { total -> amountFormatter.formatAmountToAmountModel(total, asset) }
         }
         val claimable = rewardsState.flatMap { poolRewards ->
             poolRewards.claimable.map { claimable ->
                 UserRewardsState.ClaimableRewards(
-                    amountModel = mapAmountToAmountModel(claimable, asset),
+                    amountModel = amountFormatter.formatAmountToAmountModel(claimable, asset),
                     canClaim = claimable.isPositive()
                 )
             }

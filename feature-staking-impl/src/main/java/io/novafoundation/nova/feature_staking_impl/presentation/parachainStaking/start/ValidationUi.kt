@@ -12,11 +12,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationFailure.TooLowStake
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 
 fun startParachainStakingValidationFailure(
     failure: StartParachainStakingValidationFailure,
-    resourceManager: ResourceManager
+    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter
 ): TitleAndMessage {
     return when (failure) {
         NotEnoughBalanceToPayFees -> {
@@ -27,7 +29,7 @@ fun startParachainStakingValidationFailure(
         NotEnoughStakeableBalance -> resourceManager.amountIsTooBig()
 
         is TooLowStake -> {
-            val formattedMinStake = mapAmountToAmountModel(failure.minimumStake, failure.asset).token
+            val formattedMinStake = amountFormatter.formatAmountToAmountModel(failure.minimumStake, failure.asset).token
 
             when (failure) {
                 is TooLowStake.TooLowDelegation -> {

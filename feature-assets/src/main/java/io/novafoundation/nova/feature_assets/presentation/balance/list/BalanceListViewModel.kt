@@ -46,10 +46,9 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpl
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatBalanceWithFraction
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -305,7 +304,7 @@ class BalanceListViewModel(
             val breakdown = balanceBreakdown.breakdown.map {
                 BalanceBreakdownAmount(
                     name = it.token.configuration.symbol.value + " " + mapBalanceIdToUi(resourceManager, it.id),
-                    amount = mapAmountToAmountModel(it.tokenAmount, it.token)
+                    amount = amountFormatter.formatAmountToAmountModel(it.tokenAmount, it.token)
                 )
             }
 

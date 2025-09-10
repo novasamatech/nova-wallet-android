@@ -24,7 +24,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,6 +47,7 @@ class NominationPoolsClaimRewardsViewModel(
     walletUiUseCase: WalletUiUseCase,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     assetUseCase: AssetUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -62,7 +64,9 @@ class NominationPoolsClaimRewardsViewModel(
     private val pendingRewards = interactor.pendingRewardsFlow()
         .shareInBackground()
 
-    val pendingRewardsAmountModel = combine(pendingRewards.map { it.amount }, assetFlow, ::mapAmountToAmountModel)
+    val pendingRewardsAmountModel = combine(pendingRewards.map { it.amount }, assetFlow) { amount, asset ->
+        amountFormatter.formatAmountToAmountModel(amount, asset)
+    }
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()

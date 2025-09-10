@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.RealLocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module
@@ -55,8 +56,9 @@ class ReferendumVoteModule {
     @Provides
     @FeatureScope
     fun provideLocksChangeFormatter(
-        resourceManager: ResourceManager
-    ): LocksChangeFormatter = RealLocksChangeFormatter(resourceManager)
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
+    ): LocksChangeFormatter = RealLocksChangeFormatter(resourceManager, amountFormatter)
 
     @Provides
     @FeatureScope

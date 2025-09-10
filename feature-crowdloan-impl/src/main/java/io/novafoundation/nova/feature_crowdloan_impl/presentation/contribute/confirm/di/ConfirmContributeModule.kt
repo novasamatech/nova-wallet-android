@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRoute
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.ConfirmContributeViewModel
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.confirm.parcel.ConfirmContributePayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmContributeModule {
@@ -45,7 +46,8 @@ class ConfirmContributeModule {
         externalActions: ExternalActions.Presentation,
         customContributeManager: CustomContributeManager,
         singleAssetSharedState: CrowdloanSharedState,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmContributeViewModel(
             assetIconProvider,
@@ -61,7 +63,8 @@ class ConfirmContributeModule {
             customContributeManager,
             externalActions,
             singleAssetSharedState,
-            extrinsicNavigationWrapper
+            extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

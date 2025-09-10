@@ -17,7 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryState
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -28,6 +29,7 @@ class RelaychainStakeSummaryComponentFactory(
     private val stakingInteractor: StakingInteractor,
     private val resourceManager: ResourceManager,
     private val stakingSharedComputation: StakingSharedComputation,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -39,6 +41,7 @@ class RelaychainStakeSummaryComponentFactory(
         stakingOption = stakingOption,
         hostContext = hostContext,
         stakingSharedComputation = stakingSharedComputation,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -48,6 +51,7 @@ private class RelaychainStakeSummaryComponent(
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
     private val selectedAccountStakingStateFlow = stakingSharedComputation.selectedAccountStakingStateFlow(
@@ -107,7 +111,7 @@ private class RelaychainStakeSummaryComponent(
         domainFlow
     ) { asset, summary ->
         StakeSummaryModel(
-            totalStaked = mapAmountToAmountModel(summary.activeStake, asset),
+            totalStaked = amountFormatter.formatAmountToAmountModel(summary.activeStake, asset),
             status = statusMapper(summary.status),
         )
     }.withLoading()

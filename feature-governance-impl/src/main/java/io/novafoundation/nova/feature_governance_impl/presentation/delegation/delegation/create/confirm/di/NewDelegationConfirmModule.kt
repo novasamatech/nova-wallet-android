@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class NewDelegationConfirmModule {
@@ -58,7 +59,8 @@ class NewDelegationConfirmModule {
         delegateFormatters: DelegateMappers,
         delegateLabelUseCase: DelegateLabelUseCase,
         partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NewDelegationConfirmViewModel(
             router = router,
@@ -81,7 +83,8 @@ class NewDelegationConfirmModule {
             delegateFormatters = delegateFormatters,
             delegateLabelUseCase = delegateLabelUseCase,
             partialRetriableMixinFactory = partialRetriableMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

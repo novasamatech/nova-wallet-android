@@ -13,7 +13,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.map
@@ -27,6 +28,7 @@ class PayoutDetailsViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val resourceManager: ResourceManager,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
     val payoutDetails = interactor.currentAssetFlow()
@@ -61,7 +63,7 @@ class PayoutDetailsViewModel(
             timeLeft = payout.timeLeft,
             timeLeftCalculatedAt = payout.timeLeftCalculatedAt,
             eraDisplay = resourceManager.getString(R.string.staking_era_index_no_prefix, payout.era.toLong()),
-            reward = mapAmountToAmountModel(payout.amountInPlanks, asset),
+            reward = amountFormatter.formatAmountToAmountModel(payout.amountInPlanks, asset),
             timerColor = if (payout.closeToExpire) R.color.text_negative else R.color.text_primary,
         )
     }

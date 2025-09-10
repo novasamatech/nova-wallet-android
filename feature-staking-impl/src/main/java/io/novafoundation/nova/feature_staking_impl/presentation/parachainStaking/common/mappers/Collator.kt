@@ -18,7 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.parce
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakeTargetStakeParcelModel.Active.UserStakeInfo
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakerParcelModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 typealias CollatorModel = StakeTargetModel<Collator>
@@ -30,6 +31,7 @@ suspend fun mapCollatorToCollatorModel(
     sorting: CollatorSorting,
     resourceManager: ResourceManager,
     token: Token,
+    amountFormatter: AmountFormatter
 ): CollatorModel {
     val addressModel = addressIconGenerator.collatorAddressModel(
         collator = collator,
@@ -45,7 +47,7 @@ suspend fun mapCollatorToCollatorModel(
 
     val subtitle = when (sorting) {
         CollatorSorting.REWARDS -> collator.minimumStakeToGetRewards?.let {
-            val formattedMinStake = mapAmountToAmountModel(it, token).token
+            val formattedMinStake = amountFormatter.formatAmountToAmountModel(it, token).token
 
             StakeTargetModel.Subtitle(
                 label = resourceManager.getString(R.string.staking_min_stake).withSubtitleLabelSuffix(),

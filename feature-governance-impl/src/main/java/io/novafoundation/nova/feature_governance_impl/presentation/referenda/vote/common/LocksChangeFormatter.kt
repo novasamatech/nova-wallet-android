@@ -8,7 +8,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.model.LocksChangeModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import kotlin.time.Duration
 
 interface LocksChangeFormatter {
@@ -27,6 +29,7 @@ interface LocksChangeFormatter {
 
 class RealLocksChangeFormatter(
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : LocksChangeFormatter {
 
     override suspend fun mapLocksChangeToUi(
@@ -45,14 +48,14 @@ class RealLocksChangeFormatter(
         lockedChange: Change<Balance>,
         asset: Asset
     ): AmountChangeModel {
-        val fromFormatted = mapAmountToAmountModel(lockedChange.previousValue, asset, includeAssetTicker = false).token
-        val toFormatted = mapAmountToAmountModel(lockedChange.newValue, asset).token
+        val fromFormatted = amountFormatter.formatAmountToAmountModel(lockedChange.previousValue, asset, AmountConfig(includeAssetTicker = false)).token
+        val toFormatted = amountFormatter.formatAmountToAmountModel(lockedChange.newValue, asset).token
 
         return when (lockedChange) {
             is Change.Changed -> AmountChangeModel(
                 from = fromFormatted,
                 to = toFormatted,
-                difference = mapAmountToAmountModel(lockedChange.absoluteDifference, asset).token,
+                difference = amountFormatter.formatAmountToAmountModel(lockedChange.absoluteDifference, asset).token,
                 positive = lockedChange.positive
             )
             is Change.Same -> AmountChangeModel(

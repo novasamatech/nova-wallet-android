@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.SetupVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.common.referendumId
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -36,6 +37,7 @@ class SetupReferendumVoteViewModel(
     private val payload: SetupVotePayload,
     private val router: GovernanceRouter,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -60,6 +62,7 @@ class SetupReferendumVoteViewModel(
     convictionValuesProvider,
     locksFormatter,
     maxActionProviderFactory,
+    amountFormatter,
     feeLoaderMixinFactory
 ) {
 

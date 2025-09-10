@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class SetupYieldBoostModule {
@@ -43,6 +44,7 @@ class SetupYieldBoostModule {
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         collatorsUseCase: CollatorsUseCase,
         yieldBoostValidationSystem: YieldBoostValidationSystem,
+        amountFormatter: AmountFormatter,
     ): ViewModel {
         return SetupYieldBoostViewModel(
             router = router,
@@ -57,7 +59,8 @@ class SetupYieldBoostModule {
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             collatorsUseCase = collatorsUseCase,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            validationSystem = yieldBoostValidationSystem
+            validationSystem = yieldBoostValidationSystem,
+            amountFormatter = amountFormatter
         )
     }
 

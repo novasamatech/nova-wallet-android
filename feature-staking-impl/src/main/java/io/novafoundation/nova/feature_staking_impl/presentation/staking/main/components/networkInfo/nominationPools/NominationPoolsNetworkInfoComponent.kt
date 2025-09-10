@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.BaseNetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.networkInfo.NetworkInfoItem
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.launchIn
 class NominationPoolsNetworkInfoComponentFactory(
     private val interactor: NominationPoolsNetworkInfoInteractor,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
 ) {
 
     fun create(
@@ -29,16 +31,18 @@ class NominationPoolsNetworkInfoComponentFactory(
         resourceManager = resourceManager,
         stakingOption = stakingOption,
         hostContext = hostContext,
+        amountFormatter = amountFormatter
     )
 }
 
 private class NominationPoolsNetworkInfoComponent(
     private val interactor: NominationPoolsNetworkInfoInteractor,
+    amountFormatter: AmountFormatter,
     resourceManager: ResourceManager,
 
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
-) : BaseNetworkInfoComponent(resourceManager, hostContext.scope, titleRes = R.string.nomination_pools_info) {
+) : BaseNetworkInfoComponent(resourceManager, amountFormatter, hostContext.scope, titleRes = R.string.nomination_pools_info) {
 
     init {
         updateContentState()

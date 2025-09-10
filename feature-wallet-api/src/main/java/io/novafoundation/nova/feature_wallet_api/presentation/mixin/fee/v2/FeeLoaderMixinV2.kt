@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.DefaultFeeInspector
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
@@ -82,19 +83,21 @@ typealias FeeConstructor<F> = suspend (FeePaymentCurrency) -> F?
 
 fun Factory.createDefault(
     scope: CoroutineScope,
+    amountFormatter: AmountFormatter,
     selectedChainAssetFlow: Flow<Chain.Asset>,
     configuration: Configuration<Fee, FeeDisplay> = Configuration()
-): FeeLoaderMixinV2.Presentation<Fee, FeeDisplay> = createDefaultBy(scope, selectedChainAssetFlow.asFeeContextFromChain(), configuration)
+): FeeLoaderMixinV2.Presentation<Fee, FeeDisplay> = createDefaultBy(scope, amountFormatter, selectedChainAssetFlow.asFeeContextFromChain(), configuration)
 
 fun <F : SubmissionFee> Factory.createDefaultBy(
     scope: CoroutineScope,
+    amountFormatter: AmountFormatter,
     feeContext: Flow<FeeContext>,
     configuration: Configuration<F, FeeDisplay> = Configuration()
 ): FeeLoaderMixinV2.Presentation<F, FeeDisplay> {
     return create(
         scope = scope,
         feeContextFlow = feeContext,
-        feeFormatter = DefaultFeeFormatter(),
+        feeFormatter = DefaultFeeFormatter(amountFormatter),
         feeInspector = DefaultFeeInspector(),
         configuration = configuration
     )

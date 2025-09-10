@@ -26,7 +26,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapAddStakingProxyValidationFailureToUi
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -56,7 +57,8 @@ class ConfirmAddStakingProxyViewModel(
     private val addStakingProxyInteractor: AddStakingProxyInteractor,
     private val walletUiUseCase: WalletUiUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     Validatable by validationExecutor,
@@ -90,11 +92,11 @@ class ConfirmAddStakingProxyViewModel(
     }
 
     val proxyDeposit = assetFlow.map { asset ->
-        mapAmountToAmountModel(payload.deltaDeposit, asset)
+        amountFormatter.formatAmountToAmountModel(payload.deltaDeposit, asset)
     }
 
     val feeModelFlow = combine(assetFlow, feeFlow) { asset, fee ->
-        mapAmountToAmountModel(fee.amount, asset)
+        amountFormatter.formatAmountToAmountModel(fee.amount, asset)
     }
 
     val proxyAccountModel = chainFlow.map { chain ->

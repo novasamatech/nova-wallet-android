@@ -45,7 +45,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.view.YourVote
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -64,7 +65,8 @@ private data class AccountVoteFormatComponent(
 class RealReferendumFormatter(
     private val resourceManager: ResourceManager,
     private val trackFormatter: TrackFormatter,
-    private val referendaStatusFormatter: ReferendaStatusFormatter
+    private val referendaStatusFormatter: ReferendaStatusFormatter,
+    private val amountFormatter: AmountFormatter
 ) : ReferendumFormatter {
 
     override fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel? {
@@ -116,7 +118,7 @@ class RealReferendumFormatter(
     ): String? {
         if (threshold == null) return null
 
-        val thresholdFormatted = mapAmountToAmountModel(threshold.support.value, token).token
+        val thresholdFormatted = amountFormatter.formatAmountToAmountModel(threshold.support.value, token).token
         val turnoutFormatted = token.amountFromPlanks(support.turnout).format()
 
         return resourceManager.getString(R.string.referendum_support_threshold_format, turnoutFormatted, thresholdFormatted)

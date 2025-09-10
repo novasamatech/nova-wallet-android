@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSou
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
@@ -40,6 +41,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
 interface DAppFeatureDependencies {
+
+    val amountFormatter: AmountFormatter
 
     val context: Context
 

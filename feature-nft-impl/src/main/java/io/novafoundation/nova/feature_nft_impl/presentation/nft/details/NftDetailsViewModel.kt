@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInte
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.PricedNftDetails
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatNftPrice
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.catch
@@ -32,7 +33,8 @@ class NftDetailsViewModel(
     private val nftIdentifier: String,
     private val externalActionsDelegate: ExternalActions.Presentation,
     private val addressIconGenerator: AddressIconGenerator,
-    private val addressDisplayUseCase: AddressDisplayUseCase
+    private val addressDisplayUseCase: AddressDisplayUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(), ExternalActions by externalActionsDelegate {
 
     private val _exitingErrorLiveData = MutableLiveData<Event<String>>()
@@ -76,7 +78,7 @@ class NftDetailsViewModel(
             name = nftDetails.name,
             issuance = resourceManager.formatIssuance(nftDetails.issuance),
             description = nftDetails.description,
-            price = resourceManager.formatNftPrice(pricedNftDetails.nftDetails.price, pricedNftDetails.priceToken),
+            price = resourceManager.formatNftPrice(amountFormatter, pricedNftDetails.nftDetails.price, pricedNftDetails.priceToken),
             collection = nftDetails.collection?.let {
                 NftDetailsModel.Collection(
                     name = it.name ?: it.id,

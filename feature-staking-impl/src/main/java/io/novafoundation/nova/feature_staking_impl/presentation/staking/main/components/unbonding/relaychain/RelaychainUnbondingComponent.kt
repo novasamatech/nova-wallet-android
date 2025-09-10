@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.mainStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
@@ -52,6 +53,7 @@ class RelaychainUnbondingComponentFactory(
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
     private val stakingSharedComputation: StakingSharedComputation,
+    private val amountFormatter: AmountFormatter,
 ) {
 
     fun create(
@@ -66,7 +68,8 @@ class RelaychainUnbondingComponentFactory(
         router = router,
         hostContext = hostContext,
         stakingSharedComputation = stakingSharedComputation,
-        stakingOption = stakingOption
+        stakingOption = stakingOption,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -77,6 +80,7 @@ private class RelaychainUnbondingComponent(
     private val rebondValidationSystem: StakeActionsValidationSystem,
     private val redeemValidationSystem: StakeActionsValidationSystem,
     private val router: StakingRouter,
+    private val amountFormatter: AmountFormatter,
     private val resourceManager: ResourceManager,
 
     private val stakingOption: StakingOption,
@@ -104,7 +108,7 @@ private class RelaychainUnbondingComponent(
     override val state = combine(hostContext.assetFlow, unbondingsFlow) { asset, unbondingsLoading ->
         unbondingsLoading?.let {
             it.map { unbonding ->
-                UnbondingState.from(unbonding, asset)
+                UnbondingState.from(unbonding, asset, amountFormatter)
             }
         }
     }

@@ -32,7 +32,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -62,6 +63,7 @@ class ConfirmTinderGovVoteViewModel(
     private val tinderGovBasketInteractor: TinderGovBasketInteractor,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -90,7 +92,7 @@ class ConfirmTinderGovVoteViewModel(
 
     override val amountModelFlow: Flow<AmountModel> = combine(assetFlow, basketFlow) { asset, basket ->
         val maxAmount = basket.values.maxOfOrNull { it.amount } ?: BigInteger.ZERO
-        mapAmountToAmountModel(maxAmount, asset)
+        amountFormatter.formatAmountToAmountModel(maxAmount, asset)
     }.shareInBackground()
 
     override val accountVoteUi = flowOf { null }

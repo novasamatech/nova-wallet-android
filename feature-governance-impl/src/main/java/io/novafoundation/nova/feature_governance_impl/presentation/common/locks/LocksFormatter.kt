@@ -6,7 +6,8 @@ import io.novafoundation.nova.feature_governance_api.domain.locks.reusable.Reusa
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 
 interface LocksFormatter {
 
@@ -14,7 +15,8 @@ interface LocksFormatter {
 }
 
 class RealLocksFormatter(
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : LocksFormatter {
 
     override fun formatReusableLock(
@@ -27,7 +29,7 @@ class RealLocksFormatter(
         }
 
         val amount = asset.token.amountFromPlanks(reusableLock.amount)
-        val amountModel = mapAmountToAmountModel(amount, asset)
+        val amountModel = amountFormatter.formatAmountToAmountModel(amount, asset)
 
         return AmountChipModel(
             amountInput = amount.toAmountInput(),

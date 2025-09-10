@@ -20,7 +20,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.parce
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.parcel.StakerParcelModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
@@ -39,7 +40,8 @@ class ValidatorDetailsViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val resourceManager: ResourceManager,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
-    private val identityMixinFactory: IdentityMixin.Factory
+    private val identityMixinFactory: IdentityMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(), ExternalActions.Presentation by externalActions {
 
     private val stakeTarget = payload.stakeTarget
@@ -57,7 +59,8 @@ class ValidatorDetailsViewModel(
             asset = asset,
             displayConfig = payload.displayConfig,
             iconGenerator = iconGenerator,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            amountFormatter = amountFormatter
         )
     }
         .shareInBackground()
@@ -93,9 +96,9 @@ class ValidatorDetailsViewModel(
         val nominatorsStake = stakeTargetStake.stakers?.sumByBigInteger(StakerParcelModel::value)
 
         ValidatorStakeBottomSheet.Payload(
-            own = stakeTargetStake.ownStake?.let { mapAmountToAmountModel(it, asset) },
-            stakers = nominatorsStake?.let { mapAmountToAmountModel(it, asset) },
-            total = mapAmountToAmountModel(stakeTargetStake.totalStake, asset),
+            own = stakeTargetStake.ownStake?.let { amountFormatter.formatAmountToAmountModel(it, asset) },
+            stakers = nominatorsStake?.let { amountFormatter.formatAmountToAmountModel(it, asset) },
+            total = amountFormatter.formatAmountToAmountModel(stakeTargetStake.totalStake, asset),
             stakersLabel = payload.displayConfig.stakersLabelRes
         )
     }

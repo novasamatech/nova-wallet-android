@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmUnbondModule {
@@ -42,7 +43,8 @@ class ConfirmUnbondModule {
         singleAssetSharedState: StakingSharedState,
         unbondHintsMixinFactory: UnbondHintsMixinFactory,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmUnbondViewModel(
             router = router,
@@ -57,7 +59,8 @@ class ConfirmUnbondModule {
             selectedAssetState = singleAssetSharedState,
             unbondHintsMixinFactory = unbondHintsMixinFactory,
             walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

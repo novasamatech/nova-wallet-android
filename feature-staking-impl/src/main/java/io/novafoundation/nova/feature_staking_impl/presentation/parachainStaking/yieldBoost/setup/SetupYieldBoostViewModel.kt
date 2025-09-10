@@ -63,6 +63,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -104,6 +105,7 @@ class SetupYieldBoostViewModel(
     private val collatorsUseCase: CollatorsUseCase,
     private val validationSystem: YieldBoostValidationSystem,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
@@ -126,6 +128,7 @@ class SetupYieldBoostViewModel(
 
     val originFeeMixin = feeLoaderMixinFactory.createDefault(
         this,
+        amountFormatter,
         selectedChainAsset,
         FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
     )
@@ -162,7 +165,7 @@ class SetupYieldBoostViewModel(
         currentDelegatorStateFlow,
         assetFlow
     ) { selectedCollator, currentDelegatorState, asset ->
-        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator, resourceManager)
+        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator, resourceManager, amountFormatter)
     }.shareInBackground()
 
     val rewardsWithoutYieldBoost = combine(currentDelegatorStateFlow, selectedCollatorFlow) { delegatorState, collator ->

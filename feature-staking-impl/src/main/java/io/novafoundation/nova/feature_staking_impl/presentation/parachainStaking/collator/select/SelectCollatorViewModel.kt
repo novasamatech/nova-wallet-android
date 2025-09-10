@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -37,6 +38,7 @@ class SelectCollatorViewModel(
     private val selectCollatorInterScreenResponder: SelectCollatorInterScreenResponder,
     private val selectCollatorSettingsInterScreenRequester: SelectCollatorSettingsInterScreenRequester,
     private val collatorsUseCase: CollatorsUseCase,
+    private val amountFormatter: AmountFormatter,
     collatorRecommendatorFactory: CollatorRecommendatorFactory,
     addressIconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
@@ -53,7 +55,8 @@ class SelectCollatorViewModel(
         selectCollatorSettingsInterScreenRequester = selectCollatorSettingsInterScreenRequester,
         addressIconGenerator = addressIconGenerator,
         resourceManager = resourceManager,
-        selectedAssetState = selectedAssetState
+        selectedAssetState = selectedAssetState,
+        amountFormatter = amountFormatter
     )
 ) {
 
@@ -63,6 +66,7 @@ class SelectCollatorViewModel(
         private val addressIconGenerator: AddressIconGenerator,
         private val resourceManager: ResourceManager,
         private val selectedAssetState: StakingSharedState,
+        private val amountFormatter: AmountFormatter,
     ) : SingleSelectChooseTargetState<Collator, CollatorRecommendationConfig> {
 
         override val defaultRecommendatorConfig: CollatorRecommendationConfig = CollatorRecommendationConfig.DEFAULT
@@ -97,7 +101,8 @@ class SelectCollatorViewModel(
                     addressIconGenerator = addressIconGenerator,
                     sorting = config.sorting,
                     resourceManager = resourceManager,
-                    token = token
+                    token = token,
+                    amountFormatter = amountFormatter
                 )
             }
         }

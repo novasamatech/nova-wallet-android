@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.con
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.di.StartParachainStakingModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
@@ -55,7 +56,8 @@ class ConfirmStartMythosStakingModule {
         stakingBlockNumberUseCase: StakingBlockNumberUseCase,
         mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
         interactor: StartMythosStakingInteractor,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmStartMythosStakingViewModel(
             mythosRouter = mythosRouter,
@@ -76,7 +78,8 @@ class ConfirmStartMythosStakingModule {
             stakingBlockNumberUseCase = stakingBlockNumberUseCase,
             mythosStakingValidationFailureFormatter = mythosStakingValidationFailureFormatter,
             interactor = interactor,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

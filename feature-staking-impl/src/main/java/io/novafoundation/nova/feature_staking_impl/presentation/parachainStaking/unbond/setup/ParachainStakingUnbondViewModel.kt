@@ -37,7 +37,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.parachainStakingUnbondPayloadAutoFix
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.parachainStakingUnbondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -45,8 +44,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.transferableAmountModel
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -72,6 +72,7 @@ class ParachainStakingUnbondViewModel(
     private val maxActionProviderFactory: MaxActionProviderFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor {
@@ -106,6 +107,7 @@ class ParachainStakingUnbondViewModel(
 
     val originFeeMixin = feeLoaderMixinFactory.createDefault(
         this,
+        amountFormatter,
         selectedChainAsset,
         FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
     )
@@ -127,7 +129,7 @@ class ParachainStakingUnbondViewModel(
         currentDelegatorStateFlow,
         selectedAsset
     ) { selectedCollator, currentDelegatorState, asset ->
-        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator, resourceManager)
+        mapCollatorToSelectCollatorModel(selectedCollator, currentDelegatorState, asset, addressIconGenerator, resourceManager, amountFormatter)
     }.shareInBackground()
 
     val chooseCollatorAction = actionAwaitableMixinFactory.create<ChooseStakedStakeTargetsBottomSheet.Payload<SelectCollatorModel>, SelectCollatorModel>()
@@ -136,10 +138,10 @@ class ParachainStakingUnbondViewModel(
         val minimumStake = it.minimumStakeToGetRewards
         val asset = selectedAsset.first()
 
-        mapAmountToAmountModel(minimumStake, asset)
+        amountFormatter.formatAmountToAmountModel(minimumStake, asset)
     }.shareInBackground()
 
-    val transferable = selectedAsset.map(Asset::transferableAmountModel)
+    val transferable = selectedAsset.map { it.transferableAmountModel(amountFormatter) }
         .shareInBackground()
 
     val buttonState = combine(
@@ -199,7 +201,8 @@ class ParachainStakingUnbondViewModel(
                     chain = delegatorState.chain,
                     asset = asset,
                     addressIconGenerator = addressIconGenerator,
-                    resourceManager = resourceManager
+                    resourceManager = resourceManager,
+                    amountFormatter = amountFormatter
                 )
             }
             val selected = collatorModels.findById(selectedCollator)
@@ -243,7 +246,7 @@ class ParachainStakingUnbondViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { parachainStakingUnbondValidationFailure(it, resourceManager) },
+            validationFailureTransformer = { parachainStakingUnbondValidationFailure(it, resourceManager, amountFormatter) },
             autoFixPayload = ::parachainStakingUnbondPayloadAutoFix,
             progressConsumer = validationInProgress.progressConsumer()
         ) { fixedPayload ->

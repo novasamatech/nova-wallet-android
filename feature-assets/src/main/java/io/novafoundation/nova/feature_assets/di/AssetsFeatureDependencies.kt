@@ -89,6 +89,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRep
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -112,6 +113,8 @@ import okhttp3.OkHttpClient
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    val amountFormatter: AmountFormatter
 
     val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 

@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRep
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class BalanceDetailModule {
@@ -102,7 +103,8 @@ class BalanceDetailModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         chartsInteractor: ChartsInteractor,
-        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -119,7 +121,8 @@ class BalanceDetailModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
             chartsInteractor = chartsInteractor,
-            buySellSelectorMixinFactory = buySellSelectorMixinFactory
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

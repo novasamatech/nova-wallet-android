@@ -20,7 +20,8 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigO
 import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.common.toOperationId
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import kotlinx.coroutines.flow.combine
@@ -40,7 +41,8 @@ class MultisigOperationFullDetailsViewModel(
     private val accountUIUseCase: AccountUIUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val copyTextLauncher: CopyTextLauncher.Presentation,
-    private val arbitraryTokenUseCase: ArbitraryTokenUseCase
+    private val arbitraryTokenUseCase: ArbitraryTokenUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     CopyTextLauncher by copyTextLauncher,
@@ -64,7 +66,7 @@ class MultisigOperationFullDetailsViewModel(
         .shareInBackground()
 
     val depositAmount = combine(operationFlow, tokenFlow) { operation, token ->
-        mapAmountToAmountModel(operation.deposit, token)
+        amountFormatter.formatAmountToAmountModel(operation.deposit, token)
     }.shareInBackground()
 
     private val callDataFlow = operationFlow.map { operation ->

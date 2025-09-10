@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.la
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class StartStakingLandingModule {
@@ -55,7 +56,8 @@ class StartStakingLandingModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         stakingStartedDetectionService: StakingStartedDetectionService,
         chainRegistry: ChainRegistry,
-        contextManager: ContextManager
+        contextManager: ContextManager,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -69,7 +71,8 @@ class StartStakingLandingModule {
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             stakingStartedDetectionService = stakingStartedDetectionService,
             chainRegistry = chainRegistry,
-            contextManager = contextManager
+            contextManager = contextManager,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.ConfirmSetControllerPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.confirm.ConfirmSetControllerViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmSetControllerModule {
@@ -39,7 +40,8 @@ class ConfirmSetControllerModule {
         validationSystem: SetControllerValidationSystem,
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmSetControllerViewModel(
             router = router,
@@ -53,7 +55,8 @@ class ConfirmSetControllerModule {
             validationSystem = validationSystem,
             selectedAssetState = singleAssetSharedState,
             walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

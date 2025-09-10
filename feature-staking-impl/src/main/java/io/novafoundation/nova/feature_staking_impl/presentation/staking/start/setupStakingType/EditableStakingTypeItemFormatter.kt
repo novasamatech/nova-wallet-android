@@ -10,13 +10,15 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupSta
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.isDirectStaking
 import io.novafoundation.nova.runtime.ext.isPoolStaking
 
 class EditableStakingTypeItemFormatter(
     private val resourceManager: ResourceManager,
-    private val multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter
+    private val multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter,
+    private val amountFormatter: AmountFormatter
 ) {
 
     suspend fun format(
@@ -48,7 +50,7 @@ class EditableStakingTypeItemFormatter(
 
     private fun mapConditions(asset: Asset, stakingTypeDetails: StakingTypeDetails): List<String> {
         return buildList {
-            val minAmount = mapAmountToAmountModel(stakingTypeDetails.minStake, asset.token)
+            val minAmount = amountFormatter.formatAmountToAmountModel(stakingTypeDetails.minStake, asset.token)
             add(resourceManager.getString(R.string.setup_staking_type_min_amount_condition, minAmount.token))
 
             val payoutCondition = when (stakingTypeDetails.payoutType) {
