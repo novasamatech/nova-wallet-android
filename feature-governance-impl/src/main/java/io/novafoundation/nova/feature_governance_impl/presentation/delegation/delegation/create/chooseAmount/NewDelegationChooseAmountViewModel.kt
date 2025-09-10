@@ -127,7 +127,7 @@ class NewDelegationChooseAmountViewModel(
     val amountChips = delegateAssistantFlow.map { voteAssistant ->
         val asset = selectedAsset.first()
 
-        voteAssistant.reusableLocks().map { locksFormatter.formatReusableLock(it, asset, amountFormatter) }
+        voteAssistant.reusableLocks().map { locksFormatter.formatReusableLock(it, asset) }
     }
         .shareInBackground()
 

@@ -132,7 +132,7 @@ abstract class SetupVoteViewModel(
     val amountChips = voteAssistantFlow.map { voteAssistant ->
         val asset = selectedAsset.first()
 
-        voteAssistant.reusableLocks().map { locksFormatter.formatReusableLock(it, asset, amountFormatter) }
+        voteAssistant.reusableLocks().map { locksFormatter.formatReusableLock(it, asset) }
     }
         .shareInBackground()
 

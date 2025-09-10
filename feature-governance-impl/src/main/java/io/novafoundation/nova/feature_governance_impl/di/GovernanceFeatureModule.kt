@@ -191,7 +191,10 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideLocksFormatter(resourceManager: ResourceManager): LocksFormatter = RealLocksFormatter(resourceManager)
+    fun provideLocksFormatter(
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
+    ): LocksFormatter = RealLocksFormatter(resourceManager, amountFormatter)
 
     @Provides
     @FeatureScope

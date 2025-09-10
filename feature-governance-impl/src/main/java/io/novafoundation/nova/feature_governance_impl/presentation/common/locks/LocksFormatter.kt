@@ -11,17 +11,17 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 
 interface LocksFormatter {
 
-    fun formatReusableLock(reusableLock: ReusableLock, asset: Asset, amountFormatter: AmountFormatter): AmountChipModel
+    fun formatReusableLock(reusableLock: ReusableLock, asset: Asset): AmountChipModel
 }
 
 class RealLocksFormatter(
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : LocksFormatter {
 
     override fun formatReusableLock(
         reusableLock: ReusableLock,
-        asset: Asset,
-        amountFormatter: AmountFormatter
+        asset: Asset
     ): AmountChipModel {
         val labelFormat = when (reusableLock.type) {
             ReusableLock.Type.GOVERNANCE -> R.string.referendum_vote_chip_governance_lock
