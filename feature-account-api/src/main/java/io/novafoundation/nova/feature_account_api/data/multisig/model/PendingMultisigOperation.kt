@@ -4,9 +4,11 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.domain.multisig.CallHash
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import java.math.BigInteger
 import kotlin.time.Duration
@@ -63,6 +65,15 @@ fun PendingMultisigOperation.userAction(): MultisigAction {
 }
 
 fun PendingMultisigOperationId.identifier() = toString()
+
+/**
+ * operation hash is based on address in chain and ignored meta account id
+ */
+fun PendingMultisigOperation.Companion.createOperationHash(metaAccount: MetaAccount, chain: Chain, callHash: String): String {
+    return "${metaAccount.addressIn(chain)}:${chain.id}:$callHash"
+        .toByteArray()
+        .toHexString(withPrefix = true)
+}
 
 fun PendingMultisigOperationId.Companion.create(metaAccount: MetaAccount, chain: Chain, callHash: String): PendingMultisigOperationId {
     return PendingMultisigOperationId(metaAccount.id, chain.id, callHash)

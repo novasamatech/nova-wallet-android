@@ -83,6 +83,7 @@ fun NotificationCompat.Builder.buildWithDefaults(
     return setContentTitle(title)
         .setContentText(message)
         .setSmallIcon(R.drawable.ic_nova)
+        .setOnlyAlertOnce(true)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setAutoCancel(true)
         .setStyle(

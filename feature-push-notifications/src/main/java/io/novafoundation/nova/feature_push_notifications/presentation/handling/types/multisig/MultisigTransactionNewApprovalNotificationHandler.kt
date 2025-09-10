@@ -9,6 +9,8 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
+import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
+import io.novafoundation.nova.feature_account_api.data.multisig.model.createOperationHash
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
 import io.novafoundation.nova.feature_account_api.domain.account.identity.getNameOrAddress
@@ -64,6 +66,8 @@ class MultisigTransactionNewApprovalNotificationHandler(
 
         val approverIdentity = identityProvider.getNameOrAddress(payload.signatory.accountId, chain)
 
+        val operationHash = PendingMultisigOperation.createOperationHash(multisigAccount, chain, payload.callHashString)
+
         val messageText = getMessage(
             chain,
             payload,
@@ -76,6 +80,7 @@ class MultisigTransactionNewApprovalNotificationHandler(
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSubText(getSubText(multisigAccount))
+            .setGroup(operationHash)
             .buildWithDefaults(
                 context,
                 resourceManager.getString(R.string.multisig_notification_new_approval_title, approverIdentity),
@@ -87,6 +92,13 @@ class MultisigTransactionNewApprovalNotificationHandler(
             ).build()
 
         notify(notification)
+
+        notifyMultisigGroupNotificationWithId(
+            context = context,
+            groupId = operationHash,
+            channelId = channelId,
+            metaAccount = multisigAccount
+        )
 
         return true
     }
