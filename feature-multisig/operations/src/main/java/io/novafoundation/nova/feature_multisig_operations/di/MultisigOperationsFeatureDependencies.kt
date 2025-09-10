@@ -45,7 +45,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 interface MultisigOperationsFeatureDependencies {
 
     val amountFormatter: AmountFormatter
-    
+
     val assetIconProvider: AssetIconProvider
 
     val extrinsicSplitter: ExtrinsicSplitter

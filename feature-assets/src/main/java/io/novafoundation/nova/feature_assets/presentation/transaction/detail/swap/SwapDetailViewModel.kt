@@ -167,11 +167,19 @@ class SwapDetailViewModel(
     private fun amountModelFlow(): Flow<AmountModel> {
         return if (operation.amountIsAssetIn) {
             tokenIn.map {
-                amountFormatter.formatAmountToAmountModel(operation.amountIn.amount, it, AmountConfig(estimatedFiat = true, tokenAmountSign = AmountSign.NEGATIVE))
+                amountFormatter.formatAmountToAmountModel(
+                    operation.amountIn.amount,
+                    it,
+                    AmountConfig(estimatedFiat = true, tokenAmountSign = AmountSign.NEGATIVE)
+                )
             }
         } else {
             tokenOut.map {
-                amountFormatter.formatAmountToAmountModel(operation.amountOut.amount, it, AmountConfig(estimatedFiat = true, tokenAmountSign = AmountSign.POSITIVE))
+                amountFormatter.formatAmountToAmountModel(
+                    operation.amountOut.amount,
+                    it,
+                    AmountConfig(estimatedFiat = true, tokenAmountSign = AmountSign.POSITIVE)
+                )
             }
         }
     }
