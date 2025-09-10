@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.data.proxy.repository
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.fromHexOrNull
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.removeHexPrefix
@@ -21,11 +22,13 @@ interface MultiChainProxyRepository {
 @FeatureScope
 class RealMultiChainProxyRepository @Inject constructor(
     private val proxiesApi: FindProxiesApi,
+    private val globalConfigDataSource: GlobalConfigDataSource
 ) : MultiChainProxyRepository {
 
     override suspend fun getProxies(accountIds: Collection<AccountIdKey>): List<MultiChainProxy> {
+        val globalConfig = globalConfigDataSource.getGlobalConfig()
         val request = FindProxiesRequest(accountIds)
-        return proxiesApi.findProxies(request).toDomain()
+        return proxiesApi.findProxies(globalConfig.proxyApiUrl, request).toDomain()
     }
 
     private fun SubQueryResponse<FindProxiesResponse>.toDomain(): List<MultiChainProxy> {
