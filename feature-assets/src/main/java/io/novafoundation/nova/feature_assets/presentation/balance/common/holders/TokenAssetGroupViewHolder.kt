@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.holder
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableParentViewHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableParentItem
 import io.novafoundation.nova.common.utils.setTextColorRes
@@ -9,6 +10,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIc
 import io.novafoundation.nova.feature_assets.databinding.ItemTokenAssetGroupBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableFiat
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableToken
 
 class TokenAssetGroupViewHolder(
     private val binder: ItemTokenAssetGroupBinding,
@@ -55,8 +58,8 @@ class TokenAssetGroupViewHolder(
 
     private fun bindTotalInternal(networkAsset: TokenGroupUi) {
         val balance = networkAsset.balance
-        binder.itemAssetTokenGroupBalance.text = balance.token
-        binder.itemAssetTokenGroupPriceAmount.text = balance.fiat
+        binder.itemAssetTokenGroupBalance.setMaskableText(balance.maskableToken())
+        binder.itemAssetTokenGroupPriceAmount.setMaskableText(balance.maskableFiat())
     }
 
     private fun bindRecentChangeInternal(networkAsset: TokenGroupUi) {

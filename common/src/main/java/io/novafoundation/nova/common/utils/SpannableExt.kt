@@ -88,7 +88,10 @@ fun fontSpan(typeface: Typeface?): CharacterStyle {
 
 fun boldSpan() = StyleSpan(Typeface.BOLD)
 
-fun drawableSpan(drawable: Drawable) = ImageSpan(drawable)
+fun drawableText(drawable: Drawable, verticalAlignment: Int = ImageSpan.ALIGN_BOTTOM): Spannable =
+    SpannableStringBuilder().appendEnd(drawableSpan(drawable, verticalAlignment))
+
+fun drawableSpan(drawable: Drawable, verticalAlignment: Int = ImageSpan.ALIGN_BOTTOM) = ImageSpan(drawable)
 
 fun CharSequence.formatAsSpannable(vararg args: Any): SpannedString {
     return SpannableFormatter.format(this, *args)

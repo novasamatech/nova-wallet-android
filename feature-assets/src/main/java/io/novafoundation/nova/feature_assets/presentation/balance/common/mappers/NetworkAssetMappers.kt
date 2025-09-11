@@ -13,25 +13,24 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
 import java.math.BigDecimal
 
 fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
-    amountFormatter: AmountFormatter,
+    amountFormatter: MaskableAmountFormatter,
     assetIconProvider: AssetIconProvider,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal = NetworkAssetGroup::groupTotalBalanceFiat,
     balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
 ): List<BalanceListRvItem> {
-    return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
+    return mapKeys { (assetGroup, _) -> mapAssetGroupToUi(amountFormatter, assetGroup, currency, groupBalance) }
         .mapValues { (_, assets) -> mapAssetsToAssetModels(amountFormatter, assetIconProvider, assets, balance) }
         .toListWithHeaders()
         .filterIsInstance<BalanceListRvItem>()
 }
 
 private fun mapAssetsToAssetModels(
-    amountFormatter: AmountFormatter,
+    amountFormatter: MaskableAmountFormatter,
     assetIconProvider: AssetIconProvider,
     assets: List<AssetWithOffChainBalance>,
     balance: (AssetBalance) -> PricedAmount
@@ -45,12 +44,13 @@ private fun mapAssetsToAssetModels(
 }
 
 fun mapAssetGroupToUi(
+    amountFormatter: MaskableAmountFormatter,
     assetGroup: NetworkAssetGroup,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal
 ): NetworkGroupUi {
     return NetworkGroupUi(
         chainUi = mapChainToUi(assetGroup.chain),
-        groupBalanceFiat = groupBalance(assetGroup).formatAsCurrency(currency)
+        groupBalanceFiat = amountFormatter.formatAsCurrency(groupBalance(assetGroup), currency)
     )
 }

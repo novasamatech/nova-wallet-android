@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 import android.content.Context
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -21,7 +23,7 @@ class PendingOperationsCountView @JvmOverloads constructor(
             PendingOperationsCountModel.Gone -> makeGone()
             is PendingOperationsCountModel.Visible -> {
                 makeVisible()
-                binding.pendingOperationsCountCounter.text = model.countLabel
+                binding.pendingOperationsCountCounter.setMaskableText(model.countLabel)
             }
         }
     }
@@ -31,5 +33,5 @@ sealed class PendingOperationsCountModel {
 
     data object Gone : PendingOperationsCountModel()
 
-    class Visible(val countLabel: String) : PendingOperationsCountModel()
+    class Visible(val countLabel: MaskableModel<String>) : PendingOperationsCountModel()
 }

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount
 
-import androidx.annotation.DimenRes
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -42,17 +41,6 @@ fun AmountFormatter.formatAmountToAmountModel(
     token = asset.token,
     config = config
 )
-
-fun CharSequence.formatBalanceWithFraction(formatter: AmountFormatter, @DimenRes floatAmountSize: Int): CharSequence {
-    return formatter.formatBalanceWithFraction(this, floatAmountSize)
-}
-
-fun AmountModel.formatBalanceWithFraction(amountFormatter: AmountFormatter, @DimenRes floatAmountSize: Int): AmountModel {
-    return AmountModel(
-        token = token.formatBalanceWithFraction(amountFormatter, floatAmountSize),
-        fiat = fiat
-    )
-}
 
 fun Asset.transferableAmountModel(amountFormatter: AmountFormatter) = amountFormatter.formatAmountToAmountModel(transferable, this)
 

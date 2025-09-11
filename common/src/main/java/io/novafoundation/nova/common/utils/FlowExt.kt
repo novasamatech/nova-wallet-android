@@ -165,6 +165,13 @@ fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>>
 
 fun <T1, T2, T3> combineToTriple(flow1: Flow<T1>, flow2: Flow<T2>, flow3: Flow<T3>): Flow<Triple<T1, T2, T3>> = combine(flow1, flow2, flow3, ::Triple)
 
+fun <T1, T2, T3, T4> combineToQuad(
+    flow1: Flow<T1>,
+    flow2: Flow<T2>,
+    flow3: Flow<T3>,
+    flow4: Flow<T4>
+): Flow<Quad<T1, T2, T3, T4>> = combine(flow1, flow2, flow3, flow4, ::Quad)
+
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
  * Then, it constructs new source via [sourceSupplier] and emits all of its items wrapped into [LoadingState.Loaded] state

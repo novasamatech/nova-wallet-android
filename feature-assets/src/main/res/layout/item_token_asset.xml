@@ -71,9 +71,9 @@
         android:gravity="end|center_vertical"
         android:maxLines="1"
         android:textColor="@color/text_secondary"
-        app:layout_constraintBottom_toBottomOf="@+id/itemTokenAssetRateContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintTop_toBottomOf="@+id/itemTokenAssetBalance"
         app:layout_constraintStart_toEndOf="@+id/itemTokenAssetRateContainer"
         tools:text="$1,000.05" />
 
@@ -87,10 +87,11 @@
         android:gravity="end|center_vertical"
         android:maxLines="1"
         android:textColor="@color/text_primary"
-        app:layout_constraintBaseline_toBaselineOf="@id/itemTokenAssetToken"
+        app:layout_constraintBottom_toTopOf="@+id/itemTokenAssetPriceAmount"
         app:layout_constraintEnd_toEndOf="@+id/itemTokenAssetPriceAmount"
-        app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@+id/itemTokenAssetToken"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="120.0849" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

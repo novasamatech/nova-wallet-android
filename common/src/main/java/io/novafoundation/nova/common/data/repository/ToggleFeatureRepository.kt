@@ -27,3 +27,7 @@ class RealToggleFeatureRepository(
         return preferences.booleanFlow(key, default)
     }
 }
+
+fun ToggleFeatureRepository.toggle(key: String) {
+    set(key, !get(key))
+}

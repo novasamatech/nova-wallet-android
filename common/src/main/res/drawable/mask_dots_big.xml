@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<io.novafoundation.nova.common.presentation.masking.MaskableDrawable
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:md_dotSize="10dp"
+    app:md_dotSpacing="6dp"
+    app:md_dotColor="@color/chip_icon"
+    app:md_dotCount="4"
+    app:md_gravity="center" />
