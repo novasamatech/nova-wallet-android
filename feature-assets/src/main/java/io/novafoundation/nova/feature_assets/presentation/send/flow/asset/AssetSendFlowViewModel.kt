@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayloa
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +41,7 @@ class AssetSendFlowViewModel(
     resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: MaskableAmountFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,

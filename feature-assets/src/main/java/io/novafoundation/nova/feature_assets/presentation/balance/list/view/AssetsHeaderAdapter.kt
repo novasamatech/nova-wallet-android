@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.recyclerView.WithViewType
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedWalletModel
@@ -45,7 +46,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
     private var walletConnectModel: WalletConnectSessionsModel? = null
     private var totalBalance: TotalBalanceModel? = null
     private var selectedWalletModel: SelectedWalletModel? = null
-    private var nftCountLabel: String? = null
+    private var nftCountLabel: MaskableModel<String>? = null
     private var nftPreviews: List<NftPreviewUi>? = null
     private var pendingOperationsModel: PendingOperationsCountModel = PendingOperationsCountModel.Gone
 
@@ -57,7 +58,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         this.filterIconRes = filterIconRes
     }
 
-    fun setNftCountLabel(nftCount: String) {
+    fun setNftCountLabel(nftCount: MaskableModel<String>) {
         this.nftCountLabel = nftCount
 
         notifyItemChanged(0, Payload.NFT_COUNT)
@@ -163,7 +164,7 @@ class AssetsHeaderHolder(
     fun bind(
         totalBalance: TotalBalanceModel?,
         addressModel: SelectedWalletModel?,
-        nftCount: String?,
+        nftCount: MaskableModel<String>?,
         nftPreviews: List<NftPreviewUi>?,
         walletConnect: WalletConnectSessionsModel?,
         pendingOperationsCountModel: PendingOperationsCountModel,
@@ -181,7 +182,7 @@ class AssetsHeaderHolder(
         viewBinding.balanceTableView.invalidateChildrenVisibility()
     }
 
-    fun bindNftCount(nftCount: String?) = with(viewBinding) {
+    fun bindNftCount(nftCount: MaskableModel<String>?) = with(viewBinding) {
         balanceListNfts.setNftCount(nftCount)
     }
 

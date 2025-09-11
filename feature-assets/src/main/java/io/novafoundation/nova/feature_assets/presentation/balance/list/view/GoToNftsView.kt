@@ -10,6 +10,8 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.isLoading
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
@@ -50,8 +52,9 @@ class GoToNftsView @JvmOverloads constructor(
         ).inject(this)
     }
 
-    fun setNftCount(countLabel: String?) {
-        binder.goToNftCounter.text = countLabel
+    fun setNftCount(countLabel: MaskableModel<String>?) {
+        if (countLabel == null) return
+        binder.goToNftCounter.setMaskableText(countLabel)
     }
 
     fun setPreviews(previews: List<NftPreviewUi>?) {

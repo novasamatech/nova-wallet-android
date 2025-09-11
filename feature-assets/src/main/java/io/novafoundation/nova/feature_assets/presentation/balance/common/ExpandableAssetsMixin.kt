@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common
 import io.novafoundation.nova.common.data.model.switch
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.utils.combineToTriple
+import io.novafoundation.nova.common.utils.combineToQuad
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,11 +22,11 @@ class ExpandableAssetsMixinFactory(
     private val assetIconProvider: AssetIconProvider,
     private val currencyInteractor: CurrencyInteractor,
     private val assetsViewModeRepository: AssetsViewModeRepository,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatterProvider: MaskableAmountFormatterProvider
 ) {
 
     fun create(assetsFlow: Flow<AssetsByViewModeResult>): ExpandableAssetsMixin {
-        return RealExpandableAssetsMixin(assetsFlow, currencyInteractor, assetIconProvider, assetsViewModeRepository, amountFormatter)
+        return RealExpandableAssetsMixin(assetsFlow, currencyInteractor, amountFormatterProvider, assetIconProvider, assetsViewModeRepository)
     }
 }
 
@@ -42,20 +42,21 @@ interface ExpandableAssetsMixin {
 class RealExpandableAssetsMixin(
     assetsFlow: Flow<AssetsByViewModeResult>,
     currencyInteractor: CurrencyInteractor,
+    amountFormatterProvider: MaskableAmountFormatterProvider,
     private val assetIconProvider: AssetIconProvider,
-    private val assetsViewModeRepository: AssetsViewModeRepository,
-    private val amountFormatter: AmountFormatter
+    private val assetsViewModeRepository: AssetsViewModeRepository
 ) : ExpandableAssetsMixin {
 
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
 
     private val expandedTokenIdsFlow = MutableStateFlow(setOf<String>())
 
-    override val assetModelsFlow: Flow<List<BalanceListRvItem>> = combineToTriple(
+    override val assetModelsFlow: Flow<List<BalanceListRvItem>> = combineToQuad(
         assetsFlow,
         expandedTokenIdsFlow,
-        selectedCurrency
-    ).mapLatest { (assetsByViewMode, expandedTokens, currency) ->
+        selectedCurrency,
+        amountFormatterProvider.provideFormatter()
+    ).mapLatest { (assetsByViewMode, expandedTokens, currency, amountFormatter) ->
         when (assetsByViewMode) {
             is AssetsByViewModeResult.ByNetworks -> assetsByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
             is AssetsByViewModeResult.ByTokens -> assetsByViewMode.tokens.mapGroupedAssetsToUi(

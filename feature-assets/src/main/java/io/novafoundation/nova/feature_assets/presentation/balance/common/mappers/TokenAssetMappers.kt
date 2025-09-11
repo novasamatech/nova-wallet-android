@@ -16,12 +16,12 @@ import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatBalanceWithFraction
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
-    amountFormatter: AmountFormatter,
+    amountFormatter: MaskableAmountFormatter,
     assetIconProvider: AssetIconProvider,
     assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi> = { _, assets -> assets },
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
@@ -37,7 +37,7 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
 }
 
 fun mapTokenAssetGroupToUi(
-    amountFormatter: AmountFormatter,
+    amountFormatter: MaskableAmountFormatter,
     assetIconProvider: AssetIconProvider,
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
@@ -53,16 +53,19 @@ fun mapTokenAssetGroupToUi(
         tokenSymbol = assetGroup.tokenInfo.symbol.value,
         singleItemGroup = assetGroup.itemsCount <= 1,
         balance = amountFormatter.formatAmountToAmountModel(
-            balance.amount,
-            assetGroup.tokenInfo.token,
-            config = AmountConfig(includeAssetTicker = false)
-        ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size),
+            amount = balance.amount,
+            token = assetGroup.tokenInfo.token,
+            config = AmountConfig(
+                includeAssetTicker = false,
+                tokenFractionStylingSize = FractionStylingSize.AbsoluteSize(R.dimen.asset_balance_fraction_size)
+            )
+        ),
         groupType = mapType(assets)
     )
 }
 
 private fun mapAssetsToAssetModels(
-    amountFormatter: AmountFormatter,
+    amountFormatter: MaskableAmountFormatter,
     assetIconProvider: AssetIconProvider,
     group: TokenGroupUi,
     assets: List<AssetWithNetwork>,

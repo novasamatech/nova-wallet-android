@@ -14,9 +14,9 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatBalanceWithFraction
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 import java.math.BigDecimal
 
 fun mapCoinRateChange(coinRateChange: CoinRateChange?, currency: Currency): String {
@@ -29,7 +29,7 @@ fun mapCoinRateChange(rate: BigDecimal, currency: Currency): String {
 }
 
 fun mapAssetToAssetModel(
-    amountFormatter: AmountFormatter,
+    amountFormatter: MaskableAmountFormatter,
     asset: Asset,
     balance: PricedAmount
 ): AssetModel {
@@ -38,8 +38,11 @@ fun mapAssetToAssetModel(
         amount = amountFormatter.formatAmountToAmountModel(
             amount = balance.amount,
             token = asset.token,
-            config = AmountConfig(includeAssetTicker = false)
-        ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size)
+            config = AmountConfig(
+                includeAssetTicker = false,
+                tokenFractionStylingSize = FractionStylingSize.AbsoluteSize(R.dimen.asset_balance_fraction_size)
+            )
+        )
     )
 }
 

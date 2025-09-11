@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.model.DiscreetMode
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
@@ -19,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.send.flow.asset.AssetSendFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterFactory
 
 @Module(includes = [ViewModelModule::class])
 class AssetSendFlowModule {
@@ -41,7 +43,7 @@ class AssetSendFlowModule {
         resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        amountFormatter: AmountFormatter
+        amountFormatterFactory: MaskableAmountFormatterFactory
     ): ViewModel {
         return AssetSendFlowViewModel(
             interactorFactory = interactorFactory,
@@ -53,7 +55,7 @@ class AssetSendFlowModule {
             resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatterFactory.create(DiscreetMode.DISABLED) // For assets flow DiscreetMode is always disabled
         )
     }
 }

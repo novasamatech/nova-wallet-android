@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.model.DiscreetMode
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterFactory
 
 @Module(includes = [ViewModelModule::class])
 class AssetSwapFlowModule {
@@ -48,7 +50,7 @@ class AssetSwapFlowModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        amountFormatter: AmountFormatter,
+        amountFormatterFactory: MaskableAmountFormatterFactory,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
     ): ViewModel {
         return AssetSwapFlowViewModel(
@@ -64,7 +66,7 @@ class AssetSwapFlowModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
-            amountFormatter = amountFormatter,
+            amountFormatter = amountFormatterFactory.create(DiscreetMode.DISABLED), // For assets flow DiscreetMode is always disabled,
             swapFlowScopeAggregator = swapFlowScopeAggregator
         )
     }

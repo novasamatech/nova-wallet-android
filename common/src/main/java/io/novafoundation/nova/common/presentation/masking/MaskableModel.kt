@@ -1,8 +1,8 @@
-package io.novafoundation.nova.common.presentation.model
+package io.novafoundation.nova.common.presentation.masking
 
 import io.novafoundation.nova.common.data.model.DiscreetMode
 
-sealed interface MaskableModel<T> {
+sealed interface MaskableModel<out T> {
     class Hidden<T> : MaskableModel<T>
     class Unmasked<T>(val value: T) : MaskableModel<T>
 }

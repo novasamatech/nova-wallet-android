@@ -449,3 +449,8 @@ fun TabLayout.setTabSelectedListener(callback: (TabLayout.Tab) -> Unit) {
         override fun onTabReselected(tab: TabLayout.Tab) {}
     })
 }
+
+fun View.setForegroundRes(@DrawableRes drawableRes: Int) {
+    val drawable = context.getDrawable(drawableRes)
+    foreground = drawable
+}

@@ -54,7 +54,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
@@ -268,8 +270,14 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMaskableAmountFormatterFactory(amountFormatter: AmountFormatter): MaskableAmountFormatterFactory {
-        return MaskableAmountFormatterFactory(amountFormatter)
+    fun provideFiatFormatter(): FiatFormatter {
+        return RealFiatFormatter()
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMaskableAmountFormatterFactory(amountFormatter: AmountFormatter, fiatFormatter: FiatFormatter): MaskableAmountFormatterFactory {
+        return MaskableAmountFormatterFactory(amountFormatter, fiatFormatter)
     }
 
     @Provides
