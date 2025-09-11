@@ -5,8 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetViewMode
+import io.novafoundation.nova.common.data.model.DiscreetMode
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -89,7 +91,8 @@ class BalanceListViewModel(
     private val maskableAmountFormatterProvider: MaskableAmountFormatterProvider,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
-    private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin
+    private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
+    private val discreetModeInteractor: DiscreetModeInteractor
 ) : BaseViewModel() {
 
     private val maskableAmountFormatterFlow = maskableAmountFormatterProvider.provideFormatter()
@@ -146,6 +149,10 @@ class BalanceListViewModel(
         .combine(maskableAmountFormatterFlow, ::mapNftPreviewToUi)
         .inBackground()
         .share()
+
+    val maskingModeEnableFlow = discreetModeInteractor.observeDiscreetMode()
+        .map { it == DiscreetMode.ENABLED }
+        .shareInBackground()
 
     val totalBalanceFlow = combine(
         balanceBreakdown,
@@ -372,7 +379,13 @@ class BalanceListViewModel(
         router.openPendingMultisigOperations()
     }
 
-    private fun formatNftCount(nftPreviews: NftPreviews, formatter: MaskableAmountFormatter): MaskableModel<String> {
+    private fun formatNftCount(nftPreviews: NftPreviews, formatter: MaskableAmountFormatter): MaskableModel<String>? {
+        if (nftPreviews.totalNftsCount == 0) return null
+
         return formatter.formatAny { nftPreviews.totalNftsCount.format() }
+    }
+
+    fun toggleMasking() {
+        discreetModeInteractor.toggleMaskingMode()
     }
 }

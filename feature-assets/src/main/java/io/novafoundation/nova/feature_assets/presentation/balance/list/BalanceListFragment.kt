@@ -37,7 +37,8 @@ import io.novafoundation.nova.feature_banners_api.presentation.bindWithAdapter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 
-class BalanceListFragment : BaseFragment<BalanceListViewModel, FragmentBalanceListBinding>(),
+class BalanceListFragment :
+    BaseFragment<BalanceListViewModel, FragmentBalanceListBinding>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler,
     ManageAssetsAdapter.Handler {
@@ -121,6 +122,7 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel, FragmentBalanceLi
             }
         }
 
+        viewModel.maskingModeEnableFlow.observe(headerAdapter::setMaskingEnabled)
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
         viewModel.selectedWalletModelFlow.observe(headerAdapter::setSelectedWallet)
         viewModel.shouldShowPlaceholderFlow.observe(emptyAssetsPlaceholder::show)
@@ -194,6 +196,10 @@ class BalanceListFragment : BaseFragment<BalanceListViewModel, FragmentBalanceLi
 
     override fun walletConnectClicked() {
         viewModel.walletConnectClicked()
+    }
+
+    override fun maskClicked() {
+        viewModel.toggleMasking()
     }
 
     override fun sendClicked() {

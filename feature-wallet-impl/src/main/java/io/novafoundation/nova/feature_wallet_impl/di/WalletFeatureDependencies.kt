@@ -67,7 +67,7 @@ import javax.inject.Named
 interface WalletFeatureDependencies {
 
     val discreetModeInteractor: DiscreetModeInteractor
-    
+
     val fileCache: FileCache
 
     val storageCache: StorageCache

@@ -54,8 +54,13 @@ class GoToNftsView @JvmOverloads constructor(
     }
 
     fun setNftCount(countLabel: MaskableModel<String>?) {
-        if (countLabel == null) return
-        binder.goToNftCounter.setMaskableText(countLabel)
+        if (countLabel == null) {
+            makeGone()
+            return
+        } else {
+            makeVisible()
+            binder.goToNftCounter.setMaskableText(countLabel)
+        }
     }
 
     fun setPreviews(previewsMaskable: MaskableModel<List<NftPreviewUi>>?) {
@@ -90,7 +95,6 @@ class GoToNftsView @JvmOverloads constructor(
     }
 
     private fun maskPreviews() {
-        makeVisible()
         val images = listOf(R.drawable.ic_blue_siri, R.drawable.ic_yellow_siri, R.drawable.ic_pink_siri)
         images.forEachIndexed { index, imageRes ->
             previewHolders[index].makeVisible()

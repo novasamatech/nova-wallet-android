@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.HapticFeedbackConstants
 import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dp
@@ -30,6 +31,8 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
             12.dp(context),
             12.dp(context)
         )
+
+        binder.viewAssetsTotalBalanceMaskingButton.isHapticFeedbackEnabled = true
     }
 
     fun showTotalBalance(totalBalance: TotalBalanceModel) {
@@ -42,6 +45,13 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
         binder.viewAssetsTotalBalanceLocked.setMaskableText(totalBalance.lockedBalanceFiat)
         binder.viewAssetsTotalBalanceSwap.isEnabled = totalBalance.enableSwap
+    }
+
+    fun onMaskingClick(clickListener: OnClickListener) {
+        binder.viewAssetsTotalBalanceMaskingButton.setOnClickListener {
+            clickListener.onClick(it)
+            binder.viewAssetsTotalBalanceMaskingButton.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        }
     }
 
     fun onSendClick(clickListener: OnClickListener) {
@@ -58,5 +68,13 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
 
     fun onBuyClick(clickListener: OnClickListener) {
         binder.viewAssetsTotalBalanceBuy.setOnClickListener(clickListener)
+    }
+
+    fun setMaskingEnabled(maskingEnabled: Boolean) {
+        val buttonImageRes = when (maskingEnabled) {
+            true -> R.drawable.ic_eye_hide
+            false -> R.drawable.ic_eye_show
+        }
+        binder.viewAssetsTotalBalanceMaskingButton.setImageResource(buttonImageRes)
     }
 }

@@ -26,15 +26,15 @@ fun TextView.setMaskableText(
         drawable.updateBounds(bottom = lineHeight) // To save view height
         text = drawableText(drawable)
 
-        //Save some state to restore later
-        setTag(R.id.tag_mask_cache, compoundDrawables)
+        // Save some state to restore later
+        setTag(R.id.tag_mask_cache, MaskingCache(compoundDrawables))
         removeCompoundDrawables()
     }.onUnmasked {
         text = it
 
-        //Restore drawables state
+        // Restore drawables state
         val maskingCache = getTag(R.id.tag_mask_cache) as? MaskingCache
-        setCompoundDrawables(maskingCache?.drawables)
+        maskingCache?.let { setCompoundDrawables(maskingCache.drawables) }
     }
 }
 

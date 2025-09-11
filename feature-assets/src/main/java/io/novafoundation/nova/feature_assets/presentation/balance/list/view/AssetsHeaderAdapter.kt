@@ -29,6 +29,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 
         fun walletConnectClicked()
 
+        fun maskClicked()
+
         fun sendClicked()
 
         fun receiveClicked()
@@ -44,6 +46,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 
     private var filterIconRes: Int? = null
     private var walletConnectModel: WalletConnectSessionsModel? = null
+    private var maskingEnabled: Boolean? = null
     private var totalBalance: TotalBalanceModel? = null
     private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: MaskableModel<String>? = null
@@ -58,7 +61,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         this.filterIconRes = filterIconRes
     }
 
-    fun setNftCountLabel(nftCount: MaskableModel<String>) {
+    fun setNftCountLabel(nftCount: MaskableModel<String>?) {
         this.nftCountLabel = nftCount
 
         notifyItemChanged(0, Payload.NFT_COUNT)
@@ -68,6 +71,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         this.nftPreviews = previews
 
         notifyItemChanged(0, Payload.NFT_PREVIEWS)
+    }
+
+    fun setMaskingEnabled(maskingEnabled: Boolean) {
+        this.maskingEnabled = maskingEnabled
+
+        notifyItemChanged(0, Payload.MASKING_ENABLED)
     }
 
     fun setTotalBalance(totalBalance: TotalBalanceModel) {
@@ -104,6 +113,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
             payloads.filterIsInstance<Payload>().forEach {
                 when (it) {
                     Payload.TOTAL_BALANCE -> holder.bindTotalBalance(totalBalance)
+                    Payload.MASKING_ENABLED -> holder.bindMaskingEnabled(maskingEnabled)
                     Payload.ADDRESS -> holder.bindAddress(selectedWalletModel)
                     Payload.NFT_COUNT -> holder.bindNftCount(nftCountLabel)
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
@@ -117,6 +127,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
     override fun onBindViewHolder(holder: AssetsHeaderHolder, position: Int) {
         holder.bind(
             totalBalance,
+            maskingEnabled,
             selectedWalletModel,
             nftCountLabel,
             nftPreviews,
@@ -131,7 +142,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, PENDING_OPERATIONS_COUNT
+    TOTAL_BALANCE, MASKING_ENABLED, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, PENDING_OPERATIONS_COUNT
 }
 
 class AssetsHeaderHolder(
@@ -148,9 +159,10 @@ class AssetsHeaderHolder(
     init {
         with(viewBinding) {
             balanceListWalletConnect.setOnClickListener { handler.walletConnectClicked() }
-            balanceListTotalBalance.setOnClickListener { handler.totalBalanceClicked() }
             balanceListAvatar.setOnClickListener { handler.avatarClicked() }
             balanceListNfts.setOnClickListener { handler.goToNftsClicked() }
+            balanceListTotalBalance.setOnClickListener { handler.totalBalanceClicked() }
+            balanceListTotalBalance.onMaskingClick { handler.maskClicked() }
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
             balanceListTotalBalance.onBuyClick { handler.buySellClicked() }
@@ -163,6 +175,7 @@ class AssetsHeaderHolder(
 
     fun bind(
         totalBalance: TotalBalanceModel?,
+        maskingEnabled: Boolean?,
         addressModel: SelectedWalletModel?,
         nftCount: MaskableModel<String>?,
         nftPreviews: MaskableModel<List<NftPreviewUi>>?,
@@ -170,6 +183,7 @@ class AssetsHeaderHolder(
         pendingOperationsCountModel: PendingOperationsCountModel,
     ) {
         bindTotalBalance(totalBalance)
+        bindMaskingEnabled(maskingEnabled)
         bindAddress(addressModel)
         bindNftPreviews(nftPreviews)
         bindNftCount(nftCount)
@@ -184,6 +198,12 @@ class AssetsHeaderHolder(
 
     fun bindNftCount(nftCount: MaskableModel<String>?) = with(viewBinding) {
         balanceListNfts.setNftCount(nftCount)
+    }
+
+    fun bindMaskingEnabled(maskingEnabled: Boolean?) = maskingEnabled?.let {
+        with(viewBinding) {
+            balanceListTotalBalance.setMaskingEnabled(maskingEnabled)
+        }
     }
 
     fun bindTotalBalance(totalBalance: TotalBalanceModel?) = totalBalance?.let {

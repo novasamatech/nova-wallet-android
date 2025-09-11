@@ -21,6 +21,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/viewAssetsTotalBalanceMaskingButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="-6dp"
+        android:paddingHorizontal="14dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/ic_eye_hide"
+        app:layout_constraintBottom_toBottomOf="@+id/viewAssetsTotalBalanceTitle"
+        app:layout_constraintStart_toEndOf="@+id/viewAssetsTotalBalanceTitle"
+        app:layout_constraintTop_toTopOf="@+id/viewAssetsTotalBalanceTitle"
+        app:tint="@color/chip_icon" />
+
     <FrameLayout
         android:id="@+id/viewAssetsTotalBalanceContainer"
         android:layout_width="wrap_content"

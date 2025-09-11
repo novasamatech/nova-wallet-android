@@ -40,7 +40,7 @@ import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 interface WalletFeatureApi {
 
     val maskableAmountFormatterFactory: MaskableAmountFormatterFactory
-    
+
     val amountFormatterProvider: MaskableAmountFormatterProvider
 
     val assetSourceRegistry: AssetSourceRegistry

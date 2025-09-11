@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount
 
-import androidx.annotation.DimenRes
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks

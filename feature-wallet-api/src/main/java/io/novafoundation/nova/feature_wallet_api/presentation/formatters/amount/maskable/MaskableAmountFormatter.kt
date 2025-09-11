@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import java.math.BigDecimal
 import java.math.RoundingMode
-import okhttp3.internal.format
 
 interface MaskableAmountFormatter : GenericAmountFormatter<MaskableModel<AmountModel>>, GenericFiatFormatter<MaskableModel<CharSequence>> {
     fun <T> formatAny(valueReceiver: () -> T): MaskableModel<T>
