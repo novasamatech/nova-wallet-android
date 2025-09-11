@@ -143,7 +143,7 @@ class BalanceListViewModel(
         .share()
 
     val nftPreviewsUi = nftsPreviews
-        .map { it.nftPreviews.map(::mapNftPreviewToUi) }
+        .combine(maskableAmountFormatterFlow, ::mapNftPreviewToUi)
         .inBackground()
         .share()
 
@@ -287,10 +287,16 @@ class BalanceListViewModel(
         syncJobs.joinAll()
     }
 
-    private fun mapNftPreviewToUi(nftPreview: Nft): NftPreviewUi {
-        return when (val details = nftPreview.details) {
-            Nft.Details.Loadable -> LoadingState.Loading()
-            is Nft.Details.Loaded -> LoadingState.Loaded(details.media)
+    private fun mapNftPreviewToUi(nftPreviews: NftPreviews, maskableAmountFormatter: MaskableAmountFormatter): MaskableModel<List<NftPreviewUi>> {
+        return maskableAmountFormatter.formatAny {
+            nftPreviews.nftPreviews.map {
+                when (val details = it.details) {
+                    Nft.Details.Loadable -> LoadingState.Loading()
+                    is Nft.Details.Loaded -> {
+                        LoadingState.Loaded(details.media)
+                    }
+                }
+            }
         }
     }
 

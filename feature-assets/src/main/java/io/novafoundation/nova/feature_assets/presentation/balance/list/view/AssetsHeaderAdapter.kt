@@ -47,7 +47,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
     private var totalBalance: TotalBalanceModel? = null
     private var selectedWalletModel: SelectedWalletModel? = null
     private var nftCountLabel: MaskableModel<String>? = null
-    private var nftPreviews: List<NftPreviewUi>? = null
+    private var nftPreviews: MaskableModel<List<NftPreviewUi>>? = null
     private var pendingOperationsModel: PendingOperationsCountModel = PendingOperationsCountModel.Gone
 
     override fun getItemViewType(position: Int): Int {
@@ -64,7 +64,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         notifyItemChanged(0, Payload.NFT_COUNT)
     }
 
-    fun setNftPreviews(previews: List<NftPreviewUi>) {
+    fun setNftPreviews(previews: MaskableModel<List<NftPreviewUi>>) {
         this.nftPreviews = previews
 
         notifyItemChanged(0, Payload.NFT_PREVIEWS)
@@ -165,7 +165,7 @@ class AssetsHeaderHolder(
         totalBalance: TotalBalanceModel?,
         addressModel: SelectedWalletModel?,
         nftCount: MaskableModel<String>?,
-        nftPreviews: List<NftPreviewUi>?,
+        nftPreviews: MaskableModel<List<NftPreviewUi>>?,
         walletConnect: WalletConnectSessionsModel?,
         pendingOperationsCountModel: PendingOperationsCountModel,
     ) {
@@ -177,7 +177,7 @@ class AssetsHeaderHolder(
         bindPendingOperationsModel(pendingOperationsCountModel)
     }
 
-    fun bindNftPreviews(nftPreviews: List<NftPreviewUi>?) = with(viewBinding) {
+    fun bindNftPreviews(nftPreviews: MaskableModel<List<NftPreviewUi>>?) = with(viewBinding) {
         balanceListNfts.setPreviews(nftPreviews)
         viewBinding.balanceTableView.invalidateChildrenVisibility()
     }

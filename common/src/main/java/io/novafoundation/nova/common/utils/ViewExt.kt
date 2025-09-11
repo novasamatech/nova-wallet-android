@@ -117,6 +117,10 @@ fun ShimmerFrameLayout.setShimmerVisible(visible: Boolean) {
     setVisible(visible)
 }
 
+fun TextView.setCompoundDrawables(drawables: Array<out Drawable>?) {
+    setCompoundDrawables(drawables?.getOrNull(0), drawables?.getOrNull(1), drawables?.getOrNull(2), drawables?.getOrNull(3))
+}
+
 private fun TextView.setCompoundDrawable(
     @DrawableRes drawableRes: Int?,
     widthInDp: Int?,

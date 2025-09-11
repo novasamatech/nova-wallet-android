@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.ViewGoToNftsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -57,6 +58,14 @@ class GoToNftsView @JvmOverloads constructor(
         binder.goToNftCounter.setMaskableText(countLabel)
     }
 
+    fun setPreviews(previewsMaskable: MaskableModel<List<NftPreviewUi>>?) {
+        when (previewsMaskable) {
+            is MaskableModel.Hidden -> maskPreviews()
+            is MaskableModel.Unmasked -> setPreviews(previewsMaskable.value)
+            null -> makeGone()
+        }
+    }
+
     fun setPreviews(previews: List<NftPreviewUi>?) {
         setVisible(!previews.isNullOrEmpty())
         val shouldShowLoading = previews == null || previews.all { it is LoadingState.Loading }
@@ -77,6 +86,15 @@ class GoToNftsView @JvmOverloads constructor(
                     previewViews[index].load(previewContent.dataOrNull, imageLoader)
                 }
             }
+        }
+    }
+
+    private fun maskPreviews() {
+        makeVisible()
+        val images = listOf(R.drawable.ic_blue_siri, R.drawable.ic_yellow_siri, R.drawable.ic_pink_siri)
+        images.forEachIndexed { index, imageRes ->
+            previewHolders[index].makeVisible()
+            previewViews[index].setImageResource(imageRes)
         }
     }
 }

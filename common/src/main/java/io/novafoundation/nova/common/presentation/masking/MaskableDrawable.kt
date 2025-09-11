@@ -137,7 +137,7 @@ class MaskableDrawable : Drawable() {
             )
             dotCount = a.getInt(R.styleable.MaskableDrawable_md_dotCount, 4).coerceAtLeast(1)
             gravity = Gravity.fromInt(a.getInt(R.styleable.MaskableDrawable_md_gravity, Gravity.CENTER.v))
-            setBounds(0, dotSizePx.toInt(), dotSizePx.toInt() * dotCount + (dotCount - 1) * dotSpacingPx.toInt(), dotSizePx.toInt())
+            setBounds(0, 0, dotSizePx.toInt() * dotCount + (dotCount - 1) * dotSpacingPx.toInt(), dotSizePx.toInt())
         } finally {
             a.recycle()
         }
