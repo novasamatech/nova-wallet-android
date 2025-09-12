@@ -57,8 +57,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFiatFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.RealFractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -275,17 +275,17 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMaskableAmountFormatterFactory(amountFormatter: AmountFormatter, fiatFormatter: FiatFormatter): MaskableAmountFormatterFactory {
-        return MaskableAmountFormatterFactory(amountFormatter, fiatFormatter)
+    fun provideMaskableAmountFormatterFactory(amountFormatter: AmountFormatter, fiatFormatter: FiatFormatter): MaskableValueFormatterFactory {
+        return MaskableValueFormatterFactory(amountFormatter, fiatFormatter)
     }
 
     @Provides
     @FeatureScope
     fun provideMaskableAmountFormatterProvider(
-        maskableAmountFormatterFactory: MaskableAmountFormatterFactory,
+        maskableValueFormatterFactory: MaskableValueFormatterFactory,
         discreetModeInteractor: DiscreetModeInteractor
-    ): MaskableAmountFormatterProvider {
-        return MaskableAmountFormatterProvider(maskableAmountFormatterFactory, discreetModeInteractor)
+    ): MaskableValueFormatterProvider {
+        return MaskableValueFormatterProvider(maskableValueFormatterFactory, discreetModeInteractor)
     }
 
     @Provides

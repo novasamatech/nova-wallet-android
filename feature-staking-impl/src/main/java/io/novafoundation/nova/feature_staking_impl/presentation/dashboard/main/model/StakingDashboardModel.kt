@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.
 
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.SyncingData
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
@@ -17,15 +18,15 @@ class StakingDashboardModel(
         override val chainUi: SyncingData<ChainUi>,
         override val assetId: ChainAssetId,
         override val stakingTypeBadge: StakingTypeModel?,
-        val rewards: ExtendedLoadingState<SyncingData<AmountModel>>,
-        val stake: SyncingData<AmountModel>,
+        val rewards: ExtendedLoadingState<SyncingData<MaskableModel<AmountModel>>>,
+        val stake: SyncingData<MaskableModel<AmountModel>>,
         val status: ExtendedLoadingState<SyncingData<StakeStatusModel>>,
         val earnings: ExtendedLoadingState<SyncingData<String>>,
     ) : BaseItem
 
     data class NoStakeItem(
         override val chainUi: SyncingData<ChainUi>,
-        val availableBalance: String?,
+        val availableBalance: CharSequence?,
         override val stakingTypeBadge: StakingTypeModel?,
         override val assetId: ChainAssetId,
         val earnings: ExtendedLoadingState<SyncingData<String>>,

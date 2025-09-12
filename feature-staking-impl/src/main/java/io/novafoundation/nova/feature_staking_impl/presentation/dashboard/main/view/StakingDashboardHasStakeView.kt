@@ -6,11 +6,12 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setShimmerShown
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.unsafeLazy
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
@@ -20,6 +21,8 @@ import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardHasS
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableFiat
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableToken
 
 class StakingDashboardHasStakeView @JvmOverloads constructor(
     context: Context,
@@ -83,17 +86,17 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
         binder.itemDashboardHasStakeChainContainer.setShimmerShown(chainUi.isSyncing)
     }
 
-    fun setRewards(rewardsState: ExtendedLoadingState<SyncingData<AmountModel>>) {
+    fun setRewards(rewardsState: ExtendedLoadingState<SyncingData<MaskableModel<AmountModel>>>) {
         rewardsLabelGroup.applyState(rewardsState)
-        rewardsAmountGroup.applyState(rewardsState) { text = it.token }
-        rewardsFiatGroup.applyState(rewardsState) { text = it.fiat }
+        rewardsAmountGroup.applyState(rewardsState) { setMaskableText(it.maskableToken(), maskDrawableRes = R.drawable.mask_dots_big) }
+        rewardsFiatGroup.applyState(rewardsState) { setMaskableText(it.maskableFiat()) }
     }
 
-    fun setStake(stake: SyncingData<AmountModel>) {
-        binder.itemDashboardHasStakeStakeAmount.text = stake.data.token
+    fun setStake(stake: SyncingData<MaskableModel<AmountModel>>) {
+        binder.itemDashboardHasStakeStakeAmount.setMaskableText(stake.data.maskableToken())
         binder.itemDashboardHasStakeStakeAmountContainer.setShimmerShown(stake.isSyncing)
 
-        binder.itemDashboardHasStakeStakesFiat.setTextOrHide(stake.data.fiat)
+        binder.itemDashboardHasStakeStakesFiat.setMaskableText(stake.data.maskableFiat())
         binder.itemDashboardHasStakeStakesFiatContainer.setShimmerShown(stake.isSyncing)
     }
 

@@ -13,11 +13,11 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import java.math.BigDecimal
 
 fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToUi(
-    amountFormatter: MaskableAmountFormatter,
+    amountFormatter: MaskableValueFormatter,
     assetIconProvider: AssetIconProvider,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal = NetworkAssetGroup::groupTotalBalanceFiat,
@@ -30,7 +30,7 @@ fun GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>.mapGroupedAssetsToU
 }
 
 private fun mapAssetsToAssetModels(
-    amountFormatter: MaskableAmountFormatter,
+    amountFormatter: MaskableValueFormatter,
     assetIconProvider: AssetIconProvider,
     assets: List<AssetWithOffChainBalance>,
     balance: (AssetBalance) -> PricedAmount
@@ -44,7 +44,7 @@ private fun mapAssetsToAssetModels(
 }
 
 fun mapAssetGroupToUi(
-    amountFormatter: MaskableAmountFormatter,
+    amountFormatter: MaskableValueFormatter,
     assetGroup: NetworkAssetGroup,
     currency: Currency,
     groupBalance: (NetworkAssetGroup) -> BigDecimal

@@ -17,11 +17,11 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 
 fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
-    amountFormatter: MaskableAmountFormatter,
+    amountFormatter: MaskableValueFormatter,
     assetIconProvider: AssetIconProvider,
     assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi> = { _, assets -> assets },
     groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
@@ -37,7 +37,7 @@ fun GroupedList<TokenAssetGroup, AssetWithNetwork>.mapGroupedAssetsToUi(
 }
 
 fun mapTokenAssetGroupToUi(
-    amountFormatter: MaskableAmountFormatter,
+    amountFormatter: MaskableValueFormatter,
     assetIconProvider: AssetIconProvider,
     assetGroup: TokenAssetGroup,
     assets: List<AssetWithNetwork>,
@@ -65,7 +65,7 @@ fun mapTokenAssetGroupToUi(
 }
 
 private fun mapAssetsToAssetModels(
-    amountFormatter: MaskableAmountFormatter,
+    amountFormatter: MaskableValueFormatter,
     assetIconProvider: AssetIconProvider,
     group: TokenGroupUi,
     assets: List<AssetWithNetwork>,

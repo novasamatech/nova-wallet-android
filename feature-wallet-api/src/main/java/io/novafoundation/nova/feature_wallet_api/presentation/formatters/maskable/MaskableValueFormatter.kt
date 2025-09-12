@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable
+package io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable
 
 import io.novafoundation.nova.common.data.model.DiscreetMode
 import io.novafoundation.nova.common.presentation.masking.MaskableModel
@@ -15,24 +15,24 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-interface MaskableAmountFormatter : GenericAmountFormatter<MaskableModel<AmountModel>>, GenericFiatFormatter<MaskableModel<CharSequence>> {
+interface MaskableValueFormatter : GenericAmountFormatter<MaskableModel<AmountModel>>, GenericFiatFormatter<MaskableModel<CharSequence>> {
     fun <T> formatAny(valueReceiver: () -> T): MaskableModel<T>
 }
 
-class MaskableAmountFormatterFactory(
+class MaskableValueFormatterFactory(
     private val amountFormatter: AmountFormatter,
     private val fiatFormatter: FiatFormatter
 ) {
-    fun create(discreetMode: DiscreetMode): MaskableAmountFormatter {
-        return RealMaskableAmountFormatter(discreetMode, amountFormatter, fiatFormatter)
+    fun create(discreetMode: DiscreetMode): MaskableValueFormatter {
+        return RealMaskableValueFormatter(discreetMode, amountFormatter, fiatFormatter)
     }
 }
 
-class RealMaskableAmountFormatter(
+class RealMaskableValueFormatter(
     private val discreetMode: DiscreetMode,
     private val amountFormatter: AmountFormatter,
     private val fiatFormatter: FiatFormatter
-) : MaskableAmountFormatter {
+) : MaskableValueFormatter {
 
     override fun <T> formatAny(valueReceiver: () -> T): MaskableModel<T> {
         return discreetMode.toMaskableModel(valueReceiver)

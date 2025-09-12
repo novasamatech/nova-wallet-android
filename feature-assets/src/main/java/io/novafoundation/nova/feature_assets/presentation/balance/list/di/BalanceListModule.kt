@@ -33,7 +33,7 @@ import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilit
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 
 @Module(includes = [ViewModelModule::class])
@@ -97,7 +97,7 @@ class BalanceListModule {
         buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
         multisigPendingOperationsService: MultisigPendingOperationsService,
         novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
-        maskableAmountFormatterProvider: MaskableAmountFormatterProvider,
+        maskableValueFormatterProvider: MaskableValueFormatterProvider,
         discreetModeInteractor: DiscreetModeInteractor
     ): ViewModel {
         return BalanceListViewModel(
@@ -114,7 +114,7 @@ class BalanceListModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
             amountFormatter = amountFormatter,
-            maskableAmountFormatterProvider = maskableAmountFormatterProvider,
+            maskableValueFormatterProvider = maskableValueFormatterProvider,
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             multisigPendingOperationsService = multisigPendingOperationsService,
             novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin,

@@ -68,6 +68,8 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="16dp"
         app:layout_constrainedWidth="true"
+        android:includeFontPadding="false"
+        android:layout_marginTop="2dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/itemDashboardNoStakeRightBarrier"
         app:layout_constraintHorizontal_bias="0"

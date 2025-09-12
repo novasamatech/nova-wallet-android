@@ -15,7 +15,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 import java.math.BigDecimal
 
@@ -29,7 +29,7 @@ fun mapCoinRateChange(rate: BigDecimal, currency: Currency): String {
 }
 
 fun mapAssetToAssetModel(
-    amountFormatter: MaskableAmountFormatter,
+    amountFormatter: MaskableValueFormatter,
     asset: Asset,
     balance: PricedAmount
 ): AssetModel {

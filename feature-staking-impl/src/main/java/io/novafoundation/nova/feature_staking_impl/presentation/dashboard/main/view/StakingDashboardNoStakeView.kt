@@ -71,7 +71,7 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
         earningsSuffixGroup.applyState(earningsState)
     }
 
-    fun setAvailableBalance(maybeBalance: String?) {
+    fun setAvailableBalance(maybeBalance: CharSequence?) {
         binder.itemDashboardNoStakeChainAvailableBalance.setTextOrHide(maybeBalance)
     }
 

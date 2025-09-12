@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.AssetReceiveFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
 
 @Module(includes = [ViewModelModule::class])
 class AssetReceiveFlowModule {
@@ -42,7 +42,7 @@ class AssetReceiveFlowModule {
         resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        amountFormatterFactory: MaskableAmountFormatterFactory
+        amountFormatterFactory: MaskableValueFormatterFactory
     ): ViewModel {
         return AssetReceiveFlowViewModel(
             interactorFactory = interactorFactory,

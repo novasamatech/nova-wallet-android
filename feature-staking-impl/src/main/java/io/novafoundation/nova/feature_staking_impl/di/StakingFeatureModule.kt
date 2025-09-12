@@ -113,8 +113,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.RealStakingDashboardPresentationMapper
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.display.RealPoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
@@ -603,8 +602,8 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapper {
-        return RealStakingDashboardPresentationMapper(resourceManager)
+    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapperFactory {
+        return StakingDashboardPresentationMapperFactory(resourceManager)
     }
 
     @Provides
