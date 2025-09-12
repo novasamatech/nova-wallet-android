@@ -51,8 +51,8 @@ import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilit
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -88,14 +88,14 @@ class BalanceListViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetListMixinFactory: AssetListMixinFactory,
     private val amountFormatter: AmountFormatter,
-    private val maskableAmountFormatterProvider: MaskableAmountFormatterProvider,
+    private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
     private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
     private val discreetModeInteractor: DiscreetModeInteractor
 ) : BaseViewModel() {
 
-    private val maskableAmountFormatterFlow = maskableAmountFormatterProvider.provideFormatter()
+    private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
         .shareInBackground()
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
@@ -294,8 +294,8 @@ class BalanceListViewModel(
         syncJobs.joinAll()
     }
 
-    private fun mapNftPreviewToUi(nftPreviews: NftPreviews, maskableAmountFormatter: MaskableAmountFormatter): MaskableModel<List<NftPreviewUi>> {
-        return maskableAmountFormatter.formatAny {
+    private fun mapNftPreviewToUi(nftPreviews: NftPreviews, maskableValueFormatter: MaskableValueFormatter): MaskableModel<List<NftPreviewUi>> {
+        return maskableValueFormatter.formatAny {
             nftPreviews.nftPreviews.map {
                 when (val details = it.details) {
                     Nft.Details.Loadable -> LoadingState.Loading()
@@ -340,7 +340,7 @@ class BalanceListViewModel(
 
     private fun formatPendingOperationsCount(
         operationsLoadingState: ExtendedLoadingState<Int>,
-        formatter: MaskableAmountFormatter
+        formatter: MaskableValueFormatter
     ): PendingOperationsCountModel {
         return when (val count = operationsLoadingState.dataOrNull) {
             null, 0 -> PendingOperationsCountModel.Gone
@@ -379,7 +379,7 @@ class BalanceListViewModel(
         router.openPendingMultisigOperations()
     }
 
-    private fun formatNftCount(nftPreviews: NftPreviews, formatter: MaskableAmountFormatter): MaskableModel<String>? {
+    private fun formatNftCount(nftPreviews: NftPreviews, formatter: MaskableValueFormatter): MaskableModel<String>? {
         if (nftPreviews.totalNftsCount == 0) return null
 
         return formatter.formatAny { nftPreviews.totalNftsCount.format() }

@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -22,7 +22,7 @@ class ExpandableAssetsMixinFactory(
     private val assetIconProvider: AssetIconProvider,
     private val currencyInteractor: CurrencyInteractor,
     private val assetsViewModeRepository: AssetsViewModeRepository,
-    private val amountFormatterProvider: MaskableAmountFormatterProvider
+    private val amountFormatterProvider: MaskableValueFormatterProvider
 ) {
 
     fun create(assetsFlow: Flow<AssetsByViewModeResult>): ExpandableAssetsMixin {
@@ -42,7 +42,7 @@ interface ExpandableAssetsMixin {
 class RealExpandableAssetsMixin(
     assetsFlow: Flow<AssetsByViewModeResult>,
     currencyInteractor: CurrencyInteractor,
-    amountFormatterProvider: MaskableAmountFormatterProvider,
+    amountFormatterProvider: MaskableValueFormatterProvider,
     private val assetIconProvider: AssetIconProvider,
     private val assetsViewModeRepository: AssetsViewModeRepository
 ) : ExpandableAssetsMixin {

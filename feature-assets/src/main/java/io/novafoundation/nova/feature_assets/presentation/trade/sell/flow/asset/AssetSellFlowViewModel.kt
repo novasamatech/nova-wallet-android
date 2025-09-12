@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowVi
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
@@ -28,7 +28,7 @@ class AssetSellFlowViewModel(
     resourceManager: ResourceManager,
     assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
-    amountFormatter: MaskableAmountFormatter
+    amountFormatter: MaskableValueFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,

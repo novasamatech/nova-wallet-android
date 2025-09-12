@@ -22,6 +22,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.text.toSpannable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
+import io.novafoundation.nova.common.utils.spannable.LineHeightDrawableSpan
 
 fun CharSequence.toSpannable(span: Any): Spannable {
     return this.toSpannable().setFullSpan(span)
@@ -88,10 +89,12 @@ fun fontSpan(typeface: Typeface?): CharacterStyle {
 
 fun boldSpan() = StyleSpan(Typeface.BOLD)
 
-fun drawableText(drawable: Drawable, verticalAlignment: Int = ImageSpan.ALIGN_BOTTOM): Spannable =
-    SpannableStringBuilder().appendEnd(drawableSpan(drawable, verticalAlignment))
+fun drawableText(drawable: Drawable): Spannable = SpannableStringBuilder().appendEnd(drawableSpan(drawable, extendToLineHeight = true))
 
-fun drawableSpan(drawable: Drawable, verticalAlignment: Int = ImageSpan.ALIGN_BOTTOM) = ImageSpan(drawable)
+fun drawableSpan(drawable: Drawable, extendToLineHeight: Boolean = false) = when (extendToLineHeight) {
+    true -> LineHeightDrawableSpan(drawable)
+    false -> ImageSpan(drawable)
+}
 
 fun CharSequence.formatAsSpannable(vararg args: Any): SpannedString {
     return SpannableFormatter.format(this, *args)

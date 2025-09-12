@@ -62,7 +62,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -229,7 +229,7 @@ class AssetsFeatureModule {
         assetIconProvider: AssetIconProvider,
         currencyInteractor: CurrencyInteractor,
         assetsViewModeRepository: AssetsViewModeRepository,
-        amountFormatterProvider: MaskableAmountFormatterProvider
+        amountFormatterProvider: MaskableValueFormatterProvider
     ): ExpandableAssetsMixinFactory {
         return ExpandableAssetsMixinFactory(
             assetIconProvider,

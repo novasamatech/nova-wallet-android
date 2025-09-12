@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +46,7 @@ abstract class AssetFlowViewModel(
     protected val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     private val assetViewModeInteractor: AssetViewModeInteractor,
-    private val amountFormatter: MaskableAmountFormatter
+    private val amountFormatter: MaskableValueFormatter
 ) : BaseViewModel() {
 
     protected val interactor = interactorFactory.createByAssetViewMode()
