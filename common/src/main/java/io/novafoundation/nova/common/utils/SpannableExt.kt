@@ -89,7 +89,7 @@ fun fontSpan(typeface: Typeface?): CharacterStyle {
 
 fun boldSpan() = StyleSpan(Typeface.BOLD)
 
-fun drawableText(drawable: Drawable): Spannable = SpannableStringBuilder().appendEnd(drawableSpan(drawable, extendToLineHeight = true))
+fun drawableText(drawable: Drawable, extendToLineHeight: Boolean = false): Spannable = SpannableStringBuilder().appendEnd(drawableSpan(drawable, extendToLineHeight))
 
 fun drawableSpan(drawable: Drawable, extendToLineHeight: Boolean = false) = when (extendToLineHeight) {
     true -> LineHeightDrawableSpan(drawable)

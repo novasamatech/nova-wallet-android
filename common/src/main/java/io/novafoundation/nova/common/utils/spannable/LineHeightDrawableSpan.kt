@@ -7,6 +7,9 @@ import android.text.style.ReplacementSpan
 import androidx.core.graphics.drawable.updateBounds
 import kotlin.math.roundToInt
 
+/**
+ * Extends drawable height to line height without keeping aspect ratio
+ */
 class LineHeightDrawableSpan(
     private val drawable: Drawable
 ) : ReplacementSpan() {

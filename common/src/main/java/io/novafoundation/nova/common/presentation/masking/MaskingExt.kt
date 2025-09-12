@@ -17,8 +17,7 @@ fun TextView.setMaskableText(
 ) {
     maskableText.onHidden {
         val drawable = ContextCompat.getDrawable(context, maskDrawableRes)!!
-        // drawable.updateBounds(bottom = lineHeight) // To save view height
-        text = drawableText(drawable)
+        text = drawableText(drawable, extendToLineHeight = true)
 
         // Save some state to restore later
         setTag(R.id.tag_mask_cache, MaskingCache(compoundDrawables))
