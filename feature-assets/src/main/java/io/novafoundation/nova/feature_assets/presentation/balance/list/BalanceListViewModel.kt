@@ -162,12 +162,15 @@ class BalanceListViewModel(
         val currency = selectedCurrency.first()
         TotalBalanceModel(
             isBreakdownAvailable = breakdown.breakdown.isNotEmpty(),
-            totalBalanceFiat = maskableAmountFormatter.simpleFormatAsCurrency(
+            totalBalanceFiat = maskableAmountFormatter.formatFiat(
                 breakdown.total,
                 currency,
-                config = FiatConfig(tokenFractionStylingSize = FractionStylingSize.AbsoluteSize(R.dimen.total_balance_fraction_size))
+                config = FiatConfig(
+                    style = FiatConfig.Style.SIMPLE,
+                    fractionStylingSize = FractionStylingSize.AbsoluteSize(R.dimen.total_balance_fraction_size)
+                )
             ),
-            lockedBalanceFiat = maskableAmountFormatter.formatAsCurrency(breakdown.locksTotal.amount, currency),
+            lockedBalanceFiat = maskableAmountFormatter.formatFiat(breakdown.locksTotal.amount, currency),
             enableSwap = swapSupported
         )
     }

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model
+package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount
 
 import android.text.Spannable
 import android.text.SpannableStringBuilder
@@ -8,6 +8,7 @@ import androidx.annotation.DimenRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 
 interface FractionStylingFormatter {
 
@@ -39,5 +40,12 @@ class RealFractionStylingFormatter(
             }
             spannableBuilder
         }
+    }
+}
+
+fun CharSequence.applyFractionStyling(fractionStylingFormatter: FractionStylingFormatter, fractionStylingSize: FractionStylingSize): CharSequence {
+    return when (fractionStylingSize) {
+        FractionStylingSize.Default -> this
+        is FractionStylingSize.AbsoluteSize -> fractionStylingFormatter.formatFraction(this, fractionStylingSize.sizeRes)
     }
 }

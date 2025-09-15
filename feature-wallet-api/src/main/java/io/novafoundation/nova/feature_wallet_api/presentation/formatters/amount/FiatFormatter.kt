@@ -6,21 +6,24 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpleFormatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import java.math.BigDecimal
-import java.math.RoundingMode
 
 interface FiatFormatter : GenericFiatFormatter<CharSequence>
 
-class RealFiatFormatter : FiatFormatter {
+class RealFiatFormatter(
+    private val fractionStylingFormatter: FractionStylingFormatter
+) : FiatFormatter {
 
-    override fun formatFiatNoAbbreviation(amount: BigDecimal, currency: Currency, config: FiatConfig): CharSequence {
-        return amount.formatAsCurrencyNoAbbreviation(currency)
-    }
+    override fun formatFiat(fiatAmount: BigDecimal, currency: Currency, config: FiatConfig): CharSequence {
+        var formattedFiat = when (config.style) {
+            FiatConfig.Style.DEFAULT -> fiatAmount.formatAsCurrency(currency, config.roundingMode)
+            FiatConfig.Style.NO_ABBREVIATION -> fiatAmount.formatAsCurrencyNoAbbreviation(currency)
+            FiatConfig.Style.SIMPLE -> fiatAmount.simpleFormatAsCurrency(currency, config.roundingMode)
+        }
 
-    override fun formatAsCurrency(amount: BigDecimal, currency: Currency, roundingMode: RoundingMode, config: FiatConfig): CharSequence {
-        return amount.formatAsCurrency(currency, roundingMode)
-    }
+        if (config.estimatedFiat) {
+            formattedFiat = "~$formattedFiat"
+        }
 
-    override fun simpleFormatAsCurrency(amount: BigDecimal, currency: Currency, roundingMode: RoundingMode, config: FiatConfig): CharSequence {
-        return amount.simpleFormatAsCurrency(currency, roundingMode)
+        return formattedFiat.applyFractionStyling(fractionStylingFormatter, config.fractionStylingSize)
     }
 }

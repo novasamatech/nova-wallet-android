@@ -34,3 +34,8 @@ fun <T> MaskableModel<T>.isUnmasked(): Boolean {
 
     return this is MaskableModel.Unmasked
 }
+
+fun <T> MaskableModel<T>.dataOrNull(): T? = when (this) {
+    is MaskableModel.Hidden -> null
+    is MaskableModel.Unmasked -> value
+}

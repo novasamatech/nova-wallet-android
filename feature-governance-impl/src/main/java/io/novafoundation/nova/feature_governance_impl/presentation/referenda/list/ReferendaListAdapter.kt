@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.presentation.masking.dataOrNull
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.view.shape.addRipple
@@ -109,7 +111,7 @@ private class ReferendaGroupHolder(private val binder: ItemReferendaGroupBinding
 
     fun bind(item: ReferendaGroupModel) = with(binder) {
         itemReferendaGroupStatus.text = item.name
-        itemReferendaGroupCounter.text = item.badge
+        itemReferendaGroupCounter.setMaskableText(item.badge)
     }
 }
 
@@ -166,8 +168,8 @@ private class ReferendumChildHolder(
     }
 
     fun bindYourVote(item: ReferendumModel) = with(binder) {
-        itemReferendumYourVote.setModel(item.yourVote)
-        itermReferendumDivider.isGone = item.yourVote?.votes.isNullOrEmpty()
+        itemReferendumYourVote.setModel(item.yourVote?.dataOrNull())
+        itermReferendumDivider.isGone = item.yourVote?.dataOrNull()?.votes.isNullOrEmpty()
     }
 
     fun bindVoting(child: ReferendumModel) = with(binder) {

@@ -51,6 +51,6 @@ fun mapAssetGroupToUi(
 ): NetworkGroupUi {
     return NetworkGroupUi(
         chainUi = mapChainToUi(assetGroup.chain),
-        groupBalanceFiat = amountFormatter.formatAsCurrency(groupBalance(assetGroup), currency)
+        groupBalanceFiat = amountFormatter.formatFiat(groupBalance(assetGroup), currency)
     )
 }

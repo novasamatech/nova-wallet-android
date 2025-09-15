@@ -9,29 +9,37 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.GenericAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.GenericFiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.GenericTokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import java.math.BigDecimal
-import java.math.RoundingMode
 
-interface MaskableValueFormatter : GenericAmountFormatter<MaskableModel<AmountModel>>, GenericFiatFormatter<MaskableModel<CharSequence>> {
+interface MaskableValueFormatter :
+    GenericAmountFormatter<MaskableModel<AmountModel>>,
+    GenericTokenFormatter<MaskableModel<CharSequence>>,
+    GenericFiatFormatter<MaskableModel<CharSequence>> {
+
     fun <T> formatAny(valueReceiver: () -> T): MaskableModel<T>
 }
 
 class MaskableValueFormatterFactory(
     private val amountFormatter: AmountFormatter,
+    private val tokenFormatter: TokenFormatter,
     private val fiatFormatter: FiatFormatter
 ) {
     fun create(discreetMode: DiscreetMode): MaskableValueFormatter {
-        return RealMaskableValueFormatter(discreetMode, amountFormatter, fiatFormatter)
+        return RealMaskableValueFormatter(discreetMode, amountFormatter, tokenFormatter, fiatFormatter)
     }
 }
 
 class RealMaskableValueFormatter(
     private val discreetMode: DiscreetMode,
     private val amountFormatter: AmountFormatter,
-    private val fiatFormatter: FiatFormatter
+    private val tokenFormatter: TokenFormatter,
+    private val fiatFormatter: FiatFormatter,
 ) : MaskableValueFormatter {
 
     override fun <T> formatAny(valueReceiver: () -> T): MaskableModel<T> {
@@ -42,15 +50,11 @@ class RealMaskableValueFormatter(
         return formatAny { amountFormatter.formatAmountToAmountModel(amount, token, config) }
     }
 
-    override fun formatFiatNoAbbreviation(amount: BigDecimal, currency: Currency, config: FiatConfig): MaskableModel<CharSequence> {
-        return formatAny { fiatFormatter.formatFiatNoAbbreviation(amount, currency, config) }
+    override fun formatToken(amount: BigDecimal, token: TokenBase, config: TokenConfig): MaskableModel<CharSequence> {
+        return formatAny { tokenFormatter.formatToken(amount, token, config) }
     }
 
-    override fun formatAsCurrency(amount: BigDecimal, currency: Currency, roundingMode: RoundingMode, config: FiatConfig): MaskableModel<CharSequence> {
-        return formatAny { fiatFormatter.formatAsCurrency(amount, currency, roundingMode, config) }
-    }
-
-    override fun simpleFormatAsCurrency(amount: BigDecimal, currency: Currency, roundingMode: RoundingMode, config: FiatConfig): MaskableModel<CharSequence> {
-        return formatAny { fiatFormatter.simpleFormatAsCurrency(amount, currency, roundingMode, config) }
+    override fun formatFiat(fiatAmount: BigDecimal, currency: Currency, config: FiatConfig): MaskableModel<CharSequence> {
+        return formatAny { fiatFormatter.formatFiat(fiatAmount, currency, config) }
     }
 }

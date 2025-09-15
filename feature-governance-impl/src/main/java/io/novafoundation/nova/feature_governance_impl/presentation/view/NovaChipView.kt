@@ -15,6 +15,8 @@ import androidx.core.view.updateLayoutParams
 import coil.ImageLoader
 import coil.clear
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
@@ -221,6 +223,14 @@ class NovaChipView @JvmOverloads constructor(
         setIconTint(textColorRes)
     }
 
+    fun setText(maskableModel: MaskableModel<CharSequence>?) {
+        binder.chipText.isVisible = maskableModel != null
+        invalidateDrawablePadding()
+        if (maskableModel == null) return
+
+        binder.chipText.setMaskableText(maskableModel)
+    }
+
     fun setText(text: CharSequence?) {
         binder.chipText.setTextOrHide(text)
         invalidateDrawablePadding()
@@ -253,5 +263,7 @@ class NovaChipView @JvmOverloads constructor(
         setSize(size, customTextAppearance)
     }
 }
+
+fun NovaChipView.setTextOrHide(maskableModel: MaskableModel<CharSequence>?) = letOrHide(maskableModel, ::setText)
 
 fun NovaChipView.setTextOrHide(text: CharSequence?) = letOrHide(text, ::setText)
