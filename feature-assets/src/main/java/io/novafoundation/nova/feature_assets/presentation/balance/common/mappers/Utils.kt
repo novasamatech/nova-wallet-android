@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import java.math.BigDecimal
 
-
 fun mapCoinRateChange(coinRateChange: CoinRateChange?, currency: Currency): String {
     val rateChange = coinRateChange?.rate
     return mapCoinRateChange(rateChange.orZero(), currency)

@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
@@ -21,7 +20,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.asset.AssetSellFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
 
 @Module(includes = [ViewModelModule::class])
 class AssetSellFlowModule {

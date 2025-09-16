@@ -47,7 +47,6 @@ class RealAmountFormatter(
     }
 }
 
-
 fun AmountFormatter.formatAmountToAmountModel(
     amountInPlanks: BigInteger,
     asset: Asset,
