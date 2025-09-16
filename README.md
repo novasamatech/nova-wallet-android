@@ -12,7 +12,25 @@ Developed by the former Fearless Wallet team & based on open-source work under A
 ### Build instructions
 
 #### Clone repo
-
+ACALA_PROD_AUTH_TOKEN=mock
+ACALA_TEST_AUTH_TOKEN=mock
+CI_KEYSTORE_KEY_ALIAS=mock
+CI_KEYSTORE_KEY_PASS=mock
+CI_KEYSTORE_PASS=mock
+DEBUG_GOOGLE_OAUTH_ID=mock
+RELEASE_GOOGLE_OAUTH_ID=mock
+DWELLIR_API_KEY=mock
+EHTERSCAN_API_KEY_ETHEREUM=mock
+EHTERSCAN_API_KEY_MOONBEAM=mock
+EHTERSCAN_API_KEY_MOONRIVER=mock
+INFURA_API_KEY=mock
+MERCURYO_PRODUCTION_SECRET=mock
+MERCURYO_TEST_SECRET=mock
+MOONBEAM_PROD_AUTH_TOKEN=mock
+MOONBEAM_TEST_AUTH_TOKEN=mock
+MOONPAY_PRODUCTION_SECRET=mock
+MOONPAY_TEST_SECRET=mock
+WALLET_CONNECT_PROJECT_ID=mock
 ```
 git clone git@github.com:novasamatech/nova-wallet-android.git
 ```
