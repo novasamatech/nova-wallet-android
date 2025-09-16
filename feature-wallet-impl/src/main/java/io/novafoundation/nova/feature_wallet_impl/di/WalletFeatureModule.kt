@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -296,9 +296,9 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideMaskableAmountFormatterProvider(
         maskableValueFormatterFactory: MaskableValueFormatterFactory,
-        discreetModeInteractor: DiscreetModeInteractor
+        maskingModeUseCase: MaskingModeUseCase
     ): MaskableValueFormatterProvider {
-        return MaskableValueFormatterProvider(maskableValueFormatterFactory, discreetModeInteractor)
+        return MaskableValueFormatterProvider(maskableValueFormatterFactory, maskingModeUseCase)
     }
 
     @Provides

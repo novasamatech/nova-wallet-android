@@ -1,6 +1,6 @@
 package io.novafoundation.nova.common.presentation.masking
 
-import io.novafoundation.nova.common.data.model.DiscreetMode
+import io.novafoundation.nova.common.data.model.MaskingMode
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -9,10 +9,10 @@ sealed interface MaskableModel<out T> {
     class Unmasked<T>(val value: T) : MaskableModel<T>
 }
 
-fun <T> DiscreetMode.toMaskableModel(valueReceiver: () -> T): MaskableModel<T> {
+fun <T> MaskingMode.toMaskableModel(valueReceiver: () -> T): MaskableModel<T> {
     return when (this) {
-        DiscreetMode.ENABLED -> MaskableModel.Hidden()
-        DiscreetMode.DISABLED -> MaskableModel.Unmasked(valueReceiver())
+        MaskingMode.ENABLED -> MaskableModel.Hidden()
+        MaskingMode.DISABLED -> MaskableModel.Unmasked(valueReceiver())
     }
 }
 

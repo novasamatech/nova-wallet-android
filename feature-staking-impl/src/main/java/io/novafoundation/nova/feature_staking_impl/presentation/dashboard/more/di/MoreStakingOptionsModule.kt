@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.data.model.DiscreetMode
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
@@ -41,7 +41,7 @@ class MoreStakingOptionsModule {
             stakingRouter = stakingRouter,
             stakingSharedState = stakingSharedState,
             // Show all items in more staking options
-            presentationMapper = presentationMapperFactory.create(maskableValueFormatterFactory.create(DiscreetMode.DISABLED))
+            presentationMapper = presentationMapperFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
         )
     }
 

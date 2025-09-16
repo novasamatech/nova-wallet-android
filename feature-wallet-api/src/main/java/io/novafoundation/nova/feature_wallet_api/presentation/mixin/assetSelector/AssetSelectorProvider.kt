@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector
 
 import androidx.lifecycle.MutableLiveData
-import io.novafoundation.nova.common.data.model.DiscreetMode
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
@@ -47,7 +47,7 @@ class AssetSelectorFactory(
             scope,
             amountProvider,
             maskableValueFormatterProvider,
-            maskableValueFormatterFactory.create(DiscreetMode.DISABLED) // To format values without masking in asset list
+            maskableValueFormatterFactory.create(MaskingMode.DISABLED) // To format values without masking in asset list
         )
     }
 }

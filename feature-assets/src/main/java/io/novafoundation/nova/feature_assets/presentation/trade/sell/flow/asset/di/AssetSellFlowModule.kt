@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.data.model.DiscreetMode
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
@@ -54,7 +54,7 @@ class AssetSellFlowModule {
             resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
-            amountFormatter = amountFormatterFactory.create(DiscreetMode.DISABLED) // For assets flow DiscreetMode is always disabled
+            amountFormatter = amountFormatterFactory.create(MaskingMode.DISABLED) // For assets flow MaskingMode is always disabled
         )
     }
 }

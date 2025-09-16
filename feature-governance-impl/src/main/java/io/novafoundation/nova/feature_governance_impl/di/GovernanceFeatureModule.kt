@@ -4,7 +4,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
-import io.novafoundation.nova.common.data.model.DiscreetMode
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -194,7 +194,7 @@ class GovernanceFeatureModule {
     fun provideDefaultReferendumFormatter(
         referendumFormatterFactory: ReferendumFormatterFactory,
         maskableValueFormatterFactory: MaskableValueFormatterFactory
-    ): ReferendumFormatter = referendumFormatterFactory.create(maskableValueFormatterFactory.create(DiscreetMode.DISABLED))
+    ): ReferendumFormatter = referendumFormatterFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
 
     @Provides
     @FeatureScope

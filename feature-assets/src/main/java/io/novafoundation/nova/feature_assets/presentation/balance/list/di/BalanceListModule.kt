@@ -10,7 +10,7 @@ import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -98,7 +98,7 @@ class BalanceListModule {
         multisigPendingOperationsService: MultisigPendingOperationsService,
         novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
         maskableValueFormatterProvider: MaskableValueFormatterProvider,
-        discreetModeInteractor: DiscreetModeInteractor
+        maskingModeUseCase: MaskingModeUseCase
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -118,7 +118,7 @@ class BalanceListModule {
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             multisigPendingOperationsService = multisigPendingOperationsService,
             novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin,
-            discreetModeInteractor = discreetModeInteractor
+            maskingModeUseCase = maskingModeUseCase
         )
     }
 

@@ -39,9 +39,9 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesIm
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
-import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.domain.interactor.RealAssetViewModeInteractor
-import io.novafoundation.nova.common.domain.interactor.RealDiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.RealMaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
@@ -458,7 +458,7 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun discreetModeInteractor(toggleFeatureRepository: ToggleFeatureRepository): DiscreetModeInteractor {
-        return RealDiscreetModeInteractor(toggleFeatureRepository)
+    fun maskingModeUseCase(toggleFeatureRepository: ToggleFeatureRepository): MaskingModeUseCase {
+        return RealMaskingModeUseCase(toggleFeatureRepository)
     }
 }

@@ -25,7 +25,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
-import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.interfaces.FileCache
@@ -81,7 +81,7 @@ import java.util.Random
 
 interface CommonApi {
 
-    val discreetModeInteractor: DiscreetModeInteractor
+    val maskingModeUseCase: MaskingModeUseCase
 
     val systemCallExecutor: SystemCallExecutor
 

@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetViewMode
-import io.novafoundation.nova.common.data.model.DiscreetMode
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -92,7 +92,7 @@ class BalanceListViewModel(
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
     private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
-    private val discreetModeInteractor: DiscreetModeInteractor
+    private val maskingModeUseCase: MaskingModeUseCase
 ) : BaseViewModel() {
 
     private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
@@ -150,8 +150,8 @@ class BalanceListViewModel(
         .inBackground()
         .share()
 
-    val maskingModeEnableFlow = discreetModeInteractor.observeDiscreetMode()
-        .map { it == DiscreetMode.ENABLED }
+    val maskingModeEnableFlow = maskingModeUseCase.observeMaskingMode()
+        .map { it == MaskingMode.ENABLED }
         .shareInBackground()
 
     val totalBalanceFlow = combine(
@@ -389,6 +389,6 @@ class BalanceListViewModel(
     }
 
     fun toggleMasking() {
-        discreetModeInteractor.toggleMaskingMode()
+        maskingModeUseCase.toggleMaskingMode()
     }
 }

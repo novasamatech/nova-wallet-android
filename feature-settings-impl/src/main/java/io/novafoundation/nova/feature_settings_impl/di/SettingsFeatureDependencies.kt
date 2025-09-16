@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.AppVersionProvider
@@ -43,6 +44,8 @@ import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 
 interface SettingsFeatureDependencies {
+
+    val maskingModeUseCase: MaskingModeUseCase
 
     val cloudBackupService: CloudBackupService
 
