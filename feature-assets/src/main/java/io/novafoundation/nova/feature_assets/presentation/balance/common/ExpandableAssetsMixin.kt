@@ -7,26 +7,40 @@ import io.novafoundation.nova.common.utils.combineToQuad
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapperFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapperFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 
 class ExpandableAssetsMixinFactory(
     private val assetIconProvider: AssetIconProvider,
     private val currencyInteractor: CurrencyInteractor,
     private val assetsViewModeRepository: AssetsViewModeRepository,
-    private val amountFormatterProvider: MaskableAmountFormatterProvider
+    private val amountFormatterProvider: MaskableValueFormatterProvider,
+    private val networkAssetMapperFactory: NetworkAssetMapperFactory,
+    private val tokenAssetMapperFactory: TokenAssetMapperFactory,
 ) {
 
     fun create(assetsFlow: Flow<AssetsByViewModeResult>): ExpandableAssetsMixin {
-        return RealExpandableAssetsMixin(assetsFlow, currencyInteractor, amountFormatterProvider, assetIconProvider, assetsViewModeRepository)
+        return RealExpandableAssetsMixin(
+            assetsFlow,
+            currencyInteractor,
+            amountFormatterProvider,
+            networkAssetMapperFactory,
+            tokenAssetMapperFactory,
+            assetIconProvider,
+            assetsViewModeRepository
+        )
     }
 }
 
@@ -42,10 +56,20 @@ interface ExpandableAssetsMixin {
 class RealExpandableAssetsMixin(
     assetsFlow: Flow<AssetsByViewModeResult>,
     currencyInteractor: CurrencyInteractor,
-    amountFormatterProvider: MaskableAmountFormatterProvider,
+    amountFormatterProvider: MaskableValueFormatterProvider,
+    networkAssetMapperFactory: NetworkAssetMapperFactory,
+    tokenAssetMapperFactory: TokenAssetMapperFactory,
     private val assetIconProvider: AssetIconProvider,
     private val assetsViewModeRepository: AssetsViewModeRepository
 ) : ExpandableAssetsMixin {
+
+    private val assetsFormatters = amountFormatterProvider.provideFormatter()
+        .map {
+            AssetMappers(
+                networkAssetMapperFactory.create(it),
+                tokenAssetMapperFactory.create(it)
+            )
+        }
 
     private val selectedCurrency = currencyInteractor.observeSelectCurrency()
 
@@ -55,12 +79,17 @@ class RealExpandableAssetsMixin(
         assetsFlow,
         expandedTokenIdsFlow,
         selectedCurrency,
-        amountFormatterProvider.provideFormatter()
-    ).mapLatest { (assetsByViewMode, expandedTokens, currency, amountFormatter) ->
+        assetsFormatters
+    ).mapLatest { (assetsByViewMode, expandedTokens, currency, assetMappers) ->
         when (assetsByViewMode) {
-            is AssetsByViewModeResult.ByNetworks -> assetsByViewMode.assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
-            is AssetsByViewModeResult.ByTokens -> assetsByViewMode.tokens.mapGroupedAssetsToUi(
-                amountFormatter = amountFormatter,
+            is AssetsByViewModeResult.ByNetworks -> assetMappers.networkAssetMapper.mapGroupedAssetsToUi(
+                groupedAssets = assetsByViewMode.assets,
+                assetIconProvider = assetIconProvider,
+                currency = currency
+            )
+
+            is AssetsByViewModeResult.ByTokens -> assetMappers.tokenAssetMapper.mapGroupedAssetsToUi(
+                groupedTokens = assetsByViewMode.tokens,
                 assetIconProvider = assetIconProvider,
                 assetFilter = { groupId, assetsInGroup -> filterTokens(groupId, assetsInGroup, expandedTokens) }
             )
@@ -95,3 +124,8 @@ class RealExpandableAssetsMixin(
         }
     }
 }
+
+private class AssetMappers(
+    val networkAssetMapper: NetworkAssetMapper,
+    val tokenAssetMapper: TokenAssetMapper
+)

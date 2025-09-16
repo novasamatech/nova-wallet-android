@@ -19,10 +19,10 @@ import io.novafoundation.nova.feature_governance_impl.domain.dapp.GovernanceDApp
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatterFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 
 @Module(includes = [ViewModelModule::class])
 class ReferendaListModule {
@@ -39,13 +39,13 @@ class ReferendaListModule {
         resourceManager: ResourceManager,
         updateSystem: UpdateSystem,
         governanceRouter: GovernanceRouter,
-        referendumFormatter: ReferendumFormatter,
+        referendumFormatterFactory: ReferendumFormatterFactory,
         governanceDAppsInteractor: GovernanceDAppsInteractor,
         summaryInteractor: ReferendaSummaryInteractor,
         tinderGovInteractor: TinderGovInteractor,
         selectedMetaAccountUseCase: SelectedAccountUseCase,
         validationExecutor: ValidationExecutor,
-        amountFormatter: AmountFormatter
+        maskableValueFormatterProvider: MaskableValueFormatterProvider
     ): ViewModel {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -56,13 +56,13 @@ class ReferendaListModule {
             resourceManager = resourceManager,
             updateSystem = updateSystem,
             governanceRouter = governanceRouter,
-            referendumFormatter = referendumFormatter,
+            referendumFormatterFactory = referendumFormatterFactory,
             governanceDAppsInteractor = governanceDAppsInteractor,
             referendaSummaryInteractor = summaryInteractor,
             tinderGovInteractor = tinderGovInteractor,
             selectedMetaAccountUseCase = selectedMetaAccountUseCase,
             validationExecutor = validationExecutor,
-            amountFormatter = amountFormatter
+            maskableValueFormatterProvider = maskableValueFormatterProvider
         )
     }
 

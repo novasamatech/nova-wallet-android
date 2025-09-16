@@ -18,8 +18,8 @@ import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenAssetGroupToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
@@ -30,7 +30,6 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.maskable.MaskableAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -50,7 +49,8 @@ class AssetSwapFlowViewModel(
     private val assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
-    private val amountFormatter: MaskableAmountFormatter
+    private val networkAssetMapper: NetworkAssetMapper,
+    private val tokenAssetMapper: TokenAssetMapper
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -61,7 +61,8 @@ class AssetSwapFlowViewModel(
     resourceManager,
     assetIconProvider,
     assetViewModeInteractor,
-    amountFormatter
+    networkAssetMapper,
+    tokenAssetMapper
 ) {
 
     private val swapFlowScope = swapFlowScopeAggregator.getFlowScope(viewModelScope)
@@ -102,8 +103,8 @@ class AssetSwapFlowViewModel(
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(
-            amountFormatter,
+        return networkAssetMapper.mapGroupedAssetsToUi(
+            assets,
             assetIconProvider,
             currency,
             NetworkAssetGroup::groupTransferableBalanceFiat,
@@ -113,7 +114,7 @@ class AssetSwapFlowViewModel(
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets) { it.groupBalance.transferable }
+            tokenAssetMapper.mapTokenAssetGroupToUi(assetIconProvider, group, assets) { it.groupBalance.transferable }
         }
     }
 

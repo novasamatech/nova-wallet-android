@@ -16,10 +16,10 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 
 @Module(includes = [ViewModelModule::class, ComponentsModule::class])
 class StakingDashboardModule {
@@ -35,9 +35,9 @@ class StakingDashboardModule {
         dashboardRouter: StakingDashboardRouter,
         router: StakingRouter,
         stakingSharedState: StakingSharedState,
-        presentationMapper: StakingDashboardPresentationMapper,
+        presentationMapperFactory: StakingDashboardPresentationMapperFactory,
         startMultiStakingRouter: StartMultiStakingRouter,
-        amountFormatter: AmountFormatter
+        valueFormatterProvider: MaskableValueFormatterProvider
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
@@ -47,9 +47,9 @@ class StakingDashboardModule {
             dashboardRouter = dashboardRouter,
             router = router,
             stakingSharedState = stakingSharedState,
-            presentationMapper = presentationMapper,
+            presentationMapperFactory = presentationMapperFactory,
             startMultiStakingRouter = startMultiStakingRouter,
-            amountFormatter = amountFormatter
+            maskableValueFormatterProvider = valueFormatterProvider
         )
     }
 
