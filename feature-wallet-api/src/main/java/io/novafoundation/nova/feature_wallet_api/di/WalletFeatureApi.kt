@@ -29,6 +29,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValid
 import io.novafoundation.nova.feature_wallet_api.domain.validation.ProxyHaveEnoughFeeValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -88,6 +90,10 @@ interface WalletFeatureApi {
     val accountInfoRepository: AccountInfoRepository
 
     val amountFormatter: AmountFormatter
+
+    val fiatFormatter: FiatFormatter
+
+    val tokenFormatter: TokenFormatter
 
     fun provideWalletRepository(): WalletRepository
 

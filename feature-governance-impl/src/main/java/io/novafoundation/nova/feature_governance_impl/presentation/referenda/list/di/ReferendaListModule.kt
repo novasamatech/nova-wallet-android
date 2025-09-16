@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergo
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatterFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 
@@ -45,7 +46,8 @@ class ReferendaListModule {
         tinderGovInteractor: TinderGovInteractor,
         selectedMetaAccountUseCase: SelectedAccountUseCase,
         validationExecutor: ValidationExecutor,
-        maskableValueFormatterProvider: MaskableValueFormatterProvider
+        maskableValueFormatterProvider: MaskableValueFormatterProvider,
+        tokenFormatter: TokenFormatter
     ): ViewModel {
         return ReferendaListViewModel(
             assetSelectorFactory = assetSelectorFactory,
@@ -62,7 +64,8 @@ class ReferendaListModule {
             tinderGovInteractor = tinderGovInteractor,
             selectedMetaAccountUseCase = selectedMetaAccountUseCase,
             validationExecutor = validationExecutor,
-            maskableValueFormatterProvider = maskableValueFormatterProvider
+            maskableValueFormatterProvider = maskableValueFormatterProvider,
+            tokenFormatter = tokenFormatter
         )
     }
 

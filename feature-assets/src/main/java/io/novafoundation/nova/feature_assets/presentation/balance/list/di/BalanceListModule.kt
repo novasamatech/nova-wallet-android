@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilit
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 
@@ -98,7 +99,8 @@ class BalanceListModule {
         multisigPendingOperationsService: MultisigPendingOperationsService,
         novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
         maskableValueFormatterProvider: MaskableValueFormatterProvider,
-        maskingModeUseCase: MaskingModeUseCase
+        maskingModeUseCase: MaskingModeUseCase,
+        fiatFormatter: FiatFormatter
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -118,7 +120,8 @@ class BalanceListModule {
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             multisigPendingOperationsService = multisigPendingOperationsService,
             novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin,
-            maskingModeUseCase = maskingModeUseCase
+            maskingModeUseCase = maskingModeUseCase,
+            fiatFormatter = fiatFormatter
         )
     }
 
