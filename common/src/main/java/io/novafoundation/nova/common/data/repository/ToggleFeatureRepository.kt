@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface ToggleFeatureRepository {
     fun get(key: String, default: Boolean = false): Boolean
 
-    fun set(key: String, value: Boolean)
+    fun set(key: String, value: Boolean): Boolean
 
     fun observe(key: String, default: Boolean = false): Flow<Boolean>
 }
@@ -19,11 +19,16 @@ class RealToggleFeatureRepository(
         return preferences.getBoolean(key, default)
     }
 
-    override fun set(key: String, value: Boolean) {
+    override fun set(key: String, value: Boolean): Boolean {
         preferences.putBoolean(key, value)
+        return value
     }
 
     override fun observe(key: String, default: Boolean): Flow<Boolean> {
         return preferences.booleanFlow(key, default)
     }
+}
+
+fun ToggleFeatureRepository.toggle(key: String): Boolean {
+    return set(key, !get(key))
 }

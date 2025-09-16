@@ -51,6 +51,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
         binder.settingsBiometricAuth.setOnClickListener { viewModel.changeBiometricAuth() }
         binder.settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
         binder.settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
+        binder.settingsHideBalances.setOnClickListener { viewModel.changeHideBalances() }
         binder.settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
 
         binder.settingsCloudBackup.setOnClickListener { viewModel.cloudBackupClicked() }
@@ -111,6 +112,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
 
         viewModel.safeModeStatus.observe {
             binder.settingsSafeMode.setChecked(it)
+        }
+
+        viewModel.hideBalancesOnLaunchState.observe {
+            binder.settingsHideBalances.setChecked(it)
         }
 
         viewModel.appVersionFlow.observe(binder.settingsAppVersion::setText)

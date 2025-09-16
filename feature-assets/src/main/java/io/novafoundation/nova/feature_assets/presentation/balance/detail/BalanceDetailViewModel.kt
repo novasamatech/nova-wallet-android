@@ -52,6 +52,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAss
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novasama.substrate_sdk_android.hash.isPositive
@@ -255,7 +256,11 @@ class BalanceDetailViewModel(
 
         return AssetDetailsModel(
             token = mapTokenToTokenModel(asset.token),
-            total = amountFormatter.formatAmountToAmountModel(asset.total + totalContributed, asset, AmountConfig(useAbbreviation = false)),
+            total = amountFormatter.formatAmountToAmountModel(
+                asset.total + totalContributed,
+                asset,
+                AmountConfig(useTokenAbbreviation = false, fiatAbbreviation = FiatConfig.AbbreviationStyle.NO_ABBREVIATION)
+            ),
             transferable = amountFormatter.formatAmountToAmountModel(asset.transferable, asset),
             locked = amountFormatter.formatAmountToAmountModel(asset.locked + totalContributed, asset),
             assetIcon = assetIconProvider.getAssetIconOrFallback(asset.token.configuration)

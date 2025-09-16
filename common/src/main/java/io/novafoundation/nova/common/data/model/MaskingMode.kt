@@ -1,5 +1,5 @@
 package io.novafoundation.nova.common.data.model
 
-enum class DiscreetMode {
+enum class MaskingMode {
     ENABLED, DISABLED
 }

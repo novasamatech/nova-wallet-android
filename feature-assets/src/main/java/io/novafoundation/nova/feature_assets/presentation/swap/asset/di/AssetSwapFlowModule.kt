@@ -16,13 +16,14 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class AssetSwapFlowModule {
@@ -48,7 +49,8 @@ class AssetSwapFlowModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        amountFormatter: AmountFormatter,
+        networkAssetMapper: NetworkAssetMapper,
+        tokenAssetMapper: TokenAssetMapper,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
     ): ViewModel {
         return AssetSwapFlowViewModel(
@@ -64,7 +66,8 @@ class AssetSwapFlowModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
-            amountFormatter = amountFormatter,
+            networkAssetMapper = networkAssetMapper,
+            tokenAssetMapper = tokenAssetMapper,
             swapFlowScopeAggregator = swapFlowScopeAggregator
         )
     }

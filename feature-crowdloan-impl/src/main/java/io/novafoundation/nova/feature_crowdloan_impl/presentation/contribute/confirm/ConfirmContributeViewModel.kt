@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -80,7 +81,15 @@ class ConfirmContributeViewModel(
         .share()
 
     val assetModelFlow = assetFlow
-        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager, it.transferableInPlanks) }
+        .map {
+            mapAssetToAssetModel(
+                assetIconProvider,
+                it,
+                resourceManager,
+                // Very rude way to show transferable balance but we don't support contributions so I don't se a reason for deeper refactoring
+                MaskableModel.Unmasked(it.transferableInPlanks)
+            )
+        }
         .inBackground()
         .share()
 

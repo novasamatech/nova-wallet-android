@@ -10,11 +10,14 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.dataOrNull
 import io.novafoundation.nova.common.presentation.isLoading
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.ViewGoToNftsBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
@@ -50,8 +53,22 @@ class GoToNftsView @JvmOverloads constructor(
         ).inject(this)
     }
 
-    fun setNftCount(countLabel: String?) {
-        binder.goToNftCounter.text = countLabel
+    fun setNftCount(countLabel: MaskableModel<String>?) {
+        if (countLabel == null) {
+            makeGone()
+            return
+        } else {
+            makeVisible()
+            binder.goToNftCounter.setMaskableText(countLabel)
+        }
+    }
+
+    fun setPreviews(previewsMaskable: MaskableModel<List<NftPreviewUi>>?) {
+        when (previewsMaskable) {
+            is MaskableModel.Hidden -> maskPreviews()
+            is MaskableModel.Unmasked -> setPreviews(previewsMaskable.value)
+            null -> makeGone()
+        }
     }
 
     fun setPreviews(previews: List<NftPreviewUi>?) {
@@ -74,6 +91,14 @@ class GoToNftsView @JvmOverloads constructor(
                     previewViews[index].load(previewContent.dataOrNull, imageLoader)
                 }
             }
+        }
+    }
+
+    private fun maskPreviews() {
+        val images = listOf(R.drawable.ic_blue_siri, R.drawable.ic_yellow_siri, R.drawable.ic_pink_siri)
+        images.forEachIndexed { index, imageRes ->
+            previewHolders[index].makeVisible()
+            previewViews[index].setImageResource(imageRes)
         }
     }
 }

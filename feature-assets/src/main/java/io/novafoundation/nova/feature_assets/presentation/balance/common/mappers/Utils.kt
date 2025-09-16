@@ -6,17 +6,11 @@ import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_assets.R
-import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
-import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_assets.presentation.model.TokenModel
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatBalanceWithFraction
 import java.math.BigDecimal
 
 fun mapCoinRateChange(coinRateChange: CoinRateChange?, currency: Currency): String {
@@ -26,21 +20,6 @@ fun mapCoinRateChange(coinRateChange: CoinRateChange?, currency: Currency): Stri
 
 fun mapCoinRateChange(rate: BigDecimal, currency: Currency): String {
     return rate.formatAsCurrency(currency)
-}
-
-fun mapAssetToAssetModel(
-    amountFormatter: AmountFormatter,
-    asset: Asset,
-    balance: PricedAmount
-): AssetModel {
-    return AssetModel(
-        token = mapTokenToTokenModel(asset.token),
-        amount = amountFormatter.formatAmountToAmountModel(
-            amount = balance.amount,
-            token = asset.token,
-            config = AmountConfig(includeAssetTicker = false)
-        ).formatBalanceWithFraction(amountFormatter, R.dimen.asset_balance_fraction_size)
-    )
 }
 
 @ColorRes
