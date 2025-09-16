@@ -47,11 +47,29 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.milliseconds
+
+class ReferendumFormatterFactory(
+    private val resourceManager: ResourceManager,
+    private val trackFormatter: TrackFormatter,
+    private val referendaStatusFormatter: ReferendaStatusFormatter,
+    private val amountFormatter: AmountFormatter
+) {
+    fun create(maskableValueFormatter: MaskableValueFormatter): ReferendumFormatter {
+        return RealReferendumFormatter(
+            resourceManager,
+            trackFormatter,
+            referendaStatusFormatter,
+            amountFormatter,
+            maskableValueFormatter
+        )
+    }
+}
 
 private val oneDay = 1.days
 
@@ -66,7 +84,8 @@ class RealReferendumFormatter(
     private val resourceManager: ResourceManager,
     private val trackFormatter: TrackFormatter,
     private val referendaStatusFormatter: ReferendaStatusFormatter,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val maskableValueFormatter: MaskableValueFormatter
 ) : ReferendumFormatter {
 
     override fun formatVoting(voting: ReferendumVoting, threshold: ReferendumThreshold?, token: Token): ReferendumVotingModel? {
@@ -292,7 +311,9 @@ class RealReferendumFormatter(
             track = referendum.track?.let { formatReferendumTrack(it, token.configuration) },
             number = formatId(referendum.id),
             voting = referendum.voting?.let { formatVoting(it, referendum.threshold, token) },
-            yourVote = referendum.referendumVote?.let { mapReferendumVoteToUi(it, token.configuration, chain) },
+            yourVote = referendum.referendumVote?.let {
+                maskableValueFormatter.format { mapReferendumVoteToUi(it, token.configuration, chain) }
+            },
             isOngoing = referendum.status.isOngoing()
         )
     }

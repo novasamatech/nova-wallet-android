@@ -20,13 +20,12 @@ import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBala
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenAssetGroupToUi
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +45,8 @@ abstract class AssetFlowViewModel(
     protected val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     private val assetViewModeInteractor: AssetViewModeInteractor,
-    private val amountFormatter: MaskableValueFormatter
+    private val networkAssetMapper: NetworkAssetMapper,
+    private val tokenAssetMapper: TokenAssetMapper
 ) : BaseViewModel() {
 
     protected val interactor = interactorFactory.createByAssetViewMode()
@@ -100,11 +100,11 @@ abstract class AssetFlowViewModel(
     }
 
     open fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(amountFormatter, assetIconProvider, currency)
+        return networkAssetMapper.mapGroupedAssetsToUi(assets, assetIconProvider, currency)
     }
 
     open fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
-        return assets.map { mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, it.key, assets = it.value) }
+        return assets.map { tokenAssetMapper.mapTokenAssetGroupToUi(assetIconProvider, it.key, assets = it.value) }
     }
 
     internal fun validate(asset: Chain.Asset, onAccept: (Chain.Asset) -> Unit) {

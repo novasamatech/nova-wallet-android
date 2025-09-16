@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.data.model.DiscreetMode
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
@@ -17,9 +16,10 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.asset.AssetSellFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
 
 @Module(includes = [ViewModelModule::class])
 class AssetSellFlowModule {
@@ -42,7 +42,8 @@ class AssetSellFlowModule {
         resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        amountFormatterFactory: MaskableValueFormatterFactory
+        networkAssetMapper: NetworkAssetMapper,
+        tokenAssetMapper: TokenAssetMapper
     ): ViewModel {
         return AssetSellFlowViewModel(
             interactorFactory = interactorFactory,
@@ -54,7 +55,8 @@ class AssetSellFlowModule {
             resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
-            amountFormatter = amountFormatterFactory.create(DiscreetMode.DISABLED) // For assets flow DiscreetMode is always disabled
+            networkAssetMapper = networkAssetMapper,
+            tokenAssetMapper = tokenAssetMapper
         )
     }
 }

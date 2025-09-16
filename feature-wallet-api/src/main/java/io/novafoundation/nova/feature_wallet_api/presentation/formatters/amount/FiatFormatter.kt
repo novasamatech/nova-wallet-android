@@ -6,21 +6,27 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpleFormatAsCurrency
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import java.math.BigDecimal
-import java.math.RoundingMode
 
-interface FiatFormatter : GenericFiatFormatter<CharSequence>
+interface FiatFormatter {
 
-class RealFiatFormatter : FiatFormatter {
+    fun formatFiat(fiatAmount: BigDecimal, currency: Currency, config: FiatConfig = FiatConfig()): CharSequence
+}
 
-    override fun formatFiatNoAbbreviation(amount: BigDecimal, currency: Currency, config: FiatConfig): CharSequence {
-        return amount.formatAsCurrencyNoAbbreviation(currency)
-    }
+class RealFiatFormatter(
+    private val fractionStylingFormatter: FractionStylingFormatter
+) : FiatFormatter {
 
-    override fun formatAsCurrency(amount: BigDecimal, currency: Currency, roundingMode: RoundingMode, config: FiatConfig): CharSequence {
-        return amount.formatAsCurrency(currency, roundingMode)
-    }
+    override fun formatFiat(fiatAmount: BigDecimal, currency: Currency, config: FiatConfig): CharSequence {
+        var formattedFiat = when (config.abbreviationStyle) {
+            FiatConfig.AbbreviationStyle.DEFAULT_ABBREVIATION -> fiatAmount.formatAsCurrency(currency, config.roundingMode)
+            FiatConfig.AbbreviationStyle.NO_ABBREVIATION -> fiatAmount.formatAsCurrencyNoAbbreviation(currency)
+            FiatConfig.AbbreviationStyle.SIMPLE_ABBREVIATION -> fiatAmount.simpleFormatAsCurrency(currency, config.roundingMode)
+        }
 
-    override fun simpleFormatAsCurrency(amount: BigDecimal, currency: Currency, roundingMode: RoundingMode, config: FiatConfig): CharSequence {
-        return amount.simpleFormatAsCurrency(currency, roundingMode)
+        if (config.estimatedFiat) {
+            formattedFiat = "~$formattedFiat"
+        }
+
+        return formattedFiat.applyFractionStyling(fractionStylingFormatter, config.fractionPartStyling)
     }
 }

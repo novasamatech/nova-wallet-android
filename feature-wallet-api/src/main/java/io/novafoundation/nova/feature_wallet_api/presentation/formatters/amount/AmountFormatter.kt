@@ -1,88 +1,115 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount
 
-import androidx.core.text.buildSpannedString
-import io.novafoundation.nova.common.utils.formatting.format
-import io.novafoundation.nova.common.utils.formatting.formatWithFullAmount
-import io.novafoundation.nova.common.utils.withTokenSymbol
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrencyNoAbbreviation
+import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.PricedAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
 import java.math.BigDecimal
+import java.math.BigInteger
 
-interface AmountFormatter : GenericAmountFormatter<AmountModel>
+interface AmountFormatter {
+
+    fun formatAmountToAmountModel(
+        pricedAmount: PricedAmount,
+        token: TokenSymbol,
+        config: AmountConfig = AmountConfig()
+    ): AmountModel
+}
 
 class RealAmountFormatter(
-    private val fractionStylingFormatter: FractionStylingFormatter
+    private val tokenFormatter: TokenFormatter,
+    private val fiatFormatter: FiatFormatter
 ) : AmountFormatter {
 
     override fun formatAmountToAmountModel(
-        amount: BigDecimal,
-        token: TokenBase,
+        pricedAmount: PricedAmount,
+        token: TokenSymbol,
         config: AmountConfig
     ): AmountModel {
         return AmountModel(
-            token = buildSpannedString {
-                append(config.tokenAmountSign.signSymbol)
-                append(formatAmount(config, amount, token))
-            },
-            fiat = formatFiat(amount, token, config)
+            token = tokenFormatter.formatToken(pricedAmount.amount, token, config.tokenConfig),
+            fiat = formatFiat(pricedAmount.price, pricedAmount.currency, config)
         )
     }
 
-    private fun formatAmount(
-        config: AmountConfig,
-        amount: BigDecimal,
-        token: TokenBase
-    ): CharSequence {
-        val unsignedTokenAmount = if (config.useAbbreviation) {
-            if (config.includeAssetTicker) {
-                amount.formatTokenAmount(token.configuration, config.roundingMode)
-            } else {
-                amount.format(config.roundingMode)
-            }
-        } else {
-            val unformattedAmount = amount.formatWithFullAmount()
-
-            if (config.includeAssetTicker) {
-                unformattedAmount.withTokenSymbol(token.configuration.symbol)
-            } else {
-                unformattedAmount
-            }
-        }
-
-        return unsignedTokenAmount.applyFractionStyling(config.tokenFractionStylingSize)
-    }
-
     private fun formatFiat(
-        amount: BigDecimal,
-        token: TokenBase,
+        fiatAmount: BigDecimal,
+        currency: Currency,
         config: AmountConfig
-    ): String? {
-        val fiatAmount = token.amountToFiat(amount)
-            .takeIf { it != BigDecimal.ZERO || config.includeZeroFiat }
+    ): CharSequence? {
+        if (fiatAmount == BigDecimal.ZERO && !config.includeZeroFiat) return null
 
-        var formattedFiat = if (config.useAbbreviation) {
-            fiatAmount?.formatAsCurrency(token.currency, config.roundingMode)
-        } else {
-            fiatAmount?.formatAsCurrencyNoAbbreviation(token.currency)
-        }
-
-        if (config.estimatedFiat && formattedFiat != null) {
-            formattedFiat = "~$formattedFiat"
-        }
-
-        return formattedFiat
-    }
-
-    private fun CharSequence.applyFractionStyling(fractionStylingSize: FractionStylingSize): CharSequence {
-        return when (fractionStylingSize) {
-            FractionStylingSize.Default -> this
-            is FractionStylingSize.AbsoluteSize -> fractionStylingFormatter.formatFraction(this, fractionStylingSize.sizeRes)
-        }
+        return fiatFormatter.formatFiat(fiatAmount, currency, config.fiatConfig)
     }
 }
+
+fun AmountFormatter.formatAmountToAmountModel(
+    amountInPlanks: BigInteger,
+    asset: Asset,
+    config: AmountConfig = AmountConfig()
+): AmountModel {
+    val amount = asset.token.amountFromPlanks(amountInPlanks)
+    return formatAmountToAmountModel(
+        pricedAmount = PricedAmount(
+            amount = amount,
+            price = asset.token.amountToFiat(amount),
+            currency = asset.token.currency
+        ),
+        token = asset.token.configuration.symbol,
+        config = config
+    )
+}
+
+fun AmountFormatter.formatAmountToAmountModel(
+    amountInPlanks: BigInteger,
+    token: TokenBase,
+    config: AmountConfig = AmountConfig()
+): AmountModel {
+    val amount = token.amountFromPlanks(amountInPlanks)
+    return formatAmountToAmountModel(
+        pricedAmount = PricedAmount(
+            amount = amount,
+            price = token.amountToFiat(amount),
+            currency = token.currency
+        ),
+        token = token.configuration.symbol,
+        config = config
+    )
+}
+
+fun AmountFormatter.formatAmountToAmountModel(
+    amount: BigDecimal,
+    asset: Asset,
+    config: AmountConfig = AmountConfig()
+) = formatAmountToAmountModel(
+    pricedAmount = PricedAmount(
+        amount = amount,
+        price = asset.token.amountToFiat(amount),
+        currency = asset.token.currency
+    ),
+    token = asset.token.configuration.symbol,
+    config = config
+)
+
+fun AmountFormatter.formatAmountToAmountModel(
+    amount: BigDecimal,
+    token: TokenBase,
+    config: AmountConfig = AmountConfig()
+) = formatAmountToAmountModel(
+    pricedAmount = PricedAmount(
+        amount = amount,
+        price = token.amountToFiat(amount),
+        currency = token.currency
+    ),
+    token = token.configuration.symbol,
+    config = config
+)
+
+fun Asset.transferableAmountModel(amountFormatter: AmountFormatter) = amountFormatter.formatAmountToAmountModel(transferable, this)
+
+fun transferableAmountModelOf(amountFormatter: AmountFormatter, asset: Asset) =
+    amountFormatter.formatAmountToAmountModel(asset.transferable, asset)

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -43,6 +44,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapperFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapperFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
@@ -62,6 +67,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -225,17 +233,57 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideNetworkAssetMapperFactory(
+        fiatFormatter: FiatFormatter,
+        amountFormatter: AmountFormatter
+    ): NetworkAssetMapperFactory {
+        return NetworkAssetMapperFactory(
+            fiatFormatter,
+            amountFormatter
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideTokenAssetMapperFactory(amountFormatter: AmountFormatter): TokenAssetMapperFactory {
+        return TokenAssetMapperFactory(amountFormatter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNotMaskingNetworkAssetMapper(
+        networkAssetMapperFactory: NetworkAssetMapperFactory,
+        maskableValueFormatterFactory: MaskableValueFormatterFactory
+    ): NetworkAssetMapper {
+        return networkAssetMapperFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNotMaskingTokenAssetMapper(
+        tokenAssetMapperFactory: TokenAssetMapperFactory,
+        maskableValueFormatterFactory: MaskableValueFormatterFactory
+    ): TokenAssetMapper {
+        return tokenAssetMapperFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
+    }
+
+    @Provides
+    @FeatureScope
     fun provideExpandableAssetsMixinFactory(
         assetIconProvider: AssetIconProvider,
         currencyInteractor: CurrencyInteractor,
         assetsViewModeRepository: AssetsViewModeRepository,
-        amountFormatterProvider: MaskableValueFormatterProvider
+        amountFormatterProvider: MaskableValueFormatterProvider,
+        networkAssetMapperFactory: NetworkAssetMapperFactory,
+        tokenAssetMapperFactory: TokenAssetMapperFactory,
     ): ExpandableAssetsMixinFactory {
         return ExpandableAssetsMixinFactory(
             assetIconProvider,
             currencyInteractor,
             assetsViewModeRepository,
-            amountFormatterProvider
+            amountFormatterProvider,
+            networkAssetMapperFactory,
+            tokenAssetMapperFactory
         )
     }
 

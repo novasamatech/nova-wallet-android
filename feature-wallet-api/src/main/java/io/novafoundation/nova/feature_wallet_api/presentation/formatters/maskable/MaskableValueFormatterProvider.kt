@@ -1,16 +1,16 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable
 
-import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class MaskableValueFormatterProvider(
     private val maskableValueFormatterFactory: MaskableValueFormatterFactory,
-    private val discreetModeInteractor: DiscreetModeInteractor
+    private val maskingModeUseCase: MaskingModeUseCase
 ) {
 
     fun provideFormatter(): Flow<MaskableValueFormatter> {
-        return discreetModeInteractor.observeDiscreetMode().map {
+        return maskingModeUseCase.observeMaskingMode().map {
             maskableValueFormatterFactory.create(it)
         }
     }

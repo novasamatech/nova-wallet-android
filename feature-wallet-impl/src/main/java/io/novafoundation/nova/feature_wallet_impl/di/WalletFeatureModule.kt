@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.domain.interactor.DiscreetModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -59,8 +59,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FractionStylingFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.RealFractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealTokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -263,29 +265,36 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAmountFormatter(fractionStylingFormatter: FractionStylingFormatter): AmountFormatter {
-        return RealAmountFormatter(fractionStylingFormatter)
+    fun provideAmountFormatter(
+        tokenFormatter: TokenFormatter,
+        fiatFormatter: FiatFormatter
+    ): AmountFormatter {
+        return RealAmountFormatter(tokenFormatter, fiatFormatter)
     }
 
     @Provides
     @FeatureScope
-    fun provideFiatFormatter(): FiatFormatter {
-        return RealFiatFormatter()
+    fun provideFiatFormatter(fractionStylingFormatter: FractionStylingFormatter): FiatFormatter {
+        return RealFiatFormatter(fractionStylingFormatter)
     }
 
     @Provides
     @FeatureScope
-    fun provideMaskableAmountFormatterFactory(amountFormatter: AmountFormatter, fiatFormatter: FiatFormatter): MaskableValueFormatterFactory {
-        return MaskableValueFormatterFactory(amountFormatter, fiatFormatter)
+    fun provideTokenFormatter(fractionStylingFormatter: FractionStylingFormatter): TokenFormatter = RealTokenFormatter(fractionStylingFormatter)
+
+    @Provides
+    @FeatureScope
+    fun provideMaskableAmountFormatterFactory(): MaskableValueFormatterFactory {
+        return MaskableValueFormatterFactory()
     }
 
     @Provides
     @FeatureScope
     fun provideMaskableAmountFormatterProvider(
         maskableValueFormatterFactory: MaskableValueFormatterFactory,
-        discreetModeInteractor: DiscreetModeInteractor
+        maskingModeUseCase: MaskingModeUseCase
     ): MaskableValueFormatterProvider {
-        return MaskableValueFormatterProvider(maskableValueFormatterFactory, discreetModeInteractor)
+        return MaskableValueFormatterProvider(maskableValueFormatterFactory, maskingModeUseCase)
     }
 
     @Provides
