@@ -32,8 +32,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.la
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn

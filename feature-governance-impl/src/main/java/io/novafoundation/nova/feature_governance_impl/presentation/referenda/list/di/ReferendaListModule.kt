@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.com
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.ReferendaListViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 
 @Module(includes = [ViewModelModule::class])
 class ReferendaListModule {

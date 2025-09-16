@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -57,8 +56,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFiatFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealTokenFormatter
@@ -281,21 +278,6 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideTokenFormatter(fractionStylingFormatter: FractionStylingFormatter): TokenFormatter = RealTokenFormatter(fractionStylingFormatter)
-
-    @Provides
-    @FeatureScope
-    fun provideMaskableAmountFormatterFactory(): MaskableValueFormatterFactory {
-        return MaskableValueFormatterFactory()
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideMaskableAmountFormatterProvider(
-        maskableValueFormatterFactory: MaskableValueFormatterFactory,
-        maskingModeUseCase: MaskingModeUseCase
-    ): MaskableValueFormatterProvider {
-        return MaskableValueFormatterProvider(maskableValueFormatterFactory, maskingModeUseCase)
-    }
 
     @Provides
     @FeatureScope

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable
+package io.novafoundation.nova.common.presentation.masking.formatter
 
 import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import kotlinx.coroutines.flow.Flow

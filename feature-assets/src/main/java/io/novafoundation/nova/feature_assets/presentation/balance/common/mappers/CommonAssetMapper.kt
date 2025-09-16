@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 

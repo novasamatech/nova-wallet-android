@@ -20,7 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 
 @Module(includes = [ViewModelModule::class, ComponentsModule::class])
 class StakingDashboardModule {

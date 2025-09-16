@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakin
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.MoreStakingOptionsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 
 @Module(includes = [ViewModelModule::class, ComponentsModule::class])
 class MoreStakingOptionsModule {

@@ -23,7 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.m
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
 import io.novasama.substrate_sdk_android.hash.isPositive
 

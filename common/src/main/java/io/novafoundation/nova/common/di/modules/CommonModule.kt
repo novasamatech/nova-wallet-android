@@ -56,6 +56,8 @@ import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.RealAssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -460,5 +462,20 @@ class CommonModule {
     @ApplicationScope
     fun maskingModeUseCase(toggleFeatureRepository: ToggleFeatureRepository): MaskingModeUseCase {
         return RealMaskingModeUseCase(toggleFeatureRepository)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideMaskableAmountFormatterFactory(): MaskableValueFormatterFactory {
+        return MaskableValueFormatterFactory()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideMaskableAmountFormatterProvider(
+        maskableValueFormatterFactory: MaskableValueFormatterFactory,
+        maskingModeUseCase: MaskingModeUseCase
+    ): MaskableValueFormatterProvider {
+        return MaskableValueFormatterProvider(maskableValueFormatterFactory, maskingModeUseCase)
     }
 }

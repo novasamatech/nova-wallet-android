@@ -37,6 +37,8 @@ import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -80,6 +82,10 @@ import okhttp3.OkHttpClient
 import java.util.Random
 
 interface CommonApi {
+
+    val maskableValueFormatterFactory: MaskableValueFormatterFactory
+
+    val amountFormatterProvider: MaskableValueFormatterProvider
 
     val maskingModeUseCase: MaskingModeUseCase
 
