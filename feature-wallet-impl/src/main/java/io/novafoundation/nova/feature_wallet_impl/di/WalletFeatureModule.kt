@@ -284,12 +284,8 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMaskableAmountFormatterFactory(
-        amountFormatter: AmountFormatter,
-        fiatFormatter: FiatFormatter,
-        tokenFormatter: TokenFormatter
-    ): MaskableValueFormatterFactory {
-        return MaskableValueFormatterFactory(amountFormatter, tokenFormatter, fiatFormatter)
+    fun provideMaskableAmountFormatterFactory(): MaskableValueFormatterFactory {
+        return MaskableValueFormatterFactory()
     }
 
     @Provides

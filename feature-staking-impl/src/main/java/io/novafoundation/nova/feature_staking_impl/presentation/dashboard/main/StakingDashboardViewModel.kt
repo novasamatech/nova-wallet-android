@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.v
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
@@ -57,7 +58,8 @@ class StakingDashboardViewModel(
     private val stakingSharedState: StakingSharedState,
     private val presentationMapperFactory: StakingDashboardPresentationMapperFactory,
     private val dashboardUpdatePeriod: Duration = 200.milliseconds,
-    private val maskableValueFormatterProvider: MaskableValueFormatterProvider
+    private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     private val dashboardFormattersFlow = maskableValueFormatterProvider.provideFormatter()
@@ -145,13 +147,13 @@ class StakingDashboardViewModel(
             chainUi = mapChainToUi(hasStake.chain).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.id,
             rewards = stats.map {
-                formatters.maskableValueFormatter
-                    .formatAmountToAmountModel(it.rewards, hasStake.token)
-                    .syncingIf(isSyncingSecondary)
+                formatters.maskableValueFormatter.format {
+                    amountFormatter.formatAmountToAmountModel(it.rewards, hasStake.token)
+                }.syncingIf(isSyncingSecondary)
             },
-            stake = formatters.maskableValueFormatter
-                .formatAmountToAmountModel(hasStake.stakingState.stake, hasStake.token)
-                .syncingIf(isSyncingSecondary),
+            stake = formatters.maskableValueFormatter.format {
+                amountFormatter.formatAmountToAmountModel(hasStake.stakingState.stake, hasStake.token)
+            }.syncingIf(isSyncingSecondary),
             status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
             earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
             stakingTypeBadge = stakingTypBadge

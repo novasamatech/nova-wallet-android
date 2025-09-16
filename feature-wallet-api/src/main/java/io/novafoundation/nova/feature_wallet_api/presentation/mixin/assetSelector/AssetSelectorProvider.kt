@@ -115,7 +115,7 @@ private class AssetSelectorProvider(
             resourceManager,
             icon = assetAndOption.option.assetWithChain.chain.iconOrFallback(),
             patternId = null,
-            maskableBalance = maskableValueFormatter.formatAny { balance }
+            maskableBalance = maskableValueFormatter.format { balance }
         )
         val title = assetAndOption.formatTitle()
 

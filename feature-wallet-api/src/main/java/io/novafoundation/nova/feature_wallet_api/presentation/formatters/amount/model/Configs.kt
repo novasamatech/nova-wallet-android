@@ -1,58 +1,68 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model
 
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig.AbbreviationStyle
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
-import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionStylingSize
+import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
 import java.math.RoundingMode
 
 private const val INCLUDE_ZERO_FIAT = true
 private const val INCLUDE_ASSET_TICKER: Boolean = true
-private const val USE_ABBREVIATION: Boolean = true
+private const val USE_TOKEN_ABBREVIATION: Boolean = true
 private const val ESTIMATED_FIAT: Boolean = false
+private val FIAT_ABBREVIATION: AbbreviationStyle = AbbreviationStyle.DEFAULT_ABBREVIATION
 private val TOKEN_AMOUNT_SIGN: AmountSign = AmountSign.NONE
 private val ROUNDING_MODE: RoundingMode = RoundingMode.FLOOR
-private val TOKEN_FRACTION_STYLING_SIZE: FractionStylingSize = FractionStylingSize.Default
+private val TOKEN_FRACTION_STYLING_SIZE: FractionPartStyling = FractionPartStyling.NoStyle
 
 class FiatConfig(
     val roundingMode: RoundingMode = ROUNDING_MODE,
-    val style: Style = Style.DEFAULT,
+    val abbreviationStyle: AbbreviationStyle = FIAT_ABBREVIATION,
     val estimatedFiat: Boolean = ESTIMATED_FIAT,
-    val fractionStylingSize: FractionStylingSize = TOKEN_FRACTION_STYLING_SIZE
+    val fractionPartStyling: FractionPartStyling = TOKEN_FRACTION_STYLING_SIZE
 ) {
-    enum class Style {
-        DEFAULT, NO_ABBREVIATION, SIMPLE
+    enum class AbbreviationStyle {
+        DEFAULT_ABBREVIATION, NO_ABBREVIATION, SIMPLE_ABBREVIATION
     }
 }
 
 class TokenConfig(
     val includeAssetTicker: Boolean = INCLUDE_ASSET_TICKER,
-    val useAbbreviation: Boolean = USE_ABBREVIATION,
+    val useAbbreviation: Boolean = USE_TOKEN_ABBREVIATION,
     val tokenAmountSign: AmountSign = TOKEN_AMOUNT_SIGN,
     val roundingMode: RoundingMode = ROUNDING_MODE,
-    val fractionStylingSize: FractionStylingSize = TOKEN_FRACTION_STYLING_SIZE
+    val fractionPartStyling: FractionPartStyling = TOKEN_FRACTION_STYLING_SIZE
 )
 
 class AmountConfig(
     val includeZeroFiat: Boolean = INCLUDE_ZERO_FIAT,
-    includeAssetTicker: Boolean = INCLUDE_ASSET_TICKER,
-    useAbbreviation: Boolean = USE_ABBREVIATION,
-    tokenAmountSign: AmountSign = TOKEN_AMOUNT_SIGN,
-    roundingMode: RoundingMode = ROUNDING_MODE,
-    estimatedFiat: Boolean = ESTIMATED_FIAT,
-    tokenFractionStylingSize: FractionStylingSize = TOKEN_FRACTION_STYLING_SIZE,
-    fiatFractionStylingSize: FractionStylingSize = TOKEN_FRACTION_STYLING_SIZE,
+    val tokenConfig: TokenConfig = TokenConfig(),
+    val fiatConfig: FiatConfig = FiatConfig()
 ) {
-    val tokenConfig: TokenConfig = TokenConfig(
-        includeAssetTicker = includeAssetTicker,
-        useAbbreviation = useAbbreviation,
-        tokenAmountSign = tokenAmountSign,
-        roundingMode = roundingMode,
-        fractionStylingSize = tokenFractionStylingSize
-    )
 
-    val fiatConfig: FiatConfig = FiatConfig(
-        roundingMode = roundingMode,
-        style = if (useAbbreviation) FiatConfig.Style.DEFAULT else FiatConfig.Style.NO_ABBREVIATION,
-        estimatedFiat = estimatedFiat,
-        fractionStylingSize = fiatFractionStylingSize,
+    constructor(
+        includeZeroFiat: Boolean = INCLUDE_ZERO_FIAT,
+        includeAssetTicker: Boolean = INCLUDE_ASSET_TICKER,
+        useTokenAbbreviation: Boolean = USE_TOKEN_ABBREVIATION,
+        fiatAbbreviation: AbbreviationStyle = FIAT_ABBREVIATION,
+        tokenAmountSign: AmountSign = TOKEN_AMOUNT_SIGN,
+        roundingMode: RoundingMode = ROUNDING_MODE,
+        estimatedFiat: Boolean = ESTIMATED_FIAT,
+        tokenFractionPartStyling: FractionPartStyling = TOKEN_FRACTION_STYLING_SIZE,
+        fiatFractionPartStyling: FractionPartStyling = TOKEN_FRACTION_STYLING_SIZE,
+    ) : this(
+        includeZeroFiat,
+        TokenConfig(
+            includeAssetTicker = includeAssetTicker,
+            useAbbreviation = useTokenAbbreviation,
+            tokenAmountSign = tokenAmountSign,
+            roundingMode = roundingMode,
+            fractionPartStyling = tokenFractionPartStyling
+        ),
+        FiatConfig(
+            roundingMode = roundingMode,
+            abbreviationStyle = fiatAbbreviation,
+            estimatedFiat = estimatedFiat,
+            fractionPartStyling = fiatFractionPartStyling,
+        ),
     )
 }

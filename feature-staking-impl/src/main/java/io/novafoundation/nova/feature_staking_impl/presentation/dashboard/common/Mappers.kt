@@ -87,7 +87,7 @@ class RealStakingDashboardPresentationMapper(
 
         val availableBalance = noStake.stakingState.availableBalance
         val formattedAvailableBalance = if (availableBalance.isPositive()) {
-            val maskableValue = maskableValueFormatter.formatAny<CharSequence> { availableBalance.formatPlanks(noStake.token.configuration) }
+            val maskableValue = maskableValueFormatter.format<CharSequence> { availableBalance.formatPlanks(noStake.token.configuration) }
                 .unfoldHidden {
                     val maskingDrawable = resourceManager.getDrawable(R.drawable.mask_dots_small)
                     SpannableStringBuilder()

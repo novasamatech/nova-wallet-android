@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInt
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
@@ -28,7 +30,8 @@ class AssetReceiveFlowViewModel(
     resourceManager: ResourceManager,
     assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
-    amountFormatter: MaskableValueFormatter
+    networkAssetMapper: NetworkAssetMapper,
+    tokenAssetMapper: TokenAssetMapper
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -39,7 +42,8 @@ class AssetReceiveFlowViewModel(
     resourceManager,
     assetIconProvider,
     assetViewModeInteractor,
-    amountFormatter
+    networkAssetMapper,
+    tokenAssetMapper
 ) {
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
         return interactor.searchReceiveAssetsFlow(query, externalBalancesFlow)

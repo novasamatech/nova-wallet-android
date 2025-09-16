@@ -47,9 +47,12 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.lis
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.list.validation.handleStartSwipeGovValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.view.GovernanceLocksModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.WithAssetSelector
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableToken
@@ -79,7 +82,8 @@ class ReferendaListViewModel(
     private val tinderGovInteractor: TinderGovInteractor,
     private val selectedMetaAccountUseCase: SelectedAccountUseCase,
     private val validationExecutor: ValidationExecutor,
-    private val maskableValueFormatterProvider: MaskableValueFormatterProvider
+    private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
+    private val tokenFormatter: TokenFormatter
 ) : BaseViewModel(),
     WithAssetSelector,
     Validatable by validationExecutor {
@@ -116,8 +120,7 @@ class ReferendaListViewModel(
         .share()
 
     val governanceTotalLocks = referendaListStateFlow
-        .combine(maskableValueFormatterFlow) { referendaState, formatter -> referendaState to formatter }
-        .map { (referendaState, formatter) ->
+        .combine(maskableValueFormatterFlow) { referendaState, formatter ->
             val asset = assetSelectorMixin.selectedAssetFlow.first()
             referendaState.map { mapLocksOverviewToUi(formatter, it.locksOverview, asset) }
         }
@@ -125,8 +128,7 @@ class ReferendaListViewModel(
         .shareWhileSubscribed()
 
     val governanceDelegated = referendaListStateFlow
-        .combine(maskableValueFormatterFlow) { referendaState, formatter -> referendaState to formatter }
-        .map { (referendaState, formatter) ->
+        .combine(maskableValueFormatterFlow) { referendaState, formatter ->
             val asset = assetSelectorMixin.selectedAssetFlow.first()
             referendaState.map { mapDelegatedToUi(formatter, it.delegated, asset) }
         }
@@ -205,15 +207,15 @@ class ReferendaListViewModel(
 
         return GovernanceLocksModel(
             title = resourceManager.getString(R.string.wallet_balance_locked),
-            amount = maskableValueFormatter.formatAmountToAmountModel(locksOverview.locked, asset).maskableToken(),
-            showUnlockableLocks = maskableValueFormatter.formatAny { locksOverview.hasClaimableLocks }.unfoldHidden { false }
+            amount = maskableValueFormatter.format { tokenFormatter.formatToken(locksOverview.locked, asset) },
+            showUnlockableLocks = maskableValueFormatter.format { locksOverview.hasClaimableLocks }.unfoldHidden { false }
         )
     }
 
     private fun mapDelegatedToUi(maskableValueFormatter: MaskableValueFormatter, delegatedState: DelegatedState, asset: Asset): GovernanceLocksModel? {
         return when (delegatedState) {
             is DelegatedState.Delegated -> GovernanceLocksModel(
-                amount = maskableValueFormatter.formatAmountToAmountModel(delegatedState.amount, asset).maskableToken(),
+                amount = maskableValueFormatter.format { tokenFormatter.formatToken(delegatedState.amount, asset) },
                 title = resourceManager.getString(R.string.delegation_your_delegations),
                 showUnlockableLocks = false
             )
@@ -241,7 +243,7 @@ class ReferendaListViewModel(
             if (referendumSummaries.isEmpty()) {
                 null
             } else {
-                maskableValueFormatter.formatAny {
+                maskableValueFormatter.format {
                     resourceManager.getString(R.string.referenda_swipe_gov_banner_chip, referendumSummaries.size)
                 }
             }
@@ -256,7 +258,7 @@ class ReferendaListViewModel(
 
         return ReferendaGroupModel(
             name = resourceManager.getString(nameRes),
-            badge = maskableValueFormatter.formatAny { groupSize.format() }
+            badge = maskableValueFormatter.format { groupSize.format() }
         )
     }
 

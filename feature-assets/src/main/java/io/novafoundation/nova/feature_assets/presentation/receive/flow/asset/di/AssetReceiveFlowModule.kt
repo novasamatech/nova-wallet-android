@@ -17,6 +17,10 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapperFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapperFactory
 import io.novafoundation.nova.feature_assets.presentation.receive.flow.asset.AssetReceiveFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterFactory
@@ -42,7 +46,8 @@ class AssetReceiveFlowModule {
         resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        amountFormatterFactory: MaskableValueFormatterFactory
+        networkAssetMapper: NetworkAssetMapper,
+        tokenAssetMapper: TokenAssetMapper
     ): ViewModel {
         return AssetReceiveFlowViewModel(
             interactorFactory = interactorFactory,
@@ -54,7 +59,8 @@ class AssetReceiveFlowModule {
             resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
-            amountFormatter = amountFormatterFactory.create(MaskingMode.DISABLED) // For assets flow MaskingMode is always disabled
+            networkAssetMapper = networkAssetMapper,
+            tokenAssetMapper = tokenAssetMapper
         )
     }
 }

@@ -312,7 +312,7 @@ class RealReferendumFormatter(
             number = formatId(referendum.id),
             voting = referendum.voting?.let { formatVoting(it, referendum.threshold, token) },
             yourVote = referendum.referendumVote?.let {
-                maskableValueFormatter.formatAny { mapReferendumVoteToUi(it, token.configuration, chain) }
+                maskableValueFormatter.format { mapReferendumVoteToUi(it, token.configuration, chain) }
             },
             isOngoing = referendum.status.isOngoing()
         )
