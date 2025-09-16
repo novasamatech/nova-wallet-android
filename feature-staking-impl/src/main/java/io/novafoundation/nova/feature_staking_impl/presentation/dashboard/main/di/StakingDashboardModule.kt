@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakin
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.maskable.MaskableValueFormatterProvider
 
 @Module(includes = [ViewModelModule::class, ComponentsModule::class])
@@ -37,7 +38,8 @@ class StakingDashboardModule {
         stakingSharedState: StakingSharedState,
         presentationMapperFactory: StakingDashboardPresentationMapperFactory,
         startMultiStakingRouter: StartMultiStakingRouter,
-        valueFormatterProvider: MaskableValueFormatterProvider
+        valueFormatterProvider: MaskableValueFormatterProvider,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
@@ -49,7 +51,8 @@ class StakingDashboardModule {
             stakingSharedState = stakingSharedState,
             presentationMapperFactory = presentationMapperFactory,
             startMultiStakingRouter = startMultiStakingRouter,
-            maskableValueFormatterProvider = valueFormatterProvider
+            maskableValueFormatterProvider = valueFormatterProvider,
+            amountFormatter = amountFormatter
         )
     }
 
