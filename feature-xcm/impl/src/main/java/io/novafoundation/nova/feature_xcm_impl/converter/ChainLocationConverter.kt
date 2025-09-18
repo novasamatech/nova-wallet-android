@@ -24,7 +24,9 @@ interface ChainLocationConverter {
         consensusRoot: Chain,
     ): Chain?
 
-    suspend fun locationFromChain(chainId: ChainId): AbsoluteMultiLocation
+    suspend fun absoluteLocationFromChain(
+        chainId: ChainId
+    ): AbsoluteMultiLocation
 }
 
 class RealChainLocationConverter(
@@ -41,7 +43,7 @@ class RealChainLocationConverter(
         pointOfView: Chain,
     ): Chain? {
         val consensusRoot = getConsensusRoot(pointOfView)
-        val povAbsoluteLocation = locationFromChain(pointOfView.id)
+        val povAbsoluteLocation = absoluteLocationFromChain(pointOfView.id)
 
         val absoluteLocation = location.absoluteLocationViewingFrom(povAbsoluteLocation)
 
@@ -66,7 +68,7 @@ class RealChainLocationConverter(
         }
     }
 
-    override suspend fun locationFromChain(chainId: ChainId): AbsoluteMultiLocation {
+    override suspend fun absoluteLocationFromChain(chainId: ChainId): AbsoluteMultiLocation {
         val parachainId = paraIdByChain[chainId]
 
         return if (parachainId != null) {

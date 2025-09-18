@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocatio
 import io.novafoundation.nova.runtime.ext.findAssetByNormalizedSymbol
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.normalizeSymbol
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
@@ -17,10 +18,15 @@ interface ChainAssetLocationConverter {
         pointOfView: Chain,
     ): Chain.Asset?
 
-    suspend fun locationFromChainAsset(
+    suspend fun absoluteLocationFromChainAsset(
         chainAsset: Chain.Asset
     ): AbsoluteMultiLocation?
+
+    suspend fun relativeLocationFromChainAsset(
+        chainAsset: Chain.Asset
+    ): RelativeMultiLocation?
 }
+
 
 class RealChainAssetLocationConverter(
     // Fetched from configs, see https://github.com/novasamatech/nova-utils/blob/f7623740462f406bee58f58f05ecda0ba21af495/xcm/v8/transfers_dynamic.json#L2
@@ -33,7 +39,8 @@ class RealChainAssetLocationConverter(
     private val assetToReserveIdOverrides: Map<FullChainAssetId, ChainAssetReserveId>,
 
     private val chainLocationConverter: ChainLocationConverter,
-): ChainAssetLocationConverter {
+    private val chainRegistry: ChainRegistry,
+) : ChainAssetLocationConverter {
 
     private val reserveIdsByLocation = reservesById.entries.groupBy(
         keySelector = { (_, reserve) -> reserve.reserveLocation },
@@ -50,17 +57,22 @@ class RealChainAssetLocationConverter(
         location: RelativeMultiLocation,
         pointOfView: Chain
     ): Chain.Asset? {
-        val povLocation = chainLocationConverter.locationFromChain(pointOfView.id)
+        val povLocation = chainLocationConverter.absoluteLocationFromChain(pointOfView.id)
         val assetAbsoluteLocation = location.absoluteLocationViewingFrom(povLocation)
 
         return findAssetFromReserveLocation(assetAbsoluteLocation, pointOfView)
     }
 
-    override suspend fun locationFromChainAsset(chainAsset: Chain.Asset): AbsoluteMultiLocation? {
+    override suspend fun absoluteLocationFromChainAsset(chainAsset: Chain.Asset): AbsoluteMultiLocation? {
         val reserveId = getReserveId(chainAsset)
         return reservesById[reserveId]?.reserveLocation
     }
 
+    override suspend fun relativeLocationFromChainAsset(chainAsset: Chain.Asset): RelativeMultiLocation? {
+        val chainLocation = chainLocationConverter.absoluteLocationFromChain(chainAsset.chainId)
+        val absoluteAssetLocation = absoluteLocationFromChainAsset(chainAsset)
+        return absoluteAssetLocation?.fromPointOfViewOf(chainLocation)
+    }
 
     private fun findAssetFromReserveLocation(
         reserveLocation: AbsoluteMultiLocation,
