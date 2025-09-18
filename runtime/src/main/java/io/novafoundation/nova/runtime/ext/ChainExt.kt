@@ -187,6 +187,11 @@ fun Chain.Asset.StakingType.isDirectStaking(): Boolean {
     }
 }
 
+fun Chain.findAssetByNormalizedSymbol(symbol: TokenSymbol): Chain.Asset {
+    val normalized = symbol.normalize()
+    return assets.find { it.symbol.normalize() == normalized }
+}
+
 fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
     return group() == StakingTypeGroup.NOMINATION_POOL
 }
