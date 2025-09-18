@@ -5,19 +5,19 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 sealed interface MaskableModel<out T> {
-    class Hidden<T> : MaskableModel<T>
-    class Unmasked<T>(val value: T) : MaskableModel<T>
+    data object Hidden : MaskableModel<Nothing>
+    data class Unmasked<T>(val value: T) : MaskableModel<T>
 }
 
 fun <T> MaskingMode.toMaskableModel(valueReceiver: () -> T): MaskableModel<T> {
     return when (this) {
-        MaskingMode.ENABLED -> MaskableModel.Hidden()
+        MaskingMode.ENABLED -> MaskableModel.Hidden
         MaskingMode.DISABLED -> MaskableModel.Unmasked(valueReceiver())
     }
 }
 
 fun <T, R> MaskableModel<T>.map(mapper: (T) -> R): MaskableModel<R> = when (this) {
-    is MaskableModel.Hidden -> MaskableModel.Hidden()
+    is MaskableModel.Hidden -> MaskableModel.Hidden
     is MaskableModel.Unmasked -> MaskableModel.Unmasked(mapper(value))
 }
 
