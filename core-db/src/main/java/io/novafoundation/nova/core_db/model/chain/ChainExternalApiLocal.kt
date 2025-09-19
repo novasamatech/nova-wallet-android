@@ -38,7 +38,7 @@ data class ChainExternalApiLocal(
         TRANSFERS, STAKING, CROWDLOANS,
         GOVERNANCE_REFERENDA, GOVERNANCE_DELEGATIONS,
         REFERENDUM_SUMMARY,
-        MULTISIG,
+
         UNKNOWN
     }
 

@@ -29,6 +29,8 @@ data class ChainLocal(
     val hasCrowdloans: Boolean,
     @ColumnInfo(defaultValue = "0")
     val supportProxy: Boolean,
+    @ColumnInfo(defaultValue = "0")
+    val multisigSupport: Boolean,
     val swap: String,
     val customFee: String,
     val governance: String,
