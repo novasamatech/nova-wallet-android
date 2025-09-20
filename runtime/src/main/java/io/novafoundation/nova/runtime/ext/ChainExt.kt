@@ -296,6 +296,10 @@ fun String.toAccountIdKey(chain: Chain): AccountIdKey {
     return chain.accountIdKeyOf(this)
 }
 
+fun String.toSubstrateAccountIdKey(): AccountIdKey {
+    return toAccountId().intoKey()
+}
+
 fun Chain.accountIdKeyOf(address: String): AccountIdKey {
     return accountIdOf(address).intoKey()
 }

@@ -14,6 +14,10 @@ interface DelegatedMetaAccountUpdatesListingMixin : MetaAccountListingMixin {
 
         data object Derivative : FilterType
 
+        // TODO derivative
+        // Generalize this to support any subset of filters
+        // FilterType should just be Proxied|Multisig|Derivative
+        // Selection capabilities should be represented by a separate model
         class UserIgnored(val overriddenFilter: FilterType) : FilterType
     }
 
