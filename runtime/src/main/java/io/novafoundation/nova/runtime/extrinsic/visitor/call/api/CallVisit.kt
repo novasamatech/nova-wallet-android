@@ -42,6 +42,18 @@ interface MultisigCallVisit : CallVisit {
     val nestedCall: GenericCall.Instance
 }
 
+interface DerivativeVisit: CallVisit {
+
+    val derivative: AccountIdKey
+
+    val index: Int
+
+    val parent: AccountIdKey
+        get() = callOrigin
+
+    val nestedCall: GenericCall.Instance
+}
+
 interface ProxyCallVisit : CallVisit {
 
     val proxy: AccountIdKey

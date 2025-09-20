@@ -22,7 +22,7 @@ internal class MultisigCallNode : NestedCallVisitNode {
     override fun visit(call: GenericCall.Instance, context: CallVisitingContext) {
         context.logger.info("Visiting multisig")
 
-        val innerOriginInfo = extractMultisigOriginInfo(call, context.origin)
+        val innerOriginInfo = extractMultisigOriginInfo(call)
         val innerCall = extractInnerMultisigCall(call)
 
         val multisigVisit = RealMultisigCallVisit(
@@ -41,7 +41,7 @@ internal class MultisigCallNode : NestedCallVisitNode {
         return bindGenericCall(multisigCall.arguments["call"])
     }
 
-    private fun extractMultisigOriginInfo(call: GenericCall.Instance, parentOrigin: AccountIdKey): MultisigOriginInfo {
+    private fun extractMultisigOriginInfo(call: GenericCall.Instance): MultisigOriginInfo {
         val threshold = bindInt(call.arguments["threshold"])
         val otherSignatories = bindList(call.arguments["other_signatories"], ::bindAccountIdKey)
 

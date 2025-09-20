@@ -1,9 +1,8 @@
 package io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.impl.nodes.multisig
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.address.fromEntropy
 import io.novafoundation.nova.common.utils.compareTo
-import io.novafoundation.nova.common.utils.padEnd
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.definitions.types.useScaleWriter
 import io.novasama.substrate_sdk_android.scale.utils.directWrite
@@ -35,11 +34,5 @@ fun generateMultisigAddress(
         writeUint16(threshold)
     }.blake2b256()
 
-    val result = when {
-        entropy.size == accountIdSize -> entropy
-        entropy.size < accountIdSize -> entropy.padEnd(accountIdSize, 0)
-        else -> entropy.copyOf(accountIdSize)
-    }
-
-    return result.intoKey()
+    return AccountIdKey.fromEntropy(entropy, accountIdSize)
 }

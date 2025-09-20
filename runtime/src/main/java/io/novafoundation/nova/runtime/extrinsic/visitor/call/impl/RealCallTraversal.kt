@@ -10,6 +10,7 @@ import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.LeafCallVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.impl.nodes.batch.BatchAllCallNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.impl.nodes.batch.BatchCallNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.impl.nodes.batch.ForceBatchCallNode
+import io.novafoundation.nova.runtime.extrinsic.visitor.call.impl.nodes.derivative.DerivativeCallNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.impl.nodes.multisig.MultisigCallNode
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.impl.nodes.proxy.ProxyCallNode
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -25,6 +26,8 @@ internal class RealCallTraversal(
             BatchCallNode(),
             BatchAllCallNode(),
             ForceBatchCallNode(),
+
+            DerivativeCallNode(),
 
             ProxyCallNode(),
 

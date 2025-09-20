@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.address
 
 import io.novafoundation.nova.common.utils.HexString
+import io.novafoundation.nova.common.utils.padEnd
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -38,6 +39,14 @@ fun AccountIdKey.Companion.fromHexOrNull(src: HexString): AccountIdKey? {
 
 fun AccountIdKey.Companion.fromHexOrThrow(src: HexString): AccountIdKey {
     return fromHex(src).getOrThrow()
+}
+
+fun AccountIdKey.Companion.fromEntropy(entropy: ByteArray, size: Int): AccountIdKey {
+    return when {
+        entropy.size == size -> entropy
+        entropy.size < size -> entropy.padEnd(size, 0)
+        else -> entropy.copyOf(size)
+    }.intoKey()
 }
 
 operator fun <T> Map<AccountIdKey, T>.get(key: AccountId) = get(AccountIdKey(key))
