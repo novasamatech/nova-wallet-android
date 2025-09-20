@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @FeatureScope
 class RealMultisigCallFormatter @Inject constructor(
-    private val delegates: Set<@JvmSuppressWildcards MultisigActionFormatterDelegate>,
+    private val delegates: List<@JvmSuppressWildcards MultisigActionFormatterDelegate>,
     private val resourceManager: ResourceManager,
     private val callTraversal: CallTraversal,
     @LocalIdentity private val identityProvider: IdentityProvider,
