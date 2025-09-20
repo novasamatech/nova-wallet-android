@@ -60,7 +60,8 @@ interface LightMetaAccount {
         LEDGER,
         POLKADOT_VAULT,
         PROXIED,
-        MULTISIG
+        MULTISIG,
+        DERIVATIVE
     }
 
     enum class Status {
@@ -144,24 +145,35 @@ interface MultisigMetaAccount : MetaAccount {
 
     val threshold: Int
 
-    val availability: MultisigAvailability
+    val availability: MetaAccountAvailability
 }
 
-sealed class MultisigAvailability {
+interface DerivativeMetaAccount : MetaAccount {
 
-    class Universal(val addressScheme: AddressScheme) : MultisigAvailability()
+    override val parentMetaId: Long
 
-    class SingleChain(val chainId: ChainId) : MultisigAvailability()
+    val parentAccountId: AccountIdKey
+
+    val index: Int
+
+    val availability: MetaAccountAvailability
+}
+
+sealed class MetaAccountAvailability {
+
+    class Universal(val addressScheme: AddressScheme) : MetaAccountAvailability()
+
+    class SingleChain(val chainId: ChainId) : MetaAccountAvailability()
 }
 
 fun MetaAccount.isUniversal(): Boolean {
     return substrateAccountId != null || ethereumAddress != null
 }
 
-fun MultisigAvailability.singleChainId(): ChainId? {
+fun MetaAccountAvailability.singleChainId(): ChainId? {
     return when (this) {
-        is MultisigAvailability.SingleChain -> chainId
-        is MultisigAvailability.Universal -> null
+        is MetaAccountAvailability.SingleChain -> chainId
+        is MetaAccountAvailability.Universal -> null
     }
 }
 
@@ -250,6 +262,7 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
         LightMetaAccount.Type.LEDGER,
         LightMetaAccount.Type.POLKADOT_VAULT -> true
 
+        LightMetaAccount.Type.DERIVATIVE,
         LightMetaAccount.Type.PROXIED,
         LightMetaAccount.Type.MULTISIG -> false
     }
@@ -276,7 +289,8 @@ fun LightMetaAccount.isMultisig(): Boolean {
 fun LightMetaAccount.asProxied(): ProxiedMetaAccount = this as ProxiedMetaAccount
 fun LightMetaAccount.asMultisig(): MultisigMetaAccount = this as MultisigMetaAccount
 
-fun MultisigMetaAccount.signatoriesCount() = 1 + otherSignatories.size
+fun LightMetaAccount.asDerivative(): DerivativeMetaAccount = this as DerivativeMetaAccount
+
 
 fun MultisigMetaAccount.allSignatories() = buildSet {
     add(signatoryAccountId)

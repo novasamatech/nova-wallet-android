@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.utils.compareTo
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.MultisigAvailability
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAvailability
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -49,11 +49,11 @@ class RealMultisigMetaAccount(
         otherSignatoriesUnsorted.sortedWith { a, b -> a.value.compareTo(b.value, unsigned = true) }
     }
 
-    override val availability: MultisigAvailability
+    override val availability: MetaAccountAvailability
         get() = if (chainAccounts.isEmpty()) {
-            MultisigAvailability.Universal(addressScheme())
+            MetaAccountAvailability.Universal(addressScheme())
         } else {
-            MultisigAvailability.SingleChain(chainAccounts.keys.first())
+            MetaAccountAvailability.SingleChain(chainAccounts.keys.first())
         }
 
     override suspend fun supportsAddingChainAccount(chain: Chain): Boolean {
@@ -78,11 +78,7 @@ class RealMultisigMetaAccount(
     }
 
     override fun publicKeyIn(chain: Chain): ByteArray? {
-        return if (isSupported(chain)) {
-            super.publicKeyIn(chain)
-        } else {
-            null
-        }
+        return null
     }
 
     private fun isSupported(chain: Chain): Boolean {

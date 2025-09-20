@@ -43,6 +43,15 @@ sealed interface MetaAccountListingItem {
         override val hasUpdates: Boolean
     ) : MetaAccountListingItem
 
+    class Derivative(
+        val parent: MetaAccount,
+        val singleChain: Chain?, // null in case multisig is universal
+        override val totalBalance: BigDecimal,
+        override val currency: Currency,
+        override val metaAccount: DerivativeMetaAccount,
+        override val hasUpdates: Boolean
+    ): MetaAccountListingItem
+
     class TotalBalance(
         override val totalBalance: BigDecimal,
         override val currency: Currency,

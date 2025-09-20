@@ -9,10 +9,10 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.details.ChainAccountActionsSheet.AccountAction
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.details.WalletDetailsInteractor
-import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.AccountFormatterFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.baseAccountTitleFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.details.mixin.common.hasAccountComparator
@@ -36,7 +36,8 @@ class ProxiedWalletDetailsMixin(
         val proxyAccount = metaAccount.proxy
         val proxyMetaAccount = interactor.getMetaAccount(proxyAccount.proxyMetaId)
 
-        val proxyAccountWithIcon = proxyFormatter.mapProxyMetaAccount(proxyMetaAccount.name, proxyFormatter.makeAccountDrawable(proxyMetaAccount))
+        val proxyAccountWithIcon = proxyFormatter.formatProxyMetaAccount(proxyMetaAccount)
+
         AlertModel(
             style = AlertView.Style(
                 backgroundColorRes = R.color.block_background,

@@ -18,7 +18,7 @@ import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
-import io.novafoundation.nova.feature_account_api.domain.model.MultisigAvailability
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAvailability
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.allSignatories
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
@@ -99,7 +99,7 @@ class MultisigWalletDetailsMixin(
 
     private suspend fun getAccountFormat(metaAccount: MultisigMetaAccount, accountIdKey: AccountIdKey): CharSequence {
         val addressFormat = getAddressFormat(metaAccount)
-        val accountDrawable = multisigFormatter.makeAccountDrawable(accountIdKey.value)
+        val accountDrawable = multisigFormatter.makeSignatoryDrawable(accountIdKey)
         val accountAddress = addressFormat.addressOf(accountIdKey.value.asAccountId())
             .value
             .ellipsizeAddress()
@@ -124,8 +124,8 @@ class MultisigWalletDetailsMixin(
 
     private fun showAddress(metaAccount: MultisigMetaAccount, accountIdKey: AccountIdKey, addressFormat: AddressFormat) = launchUnit {
         when (val availability = metaAccount.availability) {
-            is MultisigAvailability.Universal -> host.addressActionsMixin.showAddressActions(accountIdKey.value, addressFormat)
-            is MultisigAvailability.SingleChain -> {
+            is MetaAccountAvailability.Universal -> host.addressActionsMixin.showAddressActions(accountIdKey.value, addressFormat)
+            is MetaAccountAvailability.SingleChain -> {
                 val chain = chainRegistry.getChain(availability.chainId)
                 host.externalActions.showAddressActions(accountIdKey.value, chain)
             }
@@ -134,9 +134,9 @@ class MultisigWalletDetailsMixin(
 
     private suspend fun getAddressFormat(metaAccount: MultisigMetaAccount): AddressFormat {
         return when (val availability = metaAccount.availability) {
-            is MultisigAvailability.Universal -> AddressFormat.defaultForScheme(availability.addressScheme)
+            is MetaAccountAvailability.Universal -> AddressFormat.defaultForScheme(availability.addressScheme)
 
-            is MultisigAvailability.SingleChain -> {
+            is MetaAccountAvailability.SingleChain -> {
                 val chain = chainRegistry.getChain(availability.chainId)
                 AddressFormat.forChain(chain)
             }

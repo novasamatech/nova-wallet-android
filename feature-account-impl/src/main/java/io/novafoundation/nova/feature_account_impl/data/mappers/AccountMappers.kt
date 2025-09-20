@@ -2,29 +2,36 @@ package io.novafoundation.nova.feature_account_impl.data.mappers
 
 import android.util.Log
 import com.google.gson.Gson
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.filterNotNull
 import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.DerivativeAccountTypeExtras
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MultisigTypeExtras
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_impl.data.derivative.DerivativeAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.domain.account.model.DefaultMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.GenericLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.LegacyLedgerMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.PolkadotVaultMetaAccount
+import io.novafoundation.nova.feature_account_impl.domain.account.model.RealDerivativeMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.RealMultisigMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.RealProxiedMetaAccount
 import io.novafoundation.nova.feature_account_impl.domain.account.model.RealSecretsMetaAccount
 import io.novafoundation.nova.feature_ledger_core.domain.LedgerMigrationTracker
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import javax.inject.Inject
 
-class AccountMappers(
+@FeatureScope
+class AccountMappers @Inject constructor(
     private val ledgerMigrationTracker: LedgerMigrationTracker,
     private val gson: Gson,
-    private val multisigRepository: MultisigRepository
+    private val multisigRepository: MultisigRepository,
+    private val derivativeAccountRepository: DerivativeAccountRepository,
 ) {
 
     suspend fun mapMetaAccountsLocalToMetaAccounts(joinedMetaAccountInfo: List<JoinedMetaAccountInfo>): List<MetaAccount> {
@@ -161,7 +168,8 @@ class AccountMappers(
                 }
 
                 LightMetaAccount.Type.MULTISIG -> {
-                    val multisigTypeExtras = gson.fromJson<MultisigTypeExtras>(requireNotNull(typeExtras) { "typeExtras is null: $id" })
+                    val typeExtras = requireNotNull(this.typeExtras) { "typeExtras is null: $id" }
+                    val multisigTypeExtras = gson.fromJson<MultisigTypeExtras>(typeExtras)
 
                     RealMultisigMetaAccount(
                         id = id,
@@ -181,6 +189,27 @@ class AccountMappers(
                         multisigRepository = multisigRepository
                     )
                 }
+
+                LightMetaAccount.Type.DERIVATIVE -> {
+                    val typeExtras = requireNotNull(this.typeExtras) { "typeExtras is null: $id" }
+                    val derivativeTypeExtras = gson.fromJson<DerivativeAccountTypeExtras>(typeExtras)
+
+                    RealDerivativeMetaAccount(
+                        id = id,
+                        globallyUniqueId = globallyUniqueId,
+                        substrateAccountId = substrateAccountId,
+                        ethereumAddress = ethereumAddress,
+                        ethereumPublicKey = ethereumPublicKey,
+                        chainAccounts = chainAccounts,
+                        isSelected = isSelected,
+                        name = name,
+                        status = mapMetaAccountStateFromLocal(status),
+                        parentAccountId = derivativeTypeExtras.parentAccountId,
+                        index = derivativeTypeExtras.index,
+                        parentMetaId = requireNotNull(parentMetaId) { "parentMetaId is null: $id" },
+                        derivativeAccountRepository = derivativeAccountRepository
+                    )
+                }
             }
         }
     }
@@ -195,6 +224,7 @@ class AccountMappers(
             MetaAccountLocal.Type.POLKADOT_VAULT -> LightMetaAccount.Type.POLKADOT_VAULT
             MetaAccountLocal.Type.PROXIED -> LightMetaAccount.Type.PROXIED
             MetaAccountLocal.Type.MULTISIG -> LightMetaAccount.Type.MULTISIG
+            MetaAccountLocal.Type.DERIVATIVE -> LightMetaAccount.Type.DERIVATIVE
         }
     }
 

@@ -30,10 +30,12 @@ class DelegatedAccountUpdatesBottomSheet : BaseBottomSheetFragment<DelegatedAcco
 
         binder.delegatedAccountUpdatesMode.createTab(R.string.account_proxied)
         binder.delegatedAccountUpdatesMode.createTab(R.string.account_multisig)
+        binder.delegatedAccountUpdatesMode.createTab(R.string.account_derivative)
         binder.delegatedAccountUpdatesMode.setTabSelectedListener {
             when (it.position) {
                 0 -> viewModel.showProxieds()
                 1 -> viewModel.showMultisig()
+                2 -> viewModel.showDerivatives()
             }
         }
     }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.domain.manualBackup
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.DERIVATIVE
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER_LEGACY
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG
@@ -41,6 +42,7 @@ class RealManualBackupSelectWalletInteractor(
             LEDGER_LEGACY,
             POLKADOT_VAULT,
             MULTISIG,
+            DERIVATIVE,
             PROXIED -> false
         }
     }

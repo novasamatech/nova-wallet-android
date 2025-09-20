@@ -11,6 +11,9 @@ interface DelegatedMetaAccountUpdatesListingMixin : MetaAccountListingMixin {
     sealed interface FilterType {
         data object Proxied : FilterType
         data object Multisig : FilterType
+
+        data object Derivative : FilterType
+
         class UserIgnored(val overriddenFilter: FilterType) : FilterType
     }
 
@@ -22,5 +25,6 @@ interface DelegatedMetaAccountUpdatesListingMixin : MetaAccountListingMixin {
 fun FilterType.filter(account: MetaAccount): Boolean = when (this) {
     FilterType.Proxied -> account.type == LightMetaAccount.Type.PROXIED
     FilterType.Multisig -> account.type == LightMetaAccount.Type.MULTISIG
+    FilterType.Derivative -> account.type == LightMetaAccount.Type.DERIVATIVE
     is FilterType.UserIgnored -> overriddenFilter.filter(account)
 }

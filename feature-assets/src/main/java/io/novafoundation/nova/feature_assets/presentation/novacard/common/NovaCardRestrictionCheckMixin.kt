@@ -6,9 +6,11 @@ import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLa
 import io.novafoundation.nova.common.view.bottomSheet.action.ButtonPreferences
 import io.novafoundation.nova.common.view.bottomSheet.action.primary
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.DerivativeMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.asDerivative
 import io.novafoundation.nova.feature_account_api.domain.model.asMultisig
 import io.novafoundation.nova.feature_account_api.domain.model.asProxied
 import io.novafoundation.nova.feature_account_api.domain.model.isMultisig
@@ -35,6 +37,7 @@ class NovaCardRestrictionCheckMixin(
         return when (selectedAccount.type) {
             LightMetaAccount.Type.PROXIED -> selectedAccount.asProxied().isRestricted(availableChain)
             LightMetaAccount.Type.MULTISIG -> selectedAccount.asMultisig().isRestricted(availableChain)
+            LightMetaAccount.Type.DERIVATIVE -> selectedAccount.asDerivative().isRestricted(availableChain)
 
             LightMetaAccount.Type.SECRETS,
             LightMetaAccount.Type.WATCH_ONLY,
@@ -64,6 +67,11 @@ class NovaCardRestrictionCheckMixin(
     }
 
     private fun ProxiedMetaAccount.isRestricted(availableChain: Chain): Boolean {
+        val isAllowed = hasAccountIn(availableChain)
+        return !isAllowed
+    }
+
+    private fun DerivativeMetaAccount.isRestricted(availableChain: Chain): Boolean {
         val isAllowed = hasAccountIn(availableChain)
         return !isAllowed
     }

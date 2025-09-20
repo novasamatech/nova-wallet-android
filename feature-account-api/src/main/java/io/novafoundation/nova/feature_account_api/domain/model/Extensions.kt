@@ -9,6 +9,7 @@ fun metaAccountTypeComparator() = compareBy<LightMetaAccount.Type> {
         LightMetaAccount.Type.LEDGER_LEGACY -> 4
         LightMetaAccount.Type.PROXIED -> 5
         LightMetaAccount.Type.MULTISIG -> 6
-        LightMetaAccount.Type.WATCH_ONLY -> 7
+        LightMetaAccount.Type.DERIVATIVE -> 7
+        LightMetaAccount.Type.WATCH_ONLY -> 8
     }
 }

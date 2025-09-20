@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.validation.ValidationSystemBuilder
 import io.novafoundation.nova.common.validation.validationError
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.DERIVATIVE
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.LEDGER_LEGACY
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG
@@ -41,6 +42,8 @@ interface NoChainAccountFoundError {
         object ProxyAccountNotSupported : AddAccountState()
 
         object MultisigNotSupported : AddAccountState()
+
+        object DerivativeNotSupported : AddAccountState()
     }
 }
 
@@ -62,7 +65,8 @@ class HasChainAccountValidation<P, E>(
             else -> when (account.type) {
                 LEDGER_LEGACY, LEDGER -> errorProducer(chain, account, AddAccountState.LedgerNotSupported).validationError()
                 PROXIED -> errorProducer(chain, account, AddAccountState.ProxyAccountNotSupported).validationError()
-                MULTISIG -> errorProducer(chain, account, AddAccountState.ProxyAccountNotSupported).validationError()
+                MULTISIG -> errorProducer(chain, account, AddAccountState.MultisigNotSupported).validationError()
+                DERIVATIVE -> errorProducer(chain, account, AddAccountState.DerivativeNotSupported).validationError()
                 POLKADOT_VAULT, PARITY_SIGNER -> {
                     val variant = account.type.asPolkadotVaultVariantOrThrow()
                     errorProducer(chain, account, AddAccountState.PolkadotVaultNotSupported(variant)).validationError()
@@ -118,7 +122,8 @@ fun handleChainAccountNotFound(
         }
 
         AddAccountState.ProxyAccountNotSupported,
-        AddAccountState.MultisigNotSupported -> TransformedFailure.Default(
+        AddAccountState.MultisigNotSupported,
+        AddAccountState.DerivativeNotSupported -> TransformedFailure.Default(
             resourceManager.getString(R.string.common_network_not_supported, chainName) to null
         )
     }

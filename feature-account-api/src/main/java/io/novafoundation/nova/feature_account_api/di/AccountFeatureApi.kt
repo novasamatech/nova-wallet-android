@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.DerivativeFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
@@ -124,6 +125,8 @@ interface AccountFeatureApi {
     val multisigFormatter: MultisigFormatter
 
     val proxyFormatter: ProxyFormatter
+
+    val derivativeFormatter: DerivativeFormatter
 
     val accountUIUseCase: AccountUIUseCase
 

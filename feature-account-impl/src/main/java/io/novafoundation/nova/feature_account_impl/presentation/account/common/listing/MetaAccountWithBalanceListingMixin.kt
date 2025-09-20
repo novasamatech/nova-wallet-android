@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing
 
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.images.Icon
@@ -9,22 +10,26 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountListingItem
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.DerivativeFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
-import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
-import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import javax.inject.Inject
 
-class MetaAccountWithBalanceListingMixinFactory(
+@FeatureScope
+class MetaAccountWithBalanceListingMixinFactory @Inject constructor(
     private val walletUiUseCase: WalletUiUseCase,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     private val multisigFormatter: MultisigFormatter,
     private val proxyFormatter: ProxyFormatter,
+    private val derivativeFormatter: DerivativeFormatter,
 ) {
 
     fun create(
@@ -40,7 +45,8 @@ class MetaAccountWithBalanceListingMixinFactory(
             accountTypePresentationMapper = accountTypePresentationMapper,
             proxyFormatter = proxyFormatter,
             showUpdatedMetaAccountsBadge = showUpdatedMetaAccountsBadge,
-            multisigFormatter = multisigFormatter
+            multisigFormatter = multisigFormatter,
+            derivativeFormatter = derivativeFormatter
         )
     }
 }
@@ -52,6 +58,7 @@ private class MetaAccountWithBalanceListingMixin(
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     private val proxyFormatter: ProxyFormatter,
     private val multisigFormatter: MultisigFormatter,
+    private val derivativeFormatter: DerivativeFormatter,
     private val showUpdatedMetaAccountsBadge: Boolean,
     coroutineScope: CoroutineScope,
 ) : MetaAccountListingMixin, CoroutineScope by coroutineScope {
@@ -89,6 +96,8 @@ private class MetaAccountWithBalanceListingMixin(
 
             is MetaAccountListingItem.Multisig -> singleChain?.iconOrFallback()
 
+            is MetaAccountListingItem.Derivative -> singleChain?.iconOrFallback()
+
             is MetaAccountListingItem.TotalBalance -> null
         }
     }
@@ -97,18 +106,19 @@ private class MetaAccountWithBalanceListingMixin(
         is MetaAccountListingItem.Proxied -> formatSubtitle()
         is MetaAccountListingItem.TotalBalance -> formatSubtitle()
         is MetaAccountListingItem.Multisig -> formatSubtitle()
+        is MetaAccountListingItem.Derivative -> formatSubtitle()
     }
 
     private suspend fun MetaAccountListingItem.Proxied.formatSubtitle(): CharSequence {
-        return proxyFormatter.mapProxyMetaAccountSubtitle(
-            proxyMetaAccount.name,
-            proxyFormatter.makeAccountDrawable(proxyMetaAccount),
-            metaAccount.proxy
-        )
+        return proxyFormatter.formatProxiedMetaAccountSubtitle(proxyMetaAccount, metaAccount.proxy)
     }
 
     private suspend fun MetaAccountListingItem.Multisig.formatSubtitle(): CharSequence {
         return multisigFormatter.formatSignatorySubtitle(signatory)
+    }
+
+    private suspend fun MetaAccountListingItem.Derivative.formatSubtitle(): CharSequence {
+        return derivativeFormatter.formatDeriveAccountSubtitle(metaAccount, parent)
     }
 
     private fun MetaAccountListingItem.TotalBalance.formatSubtitle(): String {
@@ -125,7 +135,8 @@ private class MetaAccountWithBalanceListingMixin(
             LightMetaAccount.Type.POLKADOT_VAULT -> true
 
             LightMetaAccount.Type.PROXIED,
-            LightMetaAccount.Type.MULTISIG -> false
+            LightMetaAccount.Type.MULTISIG,
+            LightMetaAccount.Type.DERIVATIVE -> false
         }
     }
 }

@@ -41,6 +41,7 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.LEDGER_LEGACY -> ledgerSignerFactory.create(metaAccount, LedgerVariant.LEGACY)
             LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount as ProxiedMetaAccount, this, isRoot)
             LightMetaAccount.Type.MULTISIG -> multisigSignerFactory.create(metaAccount as MultisigMetaAccount, this, isRoot)
+            LightMetaAccount.Type.DERIVATIVE -> TODO("Derivative account implementation")
         }
     }
 }

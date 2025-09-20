@@ -56,6 +56,8 @@ class RealMetaAccountTypePresentationMapper(
             LightMetaAccount.Type.PROXIED -> resourceManager.getString(R.string.account_proxieds)
 
             LightMetaAccount.Type.MULTISIG -> resourceManager.getString(R.string.account_multisig_group_label)
+
+            LightMetaAccount.Type.DERIVATIVE -> resourceManager.getString(R.string.account_derivative_group_label)
         }
 
         return if (icon != null && label != null) {
@@ -92,6 +94,9 @@ class RealMetaAccountTypePresentationMapper(
             LightMetaAccount.Type.PROXIED -> R.drawable.ic_proxy.asTintedIcon(canApplyOwnTint = true)
 
             LightMetaAccount.Type.MULTISIG -> R.drawable.ic_multisig.asTintedIcon(canApplyOwnTint = true)
+
+            // TODO derivative real icon
+            LightMetaAccount.Type.DERIVATIVE -> R.drawable.ic_proxy.asTintedIcon(canApplyOwnTint = true)
         }
     }
 }

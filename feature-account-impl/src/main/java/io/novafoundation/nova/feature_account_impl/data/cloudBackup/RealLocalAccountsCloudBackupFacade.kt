@@ -373,7 +373,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
             MetaAccountLocal.Type.PROXIED,
-            MetaAccountLocal.Type.MULTISIG -> baseSecrets.getSubstrateBackupSecrets()
+            MetaAccountLocal.Type.MULTISIG,
+            MetaAccountLocal.Type.DERIVATIVE -> baseSecrets.getSubstrateBackupSecrets()
         }
     }
 
@@ -400,7 +401,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
             MetaAccountLocal.Type.PROXIED,
-            MetaAccountLocal.Type.MULTISIG -> emptyList()
+            MetaAccountLocal.Type.MULTISIG,
+            MetaAccountLocal.Type.DERIVATIVE -> emptyList()
         }
     }
 
@@ -580,7 +582,9 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.LEDGER_GENERIC -> CloudBackup.WalletPublicInfo.Type.LEDGER_GENERIC
             MetaAccountLocal.Type.POLKADOT_VAULT -> CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT
 
-            MetaAccountLocal.Type.PROXIED, MetaAccountLocal.Type.MULTISIG -> null
+            MetaAccountLocal.Type.PROXIED,
+            MetaAccountLocal.Type.MULTISIG,
+            MetaAccountLocal.Type.DERIVATIVE -> null
         }
     }
 

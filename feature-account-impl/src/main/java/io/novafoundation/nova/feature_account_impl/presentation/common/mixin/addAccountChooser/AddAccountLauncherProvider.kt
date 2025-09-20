@@ -77,6 +77,7 @@ class AddAccountLauncherProvider(
             LightMetaAccount.Type.POLKADOT_VAULT,
             LightMetaAccount.Type.LEDGER,
             LightMetaAccount.Type.MULTISIG,
+            LightMetaAccount.Type.DERIVATIVE,
             LightMetaAccount.Type.PROXIED -> Unit
         }
     }

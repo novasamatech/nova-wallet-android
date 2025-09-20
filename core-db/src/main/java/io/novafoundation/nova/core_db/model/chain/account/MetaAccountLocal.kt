@@ -144,7 +144,8 @@ class MetaAccountLocal(
         LEDGER_GENERIC,
         POLKADOT_VAULT,
         PROXIED,
-        MULTISIG
+        MULTISIG,
+        DERIVATIVE
     }
 }
 

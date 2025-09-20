@@ -7,11 +7,11 @@ import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 
 interface ProxyFormatter {
 
-    fun mapProxyMetaAccountSubtitle(proxyAccountName: String, proxyAccountIcon: Drawable, proxyAccount: ProxyAccount): CharSequence
+    suspend fun formatProxiedMetaAccountSubtitle(proxy: MetaAccount, proxyAccount: ProxyAccount): CharSequence
 
-    fun mapProxyMetaAccount(proxyAccountName: String, proxyAccountIcon: Drawable): CharSequence
+    suspend fun formatProxyMetaAccount(proxy: MetaAccount): CharSequence
 
     fun mapProxyTypeToString(type: ProxyType): String
 
-    suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable
+    suspend fun makeProxyDrawable(proxy: MetaAccount): Drawable
 }

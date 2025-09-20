@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="derivative_subtitle">Child #%d of</string>
+
+    <string name="account_derivative_group_label">derivative accounts (children)</string>
+    <string name="active_derivative_title">Derivative accounts</string>
+    <string name="account_derivative">Derivative</string>
 
     <string name="mutisigs_push_notifications_warning_enable">Enable in Settings</string>
 

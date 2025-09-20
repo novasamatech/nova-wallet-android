@@ -81,7 +81,6 @@ import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicS
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicSplitter
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
-import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigDetailsRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.repository.RealMultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
@@ -103,6 +102,7 @@ import io.novafoundation.nova.feature_account_impl.di.AccountFeatureModule.Binds
 import io.novafoundation.nova.feature_account_impl.di.modules.AdvancedEncryptionStoreModule
 import io.novafoundation.nova.feature_account_impl.di.modules.CloudBackupModule
 import io.novafoundation.nova.feature_account_impl.di.modules.CustomFeeModule
+import io.novafoundation.nova.feature_account_impl.di.modules.DerivativeAccountsModule
 import io.novafoundation.nova.feature_account_impl.di.modules.ExternalAccountsDiscoveryModule
 import io.novafoundation.nova.feature_account_impl.di.modules.IdentityProviderModule
 import io.novafoundation.nova.feature_account_impl.di.modules.MultisigModule
@@ -183,6 +183,7 @@ import javax.inject.Named
         CloudBackupModule::class,
         CustomFeeModule::class,
         MultisigModule::class,
+        DerivativeAccountsModule::class,
         BindsModule::class,
         DeepLinkModule::class,
         ExternalAccountsDiscoveryModule::class
@@ -372,16 +373,6 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideSecretsMetaAccountLocalFactory(): SecretsMetaAccountLocalFactory {
         return RealSecretsMetaAccountLocalFactory()
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideAccountMappers(
-        ledgerMigrationTracker: LedgerMigrationTracker,
-        multisigRepository: MultisigRepository,
-        gson: Gson
-    ): AccountMappers {
-        return AccountMappers(ledgerMigrationTracker, gson, multisigRepository)
     }
 
     @Provides
@@ -587,32 +578,6 @@ class AccountFeatureModule {
         walletUseCase: WalletUiUseCase,
         resourceManager: ResourceManager
     ) = RealProxyFormatter(walletUseCase, resourceManager)
-
-    @Provides
-    @FeatureScope
-    fun provideDelegatedMetaAccountUpdatesListingMixinFactory(
-        walletUseCase: WalletUiUseCase,
-        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-        proxyFormatter: ProxyFormatter,
-        multisigFormatter: MultisigFormatter,
-        resourceManager: ResourceManager
-    ) = DelegatedMetaAccountUpdatesListingMixinFactory(walletUseCase, metaAccountGroupingInteractor, proxyFormatter, multisigFormatter, resourceManager)
-
-    @Provides
-    @FeatureScope
-    fun provideAccountListingMixinFactory(
-        walletUseCase: WalletUiUseCase,
-        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
-        proxyFormatter: ProxyFormatter,
-        multisigFormatter: MultisigFormatter,
-        accountTypePresentationMapper: MetaAccountTypePresentationMapper,
-    ) = MetaAccountWithBalanceListingMixinFactory(
-        walletUseCase,
-        metaAccountGroupingInteractor,
-        accountTypePresentationMapper,
-        multisigFormatter,
-        proxyFormatter
-    )
 
     @Provides
     @FeatureScope

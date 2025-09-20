@@ -136,6 +136,8 @@ private class MultisigAccountsSyncDataSource(
                 LightMetaAccount.Type.PROXIED -> addSingleChainMultisig(controller, identity, position, chain)
 
                 LightMetaAccount.Type.MULTISIG -> addMultisigForComplexSigner(controller, identity, position, chain)
+
+                LightMetaAccount.Type.DERIVATIVE -> TODO("Derivative account data source")
             }
         }
 

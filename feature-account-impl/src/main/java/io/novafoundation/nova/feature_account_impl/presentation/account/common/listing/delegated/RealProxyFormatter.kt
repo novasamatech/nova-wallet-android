@@ -22,13 +22,12 @@ class RealProxyFormatter(
     private val resourceManager: ResourceManager,
 ) : ProxyFormatter {
 
-    override fun mapProxyMetaAccountSubtitle(
-        proxyAccountName: String,
-        proxyAccountIcon: Drawable,
+    override suspend fun formatProxiedMetaAccountSubtitle(
+        proxy: MetaAccount,
         proxyAccount: ProxyAccount
     ): CharSequence {
         val proxyType = mapProxyTypeToString(proxyAccount.proxyType)
-        val formattedProxyMetaAccount = mapProxyMetaAccount(proxyAccountName, proxyAccountIcon)
+        val formattedProxyMetaAccount = formatProxyMetaAccount(proxy)
 
         return SpannableStringBuilder(proxyType)
             .append(":")
@@ -36,11 +35,13 @@ class RealProxyFormatter(
             .append(formattedProxyMetaAccount)
     }
 
-    override fun mapProxyMetaAccount(proxyAccountName: String, proxyAccountIcon: Drawable): CharSequence {
+    override suspend fun formatProxyMetaAccount(proxy: MetaAccount): CharSequence {
+        val icon = makeProxyDrawable(proxy)
+
         return SpannableStringBuilder()
-            .appendEnd(drawableSpan(proxyAccountIcon))
+            .appendEnd(drawableSpan(icon))
             .appendSpace()
-            .append(proxyAccountName, colorSpan(resourceManager.getColor(R.color.text_primary)))
+            .append(proxy.name, colorSpan(resourceManager.getColor(R.color.text_primary)))
     }
 
     override fun mapProxyTypeToString(type: ProxyType): String {
@@ -59,7 +60,7 @@ class RealProxyFormatter(
         return resourceManager.getString(R.string.proxy_wallet_type, proxyType)
     }
 
-    override suspend fun makeAccountDrawable(metaAccount: MetaAccount): Drawable {
-        return walletUiUseCase.walletIcon(metaAccount, SUBTITLE_ICON_SIZE_DP)
+    override suspend fun makeProxyDrawable(proxy: MetaAccount): Drawable {
+        return walletUiUseCase.walletIcon(proxy, SUBTITLE_ICON_SIZE_DP)
     }
 }

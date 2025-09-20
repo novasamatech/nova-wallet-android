@@ -42,6 +42,10 @@ class DelegatedAccountUpdatesViewModel(
         listingMixin.filterBy(FilterType.Multisig)
     }
 
+    fun showDerivatives() {
+        listingMixin.filterBy(FilterType.Derivative)
+    }
+
     fun clickDone() {
         launch {
             accountInteractor.switchToNotDeactivatedAccountIfNeeded()

@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdates
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.AccountDelegation
+import io.novafoundation.nova.feature_account_api.domain.model.DerivativeMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
@@ -98,8 +99,19 @@ class MetaAccountGroupingInteractorImpl(
                             val singleChain = singleChainId?.let { chainsById[it] ?: return@mapNotNull null }
 
                             AccountDelegation.Multisig(
-                                metaAccount = it,
+                                multisig = it,
                                 signatory = metaById[it.signatoryMetaId] ?: return@mapNotNull null,
+                                singleChain = singleChain
+                            )
+                        }
+
+                        is DerivativeMetaAccount -> {
+                            val singleChainId = it.availability.singleChainId()
+                            val singleChain = singleChainId?.let { chainsById[it] ?: return@mapNotNull null }
+
+                            AccountDelegation.Derivative(
+                                derivative = it,
+                                parent = metaById[it.parentMetaId] ?: return@mapNotNull null,
                                 singleChain = singleChain
                             )
                         }
@@ -166,6 +178,22 @@ class MetaAccountGroupingInteractorImpl(
                 )
             }
 
+            is DerivativeMetaAccount -> {
+                val parent = allMetaAccounts.firstOrNull { it.id == metaAccount.parentMetaId } ?: return null
+
+                val singleChainId = metaAccount.availability.singleChainId()
+                val singleChain = singleChainId?.let { chains[it] ?: return null }
+
+                MetaAccountListingItem.Derivative(
+                    parent = parent,
+                    metaAccount = metaAccount,
+                    hasUpdates = hasUpdates,
+                    totalBalance = totalBalance,
+                    currency = selectedCurrency,
+                    singleChain = singleChain
+                )
+            }
+
             else -> {
                 MetaAccountListingItem.TotalBalance(
                     totalBalance = totalBalance,
@@ -187,6 +215,7 @@ class MetaAccountGroupingInteractorImpl(
                     LightMetaAccount.Type.PARITY_SIGNER,
                     LightMetaAccount.Type.PROXIED,
                     LightMetaAccount.Type.MULTISIG,
+                    LightMetaAccount.Type.DERIVATIVE,
                     LightMetaAccount.Type.LEDGER,
                     LightMetaAccount.Type.LEDGER_LEGACY -> true
 

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated
 
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.WithCoroutineScopeExtensions
@@ -12,6 +13,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountG
 import io.novafoundation.nova.feature_account_api.domain.model.AccountDelegation
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.getChainOrNull
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.DerivativeFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.IconTransform
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountTitleGroupRvItem
@@ -24,12 +27,15 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import javax.inject.Inject
 
-class DelegatedMetaAccountUpdatesListingMixinFactory(
+@FeatureScope
+class DelegatedMetaAccountUpdatesListingMixinFactory @Inject constructor(
     private val walletUiUseCase: WalletUiUseCase,
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val proxyFormatter: ProxyFormatter,
     private val multisigFormatter: MultisigFormatter,
+    private val derivativeFormatter: DerivativeFormatter,
     private val resourceManager: ResourceManager
 ) {
 
@@ -40,6 +46,7 @@ class DelegatedMetaAccountUpdatesListingMixinFactory(
             proxyFormatter = proxyFormatter,
             multisigFormatter = multisigFormatter,
             resourceManager = resourceManager,
+            derivativeFormatter = derivativeFormatter,
             coroutineScope = coroutineScope
         )
     }
@@ -53,6 +60,7 @@ private class RealDelegatedMetaAccountUpdatesListingMixin(
     private val walletUiUseCase: WalletUiUseCase,
     private val proxyFormatter: ProxyFormatter,
     private val multisigFormatter: MultisigFormatter,
+    private val derivativeFormatter: DerivativeFormatter,
     private val resourceManager: ResourceManager,
     coroutineScope: CoroutineScope,
 ) : DelegatedMetaAccountUpdatesListingMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
@@ -103,6 +111,7 @@ private class RealDelegatedMetaAccountUpdatesListingMixin(
         return when (type) {
             FilterType.Proxied -> resourceManager.getString(R.string.accounts_update_proxieds_title)
             FilterType.Multisig -> resourceManager.getString(R.string.active_multisig_title)
+            FilterType.Derivative -> resourceManager.getString(R.string.active_derivative_title)
             is FilterType.UserIgnored -> mapActiveHeader(type.overriddenFilter)
         }
     }
@@ -132,21 +141,21 @@ private class RealDelegatedMetaAccountUpdatesListingMixin(
         accountDelegation: AccountDelegation,
         isEnabled: Boolean
     ): CharSequence {
-        val icon = when (accountDelegation) {
-            is AccountDelegation.Multisig -> multisigFormatter.makeAccountDrawable(accountDelegation.signatory)
-            is AccountDelegation.Proxy -> proxyFormatter.makeAccountDrawable(accountDelegation.proxy)
+        val delegatorIconTransform: IconTransform = { icon ->
+            if (isEnabled) icon else icon.withAlphaDrawable(DISABLED_ICON_ALPHA)
         }
-
-        val delegatorIcon = if (isEnabled) icon else icon.withAlphaDrawable(DISABLED_ICON_ALPHA)
 
         return when (accountDelegation) {
             is AccountDelegation.Multisig -> {
-                multisigFormatter.formatSignatorySubtitle(accountDelegation.signatory, delegatorIcon)
+                multisigFormatter.formatSignatorySubtitle(accountDelegation.signatory, delegatorIconTransform)
             }
 
             is AccountDelegation.Proxy -> {
-                val proxy = accountDelegation.proxied.proxy
-                return proxyFormatter.mapProxyMetaAccountSubtitle(accountDelegation.proxy.name, delegatorIcon, proxy)
+                proxyFormatter.formatProxiedMetaAccountSubtitle(accountDelegation.proxy, accountDelegation.proxied.proxy)
+            }
+
+            is AccountDelegation.Derivative -> {
+                derivativeFormatter.formatDeriveAccountSubtitle(accountDelegation.derivative, accountDelegation.parent, delegatorIconTransform)
             }
         }
     }
@@ -155,6 +164,7 @@ private class RealDelegatedMetaAccountUpdatesListingMixin(
         return when (accountDelegation) {
             is AccountDelegation.Multisig -> FilterType.Multisig
             is AccountDelegation.Proxy -> FilterType.Proxied
+            is AccountDelegation.Derivative -> FilterType.Derivative
         }
     }
 }

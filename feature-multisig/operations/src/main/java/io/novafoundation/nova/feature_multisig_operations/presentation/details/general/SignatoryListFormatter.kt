@@ -1,23 +1,29 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.details.general
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountModel
+import io.novafoundation.nova.feature_account_api.domain.model.DerivativeMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.DerivativeFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.adapter.SignatoryRvItem
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import javax.inject.Inject
 
-class SignatoryListFormatter(
+@FeatureScope
+class SignatoryListFormatter @Inject constructor(
     private val accountInteractor: AccountInteractor,
     private val proxyFormatter: ProxyFormatter,
-    private val multisigFormatter: MultisigFormatter
+    private val multisigFormatter: MultisigFormatter,
+    private val derivativeFormatter: DerivativeFormatter,
 ) {
 
     private class FormattingContext(
@@ -87,23 +93,26 @@ class SignatoryListFormatter(
     private suspend fun MetaAccount.formatSubtitle(context: FormattingContext): CharSequence? = when (this) {
         is ProxiedMetaAccount -> formatSubtitle(context)
         is MultisigMetaAccount -> formatSubtitle(context)
+        is DerivativeMetaAccount -> formatSubtitle(context)
         else -> null
     }
 
     private suspend fun ProxiedMetaAccount.formatSubtitle(context: FormattingContext): CharSequence? {
         val proxyMetaAccount = context.account(this.proxy.proxyMetaId) ?: return null
 
-        return proxyFormatter.mapProxyMetaAccountSubtitle(
-            proxyMetaAccount.name,
-            proxyFormatter.makeAccountDrawable(proxyMetaAccount),
-            proxy
-        )
+        return proxyFormatter.formatProxiedMetaAccountSubtitle(proxyMetaAccount,  proxy)
     }
 
     private suspend fun MultisigMetaAccount.formatSubtitle(context: FormattingContext): CharSequence? {
         val signatory = context.account(this.signatoryMetaId) ?: return null
 
         return multisigFormatter.formatSignatorySubtitle(signatory)
+    }
+
+    private suspend fun DerivativeMetaAccount.formatSubtitle(context: FormattingContext): CharSequence? {
+        val parent = context.account(this.parentMetaId) ?: return null
+
+        return derivativeFormatter.formatDeriveAccountSubtitle(this, parent)
     }
 }
 
@@ -125,5 +134,6 @@ private fun MetaAccount.priorityToShowAsSignatory() = when (type) {
     LightMetaAccount.Type.WATCH_ONLY -> 1
 
     LightMetaAccount.Type.PROXIED,
-    LightMetaAccount.Type.MULTISIG -> 2
+    LightMetaAccount.Type.MULTISIG,
+    LightMetaAccount.Type.DERIVATIVE -> 2
 }
