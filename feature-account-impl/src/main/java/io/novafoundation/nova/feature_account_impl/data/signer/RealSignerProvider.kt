@@ -2,11 +2,13 @@ package io.novafoundation.nova.feature_account_impl.data.signer
 
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.domain.model.DerivativeMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.LedgerVariant
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
+import io.novafoundation.nova.feature_account_impl.data.signer.derivative.DerivativeSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.ledger.LedgerSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.multisig.MultisigSignerFactory
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignerFactory
@@ -20,7 +22,8 @@ internal class RealSignerProvider(
     private val watchOnlySigner: WatchOnlySignerFactory,
     private val polkadotVaultSignerFactory: PolkadotVaultVariantSignerFactory,
     private val ledgerSignerFactory: LedgerSignerFactory,
-    private val multisigSignerFactory: MultisigSignerFactory
+    private val multisigSignerFactory: MultisigSignerFactory,
+    private val derivativeSignerFactory: DerivativeSignerFactory,
 ) : SignerProvider {
 
     override fun rootSignerFor(metaAccount: MetaAccount): NovaSigner {
@@ -41,7 +44,7 @@ internal class RealSignerProvider(
             LightMetaAccount.Type.LEDGER_LEGACY -> ledgerSignerFactory.create(metaAccount, LedgerVariant.LEGACY)
             LightMetaAccount.Type.PROXIED -> proxiedSignerFactory.create(metaAccount as ProxiedMetaAccount, this, isRoot)
             LightMetaAccount.Type.MULTISIG -> multisigSignerFactory.create(metaAccount as MultisigMetaAccount, this, isRoot)
-            LightMetaAccount.Type.DERIVATIVE -> TODO("Derivative account implementation")
+            LightMetaAccount.Type.DERIVATIVE -> derivativeSignerFactory.create(metaAccount as DerivativeMetaAccount, this, isRoot)
         }
     }
 }
