@@ -1083,6 +1083,7 @@
     <string name="profile_accounts_title_2_0">Carteras</string>
     <string name="profile_language_title">Idioma</string>
     <string name="profile_pincode_change_title">Cambiar código PIN</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Ocultar saldos al iniciar</string>
     <string name="profile_settings_pin_code_verification_title">Aprobar con PIN</string>
     <string name="profile_settings_safe_mode_title">Modo seguro</string>
     <string name="profile_settings_title">Configuración</string>
