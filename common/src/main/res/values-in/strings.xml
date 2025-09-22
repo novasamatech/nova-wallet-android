@@ -1075,6 +1075,7 @@
     <string name="profile_accounts_title_2_0">Dompet</string>
     <string name="profile_language_title">Bahasa</string>
     <string name="profile_pincode_change_title">Ubah kode pin</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Sembunyikan saldo saat peluncuran</string>
     <string name="profile_settings_pin_code_verification_title">Setujui dengan PIN</string>
     <string name="profile_settings_safe_mode_title">Mode Aman</string>
     <string name="profile_settings_title">Pengaturan</string>
