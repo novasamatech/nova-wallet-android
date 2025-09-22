@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.trade.buy.flow.asset.AssetBuyFlowViewModel
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 
@@ -42,8 +42,8 @@ class AssetBuyFlowModule {
         resourceManager: ResourceManager,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        networkAssetMapper: NetworkAssetMapper,
-        tokenAssetMapper: TokenAssetMapper
+        networkAssetMapper: NetworkAssetFormatter,
+        tokenAssetFormatter: TokenAssetFormatter
     ): ViewModel {
         return AssetBuyFlowViewModel(
             interactorFactory = interactorFactory,
@@ -56,7 +56,7 @@ class AssetBuyFlowModule {
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
             networkAssetMapper = networkAssetMapper,
-            tokenAssetMapper = tokenAssetMapper
+            tokenAssetFormatter = tokenAssetFormatter
         )
     }
 }

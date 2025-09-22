@@ -77,7 +77,7 @@ class NewDelegationChooseAmountViewModel(
 
     private val delegateAssistantFlow = interactor.delegateAssistantFlow(viewModelScope)
 
-    private val originFeeMixin = feeLoaderMixinFactory.createDefault(this, amountFormatter, selectedChainAsset)
+    private val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
 
     private val maxActionProvider = maxActionProviderFactory.create(
         viewModelScope = viewModelScope,

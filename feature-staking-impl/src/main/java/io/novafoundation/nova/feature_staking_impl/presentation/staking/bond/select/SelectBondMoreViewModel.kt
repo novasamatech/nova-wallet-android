@@ -74,7 +74,6 @@ class SelectBondMoreViewModel(
 
     val originFeeMixin = feeLoaderMixinFactory.createDefault(
         this,
-        amountFormatter,
         selectedChainAsset
     )
 

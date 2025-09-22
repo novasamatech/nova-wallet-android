@@ -99,7 +99,7 @@ class SetupAmountMultiStakingViewModel(
         .distinctUntilChangedBy { it.fullId }
         .shareInBackground()
 
-    val feeLoaderMixin = feeLoaderMixinFactory.createDefault(this, amountFormatter, chainAssetFlow)
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
 
     private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {
         chainAssetFlow.providingBalance(maxStakeableBalance)

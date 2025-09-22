@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDApp
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ConfirmDAppOperationValidationPayload
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSignInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.PaymentCurrencySelectionMode
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
@@ -49,7 +48,6 @@ class ExternalSignViewModel(
     private val payload: ExternalSignPayload,
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
-    amountFormatter: AmountFormatter,
     walletUiUseCase: WalletUiUseCase,
     feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
@@ -64,7 +62,6 @@ class ExternalSignViewModel(
     val originFeeMixin = commissionTokenFlow?.let {
         feeLoaderMixinV2Factory.createDefaultBy(
             scope = viewModelScope,
-            amountFormatter = amountFormatter,
             feeContext = it.asFeeContextFromSelf(),
             configuration = FeeLoaderMixinV2.Configuration(
                 showZeroFiat = false,

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.presentation.masking.toMaskableModel
 
 interface MaskableValueFormatter {
 
+    // TODO: valueReceiver should be suspend to support suspendable logic
     fun <T> format(valueReceiver: () -> T): MaskableModel<T>
 }
 

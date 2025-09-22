@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
@@ -39,8 +39,8 @@ class AssetSendFlowViewModel(
     resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
-    private val networkAssetMapper: NetworkAssetMapper,
-    private val tokenAssetMapper: TokenAssetMapper
+    private val networkAssetMapper: NetworkAssetFormatter,
+    private val tokenAssetFormatter: TokenAssetFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -52,7 +52,7 @@ class AssetSendFlowViewModel(
     assetIconProvider,
     assetViewModeInteractor,
     networkAssetMapper,
-    tokenAssetMapper
+    tokenAssetFormatter
 ) {
 
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
@@ -84,7 +84,7 @@ class AssetSendFlowViewModel(
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            tokenAssetMapper.mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
+            tokenAssetFormatter.mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
     }
 

@@ -77,7 +77,7 @@ abstract class SetupVoteViewModel(
 
     private val voteAssistantFlow = interactor.voteAssistantFlow(payload.referendumId, viewModelScope)
 
-    private val originFeeMixin = feeLoaderMixinFactory.createDefault(this, amountFormatter, selectedChainAsset)
+    private val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
 
     protected val validatingVoteType = MutableStateFlow<VoteType?>(null)
 

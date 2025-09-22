@@ -67,7 +67,7 @@ class NominationPoolsSetupBondMoreViewModel(
         .filterNotNull()
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinFactory.createDefault(this, amountFormatter, selectedChainAsset)
+    val originFeeMixin = feeLoaderMixinFactory.createDefault(this, selectedChainAsset)
 
     private val stakeableAmount = selectedAsset.map(interactor::stakeableAmount)
 

@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
-import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
@@ -22,25 +21,25 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
 
-class TokenAssetMapperFactory(
+class TokenAssetFormatterFactory(
     private val amountFormatter: AmountFormatter
 ) {
-    fun create(maskableFormatter: MaskableValueFormatter): TokenAssetMapper {
-        return TokenAssetMapper(maskableFormatter, amountFormatter)
+    fun create(maskableFormatter: MaskableValueFormatter): TokenAssetFormatter {
+        return TokenAssetFormatter(maskableFormatter, amountFormatter)
     }
 }
 
-class TokenAssetMapper(
+class TokenAssetFormatter(
     private val maskableFormatter: MaskableValueFormatter,
     private val amountFormatter: AmountFormatter
-) : CommonAssetMapper(maskableFormatter, amountFormatter) {
+) : CommonAssetFormatter(maskableFormatter, amountFormatter) {
 
     fun mapGroupedAssetsToUi(
         groupedTokens: GroupedList<TokenAssetGroup, AssetWithNetwork>,
         assetIconProvider: AssetIconProvider,
         assetFilter: (groupId: String, List<TokenAssetUi>) -> List<TokenAssetUi> = { _, assets -> assets },
-        groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total },
-        balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
+        groupBalance: (TokenAssetGroup) -> AssetBalance.Amount = { it.groupBalance.total },
+        balance: (AssetBalance) -> AssetBalance.Amount = AssetBalance::total,
     ): List<BalanceListRvItem> {
         return groupedTokens.mapKeys { (group, assets) -> mapTokenAssetGroupToUi(assetIconProvider, group, assets, groupBalance) }
             .mapValues { (group, assets) ->
@@ -55,7 +54,7 @@ class TokenAssetMapper(
         assetIconProvider: AssetIconProvider,
         assetGroup: TokenAssetGroup,
         assets: List<AssetWithNetwork>,
-        groupBalance: (TokenAssetGroup) -> PricedAmount = { it.groupBalance.total }
+        groupBalance: (TokenAssetGroup) -> AssetBalance.Amount = { it.groupBalance.total }
     ): TokenGroupUi {
         val balance = groupBalance(assetGroup)
         return TokenGroupUi(
@@ -84,7 +83,7 @@ class TokenAssetMapper(
         assetIconProvider: AssetIconProvider,
         group: TokenGroupUi,
         assets: List<AssetWithNetwork>,
-        balance: (AssetBalance) -> PricedAmount
+        balance: (AssetBalance) -> AssetBalance.Amount
     ): List<TokenAssetUi> {
         return assets.map {
             TokenAssetUi(

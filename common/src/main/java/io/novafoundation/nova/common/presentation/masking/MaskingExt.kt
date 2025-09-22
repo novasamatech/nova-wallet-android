@@ -30,17 +30,3 @@ fun TextView.setMaskableText(
         maskingCache?.let { setCompoundDrawables(maskingCache.drawables) }
     }
 }
-
-private fun <T> MaskableModel<T>.onHidden(onHidden: () -> Unit): MaskableModel<T> {
-    if (this is MaskableModel.Hidden) {
-        onHidden()
-    }
-    return this
-}
-
-private fun <T> MaskableModel<T>.onUnmasked(onUnmasked: (T) -> Unit): MaskableModel<T> {
-    if (this is MaskableModel.Unmasked) {
-        onUnmasked(this.value)
-    }
-    return this
-}

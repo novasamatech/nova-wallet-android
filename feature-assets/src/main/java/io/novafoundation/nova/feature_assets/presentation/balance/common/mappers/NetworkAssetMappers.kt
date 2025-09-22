@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
-import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
 import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
@@ -18,27 +17,27 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import java.math.BigDecimal
 
-class NetworkAssetMapperFactory(
+class NetworkAssetFormatterFactory(
     private val fiatFormatter: FiatFormatter,
     private val amountFormatter: AmountFormatter
 ) {
-    fun create(maskableFormatter: MaskableValueFormatter): NetworkAssetMapper {
-        return NetworkAssetMapper(maskableFormatter, fiatFormatter, amountFormatter)
+    fun create(maskableFormatter: MaskableValueFormatter): NetworkAssetFormatter {
+        return NetworkAssetFormatter(maskableFormatter, fiatFormatter, amountFormatter)
     }
 }
 
-class NetworkAssetMapper(
+class NetworkAssetFormatter(
     private val maskableFormatter: MaskableValueFormatter,
     private val fiatFormatter: FiatFormatter,
     private val amountFormatter: AmountFormatter
-) : CommonAssetMapper(maskableFormatter, amountFormatter) {
+) : CommonAssetFormatter(maskableFormatter, amountFormatter) {
 
     fun mapGroupedAssetsToUi(
         groupedAssets: GroupedList<NetworkAssetGroup, AssetWithOffChainBalance>,
         assetIconProvider: AssetIconProvider,
         currency: Currency,
         groupBalance: (NetworkAssetGroup) -> BigDecimal = NetworkAssetGroup::groupTotalBalanceFiat,
-        balance: (AssetBalance) -> PricedAmount = AssetBalance::total,
+        balance: (AssetBalance) -> AssetBalance.Amount = AssetBalance::total,
     ): List<BalanceListRvItem> {
         return groupedAssets.mapKeys { (assetGroup, _) -> mapAssetGroupToUi(assetGroup, currency, groupBalance) }
             .mapValues { (_, assets) -> mapAssetsToAssetModels(assetIconProvider, assets, balance) }
@@ -49,7 +48,7 @@ class NetworkAssetMapper(
     private fun mapAssetsToAssetModels(
         assetIconProvider: AssetIconProvider,
         assets: List<AssetWithOffChainBalance>,
-        balance: (AssetBalance) -> PricedAmount
+        balance: (AssetBalance) -> AssetBalance.Amount
     ): List<BalanceListRvItem> {
         return assets.map {
             NetworkAssetUi(

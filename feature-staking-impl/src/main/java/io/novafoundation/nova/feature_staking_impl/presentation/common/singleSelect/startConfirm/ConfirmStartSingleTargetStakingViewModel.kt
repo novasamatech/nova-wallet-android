@@ -89,7 +89,7 @@ abstract class ConfirmStartSingleTargetStakingViewModel<S : ConfirmStartSingleTa
     }
         .shareInBackground()
 
-    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, amountFormatter, selectedAssetState.selectedAssetFlow())
+    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, selectedAssetState.selectedAssetFlow())
 
     val walletFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()

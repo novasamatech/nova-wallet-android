@@ -76,7 +76,6 @@ class MythosClaimRewardsViewModel(
 
     val feeLoaderMixin = feeLoaderMixinFactory.createDefault(
         scope = viewModelScope,
-        amountFormatter = amountFormatter,
         selectedChainAssetFlow = stakingSharedState.selectedAssetFlow(),
     )
 

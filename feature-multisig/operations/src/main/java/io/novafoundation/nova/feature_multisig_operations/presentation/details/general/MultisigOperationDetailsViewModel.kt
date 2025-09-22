@@ -169,7 +169,7 @@ class MultisigOperationDetailsViewModel(
 
     private val showNextProgress = MutableStateFlow(false)
 
-    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, amountFormatter, chainAssetFlow)
+    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, chainAssetFlow)
 
     val showCallButtonState = operationFlow.map { it.call == null }
         .shareInBackground()

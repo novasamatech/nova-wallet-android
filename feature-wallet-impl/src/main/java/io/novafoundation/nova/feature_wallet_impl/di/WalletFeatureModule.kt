@@ -286,8 +286,9 @@ class WalletFeatureModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
         interactor: FeeInteractor,
+        amountFormatter: AmountFormatter
     ): FeeLoaderMixinV2.Factory {
-        return FeeLoaderV2Factory(chainRegistry, actionAwaitableMixinFactory, resourceManager, interactor)
+        return FeeLoaderV2Factory(chainRegistry, actionAwaitableMixinFactory, resourceManager, interactor, amountFormatter)
     }
 
     @Provides

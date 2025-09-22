@@ -21,7 +21,6 @@ import io.novafoundation.nova.feature_external_sign_impl.domain.sign.ExternalSig
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.evm.EvmSignInteractorFactory
 import io.novafoundation.nova.feature_external_sign_impl.domain.sign.polkadot.PolkadotSignInteractorFactory
 import io.novafoundation.nova.feature_external_sign_impl.presentation.signExtrinsic.ExternalSignViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class])
@@ -56,8 +55,7 @@ class ExternalSignModule {
         walletUiUseCase: WalletUiUseCase,
         validationExecutor: ValidationExecutor,
         resourceManager: ResourceManager,
-        actionAwaitableMixin: ActionAwaitableMixin.Factory,
-        amountFormatter: AmountFormatter
+        actionAwaitableMixin: ActionAwaitableMixin.Factory
     ): ViewModel {
         return ExternalSignViewModel(
             router = router,
@@ -68,8 +66,7 @@ class ExternalSignModule {
             walletUiUseCase = walletUiUseCase,
             validationExecutor = validationExecutor,
             resourceManager = resourceManager,
-            actionAwaitableMixinFactory = actionAwaitableMixin,
-            amountFormatter = amountFormatter
+            actionAwaitableMixinFactory = actionAwaitableMixin
         )
     }
 }

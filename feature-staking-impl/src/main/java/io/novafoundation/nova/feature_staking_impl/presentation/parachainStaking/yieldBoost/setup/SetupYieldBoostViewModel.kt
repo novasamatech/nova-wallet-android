@@ -128,7 +128,6 @@ class SetupYieldBoostViewModel(
 
     val originFeeMixin = feeLoaderMixinFactory.createDefault(
         this,
-        amountFormatter,
         selectedChainAsset,
         FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
     )

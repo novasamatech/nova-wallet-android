@@ -44,10 +44,10 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapperFactory
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapperFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatterFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatterFactory
 import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
@@ -236,8 +236,8 @@ class AssetsFeatureModule {
     fun provideNetworkAssetMapperFactory(
         fiatFormatter: FiatFormatter,
         amountFormatter: AmountFormatter
-    ): NetworkAssetMapperFactory {
-        return NetworkAssetMapperFactory(
+    ): NetworkAssetFormatterFactory {
+        return NetworkAssetFormatterFactory(
             fiatFormatter,
             amountFormatter
         )
@@ -245,26 +245,26 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideTokenAssetMapperFactory(amountFormatter: AmountFormatter): TokenAssetMapperFactory {
-        return TokenAssetMapperFactory(amountFormatter)
+    fun provideTokenAssetMapperFactory(amountFormatter: AmountFormatter): TokenAssetFormatterFactory {
+        return TokenAssetFormatterFactory(amountFormatter)
     }
 
     @Provides
     @FeatureScope
     fun provideNotMaskingNetworkAssetMapper(
-        networkAssetMapperFactory: NetworkAssetMapperFactory,
+        networkAssetFormatterFactory: NetworkAssetFormatterFactory,
         maskableValueFormatterFactory: MaskableValueFormatterFactory
-    ): NetworkAssetMapper {
-        return networkAssetMapperFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
+    ): NetworkAssetFormatter {
+        return networkAssetFormatterFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
     }
 
     @Provides
     @FeatureScope
     fun provideNotMaskingTokenAssetMapper(
-        tokenAssetMapperFactory: TokenAssetMapperFactory,
+        tokenAssetFormatterFactory: TokenAssetFormatterFactory,
         maskableValueFormatterFactory: MaskableValueFormatterFactory
-    ): TokenAssetMapper {
-        return tokenAssetMapperFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
+    ): TokenAssetFormatter {
+        return tokenAssetFormatterFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
     }
 
     @Provides
@@ -274,16 +274,16 @@ class AssetsFeatureModule {
         currencyInteractor: CurrencyInteractor,
         assetsViewModeRepository: AssetsViewModeRepository,
         amountFormatterProvider: MaskableValueFormatterProvider,
-        networkAssetMapperFactory: NetworkAssetMapperFactory,
-        tokenAssetMapperFactory: TokenAssetMapperFactory,
+        networkAssetFormatterFactory: NetworkAssetFormatterFactory,
+        tokenAssetFormatterFactory: TokenAssetFormatterFactory,
     ): ExpandableAssetsMixinFactory {
         return ExpandableAssetsMixinFactory(
             assetIconProvider,
             currencyInteractor,
             assetsViewModeRepository,
             amountFormatterProvider,
-            networkAssetMapperFactory,
-            tokenAssetMapperFactory
+            networkAssetFormatterFactory,
+            tokenAssetFormatterFactory
         )
     }
 

@@ -70,7 +70,6 @@ class SelectUnbondViewModel(
 
     val originFeeMixin = feeLoaderMixinFactory.createDefault(
         this,
-        amountFormatter,
         chainAssetFlow,
         FeeLoaderMixinV2.Configuration(onRetryCancelled = ::backClicked)
     )

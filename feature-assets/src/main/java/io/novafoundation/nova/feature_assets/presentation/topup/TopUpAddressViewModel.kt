@@ -78,7 +78,7 @@ class TopUpAddressViewModel(
         )
     }
 
-    val feeMixin = feeLoaderMixinFactory.createDefault(this, amountFormatter, chainAssetFlow)
+    val feeMixin = feeLoaderMixinFactory.createDefault(this, chainAssetFlow)
 
     val amountChooserMixin: AmountChooserMixin.Presentation = amountChooserMixinFactory.create(
         scope = this,

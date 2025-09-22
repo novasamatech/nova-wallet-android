@@ -74,7 +74,7 @@ class MythosRedeemViewModel(
     val walletFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, amountFormatter, selectedAssetState.selectedAssetFlow())
+    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, selectedAssetState.selectedAssetFlow())
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: StateFlow<Boolean> = _showNextProgress

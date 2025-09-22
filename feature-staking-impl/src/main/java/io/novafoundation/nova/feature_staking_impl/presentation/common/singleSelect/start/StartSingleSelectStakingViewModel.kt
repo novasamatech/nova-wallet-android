@@ -102,7 +102,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
     private val stakeableAmount = logic.stakeableAmount(assetFlow)
         .shareInBackground()
 
-    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, amountFormatter, chainAssetFlow)
+    val originFeeMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, chainAssetFlow)
 
     private val maxAmountProvider = MaxActionProvider.create(viewModelScope) {
         chainAssetFlow.providingBalance(stakeableAmount)

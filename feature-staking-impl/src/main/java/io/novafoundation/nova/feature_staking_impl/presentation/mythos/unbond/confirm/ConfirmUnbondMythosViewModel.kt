@@ -89,7 +89,7 @@ class ConfirmUnbondMythosViewModel(
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: StateFlow<Boolean> = _showNextProgress
 
-    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, amountFormatter, selectedAssetState.selectedAssetFlow())
+    val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, selectedAssetState.selectedAssetFlow())
 
     init {
         setInitialFee()
