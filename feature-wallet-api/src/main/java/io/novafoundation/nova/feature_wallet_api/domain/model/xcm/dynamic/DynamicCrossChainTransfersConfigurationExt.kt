@@ -5,9 +5,8 @@ import io.novafoundation.nova.common.utils.graph.SimpleEdge
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.CustomTeleportEntry
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.TransferDestination
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
-import io.novafoundation.nova.feature_xcm_api.chain.isRelay
-import io.novafoundation.nova.feature_xcm_api.chain.isSystemChain
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -70,9 +69,13 @@ suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
         originChain = originXcmChain,
         destinationChain = destinationXcmChain,
         originChainAsset = originAsset,
-        reserve = reserve,
+        transferType = XcmTransferType.determineTransferType(
+            usesTeleports = canUseTeleport(originXcmChain, originAsset, destinationXcmChain),
+            originChain = originXcmChain,
+            destinationChain = destinationXcmChain,
+            reserve = reserve
+        ),
         features = targetTransfer.getTransferFeatures(),
-        usesTeleport = canUseTeleport(originXcmChain, originAsset, destinationXcmChain)
     )
 }
 
@@ -84,16 +87,9 @@ private fun DynamicCrossChainTransfersConfiguration.canUseTeleport(
     val customTeleportEntry = CustomTeleportEntry(originAsset.fullId, destinationXcmChain.chain.id)
     if (customTeleportEntry in customTeleports) return true
 
-    return isSystemTeleport(originXcmChain, destinationXcmChain)
+    return XcmTransferType.isSystemTeleport(originXcmChain, destinationXcmChain)
 }
 
-private fun isSystemTeleport(originXcmChain: XcmChain, destinationXcmChain: XcmChain): Boolean {
-    val systemToRelay = originXcmChain.isSystemChain() && destinationXcmChain.isRelay()
-    val relayToSystem = originXcmChain.isRelay() && destinationXcmChain.isSystemChain()
-    val systemToSystem = originXcmChain.isSystemChain() && destinationXcmChain.isSystemChain()
-
-    return systemToRelay || relayToSystem || systemToSystem
-}
 
 private fun AssetTransfers.getDestination(destinationChainId: ChainId): TransferDestination? {
     return destinations.find { it.fullChainAssetId.chainId == destinationChainId }
