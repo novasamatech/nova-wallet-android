@@ -9,6 +9,6 @@ object WalletConnectUtils {
         val isWalletConnectLink = isNovaLink || isLinkFromOtherSource
 
         val isPairing = "symKey" in data.toString()
-        return isWalletConnectLink || isPairing
+        return isWalletConnectLink && isPairing
     }
 }
