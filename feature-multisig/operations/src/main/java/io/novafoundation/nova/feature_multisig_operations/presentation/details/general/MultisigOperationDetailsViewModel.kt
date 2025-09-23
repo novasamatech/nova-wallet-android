@@ -34,9 +34,9 @@ import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.allSignatories
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
-import io.novafoundation.nova.feature_account_api.domain.model.requireMultisigAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -62,6 +62,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -116,7 +117,7 @@ class MultisigOperationDetailsViewModel(
         .shareInBackground()
 
     private val selectedAccountFlow = selectedAccountUseCase.selectedMetaAccountFlow()
-        .map { it.requireMultisigAccount() }
+        .filterIsInstance<MultisigMetaAccount>()
         .shareInBackground()
 
     val walletFlow = walletUiUseCase.selectedWalletUiFlow(showAddressIcon = true)
