@@ -30,6 +30,11 @@ interface CrossChainTransferConfigurationBase {
     val originChainAsset: Chain.Asset
 
     val transferType: XcmTransferType
+
+    /**
+     * Any info usefully for logging besides fields [CrossChainTransferConfigurationBase] already expose
+     */
+    fun debugExtraInfo(): String
 }
 
 val CrossChainTransferConfigurationBase.originChainLocation: ChainLocation

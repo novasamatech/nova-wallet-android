@@ -24,7 +24,12 @@ class LegacyCrossChainTransferConfiguration(
     val destinationFee: CrossChainFeeConfiguration,
     val reserveFee: CrossChainFeeConfiguration?,
     val transferMethod: LegacyXcmTransferMethod,
-) : CrossChainTransferConfigurationBase
+) : CrossChainTransferConfigurationBase {
+
+    override fun debugExtraInfo(): String {
+       return "transferMethod=$transferMethod"
+    }
+}
 
 class CrossChainFeeConfiguration(
     val from: From,

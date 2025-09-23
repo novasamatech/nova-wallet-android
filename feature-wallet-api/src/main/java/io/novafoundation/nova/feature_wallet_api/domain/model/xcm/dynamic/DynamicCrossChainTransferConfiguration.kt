@@ -11,4 +11,9 @@ class DynamicCrossChainTransferConfiguration(
     override val transferType: XcmTransferType,
     override val originChainAsset: Chain.Asset,
     val features: DynamicCrossChainTransferFeatures,
-) : CrossChainTransferConfigurationBase
+) : CrossChainTransferConfigurationBase {
+
+    override fun debugExtraInfo(): String {
+        return "features=${features}"
+    }
+}

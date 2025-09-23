@@ -37,15 +37,15 @@ sealed interface XcmTransferType {
 
     val assetAbsoluteLocation: AbsoluteMultiLocation
 
-    class Teleport(override val assetAbsoluteLocation: AbsoluteMultiLocation): XcmTransferType
+    data class Teleport(override val assetAbsoluteLocation: AbsoluteMultiLocation): XcmTransferType
 
     sealed interface Reserve : XcmTransferType {
 
-        class Origin(override val assetAbsoluteLocation: AbsoluteMultiLocation): Reserve
+        data class Origin(override val assetAbsoluteLocation: AbsoluteMultiLocation): Reserve
 
-        class Destination(override val assetAbsoluteLocation: AbsoluteMultiLocation): Reserve
+        data class Destination(override val assetAbsoluteLocation: AbsoluteMultiLocation): Reserve
 
-        class Remote(
+        data class Remote(
             override val assetAbsoluteLocation: AbsoluteMultiLocation,
             val remoteReserveLocation: ChainLocation
         ) : Reserve
