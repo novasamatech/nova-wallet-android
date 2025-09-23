@@ -1083,7 +1083,7 @@
     <string name="profile_accounts_title_2_0">Portafogli</string>
     <string name="profile_language_title">Lingua</string>
     <string name="profile_pincode_change_title">Cambia il codice PIN</string>
-    <string name="profile_settings_hide_balances_on_launch_title">Nascondi i saldi all’avvio</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Apri l\'app con saldo nascosto</string>
     <string name="profile_settings_pin_code_verification_title">Approvazione con PIN</string>
     <string name="profile_settings_safe_mode_title">Modalità sicura</string>
     <string name="profile_settings_title">Impostazioni</string>
