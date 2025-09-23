@@ -52,9 +52,16 @@ abstract class MultiLocation(
 
         data class AccountId32(val accountId: AccountIdKey) : Junction()
 
-        data class GlobalConsensus(val chainId: ChainId) : Junction()
+        data class GlobalConsensus(val networkId: NetworkId) : Junction()
 
         object Unsupported : Junction()
+    }
+
+    sealed class NetworkId {
+
+        data class Substrate(val genesisHash: ChainId): NetworkId()
+
+        data class Ethereum(val chainId: Int): NetworkId()
     }
 }
 
