@@ -14,6 +14,6 @@ class DynamicCrossChainTransferConfiguration(
 ) : CrossChainTransferConfigurationBase {
 
     override fun debugExtraInfo(): String {
-        return "features=${features}"
+        return "features=$features"
     }
 }

@@ -90,7 +90,6 @@ private fun DynamicCrossChainTransfersConfiguration.canUseTeleport(
     return XcmTransferType.isSystemTeleport(originXcmChain, destinationXcmChain)
 }
 
-
 private fun AssetTransfers.getDestination(destinationChainId: ChainId): TransferDestination? {
     return destinations.find { it.fullChainAssetId.chainId == destinationChainId }
 }

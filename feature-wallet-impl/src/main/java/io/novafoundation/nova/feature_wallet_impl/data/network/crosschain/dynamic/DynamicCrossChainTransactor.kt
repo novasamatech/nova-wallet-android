@@ -93,7 +93,6 @@ class DynamicCrossChainTransactor @Inject constructor(
         return supportsXcmExecute(configuration.originChainId, configuration.features)
     }
 
-
     private suspend fun composeXcmExecuteCall(
         configuration: DynamicCrossChainTransferConfiguration,
         transfer: AssetTransferBase,

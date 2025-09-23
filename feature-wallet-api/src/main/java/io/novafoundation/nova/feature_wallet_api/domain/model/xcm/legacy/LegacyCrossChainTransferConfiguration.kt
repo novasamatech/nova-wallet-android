@@ -27,7 +27,7 @@ class LegacyCrossChainTransferConfiguration(
 ) : CrossChainTransferConfigurationBase {
 
     override fun debugExtraInfo(): String {
-       return "transferMethod=$transferMethod"
+        return "transferMethod=$transferMethod"
     }
 }
 
