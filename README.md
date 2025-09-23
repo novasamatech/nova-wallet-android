@@ -68,6 +68,10 @@ If you face `Secret X is not found` error, it means that README is not up-to-dat
 In Nova Wallet, `debug` build type use fixed key, not publickly shared keystore to fix fingerprint to make Google-related features work
 To use your local debug keystore switch to `debugLocal` build type.
 
+#### QA Tools
+
+This project is tested with BrowserStack. We use this testing automation tool to maintain a high level of quality for each new version of the application.
+
 ## License
 Nova Wallet Android is available under the Apache 2.0 license. See the LICENSE file for more info.
 © Novasama Technologies GmbH 2023
