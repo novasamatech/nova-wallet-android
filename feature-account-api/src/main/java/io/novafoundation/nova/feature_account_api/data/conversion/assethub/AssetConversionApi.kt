@@ -4,9 +4,7 @@ package io.novafoundation.nova.feature_account_api.data.conversion.assethub
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindPair
 import io.novafoundation.nova.common.utils.assetConversionOrNull
-import io.novafoundation.nova.feature_xcm_api.message.VersionedRawXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocationRaw
 import io.novafoundation.nova.feature_xcm_api.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
@@ -23,7 +21,7 @@ val RuntimeMetadata.assetConversionOrNull: AssetConversionApi?
     get() = assetConversionOrNull()?.let(::AssetConversionApi)
 
 context(StorageQueryContext)
-val AssetConversionApi.pools: QueryableStorageEntry1<Pair<RelativeMultiLocationRaw, RelativeMultiLocationRaw>, Unit>
+val AssetConversionApi.pools: QueryableStorageEntry1<Pair<RelativeMultiLocation, RelativeMultiLocation>, Unit>
     get() = storage1(
         name = "Pools",
         binding = { _, _ -> Unit },
