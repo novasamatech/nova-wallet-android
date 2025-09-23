@@ -31,8 +31,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.co
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.transferableAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setBlockedAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setInputBlocked
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toParcel
@@ -40,7 +41,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.feature_wallet_api.presentation.model.transferableAmountModel
 import io.novafoundation.nova.runtime.state.chainAsset
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,6 +67,7 @@ class SetupUnbondMythosViewModel(
     private val mythosCollatorFormatter: MythosCollatorFormatter,
     private val mythosValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val stakingSharedState: StakingSharedState,
+    private val amountFormatter: AmountFormatter,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -112,7 +113,7 @@ class SetupUnbondMythosViewModel(
         maxActionProvider = null
     )
 
-    val transferable = assetFlow.map(Asset::transferableAmountModel)
+    val transferable = assetFlow.map { it.transferableAmountModel(amountFormatter) }
         .shareInBackground()
 
     val feeLoaderMixin = feeLoaderMixinV2Factory.createDefault(viewModelScope, chainAssetFlow)

@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.details.NftDetailsInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.details.NftDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class NfDetailsModule {
@@ -47,7 +48,8 @@ class NfDetailsModule {
         nftIdentifier: String,
         accountExternalActions: ExternalActions.Presentation,
         addressIconGenerator: AddressIconGenerator,
-        addressDisplayUseCase: AddressDisplayUseCase
+        addressDisplayUseCase: AddressDisplayUseCase,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NftDetailsViewModel(
             router = router,
@@ -57,6 +59,7 @@ class NfDetailsModule {
             externalActionsDelegate = accountExternalActions,
             addressIconGenerator = addressIconGenerator,
             addressDisplayUseCase = addressDisplayUseCase,
+            amountFormatter = amountFormatter
         )
     }
 }

@@ -15,7 +15,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.m
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.list.model.GovernanceLockModel.StatusContent
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
@@ -24,6 +25,7 @@ class GovernanceLocksOverviewViewModel(
     private val interactor: GovernanceUnlockInteractor,
     private val tokenUseCase: TokenUseCase,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     private val lockOverviewFlow = interactor.locksOverviewFlow(scope = viewModelScope)
@@ -33,7 +35,7 @@ class GovernanceLocksOverviewViewModel(
         .shareInBackground()
 
     val totalAmount = combine(lockOverviewFlow, tokenFlow) { locksOverview, token ->
-        mapAmountToAmountModel(locksOverview.totalLocked, token)
+        amountFormatter.formatAmountToAmountModel(locksOverview.totalLocked, token)
     }.shareInBackground()
 
     val lockModels = combine(lockOverviewFlow, tokenFlow) { locksOverview, token ->
@@ -58,7 +60,7 @@ class GovernanceLocksOverviewViewModel(
         return when {
             lock is Lock.Claimable -> GovernanceLockModel(
                 index = index,
-                amount = mapAmountToAmountModel(lock.amount, token).token,
+                amount = amountFormatter.formatAmountToAmountModel(lock.amount, token).token,
                 status = StatusContent.Text(resourceManager.getString(R.string.referendum_unlock_unlockable)),
                 statusColorRes = R.color.text_positive,
                 statusIconRes = null,
@@ -66,7 +68,7 @@ class GovernanceLocksOverviewViewModel(
             )
             lock is Lock.Pending && lock.claimTime is ClaimTime.At -> GovernanceLockModel(
                 index = index,
-                amount = mapAmountToAmountModel(lock.amount, token).token,
+                amount = amountFormatter.formatAmountToAmountModel(lock.amount, token).token,
                 status = StatusContent.Timer(lock.claimTime.timer),
                 statusColorRes = R.color.text_secondary,
                 statusIconRes = R.drawable.ic_time_16,
@@ -75,7 +77,7 @@ class GovernanceLocksOverviewViewModel(
 
             lock is Lock.Pending && lock.claimTime is ClaimTime.UntilAction -> GovernanceLockModel(
                 index = index,
-                amount = mapAmountToAmountModel(lock.amount, token).token,
+                amount = amountFormatter.formatAmountToAmountModel(lock.amount, token).token,
                 status = StatusContent.Text(resourceManager.getString(R.string.delegation_your_delegation)),
                 statusColorRes = R.color.text_secondary,
                 statusIconRes = null,

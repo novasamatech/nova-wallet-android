@@ -21,7 +21,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
 import javax.inject.Inject
@@ -45,6 +46,7 @@ class RealMythosCollatorFormatter @Inject constructor(
     private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val addressIconGenerator: AddressIconGenerator,
+    private val amountFormatter: AmountFormatter
 ) : MythosCollatorFormatter {
 
     override suspend fun collatorToSelectUi(
@@ -78,7 +80,7 @@ class RealMythosCollatorFormatter @Inject constructor(
         active: Boolean = true,
     ): MythosSelectCollatorModel {
         val addressModel = addressIconGenerator.collatorAddressModel(collator, stakingSharedState.chain())
-        val stakedAmountModel = stakedAmount?.let { mapAmountToAmountModel(stakedAmount, token) }
+        val stakedAmountModel = stakedAmount?.let { amountFormatter.formatAmountToAmountModel(stakedAmount, token) }
 
         val subtitle = stakedAmountModel?.let {
             resourceManager.labeledAmountSubtitle(R.string.staking_main_stake_balance_staked, it, selectionActive = active)

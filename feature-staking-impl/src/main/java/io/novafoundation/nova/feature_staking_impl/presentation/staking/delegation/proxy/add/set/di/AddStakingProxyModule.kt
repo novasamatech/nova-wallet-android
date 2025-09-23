@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.set.AddStakingProxyViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 
@@ -50,7 +51,8 @@ class AddStakingProxyModule {
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
         stakingRouter: StakingRouter,
         selectAddressMixinFactory: SelectAddressMixin.Factory,
-        getProxyRepository: GetProxyRepository
+        getProxyRepository: GetProxyRepository,
+        amountFormat: AmountFormatter
     ): ViewModel {
         return AddStakingProxyViewModel(
             addressInputMixinFactory = addressInputMixinFactory,
@@ -68,7 +70,8 @@ class AddStakingProxyModule {
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             stakingRouter = stakingRouter,
             selectAddressMixinFactory = selectAddressMixinFactory,
-            getProxyRepository = getProxyRepository
+            getProxyRepository = getProxyRepository,
+            amountFormat = amountFormat
         )
     }
 

@@ -25,7 +25,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.Flow
@@ -48,6 +49,7 @@ class MythosClaimRewardsViewModel(
     walletUiUseCase: WalletUiUseCase,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -64,7 +66,9 @@ class MythosClaimRewardsViewModel(
 
     val shouldRestakeFlow = MutableStateFlow(true)
 
-    val pendingRewardsAmountModel = combine(pendingRewardsFlow, assetFlow, ::mapAmountToAmountModel)
+    val pendingRewardsAmountModel = combine(pendingRewardsFlow, assetFlow) { pendingRewards, asset ->
+        amountFormatter.formatAmountToAmountModel(pendingRewards, asset)
+    }
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()

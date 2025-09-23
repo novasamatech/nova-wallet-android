@@ -1,27 +1,36 @@
-package io.novafoundation.nova.feature_wallet_api.presentation.model
+package io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount
 
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.ForegroundColorSpan
+import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.formatting.toAmountWithFraction
-import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
 
-interface AmountFormatter {
+interface FractionStylingFormatter {
 
-    fun formatBalanceWithFraction(unformattedAmount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence
+    fun formatFraction(
+        unformattedAmount: CharSequence,
+        @DimenRes floatAmountSize: Int,
+        @ColorRes textColorRes: Int
+    ): CharSequence
 }
 
-class RealAmountFormatter(
+class RealFractionStylingFormatter(
     private val resourceManager: ResourceManager
-) : AmountFormatter {
+) : FractionStylingFormatter {
 
-    override fun formatBalanceWithFraction(unformattedAmount: CharSequence, @DimenRes floatAmountSize: Int): CharSequence {
+    override fun formatFraction(
+        unformattedAmount: CharSequence,
+        @DimenRes floatAmountSize: Int,
+        @ColorRes textColorRes: Int
+    ): CharSequence {
         val amountWithFraction = unformattedAmount.toAmountWithFraction()
 
-        val textColor = resourceManager.getColor(R.color.text_secondary)
+        val textColor = resourceManager.getColor(textColorRes)
         val colorSpan = ForegroundColorSpan(textColor)
         val sizeSpan = AbsoluteSizeSpan(resourceManager.getDimensionPixelSize(floatAmountSize))
 
@@ -42,6 +51,9 @@ class RealAmountFormatter(
     }
 }
 
-fun CharSequence.formatBalanceWithFraction(formatter: AmountFormatter, @DimenRes floatAmountSize: Int): CharSequence {
-    return formatter.formatBalanceWithFraction(this, floatAmountSize)
+fun CharSequence.applyFractionStyling(fractionStylingFormatter: FractionStylingFormatter, fractionPartStyling: FractionPartStyling): CharSequence {
+    return when (fractionPartStyling) {
+        FractionPartStyling.NoStyle -> this
+        is FractionPartStyling.Styled -> fractionStylingFormatter.formatFraction(this, fractionPartStyling.sizeRes, fractionPartStyling.colorRes)
+    }
 }

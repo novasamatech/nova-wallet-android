@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.rebond.model.ParachainStakingRebondPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingRebondModule {
@@ -72,7 +73,8 @@ class ParachainStakingRebondModule {
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ParachainStakingRebondViewModel(
             router = router,
@@ -90,7 +92,8 @@ class ParachainStakingRebondModule {
             walletUiUseCase = walletUiUseCase,
             validationSystem = validationSystem,
             resourcesHintsMixinFactory = resourcesHintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

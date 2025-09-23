@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmReferendumVoteModule {
@@ -50,7 +51,8 @@ class ConfirmReferendumVoteModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         referendumFormatter: ReferendumFormatter,
         locksChangeFormatter: LocksChangeFormatter,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmReferendumVoteViewModel(
             router = router,
@@ -69,7 +71,8 @@ class ConfirmReferendumVoteModule {
             resourceManager = resourceManager,
             referendumFormatter = referendumFormatter,
             locksChangeFormatter = locksChangeFormatter,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

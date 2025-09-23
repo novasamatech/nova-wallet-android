@@ -27,7 +27,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,6 +50,7 @@ class NominationPoolsConfirmUnbondViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -65,7 +67,7 @@ class NominationPoolsConfirmUnbondViewModel(
         .shareInBackground()
 
     val amountModelFlow = assetFlow.map { asset ->
-        mapAmountToAmountModel(payload.amount, asset)
+        amountFormatter.formatAmountToAmountModel(payload.amount, asset)
     }
         .shareInBackground()
 
@@ -73,7 +75,7 @@ class NominationPoolsConfirmUnbondViewModel(
         .shareInBackground()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token, amountFormatter = amountFormatter)
 
         FeeStatus.Loaded(feeModel)
     }

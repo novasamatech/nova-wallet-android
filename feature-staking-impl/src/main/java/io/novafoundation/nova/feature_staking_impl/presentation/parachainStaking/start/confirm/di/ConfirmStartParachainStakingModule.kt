@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
 class ConfirmStartParachainStakingModule {
@@ -55,7 +56,8 @@ class ConfirmStartParachainStakingModule {
         hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
         delegatorStateUseCase: DelegatorStateUseCase,
         stakingStartedDetectionService: StakingStartedDetectionService,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
             parachainStakingRouter = router,
@@ -76,7 +78,8 @@ class ConfirmStartParachainStakingModule {
             delegatorStateUseCase = delegatorStateUseCase,
             startStakingRouter = startStakingRouter,
             stakingStartedDetectionService = stakingStartedDetectionService,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

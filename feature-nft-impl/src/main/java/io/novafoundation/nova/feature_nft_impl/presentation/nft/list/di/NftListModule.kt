@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_nft_impl.NftRouter
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.list.NftListViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class NftListModule {
@@ -44,11 +45,13 @@ class NftListModule {
         router: NftRouter,
         resourceManager: ResourceManager,
         interactor: NftListInteractor,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NftListViewModel(
             router = router,
             resourceManager = resourceManager,
             interactor = interactor,
+            amountFormatter = amountFormatter
         )
     }
 }

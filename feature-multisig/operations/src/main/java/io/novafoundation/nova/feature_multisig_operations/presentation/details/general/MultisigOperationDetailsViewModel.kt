@@ -57,6 +57,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -88,6 +89,7 @@ class MultisigOperationDetailsViewModel(
     private val accountInteractor: AccountInteractor,
     private val accountUIUseCase: AccountUIUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val amountFormatter: AmountFormatter,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),

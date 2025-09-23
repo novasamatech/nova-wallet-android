@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ValidatorDetailsModule {
@@ -33,6 +34,7 @@ class ValidatorDetailsModule {
         resourceManager: ResourceManager,
         singleAssetSharedState: StakingSharedState,
         identityMixinFactory: IdentityMixin.Factory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ValidatorDetailsViewModel(
             assetUseCase = assetUseCase,
@@ -42,7 +44,8 @@ class ValidatorDetailsModule {
             externalActions = externalActions,
             resourceManager = resourceManager,
             selectedAssetState = singleAssetSharedState,
-            identityMixinFactory = identityMixinFactory
+            identityMixinFactory = identityMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

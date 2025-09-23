@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -71,6 +72,7 @@ class StartParachainStakingViewModel(
     private val payload: StartParachainStakingPayload,
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val selectedAssetState: StakingSharedState,
+    private val amountFormatter: AmountFormatter,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<Collator, StartParachainStakingViewModel.ParachainLogic>(
@@ -83,7 +85,8 @@ class StartParachainStakingViewModel(
             selectedAssetState,
             addressIconGenerator,
             resourceManager,
-            interactor
+            interactor,
+            amountFormatter
         )
     },
     rewardsComponentFactory = rewardsComponentFactory,
@@ -96,6 +99,7 @@ class StartParachainStakingViewModel(
     selectedAssetState = selectedAssetState,
     router = router,
     amountChooserMixinFactory = amountChooserMixinFactory,
+    amountFormatter = amountFormatter
 ) {
 
     override val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
@@ -130,7 +134,7 @@ class StartParachainStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager, amountFormatter) },
             progressConsumer = validationInProgress.progressConsumer()
         ) {
             validationInProgress.value = false
@@ -165,6 +169,7 @@ class StartParachainStakingViewModel(
         private val addressIconGenerator: AddressIconGenerator,
         private val resourceManager: ResourceManager,
         private val interactor: StartParachainStakingInteractor,
+        private val amountFormatter: AmountFormatter,
     ) : StartSingleSelectStakingLogic<Collator>,
         ComputationalScope by computationalScope {
 
@@ -204,7 +209,8 @@ class StartParachainStakingViewModel(
                 chain = selectedAssetState.chain(),
                 asset = asset,
                 addressIconGenerator = addressIconGenerator,
-                resourceManager = resourceManager
+                resourceManager = resourceManager,
+                amountFormatter = amountFormatter
             )
         }
 

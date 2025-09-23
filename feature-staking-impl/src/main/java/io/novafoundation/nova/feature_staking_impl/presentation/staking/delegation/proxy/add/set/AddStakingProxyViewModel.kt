@@ -30,12 +30,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.common.mapAddStakingProxyValidationFailureToUi
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -71,7 +72,8 @@ class AddStakingProxyViewModel(
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val stakingRouter: StakingRouter,
     private val selectAddressMixinFactory: SelectAddressMixin.Factory,
-    private val getProxyRepository: GetProxyRepository
+    private val getProxyRepository: GetProxyRepository,
+    private val amountFormat: AmountFormatter
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExternalActions by externalActions,
@@ -135,7 +137,7 @@ class AddStakingProxyViewModel(
         .shareInBackground()
 
     val proxyDepositModel: Flow<AmountModel> = combine(proxyDepositDelta, selectedAssetFlow) { depositDelta, asset ->
-        mapAmountToAmountModel(depositDelta, asset)
+        amountFormat.formatAmountToAmountModel(depositDelta, asset)
     }
         .shareInBackground()
 
