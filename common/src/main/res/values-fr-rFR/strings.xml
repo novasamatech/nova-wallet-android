@@ -1083,7 +1083,7 @@
     <string name="profile_accounts_title_2_0">Portefeuilles</string>
     <string name="profile_language_title">Langue</string>
     <string name="profile_pincode_change_title">Modifier le code pin</string>
-    <string name="profile_settings_hide_balances_on_launch_title">Masquer les soldes au lancement</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Ouvrir l’application avec le solde masqué</string>
     <string name="profile_settings_pin_code_verification_title">Approuver avec PIN</string>
     <string name="profile_settings_safe_mode_title">Mode sans échec</string>
     <string name="profile_settings_title">Paramètres</string>

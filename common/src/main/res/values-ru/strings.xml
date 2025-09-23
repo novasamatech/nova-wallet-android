@@ -1099,7 +1099,7 @@
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
     <string name="profile_pincode_change_title">Изменить PIN-код</string>
-    <string name="profile_settings_hide_balances_on_launch_title">Скрывать балансы при запуске</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Вход со скрытым балансом</string>
     <string name="profile_settings_pin_code_verification_title">Подтверждение с PIN</string>
     <string name="profile_settings_safe_mode_title">Безопасный режим</string>
     <string name="profile_settings_title">Настройки</string>

@@ -1083,7 +1083,7 @@
     <string name="profile_accounts_title_2_0">Tárcák</string>
     <string name="profile_language_title">Nyelv</string>
     <string name="profile_pincode_change_title">PIN-kód módosítása</string>
-    <string name="profile_settings_hide_balances_on_launch_title">Egyenlegek elrejtése indításkor</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Alkalmazás megnyitása rejtett egyenleggel</string>
     <string name="profile_settings_pin_code_verification_title">Jóváhagyás PIN-kóddal</string>
     <string name="profile_settings_safe_mode_title">Biztonságos mód</string>
     <string name="profile_settings_title">Beállítások</string>
