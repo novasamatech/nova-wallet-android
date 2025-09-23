@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.recyclerView.space.SpaceBetween
 import io.novafoundation.nova.common.utils.recyclerView.space.addSpaceItemDecoration
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter

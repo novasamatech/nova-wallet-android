@@ -6,8 +6,8 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_account_migration.R
 import io.novafoundation.nova.feature_account_migration.databinding.FragmentAccountMigrationPairingBinding

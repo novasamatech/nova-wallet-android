@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 
-class DynamicCrossChainTransferFeatures(
+data class DynamicCrossChainTransferFeatures(
     val hasDeliveryFee: Boolean,
     val supportsXcmExecute: Boolean,
 )

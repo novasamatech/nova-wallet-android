@@ -7,8 +7,8 @@ import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyBarMargin
-import io.novafoundation.nova.common.utils.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyBarMargin
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceDetailBinding

@@ -41,6 +41,7 @@ data class Chain(
     val governance: List<Governance>,
     val swap: List<Swap>,
     val customFee: List<CustomFee>,
+    val multisigSupport: Boolean,
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
@@ -213,8 +214,6 @@ data class Chain(
         data class GovernanceDelegations(override val url: String) : ExternalApi()
 
         data class ReferendumSummary(override val url: String) : ExternalApi()
-
-        data class Multisig(override val url: String) : ExternalApi()
     }
 
     enum class Governance {

@@ -19,7 +19,10 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.destinationChainId
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.remoteReserveLocation
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainId
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransactor
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransactor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -122,7 +125,7 @@ class RealCrossChainTransactor(
 
     override suspend fun estimateMaximumExecutionTime(configuration: CrossChainTransferConfiguration): Duration {
         val originChainId = configuration.originChainId
-        val remoteReserveChainId = configuration.remoteReserveChainId
+        val remoteReserveChainId = configuration.transferType.remoteReserveLocation()?.chainId
         val destinationChainId = configuration.destinationChainId
 
         val relayId = chainRegistry.findRelayChainOrThrow(originChainId)

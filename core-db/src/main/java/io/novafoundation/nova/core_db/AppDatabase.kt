@@ -52,7 +52,6 @@ import io.novafoundation.nova.core_db.migrations.AddBalanceHolds_60_61
 import io.novafoundation.nova.core_db.migrations.AddBalanceModesToAssets_51_52
 import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBrowserTabs_64_65
-import io.novafoundation.nova.core_db.migrations.AddFavoriteDAppsOrdering_65_66
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddChainForeignKeyForProxy_63_64
@@ -64,6 +63,7 @@ import io.novafoundation.nova.core_db.migrations.AddEnabledColumnToChainAssets_3
 import io.novafoundation.nova.core_db.migrations.AddEventIdToOperation_47_48
 import io.novafoundation.nova.core_db.migrations.AddExternalBalances_45_46
 import io.novafoundation.nova.core_db.migrations.AddExtrinsicContentField_37_38
+import io.novafoundation.nova.core_db.migrations.AddFavoriteDAppsOrdering_65_66
 import io.novafoundation.nova.core_db.migrations.AddFavouriteDApps_9_10
 import io.novafoundation.nova.core_db.migrations.AddFungibleNfts_55_56
 import io.novafoundation.nova.core_db.migrations.AddGloballyUniqueIdToMetaAccounts_58_59
@@ -76,6 +76,7 @@ import io.novafoundation.nova.core_db.migrations.AddLocalMigratorVersionToChainR
 import io.novafoundation.nova.core_db.migrations.AddLocks_22_23
 import io.novafoundation.nova.core_db.migrations.AddMetaAccountType_14_15
 import io.novafoundation.nova.core_db.migrations.AddMultisigCalls_69_70
+import io.novafoundation.nova.core_db.migrations.AddMultisigSupportFlag_70_71
 import io.novafoundation.nova.core_db.migrations.AddNfts_5_6
 import io.novafoundation.nova.core_db.migrations.AddNodeSelectionStrategyField_38_39
 import io.novafoundation.nova.core_db.migrations.AddPoolIdToOperations_46_47
@@ -161,7 +162,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 70,
+    version = 71,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -263,7 +264,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(ChainNetworkManagement_59_60, AddBalanceHolds_60_61, ChainNetworkManagement_61_62)
                     .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
                     .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
-                    .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70)
+                    .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70, AddMultisigSupportFlag_70_71)
                     .build()
             }
             return instance!!
