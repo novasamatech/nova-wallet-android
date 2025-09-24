@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.yieldBoost.confirm.model.YieldBoostConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class YieldBoostConfirmModule {
@@ -46,7 +47,8 @@ class YieldBoostConfirmModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return YieldBoostConfirmViewModel(
             router = router,
@@ -63,7 +65,8 @@ class YieldBoostConfirmModule {
             selectedAccountUseCase = selectedAccountUseCase,
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

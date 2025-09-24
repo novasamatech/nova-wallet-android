@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -31,7 +32,9 @@ import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 
 @Module(includes = [ViewModelModule::class])
@@ -94,7 +97,10 @@ class BalanceListModule {
         amountFormatter: AmountFormatter,
         buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
         multisigPendingOperationsService: MultisigPendingOperationsService,
-        novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin
+        novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
+        maskableValueFormatterProvider: MaskableValueFormatterProvider,
+        maskingModeUseCase: MaskingModeUseCase,
+        fiatFormatter: FiatFormatter
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -110,9 +116,12 @@ class BalanceListModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetListMixinFactory = assetListMixinFactory,
             amountFormatter = amountFormatter,
+            maskableValueFormatterProvider = maskableValueFormatterProvider,
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             multisigPendingOperationsService = multisigPendingOperationsService,
-            novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin
+            novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin,
+            maskingModeUseCase = maskingModeUseCase,
+            fiatFormatter = fiatFormatter
         )
     }
 

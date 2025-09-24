@@ -25,7 +25,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +51,7 @@ class ParachainStakingRedeemViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -67,7 +69,7 @@ class ParachainStakingRedeemViewModel(
         val amount = interactor.redeemableAmount(delegatorState)
 
         assetFlow.map { asset ->
-            mapAmountToAmountModel(amount, asset)
+            amountFormatter.formatAmountToAmountModel(amount, asset)
         }
     }
         .withLoading()

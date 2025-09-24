@@ -26,7 +26,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -52,6 +53,7 @@ abstract class ConfirmStartSingleTargetStakingViewModel<S : ConfirmStartSingleTa
     private val assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartSingleTargetStakingPayload,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
@@ -83,7 +85,7 @@ abstract class ConfirmStartSingleTargetStakingViewModel<S : ConfirmStartSingleTa
         .shareInBackground()
 
     val amountModel = assetFlow.map { asset ->
-        mapAmountToAmountModel(payload.amount, asset)
+        amountFormatter.formatAmountToAmountModel(payload.amount, asset)
     }
         .shareInBackground()
 

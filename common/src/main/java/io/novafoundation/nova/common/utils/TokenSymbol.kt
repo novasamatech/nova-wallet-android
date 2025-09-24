@@ -17,10 +17,12 @@ value class TokenSymbol(val value: String) : Parcelable {
 
 fun String.asTokenSymbol() = TokenSymbol(this)
 
+@Deprecated("Use TokenFormatter instead")
 fun BigDecimal.formatTokenAmount(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return format(roundingMode)
 }
 
+@Deprecated("Use TokenFormatter instead")
 fun BigDecimal.formatTokenAmount(tokenSymbol: TokenSymbol, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return format(roundingMode).withTokenSymbol(tokenSymbol)
 }

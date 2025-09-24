@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmAddStakingProxyModule {
@@ -43,7 +44,8 @@ class ConfirmAddStakingProxyModule {
         addStakingProxyRepository: AddStakingProxyInteractor,
         walletUiUseCase: WalletUiUseCase,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmAddStakingProxyViewModel(
             router = router,
@@ -59,7 +61,8 @@ class ConfirmAddStakingProxyModule {
             addStakingProxyInteractor = addStakingProxyRepository,
             walletUiUseCase = walletUiUseCase,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

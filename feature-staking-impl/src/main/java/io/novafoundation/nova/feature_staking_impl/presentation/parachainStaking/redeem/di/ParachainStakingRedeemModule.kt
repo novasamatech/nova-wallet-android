@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.redeem.ParachainStakingRedeemViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingRedeemModule {
@@ -69,7 +70,8 @@ class ParachainStakingRedeemModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ParachainStakingRedeemViewModel(
             router = router,
@@ -85,7 +87,8 @@ class ParachainStakingRedeemModule {
             selectedAccountUseCase = selectedAccountUseCase,
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.UserContributionsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class UserContributionsModule {
@@ -28,7 +29,8 @@ class UserContributionsModule {
         crowdloanSharedState: CrowdloanSharedState,
         resourceManager: ResourceManager,
         router: CrowdloanRouter,
-        tokenUseCase: TokenUseCase
+        tokenUseCase: TokenUseCase,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return UserContributionsViewModel(
             interactor,
@@ -36,7 +38,8 @@ class UserContributionsModule {
             crowdloanSharedState,
             resourceManager,
             router,
-            tokenUseCase
+            tokenUseCase,
+            amountFormatter = amountFormatter
         )
     }
 

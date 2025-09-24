@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +38,7 @@ class SearchCollatorViewModel(
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val singleAssetSharedState: StakingSharedState,
     private val collatorsUseCase: CollatorsUseCase,
+    private val amountFormatter: AmountFormatter,
     resourceManager: ResourceManager,
     tokenUseCase: TokenUseCase,
 ) : SearchStakeTargetViewModel<Collator>(resourceManager) {
@@ -74,7 +76,8 @@ class SearchCollatorViewModel(
                 token = token,
                 addressIconGenerator = addressIconGenerator,
                 resourceManager = resourceManager,
-                sorting = CollatorRecommendationConfig.DEFAULT.sorting
+                sorting = CollatorRecommendationConfig.DEFAULT.sorting,
+                amountFormatter = amountFormatter
             )
         }
     }

@@ -18,7 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.nominationPools.loadPoolMemberState
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -28,6 +29,7 @@ class NominationPoolsAlertsComponentFactory(
     private val interactor: NominationPoolsAlertsInteractor,
     private val resourceManager: ResourceManager,
     private val router: NominationPoolsRouter,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -40,6 +42,7 @@ class NominationPoolsAlertsComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
         router = router,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -47,6 +50,7 @@ private open class NominationPoolsAlertsComponent(
     private val router: NominationPoolsRouter,
     private val interactor: NominationPoolsAlertsInteractor,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
     nominationPoolSharedComputation: NominationPoolSharedComputation,
     private val hostContext: ComponentHostContext,
     private val stakingOption: StakingOption,
@@ -79,7 +83,7 @@ private open class NominationPoolsAlertsComponent(
     private fun mapAlertToAlertModel(alert: NominationPoolAlert, asset: Asset): AlertModel {
         return when (alert) {
             is NominationPoolAlert.RedeemTokens -> {
-                val amount = mapAmountToAmountModel(alert.amount, asset).token
+                val amount = amountFormatter.formatAmountToAmountModel(alert.amount, asset).token
 
                 AlertModel(
                     title = resourceManager.getString(R.string.staking_alert_redeem_title),

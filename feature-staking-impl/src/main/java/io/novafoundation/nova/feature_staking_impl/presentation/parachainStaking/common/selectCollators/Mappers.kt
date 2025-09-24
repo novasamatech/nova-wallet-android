@@ -17,7 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.fromHex
 
@@ -27,6 +28,7 @@ suspend fun mapUnbondingCollatorToSelectCollatorModel(
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter
 ): SelectCollatorModel = mapSelectedCollatorToSelectCollatorModel(
     selectedCollator = unbondingCollator,
     active = unbondingCollator.hasPendingUnbonding.not(),
@@ -34,6 +36,7 @@ suspend fun mapUnbondingCollatorToSelectCollatorModel(
     asset = asset,
     addressIconGenerator = addressIconGenerator,
     resourceManager = resourceManager,
+    amountFormatter = amountFormatter
 )
 
 suspend fun mapSelectedCollatorToSelectCollatorModel(
@@ -43,6 +46,7 @@ suspend fun mapSelectedCollatorToSelectCollatorModel(
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter
 ): SelectCollatorModel = mapCollatorToSelectCollatorModel(
     collator = selectedCollator.target,
     stakedAmount = selectedCollator.stake.takeUnlessZero(),
@@ -50,7 +54,8 @@ suspend fun mapSelectedCollatorToSelectCollatorModel(
     active = active,
     asset = asset,
     addressIconGenerator = addressIconGenerator,
-    resourceManager = resourceManager
+    resourceManager = resourceManager,
+    amountFormatter = amountFormatter
 )
 
 suspend fun mapCollatorToSelectCollatorModel(
@@ -59,6 +64,7 @@ suspend fun mapCollatorToSelectCollatorModel(
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
     active: Boolean = true
 ): SelectCollatorModel {
     val chain = delegatorState.chain
@@ -74,6 +80,7 @@ suspend fun mapCollatorToSelectCollatorModel(
         asset = asset,
         addressIconGenerator = addressIconGenerator,
         resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -85,9 +92,10 @@ suspend fun mapCollatorToSelectCollatorModel(
     asset: Asset,
     addressIconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter
 ): SelectCollatorModel {
     val addressModel = addressIconGenerator.collatorAddressModel(collator, chain)
-    val stakedAmountModel = stakedAmount?.let { mapAmountToAmountModel(stakedAmount, asset) }
+    val stakedAmountModel = stakedAmount?.let { amountFormatter.formatAmountToAmountModel(stakedAmount, asset) }
 
     val subtitle = stakedAmountModel?.let {
         resourceManager.labeledAmountSubtitle(R.string.staking_main_stake_balance_staked, it, selectionActive = active)

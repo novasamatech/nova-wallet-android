@@ -7,9 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.SetFee
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.DefaultFeeInspector
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.amount.FeeInspector
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.DefaultFeeFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.FeeFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.ChooseFeeCurrencyPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
@@ -75,6 +73,12 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
             feeInspector: FeeInspector<F>,
             configuration: Configuration<F, D> = Configuration()
         ): Presentation<F, D>
+
+        fun <F : SubmissionFee> createDefault(
+            scope: CoroutineScope,
+            feeContextFlow: Flow<FeeContext>,
+            configuration: Configuration<F, FeeDisplay> = Configuration()
+        ): Presentation<F, FeeDisplay>
     }
 }
 
@@ -91,11 +95,9 @@ fun <F : SubmissionFee> Factory.createDefaultBy(
     feeContext: Flow<FeeContext>,
     configuration: Configuration<F, FeeDisplay> = Configuration()
 ): FeeLoaderMixinV2.Presentation<F, FeeDisplay> {
-    return create(
+    return createDefault(
         scope = scope,
         feeContextFlow = feeContext,
-        feeFormatter = DefaultFeeFormatter(),
-        feeInspector = DefaultFeeInspector(),
         configuration = configuration
     )
 }

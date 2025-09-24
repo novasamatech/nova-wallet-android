@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -43,6 +44,7 @@ class SelectBondMoreViewModel(
     private val validationSystem: BondMoreValidationSystem,
     private val payload: SelectBondMorePayload,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     hintsMixinFactory: ResourcesHintsMixinFactory,

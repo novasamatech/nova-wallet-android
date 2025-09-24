@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.commo
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.current.CurrentCollatorsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class CurrentCollatorsModule {
@@ -50,7 +51,8 @@ class CurrentCollatorsModule {
         collatorsUseCase: CollatorsUseCase,
         delegatorStateUseCase: DelegatorStateUseCase,
         tokenUseCase: TokenUseCase,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return CurrentCollatorsViewModel(
             router = router,
@@ -61,7 +63,8 @@ class CurrentCollatorsModule {
             delegatorStateUseCase = delegatorStateUseCase,
             tokenUseCase = tokenUseCase,
             collatorsUseCase = collatorsUseCase,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

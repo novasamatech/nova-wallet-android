@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -77,6 +78,8 @@ import java.util.Random
 import javax.inject.Named
 
 interface AccountFeatureDependencies {
+
+    val maskableValueFormatterProvider: MaskableValueFormatterProvider
 
     val hydraDxAssetConversionFactory: HydraDxQuoting.Factory
 
