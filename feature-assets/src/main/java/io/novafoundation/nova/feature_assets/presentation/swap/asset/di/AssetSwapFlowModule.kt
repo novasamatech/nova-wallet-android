@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetMapper
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetMapper
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.AssetSwapFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.swap.asset.SwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
@@ -49,8 +49,8 @@ class AssetSwapFlowModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         assetViewModeInteractor: AssetViewModeInteractor,
-        networkAssetMapper: NetworkAssetMapper,
-        tokenAssetMapper: TokenAssetMapper,
+        networkAssetMapper: NetworkAssetFormatter,
+        tokenAssetFormatter: TokenAssetFormatter,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
     ): ViewModel {
         return AssetSwapFlowViewModel(
@@ -67,7 +67,7 @@ class AssetSwapFlowModule {
             assetIconProvider = assetIconProvider,
             assetViewModeInteractor = assetViewModeInteractor,
             networkAssetMapper = networkAssetMapper,
-            tokenAssetMapper = tokenAssetMapper,
+            tokenAssetFormatter = tokenAssetFormatter,
             swapFlowScopeAggregator = swapFlowScopeAggregator
         )
     }

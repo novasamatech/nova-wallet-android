@@ -6,8 +6,9 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
-import io.novafoundation.nova.common.utils.applySystemBarInsets
+import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationEnterCallBinding
@@ -32,7 +33,7 @@ class MultisigOperationEnterCallFragment : BaseFragment<MultisigOperationEnterCa
     }
 
     override fun applyInsets(rootView: View) {
-        binder.root.applySystemBarInsets(imeInsets = true)
+        binder.root.applySystemBarInsets(imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
     }
 
     override fun initViews() {

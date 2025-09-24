@@ -73,9 +73,9 @@ private class AssetSelectorProvider(
 
     override val selectedAssetFlow: Flow<Asset> = selectedAssetAndOptionFlow.map { it.asset }
 
-    override val selectedAssetModelFlow: Flow<AssetSelectorModel> = selectedAssetAndOptionFlow
-        .combine(maskableValueFormatterFlow) { option, formatter -> mapAssetAndOptionToSelectorModel(option, formatter) }
-        .shareIn(this, SharingStarted.Eagerly, replay = 1)
+    override val selectedAssetModelFlow: Flow<AssetSelectorModel> = combine(selectedAssetAndOptionFlow, maskableValueFormatterFlow) { option, formatter ->
+        mapAssetAndOptionToSelectorModel(option, formatter)
+    }.shareIn(this, SharingStarted.Eagerly, replay = 1)
 
     override fun assetSelectorClicked() {
         launch {

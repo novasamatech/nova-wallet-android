@@ -17,6 +17,9 @@ import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.config.GlobalConfigApi
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
+import io.novafoundation.nova.common.data.config.RealGlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -477,5 +480,14 @@ class CommonModule {
         maskingModeUseCase: MaskingModeUseCase
     ): MaskableValueFormatterProvider {
         return MaskableValueFormatterProvider(maskableValueFormatterFactory, maskingModeUseCase)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideGlobalConfigDataSource(
+        networkApiCreator: NetworkApiCreator
+    ): GlobalConfigDataSource {
+        val api = networkApiCreator.create(GlobalConfigApi::class.java)
+        return RealGlobalConfigDataSource(api)
     }
 }

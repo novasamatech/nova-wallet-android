@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetModel
 
+@Deprecated("Create and use special formatter for that")
 fun mapAssetToAssetModel(
     assetIconProvider: AssetIconProvider,
     asset: Asset,

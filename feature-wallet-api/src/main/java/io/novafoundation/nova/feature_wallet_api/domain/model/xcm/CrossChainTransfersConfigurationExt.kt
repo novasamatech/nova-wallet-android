@@ -59,6 +59,12 @@ private fun logTransferConfiguration(
     if (result == null) {
         Log.d("CrossChainTransfersConfiguration", "Found no configuration for direction $logDirectionLabel")
     } else {
-        Log.d("CrossChainTransfersConfiguration", "Using ${result::class.simpleName} configuration for direction $logDirectionLabel")
+        val message = """
+            Using ${result::class.simpleName} configuration for direction $logDirectionLabel
+            Transfer type: ${result.transferType}
+            ${result.debugExtraInfo()}
+            
+        """.trimIndent()
+        Log.d("CrossChainTransfersConfiguration", message)
     }
 }

@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyC
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransfersConfiguration.XcmFee.Mode
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.XCMInstructionType
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.weightToFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainId
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.xcmExecute
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter

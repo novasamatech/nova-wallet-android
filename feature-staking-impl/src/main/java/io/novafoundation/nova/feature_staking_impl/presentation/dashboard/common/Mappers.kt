@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.commo
 import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
-import io.novafoundation.nova.common.presentation.masking.unfoldHidden
+import io.novafoundation.nova.common.presentation.masking.getUnmaskedOrElse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.appendEnd
 import io.novafoundation.nova.common.utils.drawableSpan
@@ -88,7 +88,7 @@ class RealStakingDashboardPresentationMapper(
         val availableBalance = noStake.stakingState.availableBalance
         val formattedAvailableBalance = if (availableBalance.isPositive()) {
             val maskableValue = maskableValueFormatter.format<CharSequence> { availableBalance.formatPlanks(noStake.token.configuration) }
-                .unfoldHidden {
+                .getUnmaskedOrElse {
                     val maskingDrawable = resourceManager.getDrawable(R.drawable.mask_dots_small)
                     SpannableStringBuilder()
                         .append(" ") // Small space before masking

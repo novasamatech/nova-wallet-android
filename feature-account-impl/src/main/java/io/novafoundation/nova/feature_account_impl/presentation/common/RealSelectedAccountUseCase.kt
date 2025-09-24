@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.common
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
-import io.novafoundation.nova.common.presentation.masking.unfoldHidden
+import io.novafoundation.nova.common.presentation.masking.getUnmaskedOrElse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
@@ -50,7 +50,7 @@ internal class RealSelectedAccountUseCase(
         SelectedWalletModel(
             typeIcon = typeIcon,
             walletIcon = maskableValueFormatter.format { icon }
-                .unfoldHidden { resourceManager.getDrawable(R.drawable.ic_identicon_placeholder_with_background) },
+                .getUnmaskedOrElse { resourceManager.getDrawable(R.drawable.ic_identicon_placeholder_with_background) },
             name = metaAccount.name,
             hasUpdates = hasMetaAccountsUpdates
         )

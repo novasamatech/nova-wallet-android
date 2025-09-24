@@ -19,14 +19,14 @@ class LineHeightDrawableSpan(
         text: CharSequence,
         start: Int,
         end: Int,
-        fm: Paint.FontMetricsInt?
+        outputFontMetrics: Paint.FontMetricsInt?
     ): Int {
-        val pFm = paint.fontMetricsInt
-        fm?.apply {
-            ascent = pFm.ascent
-            descent = pFm.descent
-            top = pFm.top
-            bottom = pFm.bottom
+        val paintFontMetrics = paint.fontMetricsInt
+        outputFontMetrics?.apply {
+            ascent = paintFontMetrics.ascent
+            descent = paintFontMetrics.descent
+            top = paintFontMetrics.top
+            bottom = paintFontMetrics.bottom
         }
 
         return drawable.intrinsicWidth

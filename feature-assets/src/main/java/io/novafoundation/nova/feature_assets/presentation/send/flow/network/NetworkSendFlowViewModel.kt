@@ -5,7 +5,7 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.common.PricedAmount
+import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -41,7 +41,7 @@ class NetworkSendFlowViewModel(
     amountFormatter
 ) {
 
-    override fun getAssetBalance(asset: AssetWithNetwork): PricedAmount {
+    override fun getAssetBalance(asset: AssetWithNetwork): AssetBalance.Amount {
         return asset.balanceWithOffChain.transferable
     }
 

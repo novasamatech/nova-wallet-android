@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.mixin.api.Validatable
-import io.novafoundation.nova.common.presentation.masking.unfoldHidden
+import io.novafoundation.nova.common.presentation.masking.getUnmaskedOrElse
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.combineToPair
@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelecto
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.runtime.ext.supportTinderGov
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
@@ -63,6 +64,11 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+private class ReferendaListFormatters(
+    val maskableValueFormatter: MaskableValueFormatter,
+    val referendaListFormatter: ReferendumFormatter
+)
 
 class ReferendaListViewModel(
     assetSelectorFactory: AssetSelectorFactory,
@@ -88,8 +94,12 @@ class ReferendaListViewModel(
     private val maskableValueFormatterFlow = maskableValueFormatterProvider.provideFormatter()
         .shareInBackground()
 
-    private val referendumFormatterFlow = maskableValueFormatterFlow.map { referendumFormatterFactory.create(it) }
-        .shareInBackground()
+    private val formattersFlow = maskableValueFormatterFlow.map {
+        ReferendaListFormatters(
+            maskableValueFormatter = it,
+            referendaListFormatter = referendumFormatterFactory.create(it)
+        )
+    }.shareInBackground()
 
     override val assetSelectorMixin = assetSelectorFactory.create(
         scope = this,
@@ -116,19 +126,17 @@ class ReferendaListViewModel(
         .inBackground()
         .share()
 
-    val governanceTotalLocks = referendaListStateFlow
-        .combine(maskableValueFormatterFlow) { referendaState, formatter ->
-            val asset = assetSelectorMixin.selectedAssetFlow.first()
-            referendaState.map { mapLocksOverviewToUi(formatter, it.locksOverview, asset) }
-        }
+    val governanceTotalLocks = combine(referendaListStateFlow, formattersFlow) { referendaState, formatters ->
+        val asset = assetSelectorMixin.selectedAssetFlow.first()
+        referendaState.map { mapLocksOverviewToUi(formatters.maskableValueFormatter, it.locksOverview, asset) }
+    }
         .inBackground()
         .shareWhileSubscribed()
 
-    val governanceDelegated = referendaListStateFlow
-        .combine(maskableValueFormatterFlow) { referendaState, formatter ->
-            val asset = assetSelectorMixin.selectedAssetFlow.first()
-            referendaState.map { mapDelegatedToUi(formatter, it.delegated, asset) }
-        }
+    val governanceDelegated = combine(referendaListStateFlow, formattersFlow) { referendaState, formatters ->
+        val asset = assetSelectorMixin.selectedAssetFlow.first()
+        referendaState.map { mapDelegatedToUi(formatters.maskableValueFormatter, it.delegated, asset) }
+    }
         .inBackground()
         .shareWhileSubscribed()
 
@@ -137,11 +145,10 @@ class ReferendaListViewModel(
         referendaSummaryInteractor.getReferendaSummaries(referendaIds, viewModelScope)
     }.shareInBackground()
 
-    val tinderGovBanner = referendaSummariesFlow
-        .combine(maskableValueFormatterFlow) { summaries, formatter ->
-            val chain = selectedAssetSharedState.chain()
-            mapTinderGovToUi(formatter, chain, summaries)
-        }
+    val tinderGovBanner = combine(referendaSummariesFlow, formattersFlow) { summaries, formatters ->
+        val chain = selectedAssetSharedState.chain()
+        mapTinderGovToUi(formatters.maskableValueFormatter, chain, summaries)
+    }
         .inBackground()
         .shareWhileSubscribed()
 
@@ -150,10 +157,9 @@ class ReferendaListViewModel(
         .inBackground()
         .shareWhileSubscribed()
 
-    val referendaUiFlow = referendaListStateFlow
-        .combine(maskableValueFormatterFlow) { summaries, formatter ->
-            summaries.map { mapReferendaListToStateList(it, formatter) }
-        }
+    val referendaUiFlow = combine(referendaListStateFlow, formattersFlow) { summaries, formatters ->
+        summaries.map { mapReferendaListToStateList(it, formatters) }
+    }
         .inBackground()
         .shareWhileSubscribed()
 
@@ -205,7 +211,7 @@ class ReferendaListViewModel(
         return GovernanceLocksModel(
             title = resourceManager.getString(R.string.wallet_balance_locked),
             amount = maskableValueFormatter.format { tokenFormatter.formatToken(locksOverview.locked, asset) },
-            showUnlockableLocks = maskableValueFormatter.format { locksOverview.hasClaimableLocks }.unfoldHidden { false }
+            showUnlockableLocks = maskableValueFormatter.format { locksOverview.hasClaimableLocks }.getUnmaskedOrElse { false }
         )
     }
 
@@ -266,13 +272,16 @@ class ReferendaListViewModel(
             R.drawable.ic_chip_filter_indicator
         }
 
-    private suspend fun mapReferendaListToStateList(state: ReferendaListState, maskableValueFormatter: MaskableValueFormatter): ReferendaListStateModel {
+    private suspend fun mapReferendaListToStateList(
+        state: ReferendaListState,
+        formatters: ReferendaListFormatters
+    ): ReferendaListStateModel {
         val asset = assetSelectorMixin.selectedAssetFlow.first()
         val chain = selectedAssetSharedState.chain()
 
         val referendaList = state.groupedReferenda.toListWithHeaders(
-            keyMapper = { group, referenda -> mapReferendumGroupToUi(group, referenda.size, maskableValueFormatter) },
-            valueMapper = { referendumFormatterFlow.first().formatReferendumPreview(it, asset.token, chain) }
+            keyMapper = { group, referenda -> mapReferendumGroupToUi(group, referenda.size, formatters.maskableValueFormatter) },
+            valueMapper = { formatters.referendaListFormatter.formatReferendumPreview(it, asset.token, chain) }
         )
 
         val placeholderModel = mapReferendaListPlaceholder(referendaList)
