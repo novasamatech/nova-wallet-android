@@ -59,9 +59,9 @@ abstract class MultiLocation(
 
     sealed class NetworkId {
 
-        data class Substrate(val genesisHash: ChainId): NetworkId()
+        data class Substrate(val genesisHash: ChainId) : NetworkId()
 
-        data class Ethereum(val chainId: Int): NetworkId()
+        data class Ethereum(val chainId: Int) : NetworkId()
     }
 }
 

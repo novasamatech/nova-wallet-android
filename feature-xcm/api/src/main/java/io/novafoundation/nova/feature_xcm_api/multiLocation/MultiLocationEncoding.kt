@@ -168,7 +168,7 @@ private fun encodableGeneralKey(xcmVersion: XcmVersion, generalKey: HexString): 
 }
 
 private fun Junction.GlobalConsensus.toEncodableInstance(): Any {
-    val innerValue = when(networkId) {
+    val innerValue = when (networkId) {
         is NetworkId.Ethereum -> networkId.toEncodableInstance()
         is NetworkId.Substrate -> networkId.toEncodableInstance()
     }
