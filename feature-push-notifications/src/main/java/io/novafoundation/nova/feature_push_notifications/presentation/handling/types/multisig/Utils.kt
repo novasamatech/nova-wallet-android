@@ -1,12 +1,17 @@
 package io.novafoundation.nova.feature_push_notifications.presentation.handling.types.multisig
 
+import android.app.Notification
+import android.content.Context
+import androidx.core.app.NotificationCompat
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.deeplink.MultisigOperationDeepLinkData
+import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.NotificationData
 import io.novafoundation.nova.feature_push_notifications.presentation.handling.extractPayloadFieldsWithPath
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -65,4 +70,27 @@ fun multisigOperationDeepLinkData(
         payload.callData,
         operationState
     )
+}
+
+fun MultisigBaseNotificationHandler.notifyMultisigGroupNotificationWithId(context: Context, groupId: String, channelId: String, metaAccount: MetaAccount) {
+    val notificationId = createGroupMessageId(groupId)
+    val notification = createMultisigGroupNotification(context, groupId, channelId, getSubText(metaAccount))
+    notify(notificationId, notification)
+}
+
+fun createGroupMessageId(groupId: String): Int {
+    return groupId.hashCode()
+}
+
+fun createMultisigGroupNotification(context: Context, groupId: String, channelId: String, walletName: String): Notification {
+    return NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(R.drawable.ic_nova)
+        .setStyle(
+            NotificationCompat.InboxStyle()
+                .setSummaryText(walletName)
+        )
+        .setGroup(groupId)
+        .setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN)
+        .setGroupSummary(true)
+        .build()
 }
