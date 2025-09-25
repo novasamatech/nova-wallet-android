@@ -1,0 +1,52 @@
+name: Upload to s3
+description: Upload artifacts to s3
+inputs:
+  s3_region:
+    description: 'S3 region'
+    required: true
+  s3_access_key:
+    description: 'S3 access key'
+    required: true
+  s3_secret_key:
+    description: 'S3 secret key'
+    required: true
+  s3_bucket:
+    description: 'S3 bucket'
+    required: true
+  upload_file:
+    description: 'File to uploading'
+    required: true
+
+outputs:
+  s3_url:
+    description: 'URL of the uploaded file'
+    value: ${{ steps.interact_with_storage.outputs.s3_url }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up S3cmd cli tool
+      uses: s3-actions/s3cmd@v1.6.1
+      with:
+        provider: scaleway
+        region: ${{ inputs.s3_region }}
+        secret_key: ${{ inputs.s3_secret_key }}
+        access_key: ${{ inputs.s3_access_key }}
+
+    - name: List available S3 buckets
+      run: s3cmd ls
+      shell: bash
+
+    - name: Interact with object storage
+      id: interact_with_storage
+      run: |
+        file="${{ inputs.upload_file }}"
+        destination_s3="${{ inputs.s3_bucket }}"
+        filename=$(basename "$file")
+        s3cmd sync "$file" "${destination_s3}/${filename}" --acl-public        
+        
+        bucket_name=$(echo "${{ inputs.s3_bucket }}" | sed 's|s3://||')
+        s3_url="https://${bucket_name}.s3.${{ inputs.s3_region }}.scw.cloud/${filename}"
+        echo "s3_url=${s3_url}" >> $GITHUB_OUTPUT
+        echo "Uploaded file URL: ${s3_url}"
+      shell: bash

@@ -1,0 +1,66 @@
+name: Appium Mobile Tests
+
+on:
+  workflow_call:
+    inputs:
+      app_url:
+        type: string
+        description: URL to download the app from
+        required: true
+      test_grep:
+        type: string
+        description: Test pattern to run (pytest marker or test name)
+        required: false
+        default: "android"
+      allure_job_run_id:
+        type: string
+        description: ALLURE_JOB_RUN_ID service parameter
+        required: false
+      allure_username:
+        type: string
+        description: ALLURE_USERNAME service parameter
+        required: false
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+      ALLURE_TOKEN:
+        required: false
+
+env:
+  PYTHON_VERSION: '3.9'
+  CI: true
+  ALLURE_ENDPOINT: https://nova.testops.cloud/
+  ALLURE_PROJECT_ID: 103
+
+jobs:
+  trigger-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger mobile tests in test repository
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const response = await github.rest.actions.createWorkflowDispatch({
+              owner: 'novasamatech', 
+              repo: 'appium-mobile-tests', 
+              workflow_id: 'browserstack-tests.yml',
+              ref: 'develop', 
+              inputs: {
+                app_url: '${{ inputs.app_url }}',                
+                ALLURE_JOB_RUN_ID: '${{ inputs.allure_job_run_id }}',
+                ALLURE_USERNAME: '${{ inputs.allure_username }}'
+              }
+            });
+            
+            console.log('Mobile tests triggered successfully');
+            console.log('App URL:', '${{ inputs.app_url }}');            
+            
+      - name: Wait for test completion (optional)
+        if: false 
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN}}
+          script: |            
+            console.log('Waiting for test completion...');
+            

@@ -12,8 +12,7 @@ jobs:
       gradlew-command: assembleDevelop
     secrets: inherit
 
-
-  upload:
+  upload-to-firebase:
     runs-on: ubuntu-latest
     needs: build
 
@@ -33,3 +32,45 @@ jobs:
           releaseNotes: ${{ github.event.head_commit.message }}
           test-groups: dev-team
           upload-file: app/develop/app-develop.apk
+
+  upload-to-s3:
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      s3_url: ${{ steps.s3_upload.outputs.s3_url }}
+    env:
+      S3_BUCKET: s3://nova-wallet-android-app
+      S3_REGION: nl-ams
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: apk
+          path: app
+
+      - name: ⚙️ Upload to S3
+        id: s3_upload
+        uses: ./.github/actions/upload-to-s3
+        with:
+          s3_region: ${{ env.S3_REGION }}
+          s3_access_key: ${{ secrets.SCW_ACCESS_KEY }}
+          s3_secret_key: ${{ secrets.SCW_SECRET_KEY }}
+          s3_bucket: ${{ env.S3_BUCKET }}
+          upload_file: app/develop/app-develop.apk
+
+      - name: Show S3 URL
+        run: |
+          echo "App uploaded to: ${{ steps.s3_upload.outputs.s3_url }}"
+
+  appium-mobile-tests:
+    needs: [upload-to-s3]
+    uses: ./.github/workflows/appium-mobile-tests.yml
+    with:
+      app_url: ${{ needs.upload-to-s3.outputs.s3_url }}
+      test_grep: "android"
+      allure_job_run_id: ${{ github.run_id }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ALLURE_TOKEN: ${{ secrets.ALLURE_TOKEN }}
