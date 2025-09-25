@@ -2,7 +2,7 @@ name: Build test and deploy develop apk
 
 on:
   push:
-    branches: [develop]
+    
 
 jobs:
   build:
@@ -12,26 +12,27 @@ jobs:
       gradlew-command: assembleDevelop
     secrets: inherit
 
-  upload-to-firebase:
-    runs-on: ubuntu-latest
-    needs: build
+# Временно закомментировано для тестирования
+  # upload-to-firebase:
+  #   runs-on: ubuntu-latest
+  #   needs: build
 
-    steps:
-      - uses: actions/checkout@v2
-      - name: Download built artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: apk
-          path: app
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - name: Download built artifact
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: apk
+  #         path: app
 
-      - name: 🗳 Upload to Firebase
-        uses: ./.github/workflows/upload-to-firebase
-        with:
-          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
-          firebase-token: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-          releaseNotes: ${{ github.event.head_commit.message }}
-          test-groups: dev-team
-          upload-file: app/develop/app-develop.apk
+  #     - name: 🗳 Upload to Firebase
+  #       uses: ./.github/workflows/upload-to-firebase
+  #       with:
+  #         appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
+  #         firebase-token: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+  #         releaseNotes: ${{ github.event.head_commit.message }}
+  #         test-groups: dev-team
+  #         upload-file: app/develop/app-develop.apk
 
   upload-to-s3:
     runs-on: ubuntu-latest
