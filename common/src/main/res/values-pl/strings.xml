@@ -1099,6 +1099,7 @@
     <string name="profile_accounts_title_2_0">Portfele</string>
     <string name="profile_language_title">Język</string>
     <string name="profile_pincode_change_title">Zmień kod PIN</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Otwórz aplikację z ukrytym saldem</string>
     <string name="profile_settings_pin_code_verification_title">Zatwierdź kodem PIN</string>
     <string name="profile_settings_safe_mode_title">Tryb bezpieczny</string>
     <string name="profile_settings_title">Ustawienia</string>

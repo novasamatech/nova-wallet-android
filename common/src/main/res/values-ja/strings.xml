@@ -1075,6 +1075,7 @@
     <string name="profile_accounts_title_2_0">ウォレット</string>
     <string name="profile_language_title">言語</string>
     <string name="profile_pincode_change_title">PINコードを変更</string>
+    <string name="profile_settings_hide_balances_on_launch_title">残高を非表示にしてアプリを開く</string>
     <string name="profile_settings_pin_code_verification_title">PINで承認</string>
     <string name="profile_settings_safe_mode_title">セーフモード</string>
     <string name="profile_settings_title">設定</string>
