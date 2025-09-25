@@ -39,7 +39,7 @@ jobs:
       - name: Trigger mobile tests in test repository
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PAT_TOKEN }} 
+          github-token: ${{ secrets.WORKFLOW_TOKEN }} 
           script: |
             const response = await github.rest.actions.createWorkflowDispatch({
               owner: 'novasamatech', 
@@ -60,7 +60,7 @@ jobs:
         if: false 
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PAT_TOKEN }} 
+          github-token: ${{ secrets.WORKFLOW_TOKEN }} 
           script: |            
             console.log('Waiting for test completion...');
             
