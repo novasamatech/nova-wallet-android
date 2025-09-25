@@ -14,12 +14,14 @@ on:
         default: "android"
       allure_job_run_id:
         type: string
-        description: ALLURE_JOB_RUN_ID service parameter
+        description: ALLURE_JOB_RUN_ID service parameter. Leave blank.
         required: false
+        default: ""
       allure_username:
         type: string
-        description: ALLURE_USERNAME service parameter
+        description: ALLURE_USERNAME service parameter. Leave blank.
         required: false
+        default: ""
     secrets:
       WORKFLOW_TOKEN:
         required: true

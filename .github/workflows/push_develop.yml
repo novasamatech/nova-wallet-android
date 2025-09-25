@@ -70,7 +70,7 @@ jobs:
     with:
       app_url: ${{ needs.upload-to-s3.outputs.s3_url }}
       test_grep: "android"
-      allure_job_run_id: ${{ github.run_id }}
+      allure_job_run_id: ""
     secrets:
       WORKFLOW_TOKEN: ${{ secrets.PAT_TOKEN }}
       ALLURE_TOKEN: ${{ secrets.ALLURE_TOKEN }}
