@@ -67,7 +67,7 @@ jobs:
 
   appium-mobile-tests:
     needs: [upload-to-s3]
-    uses: ./.github/workflows/appium-mobile-tests.yml
+    uses: ./.github/workflows/start-appium-tests/appium-mobile-tests.yml
     with:
       app_url: ${{ needs.upload-to-s3.outputs.s3_url }}
       test_grep: "android"
