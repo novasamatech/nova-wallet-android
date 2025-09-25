@@ -2,6 +2,8 @@ name: Build test and deploy develop apk
 
 on:
   push:
+    branches:
+      - develop
     
 
 jobs:
