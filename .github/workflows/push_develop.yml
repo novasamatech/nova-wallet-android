@@ -5,38 +5,37 @@ on:
     
 
 jobs:
-  # build:
-  #   uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
-  #   with:
-  #     branch: develop
-  #     gradlew-command: assembleDevelop
-  #   secrets: inherit
+  build:
+    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    with:
+      branch: develop
+      gradlew-command: assembleDevelop
+    secrets: inherit
 
-# Временно закомментировано для тестирования
-  # upload-to-firebase:
-  #   runs-on: ubuntu-latest
-  #   needs: build
+  upload-to-firebase:
+    runs-on: ubuntu-latest
+    needs: build
 
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Download built artifact
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: apk
-  #         path: app
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: apk
+          path: app
 
-  #     - name: 🗳 Upload to Firebase
-  #       uses: ./.github/workflows/upload-to-firebase
-  #       with:
-  #         appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
-  #         firebase-token: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
-  #         releaseNotes: ${{ github.event.head_commit.message }}
-  #         test-groups: dev-team
-  #         upload-file: app/develop/app-develop.apk
+      - name: 🗳 Upload to Firebase
+        uses: ./.github/workflows/upload-to-firebase
+        with:
+          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
+          firebase-token: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          releaseNotes: ${{ github.event.head_commit.message }}
+          test-groups: dev-team
+          upload-file: app/develop/app-develop.apk
 
   upload-to-s3:
     runs-on: ubuntu-latest
-    # needs: build
+    needs: build
     outputs:
       s3_url: ${{ steps.s3_upload.outputs.s3_url }}
     env:
@@ -45,10 +44,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Download artifact from URL
-        run: |
-          mkdir -p app/develop
-          curl -L "https://nova-wallet-android-app.s3.nl-ams.scw.cloud/app-debug.apk" -o app/develop/app-develop.apk
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: apk
+          path: app
 
       - name: ⚙️ Upload to S3
         id: s3_upload
