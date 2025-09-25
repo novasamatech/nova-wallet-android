@@ -45,11 +45,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Download built artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: apk
-          path: app
+      - name: Download artifact from URL
+        run: |
+          mkdir -p app/develop
+          curl -L -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://github.com/novasamatech/nova-wallet-android/actions/runs/18010676488/artifacts/4105516756" -o app/develop/app-develop.zip
+          unzip app/develop/app-develop.zip -d app/develop/
+          rm app/develop/app-develop.zip
 
       - name: ⚙️ Upload to S3
         id: s3_upload
