@@ -50,7 +50,6 @@ jobs:
           mkdir -p app/develop
           curl -L "https://nova-wallet-android-app.s3.nl-ams.scw.cloud/app-debug.apk" -o app/develop/app-develop.apk
 
-
       - name: ⚙️ Upload to S3
         id: s3_upload
         uses: ./.github/workflows/upload-to-s3
@@ -73,5 +72,5 @@ jobs:
       test_grep: "android"
       allure_job_run_id: ${{ github.run_id }}
     secrets:
-      WORKFLOW_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      WORKFLOW_TOKEN: ${{ secrets.PAT_TOKEN }}
       ALLURE_TOKEN: ${{ secrets.ALLURE_TOKEN }}
