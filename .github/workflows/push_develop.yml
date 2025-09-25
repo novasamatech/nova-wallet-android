@@ -73,5 +73,5 @@ jobs:
       test_grep: "android"
       allure_job_run_id: ${{ github.run_id }}
     secrets:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      WORKFLOW_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ALLURE_TOKEN: ${{ secrets.ALLURE_TOKEN }}
