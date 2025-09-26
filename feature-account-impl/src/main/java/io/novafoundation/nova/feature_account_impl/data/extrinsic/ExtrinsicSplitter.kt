@@ -3,11 +3,10 @@ package io.novafoundation.nova.feature_account_impl.data.extrinsic
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.data.network.runtime.binding.fitsIn
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
-import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.common.utils.min
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SplitCalls
+import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.runtime.ext.requireGenesisHash
 import io.novafoundation.nova.runtime.extrinsic.CustomTransactionExtensions
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
@@ -30,10 +29,12 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrin
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.ChargeTransactionPayment
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckGenesis
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckMortality
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckNonce.Companion.setNonce
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckSpecVersion
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.CheckTxVersion
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.checkMetadataHash.CheckMetadataHash
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.checkMetadataHash.CheckMetadataHashMode
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.extensions.verifySignature.VerifySignature
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -49,12 +50,11 @@ private const val LEAVE_SOME_SPACE_MULTIPLIER = 0.8
 internal class RealExtrinsicSplitter @Inject constructor(
     private val rpcCalls: RpcCalls,
     private val blockLimitsRepository: BlockLimitsRepository,
-    private val signingContextFactory: SigningContext.Factory,
     private val chainRegistry: ChainRegistry,
 ) : ExtrinsicSplitter {
 
     override suspend fun split(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): SplitCalls = coroutineScope {
-        val weightByCallId = estimateWeightByCallType(signer, callBuilder, chain)
+        val weightByCallId = estimateWeightByCallType(callBuilder, chain)
 
         val blockLimit = blockLimitsRepository.blockLimits(chain.id)
         val lastBlockWeight = blockLimitsRepository.lastBlockWeight(chain.id)
@@ -67,7 +67,7 @@ internal class RealExtrinsicSplitter @Inject constructor(
 
     override suspend fun estimateCallWeight(signer: NovaSigner, call: GenericCall.Instance, chain: Chain): WeightV2 {
         val runtime = chainRegistry.getRuntime(chain.id)
-        val fakeExtrinsic = wrapInFakeExtrinsic(signer, call, runtime, chain)
+        val fakeExtrinsic = wrapInFakeExtrinsic(call, runtime, chain)
         return rpcCalls.getExtrinsicFee(chain, fakeExtrinsic).weight
     }
 
@@ -87,11 +87,11 @@ internal class RealExtrinsicSplitter @Inject constructor(
         }
 
     @Suppress("SuspendFunctionOnCoroutineScope")
-    private suspend fun CoroutineScope.estimateWeightByCallType(signer: NovaSigner, callBuilder: CallBuilder, chain: Chain): CallWeightsByType {
+    private suspend fun CoroutineScope.estimateWeightByCallType(callBuilder: CallBuilder, chain: Chain): CallWeightsByType {
         return callBuilder.calls.groupBy { it.uniqueId }
             .mapValues { (_, calls) ->
                 val sample = calls.first()
-                val sampleExtrinsic = wrapInFakeExtrinsic(signer, sample, callBuilder.runtime, chain)
+                val sampleExtrinsic = wrapInFakeExtrinsic(sample, callBuilder.runtime, chain)
 
                 async { rpcCalls.getExtrinsicFee(chain, sampleExtrinsic).weight }
             }
@@ -134,7 +134,6 @@ internal class RealExtrinsicSplitter @Inject constructor(
     }
 
     private suspend fun wrapInFakeExtrinsic(
-        signer: NovaSigner,
         call: GenericCall.Instance,
         runtime: RuntimeSnapshot,
         chain: Chain
@@ -153,12 +152,13 @@ internal class RealExtrinsicSplitter @Inject constructor(
             setTransactionExtension(CheckSpecVersion(0))
             setTransactionExtension(CheckTxVersion(0))
 
+            // We don't event need to fake signing info for more accurate weight since we are interested in call weight anyway
+            setNonce(BigInteger.ZERO)
+            setTransactionExtension(VerifySignature.disabled())
+
             CustomTransactionExtensions.defaultValues().forEach(::setTransactionExtension)
 
             call(call)
-
-            val signingContext = signingContextFactory.default(chain)
-            signer.setSignerDataForFee(signingContext)
         }.buildExtrinsic()
     }
 }
