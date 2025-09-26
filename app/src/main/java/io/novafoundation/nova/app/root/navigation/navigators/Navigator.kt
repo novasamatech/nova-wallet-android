@@ -53,6 +53,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.startCreateWalle
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload.FlowType
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
+import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsFragment
+import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
@@ -616,6 +618,12 @@ class Navigator(
     override fun openCloudBackupSettings() {
         navigationBuilder().action(R.id.action_open_cloudBackupSettings)
             .navigateInFirstAttachedContext()
+    }
+
+    override fun openChainMigrationDetails(chainId: String) {
+        navigationBuilder().action(R.id.action_open_chain_migration_details)
+            .setArgs(ChainMigrationDetailsFragment.createPayload(ChainMigrationDetailsPayload(chainId)))
+            .navigateInRoot()
     }
 
     override fun returnToWallet() {

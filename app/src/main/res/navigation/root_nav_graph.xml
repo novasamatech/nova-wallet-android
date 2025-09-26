@@ -155,6 +155,14 @@
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
 
+    <action
+        android:id="@+id/action_open_chain_migration_details"
+        app:destination="@id/chainMigrationDetails"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/splashFragment"
         android:name="io.novafoundation.nova.splash.presentation.SplashFragment"
@@ -187,6 +195,12 @@
             app:popUpToInclusive="true" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/chainMigrationDetails"
+        android:name="io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsFragment"
+        android:label="fragment_chain_migration_details"
+        tools:layout="@layout/fragment_chain_migration_details" />
 
     <fragment
         android:id="@+id/pincodeFragment"

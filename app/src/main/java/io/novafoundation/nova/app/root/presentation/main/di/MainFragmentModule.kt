@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.app.root.domain.MainInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -28,13 +29,15 @@ class MainFragmentModule {
         updateNotificationsInteractor: UpdateNotificationsInteractor,
         automaticInteractionGate: AutomaticInteractionGate,
         welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor,
+        mainInteractor: MainInteractor,
         rootRouter: RootRouter
     ): ViewModel {
         return MainViewModel(
             updateNotificationsInteractor,
             automaticInteractionGate,
             welcomePushNotificationsInteractor,
-            rootRouter
+            rootRouter,
+            mainInteractor
         )
     }
 

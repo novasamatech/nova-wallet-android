@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
 import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
 import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureHolder
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
+import io.novafoundation.nova.feature_ahm_impl.di.ChainMigrationFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
 import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
@@ -287,4 +289,10 @@ interface ComponentHolderModule {
     @ClassKey(AccountMigrationFeatureApi::class)
     @IntoMap
     fun provideAccountMigrationFeatureHolder(holder: AccountMigrationFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(ChainMigrationFeatureApi::class)
+    @IntoMap
+    fun provideChainMigrationFeatureHolder(holder: ChainMigrationFeatureHolder): FeatureApiHolder
 }

@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="chaim_migration_details_hint_history">Old transaction history remains on Kusama Relay</string>
+    <string name="chaim_migration_details_hint_auto_migration">Migration happens automatically, no action needed</string>
+
+    <string name="chain_migration_details_title">Starting %1$s your %2$s balance, Staking and Governance are now on %3$s</string>
+    <string name="chaim_migration_details_subtitle">What makes Asset Hub awesome?</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx reduction in minimal balance\n(from %2$s to %3$s)</string>
+    <string name="chain_migration_details_lower_fee">%1$sx lower transaction fees\n(from %2$s to %3$s)</string>
+    <string name="chain_migration_details_tokens">More tokens supported: %s, and other ecosystem tokens</string>
+    <string name="chain_migration_details_unified_access">Unified access to %s, assets, staking, and governance</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Ability to pay fees in any token</string>
 
     <string name="profile_settings_hide_balances_on_launch_title">Hide balances on launch</string>
 

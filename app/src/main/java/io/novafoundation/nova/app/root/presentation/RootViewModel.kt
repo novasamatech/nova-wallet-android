@@ -77,9 +77,14 @@ class RootViewModel(
         contributionsInteractor.runUpdate()
             .launchIn(this)
 
-        interactor.runBalancesUpdate()
-            .onEach { handleUpdatesSideEffect(it) }
-            .launchIn(this)
+        launch {
+            // Cache balances before balances sync to detect migration
+            interactor.cacheBalancesForChainMigrationDetection()
+
+            interactor.runBalancesUpdate()
+                .onEach { handleUpdatesSideEffect(it) }
+                .launchIn(viewModelScope)
+        }
 
         backgroundAccessObserver.requestAccessFlow
             .onEach { verifyUserIfNeed() }
@@ -110,6 +115,8 @@ class RootViewModel(
         externalServiceInitializer.initialize()
 
         multisigPushNotificationsAlertMixin.subscribeToShowAlert()
+
+        launch { interactor.loadMigrationDetailsConfigs() }
     }
 
     private fun observeBusEvents() {

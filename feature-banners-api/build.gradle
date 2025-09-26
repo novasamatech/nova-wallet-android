@@ -4,9 +4,7 @@ android {
     namespace 'io.novafoundation.nova.feature_banners_api'
 
     defaultConfig {
-
-
-
+        buildConfigField "String", "BANNERS_BASE_DIRECTORY", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content\""
         buildConfigField "String", "ASSETS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/assets/banners_dev.json\""
         buildConfigField "String", "DAPPS_BANNERS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/dapps/banners_dev.json\""
         buildConfigField "String", "ASSETS_BANNERS_LOCALISATION_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/banners/v2/content/assets/localized_dev\""
@@ -50,8 +48,6 @@ dependencies {
 
     implementation daggerDep
     ksp daggerCompiler
-
-    implementation androidDep
 
     testImplementation project(':test-shared')
 }

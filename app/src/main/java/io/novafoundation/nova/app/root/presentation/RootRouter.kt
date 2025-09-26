@@ -11,4 +11,6 @@ interface RootRouter {
     fun openPushWelcome()
 
     fun openCloudBackupSettings()
+
+    fun openChainMigrationDetails(chainId: String)
 }
