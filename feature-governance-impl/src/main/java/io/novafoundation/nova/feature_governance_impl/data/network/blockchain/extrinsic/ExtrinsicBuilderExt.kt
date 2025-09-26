@@ -46,16 +46,30 @@ fun CallBuilder.convictionVotingVote(
     )
 }
 
-fun ExtrinsicBuilder.convictionVotingUnlock(
+fun CallBuilder.convictionVotingUnlock(
     trackId: TrackId,
     accountId: AccountId
-): ExtrinsicBuilder {
-    return call(
+) {
+    addCall(
         moduleName = Modules.CONVICTION_VOTING,
         callName = "unlock",
         arguments = mapOf(
             "class" to trackId.value,
             "target" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, accountId)
+        )
+    )
+}
+
+fun CallBuilder.convictionVotingRemoveVote(
+    trackId: TrackId,
+    referendumId: ReferendumId,
+) {
+    addCall(
+        moduleName = Modules.CONVICTION_VOTING,
+        callName = "remove_vote",
+        arguments = mapOf(
+            "class" to trackId.value,
+            "index" to referendumId.value
         )
     )
 }
@@ -102,10 +116,10 @@ fun CallBuilder.democracyVote(
     )
 }
 
-fun ExtrinsicBuilder.democracyUnlock(accountId: AccountId): ExtrinsicBuilder {
+fun CallBuilder.democracyUnlock(accountId: AccountId) {
     val accountLookupType = runtime.metadata.democracy().call("unlock").argumentType("target")
 
-    return call(
+    addCall(
         moduleName = Modules.DEMOCRACY,
         callName = "unlock",
         arguments = mapOf(
@@ -114,10 +128,22 @@ fun ExtrinsicBuilder.democracyUnlock(accountId: AccountId): ExtrinsicBuilder {
     )
 }
 
+fun CallBuilder.democracyRemoveVote(
+    referendumId: ReferendumId,
+) {
+    addCall(
+        moduleName = Modules.DEMOCRACY,
+        callName = "remove_vote",
+        arguments = mapOf(
+            "index" to referendumId.value
+        )
+    )
+}
+
 fun ExtrinsicBuilder.democracyRemoveVote(
     referendumId: ReferendumId,
-): ExtrinsicBuilder {
-    return call(
+) {
+    call(
         moduleName = Modules.DEMOCRACY,
         callName = "remove_vote",
         arguments = mapOf(

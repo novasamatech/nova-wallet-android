@@ -175,7 +175,7 @@ class GovV2ConvictionVotingRepository(
             .filter { it.vote.votedFor(type) }
     }
 
-    override fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
+    override fun CallBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable) {
         claimable.actions.forEach { claimAction ->
             when (claimAction) {
                 is ClaimSchedule.ClaimAction.RemoveVote -> {
@@ -195,6 +195,10 @@ class GovV2ConvictionVotingRepository(
 
     override fun CallBuilder.vote(referendumId: ReferendumId, vote: AccountVote) {
         convictionVotingVote(referendumId, vote)
+    }
+
+    private fun CallBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {
+        convictionVotingRemoveVote(trackId, referendumId)
     }
 
     override fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId) {

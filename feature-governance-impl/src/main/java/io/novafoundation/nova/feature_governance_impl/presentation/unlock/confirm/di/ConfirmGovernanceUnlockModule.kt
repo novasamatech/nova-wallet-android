@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -59,7 +60,8 @@ class ConfirmGovernanceUnlockModule {
         locksChangeFormatter: LocksChangeFormatter,
         validationSystem: UnlockReferendumValidationSystem,
         hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        partialRetriableMixinFactory: PartialRetriableMixin.Factory,
     ): ViewModel {
         return ConfirmGovernanceUnlockViewModel(
             router = router,
@@ -76,7 +78,8 @@ class ConfirmGovernanceUnlockModule {
             locksChangeFormatter = locksChangeFormatter,
             validationSystem = validationSystem,
             hintsMixinFactory = hintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            partialRetriableMixinFactory = partialRetriableMixinFactory
         )
     }
 

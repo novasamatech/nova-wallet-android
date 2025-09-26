@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -35,13 +35,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.maxLockReplacing
 import io.novafoundation.nova.feature_wallet_api.domain.model.transferableReplacingFrozen
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.selectedOption
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +54,7 @@ interface GovernanceUnlockInteractor {
 
     suspend fun calculateFee(claimable: UnlockChunk.Claimable?): Fee?
 
-    suspend fun unlock(claimable: UnlockChunk.Claimable?): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
+    suspend fun unlock(claimable: UnlockChunk.Claimable?): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
     fun locksOverviewFlow(scope: CoroutineScope): Flow<GovernanceLocksOverview>
 
@@ -89,7 +89,7 @@ class RealGovernanceUnlockInteractor(
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val origin = metaAccount.accountIdIn(chain)!!
 
-        return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
+        return extrinsicService.estimateMultiFee(chain, TransactionOrigin.SelectedWallet) {
             executeUnlock(origin, governanceSelectedOption, claimable)
         }
     }
@@ -98,14 +98,14 @@ class RealGovernanceUnlockInteractor(
         val governanceSelectedOption = selectedAssetState.selectedOption()
         val chain = governanceSelectedOption.assetWithChain.chain
 
-        extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) { buildingContext ->
+        extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) { buildingContext ->
             if (claimable == null) error("Nothing to claim")
 
             executeUnlock(accountIdToUnlock = buildingContext.submissionOrigin.executingAccount, governanceSelectedOption, claimable)
-        }.awaitInBlock()
+        }
     }
 
-    private suspend fun ExtrinsicBuilder.executeUnlock(
+    private suspend fun CallBuilder.executeUnlock(
         accountIdToUnlock: AccountId,
         selectedGovernanceOption: SupportedGovernanceOption,
         claimable: UnlockChunk.Claimable

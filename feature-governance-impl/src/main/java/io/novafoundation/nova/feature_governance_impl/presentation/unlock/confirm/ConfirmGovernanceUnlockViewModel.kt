@@ -7,8 +7,10 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.submissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
@@ -59,7 +61,8 @@ class ConfirmGovernanceUnlockViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val validationSystem: UnlockReferendumValidationSystem,
     private val hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    partialRetriableMixinFactory: PartialRetriableMixin.Factory,
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
@@ -120,6 +123,8 @@ class ConfirmGovernanceUnlockViewModel(
         }
     }
 
+    val partialRetriableMixin = partialRetriableMixinFactory.create(scope = this)
+
     init {
         originFeeMixin.connectWith(
             inputSource = unlockAffectsFlow,
@@ -164,14 +169,17 @@ class ConfirmGovernanceUnlockViewModel(
         claimable: ClaimSchedule.UnlockChunk.Claimable?,
         lockChange: Change<Balance>
     ) = launch {
-        interactor.unlock(claimable)
-            .onFailure(::showError)
-            .onSuccess {
-                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+        val result = interactor.unlock(claimable)
 
-                startNavigation(it.submissionHierarchy) { router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero) }
-            }
-
-        submissionInProgress.value = false
+        partialRetriableMixin.handleMultiResult(
+            multiResult = result,
+            onSuccess = {
+                startNavigation(it.submissionHierarchy()) {
+                    router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero)
+                }
+            },
+            progressConsumer = submissionInProgress.progressConsumer(),
+            onRetryCancelled = { router.back() }
+        )
     }
 }

@@ -46,11 +46,12 @@ interface ConvictionVotingRepository {
         return votingFor(accountId, chainId).delegations()
     }
 
-    fun ExtrinsicBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable)
+    fun CallBuilder.unlock(accountId: AccountId, claimable: ClaimSchedule.UnlockChunk.Claimable)
 
     fun ExtrinsicBuilder.vote(referendumId: ReferendumId, vote: AccountVote)
 
     fun CallBuilder.vote(referendumId: ReferendumId, vote: AccountVote)
+
     fun ExtrinsicBuilder.removeVote(trackId: TrackId, referendumId: ReferendumId)
 
     fun isAbstainVotingAvailable(): Boolean

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.presentation.unlock.confi
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -38,6 +39,7 @@ class ConfirmGovernanceUnlockFragment : BaseFragment<ConfirmGovernanceUnlockView
         setupExternalActions(viewModel)
         observeHints(viewModel.hintsMixin, binder.confirmReferendumUnlockHints)
         setupFeeLoading(viewModel, binder.confirmGovernanceUnlockInformation.fee)
+        observeRetries(viewModel.partialRetriableMixin)
 
         viewModel.currentAddressModelFlow.observe(binder.confirmGovernanceUnlockInformation::setAccount)
         viewModel.walletModel.observe(binder.confirmGovernanceUnlockInformation::setWallet)
