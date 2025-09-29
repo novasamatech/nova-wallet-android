@@ -60,7 +60,7 @@ class RealChainAssetLocationConverterTest {
     private lateinit var usdcOnPah: Chain.Asset
 
     @Mock
-    private lateinit var ksmtOnPah: Chain.Asset
+    private lateinit var dotOnKusama: Chain.Asset
 
     @Mock
     private lateinit var chainRegistry: ChainRegistry
@@ -77,7 +77,7 @@ class RealChainAssetLocationConverterTest {
     private val dotAssetId = 0
     private val usdcAssetId = 1337
     private val ksmOnKusamaAssetId = 0
-    private val ksmOnPahAssetId = 23
+    private val dotOnKusamaId = 23
 
 
     // Locations
@@ -86,7 +86,6 @@ class RealChainAssetLocationConverterTest {
     private val polkadotLocation = AbsoluteMultiLocation(Interior.Here)
     private val pahLocation = AbsoluteMultiLocation(ParachainId(1000))
 
-    private val ksmLocation = AbsoluteMultiLocation(Interior.Here)
     private val kusamaLocation = AbsoluteMultiLocation(Interior.Here)
 
     private val usdcLocation = AbsoluteMultiLocation(
@@ -222,14 +221,16 @@ class RealChainAssetLocationConverterTest {
             assets = mapOf(
                 dotAssetId to dotOnPah,
                 usdcAssetId to usdcOnPah,
-                ksmOnPahAssetId to ksmtOnPah
             )
         )
 
         setupChain(
             chain = kusama,
             chainId = kusamaChainId,
-            assets = mapOf(ksmOnKusamaAssetId to ksmOnKusama),
+            assets = mapOf(
+                ksmOnKusamaAssetId to ksmOnKusama,
+                dotOnKusamaId to dotOnKusama
+            ),
         )
 
         whenever(chainRegistry.chainsById).thenAnswer { flowOf(allChainsById()) }
@@ -244,7 +245,7 @@ class RealChainAssetLocationConverterTest {
         setupAsset(dotOnPah, pahChainId, dotAssetId, "DOT")
         setupAsset(usdcOnPah, pahChainId, usdcAssetId, "USDC")
         setupAsset(ksmOnKusama, kusamaChainId, ksmOnKusamaAssetId, "KSM")
-        setupAsset(ksmtOnPah, pahChainId, ksmOnPahAssetId, "KSM")
+        setupAsset(dotOnKusama, kusamaChainId, dotOnKusamaId, "DOT")
     }
 
     private fun setupChain(chain: Chain, chainId: String, assets: Map<Int, Chain.Asset>) {
@@ -276,7 +277,7 @@ class RealChainAssetLocationConverterTest {
     private fun setupAssetSearchBySymbol() {
         whenever(polkadot.assets).thenReturn(listOf(dotOnPolkadot))
         whenever(pah.assets).thenReturn(listOf(dotOnPah, usdcOnPah))
-        whenever(kusama.assets).thenReturn(listOf(ksmOnKusama))
+        whenever(kusama.assets).thenReturn(listOf(ksmOnKusama, dotOnKusama))
     }
 
     private fun setupXcmConfig() {
