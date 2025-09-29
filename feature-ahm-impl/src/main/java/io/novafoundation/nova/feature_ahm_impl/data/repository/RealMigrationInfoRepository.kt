@@ -14,8 +14,12 @@ class RealMigrationInfoRepository(
     private var configs: List<ChainMigrationConfig>? = null
     private val mutex = Mutex()
 
-    override suspend fun getConfig(chainId: String): ChainMigrationConfig {
-        return getConfigsInternal().first { it.sourceData.chainId == chainId }
+    override suspend fun getConfigBySource(chainId: String): ChainMigrationConfig? {
+        return getConfigsInternal().firstOrNull { it.sourceData.chainId == chainId }
+    }
+
+    override suspend fun getConfigByDestination(chainId: String): ChainMigrationConfig? {
+        return getConfigsInternal().firstOrNull { it.destinationData.chainId == chainId }
     }
 
     override suspend fun getAllConfigs(): List<ChainMigrationConfig> {

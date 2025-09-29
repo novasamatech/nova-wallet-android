@@ -9,15 +9,15 @@ import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_ahm_impl.R
 import io.novafoundation.nova.feature_ahm_impl.domain.ChainMigrationDetailsInteractor
 import io.novafoundation.nova.feature_ahm_impl.presentation.ChainMigrationRouter
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.forDirectory
-import java.text.SimpleDateFormat
-import java.util.Locale
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -42,12 +42,13 @@ class ChainMigrationDetailsViewModel(
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
-    private val dateFormatter = SimpleDateFormat("d MMMM, yyyy", Locale.getDefault())
+    private val dateFormatter = getChainMigrationDateFormat()
 
     private val chainFlow = interactor.chainFlow(payload.chainId)
         .shareInBackground()
 
     private val configFlow = flowOf { interactor.getChainMigrationConfig(payload.chainId) }
+        .filterNotNull()
         .shareInBackground()
 
     val bannersFlow = configFlow.map {

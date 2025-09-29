@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressCommunicator
 import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
@@ -47,6 +48,7 @@ class AssetsFeatureHolder @Inject constructor(
             .buyFeatureApi(getFeature(BuyFeatureApi::class.java))
             .bannersFeatureApi(getFeature(BannersFeatureApi::class.java))
             .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
+            .chainMigrationFeatureApi(getFeature(ChainMigrationFeatureApi::class.java))
             .build()
 
         return DaggerAssetsFeatureComponent.factory()

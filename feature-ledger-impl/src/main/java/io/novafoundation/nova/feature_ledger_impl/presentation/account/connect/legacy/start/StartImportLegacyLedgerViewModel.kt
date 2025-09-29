@@ -47,7 +47,7 @@ class StartImportLegacyLedgerViewModel(
             style = AlertView.Style.fromPreset(AlertView.StylePreset.WARNING),
             message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
             subMessage = resourceManager.getString(R.string.account_ledger_legacy_warning_message),
-            action = AlertModel.ActionModel(resourceManager.getString(R.string.common_find_out_more), ::deprecationWarningClicked)
+            linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_find_out_more), ::deprecationWarningClicked)
         )
     }
 

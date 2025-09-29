@@ -7,6 +7,7 @@ android {
 dependencies {
     implementation coroutinesDep
     implementation project(":common")
+    implementation project(':runtime')
     implementation project(":feature-deep-linking")
 
     implementation cardViewDep

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_ahm_api.domain.model
 
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 import java.util.Date
 
@@ -20,3 +21,11 @@ class ChainMigrationConfig(
         val averageFee: BigInteger
     )
 }
+
+class ChainMigrationConfigWithChains(
+    val config: ChainMigrationConfig,
+    val sourceChain: Chain,
+    val sourceAsset: Chain.Asset,
+    val destinationChain: Chain,
+    val destinationAsset: Chain.Asset
+)

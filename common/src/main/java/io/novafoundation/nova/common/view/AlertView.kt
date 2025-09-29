@@ -20,6 +20,7 @@ import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
+import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 
@@ -29,15 +30,17 @@ class AlertModel(
     val style: AlertView.Style,
     val message: String,
     val subMessages: List<CharSequence>,
-    val action: ActionModel? = null
+    val linkAction: ActionModel? = null,
+    val buttonAction: ActionModel? = null
 ) {
 
     constructor(
         style: AlertView.Style,
         message: String,
         subMessage: CharSequence? = null,
-        action: ActionModel? = null
-    ) : this(style, message, subMessages = listOfNotNull(subMessage), action)
+        linkAction: ActionModel? = null,
+        buttonAction: ActionModel? = null,
+    ) : this(style, message, subMessages = listOfNotNull(subMessage), linkAction, buttonAction)
 
     class ActionModel(val text: String, val listener: () -> Unit)
 }
@@ -72,7 +75,7 @@ class AlertView @JvmOverloads constructor(
     private val binder = ViewAlertBinding.inflate(inflater(), this)
 
     init {
-        updatePadding(top = 10.dp, start = 16.dp, end = 16.dp, bottom = 10.dp)
+        updatePadding(bottom = 10.dp)
 
         attrs?.let(::applyAttrs)
     }
@@ -109,9 +112,23 @@ class AlertView @JvmOverloads constructor(
         }
     }
 
-    fun setOnActionClickedListener(listener: () -> Unit) {
+    fun setOnLinkClickedListener(listener: () -> Unit) {
         binder.alertActionContent.setOnClickListener { listener() }
         binder.alertActionArrow.setOnClickListener { listener() }
+    }
+
+    fun setButtonText(text: String) {
+        binder.alertButton.setTextOrHide(text)
+    }
+
+    fun setOnButtonClickedListener(listener: () -> Unit) {
+        binder.alertButton.setOnClickListener { listener() }
+    }
+
+    fun setOnCloseClickListener(listener: (() -> Unit)?) {
+        binder.alertCloseButton.letOrHide(listener) {
+            binder.alertCloseButton.setOnClickListener { it() }
+        }
     }
 
     fun setModel(maybeModel: SimpleAlertModel?) = letOrHide(maybeModel) { model ->
@@ -162,9 +179,14 @@ fun AlertView.setModel(model: AlertModel) {
     setMessage(model.message)
     setSubMessages(model.subMessages)
 
-    if (model.action != null) {
-        setActionText(model.action.text)
-        setOnActionClickedListener(model.action.listener)
+    if (model.linkAction != null) {
+        setActionText(model.linkAction.text)
+        setOnLinkClickedListener(model.linkAction.listener)
+    }
+
+    if (model.buttonAction != null) {
+        setButtonText(model.buttonAction.text)
+        setOnButtonClickedListener(model.buttonAction.listener)
     }
 
     setStyle(model.style)

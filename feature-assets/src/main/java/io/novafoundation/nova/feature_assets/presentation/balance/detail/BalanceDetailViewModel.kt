@@ -5,15 +5,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.common.view.AlertModel
+import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
+import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
+import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
@@ -29,6 +35,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
+import io.novafoundation.nova.feature_assets.presentation.transaction.history.TransactionHistoryBannerModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartModel
@@ -84,9 +91,11 @@ class BalanceDetailViewModel(
     private val assetIconProvider: AssetIconProvider,
     private val chartsInteractor: ChartsInteractor,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
-    private val amountFormatter: AmountFormatter
-) : BaseViewModel(),
-    TransactionHistoryUi by transactionHistoryMixin {
+    private val amountFormatter: AmountFormatter,
+    private val assetMigrationUseCase: AssetMigrationUseCase
+) : BaseViewModel(), TransactionHistoryUi by transactionHistoryMixin, Browserable {
+
+    override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     val acknowledgeLedgerWarning = controllableAssetCheck.acknowledgeLedgerWarning
 
@@ -114,6 +123,9 @@ class BalanceDetailViewModel(
 
     private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances(assetPayload.fullChainAssetId)
         .onStart { emit(emptyList()) }
+        .shareInBackground()
+
+    private val migrationConfigFlow = assetMigrationUseCase.observeMigrationConfigOrNull(assetPayload.chainId, assetPayload.chainAssetId)
         .shareInBackground()
 
     val assetDetailsModel = combine(assetFlow, externalBalancesFlow) { asset, externalBalances ->
@@ -163,6 +175,50 @@ class BalanceDetailViewModel(
             RealPricePriceTextInjector(currency, lastCoinRate),
             RealPriceChangeTextInjector(resourceManager, currency),
             RealDateChartTextInjector(resourceManager)
+        )
+    }.shareInBackground()
+
+    private val dateFormatter = getChainMigrationDateFormat()
+
+    val sourceMigrationAlertFlow = combine(
+        migrationConfigFlow,
+        chainFlow,
+        assetMigrationUseCase.observeSourceShouldBeHidden(assetPayload.chainId, assetPayload.chainAssetId)
+    ) { configWithChains, chain, shouldBeHidden ->
+        if (shouldBeHidden) return@combine null
+        if (configWithChains == null) return@combine null
+        if (chain.id != configWithChains.config.sourceData.chainId) return@combine null
+
+        val config = configWithChains.config
+        val sourceAsset = configWithChains.sourceAsset
+        val destinationChain = configWithChains.destinationChain
+        val formattedDate = dateFormatter.format(config.timeStartAt)
+        AlertModel(
+            style = AlertView.Style.fromPreset(AlertView.StylePreset.INFO),
+            message = resourceManager.getString(R.string.asset_details_source_asset_alert_title, sourceAsset.symbol.value, destinationChain.name),
+            subMessage = resourceManager.getString(
+                R.string.asset_details_source_asset_alert_message,
+                formattedDate,
+                sourceAsset.symbol.value,
+                destinationChain.name
+            ),
+            linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreClicked(config) },
+            buttonAction = AlertModel.ActionModel(
+                resourceManager.getString(R.string.asset_details_source_asset_alert_button, destinationChain.name),
+                { openAssetDetails(configWithChains.config.destinationData) }
+            )
+        )
+    }.shareInBackground()
+
+    val destinationMigrationBannerFlow = combine(migrationConfigFlow, chainFlow) { configWithChains, chain ->
+        if (configWithChains == null) return@combine null
+        if (chain.id != configWithChains.config.destinationData.chainId) return@combine null
+
+        val sourceAsset = configWithChains.sourceAsset
+        val sourceChain = configWithChains.sourceChain
+        TransactionHistoryBannerModel(
+            resourceManager.getString(R.string.transaction_history_migration_source_message, sourceAsset.symbol.value, sourceChain.name),
+            { openAssetDetails(configWithChains.config.sourceData) }
         )
     }.shareInBackground()
 
@@ -242,6 +298,10 @@ class BalanceDetailViewModel(
         _showLockedDetailsEvent.value = Event(balanceLocks)
     }
 
+    fun closeMigrationAlert() {
+        assetMigrationUseCase.markRelayMigrationInfoAsHidden(assetPayload.chainId, assetPayload.chainAssetId)
+    }
+
     private fun checkControllableAsset(action: () -> Unit) {
         launch {
             val metaAccount = selectedAccountFlow.first()
@@ -264,6 +324,15 @@ class BalanceDetailViewModel(
             transferable = amountFormatter.formatAmountToAmountModel(asset.transferable, asset),
             locked = amountFormatter.formatAmountToAmountModel(asset.locked + totalContributed, asset),
             assetIcon = assetIconProvider.getAssetIconOrFallback(asset.token.configuration)
+        )
+    }
+
+    private fun openAssetDetails(chainData: ChainMigrationConfig.ChainData) {
+        router.openAssetDetails(
+            AssetPayload(
+                chainId = chainData.chainId,
+                chainAssetId = chainData.assetId
+            )
         )
     }
 
@@ -352,6 +421,12 @@ class BalanceDetailViewModel(
         return when (pricePeriod) {
             PricePeriod.DAY, PricePeriod.WEEK, PricePeriod.MONTH -> true
             PricePeriod.YEAR, PricePeriod.MAX -> false
+        }
+    }
+
+    private fun learnMoreClicked(config: ChainMigrationConfig) {
+        launch {
+            openBrowserEvent.value = Event(config.wikiURL)
         }
     }
 }

@@ -656,6 +656,7 @@ class Navigator(
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
             .addCase(R.id.tradeWebFragment, R.id.action_tradeWebFragment_to_balanceDetailFragment)
+            .addCase(R.id.balanceDetailFragment, R.id.action_balanceDetailFragment_to_balanceDetailFragment)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }

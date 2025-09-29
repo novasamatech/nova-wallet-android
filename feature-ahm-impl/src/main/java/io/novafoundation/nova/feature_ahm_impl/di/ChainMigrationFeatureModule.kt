@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_ahm_impl.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.AssetDao
@@ -12,7 +13,9 @@ import io.novafoundation.nova.feature_ahm_impl.data.config.ChainMigrationConfigA
 import io.novafoundation.nova.feature_ahm_impl.data.repository.RealChainMigrationRepository
 import io.novafoundation.nova.feature_ahm_impl.data.repository.RealMigrationInfoRepository
 import io.novafoundation.nova.feature_ahm_impl.di.modules.DeepLinkModule
+import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
 import io.novafoundation.nova.feature_ahm_impl.domain.ChainMigrationDetailsInteractor
+import io.novafoundation.nova.feature_ahm_impl.domain.RealAssetMigrationUseCase
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -66,6 +69,20 @@ class ChainMigrationFeatureModule {
             chainRegistry,
             chainMigrationRepository,
             migrationInfoRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAssetMigrationUseCase(
+        migrationInfoRepository: MigrationInfoRepository,
+        toggleFeatureRepository: ToggleFeatureRepository,
+        chainRegistry: ChainRegistry
+    ): AssetMigrationUseCase {
+        return RealAssetMigrationUseCase(
+            migrationInfoRepository,
+            toggleFeatureRepository,
+            chainRegistry
         )
     }
 }

@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.utils.DrawableExtension
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.enableShowingNewlyAddedTopElements
 import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setVisible
@@ -107,6 +108,16 @@ class TransferHistorySheet @JvmOverloads constructor(
         addScrollListener()
 
         updateSlidingEffects()
+    }
+
+    fun setBannerClickListener(onClickListener: OnClickListener?) {
+        binder.transferHistoryBannerView.setOnClickListener(onClickListener)
+    }
+
+    fun setBannerTextOrHide(text: String?) {
+        binder.transactionHistoryMigrationBanner.letOrHide(text) {
+            binder.transferHistoryBannerText.text = text
+        }
     }
 
     fun setFiltersVisible(visible: Boolean) {
@@ -274,4 +285,9 @@ class TransferHistorySheet @JvmOverloads constructor(
     private fun linearUpdate(min: Int, max: Int, progress: Float): Int {
         return (min + (max - min) * progress).toInt()
     }
+}
+
+fun TransferHistorySheet.setBannerModelOrHide(banner: TransactionHistoryBannerModel?) {
+    setBannerTextOrHide(banner?.text)
+    setBannerClickListener { banner?.clickListener?.invoke() }
 }
