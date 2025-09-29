@@ -6,15 +6,24 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 interface ChainAssetLocationConverter {
 
+    /**
+     * Find asset on [pointOfView] chain that matches given [location]
+     */
     suspend fun chainAssetFromRelativeLocation(
         location: RelativeMultiLocation,
         pointOfView: Chain,
     ): Chain.Asset?
 
+    /**
+     * Convert given [chainAsset] to absolute location
+     */
     suspend fun absoluteLocationFromChainAsset(
         chainAsset: Chain.Asset
     ): AbsoluteMultiLocation?
 
+    /**
+     * Convert given [chainAsset] to relative location from the pov of its chain
+     */
     suspend fun relativeLocationFromChainAsset(
         chainAsset: Chain.Asset
     ): RelativeMultiLocation?

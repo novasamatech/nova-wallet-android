@@ -61,6 +61,10 @@ class RealChainAssetLocationConverter(
 
         val povConsensusRoot = chainLocationConverter.getConsensusRoot(povChain)
 
+        // Resolve cross-consensus symbol collisions
+        // E.g. when searching for KSM reserve we need to make make we don't process PAH which has KSM since
+        // "use first reserve that has matching asset by symbol" logic breaks in such case
+        // Long term solution would be to use proper cross-consensus absolute locations, like "GlobalConsensus(Kusama)" for KSM
         val reservesInCurrentConsensus = allMatchingReserves.filter {
             val reserveChain = chainRegistry.getChainOrNull(it.reserveAssetId.chainId) ?: return@filter false
             val reserveConsensusRoot =  chainLocationConverter.getConsensusRoot(reserveChain)
