@@ -10,7 +10,9 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocatio
 import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.test_shared.whenever
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -31,67 +33,93 @@ class RealChainLocationConverterTest {
     private lateinit var chainRegistry: ChainRegistry
 
     @Mock
-    private lateinit var relayChain: Chain
+    private lateinit var polkadot: Chain
+    @Mock
+    private lateinit var pah: Chain
 
     @Mock
-    private lateinit var parachain: Chain
+    private lateinit var kusama: Chain
+    @Mock
+    private lateinit var kah: Chain
+
 
     private lateinit var converter: RealChainLocationConverter
 
-    private val relayChainId = "polkadot"
-    private val parachainId = "asset-hub"
+    private val polkadotId = "polkadot"
+    private val pahId = "pah"
+
+    private val kusamaId = "kusama"
+    private val kahId = "kah"
+
     private val paraId = 1000.toBigInteger()
 
     @Before
     fun setUp() = runBlocking {
-        whenever(xcmConfig.parachainIds).thenReturn(mapOf(parachainId to paraId))
+        whenever(xcmConfig.parachainIds).thenReturn(mapOf(
+            // In difference consensuses, same para id can be used
+            pahId to paraId,
+            kahId to paraId
+        ))
 
-        whenever(relayChain.id).thenReturn(relayChainId)
-        whenever(relayChain.parentId).thenReturn(null)
+        setupRelay(polkadot, polkadotId)
+        setupChain(pah, pahId, parentId = polkadotId)
 
-        whenever(parachain.id).thenReturn(parachainId)
-        whenever(parachain.parentId).thenReturn(relayChainId)
+        setupRelay(kusama, kusamaId)
+        setupChain(kah, kahId, parentId = kusamaId)
 
-        whenever(chainRegistry.getChain(relayChainId)).thenReturn(relayChain)
-        whenever(chainRegistry.getChain(parachainId)).thenReturn(parachain)
+        whenever(chainRegistry.chainsById).thenAnswer { flowOf(allChainsById()) }
 
         converter = RealChainLocationConverter(xcmConfig, chainRegistry)
+    }
+
+    private fun allChainsById(): Map<ChainId, Chain> {
+        return listOf(polkadot, pah, kusama, kah).associateBy { it.id  }
+    }
+
+    private suspend fun setupRelay(relaychain: Chain, relayId: String) {
+        setupChain(relaychain, relayId, parentId = null)
+    }
+
+    private suspend fun setupChain(relaychain: Chain, chainId: String, parentId: String?) {
+        whenever(relaychain.id).thenReturn(chainId)
+        whenever(relaychain.parentId).thenReturn(parentId)
+        whenever(chainRegistry.getChain(chainId)).thenReturn(relaychain)
     }
 
     @Test
     fun `chainFromRelativeLocation should return relaychain when location points to relaychain`() = runBlocking {
         val relativeLocation = RelativeMultiLocation(parents = 1, interior = Interior.Here)
 
-        val result = converter.chainFromRelativeLocation(relativeLocation, parachain)
+        val result = converter.chainFromRelativeLocation(relativeLocation, pah)
 
-        assertEquals(relayChain, result)
+        assertEquals(polkadot, result)
     }
 
     @Test
     fun `chainFromRelativeLocation should return parachain when location points to parachain`() = runBlocking {
         val relativeLocation = RelativeMultiLocation(parents = 0, interior = Junctions(ParachainId(paraId)))
 
-        val result = converter.chainFromRelativeLocation(relativeLocation, relayChain)
+        val result = converter.chainFromRelativeLocation(relativeLocation, polkadot)
 
-        assertEquals(parachain, result)
+        assertEquals(pah, result)
     }
 
     @Test
     fun `chainFromAbsoluteLocation should return relaychain when location has no junctions`() = runBlocking {
         val absoluteLocation = AbsoluteMultiLocation(Interior.Here)
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, relayChain)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
 
-        assertEquals(relayChain, result)
+        assertEquals(polkadot, result)
     }
 
     @Test
     fun `chainFromAbsoluteLocation should return parachain when location has parachain junction`() = runBlocking {
         val absoluteLocation = AbsoluteMultiLocation(ParachainId(paraId))
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, relayChain)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
 
-        assertEquals(parachain, result)
+        assertEquals(pah, result)
     }
 
     @Test
@@ -99,7 +127,7 @@ class RealChainLocationConverterTest {
         val unknownParaId = 9999
         val absoluteLocation = AbsoluteMultiLocation(ParachainId(unknownParaId))
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, relayChain)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
 
         assertNull(result)
     }
@@ -108,7 +136,7 @@ class RealChainLocationConverterTest {
     fun `chainFromAbsoluteLocation should return null when location has multiple junctions`() = runBlocking {
         val absoluteLocation = AbsoluteMultiLocation(ParachainId(paraId), ParachainId(2000))
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, relayChain)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
 
         assertNull(result)
     }
@@ -117,7 +145,7 @@ class RealChainLocationConverterTest {
     fun `chainFromAbsoluteLocation should return null when junction is not ParachainId`() = runBlocking {
         val absoluteLocation = AbsoluteMultiLocation(MultiLocation.Junction.GeneralIndex(BigInteger.ZERO))
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, relayChain)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
 
         assertNull(result)
     }
@@ -126,7 +154,7 @@ class RealChainLocationConverterTest {
     fun `absoluteLocationFromChain should return Here location for relaychain`() = runBlocking {
         val expected = Interior.Here.asLocation()
 
-        val result = converter.absoluteLocationFromChain(relayChainId)
+        val result = converter.absoluteLocationFromChain(polkadotId)
 
         assertEquals(expected, result)
     }
@@ -135,7 +163,7 @@ class RealChainLocationConverterTest {
     fun `absoluteLocationFromChain should return parachain location for parachain`() = runBlocking {
         val expected = AbsoluteMultiLocation(ParachainId(paraId))
 
-        val result = converter.absoluteLocationFromChain(parachainId)
+        val result = converter.absoluteLocationFromChain(pahId)
 
         assertEquals(expected, result)
     }

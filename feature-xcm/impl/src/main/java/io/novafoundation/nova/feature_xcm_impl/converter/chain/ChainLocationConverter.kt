@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_xcm_impl.converter.chain
 
-import io.novafoundation.nova.common.utils.reversed
+import io.novafoundation.nova.common.utils.reversedManyToOne
 import io.novafoundation.nova.feature_xcm_api.config.model.ChainXcmConfig
 import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainLocationConverter
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
@@ -12,13 +12,15 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.junctions
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
+import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 
 class RealChainLocationConverter(
     private val xcmConfig: ChainXcmConfig,
     private val chainRegistry: ChainRegistry,
 ) : ChainLocationConverter {
 
-    private val chainByParaId = xcmConfig.parachainIds.reversed()
+    private val chainsByParaId = xcmConfig.parachainIds.reversedManyToOne()
 
     override suspend fun chainFromRelativeLocation(
         location: RelativeMultiLocation,
@@ -42,9 +44,13 @@ class RealChainLocationConverter(
             0 -> consensusRoot
             1 -> {
                 val parachainId = junctions.single() as? ParachainId ?: return null
-                val chainId = chainByParaId[parachainId.id] ?: return null
+                val candidates = chainsByParaId[parachainId.id] ?: return null
 
-                chainRegistry.getChain(chainId)
+                val chains = chainRegistry.chainsById()
+
+                candidates.tryFindNonNull { candidateChainId ->
+                    chains[candidateChainId]?.takeIf { it.parentId == consensusRoot.id }
+                }
             }
             else -> null
         }
