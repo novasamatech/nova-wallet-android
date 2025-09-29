@@ -9,7 +9,7 @@ data class AbsoluteMultiLocation(
 
     companion object;
 
-    constructor(junctions: List<Junction>): this(junctions.toInterior())
+    constructor(junctions: List<Junction>) : this(junctions.toInterior())
 
     constructor(vararg junctions: Junction) : this(junctions.toList())
 

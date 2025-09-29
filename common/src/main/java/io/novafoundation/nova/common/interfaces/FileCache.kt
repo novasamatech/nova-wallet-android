@@ -49,7 +49,7 @@ internal class InternalFileSystemCache(
     }
 
     override suspend fun getCachedValue(fileName: String): String? {
-       return fileProvider.readCache(fileName)
+        return fileProvider.readCache(fileName)
     }
 
     private fun putCallback(fileName: String, callback: OnCacheValueChanged) = synchronized(this) {

@@ -13,7 +13,7 @@ import javax.inject.Inject
 class RealLocationConverterFactory @Inject constructor(
     private val xcmConfigRepository: XcmConfigRepository,
     private val chainRegistry: ChainRegistry,
-): LocationConverterFactory {
+) : LocationConverterFactory {
 
     override suspend fun createChainConverter(): ChainLocationConverter {
         val config = xcmConfigRepository.awaitXcmConfig()

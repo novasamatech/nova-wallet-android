@@ -67,7 +67,7 @@ class RealChainAssetLocationConverter(
         // Long term solution would be to use proper cross-consensus absolute locations, like "GlobalConsensus(Kusama)" for KSM
         val reservesInCurrentConsensus = allMatchingReserves.filter {
             val reserveChain = chainRegistry.getChainOrNull(it.reserveAssetId.chainId) ?: return@filter false
-            val reserveConsensusRoot =  chainLocationConverter.getConsensusRoot(reserveChain)
+            val reserveConsensusRoot = chainLocationConverter.getConsensusRoot(reserveChain)
             reserveConsensusRoot.id == povConsensusRoot.id
         }
 

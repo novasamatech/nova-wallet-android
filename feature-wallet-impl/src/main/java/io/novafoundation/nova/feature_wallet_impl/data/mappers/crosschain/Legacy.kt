@@ -51,7 +51,6 @@ fun LegacyCrossChainTransfersConfigRemote.toDomain(
     )
 }
 
-
 private fun mapNetworkDeliveryFeeFromRemote(networkDeliveryFeeRemote: LegacyNetworkDeliveryFeeRemote): DeliveryFeeConfiguration {
     return DeliveryFeeConfiguration(
         toParent = mapDeliveryFeeConfigFromRemote(networkDeliveryFeeRemote.toParent),
