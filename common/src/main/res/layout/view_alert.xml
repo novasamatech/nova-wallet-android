@@ -97,18 +97,19 @@
         app:constraint_referenced_ids="alertActionArrow,alertActionContent"
         tools:visibility="visible" />
 
-    <io.novafoundation.nova.common.view.PrimaryButtonV2
+    <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/alertButton"
-        style="@style/Widget.Nova.MaterialButton.Secondary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="2dp"
-        android:textColor="@color/button_text_accent"
         android:visibility="gone"
+        app:appearance="accentSecondaryTransparent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/alertActionContent"
+        app:size="small"
         tools:text="Do Something"
         tools:visibility="visible" />
+
 </merge>
