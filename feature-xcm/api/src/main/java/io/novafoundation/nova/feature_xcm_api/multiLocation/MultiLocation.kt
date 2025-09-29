@@ -15,7 +15,7 @@ abstract class MultiLocation(
 
     sealed class Interior {
 
-        object Here : Interior()
+        data object Here : Interior()
 
         class Junctions(junctions: List<Junction>) : Interior() {
             val junctions = junctions.sorted()

@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interi
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
+import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -45,11 +46,11 @@ class RealChainLocationConverterTest {
 
     private lateinit var converter: RealChainLocationConverter
 
-    private val polkadotId = "polkadot"
-    private val pahId = "pah"
+    private val polkadotId = Chain.Geneses.POLKADOT
+    private val pahId = Chain.Geneses.POLKADOT_ASSET_HUB
 
-    private val kusamaId = "kusama"
-    private val kahId = "kah"
+    private val kusamaId = Chain.Geneses.KUSAMA
+    private val kahId = Chain.Geneses.KUSAMA_ASSET_HUB
 
     private val paraId = 1000.toBigInteger()
 

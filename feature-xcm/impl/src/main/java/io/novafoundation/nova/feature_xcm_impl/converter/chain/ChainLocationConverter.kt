@@ -66,7 +66,7 @@ class RealChainLocationConverter(
         }
     }
 
-    private suspend fun getConsensusRoot(chain: Chain): Chain {
+    override suspend fun getConsensusRoot(chain: Chain): Chain {
         val parentId = chain.parentId
 
         return if (parentId != null) {

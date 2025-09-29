@@ -23,6 +23,6 @@ class RealLocationConverterFactory @Inject constructor(
     override suspend fun createAssetLocationConverter(): ChainAssetLocationConverter {
         val config = xcmConfigRepository.awaitXcmConfig()
         val chainLocationConverter = RealChainLocationConverter(config.chains, chainRegistry)
-        return RealChainAssetLocationConverter(config.assets, chainLocationConverter)
+        return RealChainAssetLocationConverter(config.assets, chainLocationConverter, chainRegistry)
     }
 }

@@ -8,6 +8,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 interface ChainLocationConverter {
 
+    suspend fun getConsensusRoot(chain: Chain): Chain
+
     suspend fun chainFromRelativeLocation(
         location: RelativeMultiLocation,
         pointOfView: Chain,
