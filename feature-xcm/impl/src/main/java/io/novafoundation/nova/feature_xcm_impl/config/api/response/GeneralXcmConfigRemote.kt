@@ -13,11 +13,11 @@ class ChainXcmConfigRemote(
 )
 
 class AssetsXcmConfigRemote(
-    val reservesById: Map<String, ChainAssetReserveConfigRemote>?,
+    val assetsLocation: Map<String, ChainAssetReserveConfigRemote>?,
 
     // By default, asset reserve id is equal to its symbol
     // This mapping allows to override that for cases like multiple reserves (Statemine & Polkadot for DOT)
-    val assetToReserveIdOverrides: Map<String, Map<Int, String>>?,
+    val reserveIdOverrides: Map<String, Map<Int, String>>?,
 )
 
 class ChainAssetReserveConfigRemote(

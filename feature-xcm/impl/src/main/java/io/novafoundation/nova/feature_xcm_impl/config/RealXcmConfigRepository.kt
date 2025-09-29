@@ -98,9 +98,9 @@ class RealXcmConfigRepository @Inject constructor(
 
     private fun AssetsXcmConfigRemote.toDomain(): AssetsXcmConfig {
         return AssetsXcmConfig(
-            reservesById = reservesById.orEmpty()
+            reservesById = assetsLocation.orEmpty()
                 .mapValues { (reserveId, reserve) -> reserve.toDomain(reserveId) },
-            assetToReserveIdOverrides = assetToReserveIdOverrides.orEmpty()
+            assetToReserveIdOverrides = reserveIdOverrides.orEmpty()
                 .flattenKeys(::FullChainAssetId)
         )
     }
