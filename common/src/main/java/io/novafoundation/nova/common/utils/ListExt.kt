@@ -4,6 +4,12 @@ fun <T> List<T>.isSubsetOf(list: List<T>): Boolean {
     return list.containsAll(this)
 }
 
+fun <K, T> Collection<T>.associateMutableBy(keyExtractor: (T) -> K): MutableMap<K, T> {
+    val map = mutableMapOf<K, T>()
+    onEach { map[keyExtractor(it)] = it }
+    return map
+}
+
 fun <T> Collection<T>.isAllEquals(value: (T) -> Any): Boolean {
     if (isEmpty()) return false
 

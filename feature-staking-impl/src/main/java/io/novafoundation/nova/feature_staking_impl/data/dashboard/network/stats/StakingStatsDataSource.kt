@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.asPerbill
 import io.novafoundation.nova.common.utils.atLeastZero
@@ -15,7 +16,6 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsResponse.WithStakingId
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.StakingStatsRewards
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.api.mapSubQueryIdToStakingType
-import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.UTILITY_ASSET_ID
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -29,7 +29,7 @@ interface StakingStatsDataSource {
 
 class RealStakingStatsDataSource(
     private val api: StakingStatsApi,
-    private val stakingGlobalConfigRepository: StakingGlobalConfigRepository
+    private val globalConfigDataSource: GlobalConfigDataSource
 ) : StakingStatsDataSource {
 
     override suspend fun fetchStakingStats(
@@ -38,8 +38,8 @@ class RealStakingStatsDataSource(
     ): MultiChainStakingStats = withContext(Dispatchers.IO) {
         retryUntilDone {
             val request = StakingStatsRequest(stakingAccounts, stakingChains)
-            val dashboardApiUrl = stakingGlobalConfigRepository.getStakingGlobalConfig().multiStakingApiUrl
-            val response = api.fetchStakingStats(request, dashboardApiUrl).data
+            val globalConfig = globalConfigDataSource.getGlobalConfig()
+            val response = api.fetchStakingStats(request, globalConfig.multiStakingApiUrl).data
 
             val earnings = response.stakingApies.associatedById()
             val rewards = response.rewards?.associatedById() ?: emptyMap()

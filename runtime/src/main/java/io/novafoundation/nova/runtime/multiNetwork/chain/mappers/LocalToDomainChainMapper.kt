@@ -161,10 +161,6 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
             ExternalApi.ReferendumSummary(externalApiLocal.url)
         }
 
-        ApiType.MULTISIG -> {
-            ExternalApi.Multisig(externalApiLocal.url)
-        }
-
         ApiType.UNKNOWN -> null
     }
 }.getOrNull()
@@ -271,6 +267,7 @@ fun mapChainLocalToChain(
             hasCrowdloans = hasCrowdloans,
             pushSupport = pushSupport,
             supportProxy = supportProxy,
+            multisigSupport = multisigSupport,
             hasSubstrateRuntime = hasSubstrateRuntime,
             governance = mapGovernanceListFromLocal(governance),
             swap = mapSwapListFromLocal(swap),

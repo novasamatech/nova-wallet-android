@@ -17,6 +17,9 @@ import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.config.GlobalConfigApi
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
+import io.novafoundation.nova.common.data.config.RealGlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -76,6 +79,7 @@ import io.novafoundation.nova.common.utils.RealCopyValueMixin
 import io.novafoundation.nova.common.utils.RealDialogMessageManager
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpReceiverApi
@@ -416,9 +420,9 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
-    fun provideIntegrityService(context: Context): IntegrityService {
+    fun provideIntegrityService(context: Context, rootScope: RootScope): IntegrityService {
         val integrityManager = IntegrityManagerFactory.createStandard(context)
-        return IntegrityService(BuildConfig.CLOUD_PROJECT_NUMBER, integrityManager)
+        return IntegrityService(BuildConfig.CLOUD_PROJECT_NUMBER, integrityManager, rootScope)
     }
 
     @Provides
@@ -452,4 +456,13 @@ class CommonModule {
     fun actionBottomSheetLauncher(
         actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
     ): ActionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
+
+    @Provides
+    @ApplicationScope
+    fun provideGlobalConfigDataSource(
+        networkApiCreator: NetworkApiCreator
+    ): GlobalConfigDataSource {
+        val api = networkApiCreator.create(GlobalConfigApi::class.java)
+        return RealGlobalConfigDataSource(api)
+    }
 }

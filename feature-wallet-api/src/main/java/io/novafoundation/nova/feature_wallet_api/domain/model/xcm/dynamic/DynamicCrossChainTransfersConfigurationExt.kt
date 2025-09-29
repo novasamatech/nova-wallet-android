@@ -3,7 +3,9 @@ package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.CustomTeleportEntry
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.TransferDestination
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -67,9 +69,25 @@ suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
         originChain = originXcmChain,
         destinationChain = destinationXcmChain,
         originChainAsset = originAsset,
-        reserve = reserve,
+        transferType = XcmTransferType.determineTransferType(
+            usesTeleports = canUseTeleport(originXcmChain, originAsset, destinationXcmChain),
+            originChain = originXcmChain,
+            destinationChain = destinationXcmChain,
+            reserve = reserve
+        ),
         features = targetTransfer.getTransferFeatures(),
     )
+}
+
+private fun DynamicCrossChainTransfersConfiguration.canUseTeleport(
+    originXcmChain: XcmChain,
+    originAsset: Chain.Asset,
+    destinationXcmChain: XcmChain,
+): Boolean {
+    val customTeleportEntry = CustomTeleportEntry(originAsset.fullId, destinationXcmChain.chain.id)
+    if (customTeleportEntry in customTeleports) return true
+
+    return XcmTransferType.isSystemTeleport(originXcmChain, destinationXcmChain)
 }
 
 private fun AssetTransfers.getDestination(destinationChainId: ChainId): TransferDestination? {
@@ -80,7 +98,6 @@ private fun TransferDestination.getTransferFeatures(): DynamicCrossChainTransfer
     return DynamicCrossChainTransferFeatures(
         hasDeliveryFee = hasDeliveryFee,
         supportsXcmExecute = supportsXcmExecute,
-        usesTeleport = usesTeleport
     )
 }
 

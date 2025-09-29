@@ -8,6 +8,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountIdWithType
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
 import io.novafoundation.nova.core_db.model.chain.account.ProxyAccountLocal
@@ -188,43 +189,35 @@ interface MetaAccountDao {
 
     @Query(
         """
-    WITH RECURSIVE accounts_to_delete AS (
-        SELECT id, parentMetaId FROM meta_accounts WHERE id = :metaId
-        UNION ALL
-        SELECT m.id, m.parentMetaId
-        FROM meta_accounts m
-        JOIN accounts_to_delete r ON m.parentMetaId = r.id
+        WITH RECURSIVE accounts_to_delete AS (
+            SELECT id, parentMetaId, type FROM meta_accounts WHERE id IN (:metaIds)
+            UNION ALL
+            SELECT m.id, m.parentMetaId, m.type
+            FROM meta_accounts m
+            JOIN accounts_to_delete r ON m.parentMetaId = r.id
+        )
+        SELECT id, type FROM accounts_to_delete
+        """
     )
-    SELECT id FROM accounts_to_delete
-    """
-    )
-    suspend fun findIdsToDelete(metaId: Long): List<Long>
+    suspend fun findAffectedMetaIdsOnDelete(metaIds: List<Long>): List<MetaAccountIdWithType>
 
     @Query("DELETE FROM meta_accounts WHERE id IN (:ids)")
     suspend fun deleteByIds(ids: List<Long>)
 
     @Transaction
-    suspend fun delete(metaId: Long): List<Long> {
-        val ids = findIdsToDelete(metaId)
-        if (ids.isNotEmpty()) {
+    suspend fun delete(vararg metaId: Long): List<MetaAccountIdWithType> {
+        val affectingMetaAccounts = findAffectedMetaIdsOnDelete(metaId.toList())
+        if (affectingMetaAccounts.isNotEmpty()) {
+            val ids = affectingMetaAccounts.map { it.id }
             deleteByIds(ids)
         }
-        return ids
+        return affectingMetaAccounts
     }
 
-    @Query(
-        """
-        WITH RECURSIVE accounts_to_delete AS (
-            SELECT id, parentMetaId FROM meta_accounts WHERE id IN (:metaIds)
-            UNION ALL
-            SELECT m.id, m.parentMetaId
-            FROM meta_accounts m
-            JOIN accounts_to_delete r ON m.parentMetaId = r.id
-        )
-        DELETE FROM meta_accounts WHERE id IN (SELECT id FROM accounts_to_delete)
-    """
-    )
-    suspend fun delete(metaIds: List<Long>)
+    @Transaction
+    suspend fun delete(metaIds: List<Long>): List<MetaAccountIdWithType> {
+        return delete(*metaIds.toLongArray())
+    }
 
     @Query("SELECT COALESCE(MAX(position), 0)  + 1 FROM meta_accounts")
     suspend fun nextAccountPosition(): Int
@@ -267,6 +260,9 @@ interface MetaAccountDao {
 
     @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE type = :type)")
     suspend fun hasMetaAccountsByType(type: MetaAccountLocal.Type): Boolean
+
+    @Query("SELECT EXISTS(SELECT * FROM meta_accounts WHERE id IN (:metaIds) AND type = :type)")
+    suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: MetaAccountLocal.Type): Boolean
 
     @Query("UPDATE meta_accounts SET status = :status WHERE id IN (:metaIds)")
     suspend fun changeAccountsStatus(metaIds: List<Long>, status: MetaAccountLocal.Status)

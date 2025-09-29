@@ -129,6 +129,7 @@ class CustomChainFactory(
             hasSubstrateRuntime = hasSubstrateRuntime,
             pushSupport = prefilledChain?.pushSupport.orFalse(),
             hasCrowdloans = prefilledChain?.hasCrowdloans.orFalse(),
+            multisigSupport = prefilledChain?.multisigSupport.orFalse(),
             supportProxy = prefilledChain?.supportProxy.orFalse(),
             governance = prefilledChain?.governance.orEmpty(),
             swap = prefilledChain?.swap.orEmpty(),

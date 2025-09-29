@@ -1,22 +1,19 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.utils.composeCall
-import io.novafoundation.nova.common.utils.metadata
-import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.destinationChainLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.destinationChainLocationOnOrigin
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferReserve
-import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainId
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainLocation
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.common.TransferAssetUsingTypeTransactor
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
-import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
 import io.novafoundation.nova.feature_xcm_api.builder.buyExecution
 import io.novafoundation.nova.feature_xcm_api.builder.createWithoutFeesMeasurement
@@ -25,15 +22,10 @@ import io.novafoundation.nova.feature_xcm_api.extrinsic.composeXcmExecute
 import io.novafoundation.nova.feature_xcm_api.message.VersionedXcmMessage
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.toMultiLocation
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.getInnerSuccessOrThrow
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.XcmPaymentApi
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
-import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
-import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
-import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
@@ -50,6 +42,7 @@ class DynamicCrossChainTransactor @Inject constructor(
     private val xcmBuilderFactory: XcmBuilder.Factory,
     private val xcmPaymentApi: XcmPaymentApi,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val usingTypeTransactor: TransferAssetUsingTypeTransactor,
 ) {
 
     context(ExtrinsicBuilder)
@@ -81,7 +74,7 @@ class DynamicCrossChainTransactor @Inject constructor(
         return if (supportsXcmExecute(configuration)) {
             composeXcmExecuteCall(configuration, transfer, crossChainFee)
         } else {
-            composeTransferAssetsCall(configuration, transfer, crossChainFee)
+            usingTypeTransactor.composeCall(configuration, transfer, crossChainFee, forceXcmVersion = USED_XCM_VERSION)
         }
     }
 
@@ -98,29 +91,6 @@ class DynamicCrossChainTransactor @Inject constructor(
 
     private suspend fun supportsXcmExecute(configuration: DynamicCrossChainTransferConfiguration): Boolean {
         return supportsXcmExecute(configuration.originChainId, configuration.features)
-    }
-
-    private suspend fun composeTransferAssetsCall(
-        configuration: DynamicCrossChainTransferConfiguration,
-        transfer: AssetTransferBase,
-        crossChainFee: Balance
-    ): GenericCall.Instance {
-        val totalTransferAmount = transfer.amountPlanks + crossChainFee
-        val multiAsset = MultiAsset.from(configuration.assetLocationOnOrigin, totalTransferAmount)
-
-        return chainRegistry.withRuntime(configuration.originChainId) {
-            composeCall(
-                moduleName = metadata.xcmPalletName(),
-                callName = "transfer_assets",
-                arguments = mapOf(
-                    "dest" to configuration.destinationChainLocationOnOrigin().versionedXcm().toEncodableInstance(),
-                    "beneficiary" to transfer.beneficiaryLocation().versionedXcm().toEncodableInstance(),
-                    "assets" to MultiAssets(multiAsset).versionedXcm().toEncodableInstance(),
-                    "fee_asset_item" to BigInteger.ZERO,
-                    "weight_limit" to WeightLimit.Unlimited.toEncodableInstance()
-                )
-            )
-        }
     }
 
     private suspend fun composeXcmExecuteCall(
@@ -144,7 +114,7 @@ class DynamicCrossChainTransactor @Inject constructor(
     ): VersionedXcmMessage {
         val builder = xcmBuilderFactory.createWithoutFeesMeasurement(
             initial = configuration.originChainLocation,
-            xcmVersion = XcmVersion.V4
+            xcmVersion = USED_XCM_VERSION
         )
 
         builder.buildTransferProgram(configuration, transfer, crossChainFee)
@@ -158,31 +128,32 @@ class DynamicCrossChainTransactor @Inject constructor(
         crossChainFee: Balance
     ) {
         val totalTransferAmount = transfer.amountPlanks + crossChainFee
+        val assetAbsoluteMultiLocation = configuration.transferType.assetAbsoluteLocation
 
         when (val transferType = configuration.transferType) {
-            XcmTransferReserve.Teleport -> buildTeleportProgram(
-                assetLocation = configuration.assetAbsoluteLocation,
+            is XcmTransferType.Teleport -> buildTeleportProgram(
+                assetLocation = assetAbsoluteMultiLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
                 amount = totalTransferAmount
             )
 
-            XcmTransferReserve.Reserve.Origin -> buildOriginReserveProgram(
-                assetLocation = configuration.assetAbsoluteLocation,
+            is XcmTransferType.Reserve.Origin -> buildOriginReserveProgram(
+                assetLocation = assetAbsoluteMultiLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
                 amount = totalTransferAmount
             )
 
-            XcmTransferReserve.Reserve.Destination -> buildDestinationReserveProgram(
-                assetLocation = configuration.assetAbsoluteLocation,
+            is XcmTransferType.Reserve.Destination -> buildDestinationReserveProgram(
+                assetLocation = assetAbsoluteMultiLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
                 amount = totalTransferAmount
             )
 
-            is XcmTransferReserve.Reserve.Remote -> buildRemoteReserveProgram(
-                assetLocation = configuration.assetAbsoluteLocation,
+            is XcmTransferType.Reserve.Remote -> buildRemoteReserveProgram(
+                assetLocation = assetAbsoluteMultiLocation,
                 remoteReserveLocation = transferType.remoteReserveLocation,
                 destinationChainLocation = configuration.destinationChainLocation,
                 beneficiary = transfer.recipientAccountId,
@@ -273,13 +244,6 @@ class DynamicCrossChainTransactor @Inject constructor(
 
     private fun deriveBuyExecutionUpperBoundAmount(transferringAmount: Balance): Balance {
         return transferringAmount / 2.toBigInteger()
-    }
-
-    private fun <T> T.versionedXcm() = versionedXcm(USED_XCM_VERSION)
-
-    private fun AssetTransferBase.beneficiaryLocation(): RelativeMultiLocation {
-        val accountId = destinationChain.accountIdOrDefault(recipient).intoKey()
-        return accountId.toMultiLocation()
     }
 
     private fun WeightLimit.Companion.one(): WeightLimit.Limited {

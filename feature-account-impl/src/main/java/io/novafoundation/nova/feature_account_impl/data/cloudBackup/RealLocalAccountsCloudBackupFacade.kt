@@ -134,17 +134,21 @@ class RealLocalAccountsCloudBackupFacade(
         if (toRemove.isEmpty()) return emptyList()
 
         val localIds = toRemove.mapNotNull { metaAccountsByUUid[it.walletId]?.metaAccount?.id }
-        accountDao.delete(localIds)
+        val allAffectedMetaAccounts = accountDao.delete(localIds)
 
-        return toRemove.mapNotNull {
-            val localWallet = metaAccountsByUUid[it.walletId] ?: return@mapNotNull null
+        // Clear meta account secrets
+        toRemove.forEach {
+            val localWallet = metaAccountsByUUid[it.walletId] ?: return@forEach
             val chainAccountIds = localWallet.chainAccounts.map(ChainAccountLocal::accountId)
 
             secretsStoreV2.clearMetaAccountSecrets(localWallet.metaAccount.id, chainAccountIds)
+        }
 
+        // Return changes
+        return allAffectedMetaAccounts.map {
             MetaAccountChangesEventBus.Event.AccountRemoved(
-                metaId = localWallet.metaAccount.id,
-                metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(localWallet.metaAccount.type)
+                metaId = it.id,
+                metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(it.type)
             )
         }
     }

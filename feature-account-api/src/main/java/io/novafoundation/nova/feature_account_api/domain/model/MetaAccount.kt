@@ -20,6 +20,11 @@ import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+class MetaIdWithType(
+    val metaId: Long,
+    val type: LightMetaAccount.Type
+)
+
 class MetaAccountOrdering(
     val id: Long,
     val position: Int,

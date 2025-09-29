@@ -4,6 +4,7 @@ import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.fromHexOrNull
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.HexString
@@ -25,11 +26,8 @@ import io.novafoundation.nova.feature_account_impl.data.multisig.blockhain.multi
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.DiscoveredMultisig
 import io.novafoundation.nova.feature_account_impl.data.multisig.model.OffChainPendingMultisigOperationInfo
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
-import io.novafoundation.nova.runtime.ext.externalApi
-import io.novafoundation.nova.runtime.ext.hasExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.ExternalApi
 import io.novafoundation.nova.runtime.multiNetwork.withRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -46,15 +44,17 @@ class RealMultisigRepository @Inject constructor(
     @Named(REMOTE_STORAGE_SOURCE)
     private val remoteStorageSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
+    private val globalConfigDataSource: GlobalConfigDataSource
 ) : MultisigRepository {
 
     override fun supportsMultisigSync(chain: Chain): Boolean {
-        return chain.hasMultisigApi()
+        return chain.multisigSupport
     }
 
     override suspend fun findMultisigAccounts(accountIds: Set<AccountIdKey>): List<DiscoveredMultisig> {
+        val globalConfig = globalConfigDataSource.getGlobalConfig()
         val request = FindMultisigsRequest(accountIds)
-        return api.findMultisigs(request).toDiscoveredMultisigs()
+        return api.findMultisigs(globalConfig.multisigsApiUrl, request).toDiscoveredMultisigs()
     }
 
     override suspend fun getPendingOperationIds(chain: Chain, accountIdKey: AccountIdKey): Set<CallHash> {
@@ -83,11 +83,11 @@ class RealMultisigRepository @Inject constructor(
         accountId: AccountIdKey,
         pendingCallHashes: Collection<CallHash>
     ): Result<Map<CallHash, OffChainPendingMultisigOperationInfo>> {
-        val apiConfig = chain.multisigApi() ?: return Result.success(emptyMap())
+        return runCatching {
+            val globalConfig = globalConfigDataSource.getGlobalConfig()
 
-        return kotlin.runCatching {
-            val request = OffChainPendingMultisigInfoRequest(accountId, pendingCallHashes)
-            val response = api.getCallDatas(apiConfig.url, request)
+            val request = OffChainPendingMultisigInfoRequest(accountId, pendingCallHashes, chain.id)
+            val response = api.getCallDatas(globalConfig.multisigsApiUrl, request)
             response.toDomain(chain)
         }
             .onFailure { Log.e("RealMultisigRepository", "Failed to fetch call datas in ${chain.name}", it) }
@@ -151,13 +151,5 @@ class RealMultisigRepository @Inject constructor(
     private fun AccountMultisigRemote.MultisigRemote.thresholdIfValid(): Int? {
         // Just to be sure we do not insert some invalid data
         return threshold.takeIf { it >= 1 }
-    }
-
-    private fun Chain.hasMultisigApi(): Boolean {
-        return hasExternalApi<ExternalApi.Multisig>()
-    }
-
-    private fun Chain.multisigApi(): ExternalApi.Multisig? {
-        return externalApi()
     }
 }
