@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
@@ -52,6 +51,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -350,6 +350,10 @@ fun <T> Flow<T>.zipWithPrevious(): Flow<Pair<T?, T>> = flow {
 
         current = it
     }
+}
+
+fun <T1, T2> Flow<T1>.zip(other: Flow<T2>): Flow<Pair<T1, T2>> {
+    return zip(other, ::Pair)
 }
 
 fun <T> Flow<T>.onEachWithPrevious(action: suspend (T?, T) -> Unit): Flow<T> = flow {

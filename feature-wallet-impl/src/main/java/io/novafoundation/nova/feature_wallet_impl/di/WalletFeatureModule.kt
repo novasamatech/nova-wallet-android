@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
-import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -54,9 +53,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFiatFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealTokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -83,7 +82,6 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepos
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealChainAssetRepository
-import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
@@ -297,15 +295,6 @@ class WalletFeatureModule {
     fun provideCrossChainConfigApi(
         apiCreator: NetworkApiCreator
     ): CrossChainConfigApi = apiCreator.create(CrossChainConfigApi::class.java)
-
-    @Provides
-    @FeatureScope
-    fun provideCrossChainRepository(
-        api: CrossChainConfigApi,
-        fileCache: FileCache,
-        gson: Gson,
-        parachainInfoRepository: ParachainInfoRepository,
-    ): CrossChainTransfersRepository = RealCrossChainTransfersRepository(api, fileCache, gson, parachainInfoRepository)
 
     @Provides
     @FeatureScope

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.di.modules
 
 import dagger.Binds
 import dagger.Module
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainValidationSystemProvider
 import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssetsRepository
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynami
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.AssetIssuerRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.dryRun.issuing.RealAssetIssuerRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.validations.RealCrossChainValidationSystemProvider
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealStatemineAssetsRepository
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.multisig.RealMultisigExtrinsicValidationFactory
 
@@ -40,4 +42,7 @@ internal interface WalletBindsModule {
 
     @Binds
     fun bindArbitraryTokenUseCase(implementation: RealArbitraryTokenUseCase): ArbitraryTokenUseCase
+
+    @Binds
+    fun bindrossChainTransfersRepository(real: RealCrossChainTransfersRepository): CrossChainTransfersRepository
 }
