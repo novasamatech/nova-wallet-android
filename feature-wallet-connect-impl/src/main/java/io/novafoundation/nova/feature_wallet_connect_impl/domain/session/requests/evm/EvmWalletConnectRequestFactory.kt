@@ -29,7 +29,7 @@ class EvmWalletConnectRequestFactory(
 
             "eth_signTransaction" -> parseEvmSignTx(sessionRequest, sessionRequest.eipChainId())
 
-            "eth_signTypedData" -> parseEvmSignTypedMessage(sessionRequest)
+            "eth_signTypedData", "eth_signTypedData_v4" -> parseEvmSignTypedMessage(sessionRequest)
 
             "personal_sign" -> parsePersonalSign(sessionRequest)
 
