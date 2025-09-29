@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.sel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class SelectBondMoreModule {
@@ -39,6 +40,7 @@ class SelectBondMoreModule {
         payload: SelectBondMorePayload,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
+        amountFormatter: AmountFormatter,
     ): ViewModel {
         return SelectBondMoreViewModel(
             router = router,
@@ -51,7 +53,8 @@ class SelectBondMoreModule {
             maxActionProviderFactory = maxActionProviderFactory,
             payload = payload,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            hintsMixinFactory = resourcesHintsMixinFactory
+            hintsMixinFactory = resourcesHintsMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -65,6 +66,8 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface WalletFeatureDependencies {
+
+    val maskingModeUseCase: MaskingModeUseCase
 
     val fileCache: FileCache
 

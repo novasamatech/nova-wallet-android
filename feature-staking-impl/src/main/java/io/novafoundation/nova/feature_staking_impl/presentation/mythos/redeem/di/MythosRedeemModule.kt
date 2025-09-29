@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.My
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class MythosRedeemModule {
@@ -42,7 +43,8 @@ class MythosRedeemModule {
         selectedAccountUseCase: SelectedAccountUseCase,
         assetUseCase: AssetUseCase,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return MythosRedeemViewModel(
             router = router,
@@ -57,7 +59,8 @@ class MythosRedeemModule {
             selectedAccountUseCase = selectedAccountUseCase,
             assetUseCase = assetUseCase,
             walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

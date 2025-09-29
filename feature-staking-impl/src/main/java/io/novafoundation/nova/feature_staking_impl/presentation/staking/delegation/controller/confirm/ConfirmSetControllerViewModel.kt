@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.controller.set.bondSetControllerValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -41,6 +42,7 @@ class ConfirmSetControllerViewModel(
     private val validationSystem: SetControllerValidationSystem,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter,
     walletUiUseCase: WalletUiUseCase,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -54,7 +56,7 @@ class ConfirmSetControllerViewModel(
         .share()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token, amountFormatter = amountFormatter)
 
         FeeStatus.Loaded(feeModel)
     }

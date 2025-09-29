@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.recyclerView.dragging.SimpleItemDragHelperCallback
 import io.novafoundation.nova.common.utils.recyclerView.dragging.StartDragListener
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi

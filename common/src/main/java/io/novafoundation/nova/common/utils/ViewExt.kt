@@ -35,7 +35,6 @@ import androidx.viewpager2.widget.ViewPager2
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
@@ -115,6 +114,10 @@ fun ShimmerFrameLayout.setShimmerVisible(visible: Boolean) {
     if (visible) startShimmer() else stopShimmer()
 
     setVisible(visible)
+}
+
+fun TextView.setCompoundDrawables(drawables: Array<out Drawable>?) {
+    setCompoundDrawables(drawables?.getOrNull(0), drawables?.getOrNull(1), drawables?.getOrNull(2), drawables?.getOrNull(3))
 }
 
 private fun TextView.setCompoundDrawable(
@@ -337,36 +340,6 @@ fun TypedArray.getResourceIdOrNull(@StyleableRes index: Int) = getResourceId(ind
 
 fun TypedArray.getColorOrNull(@StyleableRes index: Int) = runCatching { getColorOrThrow(index) }.getOrNull()
 
-fun View.applyBarMargin() = applyInsetter {
-    type(statusBars = true) {
-        margin()
-    }
-}
-
-fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
-    type(statusBars = true) {
-        padding()
-    }
-
-    consume(consume)
-}
-
-fun View.applyNavigationBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(navigationBars = true, ime = imeInsets) {
-        padding(bottom = true)
-    }
-
-    consume(consume)
-}
-
-fun View.applySystemBarInsets(consume: Boolean = true, imeInsets: Boolean = false) = applyInsetter {
-    type(statusBars = true, navigationBars = true, ime = imeInsets) {
-        padding(top = true, bottom = true)
-    }
-
-    consume(consume)
-}
-
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
 
 fun View.setBackgroundTintRes(@ColorRes colorRes: Int) {
@@ -448,4 +421,9 @@ fun TabLayout.setTabSelectedListener(callback: (TabLayout.Tab) -> Unit) {
 
         override fun onTabReselected(tab: TabLayout.Tab) {}
     })
+}
+
+fun View.setForegroundRes(@DrawableRes drawableRes: Int) {
+    val drawable = context.getDrawable(drawableRes)
+    foreground = drawable
 }

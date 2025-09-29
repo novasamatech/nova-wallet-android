@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.recyclerview.widget.DiffUtil
 import coil.ImageLoader
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.ClickHandler
@@ -51,7 +52,7 @@ private class AssetSelectorHolder(
         super.bind(item, isSelected, handler)
 
         with(itemView) {
-            binder.itemAssetSelectorBalance.text = item.assetModel.assetBalance
+            binder.itemAssetSelectorBalance.setMaskableText(item.assetModel.assetBalance)
             binder.itemAssetSelectorTokenName.text = item.title
             binder.itemAssetSelectorIcon.setIcon(item.assetModel.icon, imageLoader)
             binder.itemAssetSelectorRadioButton.isChecked = isSelected

@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.SelectCollatorViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.settings.SelectCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class SelectCollatorModule {
@@ -36,6 +37,7 @@ class SelectCollatorModule {
         resourceManager: ResourceManager,
         tokenUseCase: TokenUseCase,
         selectedAssetState: StakingSharedState,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SelectCollatorViewModel(
             router = router,
@@ -46,7 +48,8 @@ class SelectCollatorModule {
             tokenUseCase = tokenUseCase,
             selectedAssetState = selectedAssetState,
             collatorsUseCase = collatorsUseCase,
-            selectCollatorSettingsInterScreenRequester = selectCollatorSettingsInterScreenCommunicator
+            selectCollatorSettingsInterScreenRequester = selectCollatorSettingsInterScreenCommunicator,
+            amountFormatter = amountFormatter
         )
     }
 

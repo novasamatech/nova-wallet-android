@@ -1075,6 +1075,7 @@
     <string name="profile_accounts_title_2_0">钱包</string>
     <string name="profile_language_title">语言</string>
     <string name="profile_pincode_change_title">更改密码</string>
+    <string name="profile_settings_hide_balances_on_launch_title">使用隐藏余额打开应用</string>
     <string name="profile_settings_pin_code_verification_title">通过PIN码确认</string>
     <string name="profile_settings_safe_mode_title">安全模式</string>
     <string name="profile_settings_title">设置</string>

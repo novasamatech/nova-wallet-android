@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class NewDelegationChooseAmountModule {
@@ -45,6 +46,7 @@ class NewDelegationChooseAmountModule {
         resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
         maxActionProviderFactory: MaxActionProviderFactory,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        amountFormatter: AmountFormatter,
     ): ViewModel {
         return NewDelegationChooseAmountViewModel(
             assetUseCase = assetUseCase,
@@ -60,7 +62,8 @@ class NewDelegationChooseAmountModule {
             validationSystem = validationSystem,
             maxActionProviderFactory = maxActionProviderFactory,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            resourcesHintsMixinFactory = resourcesHintsMixinFactory
+            resourcesHintsMixinFactory = resourcesHintsMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -42,6 +43,7 @@ class NominationPoolsSetupBondMoreViewModel(
     private val validationSystem: NominationPoolsBondMoreValidationSystem,
     private val poolMemberUseCase: NominationPoolMemberUseCase,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val amountFormatter: AmountFormatter,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsBondMoreHintsFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,

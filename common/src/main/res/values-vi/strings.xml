@@ -1075,6 +1075,7 @@
     <string name="profile_accounts_title_2_0">Ví tiền</string>
     <string name="profile_language_title">Ngôn ngữ</string>
     <string name="profile_pincode_change_title">Đổi mã PIN</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Mở ứng dụng với số dư ẩn</string>
     <string name="profile_settings_pin_code_verification_title">Xác nhận bằng mã PIN</string>
     <string name="profile_settings_safe_mode_title">Chế độ an toàn</string>
     <string name="profile_settings_title">Cài đặt</string>

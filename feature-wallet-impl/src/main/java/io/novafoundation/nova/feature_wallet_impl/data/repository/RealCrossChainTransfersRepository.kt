@@ -46,7 +46,7 @@ class RealCrossChainTransfersRepository(
     override fun configurationFlow(): Flow<CrossChainTransfersConfiguration> {
         val legacyFlow = fileCache.observeCachedValue(LEGACY_CACHE_NAME).map {
             val remote = gson.fromJson<LegacyCrossChainTransfersConfigRemote>(it)
-            remote.toDomain()
+            remote.toDomain(parachainInfoRepository)
         }
 
         val dynamicRemoteFlow = fileCache.observeCachedValue(DYNAMIC_CACHE_NAME).map {

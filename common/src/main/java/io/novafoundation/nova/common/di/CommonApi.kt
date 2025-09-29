@@ -26,6 +26,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.ActivityIntentProvider
 import io.novafoundation.nova.common.interfaces.BuildTypeProvider
 import io.novafoundation.nova.common.interfaces.FileCache
@@ -37,6 +38,8 @@ import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -80,6 +83,12 @@ import okhttp3.OkHttpClient
 import java.util.Random
 
 interface CommonApi {
+
+    val maskableValueFormatterFactory: MaskableValueFormatterFactory
+
+    val amountFormatterProvider: MaskableValueFormatterProvider
+
+    val maskingModeUseCase: MaskingModeUseCase
 
     val systemCallExecutor: SystemCallExecutor
 

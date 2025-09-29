@@ -11,9 +11,12 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.XcmTransferDryRunOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.destinationChainLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.isRemoteReserve
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.remoteReserveLocation
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainId
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainLocation
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeBatchAll
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls.composeDispatchAs
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransactor

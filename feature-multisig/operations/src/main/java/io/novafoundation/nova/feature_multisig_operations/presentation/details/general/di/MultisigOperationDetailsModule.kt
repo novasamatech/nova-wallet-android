@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.details.g
 import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.di.MultisigOperationDetailsModule.BindsModule
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class, BindsModule::class])
 class MultisigOperationDetailsModule {
@@ -77,6 +78,7 @@ class MultisigOperationDetailsModule {
         accountInteractor: AccountInteractor,
         accountUIUseCase: AccountUIUseCase,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        amountFormatter: AmountFormatter,
     ): ViewModel {
         return MultisigOperationDetailsViewModel(
             router = router,
@@ -96,7 +98,8 @@ class MultisigOperationDetailsModule {
             actionBottomSheetLauncherFactory = actionBottomSheetLauncherFactory,
             accountInteractor = accountInteractor,
             accountUIUseCase = accountUIUseCase,
-            actionAwaitableMixinFactory = actionAwaitableMixinFactory
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -42,6 +42,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -68,6 +69,7 @@ class ConfirmStartMythosStakingViewModel(
     private val mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val interactor: StartMythosStakingInteractor,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter,
     mythosSharedComputation: MythosSharedComputation,
     walletUiUseCase: WalletUiUseCase,
 ) : ConfirmStartSingleTargetStakingViewModel<MythosConfirmStartStakingState>(
@@ -91,6 +93,7 @@ class ConfirmStartMythosStakingViewModel(
     assetUseCase = assetUseCase,
     walletUiUseCase = walletUiUseCase,
     payload = payload,
+    amountFormatter = amountFormatter
 ),
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 

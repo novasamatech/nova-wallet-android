@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.model.CurrencyLocal
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
-import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExplorerLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
@@ -12,6 +11,7 @@ import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.JoinedChainInfo
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
+import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 
 fun createTestChain(
@@ -67,7 +67,8 @@ fun chainOf(
     hasSubstrateRuntime = true,
     nodeSelectionStrategy = ChainLocal.AutoBalanceStrategyLocal.ROUND_ROBIN,
     source = ChainLocal.Source.CUSTOM,
-    customFee = ""
+    customFee = "",
+    multisigSupport = true
 )
 
 fun ChainLocal.nodeOf(

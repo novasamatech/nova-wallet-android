@@ -20,7 +20,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chain
@@ -37,7 +38,8 @@ class ReferendumFullDetailsViewModel(
     private val tokenUseCase: TokenUseCase,
     private val externalActions: ExternalActions.Presentation,
     private val copyTextLauncher: CopyTextLauncher.Presentation,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     CopyTextLauncher by copyTextLauncher {
@@ -72,11 +74,11 @@ class ReferendumFullDetailsViewModel(
     val callHash = payload.hash?.toHexString(withPrefix = true)
 
     val turnoutAmount = payloadFlow
-        .map { payload -> payload.turnout?.let { mapAmountToAmountModel(it, getToken()) } }
+        .map { payload -> payload.turnout?.let { amountFormatter.formatAmountToAmountModel(it, getToken()) } }
         .shareInBackground()
 
     val electorateAmount = payloadFlow
-        .map { payload -> payload.electorate?.let { mapAmountToAmountModel(it, getToken()) } }
+        .map { payload -> payload.electorate?.let { amountFormatter.formatAmountToAmountModel(it, getToken()) } }
         .shareInBackground()
 
     fun backClicked() {
@@ -105,7 +107,7 @@ class ReferendumFullDetailsViewModel(
             proposerIdentityProvider
         )
 
-        val amountModel = deposit?.let { mapAmountToAmountModel(deposit, getToken()) }
+        val amountModel = deposit?.let { amountFormatter.formatAmountToAmountModel(deposit, getToken()) }
 
         return AddressAndAmountModel(addressModel, amountModel)
     }
@@ -119,7 +121,7 @@ class ReferendumFullDetailsViewModel(
             defaultIdentityProvider
         )
         val token = tokenUseCase.getToken(referendumCall.asset.fullChainAssetId)
-        val amountModel = mapAmountToAmountModel(referendumCall.amount, token)
+        val amountModel = amountFormatter.formatAmountToAmountModel(referendumCall.amount, token)
 
         return AddressAndAmountModel(addressModel, amountModel)
     }
