@@ -12,23 +12,16 @@ import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProvid
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProviderFactory
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.HydrationFeePaymentProvider
-import io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub.AssetHubFeePaymentAssetsFetcherFactory
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQuoteSharedComputation
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.RealHydrationFeeInjector
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
-import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.BlockNumberUpdater
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import javax.inject.Named
 
 @Module
 class CustomFeeModule {
@@ -62,31 +55,6 @@ class CustomFeeModule {
             chainStateRepository = chainStateRepository
         )
     }
-
-    @Provides
-    @FeatureScope
-    fun provideAssetHubFeePaymentAssetsFetcher(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        multiLocationConverterFactory: MultiLocationConverterFactory
-    ): AssetHubFeePaymentAssetsFetcherFactory {
-        return AssetHubFeePaymentAssetsFetcherFactory(remoteStorageSource, multiLocationConverterFactory)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideAssetHubFeePaymentProviderFactory(
-        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
-        multiLocationConverterFactory: MultiLocationConverterFactory,
-        assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
-        chainRegistry: ChainRegistry,
-        xcmVersionDetector: XcmVersionDetector
-    ) = AssetHubFeePaymentProviderFactory(
-        multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
-        multiLocationConverterFactory = multiLocationConverterFactory,
-        assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher,
-        chainRegistry = chainRegistry,
-        xcmVersionDetector = xcmVersionDetector
-    )
 
     @Provides
     @FeatureScope

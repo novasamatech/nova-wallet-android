@@ -1,7 +1,8 @@
-package io.novafoundation.nova.feature_xcm_impl.converter
+package io.novafoundation.nova.feature_xcm_impl.converter.chain
 
-import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.reversed
+import io.novafoundation.nova.feature_xcm_api.config.model.ChainXcmConfig
+import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainLocationConverter
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
@@ -12,31 +13,12 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
-interface ChainLocationConverter {
-
-    suspend fun chainFromRelativeLocation(
-        location: RelativeMultiLocation,
-        pointOfView: Chain,
-    ): Chain?
-
-    suspend fun chainFromAbsoluteLocation(
-        location: AbsoluteMultiLocation,
-        consensusRoot: Chain,
-    ): Chain?
-
-    suspend fun absoluteLocationFromChain(
-        chainId: ChainId
-    ): AbsoluteMultiLocation
-}
-
 class RealChainLocationConverter(
-    // parachainId can be added to chains.json, can be fetched from ParachainInfo.ParachainId storage from each parachain
-    // relay is not included here as it has no para id obviously
-    private val paraIdByChain: Map<ChainId, ParaId>,
+    private val xcmConfig: ChainXcmConfig,
     private val chainRegistry: ChainRegistry,
 ) : ChainLocationConverter {
 
-    private val chainByParaId = paraIdByChain.reversed()
+    private val chainByParaId = xcmConfig.parachainIds.reversed()
 
     override suspend fun chainFromRelativeLocation(
         location: RelativeMultiLocation,
@@ -69,7 +51,7 @@ class RealChainLocationConverter(
     }
 
     override suspend fun absoluteLocationFromChain(chainId: ChainId): AbsoluteMultiLocation {
-        val parachainId = paraIdByChain[chainId]
+        val parachainId = xcmConfig.parachainIds[chainId]
 
         return if (parachainId != null) {
             AbsoluteMultiLocation(ParachainId(parachainId))

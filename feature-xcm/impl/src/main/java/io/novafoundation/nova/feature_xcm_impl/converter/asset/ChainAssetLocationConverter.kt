@@ -1,54 +1,30 @@
-package io.novafoundation.nova.feature_xcm_impl.converter
+package io.novafoundation.nova.feature_xcm_impl.converter.asset
 
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.feature_xcm_api.config.model.AssetsXcmConfig
+import io.novafoundation.nova.feature_xcm_api.config.model.ChainAssetReserveId
+import io.novafoundation.nova.feature_xcm_api.converter.asset.ChainAssetLocationConverter
+import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainLocationConverter
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.ext.findAssetByNormalizedSymbol
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.normalizeSymbol
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 
-interface ChainAssetLocationConverter {
-
-    suspend fun chainAssetFromRelativeLocation(
-        location: RelativeMultiLocation,
-        pointOfView: Chain,
-    ): Chain.Asset?
-
-    suspend fun absoluteLocationFromChainAsset(
-        chainAsset: Chain.Asset
-    ): AbsoluteMultiLocation?
-
-    suspend fun relativeLocationFromChainAsset(
-        chainAsset: Chain.Asset
-    ): RelativeMultiLocation?
-}
-
-
 class RealChainAssetLocationConverter(
-    // Fetched from configs, see https://github.com/novasamatech/nova-utils/blob/f7623740462f406bee58f58f05ecda0ba21af495/xcm/v8/transfers_dynamic.json#L2
-    private val reservesById: Map<ChainAssetReserveId, ChainAssetReserveConfig>,
-
-    // By default, asset reserve id is equal to its symbol
-    // This mapping allows to override that for cases like multiple reserves (Statemine & Polkadot for DOT)
-
-    // Fetched from configs, see https://github.com/novasamatech/nova-utils/blob/f7623740462f406bee58f58f05ecda0ba21af495/xcm/v8/transfers_dynamic.json#L213
-    private val assetToReserveIdOverrides: Map<FullChainAssetId, ChainAssetReserveId>,
-
+    private val xcmConfig: AssetsXcmConfig,
     private val chainLocationConverter: ChainLocationConverter,
-    private val chainRegistry: ChainRegistry,
 ) : ChainAssetLocationConverter {
 
-    private val reserveIdsByLocation = reservesById.entries.groupBy(
+    private val reserveIdsByLocation = xcmConfig.reservesById.entries.groupBy(
         keySelector = { (_, reserve) -> reserve.reserveLocation },
         valueTransform = { (_, reserve) -> reserve }
     )
 
     // Association works assuming multiple assets on one chain cannot map to the same reserve
-    private val assetIdByReserveIdOverrideAndChain = assetToReserveIdOverrides.entries.associateBy(
+    private val assetIdByReserveIdOverrideAndChain = xcmConfig.assetToReserveIdOverrides.entries.associateBy(
         keySelector = { (assetId, reserveId) -> reserveId to assetId.chainId },
         valueTransform = { (assetId, _) -> assetId.assetId }
     )
@@ -65,7 +41,7 @@ class RealChainAssetLocationConverter(
 
     override suspend fun absoluteLocationFromChainAsset(chainAsset: Chain.Asset): AbsoluteMultiLocation? {
         val reserveId = getReserveId(chainAsset)
-        return reservesById[reserveId]?.reserveLocation
+        return xcmConfig.reservesById[reserveId]?.reserveLocation
     }
 
     override suspend fun relativeLocationFromChainAsset(chainAsset: Chain.Asset): RelativeMultiLocation? {
@@ -98,6 +74,6 @@ class RealChainAssetLocationConverter(
     }
 
     private fun getReserveId(chainAsset: Chain.Asset): ChainAssetReserveId {
-        return assetToReserveIdOverrides[chainAsset.fullId] ?: chainAsset.normalizeSymbol()
+        return xcmConfig.assetToReserveIdOverrides[chainAsset.fullId] ?: chainAsset.normalizeSymbol()
     }
 }

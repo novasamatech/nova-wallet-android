@@ -44,6 +44,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
 import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.XcmPaymentApi
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
@@ -81,7 +82,7 @@ interface WalletFeatureDependencies {
 
     val computationalCache: ComputationalCache
 
-    val multiLocationConverterFactory: io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+    val multiLocationConverterFactory: LocationConverterFactory
 
     val extrinsicWalk: ExtrinsicWalk
 

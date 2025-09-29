@@ -85,6 +85,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -376,7 +377,7 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideSubstrateRealtimeOperationFetcherFactory(
-        multiLocationConverterFactory: io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory,
+        multiLocationConverterFactory: LocationConverterFactory,
         eventsRepository: EventsRepository,
         extrinsicWalk: ExtrinsicWalk,
         hydraDxAssetIdConverter: HydraDxAssetIdConverter

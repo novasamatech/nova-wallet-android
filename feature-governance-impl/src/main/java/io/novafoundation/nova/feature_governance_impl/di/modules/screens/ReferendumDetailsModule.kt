@@ -21,8 +21,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasuryApproveProposalAdapter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasurySpendAdapter
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.treasury.TreasurySpendLocalAdapter
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainMultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
@@ -40,9 +39,8 @@ class ReferendumDetailsModule {
     @FeatureScope
     @IntoSet
     fun provideTreasurySpendParser(
-        chainLocationConverter: ChainMultiLocationConverterFactory,
-        assetLocationConverter: MultiLocationConverterFactory
-    ): ReferendumCallAdapter = TreasurySpendAdapter(chainLocationConverter, assetLocationConverter)
+        locationConverterFactory: LocationConverterFactory
+    ): ReferendumCallAdapter = TreasurySpendAdapter(locationConverterFactory)
 
     @Provides
     @FeatureScope

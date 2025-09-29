@@ -8,16 +8,14 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumCallParseContext
 import io.novafoundation.nova.feature_xcm_api.asset.LocatableMultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.bindVersionedLocatableMultiAsset
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainMultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.multiLocation.accountId
 import io.novafoundation.nova.feature_xcm_api.multiLocation.bindVersionedMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 
 class TreasurySpendAdapter(
-    private val chainLocationConverterFactory: ChainMultiLocationConverterFactory,
-    private val assetLocationConverterFactory: MultiLocationConverterFactory
+    private val locationConverterFactory: LocationConverterFactory,
 ) : ReferendumCallAdapter {
 
     override suspend fun fromCall(
@@ -38,10 +36,10 @@ class TreasurySpendAdapter(
     }
 
     private suspend fun resolveChainAsset(locatableMultiAsset: LocatableMultiAsset, chain: Chain): Chain.Asset? {
-        val chainLocationConverter = chainLocationConverterFactory.resolveSelfAndChildrenParachains(chain)
-        val resolvedChain = chainLocationConverter.toChain(locatableMultiAsset.location) ?: return null
+        val chainLocationConverter = locationConverterFactory.createChainConverter()
+        val resolvedChain = chainLocationConverter.chainFromRelativeLocation(locatableMultiAsset.location, pointOfView = chain) ?: return null
 
-        val assetLocationConverter = assetLocationConverterFactory.resolveLocalAssets(resolvedChain)
-        return assetLocationConverter.toChainAsset(locatableMultiAsset.assetId.multiLocation)
+        val assetLocationConverter = locationConverterFactory.createAssetLocationConverter()
+        return assetLocationConverter.chainAssetFromRelativeLocation(locatableMultiAsset.assetId.multiLocation, resolvedChain)
     }
 }

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate
 
-import io.novafoundation.nova.feature_xcm_api.multiLocation.bindMultiLocation
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountId
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -9,8 +8,9 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.h
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcher
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.asset.ChainAssetLocationConverter
+import io.novafoundation.nova.feature_xcm_api.multiLocation.bindMultiLocation
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -18,11 +18,9 @@ import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.assetTxFee
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvents
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.requireNativeFee
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import kotlinx.coroutines.CoroutineScope
-import kotlin.coroutines.coroutineContext
 
 class AssetConversionSwapExtractor(
-    private val multiLocationConverterFactory: MultiLocationConverterFactory,
+    private val multiLocationConverterFactory: LocationConverterFactory,
 ) : SubstrateRealtimeOperationFetcher.Extractor {
 
     private val calls = listOf("swap_exact_tokens_for_tokens", "swap_tokens_for_exact_tokens")
@@ -37,12 +35,11 @@ class AssetConversionSwapExtractor(
 
         if (!call.isSwap()) return null
 
-        val scope = CoroutineScope(coroutineContext)
-        val multiLocationConverter = multiLocationConverterFactory.defaultAsync(chain, scope)
+        val multiLocationConverter = multiLocationConverterFactory.createAssetLocationConverter()
 
         val path = bindList(callArgs["path"], ::bindMultiLocation)
-        val assetIn = multiLocationConverter.toChainAsset(path.first()) ?: return null
-        val assetOut = multiLocationConverter.toChainAsset(path.last()) ?: return null
+        val assetIn = multiLocationConverter.chainAssetFromRelativeLocation(path.first(), chain) ?: return null
+        val assetOut = multiLocationConverter.chainAssetFromRelativeLocation(path.last(), chain) ?: return null
 
         val (amountIn, amountOut) = extrinsicVisit.extractSwapAmounts()
 
@@ -112,10 +109,10 @@ class AssetConversionSwapExtractor(
 
     private suspend fun ExtrinsicVisit.extractFee(
         chain: Chain,
-        multiLocationConverter: MultiLocationConverter
+        multiLocationConverter: ChainAssetLocationConverter
     ): ChainAssetWithAmount {
         // We check for fee usage from root extrinsic since `extrinsicVisit` will cut it out when nested calls are present
-        val assetFee = rootExtrinsic.events.assetFee(multiLocationConverter)
+        val assetFee = rootExtrinsic.events.assetFee(multiLocationConverter, chain)
         if (assetFee != null) return assetFee
 
         val nativeFee = rootExtrinsic.events.requireNativeFee()

@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.Hydra
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
-import io.novafoundation.nova.feature_swap_impl.di.exchanges.AssetConversionExchangeModule
 import io.novafoundation.nova.feature_swap_impl.di.exchanges.CrossChainTransferExchangeModule
 import io.novafoundation.nova.feature_swap_impl.di.exchanges.HydraDxExchangeModule
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
@@ -57,7 +56,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
-@Module(includes = [HydraDxExchangeModule::class, AssetConversionExchangeModule::class, CrossChainTransferExchangeModule::class])
+@Module(includes = [HydraDxExchangeModule::class, CrossChainTransferExchangeModule::class])
 class SwapFeatureModule {
 
     @FeatureScope

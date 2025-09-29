@@ -53,7 +53,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -112,7 +112,7 @@ interface AccountFeatureDependencies {
 
     val ledgerMigrationTracker: LedgerMigrationTracker
 
-    val multiLocationConverterFactory: MultiLocationConverterFactory
+    val multiLocationConverterFactory: LocationConverterFactory
 
     val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
