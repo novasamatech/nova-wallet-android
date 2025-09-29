@@ -4,9 +4,6 @@ import io.novafoundation.nova.feature_xcm_api.config.remote.JunctionsRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class DynamicCrossChainTransfersConfigRemote(
-    val assetsLocation: Map<String, DynamicReserveLocationRemote>?,
-    // (ChainId, AssetId) -> ReserveId
-    val reserveIdOverrides: Map<String, Map<Int, String>>,
     val chains: List<DynamicCrossChainOriginChainRemote>?,
     val customTeleports: List<CustomTeleportEntryRemote>?,
 )

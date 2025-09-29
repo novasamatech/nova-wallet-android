@@ -215,19 +215,19 @@ class RealChainAssetLocationConverterTest {
         val dotReserve = ChainAssetReserveConfig(
             reserveId = "DOT",
             reserveAssetId = FullChainAssetId(polkadotChainId, dotAssetId),
-            reserveLocation = dotLocation
+            tokenLocation = dotLocation
         )
 
         val dotPahReserve = ChainAssetReserveConfig(
             reserveId = "DOT-PAH",
             reserveAssetId = FullChainAssetId(pahChainId, dotAssetId),
-            reserveLocation = dotLocation
+            tokenLocation = dotLocation
         )
 
         val usdcPahReserve = ChainAssetReserveConfig(
             reserveId = "USDC-PAH",
             reserveAssetId = FullChainAssetId(pahChainId, usdcAssetId),
-            reserveLocation = usdcLocation
+            tokenLocation = usdcLocation
         )
 
         val reservesById = mapOf(

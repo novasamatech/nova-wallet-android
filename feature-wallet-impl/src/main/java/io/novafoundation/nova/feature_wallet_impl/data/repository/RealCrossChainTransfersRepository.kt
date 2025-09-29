@@ -6,16 +6,19 @@ import io.novafoundation.nova.common.utils.fromJson
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.TokenReserveRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.crosschain.toDomain
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.CrossChainConfigApi
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransfersConfigRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransfersConfigRemote
-import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.feature_xcm_api.config.XcmConfigRepository
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.zip
@@ -28,7 +31,8 @@ class RealCrossChainTransfersRepository(
     private val api: CrossChainConfigApi,
     private val fileCache: FileCache,
     private val gson: Gson,
-    private val parachainInfoRepository: ParachainInfoRepository,
+    private val xcmConfigRepository: XcmConfigRepository,
+    private val locationConverterFactory: LocationConverterFactory,
 ) : CrossChainTransfersRepository {
 
     override suspend fun syncConfiguration() = withContext(Dispatchers.IO) {
@@ -45,9 +49,12 @@ class RealCrossChainTransfersRepository(
             remote.toDomain()
         }
 
-        val dynamicFlow = fileCache.observeCachedValue(DYNAMIC_CACHE_NAME).map {
-            val remote = gson.fromJson<DynamicCrossChainTransfersConfigRemote>(it)
-            remote.toDomain(parachainInfoRepository)
+        val dynamicRemoteFlow = fileCache.observeCachedValue(DYNAMIC_CACHE_NAME).map {
+            gson.fromJson<DynamicCrossChainTransfersConfigRemote>(it)
+        }
+
+        val dynamicFlow = combine(tokenReserveRegistryFlow(), dynamicRemoteFlow) { reserveRegistry, dynamicTransfersConfig ->
+            dynamicTransfersConfig.toDomain(reserveRegistry)
         }
 
         return dynamicFlow.zip(legacyFlow, ::CrossChainTransfersConfiguration)
@@ -63,6 +70,15 @@ class RealCrossChainTransfersRepository(
         return async {
             val raw = retryUntilDone { load() }
             fileCache.updateCache(cacheFileName, raw)
+        }
+    }
+
+    private fun tokenReserveRegistryFlow(): Flow<TokenReserveRegistry> {
+        return xcmConfigRepository.xcmConfigFlow().map { xcmGeneralConfig ->
+            TokenReserveRegistry(
+                xcmConfig = xcmGeneralConfig.assets,
+                chainLocationConverter = locationConverterFactory.createChainConverter()
+            )
         }
     }
 }

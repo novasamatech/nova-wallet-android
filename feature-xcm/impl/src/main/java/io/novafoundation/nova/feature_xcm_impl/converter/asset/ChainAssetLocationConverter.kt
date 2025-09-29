@@ -19,7 +19,7 @@ class RealChainAssetLocationConverter(
 ) : ChainAssetLocationConverter {
 
     private val reserveIdsByLocation = xcmConfig.reservesById.entries.groupBy(
-        keySelector = { (_, reserve) -> reserve.reserveLocation },
+        keySelector = { (_, reserve) -> reserve.tokenLocation },
         valueTransform = { (_, reserve) -> reserve }
     )
 
@@ -41,7 +41,7 @@ class RealChainAssetLocationConverter(
 
     override suspend fun absoluteLocationFromChainAsset(chainAsset: Chain.Asset): AbsoluteMultiLocation? {
         val reserveId = getReserveId(chainAsset)
-        return xcmConfig.reservesById[reserveId]?.reserveLocation
+        return xcmConfig.reservesById[reserveId]?.tokenLocation
     }
 
     override suspend fun relativeLocationFromChainAsset(chainAsset: Chain.Asset): RelativeMultiLocation? {

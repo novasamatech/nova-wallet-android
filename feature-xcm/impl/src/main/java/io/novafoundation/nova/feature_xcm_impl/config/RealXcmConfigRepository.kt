@@ -69,7 +69,7 @@ class RealXcmConfigRepository @Inject constructor(
         return xcmConfigFlow().first()
     }
 
-    override suspend fun xcmConfigFlow(): Flow<GeneralXcmConfig> {
+    override fun xcmConfigFlow(): Flow<GeneralXcmConfig> {
         launchXcmConfigSync()
         return configCache
     }
@@ -109,7 +109,7 @@ class RealXcmConfigRepository @Inject constructor(
         return ChainAssetReserveConfig(
             reserveId = reserveId,
             reserveAssetId = FullChainAssetId(chainId, assetId),
-            reserveLocation = multiLocation.toAbsoluteLocation(),
+            tokenLocation = multiLocation.toAbsoluteLocation(),
         )
     }
 }

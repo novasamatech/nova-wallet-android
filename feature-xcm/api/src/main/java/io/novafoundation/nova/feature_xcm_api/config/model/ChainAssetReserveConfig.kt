@@ -6,5 +6,5 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 class ChainAssetReserveConfig(
     val reserveId: ChainAssetReserveId,
     val reserveAssetId: FullChainAssetId,
-    val reserveLocation: AbsoluteMultiLocation,
+    val tokenLocation: AbsoluteMultiLocation,
 )

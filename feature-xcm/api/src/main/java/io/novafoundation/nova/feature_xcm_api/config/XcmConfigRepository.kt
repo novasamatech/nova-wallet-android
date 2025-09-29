@@ -7,5 +7,5 @@ interface XcmConfigRepository {
 
     suspend fun awaitXcmConfig(): GeneralXcmConfig
 
-    suspend fun xcmConfigFlow(): Flow<GeneralXcmConfig>
+    fun xcmConfigFlow(): Flow<GeneralXcmConfig>
 }
