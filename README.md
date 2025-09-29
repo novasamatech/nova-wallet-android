@@ -1,4 +1,4 @@
-### Nova Wallet Android - Next get mobile app for Polkadot & Kusama ecosystem
+### Nova Wallet Android - Next gen mobile app for Polkadot & Kusama ecosystem
 
 [![](https://img.shields.io/twitter/follow/NovaWalletApp?label=Follow&style=social)](https://twitter.com/NovaWalletApp)
 
@@ -23,7 +23,7 @@ Install NDK version `26.1.10909125` from SDK Manager by going to Tools -> SDK Ma
 
 #### Install Rust
 
-Install Rust by following [official instruction](https://www.rust-lang.org/tools/install). Use "Using rustup" option. On MacOS you can also install rust with [brew](https://formulae.brew.sh/formula/rust)
+Install Rust by following [official instructions](https://www.rust-lang.org/tools/install). Use "Using rustup" option. On MacOS you can also install rust with [brew](https://formulae.brew.sh/formula/rust)
 
 Run the following commands to add Android build targets to rustup:
 
@@ -65,7 +65,7 @@ If you face `Secret X is not found` error, it means that README is not up-to-dat
 
 #### Setup build type
 
-In Nova Wallet, `debug` build type use fixed key, not publickly shared keystore to fix fingerprint to make Google-related features work
+In Nova Wallet, `debug` build type uses fixed key, not publicly shared keystore to fix fingerprint to make Google-related features work
 To use your local debug keystore switch to `debugLocal` build type.
 
 #### QA Tools
