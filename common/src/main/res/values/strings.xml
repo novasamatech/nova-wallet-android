@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="staking_details_migration_alert_title">%1$s staking is live on %2$s starting %3$s</string>
+
     <string name="common_view">View</string>
     <string name="transaction_history_migration_source_message">Your previous %s transaction history is still available on %s</string>
 

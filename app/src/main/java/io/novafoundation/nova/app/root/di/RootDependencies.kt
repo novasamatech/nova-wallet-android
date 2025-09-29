@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -128,6 +129,8 @@ interface RootDependencies {
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
     val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
+
+    val deviceNetworkStateObserver: DeviceNetworkStateObserver
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 

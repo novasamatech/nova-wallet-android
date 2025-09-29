@@ -14,8 +14,10 @@ import io.novafoundation.nova.feature_ahm_impl.data.repository.RealChainMigratio
 import io.novafoundation.nova.feature_ahm_impl.data.repository.RealMigrationInfoRepository
 import io.novafoundation.nova.feature_ahm_impl.di.modules.DeepLinkModule
 import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.StakingMigrationUseCase
 import io.novafoundation.nova.feature_ahm_impl.domain.ChainMigrationDetailsInteractor
 import io.novafoundation.nova.feature_ahm_impl.domain.RealAssetMigrationUseCase
+import io.novafoundation.nova.feature_ahm_impl.domain.RealStakingMigrationUseCase
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -80,6 +82,20 @@ class ChainMigrationFeatureModule {
         chainRegistry: ChainRegistry
     ): AssetMigrationUseCase {
         return RealAssetMigrationUseCase(
+            migrationInfoRepository,
+            toggleFeatureRepository,
+            chainRegistry
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideStakingMigrationUseCase(
+        migrationInfoRepository: MigrationInfoRepository,
+        toggleFeatureRepository: ToggleFeatureRepository,
+        chainRegistry: ChainRegistry
+    ): StakingMigrationUseCase {
+        return RealStakingMigrationUseCase(
             migrationInfoRepository,
             toggleFeatureRepository,
             chainRegistry

@@ -1,12 +1,20 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.main
 
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.view.AlertModel
+import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_ahm_api.domain.StakingMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
+import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -20,8 +28,12 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.runtime.state.selectedChainFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class StakingViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -41,10 +53,14 @@ class StakingViewModel(
     private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val externalActionsMixin: ExternalActions.Presentation,
+    private val stakingMigrationUseCase: StakingMigrationUseCase,
     stakingUpdateSystem: UpdateSystem,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
-    ExternalActions by externalActionsMixin {
+    ExternalActions by externalActionsMixin,
+    Browserable {
+
+    override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     private val selectedAssetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -73,12 +89,48 @@ class StakingViewModel(
     val alertsComponent = alertsComponentFactory.create(componentHostContext)
     val yourPoolComponent = yourPoolComponentFactory.create(componentHostContext)
 
+    private val dateFormatter = getChainMigrationDateFormat()
+
+    val migrationAlertFlow = selectedAssetFlow.flatMapLatest {
+        val chainAsset = it.token.configuration
+        combine(
+            stakingMigrationUseCase.observeMigrationConfigOrNull(chainAsset.chainId, chainAsset.id),
+            stakingMigrationUseCase.observeAlertShouldBeHidden(chainAsset.chainId, chainAsset.id)
+        ) { configWithChains, shouldBeHidden ->
+            if (shouldBeHidden) return@combine null
+            if (configWithChains == null) return@combine null
+
+            val config = configWithChains.config
+            val sourceChain = configWithChains.sourceChain
+            val destinationChain = configWithChains.destinationChain
+            val formattedDate = dateFormatter.format(config.timeStartAt)
+            AlertModel(
+                style = AlertView.Style.fromPreset(AlertView.StylePreset.INFO),
+                message = resourceManager.getString(R.string.staking_details_migration_alert_title, sourceChain.name, destinationChain.name, formattedDate),
+                linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreMigrationClicked(config) },
+            )
+        }
+    }
+
     fun backClicked() {
         router.back()
+    }
+
+    fun closeMigrationAlert() {
+        launch {
+            val chainAsset = selectedAssetFlow.first().token.configuration
+            stakingMigrationUseCase.markMigrationInfoAsHidden(chainAsset.chainId, chainAsset.id)
+        }
     }
 
     init {
         stakingUpdateSystem.start()
             .launchIn(this)
+    }
+
+    private fun learnMoreMigrationClicked(config: ChainMigrationConfig) {
+        launch {
+            openBrowserEvent.value = Event(config.wikiURL)
+        }
     }
 }

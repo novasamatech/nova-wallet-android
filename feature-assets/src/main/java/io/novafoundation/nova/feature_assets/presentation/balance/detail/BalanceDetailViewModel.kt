@@ -202,7 +202,7 @@ class BalanceDetailViewModel(
                 sourceAsset.symbol.value,
                 destinationChain.name
             ),
-            linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreClicked(config) },
+            linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreMigrationClicked(config) },
             buttonAction = AlertModel.ActionModel(
                 resourceManager.getString(R.string.asset_details_source_asset_alert_button, destinationChain.name),
                 { openAssetDetails(configWithChains.config.destinationData) }
@@ -424,7 +424,7 @@ class BalanceDetailViewModel(
         }
     }
 
-    private fun learnMoreClicked(config: ChainMigrationConfig) {
+    private fun learnMoreMigrationClicked(config: ChainMigrationConfig) {
         launch {
             openBrowserEvent.value = Event(config.wikiURL)
         }

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_ahm_api.presentation
 
-import java.text.SimpleDateFormat
-import java.util.Locale
+import java.text.DateFormat
 
-fun getChainMigrationDateFormat() = SimpleDateFormat("d MMMM, yyyy", Locale.getDefault())
+fun getChainMigrationDateFormat() = DateFormat.getDateInstance(DateFormat.LONG)

@@ -57,6 +57,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalTo
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_ahm_api.domain.StakingMigrationUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -146,6 +147,8 @@ interface StakingFeatureDependencies {
     val balanceHoldsRepository: BalanceHoldsRepository
 
     val amountFormatter: AmountFormatter
+
+    val stakingMigrationUseCase: StakingMigrationUseCase
 
     fun contextManager(): ContextManager
 

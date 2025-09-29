@@ -9,5 +9,6 @@ interface MigrationInfoRepository {
     suspend fun getAllConfigs(): List<ChainMigrationConfig>
 
     suspend fun loadConfigs()
+
     suspend fun getConfigByDestination(chainId: String): ChainMigrationConfig?
 }

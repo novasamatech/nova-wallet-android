@@ -4,9 +4,11 @@ import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStakingBinding
@@ -35,6 +37,8 @@ class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>()
 
     override fun initViews() {
         binder.stakingToolbar.setHomeButtonListener { viewModel.backClicked() }
+
+        binder.stakingMigrationAlert.setOnCloseClickListener { viewModel.closeMigrationAlert() }
     }
 
     override fun inject() {
@@ -48,8 +52,11 @@ class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>()
     }
 
     override fun subscribe(viewModel: StakingViewModel) {
+        observeBrowserEvents(viewModel)
         observeValidations(viewModel)
         setupExternalActions(viewModel)
+
+        viewModel.migrationAlertFlow.observe { binder.stakingMigrationAlert.setModelOrHide(it) }
 
         setupNetworkInfoComponent(viewModel.networkInfoComponent, binder.stakingNetworkInfo)
         setupStakeSummaryComponent(viewModel.stakeSummaryComponent, binder.stakingStakeSummary)

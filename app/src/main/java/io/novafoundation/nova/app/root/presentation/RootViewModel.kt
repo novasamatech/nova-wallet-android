@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapEvent
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.onFailureInstance
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
@@ -57,7 +58,8 @@ class RootViewModel(
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
     private val toastMessageManager: ToastMessageManager,
     private val dialogMessageManager: DialogMessageManager,
-    private val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
+    private val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
+    private val deviceNetworkStateObserver: DeviceNetworkStateObserver
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -116,7 +118,9 @@ class RootViewModel(
 
         multisigPushNotificationsAlertMixin.subscribeToShowAlert()
 
-        launch { interactor.loadMigrationDetailsConfigs() }
+        deviceNetworkStateObserver.observeIsNetworkAvailable()
+            .onEach { interactor.loadMigrationDetailsConfigs() }
+            .launchIn(this)
     }
 
     private fun observeBusEvents() {
