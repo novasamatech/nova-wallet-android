@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.validations.UnlockReferendumValidationSystem
@@ -26,6 +27,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confir
 import io.novafoundation.nova.feature_governance_impl.presentation.unlock.confirm.hints.ConfirmGovernanceUnlockHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmGovernanceUnlockModule {
@@ -37,8 +39,9 @@ class ConfirmGovernanceUnlockModule {
     @Provides
     @ScreenScope
     fun provieHintsFactory(
-        resourceManager: ResourceManager
-    ) = ConfirmGovernanceUnlockHintsMixinFactory(resourceManager)
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
+    ) = ConfirmGovernanceUnlockHintsMixinFactory(resourceManager, amountFormatter)
 
     @Provides
     @IntoMap
@@ -58,6 +61,8 @@ class ConfirmGovernanceUnlockModule {
         locksChangeFormatter: LocksChangeFormatter,
         validationSystem: UnlockReferendumValidationSystem,
         hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmGovernanceUnlockViewModel(
             router = router,
@@ -73,7 +78,9 @@ class ConfirmGovernanceUnlockModule {
             resourceManager = resourceManager,
             locksChangeFormatter = locksChangeFormatter,
             validationSystem = validationSystem,
-            hintsMixinFactory = hintsMixinFactory
+            hintsMixinFactory = hintsMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

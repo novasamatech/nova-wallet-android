@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/multisigPendingOperationDetailsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:titleText="Balances.transfer" />
+
+    <LinearLayout
+        android:id="@+id/multisigPendingOperationProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/multisigPendingOperationDetailsToolbar">
+
+        <ProgressBar
+            style="@style/Widget.Nova.ProgressBar.Indeterminate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/loading_transaction_details" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/multisigPendingOperationDetailsContainer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/multisigPendingOperationDetailsToolbar">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:overScrollMode="never"
+            android:paddingBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:orientation="vertical">
+
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+                    android:id="@+id/multisigPendingOperationPrimaryAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="8dp" />
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp">
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/multisigPendingOperationDetailsNetwork"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/common_network" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/multisigPendingOperationDetailsWallet"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:primaryValueEndIcon="@drawable/ic_info"
+                        app:title="@string/account_multisig" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/multisigPendingOperationDetailsBehalfOf"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:primaryValueEndIcon="@drawable/ic_info"
+                        app:title="@string/multisig_on_behalf_of" />
+
+                </io.novafoundation.nova.common.view.TableView>
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:id="@+id/multisigPendingOperationDetailsCallTable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp" />
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/multisigPendingOperationDetailsSignatory"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:primaryValueEndIcon="@drawable/ic_info"
+                        app:title="@string/common_signatory" />
+
+                    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                        android:id="@+id/multisigPendingOperationDetailsFee"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </io.novafoundation.nova.common.view.TableView>
+
+                <io.novafoundation.nova.common.view.ExpandableView
+                    android:id="@+id/multisigOperationSignatoriesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/bg_block_12"
+                    android:paddingTop="12dp"
+                    app:chevronId="@+id/multisigOperationShowHideButtonIcon"
+                    app:expandableId="@+id/multisigOperationSignatoriesExpandablePart"
+                    app:supportAnimation="false">
+
+                    <TextView
+                        android:id="@+id/multisigOperationSignatoriesTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:textColor="@color/text_secondary"
+                        app:layout_constraintBottom_toBottomOf="@+id/multisigOperationShowHideButton"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/multisigOperationShowHideButton"
+                        tools:text="Signatories (1 of 4)" />
+
+                    <TextView
+                        android:id="@+id/multisigOperationShowHideButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:includeFontPadding="false"
+                        android:paddingEnd="4dp"
+                        android:textColor="@color/text_secondary"
+                        app:layout_constraintBottom_toBottomOf="@+id/multisigOperationShowHideButtonIcon"
+                        app:layout_constraintEnd_toStartOf="@+id/multisigOperationShowHideButtonIcon"
+                        app:layout_constraintTop_toTopOf="parent"
+                        tools:text="Show" />
+
+                    <ImageView
+                        android:id="@+id/multisigOperationShowHideButtonIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:src="@drawable/ic_chevron_up"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/icon_secondary" />
+
+                    <Space
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        app:layout_constraintTop_toBottomOf="@+id/multisigOperationShowHideButtonIcon" />
+
+                    <FrameLayout
+                        android:id="@+id/multisigOperationSignatoriesExpandablePart"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintTop_toBottomOf="@+id/multisigOperationShowHideButtonIcon">
+
+                        <LinearLayout
+                            android:id="@+id/multisigOperationSignatoriesShimmering"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <include layout="@layout/item_signatory_shimmering" />
+
+                            <include layout="@layout/item_signatory_shimmering" />
+
+                            <include layout="@layout/item_signatory_shimmering" />
+
+                            <include layout="@layout/item_signatory_shimmering" />
+
+                        </LinearLayout>
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/multisigOperationSignatories"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:overScrollMode="never"
+                            android:paddingBottom="8dp"
+                            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                            tools:itemCount="4"
+                            tools:listitem="@layout/item_multisig_signatory_account" />
+
+                    </FrameLayout>
+
+                </io.novafoundation.nova.common.view.ExpandableView>
+
+                <io.novafoundation.nova.common.view.GoNextView
+                    android:id="@+id/multisigPendingOperationCallDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/common_full_details"
+                    android:textAppearance="@style/GoNextTransactionDetailsTextAppearance"
+                    android:textColor="@color/button_text_accent"
+                    app:actionIcon="@drawable/ic_chevron_right"
+                    app:actionTint="@color/icon_secondary"
+                    app:dividerVisible="false"
+                    tools:background="@color/block_background" />
+            </LinearLayout>
+        </ScrollView>
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/multisigPendingOperationDetailsEnterCallData"
+            style="@style/Widget.Nova.Button.Secondary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/multisig_operation_details_call_data_not_found" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/multisigPendingOperationDetailsAction"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/common_confirm" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

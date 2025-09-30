@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.payout.PayoutInteractor
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmPayoutModule {
@@ -45,6 +47,8 @@ class ConfirmPayoutModule {
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         partialRetriableMixinFactory: PartialRetriableMixin.Factory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmPayoutViewModel(
             interactor = interactor,
@@ -59,7 +63,9 @@ class ConfirmPayoutModule {
             resourceManager = resourceManager,
             selectedAssetState = singleAssetSharedState,
             walletUiUseCase = walletUiUseCase,
-            partialRetriableMixinFactory = partialRetriableMixinFactory
+            partialRetriableMixinFactory = partialRetriableMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

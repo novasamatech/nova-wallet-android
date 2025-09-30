@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.mappers
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
-import io.novafoundation.nova.common.address.createAddressModel
+import io.novafoundation.nova.common.address.createSubstrateAddressModel
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Fraction
@@ -31,7 +31,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatTokenAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -50,7 +51,7 @@ suspend fun mapValidatorToValidatorModel(
 ) = mapValidatorToValidatorModel(
     chain = chain,
     validator = validator,
-    createIcon = { iconGenerator.createAddressModel(it, ICON_SIZE_DP, validator.identity?.display, AddressIconGenerator.BACKGROUND_TRANSPARENT) },
+    createIcon = { iconGenerator.createSubstrateAddressModel(it, ICON_SIZE_DP, validator.identity?.display, AddressIconGenerator.BACKGROUND_TRANSPARENT) },
     token = token,
     isChecked = isChecked,
     sorting = sorting
@@ -183,6 +184,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
     displayConfig: StakeTargetDetailsPayload.DisplayConfig,
     iconGenerator: AddressIconGenerator,
     resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter,
 ): ValidatorDetailsModel {
     return with(validator) {
         val address = chain.addressOf(validator.accountIdHex.fromHex())
@@ -202,7 +204,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
             )
 
             is StakeTargetStakeParcelModel.Active -> {
-                val totalStakeModel = mapAmountToAmountModel(stake.totalStake, asset)
+                val totalStakeModel = amountFormatter.formatAmountToAmountModel(stake.totalStake, asset)
 
                 val nominatorsCount = stake.stakersCount
                 val rewardsWithLabel = displayConfig.rewardSuffix.format(resourceManager, stake.rewards)
@@ -217,7 +219,7 @@ suspend fun mapValidatorDetailsParcelToValidatorDetailsModel(
                     ),
                     activeStakeModel = ValidatorStakeModel.ActiveStakeModel(
                         totalStake = totalStakeModel,
-                        minimumStake = stake.minimumStake?.let { mapAmountToAmountModel(it, asset) },
+                        minimumStake = stake.minimumStake?.let { amountFormatter.formatAmountToAmountModel(it, asset) },
                         nominatorsCount = nominatorsCount.format(),
                         maxNominations = formattedMaxStakers?.let { resourceManager.getString(R.string.staking_nominations_rewarded_format, it) },
                         apy = rewardsWithLabel

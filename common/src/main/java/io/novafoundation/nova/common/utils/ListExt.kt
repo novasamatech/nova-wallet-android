@@ -4,11 +4,29 @@ fun <T> List<T>.isSubsetOf(list: List<T>): Boolean {
     return list.containsAll(this)
 }
 
+fun <K, T> Collection<T>.associateMutableBy(keyExtractor: (T) -> K): MutableMap<K, T> {
+    val map = mutableMapOf<K, T>()
+    onEach { map[keyExtractor(it)] = it }
+    return map
+}
+
 fun <T> Collection<T>.isAllEquals(value: (T) -> Any): Boolean {
     if (isEmpty()) return false
 
     val first = value(first())
     return all { value(it) == first }
+}
+
+fun <T> Collection<T>.isLast(value: T): Boolean {
+    return lastOrNull() == value
+}
+
+fun <T> Collection<T>.isNotLast(value: T): Boolean {
+    return lastOrNull() != null && !isLast(value)
+}
+
+fun <T> List<T>.getFromTheEndOrNull(index: Int): T? {
+    return getOrNull(lastIndex - index)
 }
 
 inline fun <T> List<T>.binarySearchFloor(fromIndex: Int = 0, toIndex: Int = size, comparison: (T) -> Int): Int {

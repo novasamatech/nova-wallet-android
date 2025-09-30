@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.claimRewards.NominationPoolsClaimRewardsInteractor
@@ -22,7 +24,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,13 +42,16 @@ class NominationPoolsClaimRewardsViewModel(
     private val validationSystem: NominationPoolsClaimRewardsValidationSystem,
     private val stakingSharedState: StakingSharedState,
     private val externalActions: ExternalActions.Presentation,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
     feeLoaderMixinFactory: FeeLoaderMixin.Factory,
     assetUseCase: AssetUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
@@ -58,7 +64,9 @@ class NominationPoolsClaimRewardsViewModel(
     private val pendingRewards = interactor.pendingRewardsFlow()
         .shareInBackground()
 
-    val pendingRewardsAmountModel = combine(pendingRewards.map { it.amount }, assetFlow, ::mapAmountToAmountModel)
+    val pendingRewardsAmountModel = combine(pendingRewards.map { it.amount }, assetFlow) { amount, asset ->
+        amountFormatter.formatAmountToAmountModel(amount, asset)
+    }
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
@@ -122,9 +130,9 @@ class NominationPoolsClaimRewardsViewModel(
     private fun sendTransaction(shouldRestake: Boolean) = launch {
         interactor.claimRewards(shouldRestake)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingMain()
+                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
             .onFailure(::showError)
 

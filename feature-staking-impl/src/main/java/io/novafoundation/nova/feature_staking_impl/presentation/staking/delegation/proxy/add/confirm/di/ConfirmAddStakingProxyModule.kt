@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.validations.delegation.proxy.add.AddStakingProxyValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmAddStakingProxyModule {
@@ -42,6 +44,8 @@ class ConfirmAddStakingProxyModule {
         addStakingProxyRepository: AddStakingProxyInteractor,
         walletUiUseCase: WalletUiUseCase,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmAddStakingProxyViewModel(
             router = router,
@@ -56,7 +60,9 @@ class ConfirmAddStakingProxyModule {
             addStakingProxyValidationSystem = addStakingProxyValidationSystem,
             addStakingProxyInteractor = addStakingProxyRepository,
             walletUiUseCase = walletUiUseCase,
-            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher
+            descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

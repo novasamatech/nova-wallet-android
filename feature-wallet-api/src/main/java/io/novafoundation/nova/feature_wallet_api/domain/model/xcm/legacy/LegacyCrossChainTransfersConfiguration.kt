@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.TokenReserveRegistry
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -12,7 +13,8 @@ class LegacyCrossChainTransfersConfiguration(
     val feeInstructions: Map<String, List<XCMInstructionType>>,
     val deliveryFeeConfigurations: Map<String, DeliveryFeeConfiguration>,
     val instructionBaseWeights: Map<String, Weight>,
-    val chains: Map<ChainId, List<AssetTransfers>>
+    val chains: Map<ChainId, List<AssetTransfers>>,
+    val reserveRegistry: TokenReserveRegistry,
 ) {
 
     class ReserveLocation(
@@ -30,7 +32,7 @@ class LegacyCrossChainTransfersConfiguration(
 
     class XcmTransfer(
         val destination: XcmDestination,
-        val type: XcmTransferType
+        val type: LegacyXcmTransferMethod
     )
 
     class XcmDestination(
@@ -62,7 +64,7 @@ sealed class AssetLocationPath {
     class Concrete(val multiLocation: RelativeMultiLocation) : AssetLocationPath()
 }
 
-enum class XcmTransferType {
+enum class LegacyXcmTransferMethod {
     X_TOKENS,
     XCM_PALLET_RESERVE,
     XCM_PALLET_TELEPORT,

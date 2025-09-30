@@ -36,7 +36,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
@@ -60,6 +61,7 @@ class CurrentCollatorsViewModel(
     private val collatorsUseCase: CollatorsUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     tokenUseCase: TokenUseCase,
+    private val amountFormatter: AmountFormatter
 ) : CurrentStakeTargetsViewModel() {
 
     private val groupedCurrentCollatorsFlow = delegatorStateUseCase.currentDelegatorStateFlow()
@@ -144,7 +146,7 @@ class CurrentCollatorsViewModel(
                 address = collator.address,
                 name = collator.identity?.display
             ),
-            nominated = mapAmountToAmountModel(delegatedCollator.delegation, token),
+            nominated = amountFormatter.formatAmountToAmountModel(delegatedCollator.delegation, token),
             isOversubscribed = delegatedCollator.delegationStatus == TOO_LOW_STAKE,
             isSlashed = false,
             apy = formatStakeTargetRewardsOrNull(collator.apr)

@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemInteractor
@@ -22,7 +24,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.reedeem.Re
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
@@ -42,11 +45,14 @@ class RedeemViewModel(
     private val feeLoaderMixin: FeeLoaderMixin.Presentation,
     private val externalActions: ExternalActions.Presentation,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
@@ -63,7 +69,7 @@ class RedeemViewModel(
         .shareInBackground()
 
     val amountModelFlow = assetFlow.map { asset ->
-        mapAmountToAmountModel(asset.redeemable, asset)
+        amountFormatter.formatAmountToAmountModel(asset.redeemable, asset)
     }
         .shareInBackground()
 
@@ -121,10 +127,10 @@ class RedeemViewModel(
 
     private fun sendTransaction(redeemValidationPayload: RedeemValidationPayload) = launch {
         redeemInteractor.redeem(accountStakingFlow.first(), redeemValidationPayload.asset)
-            .onSuccess { redeemConsequences ->
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+            .onSuccess { (submissionResult, redeemConsequences) ->
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishRedeemFlow(redeemConsequences)
+                startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
             }
             .onFailure(::showError)
 

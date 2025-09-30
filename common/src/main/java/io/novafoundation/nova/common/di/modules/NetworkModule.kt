@@ -54,7 +54,7 @@ class NetworkModule {
             recommendedValidatorsLearnMore = BuildConfig.RECOMMENDED_VALIDATORS_LEARN_MORE,
             paritySignerTroubleShooting = BuildConfig.PARITY_SIGNER_TROUBLESHOOTING,
             polkadotVaultTroubleShooting = BuildConfig.POLKADOT_VAULT_TROUBLESHOOTING,
-            ledgerBluetoothGuide = BuildConfig.LEDGER_BLEUTOOTH_GUIDE,
+            ledgerConnectionGuide = BuildConfig.LEDGER_CONNECTION_GUIDE,
             telegram = BuildConfig.TELEGRAM_URL,
             twitter = BuildConfig.TWITTER_URL,
             rateApp = BuildConfig.RATE_URL,
@@ -68,7 +68,8 @@ class NetworkModule {
             storeUrl = BuildConfig.APP_UPDATE_SOURCE_LINK,
             ledgerMigrationArticle = BuildConfig.LEDGER_MIGRATION_ARTICLE,
             novaCardWidgetUrl = BuildConfig.NOVA_CARD_WIDGET_URL,
-            unifiedAddressArticle = BuildConfig.UNIFIED_ADDRESS_ARTICLE
+            unifiedAddressArticle = BuildConfig.UNIFIED_ADDRESS_ARTICLE,
+            multisigsWikiUrl = BuildConfig.MULTISIGS_WIKI_URL
         )
     }
 

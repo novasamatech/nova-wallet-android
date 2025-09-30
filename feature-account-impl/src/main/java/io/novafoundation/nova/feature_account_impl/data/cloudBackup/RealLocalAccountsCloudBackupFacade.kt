@@ -111,7 +111,7 @@ class RealLocalAccountsCloudBackupFacade(
         val metaAccountsByUuid = getAllBackupableAccounts().associateBy { it.metaAccount.globallyUniqueId }
 
         val changesEvent = buildChangesEvent {
-            accountDao.withTransaction {
+            accountDao.runInTransaction {
                 addAll(applyLocalRemoval(localChangesToApply.removed, metaAccountsByUuid))
                 addAll(applyLocalAddition(localChangesToApply.added, cloudVersion))
                 addAll(
@@ -134,17 +134,21 @@ class RealLocalAccountsCloudBackupFacade(
         if (toRemove.isEmpty()) return emptyList()
 
         val localIds = toRemove.mapNotNull { metaAccountsByUUid[it.walletId]?.metaAccount?.id }
-        accountDao.delete(localIds)
+        val allAffectedMetaAccounts = accountDao.delete(localIds)
 
-        return toRemove.mapNotNull {
-            val localWallet = metaAccountsByUUid[it.walletId] ?: return@mapNotNull null
+        // Clear meta account secrets
+        toRemove.forEach {
+            val localWallet = metaAccountsByUUid[it.walletId] ?: return@forEach
             val chainAccountIds = localWallet.chainAccounts.map(ChainAccountLocal::accountId)
 
             secretsStoreV2.clearMetaAccountSecrets(localWallet.metaAccount.id, chainAccountIds)
+        }
 
+        // Return changes
+        return allAffectedMetaAccounts.map {
             MetaAccountChangesEventBus.Event.AccountRemoved(
-                metaId = localWallet.metaAccount.id,
-                metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(localWallet.metaAccount.type)
+                metaId = it.id,
+                metaAccountType = accountMappers.mapMetaAccountTypeFromLocal(it.type)
             )
         }
     }
@@ -368,7 +372,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.WATCH_ONLY,
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
-            MetaAccountLocal.Type.PROXIED -> baseSecrets.getSubstrateBackupSecrets()
+            MetaAccountLocal.Type.PROXIED,
+            MetaAccountLocal.Type.MULTISIG -> baseSecrets.getSubstrateBackupSecrets()
         }
     }
 
@@ -394,7 +399,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.WATCH_ONLY,
             MetaAccountLocal.Type.PARITY_SIGNER,
             MetaAccountLocal.Type.POLKADOT_VAULT,
-            MetaAccountLocal.Type.PROXIED -> emptyList()
+            MetaAccountLocal.Type.PROXIED,
+            MetaAccountLocal.Type.MULTISIG -> emptyList()
         }
     }
 
@@ -453,7 +459,7 @@ class RealLocalAccountsCloudBackupFacade(
     private fun CloudBackup.WalletPrivateInfo.getLocalMetaAccountSecrets(): EncodableStruct<MetaAccountSecrets>? {
         return MetaAccountSecrets(
             entropy = entropy,
-            seed = substrate?.seed,
+            substrateSeed = substrate?.seed,
             // Keypair is optional in backup since Ledger backup has base substrate derivation path but doesn't have keypair
             // MetaAccountSecrets, however, require substrateKeyPair to be non-null, so we return null here in case of null keypair
             // Which is a expected behavior in case of Ledger secrets
@@ -535,7 +541,8 @@ class RealLocalAccountsCloudBackupFacade(
             parentMetaId = null,
             isSelected = isSelected,
             position = accountPosition,
-            status = MetaAccountLocal.Status.ACTIVE
+            status = MetaAccountLocal.Status.ACTIVE,
+            typeExtras = null
         ).also {
             if (localIdOverwrite != null) {
                 it.id = localIdOverwrite
@@ -572,7 +579,8 @@ class RealLocalAccountsCloudBackupFacade(
             MetaAccountLocal.Type.LEDGER -> CloudBackup.WalletPublicInfo.Type.LEDGER
             MetaAccountLocal.Type.LEDGER_GENERIC -> CloudBackup.WalletPublicInfo.Type.LEDGER_GENERIC
             MetaAccountLocal.Type.POLKADOT_VAULT -> CloudBackup.WalletPublicInfo.Type.POLKADOT_VAULT
-            MetaAccountLocal.Type.PROXIED -> null
+
+            MetaAccountLocal.Type.PROXIED, MetaAccountLocal.Type.MULTISIG -> null
         }
     }
 

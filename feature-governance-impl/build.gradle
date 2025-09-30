@@ -1,19 +1,13 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../scripts/secrets.gradle'
 
 android {
     namespace 'io.novafoundation.nova.feature_governance_impl'
 
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
 
         buildConfigField "String", "GOVERNANCE_DAPPS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/governance/v2/dapps_dev.json\""
 
@@ -29,16 +23,6 @@ android {
         }
     }
 
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
     buildFeatures {
         viewBinding true
     }
@@ -50,7 +34,7 @@ dependencies {
     implementation project(':feature-governance-api')
     implementation project(':feature-dapp-api')
     implementation project(':feature-xcm:api')
-    implementation project(':feature-deep-link-building')
+    implementation project(':feature-deep-linking')
 
     implementation project(":common")
     implementation project(":runtime")
@@ -80,7 +64,7 @@ dependencies {
     implementation cardStackView
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep

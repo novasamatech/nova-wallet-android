@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -21,8 +22,7 @@ abstract class BaseBottomSheet<B : ViewBinding>(
     context: Context,
     style: Int = R.style.BottomSheetDialog,
     private val onCancel: (() -> Unit)? = null,
-) :
-    BottomSheetDialog(context, style),
+) : BottomSheetDialog(context, style),
     DialogExtensions,
     CoroutineScope by CoroutineScope(SupervisorJob() + Dispatchers.Main) {
 
@@ -35,9 +35,9 @@ abstract class BaseBottomSheet<B : ViewBinding>(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(binder.root)
 
+        window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
         window?.decorView
             ?.findViewById<View>(R.id.touch_outside)
             ?.isFocusable = false

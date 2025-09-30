@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di.staking.dashboard
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
@@ -23,7 +24,6 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Rea
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -50,11 +50,11 @@ class StakingDashboardModule {
     @FeatureScope
     fun provideStakingStatsDataSource(
         api: StakingStatsApi,
-        globalConfigRepository: StakingGlobalConfigRepository
+        globalConfigDataSource: GlobalConfigDataSource
     ): StakingStatsDataSource {
         return RealStakingStatsDataSource(
             api = api,
-            stakingGlobalConfigRepository = globalConfigRepository
+            globalConfigDataSource = globalConfigDataSource
         )
     }
 

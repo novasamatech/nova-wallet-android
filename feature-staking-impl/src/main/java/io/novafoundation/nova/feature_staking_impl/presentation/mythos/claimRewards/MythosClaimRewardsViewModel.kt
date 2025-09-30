@@ -11,6 +11,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.MythosClaimRewardsInteractor
@@ -23,7 +25,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.Flow
@@ -41,13 +44,16 @@ class MythosClaimRewardsViewModel(
     private val validationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val stakingSharedState: StakingSharedState,
     private val externalActions: ExternalActions.Presentation,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     selectedAccountUseCase: SelectedAccountUseCase,
     walletUiUseCase: WalletUiUseCase,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
@@ -60,7 +66,9 @@ class MythosClaimRewardsViewModel(
 
     val shouldRestakeFlow = MutableStateFlow(true)
 
-    val pendingRewardsAmountModel = combine(pendingRewardsFlow, assetFlow, ::mapAmountToAmountModel)
+    val pendingRewardsAmountModel = combine(pendingRewardsFlow, assetFlow) { pendingRewards, asset ->
+        amountFormatter.formatAmountToAmountModel(pendingRewards, asset)
+    }
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
@@ -125,9 +133,9 @@ class MythosClaimRewardsViewModel(
 
         interactor.claimRewards(pendingRewards, shouldRestake)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingMain()
+                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
             .onFailure(::showError)
 

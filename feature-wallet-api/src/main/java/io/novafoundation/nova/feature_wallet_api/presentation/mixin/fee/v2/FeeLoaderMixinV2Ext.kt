@@ -29,7 +29,7 @@ suspend fun <F> FeeLoaderMixinV2<F, *>.awaitOptionalFee(): F? = fee
 context(BaseViewModel)
 fun <F, I1> FeeLoaderMixinV2.Presentation<F, *>.connectWith(
     inputSource1: Flow<I1>,
-    feeConstructor: suspend (FeePaymentCurrency, input1: I1) -> F
+    feeConstructor: suspend (FeePaymentCurrency, input1: I1) -> F?
 ) {
     inputSource1.map { input1 ->
         loadFee(
@@ -44,7 +44,7 @@ context(BaseViewModel)
 fun <F, I1, I2> FeeLoaderMixinV2.Presentation<F, *>.connectWith(
     inputSource1: Flow<I1>,
     inputSource2: Flow<I2>,
-    feeConstructor: suspend (FeePaymentCurrency, input1: I1, input2: I2) -> F
+    feeConstructor: suspend (FeePaymentCurrency, input1: I1, input2: I2) -> F?
 ) {
     combine(
         inputSource1,

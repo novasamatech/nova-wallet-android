@@ -9,12 +9,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
@@ -24,6 +26,8 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import okhttp3.OkHttpClient
 
 interface ExternalSignFeatureDependencies {
+
+    val amountFormatter: AmountFormatter
 
     fun currencyRepository(): CurrencyRepository
 
@@ -67,4 +71,6 @@ interface ExternalSignFeatureDependencies {
     val rpcCalls: RpcCalls
 
     val metadataShortenerService: MetadataShortenerService
+
+    val signingContextFactory: SigningContext.Factory
 }

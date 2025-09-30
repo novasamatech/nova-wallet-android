@@ -11,9 +11,11 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.resources.formatBooleanToState
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.common.utils.updateValue
+import io.novafoundation.nova.feature_account_api.domain.model.isMultisig
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.list.SelectMultipleWalletsRequester
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.fromTrackIds
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.toTrackIds
@@ -26,6 +28,9 @@ import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushN
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsPayload
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsRequester
 import io.novafoundation.nova.feature_push_notifications.presentation.governance.PushGovernanceSettingsResponder
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.PushMultisigSettingsRequester
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.toDomain
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigs.toModel
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsPayload
 import io.novafoundation.nova.feature_push_notifications.presentation.staking.PushStakingSettingsRequester
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -43,7 +48,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 private const val MIN_WALLETS = 1
-private const val MAX_WALLETS = 3
+private const val MAX_WALLETS = 10
 
 class PushSettingsViewModel(
     private val router: PushNotificationsRouter,
@@ -52,8 +57,10 @@ class PushSettingsViewModel(
     private val walletRequester: SelectMultipleWalletsRequester,
     private val pushGovernanceSettingsRequester: PushGovernanceSettingsRequester,
     private val pushStakingSettingsRequester: PushStakingSettingsRequester,
+    private val pushMultisigSettingsRequester: PushMultisigSettingsRequester,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val permissionsAsker: PermissionsAsker.Presentation,
+    private val payload: PushSettingsPayload
 ) : BaseViewModel() {
 
     val closeConfirmationAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -86,6 +93,10 @@ class PushSettingsViewModel(
         .map { resourceManager.formatBooleanToState(it.isGovEnabled()) }
         .distinctUntilChanged()
 
+    val pushMultisigsState = pushSettingsState.mapNotNull { it }
+        .map { resourceManager.formatBooleanToState(it.multisigs.isEnabled) }
+        .distinctUntilChanged()
+
     val pushStakingRewardsState = pushSettingsState.mapNotNull { it }
         .map { resourceManager.formatBooleanToState(it.stakingReward.isNotEmpty()) }
         .distinctUntilChanged()
@@ -98,14 +109,24 @@ class PushSettingsViewModel(
     val savingInProgress: Flow<Boolean> = _savingInProgress
 
     init {
-        launch {
-            pushSettingsState.value = oldPushSettingsState.first()
-        }
+        initFirstState()
 
         subscribeOnSelectWallets()
         subscribeOnGovernanceSettings()
         subscribeOnStakingSettings()
+        subscribeMultisigSettings()
         disableNotificationsIfPushSettingsEmpty()
+
+        enableSwitcherOnStartIfRequested()
+    }
+
+    private fun initFirstState() {
+        launch {
+            val settings = oldPushSettingsState.first()
+            pushSettingsState.value = pushNotificationsInteractor.filterAvailableMetaIdsAndGetNewState(settings)
+
+            openWalletSelectionIfRequested()
+        }
     }
 
     fun backClicked() {
@@ -131,10 +152,19 @@ class PushSettingsViewModel(
             _savingInProgress.value = true
             val pushSettings = pushSettingsState.value ?: return@launch
             pushNotificationsInteractor.updatePushSettings(pushEnabledState.value, pushSettings)
-                .onSuccess { router.back() }
+                .onSuccess {
+                    enableMultisigWalletIfAtLeastOneSelected(pushSettings)
+                    router.back()
+                }
                 .onFailure { showError(it) }
 
             _savingInProgress.value = false
+        }
+    }
+
+    private fun enableMultisigWalletIfAtLeastOneSelected(pushSettings: PushSettings) {
+        if (pushSettings.multisigs.isEnabled && isMultisigsStillWasNotEnabled()) {
+            pushNotificationsInteractor.setMultisigsWasEnabledFirstTime()
         }
     }
 
@@ -157,14 +187,7 @@ class PushSettingsViewModel(
     }
 
     fun walletsClicked() {
-        walletRequester.openRequest(
-            SelectMultipleWalletsRequester.Request(
-                titleText = resourceManager.getString(R.string.push_wallets_title),
-                currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
-                min = MIN_WALLETS,
-                max = MAX_WALLETS
-            )
-        )
+        selectWallets()
     }
 
     fun announementsClicked() {
@@ -177,6 +200,14 @@ class PushSettingsViewModel(
 
     fun receivedTokensClicked() {
         pushSettingsState.updateValue { it?.copy(receivedTokensEnabled = !it.receivedTokensEnabled) }
+    }
+
+    fun multisigOperationsClicked() = launchUnit {
+        val settings = pushSettingsState.value ?: return@launchUnit
+        val isAtLeastOneAccountMultisig = settings.subscribedMetaAccounts.atLeastOneMultisigWalletEnabled()
+        pushMultisigSettingsRequester.openRequest(
+            PushMultisigSettingsRequester.Request(isAtLeastOneAccountMultisig, settings.multisigs.toModel())
+        )
     }
 
     fun governanceClicked() {
@@ -196,9 +227,11 @@ class PushSettingsViewModel(
 
     private fun subscribeOnSelectWallets() {
         walletRequester.responseFlow
-            .onEach {
-                pushSettingsState.value = pushSettingsState.value
-                    ?.copy(subscribedMetaAccounts = it.selectedMetaIds)
+            .onEach { response ->
+                val currentState = pushSettingsState.value ?: return@onEach
+                val newPushSettingsState = pushNotificationsInteractor.getNewStateForChangedMetaAccounts(currentState, response.selectedMetaIds)
+
+                pushSettingsState.value = newPushSettingsState
             }
             .launchIn(this)
     }
@@ -223,6 +256,16 @@ class PushSettingsViewModel(
 
                 pushSettingsState.updateValue { settings ->
                     settings?.copy(stakingReward = stakingSettings)
+                }
+            }
+            .launchIn(this)
+    }
+
+    private fun subscribeMultisigSettings() {
+        pushMultisigSettingsRequester.responseFlow
+            .onEach { response ->
+                pushSettingsState.updateValue { settings ->
+                    settings?.copy(multisigs = response.settings.toDomain())
                 }
             }
             .launchIn(this)
@@ -269,5 +312,35 @@ class PushSettingsViewModel(
         if (pushSettingsState.value?.settingsIsEmpty() == true) {
             pushSettingsState.value = pushNotificationsInteractor.getPushSettings()
         }
+    }
+
+    private suspend fun Collection<Long>.atLeastOneMultisigWalletEnabled(): Boolean {
+        return pushNotificationsInteractor.getMetaAccounts(this.toList())
+            .any { it.isMultisig() }
+    }
+
+    private fun isMultisigsStillWasNotEnabled() = !pushNotificationsInteractor.isMultisigsWasEnabledFirstTime()
+
+    private fun enableSwitcherOnStartIfRequested() {
+        if (payload.enableSwitcherOnStart) {
+            pushEnabledState.value = true
+        }
+    }
+
+    private fun openWalletSelectionIfRequested() {
+        if (payload.navigation is PushSettingsPayload.InstantNavigation.WithWalletSelection) {
+            selectWallets()
+        }
+    }
+
+    private fun selectWallets() {
+        walletRequester.openRequest(
+            SelectMultipleWalletsRequester.Request(
+                titleText = resourceManager.getString(R.string.push_wallets_title, MAX_WALLETS),
+                currentlySelectedMetaIds = pushSettingsState.value?.subscribedMetaAccounts?.toSet().orEmpty(),
+                min = MIN_WALLETS,
+                max = MAX_WALLETS
+            )
+        )
     }
 }

@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_governance_api.domain.locks.ClaimSchedule
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.Change
 import io.novafoundation.nova.feature_governance_api.domain.referendum.common.absoluteDifference
@@ -34,7 +36,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.WithFeeL
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -57,10 +60,13 @@ class ConfirmGovernanceUnlockViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val validationSystem: UnlockReferendumValidationSystem,
     private val hintsMixinFactory: ConfirmGovernanceUnlockHintsMixinFactory,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     WithFeeLoaderMixin,
     Validatable by validationExecutor,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -85,7 +91,7 @@ class ConfirmGovernanceUnlockViewModel(
         val asset = assetFlow.first()
         val amount = it.governanceLockChange.absoluteDifference()
 
-        mapAmountToAmountModel(amount, asset)
+        amountFormatter.formatAmountToAmountModel(amount, asset)
     }.shareInBackground()
 
     val currentAddressModelFlow = selectedAccountUseCase.selectedMetaAccountFlow().map { metaAccount ->
@@ -163,9 +169,9 @@ class ConfirmGovernanceUnlockViewModel(
         interactor.unlock(claimable)
             .onFailure(::showError)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero)
+                startNavigation(it.submissionHierarchy) { router.finishUnlockFlow(shouldCloseLocksScreen = lockChange.newValue.isZero) }
             }
 
         submissionInProgress.value = false

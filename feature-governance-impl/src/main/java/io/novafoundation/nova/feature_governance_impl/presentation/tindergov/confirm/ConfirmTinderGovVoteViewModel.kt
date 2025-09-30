@@ -7,9 +7,12 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.submissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_governance_api.data.model.TinderGovBasketItem
 import io.novafoundation.nova.feature_governance_api.data.model.accountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
@@ -29,7 +32,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -57,7 +61,9 @@ class ConfirmTinderGovVoteViewModel(
     private val locksChangeFormatter: LocksChangeFormatter,
     private val tinderGovInteractor: TinderGovInteractor,
     private val tinderGovBasketInteractor: TinderGovBasketInteractor,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -69,7 +75,8 @@ class ConfirmTinderGovVoteViewModel(
     addressIconGenerator,
     assetUseCase,
     validationExecutor
-) {
+),
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val basketFlow = tinderGovBasketInteractor.observeTinderGovBasket()
         .map { it.associateBy { it.referendumId } }
@@ -85,7 +92,7 @@ class ConfirmTinderGovVoteViewModel(
 
     override val amountModelFlow: Flow<AmountModel> = combine(assetFlow, basketFlow) { asset, basket ->
         val maxAmount = basket.values.maxOfOrNull { it.amount } ?: BigInteger.ZERO
-        mapAmountToAmountModel(maxAmount, asset)
+        amountFormatter.formatAmountToAmountModel(maxAmount, asset)
     }.shareInBackground()
 
     override val accountVoteUi = flowOf { null }
@@ -143,7 +150,7 @@ class ConfirmTinderGovVoteViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                onVoteSuccess(payload.basket)
+                startNavigation(it.submissionHierarchy()) { onVoteSuccess(payload.basket) }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }
@@ -153,7 +160,7 @@ class ConfirmTinderGovVoteViewModel(
     private suspend fun onVoteSuccess(basket: List<TinderGovBasketItem>) {
         awaitVotedReferendaStateUpdate(basket)
 
-        showMessage(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, basket.size))
+        showToast(resourceManager.getString(R.string.swipe_gov_convirm_votes_success_message, basket.size))
         tinderGovBasketInteractor.clearBasket()
         router.backToTinderGovCards()
     }

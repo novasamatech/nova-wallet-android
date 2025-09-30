@@ -7,7 +7,6 @@ import android.view.ViewGroup.MarginLayoutParams
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.InstructionStepView
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig.Connect.Instruction
@@ -33,7 +32,6 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
 
     override fun initViews() {
         binder.startImportParitySignerToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.startImportParitySignerToolbar.applyStatusBarInsets()
 
         binder.startImportParitySignerScanQrCode.setOnClickListener { viewModel.scanQrCodeClicked() }
     }

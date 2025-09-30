@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
 class ConfirmStartParachainStakingModule {
@@ -54,6 +56,8 @@ class ConfirmStartParachainStakingModule {
         hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
         delegatorStateUseCase: DelegatorStateUseCase,
         stakingStartedDetectionService: StakingStartedDetectionService,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
             parachainStakingRouter = router,
@@ -73,7 +77,9 @@ class ConfirmStartParachainStakingModule {
             collatorsUseCase = collatorsUseCase,
             delegatorStateUseCase = delegatorStateUseCase,
             startStakingRouter = startStakingRouter,
-            stakingStartedDetectionService = stakingStartedDetectionService
+            stakingStartedDetectionService = stakingStartedDetectionService,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

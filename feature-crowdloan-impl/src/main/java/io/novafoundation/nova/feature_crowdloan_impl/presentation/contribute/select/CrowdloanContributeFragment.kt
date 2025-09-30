@@ -4,12 +4,12 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.presentation.masking.dataOrNull
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setProgressState
@@ -25,7 +25,8 @@ private const val KEY_PAYLOAD = "KEY_PAYLOAD"
 
 class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel, FragmentContributeBinding>() {
 
-    @Inject lateinit var imageLoader: ImageLoader
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     companion object {
 
@@ -39,14 +40,6 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel, F
     override fun createBinding() = FragmentContributeBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.crowdloanContributeContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-
-            consume(true)
-        }
-
         binder.crowdloanContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.crowdloanContributeContinue.prepareForProgress(viewLifecycleOwner)
         binder.crowdloanContributeContinue.setOnClickListener { viewModel.nextClicked() }
@@ -76,7 +69,8 @@ class CrowdloanContributeFragment : BaseFragment<CrowdloanContributeViewModel, F
         viewModel.showNextProgress.observe(binder.crowdloanContributeContinue::setProgressState)
 
         viewModel.assetModelFlow.observe {
-            binder.crowdloanContributeAmount.setAssetBalance(it.assetBalance)
+            // Very rude way to set balance but we not needed to refactor it since we don't support this feature
+            binder.crowdloanContributeAmount.setAssetBalance(it.assetBalance.dataOrNull() ?: "")
             binder.crowdloanContributeAmount.setAssetName(it.tokenSymbol)
             binder.crowdloanContributeAmount.loadAssetImage(it.icon)
         }

@@ -9,17 +9,22 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.utils.HexString
+import io.novafoundation.nova.common.utils.padEnd
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.NetworkId
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.bindVersionedXcm
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.ext.Ids
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.encrypt.json.copyBytes
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
+import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 
 // ------ Decode ------
 
@@ -62,11 +67,7 @@ private fun bindJunction(instance: Any?): Junction {
     val asDictEnum = instance.castToDictEnum()
 
     return when (asDictEnum.name) {
-        "GeneralKey" -> {
-            val keyBytes = bindByteArray(asDictEnum.value)
-            Junction.GeneralKey(keyBytes.toHexString(withPrefix = true))
-        }
-
+        "GeneralKey" -> Junction.GeneralKey(bindGeneralKey(asDictEnum.value))
         "PalletInstance" -> Junction.PalletInstance(bindNumber(asDictEnum.value))
         "Parachain" -> Junction.ParachainId(bindNumber(asDictEnum.value))
         "GeneralIndex" -> Junction.GeneralIndex(bindNumber(asDictEnum.value))
@@ -76,6 +77,20 @@ private fun bindJunction(instance: Any?): Junction {
 
         else -> Junction.Unsupported
     }
+}
+
+private fun bindGeneralKey(instance: Any?): HexString {
+    val keyBytes = if (instance is Struct.Instance) {
+        // v3+ structure
+        val keyLength = bindInt(instance["length"])
+        val keyPadded = bindByteArray(instance["data"])
+
+        keyPadded.copyBytes(0, keyLength)
+    } else {
+        bindByteArray(instance)
+    }
+
+    return keyBytes.toHexString(withPrefix = true)
 }
 
 private fun bindAccountIdJunction(instance: Any?, accountIdKey: String): AccountIdKey {
@@ -90,13 +105,16 @@ private fun bindGlobalConsensusJunction(instance: Any?): Junction {
     return when (asDictEnum.name) {
         "ByGenesis" -> {
             val genesis = bindByteArray(asDictEnum.value).toHexString(withPrefix = false)
-            Junction.GlobalConsensus(chainId = genesis)
+            Junction.GlobalConsensus(networkId = NetworkId.Substrate(genesis))
         }
 
-        "Polkadot" -> Junction.GlobalConsensus(chainId = Chain.Geneses.POLKADOT)
-        "Kusama" -> Junction.GlobalConsensus(chainId = Chain.Geneses.KUSAMA)
-        "Westend" -> Junction.GlobalConsensus(chainId = Chain.Geneses.WESTEND)
-        "Ethereum" -> Junction.GlobalConsensus(chainId = Chain.Ids.ETHEREUM)
+        "Polkadot" -> Junction.GlobalConsensus(NetworkId.Substrate(Chain.Geneses.POLKADOT))
+        "Kusama" -> Junction.GlobalConsensus(NetworkId.Substrate(Chain.Geneses.KUSAMA))
+        "Westend" -> Junction.GlobalConsensus(NetworkId.Substrate(Chain.Geneses.WESTEND))
+        "Ethereum" -> {
+            val chainId = bindInt(asDictEnum.value.castToStruct()["chain_id"])
+            Junction.GlobalConsensus(NetworkId.Ethereum(chainId))
+        }
         else -> Junction.Unsupported
     }
 }
@@ -126,7 +144,7 @@ private fun MultiLocation.Interior.toEncodableInstance(xcmVersion: XcmVersion) =
 }
 
 private fun Junction.toEncodableInstance(xcmVersion: XcmVersion) = when (this) {
-    is Junction.GeneralKey -> DictEnum.Entry("GeneralKey", key.fromHex())
+    is Junction.GeneralKey -> DictEnum.Entry("GeneralKey", encodableGeneralKey(xcmVersion, key))
     is Junction.PalletInstance -> DictEnum.Entry("PalletInstance", index)
     is Junction.ParachainId -> DictEnum.Entry("Parachain", id)
     is Junction.AccountKey20 -> DictEnum.Entry("AccountKey20", accountId.toJunctionAccountIdInstance(accountIdKey = "key", xcmVersion))
@@ -136,16 +154,40 @@ private fun Junction.toEncodableInstance(xcmVersion: XcmVersion) = when (this) {
     Junction.Unsupported -> error("Unsupported junction")
 }
 
+private fun encodableGeneralKey(xcmVersion: XcmVersion, generalKey: HexString): Any {
+    val bytes = generalKey.fromHex()
+
+    return if (xcmVersion >= XcmVersion.V3) {
+        structOf(
+            "length" to bytes.size.toBigInteger(),
+            "data" to bytes.padEnd(expectedSize = 32, padding = 0)
+        )
+    } else {
+        bytes
+    }
+}
+
 private fun Junction.GlobalConsensus.toEncodableInstance(): Any {
-    val innerValue = when (chainId) {
+    val innerValue = when (networkId) {
+        is NetworkId.Ethereum -> networkId.toEncodableInstance()
+        is NetworkId.Substrate -> networkId.toEncodableInstance()
+    }
+
+    return DictEnum.Entry("GlobalConsensus", innerValue)
+}
+
+private fun NetworkId.Ethereum.toEncodableInstance(): Any {
+    return DictEnum.Entry("Ethereum", structOf("chain_id" to chainId.toBigInteger()))
+}
+
+private fun NetworkId.Substrate.toEncodableInstance(): Any {
+    return when (genesisHash) {
         Chain.Geneses.POLKADOT -> DictEnum.Entry("Polkadot", null)
         Chain.Geneses.KUSAMA -> DictEnum.Entry("Kusama", null)
         Chain.Geneses.WESTEND -> DictEnum.Entry("Westend", null)
         Chain.Ids.ETHEREUM -> DictEnum.Entry("Ethereum", null)
-        else -> DictEnum.Entry("ByGenesis", chainId.fromHex())
+        else -> DictEnum.Entry("ByGenesis", genesisHash.fromHex())
     }
-
-    return DictEnum.Entry("GlobalConsensus", innerValue)
 }
 
 private fun AccountIdKey.toJunctionAccountIdInstance(accountIdKey: String, xcmVersion: XcmVersion) = structOf(

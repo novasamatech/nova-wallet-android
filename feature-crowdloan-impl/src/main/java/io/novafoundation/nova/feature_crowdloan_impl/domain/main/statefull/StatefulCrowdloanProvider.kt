@@ -9,7 +9,8 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.CrowdloanInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.getCurrentAsset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
@@ -20,6 +21,7 @@ class StatefulCrowdloanProviderFactory(
     private val crowdloanInteractor: CrowdloanInteractor,
     private val contributionsInteractor: ContributionsInteractor,
     private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val amountFormatter: AmountFormatter,
     private val assetUseCase: AssetUseCase,
 ) : StatefulCrowdloanMixin.Factory {
 
@@ -30,6 +32,7 @@ class StatefulCrowdloanProviderFactory(
             contributionsInteractor = contributionsInteractor,
             selectedAccountUseCase = selectedAccountUseCase,
             assetUseCase = assetUseCase,
+            amountFormatter = amountFormatter,
             coroutineScope = scope
         )
     }
@@ -42,6 +45,7 @@ class StatefulCrowdloanProvider(
     private val contributionsInteractor: ContributionsInteractor,
     private val assetUseCase: AssetUseCase,
     coroutineScope: CoroutineScope,
+    private val amountFormatter: AmountFormatter,
 ) : StatefulCrowdloanMixin,
     CoroutineScope by coroutineScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(coroutineScope) {
@@ -64,7 +68,7 @@ class StatefulCrowdloanProvider(
         contributionsInteractor.observeChainContributions(account, chain.id, chain.utilityAsset.id)
     }
         .mapLoading {
-            val amountModel = mapAmountToAmountModel(
+            val amountModel = amountFormatter.formatAmountToAmountModel(
                 it.totalContributed,
                 assetUseCase.getCurrentAsset()
             )

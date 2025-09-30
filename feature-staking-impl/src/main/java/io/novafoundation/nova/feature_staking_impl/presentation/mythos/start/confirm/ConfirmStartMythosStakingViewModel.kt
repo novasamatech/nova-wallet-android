@@ -14,6 +14,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -40,6 +42,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -65,6 +68,8 @@ class ConfirmStartMythosStakingViewModel(
     private val stakingBlockNumberUseCase: StakingBlockNumberUseCase,
     private val mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val interactor: StartMythosStakingInteractor,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter,
     mythosSharedComputation: MythosSharedComputation,
     walletUiUseCase: WalletUiUseCase,
 ) : ConfirmStartSingleTargetStakingViewModel<MythosConfirmStartStakingState>(
@@ -88,7 +93,9 @@ class ConfirmStartMythosStakingViewModel(
     assetUseCase = assetUseCase,
     walletUiUseCase = walletUiUseCase,
     payload = payload,
-) {
+    amountFormatter = amountFormatter
+),
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     override val hintsMixin = NoHintsMixin()
 
@@ -135,9 +142,9 @@ class ConfirmStartMythosStakingViewModel(
                 stakingStartedDetectionService.activateDetection(viewModelScope)
             }
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                finishFlow(currentState)
+                startNavigation(it.submissionHierarchy) { finishFlow(currentState) }
             }
 
         _showNextProgress.value = false

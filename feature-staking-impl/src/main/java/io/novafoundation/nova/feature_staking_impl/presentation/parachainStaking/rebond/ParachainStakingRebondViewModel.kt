@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.DelegatorStateUseCase
@@ -27,7 +29,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.Dispatchers
@@ -51,15 +54,18 @@ class ParachainStakingRebondViewModel(
     private val delegatorStateUseCase: DelegatorStateUseCase,
     private val payload: ParachainStakingRebondPayload,
     private val collatorsUseCase: CollatorsUseCase,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     resourcesHintsMixinFactory: ResourcesHintsMixinFactory,
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
     FeeLoaderMixin by feeLoaderMixin,
-    ExternalActions by externalActions {
+    ExternalActions by externalActions,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val assetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
@@ -70,7 +76,7 @@ class ParachainStakingRebondViewModel(
     val rebondAmount = delegatorState.flatMapLatest { state ->
         val amount = interactor.rebondAmount(state, payload.collatorId)
 
-        assetFlow.map { mapAmountToAmountModel(amount, it) }
+        assetFlow.map { amountFormatter.formatAmountToAmountModel(amount, it) }
     }
         .withLoading()
         .shareInBackground()
@@ -148,9 +154,9 @@ class ParachainStakingRebondViewModel(
         interactor.rebond(payload.collatorId)
             .onFailure(::showError)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.returnToStakingMain()
+                startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
 
         _showNextProgress.value = false

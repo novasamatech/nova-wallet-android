@@ -11,6 +11,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
@@ -34,6 +35,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.interactor.RealSwapAvaila
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import io.novafoundation.nova.feature_swap_impl.domain.swap.RealSwapService
+import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.CanReceiveAssetOutValidationFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealPriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.RealSwapRateFormatter
@@ -51,6 +53,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTra
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -72,7 +75,8 @@ class SwapFeatureModule {
         tokenRepository: TokenRepository,
         accountRepository: AccountRepository,
         assetSourceRegistry: AssetSourceRegistry,
-        chainStateRepository: ChainStateRepository
+        chainStateRepository: ChainStateRepository,
+        signerProvider: SignerProvider
     ): SwapService {
         return RealSwapService(
             assetConversionFactory = assetConversionFactory,
@@ -86,7 +90,8 @@ class SwapFeatureModule {
             tokenRepository = tokenRepository,
             assetSourceRegistry = assetSourceRegistry,
             accountRepository = accountRepository,
-            chainStateRepository = chainStateRepository
+            chainStateRepository = chainStateRepository,
+            signerProvider = signerProvider
         )
     }
 
@@ -114,9 +119,9 @@ class SwapFeatureModule {
         accountRepository: AccountRepository,
         buyTokenRegistry: TradeTokenRegistry,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
-        swapTransactionHistoryRepository: SwapTransactionHistoryRepository,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
-        assetsValidationContextFactory: AssetsValidationContext.Factory
+        assetsValidationContextFactory: AssetsValidationContext.Factory,
+        canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
     ): SwapInteractor {
         return SwapInteractor(
             priceImpactThresholds = priceImpactThresholds,
@@ -124,7 +129,7 @@ class SwapFeatureModule {
             buyTokenRegistry = buyTokenRegistry,
             crossChainTransfersUseCase = crossChainTransfersUseCase,
             accountRepository = accountRepository,
-            swapTransactionHistoryRepository = swapTransactionHistoryRepository,
+            canReceiveAssetOutValidationFactory = canReceiveAssetOutValidationFactory,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
             assetsValidationContextFactory = assetsValidationContextFactory,
             tokenRepository = tokenRepository
@@ -220,6 +225,7 @@ class SwapFeatureModule {
         swapRateFormatter: SwapRateFormatter,
         priceImpactFormatter: PriceImpactFormatter,
         resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ): SwapConfirmationDetailsFormatter {
         return RealSwapConfirmationDetailsFormatter(
             chainRegistry = chainRegistry,
@@ -228,7 +234,8 @@ class SwapFeatureModule {
             swapRouteFormatter = swapRouteFormatter,
             swapRateFormatter = swapRateFormatter,
             priceImpactFormatter = priceImpactFormatter,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            amountFormatter = amountFormatter
         )
     }
 

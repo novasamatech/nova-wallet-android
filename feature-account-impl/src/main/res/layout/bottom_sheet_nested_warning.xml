@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp">
+
+    <include layout="@layout/layout_puller" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:layout_width="88dp"
+        android:id="@+id/nestedSigningWarningIcon"
+        android:layout_height="88dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_icon_big"
+        android:padding="12dp"
+        tools:src="@drawable/ic_proxy"
+        android:tint="@color/icon_primary" />
+
+    <TextView
+        android:id="@+id/nestedSigningWarningTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        tools:text="@string/proxy_signing_warning_title"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        android:id="@+id/nestedSigningWarningMessage"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/proxy_signing_warning_message"
+        android:textColor="@color/text_secondary" />
+
+    <CheckBox
+        android:id="@+id/nestedSigningWarningDontShowAgain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:paddingStart="10dp"
+        android:text="@string/common_check_box_auto_continue"
+        android:textColor="@color/text_secondary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/nestedSigningWarningCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="6dp"
+            android:layout_weight="1"
+            android:text="@string/common_cancel"
+            app:appearance="secondary" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/nestedSigningWarningContinue"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="6dp"
+            android:layout_weight="1"
+            android:text="@string/common_continue" />
+
+    </LinearLayout>
+
+</LinearLayout>

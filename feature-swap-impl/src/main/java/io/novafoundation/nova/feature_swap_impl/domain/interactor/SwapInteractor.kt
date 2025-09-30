@@ -13,10 +13,10 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.allBasicFees
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
-import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.swap.PriceImpactThresholds
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationSystem
@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.sufficientBala
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapFeeSufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.swapSmallRemainingBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQuoteValidationRetriever
+import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.CanReceiveAssetOutValidationFactory
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.intermediateReceivesMeetEDValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.sufficientBalanceConsideringNonSufficientAssetsValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.sufficientNativeBalanceToPayFeeConsideringED
@@ -64,7 +65,7 @@ class SwapInteractor(
     private val tokenRepository: TokenRepository,
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val assetsValidationContextFactory: AssetsValidationContext.Factory,
-    private val swapTransactionHistoryRepository: SwapTransactionHistoryRepository
+    private val canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
 ) {
 
     suspend fun getAllFeeTokens(swapFee: SwapFee): Map<FullChainAssetId, Token> {
@@ -139,6 +140,8 @@ class SwapInteractor(
 
     suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = swapService.swap(calculatedFee)
 
+    suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult> = swapService.submitFirstSwapStep(calculatedFee)
+
     suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {
         swapService.warmUpCommonChains(computationalScope)
     }
@@ -153,6 +156,10 @@ class SwapInteractor(
 
     fun runSubscriptions(metaAccount: MetaAccount): Flow<ReQuoteTrigger> {
         return swapService.runSubscriptions(metaAccount)
+    }
+
+    suspend fun isDeepSwapAvailable(): Boolean {
+        return swapService.isDeepSwapAllowed()
     }
 
     private fun buyAvailable(chainAssetFlow: Flow<Chain.Asset?>): Flow<Boolean> {
@@ -181,6 +188,8 @@ class SwapInteractor(
             enoughAssetInToPayForSwapAndFee(assetsValidationContext)
 
             sufficientNativeBalanceToPayFeeConsideringED(assetsValidationContext)
+
+            canReceiveAssetOutValidationFactory.canReceiveAssetOut(assetsValidationContext)
 
             availableSlippage(swapService)
 

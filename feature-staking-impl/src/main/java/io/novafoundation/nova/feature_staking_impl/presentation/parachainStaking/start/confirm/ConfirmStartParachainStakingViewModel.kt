@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.common.CollatorsUseCase
@@ -44,6 +46,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -72,6 +75,8 @@ class ConfirmStartParachainStakingViewModel(
     walletUiUseCase: WalletUiUseCase,
     private val payload: ConfirmStartParachainStakingPayload,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : ConfirmStartSingleTargetStakingViewModel<ParachainConfirmStartStakingState>(
     stateFactory = { computationalScope ->
@@ -93,7 +98,9 @@ class ConfirmStartParachainStakingViewModel(
     assetUseCase = assetUseCase,
     walletUiUseCase = walletUiUseCase,
     payload = payload,
-) {
+    amountFormatter = amountFormatter,
+),
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     override val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
 
@@ -109,7 +116,7 @@ class ConfirmStartParachainStakingViewModel(
         validationExecutor.requireValid(
             validationSystem = validationSystem,
             payload = payload,
-            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager) },
+            validationFailureTransformer = { startParachainStakingValidationFailure(it, resourceManager, amountFormatter) },
             progressConsumer = _showNextProgress.progressConsumer()
         ) {
             sendTransaction(amount, payload.collator)
@@ -140,9 +147,9 @@ class ConfirmStartParachainStakingViewModel(
                 stakingStartedDetectionService.activateDetection(viewModelScope)
             }
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                finishFlow()
+                startNavigation(it.submissionHierarchy) { finishFlow() }
             }
 
         _showNextProgress.value = false

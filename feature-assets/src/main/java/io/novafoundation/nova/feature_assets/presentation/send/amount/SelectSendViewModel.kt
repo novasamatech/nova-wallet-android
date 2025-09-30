@@ -53,7 +53,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.DefaultFeeFormatter
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -92,6 +94,7 @@ class SelectSendViewModel(
     addressInputMixinFactory: AddressInputMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     selectAddressMixinFactory: SelectAddressMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
@@ -165,7 +168,7 @@ class SelectSendViewModel(
     private val originAssetFlow = originChainAsset.flatMapLatest(interactor::assetFlow)
         .shareInBackground()
 
-    private val feeFormatter = TransferFeeDisplayFormatter()
+    private val feeFormatter = TransferFeeDisplayFormatter(componentDelegate = DefaultFeeFormatter(amountFormatter))
     val feeMixin = feeLoaderMixinFactory.createForTransfer(originChainAsset, feeFormatter)
 
     private val maxActionProvider = maxActionProviderFactory.create(
@@ -478,7 +481,7 @@ class SelectSendViewModel(
             CrossChainDestinationModel(
                 chainWithAsset = it.chainWithAsset,
                 chainUi = mapChainToUi(it.chainWithAsset.chain),
-                balance = it.balances?.let { asset -> mapAmountToAmountModel(asset.transferable, asset) }
+                balance = it.balances?.let { asset -> amountFormatter.formatAmountToAmountModel(asset.transferable, asset) }
             )
         }
 
@@ -534,13 +537,13 @@ class SelectSendViewModel(
         }
     }
 
-    private suspend fun getMetaAccountsFilter(origin: Chain, desination: Chain): SelectAddressAccountFilter {
-        val isCrossChain = origin.id != desination.id
+    private suspend fun getMetaAccountsFilter(origin: Chain, destination: Chain): SelectAddressAccountFilter {
+        val isCrossChain = origin.id != destination.id
 
         return if (isCrossChain) {
             SelectAddressAccountFilter.Everything()
         } else {
-            val destinationAccountId = selectedAccount.first().requireAccountIdIn(desination)
+            val destinationAccountId = selectedAccount.first().requireAccountIdIn(destination)
             val notOriginMetaAccounts = accountRepository.getActiveMetaAccounts()
                 .filter { it.accountIdIn(origin)?.intoKey() == destinationAccountId.intoKey() }
                 .map { it.id }

@@ -42,6 +42,10 @@ abstract class BaseNotificationHandler(
         notificationManager.notify(notificationIdProvider.getId(), notification)
     }
 
+    internal fun notify(id: Int, notification: Notification) {
+        notificationManager.notify(id, notification)
+    }
+
     internal fun activityIntent() = activityIntentProvider.getIntent()
 
     protected abstract suspend fun handleNotificationInternal(channelId: String, message: RemoteMessage): Boolean

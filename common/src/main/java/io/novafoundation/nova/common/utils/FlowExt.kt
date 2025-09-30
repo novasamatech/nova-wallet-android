@@ -22,6 +22,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.SendChannel
@@ -52,6 +53,8 @@ import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.coroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 import kotlin.time.Duration
@@ -149,9 +152,25 @@ inline fun <T> withFlowScope(crossinline block: suspend (scope: CoroutineScope) 
     }
 }
 
+inline fun <T> parentCancellableFlowScope(crossinline block: suspend (scope: CoroutineScope) -> T): Flow<T> {
+    return flow {
+        val flowScope = CoroutineScope(coroutineContext)
+        emit(block(flowScope))
+
+        awaitCancellation()
+    }
+}
+
 fun <T1, T2> combineToPair(flow1: Flow<T1>, flow2: Flow<T2>): Flow<Pair<T1, T2>> = combine(flow1, flow2, ::Pair)
 
 fun <T1, T2, T3> combineToTriple(flow1: Flow<T1>, flow2: Flow<T2>, flow3: Flow<T3>): Flow<Triple<T1, T2, T3>> = combine(flow1, flow2, flow3, ::Triple)
+
+fun <T1, T2, T3, T4> combineToTuple4(
+    flow1: Flow<T1>,
+    flow2: Flow<T2>,
+    flow3: Flow<T3>,
+    flow4: Flow<T4>
+): Flow<Tuple4<T1, T2, T3, T4>> = combine(flow1, flow2, flow3, flow4, ::Tuple4)
 
 /**
  * Modifies flow so that it firstly emits [LoadingState.Loading] state for each element from upstream.
@@ -624,11 +643,13 @@ fun <T> Collection<Flow<T>>.accumulate(): Flow<List<T>> {
 fun <T> accumulate(vararg flows: Flow<T>): Flow<List<T>> {
     val flowsList = flows.mapIndexed { index, flow -> flow.map { index to flow } }
     val resultOfFlows = MutableList<T?>(flowsList.size) { null }
+    val lock = Mutex()
+
     return flowsList
         .merge()
         .map {
-            resultOfFlows[it.first] = it.second.first()
-            resultOfFlows.filterNotNull()
+            lock.withLock { resultOfFlows[it.first] = it.second.first() }
+            resultOfFlows.filterNotNull().toList()
         }
 }
 

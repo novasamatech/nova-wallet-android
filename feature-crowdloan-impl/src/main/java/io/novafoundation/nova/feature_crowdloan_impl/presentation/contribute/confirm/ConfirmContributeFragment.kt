@@ -4,11 +4,11 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.presentation.masking.dataOrNull
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -37,14 +37,6 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel, Fragm
     override fun createBinding() = FragmentContributeConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.confirmContributeContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-
-            consume(true)
-        }
-
         binder.confirmContributeToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.confirmContributeConfirm.prepareForProgress(viewLifecycleOwner)
         binder.confirmContributeConfirm.setOnClickListener { viewModel.nextClicked() }
@@ -72,7 +64,7 @@ class ConfirmContributeFragment : BaseFragment<ConfirmContributeViewModel, Fragm
         viewModel.showNextProgress.observe(binder.confirmContributeConfirm::setProgressState)
 
         viewModel.assetModelFlow.observe {
-            binder.confirmContributeAmount.setAssetBalance(it.assetBalance)
+            binder.confirmContributeAmount.setAssetBalance(it.assetBalance.dataOrNull() ?: "")
             binder.confirmContributeAmount.setAssetName(it.tokenSymbol)
             binder.confirmContributeAmount.loadAssetImage(it.icon)
         }

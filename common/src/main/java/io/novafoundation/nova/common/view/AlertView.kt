@@ -1,20 +1,25 @@
 package io.novafoundation.nova.common.view
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
+import android.view.Gravity
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewAlertBinding
+import io.novafoundation.nova.common.databinding.ViewAlertMessageBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.getResourceIdOrNull
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
-import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 
@@ -23,9 +28,16 @@ typealias SimpleAlertModel = String
 class AlertModel(
     val style: AlertView.Style,
     val message: String,
-    val subMessage: CharSequence? = null,
+    val subMessages: List<CharSequence>,
     val action: ActionModel? = null
 ) {
+
+    constructor(
+        style: AlertView.Style,
+        message: String,
+        subMessage: CharSequence? = null,
+        action: ActionModel? = null
+    ) : this(style, message, subMessages = listOfNotNull(subMessage), action)
 
     class ActionModel(val text: String, val listener: () -> Unit)
 }
@@ -40,14 +52,19 @@ class AlertView @JvmOverloads constructor(
         WARNING, ERROR, INFO
     }
 
-    class Style(@DrawableRes val iconRes: Int, @ColorRes val backgroundColorRes: Int, @ColorRes val iconTintRes: Int? = null) {
+    data class Style(
+        @DrawableRes val iconRes: Int,
+        @ColorRes val backgroundColorRes: Int,
+        @ColorRes val iconTintRes: Int? = null,
+        val iconGravity: Int = Gravity.TOP
+    ) {
 
         companion object {
 
-            fun fromPreset(preset: StylePreset) = when (preset) {
-                StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background)
-                StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background)
-                StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background)
+            fun fromPreset(preset: StylePreset, iconGravity: Int = Gravity.TOP) = when (preset) {
+                StylePreset.WARNING -> Style(R.drawable.ic_warning_filled, R.color.warning_block_background, iconGravity = iconGravity)
+                StylePreset.ERROR -> Style(R.drawable.ic_slash, R.color.error_block_background, iconGravity = iconGravity)
+                StylePreset.INFO -> Style(R.drawable.ic_info_accent, R.color.individual_chip_background, iconGravity = iconGravity)
             }
         }
     }
@@ -62,7 +79,7 @@ class AlertView @JvmOverloads constructor(
 
     fun setStyle(style: Style) {
         setStyleBackground(style.backgroundColorRes)
-        setStyleIcon(style.iconRes, style.iconTintRes)
+        setStyleIcon(style.iconRes, style.iconTintRes, style.iconGravity)
     }
 
     fun setStylePreset(preset: StylePreset) {
@@ -78,7 +95,12 @@ class AlertView @JvmOverloads constructor(
     }
 
     fun setSubMessage(text: CharSequence?) {
-        binder.alertSubMessage.setTextOrHide(text)
+        setSubMessages(listOfNotNull(text))
+    }
+
+    fun setSubMessages(subMessages: List<CharSequence>) {
+        binder.alertSubMessageContainer.removeAllViews()
+        subMessages.forEach { createSubMessageView(it) }
     }
 
     fun setActionText(actionText: String?) {
@@ -100,9 +122,19 @@ class AlertView @JvmOverloads constructor(
         background = getRoundedCornerDrawable(fillColorRes = colorRes)
     }
 
-    private fun setStyleIcon(@DrawableRes iconRes: Int, iconTintRes: Int? = null) {
+    private fun setStyleIcon(@DrawableRes iconRes: Int, iconTintRes: Int? = null, iconGravity: Int) {
         binder.alertIcon.setImageResource(iconRes)
         binder.alertIcon.setImageTintRes(iconTintRes)
+        binder.alertIcon.updateLayoutParams<FrameLayout.LayoutParams> { gravity = iconGravity }
+    }
+
+    private fun createSubMessageView(text: CharSequence): TextView {
+        return ViewAlertMessageBinding.inflate(inflater(), binder.alertSubMessageContainer, true)
+            .alertSubMessage
+            .apply {
+                this.text = text
+                this.movementMethod = LinkMovementMethod.getInstance()
+            }
     }
 
     private fun applyAttrs(attributeSet: AttributeSet) = context.useAttributes(attributeSet, R.styleable.AlertView) {
@@ -128,7 +160,7 @@ class AlertView @JvmOverloads constructor(
 
 fun AlertView.setModel(model: AlertModel) {
     setMessage(model.message)
-    setSubMessage(model.subMessage)
+    setSubMessages(model.subMessages)
 
     if (model.action != null) {
         setActionText(model.action.text)

@@ -6,7 +6,6 @@ import android.view.View
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -38,8 +37,6 @@ class DelegateDelegatorsFragment : BaseFragment<DelegateDelegatorsViewModel, Fra
     }
 
     override fun initViews() {
-        binder.delegateDelegatorsToolbar.applyStatusBarInsets()
-
         binder.delegateDelegatorsList.setHasFixedSize(true)
         binder.delegateDelegatorsList.adapter = delegatorsAdapter
 

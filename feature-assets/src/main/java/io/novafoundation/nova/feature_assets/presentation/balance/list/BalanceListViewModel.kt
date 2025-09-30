@@ -3,19 +3,29 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetViewMode
+import io.novafoundation.nova.common.data.model.MaskingMode
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.presentation.LoadingState
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
+import io.novafoundation.nova.feature_assets.domain.assets.list.NftPreviews
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdown
 import io.novafoundation.nova.feature_assets.domain.breakdown.BalanceBreakdownInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -26,23 +36,27 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.model.formatBalanceWithFraction
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.NftPreviewUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.TotalBalanceModel
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetViewModeModel
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.PendingOperationsCountModel
+import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.assetsSource
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.simpleFormatAsCurrency
 import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.mapNumberOfActiveSessionsToUi
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -59,7 +73,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.seconds
 
 private typealias SyncAction = suspend (MetaAccount) -> Unit
 
@@ -77,8 +90,16 @@ class BalanceListViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetListMixinFactory: AssetListMixinFactory,
     private val amountFormatter: AmountFormatter,
-    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+    private val fiatFormatter: FiatFormatter,
+    private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
+    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+    private val multisigPendingOperationsService: MultisigPendingOperationsService,
+    private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
+    private val maskingModeUseCase: MaskingModeUseCase
 ) : BaseViewModel() {
+
+    private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
+        .shareInBackground()
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
@@ -123,24 +144,38 @@ class BalanceListViewModel(
         .share()
 
     val nftCountFlow = nftsPreviews
-        .map { it.totalNftsCount.format() }
+        .combine(maskableAmountFormatterFlow, ::formatNftCount)
         .inBackground()
         .share()
 
     val nftPreviewsUi = nftsPreviews
-        .map { it.nftPreviews.map(::mapNftPreviewToUi) }
+        .combine(maskableAmountFormatterFlow, ::mapNftPreviewToUi)
         .inBackground()
         .share()
 
+    val maskingModeEnableFlow = maskingModeUseCase.observeMaskingMode()
+        .map { it == MaskingMode.ENABLED }
+        .shareInBackground()
+
     val totalBalanceFlow = combine(
         balanceBreakdown,
-        swapAvailabilityInteractor.anySwapAvailableFlow()
-    ) { breakdown, swapSupported ->
+        swapAvailabilityInteractor.anySwapAvailableFlow(),
+        maskableAmountFormatterFlow
+    ) { breakdown, swapSupported, maskableAmountFormatter ->
         val currency = selectedCurrency.first()
         TotalBalanceModel(
-            isBreakdownAbailable = breakdown.breakdown.isNotEmpty(),
-            totalBalanceFiat = breakdown.total.simpleFormatAsCurrency(currency).formatBalanceWithFraction(amountFormatter, R.dimen.total_balance_fraction_size),
-            lockedBalanceFiat = breakdown.locksTotal.amount.formatAsCurrency(currency),
+            isBreakdownAvailable = breakdown.breakdown.isNotEmpty(),
+            totalBalanceFiat = maskableAmountFormatter.format {
+                fiatFormatter.formatFiat(
+                    breakdown.total,
+                    currency,
+                    config = FiatConfig(
+                        abbreviationStyle = FiatConfig.AbbreviationStyle.SIMPLE_ABBREVIATION,
+                        fractionPartStyling = FractionPartStyling.Styled(R.dimen.total_balance_fraction_size)
+                    )
+                )
+            },
+            lockedBalanceFiat = maskableAmountFormatter.format { fiatFormatter.formatFiat(breakdown.locksTotal.amount, currency) },
             enableSwap = swapSupported
         )
     }
@@ -175,6 +210,11 @@ class BalanceListViewModel(
             AssetViewMode.TOKENS -> AssetViewModeModel(R.drawable.ic_asset_view_tokens, R.string.asset_view_tokens)
         }
     }.distinctUntilChanged()
+
+    val pendingOperationsCountModel = multisigPendingOperationsService.pendingOperationsCountFlow()
+        .withSafeLoading()
+        .combine(maskableAmountFormatterFlow, ::formatPendingOperationsCount)
+        .shareInBackground()
 
     init {
         selectedCurrency
@@ -247,7 +287,7 @@ class BalanceListViewModel(
     fun balanceBreakdownClicked() {
         launch {
             val totalBalance = totalBalanceFlow.first()
-            if (totalBalance.isBreakdownAbailable) {
+            if (totalBalance.isBreakdownAvailable) {
                 val balanceBreakdown = balanceBreakdownFlow.first()
                 _showBalanceBreakdownEvent.value = Event(balanceBreakdown)
             }
@@ -262,10 +302,16 @@ class BalanceListViewModel(
         syncJobs.joinAll()
     }
 
-    private fun mapNftPreviewToUi(nftPreview: Nft): NftPreviewUi {
-        return when (val details = nftPreview.details) {
-            Nft.Details.Loadable -> LoadingState.Loading()
-            is Nft.Details.Loaded -> LoadingState.Loaded(details.media)
+    private fun mapNftPreviewToUi(nftPreviews: NftPreviews, maskableValueFormatter: MaskableValueFormatter): MaskableModel<List<NftPreviewUi>> {
+        return maskableValueFormatter.format {
+            nftPreviews.nftPreviews.map {
+                when (val details = it.details) {
+                    Nft.Details.Loadable -> LoadingState.Loading()
+                    is Nft.Details.Loaded -> {
+                        LoadingState.Loaded(details.media)
+                    }
+                }
+            }
         }
     }
 
@@ -292,11 +338,22 @@ class BalanceListViewModel(
             val breakdown = balanceBreakdown.breakdown.map {
                 BalanceBreakdownAmount(
                     name = it.token.configuration.symbol.value + " " + mapBalanceIdToUi(resourceManager, it.id),
-                    amount = mapAmountToAmountModel(it.tokenAmount, it.token)
+                    amount = amountFormatter.formatAmountToAmountModel(it.tokenAmount, it.token)
                 )
             }
 
             addAll(breakdown)
+        }
+    }
+
+    private fun formatPendingOperationsCount(
+        operationsLoadingState: ExtendedLoadingState<Int>,
+        formatter: MaskableValueFormatter
+    ): PendingOperationsCountModel {
+        return when (val count = operationsLoadingState.dataOrNull) {
+            null, 0 -> PendingOperationsCountModel.Gone
+
+            else -> PendingOperationsCountModel.Visible(formatter.format { count.format() })
         }
     }
 
@@ -316,11 +373,27 @@ class BalanceListViewModel(
         router.openSwapFlow()
     }
 
-    fun novaCardClicked() {
-        router.openNovaCard()
+    fun novaCardClicked() = launchUnit {
+        novaCardRestrictionCheckMixin.checkRestrictionAndDo {
+            router.openNovaCard()
+        }
     }
 
     fun switchViewMode() {
         launch { assetListMixin.switchViewMode() }
+    }
+
+    fun pendingOperationsClicked() {
+        router.openPendingMultisigOperations()
+    }
+
+    private fun formatNftCount(nftPreviews: NftPreviews, formatter: MaskableValueFormatter): MaskableModel<String>? {
+        if (nftPreviews.totalNftsCount == 0) return null
+
+        return formatter.format { nftPreviews.totalNftsCount.format() }
+    }
+
+    fun toggleMasking() {
+        maskingModeUseCase.toggleMaskingMode()
     }
 }

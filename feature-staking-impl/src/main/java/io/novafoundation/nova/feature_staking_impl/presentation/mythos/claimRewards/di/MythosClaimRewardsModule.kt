@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.MythosClaimRewardsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.claimRewards.validations.MythosClaimRewardsValidationSystem
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.claimRewa
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class MythosClaimRewardsModule {
@@ -41,6 +43,8 @@ class MythosClaimRewardsModule {
         walletUiUseCase: WalletUiUseCase,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         assetUseCase: AssetUseCase,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return MythosClaimRewardsViewModel(
             router = router,
@@ -54,7 +58,9 @@ class MythosClaimRewardsModule {
             selectedAccountUseCase = selectedAccountUseCase,
             walletUiUseCase = walletUiUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            assetUseCase = assetUseCase
+            assetUseCase = assetUseCase,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

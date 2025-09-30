@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingBlockNumberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -27,6 +28,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.con
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm.ConfirmStartMythosStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.di.StartParachainStakingModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
@@ -54,6 +56,8 @@ class ConfirmStartMythosStakingModule {
         stakingBlockNumberUseCase: StakingBlockNumberUseCase,
         mythosStakingValidationFailureFormatter: MythosStakingValidationFailureFormatter,
         interactor: StartMythosStakingInteractor,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmStartMythosStakingViewModel(
             mythosRouter = mythosRouter,
@@ -73,7 +77,9 @@ class ConfirmStartMythosStakingModule {
             validationSystem = validationSystem,
             stakingBlockNumberUseCase = stakingBlockNumberUseCase,
             mythosStakingValidationFailureFormatter = mythosStakingValidationFailureFormatter,
-            interactor = interactor
+            interactor = interactor,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

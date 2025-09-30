@@ -10,15 +10,19 @@ class BuySellSelectorMixinFactory(
     private val router: AssetsRouter,
     private val tradeTokenRegistry: TradeTokenRegistry,
     private val chainRegistry: ChainRegistry,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val buySellRestrictionCheckMixin: BuySellRestrictionCheckMixin
 ) {
 
-    fun create(selectorType: BuySellSelectorMixin.SelectorType, coroutineScope: CoroutineScope): BuySellSelectorMixin = RealBuySellSelectorMixin(
-        router,
-        tradeTokenRegistry,
-        chainRegistry,
-        resourceManager,
-        selectorType,
-        coroutineScope
-    )
+    fun create(selectorType: BuySellSelectorMixin.SelectorType, coroutineScope: CoroutineScope): BuySellSelectorMixin {
+        return RealBuySellSelectorMixin(
+            buySellRestrictionCheckMixin,
+            router,
+            tradeTokenRegistry,
+            chainRegistry,
+            resourceManager,
+            selectorType,
+            coroutineScope
+        )
+    }
 }

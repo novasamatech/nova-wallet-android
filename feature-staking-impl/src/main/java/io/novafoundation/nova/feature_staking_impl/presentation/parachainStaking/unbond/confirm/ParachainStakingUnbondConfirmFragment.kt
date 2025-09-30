@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -29,8 +28,6 @@ class ParachainStakingUnbondConfirmFragment : BaseFragment<ParachainStakingUnbon
     override fun createBinding() = FragmentParachainStakingUnbondConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.parachainStakingUnbondConfirmContainer.applyStatusBarInsets()
-
         binder.parachainStakingUnbondConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.parachainStakingUnbondConfirmExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }

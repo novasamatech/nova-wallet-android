@@ -4,6 +4,7 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.JoinedMetaAccountInfo
+import io.novafoundation.nova.core_db.model.chain.account.MetaAccountIdWithType
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.RelationJoinedMetaAccountInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -25,13 +26,15 @@ object LocalAccountsMocker {
 
         var metaAccountCounter = allJoinedMetaAccountInfo.size
 
-        whenever(dao.withTransaction(any())).then { invocation ->
+        whenever(dao.runInTransaction(any())).then { invocation ->
             val txAction = invocation.arguments.first() as suspend () -> Unit
 
             runBlocking { txAction() }
         }
 
         whenever(dao.nextAccountPosition()).thenReturn(0)
+
+        whenever(dao.delete(any<List<Long>>())).thenReturn(listOf(MetaAccountIdWithType(0, MetaAccountLocal.Type.SECRETS)))
 
         whenever(dao.insertMetaAccount(any())).thenAnswer {
             metaAccountCounter++
@@ -78,6 +81,7 @@ class LocalMetaAccountMockBuilder(
     private var _type: MetaAccountLocal.Type = MetaAccountLocal.Type.SECRETS
     private var _status: MetaAccountLocal.Status = MetaAccountLocal.Status.ACTIVE
     private var _globallyUniqueId: String = MetaAccountLocal.generateGloballyUniqueId()
+    private var _typeExtras: String? = null
 
 
     fun chainAccount(chainId: ChainId, builder: LocalChainAccountMockBuilder.() -> Unit) {
@@ -129,6 +133,10 @@ class LocalMetaAccountMockBuilder(
         _globallyUniqueId = value
     }
 
+    fun typeExtras(typeExtras: String) {
+        _typeExtras = typeExtras
+    }
+
     fun build(): JoinedMetaAccountInfo {
         return RelationJoinedMetaAccountInfo(
             metaAccount = MetaAccountLocal(
@@ -144,6 +152,7 @@ class LocalMetaAccountMockBuilder(
                 _type,
                 _status,
                 _globallyUniqueId,
+                _typeExtras
             ).also {
                 it.id = metaId
             },

@@ -35,7 +35,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.facebook.shimmer.ShimmerFrameLayout
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
-import dev.chrisbanes.insetter.applyInsetter
+import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.common.utils.input.valueOrNull
 
@@ -116,6 +116,10 @@ fun ShimmerFrameLayout.setShimmerVisible(visible: Boolean) {
     setVisible(visible)
 }
 
+fun TextView.setCompoundDrawables(drawables: Array<out Drawable>?) {
+    setCompoundDrawables(drawables?.getOrNull(0), drawables?.getOrNull(1), drawables?.getOrNull(2), drawables?.getOrNull(3))
+}
+
 private fun TextView.setCompoundDrawable(
     @DrawableRes drawableRes: Int?,
     widthInDp: Int?,
@@ -170,6 +174,17 @@ fun TextView.setDrawableEnd(
         setCompoundDrawablesRelative(start, top, it, bottom)
     }
 }
+
+fun TextView.removeDrawableEnd() {
+    setDrawableEnd(null as Int?)
+}
+
+fun TextView.setDrawableEnd(
+    icon: ColoredDrawable?,
+    widthInDp: Int? = null,
+    heightInDp: Int? = widthInDp,
+    paddingInDp: Int = 0,
+) = setDrawableEnd(icon?.drawableRes, widthInDp, heightInDp, paddingInDp, icon?.iconColor)
 
 fun TextView.setDrawableStart(
     @DrawableRes drawableRes: Int? = null,
@@ -325,26 +340,6 @@ fun TypedArray.getResourceIdOrNull(@StyleableRes index: Int) = getResourceId(ind
 
 fun TypedArray.getColorOrNull(@StyleableRes index: Int) = runCatching { getColorOrThrow(index) }.getOrNull()
 
-fun View.applyBarMargin() = applyInsetter {
-    type(statusBars = true) {
-        margin()
-    }
-}
-
-fun View.applyStatusBarInsets(consume: Boolean = true) = applyInsetter {
-    type(statusBars = true) {
-        padding()
-    }
-
-    consume(consume)
-}
-
-fun View.applyImeInsetts() = applyInsetter {
-    type(ime = true) {
-        padding()
-    }
-}
-
 fun View.setBackgroundColorRes(@ColorRes colorRes: Int) = setBackgroundColor(context.getColor(colorRes))
 
 fun View.setBackgroundTintRes(@ColorRes colorRes: Int) {
@@ -414,4 +409,21 @@ fun TabLayout.setupWithViewPager2(viewPager: ViewPager2, tabText: (Int) -> CharS
 
 fun View.bounds(): Rect {
     return Rect(0, 0, width, height)
+}
+
+fun TabLayout.setTabSelectedListener(callback: (TabLayout.Tab) -> Unit) {
+    addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab) {
+            callback(tab)
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab) {}
+
+        override fun onTabReselected(tab: TabLayout.Tab) {}
+    })
+}
+
+fun View.setForegroundRes(@DrawableRes drawableRes: Int) {
+    val drawable = context.getDrawable(drawableRes)
+    foreground = drawable
 }

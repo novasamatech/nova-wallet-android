@@ -5,10 +5,12 @@ import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.xTokensName
 import io.novafoundation.nova.common.utils.xcmPalletName
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransferConfiguration
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.XcmTransferType
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyXcmTransferMethod
+import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.common.TransferAssetUsingTypeTransactor
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssets
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
@@ -20,7 +22,8 @@ import io.novafoundation.nova.feature_xcm_api.versions.toEncodableInstance
 import io.novafoundation.nova.feature_xcm_api.versions.versionedXcm
 import io.novafoundation.nova.feature_xcm_api.weight.WeightLimit
 import io.novafoundation.nova.runtime.ext.accountIdOrDefault
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import java.math.BigInteger
 import javax.inject.Inject
 
@@ -28,6 +31,8 @@ import javax.inject.Inject
 class LegacyCrossChainTransactor @Inject constructor(
     private val weigher: LegacyCrossChainWeigher,
     private val xcmVersionDetector: XcmVersionDetector,
+    private val assetSourceRegistry: AssetSourceRegistry,
+    private val usingTypeTransactor: TransferAssetUsingTypeTransactor,
 ) {
 
     context(ExtrinsicBuilder)
@@ -36,13 +41,20 @@ class LegacyCrossChainTransactor @Inject constructor(
         transfer: AssetTransferBase,
         crossChainFee: Balance
     ) {
-        when (configuration.transferType) {
-            XcmTransferType.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_RESERVE -> xcmPalletReserveTransfer(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_TELEPORT -> xcmPalletTeleport(configuration, transfer, crossChainFee)
-            XcmTransferType.XCM_PALLET_TRANSFER_ASSETS -> xcmPalletTransferAssets(configuration, transfer, crossChainFee)
-            XcmTransferType.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
+        when (configuration.transferMethod) {
+            LegacyXcmTransferMethod.X_TOKENS -> xTokensTransfer(configuration, transfer, crossChainFee)
+            LegacyXcmTransferMethod.XCM_PALLET_RESERVE -> xcmPalletReserveTransfer(configuration, transfer, crossChainFee)
+            LegacyXcmTransferMethod.XCM_PALLET_TELEPORT -> xcmPalletTeleport(configuration, transfer, crossChainFee)
+            LegacyXcmTransferMethod.XCM_PALLET_TRANSFER_ASSETS -> xcmPalletTransferAssets(configuration, transfer, crossChainFee)
+            LegacyXcmTransferMethod.UNKNOWN -> throw IllegalArgumentException("Unknown transfer type")
         }
+    }
+
+    suspend fun requiredRemainingAmountAfterTransfer(
+        configuration: LegacyCrossChainTransferConfiguration
+    ): Balance {
+        val chainAsset = configuration.originChainAsset
+        return assetSourceRegistry.sourceFor(chainAsset).balance.existentialDeposit(chainAsset)
     }
 
     private suspend fun ExtrinsicBuilder.xTokensTransfer(
@@ -78,12 +90,8 @@ class LegacyCrossChainTransactor @Inject constructor(
         assetTransfer: AssetTransferBase,
         crossChainFee: Balance
     ) {
-        xcmPalletTransfer(
-            configuration = configuration,
-            assetTransfer = assetTransfer,
-            crossChainFee = crossChainFee,
-            callName = "transfer_assets"
-        )
+        val call = usingTypeTransactor.composeCall(configuration, assetTransfer, crossChainFee)
+        call(call)
     }
 
     private suspend fun ExtrinsicBuilder.xcmPalletReserveTransfer(

@@ -41,6 +41,7 @@ data class Chain(
     val governance: List<Governance>,
     val swap: List<Swap>,
     val customFee: List<CustomFee>,
+    val multisigSupport: Boolean,
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
@@ -104,7 +105,13 @@ data class Chain(
                 val currencyIdType: String,
                 val existentialDeposit: BigInteger,
                 val transfersEnabled: Boolean,
-            ) : Type()
+                val subType: SubType
+            ) : Type() {
+
+                enum class SubType {
+                    DEFAULT, HYDRATION_EVM
+                }
+            }
 
             data class EvmErc20(
                 val contractAddress: String

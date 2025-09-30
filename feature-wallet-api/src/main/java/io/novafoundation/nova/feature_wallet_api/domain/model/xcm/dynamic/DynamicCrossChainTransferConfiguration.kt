@@ -1,22 +1,19 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic
 
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransferConfigurationBase
-import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType
+import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class DynamicCrossChainTransferConfiguration(
-    val assetLocationOnOrigin: RelativeMultiLocation,
-    val originChainLocation: ChainLocation,
-    val destinationChainLocation: ChainLocation,
-    val remoteReserveChainLocation: ChainLocation?,
+    override val originChain: XcmChain,
+    override val destinationChain: XcmChain,
+    override val transferType: XcmTransferType,
+    override val originChainAsset: Chain.Asset,
+    val features: DynamicCrossChainTransferFeatures,
 ) : CrossChainTransferConfigurationBase {
 
-    override val originChainId: ChainId = originChainLocation.chainId
-    override val destinationChainId: ChainId = destinationChainLocation.chainId
-    override val remoteReserveChainId: ChainId? = remoteReserveChainLocation?.chainId
-}
-
-fun DynamicCrossChainTransferConfiguration.destinationChainLocationOnOrigin(): RelativeMultiLocation {
-    return destinationChainLocation.location.fromPointOfViewOf(originChainLocation.location)
+    override fun debugExtraInfo(): String {
+        return "features=$features"
+    }
 }

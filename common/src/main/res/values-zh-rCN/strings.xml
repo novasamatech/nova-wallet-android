@@ -77,27 +77,34 @@
     <string name="account_ledger_import_fill_description">确保通过Ledger Live应用把网络应用安装到您的Ledger设备上。在您的Ledger设备上打开网络应用。</string>
     <string name="account_ledger_import_fill_disabled_hint">至少添加一个账户</string>
     <string name="account_ledger_import_fill_title">将账户添加到您的钱包</string>
+    <string name="account_ledger_import_start_guide">Ledger 连接指南</string>
     <string name="account_ledger_import_start_step_1">确保%s到您的Ledger设备中，使用Ledger Live应用</string>
     <string name="account_ledger_import_start_step_1_highlighted">Network应用程序已安装</string>
     <string name="account_ledger_import_start_step_2">在您的Ledger设备上%s</string>
     <string name="account_ledger_import_start_step_2_highlighted">打开network应用程序</string>
     <string name="account_ledger_import_start_step_3">允许Nova Wallet%s</string>
-    <string name="account_ledger_import_start_step_3_highlighted">访问蓝牙和位置</string>
+    <string name="account_ledger_import_start_step_3_highlighted">访问蓝牙</string>
     <string name="account_ledger_import_start_step_4">%s添加到钱包</string>
     <string name="account_ledger_import_start_step_4_highlighted">选择账户</string>
     <string name="account_ledger_import_start_step_otg">%s 在你的手机设置中</string>
     <string name="account_ledger_import_start_step_otg_highlighted">启用 OTG</string>
+    <string name="account_ledger_import_start_title">连接 Ledger</string>
     <string name="account_ledger_legacy_warning_message">要进行操作签名并将您的账户迁移到新的 Generic Ledger 应用程序，请安装并打开 Migration 应用程序。旧版 Legacy 和 Migration Ledger 应用程序将来不会被支持。</string>
     <string name="account_ledger_legacy_warning_title">新版 Ledger 应用程序已发布</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migration 应用程序在不久的将来将无法使用。使用它将您的账户迁移到新的 Ledger 应用程序，以免丢失资金。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_legacy">账本传承</string>
     <string name="account_ledger_select_device_all_description">如果使用通过蓝牙连接的 Ledger，请在两个设备上启用蓝牙，并授予 Nova 蓝牙和位置权限。如需使用 USB，请在手机设置中启用 OTG。</string>
     <string name="account_ledger_select_device_description">请在手机设置和Ledger设备中启用蓝牙。解锁您的Ledger设备并打开%s应用。</string>
     <string name="account_ledger_select_device_title">选择您的Ledger设备</string>
     <string name="account_ledger_select_device_usb_description">请启用 Ledger 设备。解锁你的 Ledger 设备并打开 %s 应用。</string>
+    <string name="account_migration_subtitle">您快到了！🎉\n 只需点击下面即可完成设置，并在 Polkadot App 和 Nova Wallet 中无缝使用您的账户</string>
+    <string name="account_migration_title">欢迎来到 Nova！</string>
     <string name="account_mnmonic_length_variants">12、15、18、21或24个单词的短语</string>
+    <string name="account_multisig">多重签名</string>
+    <string name="account_multisig_group_label">共享控制（多重签名）</string>
     <string name="account_needed_message">您在这个网络上没有账户，您可以创建或导入账户。</string>
     <string name="account_needed_title">需要账户</string>
     <string name="account_no_chain_projection">没有找到账户</string>
@@ -134,7 +141,8 @@
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault 将提供给您%s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR 码扫描</string>
     <string name="account_private_key">私钥</string>
-    <string name="account_proxieds">委托给您的（代理）</string>
+    <string name="account_proxied">代理</string>
+    <string name="account_proxieds">代理给你（代理）</string>
     <string name="account_proxy_type_any">任何</string>
     <string name="account_proxy_type_auction">拍卖</string>
     <string name="account_proxy_type_cancel_proxy">取消代理</string>
@@ -163,11 +171,15 @@
     <string name="account_watch_only">仅查看</string>
     <string name="account_welcome_hardware_wallet_subtitle">使用Polkadot Vault、Ledger或Parity Signer</string>
     <string name="account_welcome_hardware_wallet_title">连接硬件钱包</string>
+    <string name="account_welcome_trust_wallet_subtitle">在 Nova 中使用您的 Trust Wallet 账户</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">添加%s帐户</string>
     <string name="accounts_add_wallet">添加钱包</string>
     <string name="accounts_change_chain_account">更改%s帐户</string>
     <string name="accounts_change_chain_secrets">更改帐户</string>
     <string name="accounts_ledger_legacy">Ledger（旧版）</string>
+    <string name="accounts_update_proxieds_title">委托给您</string>
+    <string name="active_multisig_title">共享控制</string>
     <string name="add_custom_node">添加自定义节点</string>
     <string name="add_delegation_missing_account_message">您需要添加一个%s帐户到钱包才能委托</string>
     <string name="add_network_title">输入网络详情</string>
@@ -180,6 +192,7 @@
     <string name="add_proxy_maximum_reached_error_title">已达到代理最大数量</string>
     <string name="added_networks_empty_placeholder">添加的自定义网络会显示在这里</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">Nova 已自动切换到您的多重签名钱包，以便您查看待处理的交易。</string>
     <string name="appearance_colored_icon_title">彩色图标</string>
     <string name="appearance_title">外观</string>
     <string name="appearance_token_assets_title">代币图标</string>
@@ -333,6 +346,8 @@
     <string name="common_balance">余额</string>
     <string name="common_bonus">奖金</string>
     <string name="common_call">呼叫</string>
+    <string name="common_call_data">调用数据</string>
+    <string name="common_call_hash">调用哈希</string>
     <string name="common_cancel">取消</string>
     <string name="common_cancel_operation_warning">您确定要取消这项操作吗？</string>
     <string name="common_cannot_find_app">抱歉，您没有适当的应用程序来处理这个请求</string>
@@ -360,17 +375,21 @@
     <string name="common_continue">继续</string>
     <string name="common_copied">已复制到剪贴板</string>
     <string name="common_copy_address">复制地址</string>
+    <string name="common_copy_call_data">复制调用数据</string>
+    <string name="common_copy_hash">复制哈希</string>
     <string name="common_copy_id">复制ID</string>
     <string name="common_crypto_type">密钥对加密类型</string>
     <string name="common_date">日期</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s和%s</string>
     <string name="common_delete">删除</string>
+    <string name="common_depositor">存款人</string>
     <string name="common_details">详细信息</string>
     <string name="common_disabled">已禁用</string>
     <string name="common_disconnect">断开</string>
     <string name="common_do_not_close_app">不要关闭应用程序!</string>
     <string name="common_done">完成</string>
-    <string name="common_dont_show_again">不再显示</string>
+    <string name="common_dry_run_failed_message">Nova 会提前模拟交易以防止错误。此次模拟未成功。稍后再试或尝试更高金额。如果问题仍然存在，请在设置中联系 Nova Wallet 支持。</string>
+    <string name="common_dry_run_failed_title">交易模拟失败</string>
     <string name="common_edit">编辑</string>
     <string name="common_element_and_more_format" formatted="false">%s（+%s更多）</string>
     <string name="common_email_chooser_title">选择电子邮件应用程序</string>
@@ -401,10 +420,12 @@
     </plurals>
     <string name="common_frequency_days_daily">每天</string>
     <string name="common_frequency_days_everyday">每天</string>
+    <string name="common_full_details">完整详情</string>
     <string name="common_get_token_format">获取%s</string>
     <string name="common_got_it">知道了</string>
     <string name="common_governance">治理</string>
     <string name="common_hexadecimal_string">十六进制字符串</string>
+    <string name="common_hide">隐藏</string>
     <plurals name="common_hours_format">
         <item quantity="other">%d小时</item>
     </plurals>
@@ -490,8 +511,12 @@
     <string name="common_see_all">查看全部</string>
     <string name="common_settings">设置</string>
     <string name="common_share">分享</string>
+    <string name="common_share_call_data">分享调用数据</string>
+    <string name="common_share_hash">分享哈希</string>
+    <string name="common_show">显示</string>
     <string name="common_sign_in">登录</string>
     <string name="common_sign_request">签名请求</string>
+    <string name="common_signatory">签署人</string>
     <string name="common_signature_invalid">签名无效</string>
     <string name="common_skip">跳过</string>
     <string name="common_skip_process">跳过过程</string>
@@ -684,8 +709,8 @@
     <string name="delegate_search_hint">通过地址或名称搜索</string>
     <string name="delegate_search_placeholder_empty">地址格式无效。请确保地址属于正确的网络</string>
     <string name="delegate_search_result_count">搜索结果：%d</string>
-    <string name="delegated_accounts_fragment_explanation">Nova钱包自动为您将代理权限（Proxy）添加到单独的类别中。您可以在设置中随时管理钱包。</string>
-    <string name="delegated_accounts_fragment_title">代理账户更新</string>
+    <string name="delegated_accounts_fragment_explanation">为您自动检测并组织代理和多重签名账户。可以随时在设置中管理。</string>
+    <string name="delegated_accounts_fragment_title">钱包列表已更新</string>
     <string name="delegation_all_votes">所有时间的投票</string>
     <string name="delegation_delegate">代理</string>
     <string name="delegation_delegate_filter_all">所有账户</string>
@@ -722,6 +747,7 @@
     <string name="delegation_tracks_governance_preset">管理</string>
     <string name="delegation_tracks_treasury_preset">财政</string>
     <string name="delegation_undelegating_period">取消委托期</string>
+    <string name="delegation_updates_deactivated_title">不再有效</string>
     <string name="delegation_your_delegation">您的委托</string>
     <string name="delegation_your_delegations">您的委托</string>
     <string name="delegations_filter">显示</string>
@@ -738,6 +764,7 @@
     <string name="ed25519_selection_subtitle">ed25519（替代方案）</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">备份密码</string>
+    <string name="enter_call_data_title">输入调用数据</string>
     <string name="error_not_enough_to_pay_fee_title">代币不足以支付费用</string>
     <string name="ethereum_contract">合约</string>
     <string name="ethereum_contract_call">合约调用</string>
@@ -799,6 +826,9 @@
     <string name="integrate_networks_banner_description">将您构建的网络的所有功能集成到 Nova Wallet，使每个人都能访问。</string>
     <string name="integrate_networks_banner_link">集成您的网络</string>
     <string name="integrate_networks_banner_title">为 Polkadot 构建？</string>
+    <string name="invalid_call_data_format_message">您提供的调用数据无效或格式错误。请确保其正确并重试。</string>
+    <string name="invalid_call_data_message">此调用数据用于另一个调用哈希为 %s 的操作</string>
+    <string name="invalid_call_data_title">无效的调用数据</string>
     <string name="invalid_proxy_address_message">代理地址应该是一个有效的%s地址</string>
     <string name="invalid_proxy_address_title">代理地址无效</string>
     <string name="invalid_token_symbol_message">输入的货币符号（%1$s）与网络（%2$s）不匹配。您想使用正确的货币符号吗？</string>
@@ -844,6 +874,7 @@
     <string name="ledger_wallet_details_description">这个钱包与Ledger配对。Nova将帮助您形成任何您想要的操作，并且您将被要求使用Ledger签名</string>
     <string name="ledher_import_select_address_title">选择要添加到钱包的账户</string>
     <string name="loading_network_info">加载网络信息...</string>
+    <string name="loading_transaction_details">正在加载交易详情…</string>
     <string name="loocking_backup_progress">正在寻找您的备份...</string>
     <string name="make_payout_transaction_sent">支付交易已发送</string>
     <string name="manage_assets_add_token">添加代币</string>
@@ -879,6 +910,77 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">请至少选择%d个钱包</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">此交易已被拒绝或执行。</string>
+    <string name="multisig_approve_transaction_unavailable_title">无法执行此交易</string>
+    <string name="multisig_callhash_exists_message">%s 已经发起相同操作，当前正等待其他签署人签署。</string>
+    <string name="multisig_callhash_exists_title">操作已存在</string>
+    <string name="multisig_card_not_supported_message">要管理您的借记卡，请切换到不同类型的钱包。</string>
+    <string name="multisig_card_not_supported_title">多签不支持借记卡</string>
+    <string name="multisig_deposit">多签存款</string>
+    <string name="multisig_deposit_description">存款将在发起人的账户上锁定，直到多签操作被执行或拒绝。</string>
+    <string name="multisig_extrinsic_details_subtitle">确保操作正确</string>
+    <string name="multisig_notification_executed_transaction_message">由 %s 签署并执行。</string>
+    <string name="multisig_notification_executed_transaction_title">✅ 多重签名交易已执行</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s 于 %s。</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 请求您的签名 </string>
+    <string name="multisig_notification_initiator_footer">由 %s 发起。</string>
+    <string name="multisig_notification_message_header">钱包：%s</string>
+    <string name="multisig_notification_new_approval_title">由 %s 签署</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">已收集 %d 中的 %d 个签名。</string>
+    <string name="multisig_notification_on_behalf_of">代表 %s。</string>
+    <string name="multisig_notification_rejected_transaction_message">由 %s 拒绝。</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ 多重签名交易被拒绝</string>
+    <string name="multisig_on_behalf_of">代表</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s：%s</string>
+    <string name="multisig_operation_details_approve">批准</string>
+    <string name="multisig_operation_details_approve_and_execute">批准并执行</string>
+    <string name="multisig_operation_details_call_data_not_found">输入调用数据以查看详细信息</string>
+    <string name="multisig_operation_details_not_found_message">交易已执行或被拒绝。</string>
+    <string name="multisig_operation_details_not_found_title">签署已结束</string>
+    <string name="multisig_operation_details_reject">拒绝</string>
+    <string name="multisig_operation_details_signatories" formatted="false">签署人 (%d / %d)</string>
+    <string name="multisig_operation_utility_batch_all_title">批量全部（错误时推翻）</string>
+    <string name="multisig_operation_utility_batch_title">批量（执行直到错误）</string>
+    <string name="multisig_operation_utility_force_batch_title">强制批量（忽略错误）</string>
+    <string name="multisig_operations_created">由您创建</string>
+    <string name="multisig_operations_placeholder">还没有交易。\n签署请求将显示在这里</string>
+    <string name="multisig_operations_progress" formatted="false">签署中（%s / %s）</string>
+    <string name="multisig_operations_signed">由您签署</string>
+    <string name="multisig_operations_unknown_calldata">未知操作</string>
+    <string name="multisig_pending_operations">待签署的交易</string>
+    <string name="multisig_pending_operations_on_behalf_of">代表:</string>
+    <string name="multisig_push_settings_approval_switcher">由签署人签署</string>
+    <string name="multisig_push_settings_executed_switcher">多重签名交易已执行</string>
+    <string name="multisig_push_settings_initial_switcher">请求您的签名</string>
+    <string name="multisig_push_settings_rejected_switcher">多重签名交易被拒绝</string>
+    <string name="multisig_sell_not_supported_message">要将加密货币出售为法币，请切换到不同类型的钱包。</string>
+    <string name="multisig_sell_not_supported_title">多签不支持出售</string>
+    <string name="multisig_signatory">签署人：</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%s 没有足够的余额放置多签存款 %s。您需要在余额中添加 %s。</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%s 没有足够的余额支付 %s 的网络费用并放置多签存款 %s。您需要在余额中添加 %s。</string>
+    <string name="multisig_signatory_validation_ed" formatted="false">%s 需要至少 %s 才能支付此交易费用并保持在最低网络余额之上。当前余额为：%s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">%s 没有足够的余额支付网络费用 %s。您需要在余额中添加 %s。</string>
+    <string name="multisig_signing_is_not_supported_message">多签钱包不支持签署任意消息 —— 仅限交易</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">交易将会被拒绝。多重签名存款将返还给 %s。</string>
+    <string name="multisig_signing_warning_message">多签交易将由 %s 发起。发起人承担网络费用并保留多签存款，一旦交易完成，存款将被解除保留。</string>
+    <string name="multisig_signing_warning_title">多重签名交易</string>
+    <string name="multisig_transaction_created_subtitle">其他签署者现在可以确认交易。\n您可以在 %s 中跟踪其状态。</string>
+    <string name="multisig_transaction_created_subtitle_highlight"><font>待签署交易</font></string>
+    <string name="multisig_transaction_created_title">多重签名交易已创建</string>
+    <string name="multisig_transaction_created_view_details">查看详细信息</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">没有初始链上信息（调用数据）的交易被拒绝</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s 于 %s。\n您无需采取进一步动作。</string>
+    <string name="multisig_transaction_executed_dialog_title">多重签名交易已执行</string>
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s 于 %s。\n由 %s 拒绝。\n您无需采取进一步动作。</string>
+    <string name="multisig_transaction_rejected_dialog_title">多重签名交易被拒绝</string>
+    <string name="multisig_wallet_details_info_warning">从此钱包进行的交易需要多个签署人的批准。您的账户是其中之一的签署人：</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">其他签署者：</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">阈值 %d 中的 %d</string>
+    <string name="multisigs_notification_channel_name">多重签名交易通知频道</string>
+    <string name="mutisigs_push_notifications_warning_enable">在设置中启用</string>
+    <string name="mutisigs_push_notifications_warning_message">接收签署请求、新签名和已完成交易的通知—确保您始终处于控制之中。可随时在设置中管理。</string>
+    <string name="mutisigs_push_notifications_warning_title">多重签名推送通知来了！</string>
     <string name="network_already_exist_failure_title">该节点已存在</string>
     <string name="network_fee">网络费用</string>
     <string name="network_info_address">节点地址</string>
@@ -897,6 +999,8 @@
     <string name="nft_owned_by">拥有者</string>
     <string name="nft_price_not_listed">未上市</string>
     <string name="nft_your_nfts">您的NFT</string>
+    <string name="no_ms_accounts_found_dialog_message">您尚未在 Nova 中添加或选择任何多重签名钱包。添加并至少选择一个以接收多重签名推送通知。</string>
+    <string name="no_ms_accounts_found_dialog_title">没有多重签名钱包</string>
     <string name="node_already_exist_failure_message">您输入的 URL 已作为“%s”节点存在。</string>
     <string name="node_already_exist_failure_title">该节点已存在</string>
     <string name="node_not_alive_message">您输入的节点 URL 无响应或格式不正确。URL 格式应以“wss://”开头。</string>
@@ -971,12 +1075,13 @@
     <string name="profile_accounts_title_2_0">钱包</string>
     <string name="profile_language_title">语言</string>
     <string name="profile_pincode_change_title">更改密码</string>
+    <string name="profile_settings_hide_balances_on_launch_title">使用隐藏余额打开应用</string>
     <string name="profile_settings_pin_code_verification_title">通过PIN码确认</string>
     <string name="profile_settings_safe_mode_title">安全模式</string>
     <string name="profile_settings_title">设置</string>
+    <string name="proxied_card_not_supported_message">要管理您的借记卡，请切换到其他具有 Polkadot 网络的钱包。</string>
+    <string name="proxied_card_not_supported_title">借记卡不支持此代理钱包</string>
     <string name="proxied_wallet_details_info_warning">该账户已授权以下账户执行交易：</string>
-    <string name="proxieds_updates_deactivated_title">不再有效</string>
-    <string name="proxy_about">什么是代理？</string>
     <string name="proxy_access_type_staking_operations">赌注操作</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">委托账户%s的余额不足以支付%s的网络费用。可用余额支付费用：%s</string>
     <string name="proxy_signing_is_not_supported_message">代理钱包不支持签署任意消息 - 仅支持交易</string>
@@ -1003,6 +1108,7 @@
     <string name="push_settings_announcements">Nova 公告</string>
     <string name="push_settings_balances">余额</string>
     <string name="push_settings_enable">启用通知</string>
+    <string name="push_settings_multisig_operations">多重签名交易</string>
     <string name="push_settings_no_selected_wallets">因为您没有选择任何钱包，您将不会接收到有关钱包活动（余额，质押）的通知</string>
     <string name="push_settings_others">其他</string>
     <string name="push_settings_received_tokens">收到的代币</string>
@@ -1020,7 +1126,7 @@
     <string name="push_token_sent_message" formatted="false">已发送 %s 到 %s 上的 %s</string>
     <string name="push_token_sent_no_account_name_title">💸 已发送</string>
     <string name="push_token_sent_title">💸 发送 %s</string>
-    <string name="push_wallets_title">选择最多 3 个钱包以在钱包有活动时被通知</string>
+    <string name="push_wallets_title">选择最多 %d 个钱包以在钱包有活动时收到通知</string>
     <string name="push_welcome_enable_button">启用推送通知</string>
     <string name="push_welcome_message">接收有关钱包操作、治理更新、质押活动和安全的通知，让您始终了解最新情况</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">启用推送通知，即表示您同意我们的 %s 和 %s</string>
@@ -1052,16 +1158,13 @@
     <string name="referendum_aye_format">赞成：%s</string>
     <string name="referendum_dapp_list_title">使用 Nova DApp 浏览器</string>
     <string name="referendum_description_fallback">只有提案人可以编辑此描述和标题。如果您拥有提案人的账户，请访问 Polkassembly 并填写有关您提案的信息</string>
-    <string name="referendum_details_full_details">完整详情</string>
     <string name="referendum_details_requested_amount">请求的金额</string>
     <string name="referendum_details_timeline">时间线</string>
     <string name="referendum_details_your_vote">你的投票：</string>
     <string name="referendum_full_details_approve_threshold">批准曲线</string>
     <string name="referendum_full_details_beneficiary">受益人</string>
-    <string name="referendum_full_details_copy_hash">复制哈希</string>
     <string name="referendum_full_details_deposit">存款</string>
     <string name="referendum_full_details_electorate">选民</string>
-    <string name="referendum_full_details_hash">调用哈希</string>
     <string name="referendum_full_details_long_for_preview">预览过长</string>
     <string name="referendum_full_details_parameters_json">参数 JSON</string>
     <string name="referendum_full_details_proposer">提议者</string>
@@ -1572,6 +1675,7 @@
     <string name="state_removed">已移除</string>
     <string name="swap_custom_fee_selector_description">用于支付网络费用的代币</string>
     <string name="swap_custom_fee_selector_footer">网络费用将添加到输入的金额之上</string>
+    <string name="swap_dry_run_failed_inline_message">交换步骤模拟失败</string>
     <string name="swap_error_pair_not_supported">不支持此对</string>
     <string name="swap_execution_failure" formatted="false">操作 #%s (%s) 失败</string>
     <string name="swap_execution_failure_swap_label" formatted="false">%s 到 %s 的交换在 %s 上</string>
@@ -1585,6 +1689,7 @@
     <string name="swap_execution_time">执行时间</string>
     <string name="swap_failure_balance_not_consider_consumers" formatted="false">您在支付%s网络费后至少应保留%s，因为您持有的代币不足</string>
     <string name="swap_failure_balance_not_consider_non_sufficient_assets" formatted="false">您必须至少保留%s，以接收%s代币</string>
+    <string name="swap_failure_cannot_receive_insufficient_asset_out" formatted="false">要接收 %s 代币，您必须在 %s 至少拥有 %s</string>
     <string name="swap_failure_insufficient_balance_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费</string>
     <string name="swap_failure_insufficient_balance_with_buy_ed_message">您最多可以交换%1$s，因为您需要支付%2$s的网络费并将%3$s兑换为%4$s，以满足%5$s的最低余额</string>
     <string name="swap_failure_swap_max_button">最大交换</string>

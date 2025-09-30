@@ -1,0 +1,51 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+}
+
+android {
+    namespace 'io.novafoundation.nova.feature_account_migration'
+    compileSdk rootProject.compileSdkVersion
+
+    
+    buildFeatures {
+        buildConfig true
+        viewBinding true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+        freeCompilerArgs = ["-Xcontext-receivers"]
+    }
+}
+
+dependencies {
+    implementation project(":common")
+    implementation project(":feature-account-api")
+    implementation project(":feature-cloud-backup-api")
+    implementation project(':feature-deep-linking')
+
+    implementation daggerDep
+    ksp daggerCompiler
+
+    implementation androidDep
+    implementation constraintDep
+    implementation cardViewDep
+    implementation recyclerViewDep
+    implementation materialDep
+
+    implementation kotlinDep
+
+    testImplementation jUnitDep
+}

@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import coil.ImageLoader
 import coil.decode.SvgDecoder
+import com.google.android.play.core.integrity.IntegrityManagerFactory
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.BuildConfig
@@ -16,8 +17,12 @@ import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.config.GlobalConfigApi
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
+import io.novafoundation.nova.common.data.config.RealGlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
@@ -25,6 +30,8 @@ import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.repository.RealAssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.RealAssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
+import io.novafoundation.nova.common.data.repository.RealToggleFeatureRepository
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -35,7 +42,9 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesIm
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.domain.interactor.RealAssetViewModeInteractor
+import io.novafoundation.nova.common.domain.usecase.RealMaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
@@ -44,10 +53,14 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableProvid
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.condition.RealConditionMixinFactory
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
+import io.novafoundation.nova.common.mixin.copy.RealCopyTextLauncher
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.RealAssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -63,10 +76,17 @@ import io.novafoundation.nova.common.sequrity.TwoFactorVerificationService
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationCommunicator
 import io.novafoundation.nova.common.sequrity.verification.PinCodeTwoFactorVerificationExecutor
 import io.novafoundation.nova.common.utils.CopyValueMixin
+import io.novafoundation.nova.common.utils.DialogMessageManager
+import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
+import io.novafoundation.nova.common.utils.RealDialogMessageManager
 import io.novafoundation.nova.common.utils.RealToastMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
+import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
+import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
+import io.novafoundation.nova.common.utils.ip.PublicIpReceiverApi
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
@@ -74,9 +94,12 @@ import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.sequrity.RealAutomaticInteractionGate
+import io.novafoundation.nova.common.utils.splash.RealSplashPassedObserver
+import io.novafoundation.nova.common.utils.splash.SplashPassedObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.vibration.DeviceVibrator
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.action.RealActionBottomSheetLauncherFactory
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
@@ -150,6 +173,10 @@ class CommonModule {
     ): BackgroundAccessObserver {
         return BackgroundAccessObserver(preferences, automaticInteractionGate)
     }
+
+    @Provides
+    @ApplicationScope
+    fun provideSplashPassedObserver(): SplashPassedObserver = RealSplashPassedObserver()
 
     @Provides
     @ApplicationScope
@@ -391,6 +418,19 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
+    fun provideDialogMessageManager(): DialogMessageManager {
+        return RealDialogMessageManager()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideIntegrityService(context: Context, rootScope: RootScope): IntegrityService {
+        val integrityManager = IntegrityManagerFactory.createStandard(context)
+        return IntegrityService(BuildConfig.CLOUD_PROJECT_NUMBER, integrityManager, rootScope)
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideCopyValueMixin(
         clipboardManager: ClipboardManager,
         toastMessageManager: ToastMessageManager,
@@ -400,4 +440,54 @@ class CommonModule {
         toastMessageManager,
         resourceManager
     )
+
+    @Provides
+    @ApplicationScope
+    fun provideToggleFeatureRepository(preferences: Preferences): ToggleFeatureRepository = RealToggleFeatureRepository(preferences)
+
+    @Provides
+    @ApplicationScope
+    fun provideCopyTextMixin(): CopyTextLauncher.Presentation = RealCopyTextLauncher()
+
+    @Provides
+    @ApplicationScope
+    fun provideIpReceiver(
+        networkApiCreator: NetworkApiCreator
+    ): IpAddressReceiver = PublicIpAddressReceiver(networkApiCreator.create(PublicIpReceiverApi::class.java))
+
+    @Provides
+    @ApplicationScope
+    fun actionBottomSheetLauncher(
+        actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory
+    ): ActionBottomSheetLauncher = actionBottomSheetLauncherFactory.create()
+
+    @Provides
+    @ApplicationScope
+    fun maskingModeUseCase(toggleFeatureRepository: ToggleFeatureRepository): MaskingModeUseCase {
+        return RealMaskingModeUseCase(toggleFeatureRepository)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideMaskableAmountFormatterFactory(): MaskableValueFormatterFactory {
+        return MaskableValueFormatterFactory()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideMaskableAmountFormatterProvider(
+        maskableValueFormatterFactory: MaskableValueFormatterFactory,
+        maskingModeUseCase: MaskingModeUseCase
+    ): MaskableValueFormatterProvider {
+        return MaskableValueFormatterProvider(maskableValueFormatterFactory, maskingModeUseCase)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideGlobalConfigDataSource(
+        networkApiCreator: NetworkApiCreator
+    ): GlobalConfigDataSource {
+        val api = networkApiCreator.create(GlobalConfigApi::class.java)
+        return RealGlobalConfigDataSource(api)
+    }
 }

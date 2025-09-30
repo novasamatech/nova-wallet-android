@@ -3,13 +3,13 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
-import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.HydraDxQuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.DictEnum
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
 
 interface StandaloneHydraSwap {
@@ -20,7 +20,7 @@ interface StandaloneHydraSwap {
     fun extractReceivedAmount(events: List<GenericEvent.Instance>): Balance
 }
 
-interface HydraDxSourceEdge : QuotableEdge {
+interface HydraDxSourceEdge : HydraDxQuotableEdge {
 
     fun routerPoolArgument(): DictEnum.Entry<*>
 

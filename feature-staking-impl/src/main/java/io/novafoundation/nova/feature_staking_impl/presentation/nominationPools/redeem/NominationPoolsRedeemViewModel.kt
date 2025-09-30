@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
@@ -23,7 +25,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,10 +48,13 @@ class NominationPoolsRedeemViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val poolMemberUseCase: NominationPoolMemberUseCase,
     private val feeLoaderMixinFactory: FeeLoaderMixin.Factory,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     assetUseCase: AssetUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
@@ -64,7 +70,9 @@ class NominationPoolsRedeemViewModel(
         interactor.redeemAmountFlow(poolMember, viewModelScope)
     }
 
-    val redeemAmountModel = combine(redeemAmount, assetFlow, ::mapAmountToAmountModel)
+    val redeemAmountModel = combine(redeemAmount, assetFlow) { redeemAmount, asset ->
+        amountFormatter.formatAmountToAmountModel(redeemAmount, asset)
+    }
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
@@ -123,10 +131,10 @@ class NominationPoolsRedeemViewModel(
 
     private fun sendTransaction() = launch {
         interactor.redeem(poolMemberFlow.first())
-            .onSuccess { redeemConsequences ->
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+            .onSuccess { (submissionResult, redeemConsequences) ->
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                router.finishRedeemFlow(redeemConsequences)
+                startNavigation(submissionResult.submissionHierarchy) { router.finishRedeemFlow(redeemConsequences) }
             }
             .onFailure(::showError)
 

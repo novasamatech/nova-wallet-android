@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_versions_impl.databinding.FragmentUpdateNotificationsBinding
 import io.novafoundation.nova.feature_versions_impl.di.VersionsFeatureComponent
@@ -26,7 +25,6 @@ class UpdateNotificationFragment :
     private val adapter = ConcatAdapter(bannerAdapter, listAdapter, seeAllAdapter)
 
     override fun initViews() {
-        binder.updatesToolbar.applyStatusBarInsets()
         binder.updatesList.adapter = adapter
         val decoration = UpdateNotificationsItemDecoration(requireContext())
         binder.updatesList.addItemDecoration(decoration)

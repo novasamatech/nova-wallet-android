@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.network.NetworkSellFlowViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -37,7 +38,8 @@ class NetworkSellFlowModule {
         accountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager,
         networkFlowPayload: NetworkFlowPayload,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NetworkSellFlowViewModel(
             interactor = interactor,
@@ -47,7 +49,8 @@ class NetworkSellFlowModule {
             accountUseCase = accountUseCase,
             resourceManager = resourceManager,
             networkFlowPayload = networkFlowPayload,
-            chainRegistry = chainRegistry
+            chainRegistry = chainRegistry,
+            amountFormatter = amountFormatter
         )
     }
 }

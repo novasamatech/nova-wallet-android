@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.repository.datasource
 
+import android.util.Log
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.KeyPairSchema
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
+import io.novafoundation.nova.feature_account_api.domain.model.MetaIdWithType
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeToLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
@@ -36,10 +38,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -69,10 +73,9 @@ class AccountDataSourceImpl(
         }
     }
 
-    private val selectedMetaAccountLocal = metaAccountDao.selectedMetaAccountInfoFlow()
-        .shareIn(GlobalScope, started = SharingStarted.Eagerly, replay = 1)
-
-    private val selectedMetaAccountFlow = selectedMetaAccountLocal
+    private val selectedMetaAccountFlow = metaAccountDao.selectedMetaAccountInfoFlow()
+        .distinctUntilChanged()
+        .onEach { Log.d("AccountDataSourceImpl", "Current meta account: ${it?.metaAccount?.id}") }
         .filterNotNull()
         .map(accountMappers::mapMetaAccountLocalToMetaAccount)
         .inBackground()
@@ -144,12 +147,39 @@ class AccountDataSourceImpl(
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
-    override suspend fun getActiveMetaAccountsQuantity(): Int {
-        return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
+    override suspend fun getActiveMetaIds(): Set<Long> {
+        return withContext(Dispatchers.IO) { metaAccountDao.getMetaAccountsIdsByStatus(MetaAccountLocal.Status.ACTIVE).toSet() }
     }
 
-    override suspend fun getMetaAccountIdsByType(type: LightMetaAccount.Type): List<Long> {
-        return metaAccountDao.getMetaAccountIdsByType(mapMetaAccountTypeToLocal(type))
+    override suspend fun getAllMetaAccounts(): List<MetaAccount> {
+        val local = metaAccountDao.getFullMetaAccounts()
+        return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
+    }
+
+    override suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount> {
+        val localMetaAccounts = metaAccountDao.getMetaAccountsByIds(metaIds)
+        return accountMappers.mapMetaAccountsLocalToMetaAccounts(localMetaAccounts)
+    }
+
+    override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
+        return metaAccountDao.hasMetaAccountsCountOfTypeFlow(mapMetaAccountTypeToLocal(type)).distinctUntilChanged()
+    }
+
+    override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
+        return metaAccountDao.observeMetaAccountsByTypeFlow(mapMetaAccountTypeToLocal(type))
+            .map { accountMappers.mapMetaAccountsLocalToMetaAccounts(it) }
+    }
+
+    override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(mapMetaAccountTypeToLocal(type))
+    }
+
+    override suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: LightMetaAccount.Type): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(metaIds, mapMetaAccountTypeToLocal(type))
+    }
+
+    override suspend fun getActiveMetaAccountsQuantity(): Int {
+        return metaAccountDao.getMetaAccountsQuantityByStatus(MetaAccountLocal.Status.ACTIVE)
     }
 
     override suspend fun deleteProxiedMetaAccountsByChain(chainId: String) {
@@ -158,10 +188,6 @@ class AccountDataSourceImpl(
 
     override suspend fun hasSecretsAccounts(): Boolean {
         return metaAccountDao.hasMetaAccountsByType(MetaAccountLocal.Type.SECRETS)
-    }
-
-    override suspend fun allLightMetaAccounts(): List<LightMetaAccount> {
-        return metaAccountDao.getMetaAccounts().map(accountMappers::mapMetaAccountLocalToLightMetaAccount)
     }
 
     override fun allMetaAccountsFlow(): Flow<List<MetaAccount>> {
@@ -229,12 +255,13 @@ class AccountDataSourceImpl(
         metaAccountDao.updateName(metaId, newName)
     }
 
-    override suspend fun deleteMetaAccount(metaId: Long) {
+    override suspend fun deleteMetaAccount(metaId: Long): List<MetaIdWithType> {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)
 
-        metaAccountDao.delete(metaId)
+        val allAffectedMetaAccounts = metaAccountDao.delete(metaId)
         secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
+        return allAffectedMetaAccounts.map { MetaIdWithType(it.id, accountMappers.mapMetaAccountTypeFromLocal(it.type)) }
     }
 
     override suspend fun insertMetaAccountFromSecrets(

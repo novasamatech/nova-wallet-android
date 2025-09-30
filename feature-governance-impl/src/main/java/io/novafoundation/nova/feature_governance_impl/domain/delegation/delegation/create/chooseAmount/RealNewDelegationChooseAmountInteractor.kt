@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireIdOfSelectedMetaAccountIn
@@ -78,16 +79,16 @@ class RealNewDelegationChooseAmountInteractor(
         delegate: AccountId,
         tracks: Collection<TrackId>,
         shouldRemoveOtherTracks: Boolean,
-    ): RetriableMultiResult<ExtrinsicStatus.InBlock> {
+    ): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
         val (chain, governanceSource) = useSelectedGovernance()
 
-        return extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) { origin ->
+        return extrinsicService.submitMultiExtrinsicAwaitingInclusion(chain, TransactionOrigin.SelectedWallet) { buildingContext ->
             delegate(
                 governanceSource = governanceSource,
                 amount = amount,
                 conviction = conviction,
                 delegate = delegate,
-                user = origin.executingAccount,
+                user = buildingContext.submissionOrigin.executingAccount,
                 chain = chain,
                 tracks = tracks,
                 shouldRemoveOtherTracks = shouldRemoveOtherTracks

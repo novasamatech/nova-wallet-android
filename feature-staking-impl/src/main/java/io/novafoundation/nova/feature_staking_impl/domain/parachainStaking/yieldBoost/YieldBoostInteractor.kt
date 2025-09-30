@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.OptimalAutomationRequest
 import io.novafoundation.nova.feature_staking_api.data.parachainStaking.turing.repository.TuringAutomationTask
@@ -22,7 +23,8 @@ import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.math.roundToLong
@@ -47,7 +49,7 @@ interface YieldBoostInteractor {
     suspend fun setYieldBoost(
         configuration: YieldBoostConfiguration,
         activeTasks: List<YieldBoostTask>
-    ): Result<ExtrinsicStatus.InBlock>
+    ): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
     suspend fun optimalYieldBoostParameters(delegatorState: DelegatorState, collatorId: AccountId): YieldBoostParameters
 
@@ -72,7 +74,10 @@ class RealYieldBoostInteractor(
         }
     }
 
-    override suspend fun setYieldBoost(configuration: YieldBoostConfiguration, activeTasks: List<YieldBoostTask>): Result<ExtrinsicStatus.InBlock> {
+    override suspend fun setYieldBoost(
+        configuration: YieldBoostConfiguration,
+        activeTasks: List<YieldBoostTask>
+    ): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
         val chain = singleAssetSharedState.chain()
 
         return extrinsicService.submitAndWatchExtrinsic(chain, TransactionOrigin.SelectedWallet) {
@@ -128,6 +133,7 @@ class RealYieldBoostInteractor(
                     stopAutoCompounding(it)
                 }
             }
+
             is YieldBoostConfiguration.On -> {
                 if (activeCollatorTask != null) {
                     // updating existing yield-boost - cancel only modified collator task

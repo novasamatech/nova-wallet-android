@@ -4,6 +4,7 @@ import android.os.Parcelable
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -24,7 +25,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chainAndAsset
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicBuilder
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -87,7 +88,7 @@ class CrowdloanContributeInteractor(
         customizationPayload = customizationPayload,
         toCalculateFee = true
     ) { submission, chain, _ ->
-        extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, formExtrinsic = submission)
+        extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet, formExtrinsic = { submission() })
     }
 
     suspend fun contribute(
@@ -95,12 +96,12 @@ class CrowdloanContributeInteractor(
         contribution: BigDecimal,
         bonusPayload: BonusPayload?,
         customizationPayload: Parcelable?,
-    ): Result<String> = runCatching {
+    ): Result<ExtrinsicSubmission> = runCatching {
         crowdloan.parachainMetadata?.customFlow?.let {
             customContributeManager.getFactoryOrNull(it)?.submitter?.submitOffChain(customizationPayload, bonusPayload, contribution)
         }
 
-        val extrinsicSubmission = formingSubmission(
+        formingSubmission(
             crowdloan = crowdloan,
             contribution = contribution,
             bonusPayload = bonusPayload,
@@ -109,8 +110,6 @@ class CrowdloanContributeInteractor(
         ) { submission, chain, account ->
             extrinsicService.submitExtrinsic(chain, TransactionOrigin.Wallet(account)) { submission() }
         }.getOrThrow()
-
-        extrinsicSubmission.hash
     }
 
     private suspend fun <T> formingSubmission(

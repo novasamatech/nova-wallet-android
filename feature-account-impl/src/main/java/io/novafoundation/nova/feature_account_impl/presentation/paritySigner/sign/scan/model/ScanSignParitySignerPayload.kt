@@ -10,7 +10,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class ScanSignParitySignerPayload(
     val request: SignInterScreenCommunicator.Request,
-    val validityPeriod: ValidityPeriodParcel,
+    val validityPeriod: ValidityPeriodParcel?,
     val variant: PolkadotVaultVariant,
 ) : Parcelable
 

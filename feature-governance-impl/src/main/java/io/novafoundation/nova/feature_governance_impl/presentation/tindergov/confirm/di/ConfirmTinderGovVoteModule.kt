@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
@@ -29,6 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm.ConfirmTinderGovVoteViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmTinderGovVoteModule {
@@ -60,6 +62,8 @@ class ConfirmTinderGovVoteModule {
         tinderGovInteractor: TinderGovInteractor,
         tinderGovBasketInteractor: TinderGovBasketInteractor,
         partialRetriableMixinFactory: PartialRetriableMixin.Factory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmTinderGovVoteViewModel(
             router = router,
@@ -78,7 +82,9 @@ class ConfirmTinderGovVoteModule {
             locksChangeFormatter = locksChangeFormatter,
             tinderGovInteractor = tinderGovInteractor,
             tinderGovBasketInteractor = tinderGovBasketInteractor,
-            partialRetriableMixinFactory = partialRetriableMixinFactory
+            partialRetriableMixinFactory = partialRetriableMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

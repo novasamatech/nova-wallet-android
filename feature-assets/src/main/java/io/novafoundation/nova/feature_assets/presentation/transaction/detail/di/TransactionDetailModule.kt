@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_assets.presentation.model.OperationParceli
 import io.novafoundation.nova.feature_assets.presentation.transaction.detail.transfer.TransactionDetailViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class TransactionDetailModule {
@@ -30,7 +31,8 @@ class TransactionDetailModule {
         chainRegistry: ChainRegistry,
         operation: OperationParcelizeModel.Transfer,
         externalActions: ExternalActions.Presentation,
-        arbitraryTokenUseCase: ArbitraryTokenUseCase
+        arbitraryTokenUseCase: ArbitraryTokenUseCase,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return TransactionDetailViewModel(
             router,
@@ -39,7 +41,8 @@ class TransactionDetailModule {
             chainRegistry,
             operation,
             externalActions,
-            arbitraryTokenUseCase
+            arbitraryTokenUseCase,
+            amountFormatter
         )
     }
 

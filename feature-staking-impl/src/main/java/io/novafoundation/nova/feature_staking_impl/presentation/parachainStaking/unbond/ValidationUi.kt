@@ -12,17 +12,19 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbon
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
 import io.novafoundation.nova.feature_wallet_api.domain.validation.notSufficientBalanceToPayFeeErrorMessage
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 
 fun parachainStakingUnbondValidationFailure(
     failure: ParachainStakingUnbondValidationFailure,
-    resourceManager: ResourceManager
+    resourceManager: ResourceManager,
+    amountFormatter: AmountFormatter
 ): TitleAndMessage {
     return when (failure) {
         NotEnoughBalanceToPayFees -> resourceManager.notSufficientBalanceToPayFeeErrorMessage()
 
         is TooLowRemainingBond -> {
-            val minimumRequired = mapAmountToAmountModel(failure.minimumRequired, failure.asset).token
+            val minimumRequired = amountFormatter.formatAmountToAmountModel(failure.minimumRequired, failure.asset).token
 
             when (failure) {
                 is TooLowRemainingBond.WontReceiveRewards -> {

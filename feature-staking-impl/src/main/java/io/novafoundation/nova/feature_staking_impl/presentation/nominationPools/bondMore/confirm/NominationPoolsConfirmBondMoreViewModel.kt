@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
+
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.bondMore.NominationPoolsBondMoreInteractor
@@ -24,7 +26,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,14 +46,17 @@ class NominationPoolsConfirmBondMoreViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val stakingSharedState: StakingSharedState,
     private val payload: NominationPoolsConfirmBondMorePayload,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     poolMemberUseCase: NominationPoolMemberUseCase,
     hintsFactory: NominationPoolsBondMoreHintsFactory,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val submissionFee = mapFeeFromParcel(payload.fee)
 
@@ -64,14 +70,16 @@ class NominationPoolsConfirmBondMoreViewModel(
 
     private val amountFlow = MutableStateFlow(payload.amount)
 
-    val amountModelFlow = combine(amountFlow, assetFlow, ::mapAmountToAmountModel)
+    val amountModelFlow = combine(amountFlow, assetFlow) { amount, asset ->
+        amountFormatter.formatAmountToAmountModel(amount, asset)
+    }
         .shareInBackground()
 
     val walletUiFlow = walletUiUseCase.selectedWalletUiFlow()
         .shareInBackground()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(submissionFee, asset.token)
+        val feeModel = mapFeeToFeeModel(submissionFee, asset.token, amountFormatter = amountFormatter)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -124,9 +132,9 @@ class NominationPoolsConfirmBondMoreViewModel(
 
         interactor.bondMore(amountInPlanks)
             .onSuccess {
-                showMessage(resourceManager.getString(R.string.common_transaction_submitted))
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
-                finishFlow()
+                startNavigation(it.submissionHierarchy) { finishFlow() }
             }
             .onFailure(::showError)
 

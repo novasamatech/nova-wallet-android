@@ -6,7 +6,6 @@ import android.text.TextUtils.TruncateAt
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -27,8 +26,6 @@ class ConfirmMultiStakingFragment : BaseFragment<ConfirmMultiStakingViewModel, F
     override fun createBinding() = FragmentStartMultiStakingConfirmBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.startMultiStakingConfirmToolbar.applyStatusBarInsets()
-
         binder.startMultiStakingConfirmExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         binder.startMultiStakingConfirmToolbar.setHomeButtonListener { viewModel.backClicked() }

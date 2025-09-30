@@ -1,18 +1,12 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
 
         buildConfigField "String", "KARURA_NOVA_REFERRAL", "\"0x9642d0db9f3b301b44df74b63b0b930011e3f52154c5ca24b4dc67b3c7322f15\""
         buildConfigField "String", "ACALA_NOVA_REFERRAL", "\"0x08eb319467ea54784cd9edfbd03bbcc53f7a021ed8d9ed2ca97b6ae46b3f6014\""
@@ -33,16 +27,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
     }
     namespace 'io.novafoundation.nova.feature_crowdloan_impl'
 
@@ -79,13 +63,13 @@ dependencies {
 
     implementation daggerDep
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation roomDep
-    kapt roomKapt
+    ksp roomCompiler
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     testImplementation jUnitDep
     testImplementation mockitoDep
@@ -97,7 +81,6 @@ dependencies {
     implementation retrofitDep
 
     implementation shimmerDep
-    implementation storiesDep
 
     implementation coilDep
 }

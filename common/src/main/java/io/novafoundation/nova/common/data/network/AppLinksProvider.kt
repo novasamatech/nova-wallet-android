@@ -19,7 +19,7 @@ class AppLinksProvider(
 
     val paritySignerTroubleShooting: String,
     val polkadotVaultTroubleShooting: String,
-    val ledgerBluetoothGuide: String,
+    val ledgerConnectionGuide: String,
     val wikiBase: String,
     val wikiProxy: String,
     val integrateNetwork: String,
@@ -28,7 +28,8 @@ class AppLinksProvider(
     val ledgerMigrationArticle: String,
 
     val novaCardWidgetUrl: String,
-    val unifiedAddressArticle: String
+    val unifiedAddressArticle: String,
+    val multisigsWikiUrl: String
 ) {
 
     fun getTwitterAccountUrl(

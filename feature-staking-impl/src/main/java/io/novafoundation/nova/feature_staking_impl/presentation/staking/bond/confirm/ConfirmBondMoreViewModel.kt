@@ -8,13 +8,13 @@ import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.requireException
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
@@ -23,10 +23,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondM
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.bondMoreValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.first
@@ -44,11 +46,14 @@ class ConfirmBondMoreViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val payload: ConfirmBondMorePayload,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
     hintsMixinFactory: ResourcesHintsMixinFactory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor {
+    Validatable by validationExecutor,
+    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     private val decimalFee = mapFeeFromParcel(payload.fee)
 
@@ -63,8 +68,13 @@ class ConfirmBondMoreViewModel(
     private val stashAssetFlow = interactor.assetFlow(payload.stashAddress)
         .shareInBackground()
 
+    private val stakeableAmountFlow = stashAssetFlow.map {
+        val planks = bondMoreInteractor.stakeableAmount(it)
+        it.token.amountFromPlanks(planks)
+    }.shareInBackground()
+
     val amountModelFlow = stashAssetFlow.map { asset ->
-        mapAmountToAmountModel(payload.amount, asset)
+        amountFormatter.formatAmountToAmountModel(payload.amount, asset)
     }
         .shareInBackground()
 
@@ -72,7 +82,7 @@ class ConfirmBondMoreViewModel(
         .shareInBackground()
 
     val feeStatusFlow = stashAssetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token, amountFormatter = amountFormatter)
 
         FeeStatus.Loaded(feeModel)
     }
@@ -100,7 +110,8 @@ class ConfirmBondMoreViewModel(
             stashAddress = payload.stashAddress,
             fee = decimalFee,
             amount = payload.amount,
-            stashAsset = stashAssetFlow.first()
+            stashAsset = stashAssetFlow.first(),
+            stakeable = stakeableAmountFlow.first()
         )
 
         validationExecutor.requireValid(
@@ -117,17 +128,16 @@ class ConfirmBondMoreViewModel(
         val token = stashAssetFlow.first().token
         val amountInPlanks = token.planksFromAmount(payload.amount)
 
-        val result = bondMoreInteractor.bondMore(payload.stashAddress, amountInPlanks)
+        bondMoreInteractor.bondMore(payload.stashAddress, amountInPlanks)
+            .onSuccess {
+                showToast(resourceManager.getString(R.string.common_transaction_submitted))
+
+                startNavigation(it.submissionHierarchy) { finishFlow() }
+            }.onFailure {
+                showError(it)
+            }
 
         _showNextProgress.value = false
-
-        if (result.isSuccess) {
-            showMessage(resourceManager.getString(R.string.common_transaction_submitted))
-
-            finishFlow()
-        } else {
-            showError(result.requireException())
-        }
     }
 
     private fun finishFlow() {

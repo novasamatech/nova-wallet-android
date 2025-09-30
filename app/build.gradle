@@ -1,22 +1,16 @@
-apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'com.google.firebase.appdistribution'
 apply plugin: "com.github.triplet.play"
 apply from: "../scripts/versions.gradle"
 apply from: "../scripts/secrets.gradle"
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
     defaultConfig {
         applicationId rootProject.applicationId
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
         versionCode computeVersionCode()
         versionName computeVersionName()
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        
     }
     signingConfigs {
         dev {
@@ -136,16 +130,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
     applicationVariants.all { variant ->
         String name = variant.buildType.name
         if (name != "release" && name.startsWith("release")) {
@@ -158,7 +142,6 @@ android {
         resources.excludes.add("META-INF/DEPENDENCIES")
         resources.excludes.add("META-INF/NOTICE.md")
     }
-
 
     buildFeatures {
         viewBinding true
@@ -214,6 +197,8 @@ dependencies {
     implementation project(':feature-account-api')
     implementation project(':feature-account-impl')
 
+    implementation project(':feature-account-migration')
+
     implementation project(':feature-wallet-api')
     implementation project(':feature-wallet-impl')
 
@@ -268,7 +253,6 @@ dependencies {
 
     implementation project(':feature-push-notifications')
     implementation project(':feature-deep-linking')
-    implementation project(':feature-deep-link-building')
 
     implementation project(':feature-cloud-backup-api')
     implementation project(':feature-cloud-backup-impl')
@@ -279,6 +263,8 @@ dependencies {
     implementation project(':bindings:metadata_shortener')
 
     implementation project(":feature-xcm:impl")
+
+    implementation project(":feature-multisig:operations")
 
     implementation project(':test-shared')
 
@@ -300,10 +286,10 @@ dependencies {
     implementation substrateSdkDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     implementation lifeCycleKtxDep
 
@@ -330,7 +316,7 @@ dependencies {
     implementation walletConnectCoreDep, withoutTransitiveAndroidX
     implementation walletConnectWalletDep, withoutTransitiveAndroidX
 
-    kaptAndroidTest daggerKapt
+    kspAndroidTest daggerCompiler
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep

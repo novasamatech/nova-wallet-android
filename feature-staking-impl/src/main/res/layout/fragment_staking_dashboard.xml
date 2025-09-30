@@ -6,5 +6,5 @@
     android:layout_height="match_parent"
     android:background="@drawable/drawable_background_image"
     android:clipToPadding="false"
-    android:paddingBottom="64dp"
+    android:paddingBottom="16dp"
     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />

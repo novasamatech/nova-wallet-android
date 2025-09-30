@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmou
 data class SwapValidationPayload(
     val fee: SwapFee,
     val swapQuote: SwapQuote,
-    val slippage: Fraction
+    val slippage: Fraction,
 ) {
 
     val amountIn: ChainAssetWithAmount = swapQuote.amountIn
