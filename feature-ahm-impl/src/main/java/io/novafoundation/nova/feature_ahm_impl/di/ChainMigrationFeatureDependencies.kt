@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ahm_impl.di
 
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -30,6 +31,8 @@ interface ChainMigrationFeatureDependencies {
     val apiCreator: NetworkApiCreator
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val toggleFeatureRepository: ToggleFeatureRepository
 
     val chainStateRepository: ChainStateRepository
 

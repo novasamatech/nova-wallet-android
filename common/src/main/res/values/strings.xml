@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="staking_details_migration_alert_title">%1$s staking is live on %2$s starting %3$s</string>
+
+    <string name="common_view">View</string>
+    <string name="transaction_history_migration_source_message">Your previous %s transaction history is still available on %s</string>
+
+    <string name="asset_details_source_asset_alert_title">Your %s tokens now on %s</string>
+    <string name="asset_details_source_asset_alert_message">Starting %1$s, your %2$s balance, Staking, and Governance will be on %3$s — with improved performance and lower costs.</string>
+    <string name="asset_details_source_asset_alert_button">Go to %s</string>
+
     <string name="chaim_migration_details_hint_history">Old transaction history remains on Kusama Relay</string>
     <string name="chaim_migration_details_hint_auto_migration">Migration happens automatically, no action needed</string>
 

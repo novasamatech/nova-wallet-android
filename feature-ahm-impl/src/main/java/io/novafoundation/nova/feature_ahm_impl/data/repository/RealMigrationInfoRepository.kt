@@ -15,19 +15,23 @@ class RealMigrationInfoRepository(
         configResponse.map { it.toDomain() }
     }
 
-    override suspend fun getConfig(chainId: String): ChainMigrationConfig {
-        return getConfigsInternal().first { it.sourceData.chainId == chainId }
+    override suspend fun getConfigByOriginChain(chainId: String): ChainMigrationConfig? {
+        return getConfigsInternal().getOrNull()?.firstOrNull { it.originData.chainId == chainId }
+    }
+
+    override suspend fun getConfigByDestinationChain(chainId: String): ChainMigrationConfig? {
+        return getConfigsInternal().getOrNull()?.firstOrNull { it.destinationData.chainId == chainId }
     }
 
     override suspend fun getAllConfigs(): List<ChainMigrationConfig> {
-        return getConfigsInternal()
+        return getConfigsInternal().getOrNull() ?: emptyList()
     }
 
     override suspend fun loadConfigs() {
         getConfigsInternal()
     }
 
-    private suspend fun getConfigsInternal(): List<ChainMigrationConfig> {
-        return config()
+    private suspend fun getConfigsInternal() = runCatching {
+        config()
     }
 }

@@ -1,13 +1,14 @@
 package io.novafoundation.nova.feature_ahm_impl.data.config
 
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
-import java.util.*
+import java.math.BigInteger
+import java.util.Date
 import kotlin.time.Duration.Companion.seconds
 
 class ChainMigrationConfigRemote(
     val sourceData: ChainData,
     val destinationData: ChainData,
-    val blockNumber: Long,
+    val blockNumber: BigInteger,
     val timestamp: Long,
     val newTokenNames: List<String>,
     val bannerPath: String,
@@ -17,16 +18,16 @@ class ChainMigrationConfigRemote(
     class ChainData(
         val chainId: String,
         val assetId: Int,
-        val minBalance: Long,
-        val averageFee: Long
+        val minBalance: BigInteger,
+        val averageFee: BigInteger
     )
 }
 
 fun ChainMigrationConfigRemote.toDomain(): ChainMigrationConfig {
     return ChainMigrationConfig(
-        sourceData = sourceData.toDomain(),
+        originData = sourceData.toDomain(),
         destinationData = destinationData.toDomain(),
-        blockNumberStartAt = blockNumber.toBigInteger(),
+        blockNumberStartAt = blockNumber,
         timeStartAt = Date(timestamp.seconds.inWholeMilliseconds),
         newTokenNames = newTokenNames,
         bannerPath = bannerPath,
@@ -38,7 +39,7 @@ fun ChainMigrationConfigRemote.ChainData.toDomain(): ChainMigrationConfig.ChainD
     return ChainMigrationConfig.ChainData(
         chainId = chainId,
         assetId = assetId,
-        minBalance = minBalance.toBigInteger(),
-        averageFee = averageFee.toBigInteger()
+        minBalance = minBalance,
+        averageFee = averageFee
     )
 }
