@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <!--<string name="wallet_your_balance">Your balance</string>-->
 
     <string name="staking_details_migration_alert_title">%1$s staking is live on %2$s starting %3$s</string>
 
@@ -2654,6 +2655,5 @@
     <string name="wallet_send_phishing_warning_text">Following address: %s is known to be used in phishing activities, thus we are not recommending sending tokens to that address. Would you like to proceed anyway?</string>
     <string name="wallet_send_phishing_warning_title">Scam alert</string>
     <string name="wallet_transfer_details_title">Transfer details</string>
-    <string name="wallet_your_balance">Your balance</string>
     <string name="yesterday">Yesterday</string>
 </resources>
