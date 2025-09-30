@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.repository
 
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.fromHex
 import io.novafoundation.nova.common.address.toHex
 import io.novafoundation.nova.common.data.network.runtime.binding.NonNullBinderWithType
 import io.novafoundation.nova.common.data.network.runtime.binding.returnType
@@ -247,7 +248,7 @@ class StakingRepositoryImpl(
                 isSlashed(span, activeEraIndex, slashDeferDuration)
             }
         )
-            .mapNotNull { (key, value) -> AccountIdKey.fromHex(key).takeIf { value } }
+            .mapNotNull { (key, value) -> AccountIdKey.fromHex(key).getOrNull().takeIf { value } }
             .toSet()
     }
 

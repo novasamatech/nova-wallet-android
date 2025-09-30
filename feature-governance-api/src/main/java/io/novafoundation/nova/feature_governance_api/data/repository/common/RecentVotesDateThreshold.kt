@@ -6,4 +6,3 @@ sealed interface RecentVotesDateThreshold {
     class BlockNumber(val number: BigInteger) : RecentVotesDateThreshold
     class Timestamp(val timestampMs: Long) : RecentVotesDateThreshold
 }
-

@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOutcomeOk
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.flattenDispatchFailure
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
@@ -317,11 +316,7 @@ private class AssetConversionExchange(
             ) { buildingContext ->
                 // Send swapped funds to the executingAccount since it the account doing the swap
                 executeSwap(swapLimit = args.actualSwapLimit, sendTo = buildingContext.submissionOrigin.executingAccount)
-            }.requireOk().flattenDispatchFailure().mapCatching {
-                SwapExecutionCorrection(
-                    actualReceivedAmount = it.emittedEvents.determineActualSwappedAmount()
-                )
-            }
+            }.requireOk()
         }
 
         private fun List<GenericEvent.Instance>.determineActualSwappedAmount(): Balance {

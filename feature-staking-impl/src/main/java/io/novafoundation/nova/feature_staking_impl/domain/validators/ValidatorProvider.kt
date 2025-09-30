@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validators
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.fromHex
 import io.novafoundation.nova.common.utils.foldToSet
 import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
@@ -60,7 +61,7 @@ class ValidatorProvider(
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return requestedValidatorIds.map { accountIdHex ->
-            val accountId = AccountIdKey.fromHex(accountIdHex)
+            val accountId = AccountIdKey.fromHex(accountIdHex).getOrThrow()
 
             val electedInfo = electedValidatorExposures[accountIdHex]?.let {
                 Validator.ElectedInfo(
@@ -88,7 +89,7 @@ class ValidatorProvider(
         val chainId = chain.id
 
         val accountIdHex = address.toHexAccountId()
-        val accountId = AccountIdKey.fromHex(accountIdHex)
+        val accountId = AccountIdKey.fromHex(accountIdHex).getOrThrow()
 
         val accountIdHexBridged = listOf(accountIdHex)
 
