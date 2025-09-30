@@ -62,6 +62,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -189,10 +190,10 @@ class BalanceDetailViewModel(
     ) { configWithChains, chain, shouldBeHidden ->
         if (shouldBeHidden) return@combine null
         if (configWithChains == null) return@combine null
-        if (chain.id != configWithChains.config.sourceData.chainId) return@combine null
+        if (configWithChains.originAsset.notMatchWithBalanceAsset()) return@combine null
 
         val config = configWithChains.config
-        val sourceAsset = configWithChains.sourceAsset
+        val sourceAsset = configWithChains.originAsset
         val destinationChain = configWithChains.destinationChain
         val formattedDate = dateFormatter.format(config.timeStartAt)
         AlertModel(
@@ -214,13 +215,13 @@ class BalanceDetailViewModel(
 
     val destinationMigrationBannerFlow = combine(migrationConfigFlow, chainFlow) { configWithChains, chain ->
         if (configWithChains == null) return@combine null
-        if (chain.id != configWithChains.config.destinationData.chainId) return@combine null
+        if (configWithChains.destinationAsset.notMatchWithBalanceAsset()) return@combine null
 
-        val sourceAsset = configWithChains.sourceAsset
-        val sourceChain = configWithChains.sourceChain
+        val sourceAsset = configWithChains.originAsset
+        val sourceChain = configWithChains.originChain
         TransactionHistoryBannerModel(
             resourceManager.getString(R.string.transaction_history_migration_source_message, sourceAsset.symbol.value, sourceChain.name),
-            { openAssetDetails(chainData = configWithChains.config.sourceData) }
+            { openAssetDetails(chainData = configWithChains.config.originData) }
         )
     }.shareInBackground()
 
@@ -430,5 +431,9 @@ class BalanceDetailViewModel(
         launch {
             openBrowserEvent.value = Event(config.wikiURL)
         }
+    }
+
+    private fun Chain.Asset.notMatchWithBalanceAsset(): Boolean {
+        return assetPayload.chainId != chainId || assetPayload.chainAssetId != id
     }
 }

@@ -5,7 +5,7 @@ import java.math.BigInteger
 import java.util.Date
 
 class ChainMigrationConfig(
-    val sourceData: ChainData,
+    val originData: ChainData,
     val destinationData: ChainData,
     val blockNumberStartAt: BigInteger,
     val timeStartAt: Date,
@@ -24,8 +24,8 @@ class ChainMigrationConfig(
 
 class ChainMigrationConfigWithChains(
     val config: ChainMigrationConfig,
-    val sourceChain: Chain,
-    val sourceAsset: Chain.Asset,
+    val originChain: Chain,
+    val originAsset: Chain.Asset,
     val destinationChain: Chain,
     val destinationAsset: Chain.Asset
 )

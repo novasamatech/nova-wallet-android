@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.map
 fun ChainRegistry.observeMigrationConfigWithChains(config: ChainMigrationConfig): Flow<ChainMigrationConfigWithChains> {
     return chainsById
         .map {
-            val sourceChain = it.getValue(config.sourceData.chainId)
+            val sourceChain = it.getValue(config.originData.chainId)
             val destinationChain = it.getValue(config.destinationData.chainId)
 
             ChainMigrationConfigWithChains(
                 config = config,
-                sourceChain = sourceChain,
-                sourceAsset = sourceChain.assetsById.getValue(config.sourceData.assetId),
+                originChain = sourceChain,
+                originAsset = sourceChain.assetsById.getValue(config.originData.assetId),
                 destinationChain = destinationChain,
                 destinationAsset = destinationChain.assetsById.getValue(config.destinationData.assetId)
             )

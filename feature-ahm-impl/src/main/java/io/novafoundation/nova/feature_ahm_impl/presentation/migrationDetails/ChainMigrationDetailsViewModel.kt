@@ -48,27 +48,27 @@ class ChainMigrationDetailsViewModel(
 
     val configUIFlow = combine(configFlow, chainFlow) { config, sourceChain ->
         val destinationChain = interactor.getChain(config.destinationData.chainId)
-        val sourceAsset = sourceChain.assetsById.getValue(config.sourceData.assetId)
+        val sourceAsset = sourceChain.assetsById.getValue(config.originData.assetId)
         val destinationAsset = destinationChain.assetsById.getValue(config.destinationData.assetId)
         val tokenSymbol = sourceAsset.symbol.value
         val newTokens = config.newTokenNames.joinToString()
 
         val formattedDate = dateFormatter.format(config.timeStartAt)
-        val minimalBalanceScale = config.sourceData.minBalance / config.destinationData.minBalance
-        val lowerFeeScale = config.sourceData.averageFee / config.destinationData.averageFee
+        val minimalBalanceScale = config.originData.minBalance / config.destinationData.minBalance
+        val lowerFeeScale = config.originData.averageFee / config.destinationData.averageFee
 
         ConfigModel(
             title = resourceManager.getString(R.string.chain_migration_details_title, formattedDate, tokenSymbol, destinationChain.name),
             minimalBalance = resourceManager.getString(
                 R.string.chain_migration_details_minimal_balance,
                 minimalBalanceScale.format(),
-                config.sourceData.minBalance.amountFromPlanks(sourceAsset.precision).format(),
+                config.originData.minBalance.amountFromPlanks(sourceAsset.precision).format(),
                 config.destinationData.minBalance.amountFromPlanks(destinationAsset.precision).format(),
             ),
             lowerFee = resourceManager.getString(
                 R.string.chain_migration_details_lower_fee,
                 lowerFeeScale.format(),
-                config.sourceData.averageFee.amountFromPlanks(sourceAsset.precision).format(),
+                config.originData.averageFee.amountFromPlanks(sourceAsset.precision).format(),
                 config.destinationData.averageFee.amountFromPlanks(destinationAsset.precision).format(),
             ),
             tokens = resourceManager.getString(R.string.chain_migration_details_tokens, newTokens),

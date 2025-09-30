@@ -16,14 +16,14 @@ class RealChainMigrationDetailsSelectToShowUseCase(
         val configs = migrationInfoRepository.getAllConfigs()
         return configs
             .filter {
-                val detailsWasNotShown = !chainMigrationRepository.isMigrationDetailsWasShown(it.sourceData.chainId)
-                val chainRequireMigrationDetails = chainMigrationRepository.isChainMigrationDetailsNeeded(it.sourceData.chainId)
+                val detailsWasNotShown = !chainMigrationRepository.isMigrationDetailsWasShown(it.originData.chainId)
+                val chainRequireMigrationDetails = chainMigrationRepository.isChainMigrationDetailsNeeded(it.originData.chainId)
                 detailsWasNotShown && chainRequireMigrationDetails && isMigrationBlockPassed(it)
             }
-            .map { it.sourceData.chainId }
+            .map { it.originData.chainId }
     }
 
     private suspend fun isMigrationBlockPassed(config: ChainMigrationConfig): Boolean {
-        return chainStateRepository.currentRemoteBlock(config.sourceData.chainId) > config.blockNumberStartAt
+        return chainStateRepository.currentRemoteBlock(config.originData.chainId) > config.blockNumberStartAt
     }
 }

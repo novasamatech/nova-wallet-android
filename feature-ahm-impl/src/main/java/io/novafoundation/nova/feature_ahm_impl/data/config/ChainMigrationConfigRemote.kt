@@ -25,7 +25,7 @@ class ChainMigrationConfigRemote(
 
 fun ChainMigrationConfigRemote.toDomain(): ChainMigrationConfig {
     return ChainMigrationConfig(
-        sourceData = sourceData.toDomain(),
+        originData = sourceData.toDomain(),
         destinationData = destinationData.toDomain(),
         blockNumberStartAt = blockNumber,
         timeStartAt = Date(timestamp.seconds.inWholeMilliseconds),

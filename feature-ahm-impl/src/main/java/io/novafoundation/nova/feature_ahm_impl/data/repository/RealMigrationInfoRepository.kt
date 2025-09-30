@@ -16,7 +16,7 @@ class RealMigrationInfoRepository(
     }
 
     override suspend fun getConfigByOriginChain(chainId: String): ChainMigrationConfig? {
-        return getConfigsInternal().getOrNull()?.firstOrNull { it.sourceData.chainId == chainId }
+        return getConfigsInternal().getOrNull()?.firstOrNull { it.originData.chainId == chainId }
     }
 
     override suspend fun getConfigByDestinationChain(chainId: String): ChainMigrationConfig? {

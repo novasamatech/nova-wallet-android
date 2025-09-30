@@ -103,7 +103,7 @@ class StakingViewModel(
             if (configWithChains == null) return@combine null
 
             val config = configWithChains.config
-            val sourceChain = configWithChains.sourceChain
+            val sourceChain = configWithChains.originChain
             val destinationChain = configWithChains.destinationChain
             val formattedDate = dateFormatter.format(config.timeStartAt)
             AlertModel(
