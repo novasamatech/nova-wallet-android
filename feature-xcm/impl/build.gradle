@@ -4,7 +4,7 @@ android {
     namespace 'io.novafoundation.nova.feature_xcm_impl'
 
     defaultConfig {
-        buildConfigField "String", "XCM_GENERAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v8/xcm_general_config_dev.json\""
+        buildConfigField "String", "XCM_GENERAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v9/xcm_general_config_dev.json\""
     }
 
     buildTypes {
@@ -12,7 +12,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "XCM_GENERAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v8/xcm_general_config.json\""
+            buildConfigField "String", "XCM_GENERAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/xcm/v9/xcm_general_config.json\""
         }
     }
 }

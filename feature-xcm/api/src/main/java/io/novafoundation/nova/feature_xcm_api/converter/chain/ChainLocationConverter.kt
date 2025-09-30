@@ -17,11 +17,9 @@ interface ChainLocationConverter {
     ): Chain?
 
     /**
-     *  Determine chain that corresponds to the given absolute [location] within the given [consensusRoot]
+     * Determine chain that corresponds to the given absolute [location]
      */
-    suspend fun chainFromAbsoluteLocation(
-        location: AbsoluteMultiLocation,
-    ): Chain?
+    suspend fun chainFromAbsoluteLocation(location: AbsoluteMultiLocation): Chain?
 
     /**
      * Determine absolute location of the given [chain]
