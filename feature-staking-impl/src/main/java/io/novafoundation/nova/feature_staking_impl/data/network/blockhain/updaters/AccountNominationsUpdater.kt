@@ -4,7 +4,7 @@ import io.novafoundation.nova.common.utils.staking
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.AccountStakingScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SingleStorageKeyUpdater
@@ -17,7 +17,7 @@ class AccountNominationsUpdater(
     storageCache: StorageCache,
     stakingSharedState: StakingSharedState,
     chainRegistry: ChainRegistry,
-) : SingleStorageKeyUpdater<AccountStakingLocal>(scope, stakingSharedState, chainRegistry, storageCache), StakingUpdater<AccountStakingLocal> {
+) : SingleStorageKeyUpdater<AccountStakingLocal>(scope, stakingSharedState, chainRegistry, storageCache), SharedStateBasedUpdater<AccountStakingLocal> {
 
     override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: AccountStakingLocal): String? {
         val stakingAccessInfo = scopeValue.stakingAccessInfo ?: return null

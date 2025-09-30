@@ -69,7 +69,9 @@ class RealStakingTypeDetailsCompoundInteractor(
     }
 
     override fun observeStartStakingInfo(): Flow<StartStakingCompoundData> {
-        val startStakingDataFlow = interactors.map { it.observeData() }.combineList()
+        val startStakingDataFlow = interactors.map { interactor ->
+            interactor.observeData()
+        }.combineList()
         val assetFlow = assetFlow()
         val eraInfoDataFlow = stakingEraInteractor.observeEraInfo()
 

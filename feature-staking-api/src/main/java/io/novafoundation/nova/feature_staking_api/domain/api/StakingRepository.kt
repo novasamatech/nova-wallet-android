@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_api.domain.api
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
@@ -19,7 +20,7 @@ typealias ExposuresWithEraIndex = Pair<AccountIdMap<Exposure>, EraIndex>
 
 interface StakingRepository {
 
-    suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex
+    suspend fun eraStartSessionIndex(chainId: ChainId, era: EraIndex): EraIndex
 
     suspend fun eraLength(chainId: ChainId): BigInteger
 
@@ -35,7 +36,7 @@ interface StakingRepository {
 
     suspend fun getValidatorPrefs(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<ValidatorPrefs?>
 
-    suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Boolean>
+    suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): Set<AccountIdKey>
 
     suspend fun getSlashingSpan(chainId: ChainId, accountId: AccountId): SlashingSpans?
 

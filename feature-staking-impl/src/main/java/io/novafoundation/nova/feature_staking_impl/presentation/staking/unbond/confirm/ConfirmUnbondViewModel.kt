@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
-
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -142,9 +141,8 @@ class ConfirmUnbondViewModel(
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
-            }.onFailure {
-                showError(it)
             }
+            .onFailure(::showError)
 
         _showNextProgress.value = false
     }

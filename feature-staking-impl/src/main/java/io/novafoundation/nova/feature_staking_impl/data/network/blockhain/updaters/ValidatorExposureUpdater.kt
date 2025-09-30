@@ -10,7 +10,7 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater.Companion.STORAGE_KEY_PAGED_EXPOSURES
-import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.base.StakingUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.ActiveEraScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -43,7 +43,7 @@ class ValidatorExposureUpdater(
     private val chainRegistry: ChainRegistry,
     private val storageCache: StorageCache,
     override val scope: ActiveEraScope,
-) : StakingUpdater<EraIndex> {
+) : SharedStateBasedUpdater<EraIndex> {
 
     companion object {
 

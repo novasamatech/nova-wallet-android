@@ -1083,6 +1083,7 @@
     <string name="profile_accounts_title_2_0">Cüzdanlar</string>
     <string name="profile_language_title">Dil</string>
     <string name="profile_pincode_change_title">Pin kodunu değiştir</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Gizli bakiye ile uygulamayı aç</string>
     <string name="profile_settings_pin_code_verification_title">PIN ile onayla</string>
     <string name="profile_settings_safe_mode_title">Güvenli mod</string>
     <string name="profile_settings_title">Ayarlar</string>

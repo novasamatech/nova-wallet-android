@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -148,7 +149,7 @@ class RealNewDelegationChooseAmountInteractor(
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
         val voteLockingPeriod = governanceSource.convictionVoting.voteLockingPeriod(chain.id)
 
-        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
+        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
 
         val metaId = accountRepository.getSelectedMetaAccount().id
 

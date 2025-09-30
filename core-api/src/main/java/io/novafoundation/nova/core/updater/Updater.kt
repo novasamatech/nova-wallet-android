@@ -37,6 +37,10 @@ interface GlobalScopeUpdater : Updater<Unit> {
 
 interface Updater<V> : SideEffectScope {
 
+    @Deprecated(
+        "This feature is not flexible enough" +
+            "Updaters should check presense of relevant modules themselves and fallback to no-op in case module is not found"
+    )
     val requiredModules: List<String>
         get() = emptyList()
 

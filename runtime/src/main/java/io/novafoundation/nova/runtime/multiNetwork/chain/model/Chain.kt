@@ -62,7 +62,8 @@ data class Chain(
         val supportLedgerGenericApp: Boolean?,
         val identityChain: ChainId?,
         val disabledCheckMetadataHash: Boolean?,
-        val sessionLength: Int?
+        val sessionLength: Int?,
+        val timelineChain: ChainId?
     )
 
     data class Types(
@@ -200,6 +201,8 @@ data class Chain(
         data class Crowdloans(override val url: String) : ExternalApi()
 
         data class Staking(override val url: String) : ExternalApi()
+
+        data class StakingRewards(override val url: String) : ExternalApi()
 
         data class GovernanceReferenda(override val url: String, val source: Source) : ExternalApi() {
 
