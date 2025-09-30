@@ -22,15 +22,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class ConfigModel(
-    val title: String,
-    val minimalBalance: String,
-    val lowerFee: String,
-    val tokens: String,
-    val unifiedAccess: String,
-    val anyTokenFee: String
-)
-
 class ChainMigrationDetailsViewModel(
     private val resourceManager: ResourceManager,
     private val router: ChainMigrationRouter,

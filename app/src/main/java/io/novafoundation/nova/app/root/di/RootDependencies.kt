@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigr
 import io.novafoundation.nova.feature_ahm_api.data.repository.ChainMigrationRepository
 import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepository
 import io.novafoundation.nova.feature_ahm_api.di.deeplinks.ChainMigrationDeepLinks
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationDetailsSelectToShowUseCase
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
@@ -129,6 +130,8 @@ interface RootDependencies {
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
     val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
+
+    val chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase
 
     val deviceNetworkStateObserver: DeviceNetworkStateObserver
 

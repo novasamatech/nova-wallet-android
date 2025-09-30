@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepos
 import io.novafoundation.nova.feature_ahm_api.di.deeplinks.ChainMigrationDeepLinks
 import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
 import io.novafoundation.nova.feature_ahm_api.domain.StakingMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationDetailsSelectToShowUseCase
 
 interface ChainMigrationFeatureApi {
 
@@ -17,4 +18,6 @@ interface ChainMigrationFeatureApi {
     val chainMigrationDeepLinks: ChainMigrationDeepLinks
 
     val stakingMigrationUseCase: StakingMigrationUseCase
+
+    val chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase
 }
