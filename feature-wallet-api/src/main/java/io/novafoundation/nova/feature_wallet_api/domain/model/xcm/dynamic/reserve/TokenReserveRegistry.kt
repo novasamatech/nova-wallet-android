@@ -9,8 +9,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class TokenReserveRegistry(
     private val xcmConfig: AssetsXcmConfig,
-    private val chainLocationConverter: ChainLocationConverter,
     private val chainRegistry: ChainRegistry,
+    val chainLocationConverter: ChainLocationConverter,
 ) {
 
     suspend fun getReserve(chainAsset: Chain.Asset): TokenReserve {

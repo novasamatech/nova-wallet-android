@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.assetLocationO
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.destinationChainLocationOnOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainId
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainLocation
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAsset
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetId

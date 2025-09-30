@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_xcm_api.chain.isRelay
 import io.novafoundation.nova.feature_xcm_api.chain.isSystemChain
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 sealed interface XcmTransferType {
 
@@ -12,16 +13,16 @@ sealed interface XcmTransferType {
 
         fun determineTransferType(
             usesTeleports: Boolean,
-            originChain: XcmChain,
-            destinationChain: XcmChain,
+            originChain: Chain,
+            destinationChain: Chain,
             reserve: TokenReserve
         ): XcmTransferType {
             val assetAbsoluteLocation = reserve.tokenLocation
 
             return when {
                 usesTeleports -> Teleport(assetAbsoluteLocation)
-                originChain.chain.id == reserve.reserveChainLocation.chainId -> Reserve.Origin(assetAbsoluteLocation)
-                destinationChain.chain.id == reserve.reserveChainLocation.chainId -> Reserve.Destination(assetAbsoluteLocation)
+                originChain.id == reserve.reserveChainLocation.chainId -> Reserve.Origin(assetAbsoluteLocation)
+                destinationChain.id == reserve.reserveChainLocation.chainId -> Reserve.Destination(assetAbsoluteLocation)
                 else -> Reserve.Remote(assetAbsoluteLocation, reserve.reserveChainLocation)
             }
         }
