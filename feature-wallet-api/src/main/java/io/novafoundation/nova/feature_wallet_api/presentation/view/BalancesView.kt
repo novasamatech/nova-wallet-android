@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.showLoadingState
 import io.novafoundation.nova.common.view.showValueOrHide
+import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewBalancesBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -32,6 +33,10 @@ abstract class BalancesView @JvmOverloads constructor(
         orientation = VERTICAL
 
         background = context.getBlockDrawable()
+    }
+
+    fun setChain(chain: ChainUi) {
+        binder.viewBalanceChain.setChain(chain)
     }
 
     fun setTotalBalance(token: CharSequence, fiat: CharSequence?) {

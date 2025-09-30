@@ -16,15 +16,16 @@
         app:expandableId="@+id/viewBalanceExpandableContainer"
         app:supportAnimation="false">
 
-        <TextView
-            android:id="@+id/viewBalanceTitle"
-            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/viewBalanceChain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:text="@string/wallet_your_balance"
-            android:textColor="@color/text_secondary"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@+id/balanceDetailTokenName"
+            app:layout_constraintHorizontal_bias="1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/viewBalanceToken"
@@ -32,7 +33,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:ellipsize="end"
             android:lines="1"
@@ -42,7 +43,7 @@
             app:autoSizeTextType="uniform"
             app:layout_constraintEnd_toStartOf="@+id/viewBalanceChevron"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewBalanceTitle"
+            app:layout_constraintTop_toBottomOf="@+id/viewBalanceChain"
             tools:text="100,000,000,000,000,000,000.431351 DOT" />
 
         <TextView

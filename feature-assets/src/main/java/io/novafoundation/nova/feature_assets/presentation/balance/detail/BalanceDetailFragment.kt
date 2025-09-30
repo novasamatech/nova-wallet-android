@@ -162,7 +162,7 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         }
 
         viewModel.chainUI.observe {
-            binder.balanceDetailsChain.setChain(it)
+            binder.balanceDetailsBalances.setChain(it)
         }
 
         viewModel.originMigrationAlertFlow.observe {
