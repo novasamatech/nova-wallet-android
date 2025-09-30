@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.storage.source.query.AtBlock
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.WithRawValue
 import io.novafoundation.nova.runtime.storage.source.query.toAtBlock
+import io.novasama.substrate_sdk_android.runtime.metadata.fullName
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
@@ -15,6 +16,8 @@ import kotlinx.coroutines.flow.map
 typealias QueryableStorageBinder0<V> = (dynamicInstance: Any) -> V
 
 interface QueryableStorageEntry0<T : Any> {
+
+    val storageEntry: StorageEntry
 
     context(StorageQueryContext)
     suspend fun query(): T?
@@ -46,10 +49,12 @@ context(StorageQueryContext)
 fun <T : Any> QueryableStorageEntry0<T>.observeNonNull(): Flow<T> = observe().filterNotNull()
 
 context(StorageQueryContext)
-suspend fun <T : Any> QueryableStorageEntry0<T>.queryNonNull(): T = requireNotNull(query())
+suspend fun <T : Any> QueryableStorageEntry0<T>.queryNonNull(): T = requireNotNull(query()) {
+    "Null was was not expected when querying ${storageEntry.fullName}"
+}
 
 internal class RealQueryableStorageEntry0<T : Any>(
-    private val storageEntry: StorageEntry,
+    override val storageEntry: StorageEntry,
     private val binding: QueryableStorageBinder0<T>,
     runtimeContext: RuntimeContext
 ) : QueryableStorageEntry0<T>, RuntimeContext by runtimeContext {

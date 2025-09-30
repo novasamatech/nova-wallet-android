@@ -35,7 +35,7 @@ data class ChainExternalApiLocal(
     }
 
     enum class ApiType {
-        TRANSFERS, STAKING, CROWDLOANS,
+        TRANSFERS, STAKING, STAKING_REWARDS, CROWDLOANS,
         GOVERNANCE_REFERENDA, GOVERNANCE_DELEGATIONS,
         REFERENDUM_SUMMARY,
 

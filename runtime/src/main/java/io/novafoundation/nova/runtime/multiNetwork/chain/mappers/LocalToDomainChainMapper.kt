@@ -145,6 +145,10 @@ private fun mapExternalApiLocalToExternalApi(externalApiLocal: ChainExternalApiL
             ExternalApi.Staking(externalApiLocal.url)
         }
 
+        ApiType.STAKING_REWARDS -> externalApiLocal.ensureSourceType(SourceType.SUBQUERY) {
+            ExternalApi.StakingRewards(externalApiLocal.url)
+        }
+
         ApiType.CROWDLOANS -> externalApiLocal.ensureSourceType(SourceType.GITHUB) {
             ExternalApi.Crowdloans(externalApiLocal.url)
         }
