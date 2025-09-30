@@ -38,7 +38,7 @@ class RealChainLocationConverter(
         location: AbsoluteMultiLocation,
     ): Chain? {
         return location.junctions.fold(null) { currentChain, junction ->
-            when(junction) {
+            when (junction) {
                 is GlobalConsensus -> descendToConsensus(junction, currentChain)
 
                 is ParachainId -> descendToParachain(junction, currentChain)
@@ -48,7 +48,7 @@ class RealChainLocationConverter(
         }
     }
 
-    private suspend fun descendToConsensus(junction: GlobalConsensus, currentChain: Chain?) : Chain? {
+    private suspend fun descendToConsensus(junction: GlobalConsensus, currentChain: Chain?): Chain? {
         if (currentChain != null) {
             // GlobalConsensus should be the first junction
             return null
@@ -95,7 +95,7 @@ class RealChainLocationConverter(
     }
 
     private suspend fun getNetwork(networkId: MultiLocation.NetworkId): Chain? {
-        val chainId = when(networkId) {
+        val chainId = when (networkId) {
             is MultiLocation.NetworkId.Ethereum -> createEvmChainId(networkId.chainId)
             is MultiLocation.NetworkId.Substrate -> networkId.genesisHash
         }

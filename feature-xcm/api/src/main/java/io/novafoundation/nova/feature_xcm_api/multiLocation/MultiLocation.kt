@@ -54,7 +54,7 @@ abstract class MultiLocation(
 
         data class GlobalConsensus(val networkId: NetworkId) : Junction() {
 
-            constructor(genesisHash: String): this(NetworkId.Substrate(genesisHash))
+            constructor(genesisHash: String) : this(NetworkId.Substrate(genesisHash))
         }
 
         object Unsupported : Junction()

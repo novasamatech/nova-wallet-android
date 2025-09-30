@@ -34,13 +34,13 @@ private fun mapJunctionFromRemote(type: String, value: Any?): Junction {
 }
 
 private fun mapGlobalConsensusFromRemote(junctionValue: Any?): NetworkId {
-    return when(junctionValue) {
+    return when (junctionValue) {
         "Polkadot" -> NetworkId.Substrate(Chain.Geneses.POLKADOT)
         "Kusama" -> NetworkId.Substrate(Chain.Geneses.KUSAMA)
         is Map<*, *> -> {
             val entry = junctionValue.entries.first()
 
-            when(entry.key) {
+            when (entry.key) {
                 "ByGenesis" -> {
                     val genesis = (entry.value as String).removeHexPrefix()
                     NetworkId.Substrate(genesis)
