@@ -12,7 +12,6 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.normalizeSymbol
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.getChainOrNull
 import io.novasama.substrate_sdk_android.extensions.tryFindNonNull
 
 class RealChainAssetLocationConverter(
@@ -36,7 +35,7 @@ class RealChainAssetLocationConverter(
         location: RelativeMultiLocation,
         pointOfView: Chain
     ): Chain.Asset? {
-        val povLocation = chainLocationConverter.absoluteLocationFromChain(pointOfView.id)
+        val povLocation = chainLocationConverter.absoluteLocationFromChain(pointOfView)
         val assetAbsoluteLocation = location.absoluteLocationViewingFrom(povLocation)
 
         return findAssetFromReserveLocation(assetAbsoluteLocation, pointOfView)
@@ -48,30 +47,19 @@ class RealChainAssetLocationConverter(
     }
 
     override suspend fun relativeLocationFromChainAsset(chainAsset: Chain.Asset): RelativeMultiLocation? {
-        val chainLocation = chainLocationConverter.absoluteLocationFromChain(chainAsset.chainId)
+        val chain = chainRegistry.getChain(chainAsset.chainId)
+        val chainLocation = chainLocationConverter.absoluteLocationFromChain(chain)
         val absoluteAssetLocation = absoluteLocationFromChainAsset(chainAsset)
         return absoluteAssetLocation?.fromPointOfViewOf(chainLocation)
     }
 
-    private suspend fun findAssetFromReserveLocation(
+    private fun findAssetFromReserveLocation(
         reserveLocation: AbsoluteMultiLocation,
         povChain: Chain,
     ): Chain.Asset? {
         val allMatchingReserves = reserveIdsByLocation[reserveLocation] ?: return null
 
-        val povConsensusRoot = chainLocationConverter.getConsensusRoot(povChain)
-
-        // Resolve cross-consensus symbol collisions
-        // E.g. when searching for KSM reserve we need to make make we don't process PAH which has KSM since
-        // "use first reserve that has matching asset by symbol" logic breaks in such case
-        // Long term solution would be to use proper cross-consensus absolute locations, like "GlobalConsensus(Kusama)" for KSM
-        val reservesInCurrentConsensus = allMatchingReserves.filter {
-            val reserveChain = chainRegistry.getChainOrNull(it.reserveAssetId.chainId) ?: return@filter false
-            val reserveConsensusRoot = chainLocationConverter.getConsensusRoot(reserveChain)
-            reserveConsensusRoot.id == povConsensusRoot.id
-        }
-
-        return reservesInCurrentConsensus.tryFindNonNull { matchingReserve ->
+        return allMatchingReserves.tryFindNonNull { matchingReserve ->
             // We are using povChain id here as we interested in reserve override with the given reserveId that
             // happens on povChain
             val overrideKey = matchingReserve.reserveId to povChain.id

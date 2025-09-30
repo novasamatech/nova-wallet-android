@@ -3,11 +3,10 @@ package io.novafoundation.nova.feature_xcm_impl.converter.chain
 import io.novafoundation.nova.feature_xcm_api.config.model.ChainXcmConfig
 import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.Junctions
-import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.GlobalConsensus
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
-import io.novafoundation.nova.feature_xcm_api.multiLocation.asLocation
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -22,7 +21,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
-import java.math.BigInteger
 
 @RunWith(MockitoJUnitRunner::class)
 class RealChainLocationConverterTest {
@@ -107,18 +105,18 @@ class RealChainLocationConverterTest {
 
     @Test
     fun `chainFromAbsoluteLocation should return relaychain when location has no junctions`() = runBlocking {
-        val absoluteLocation = AbsoluteMultiLocation(Interior.Here)
+        val absoluteLocation = AbsoluteMultiLocation(GlobalConsensus(polkadotId))
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation)
 
         assertEquals(polkadot, result)
     }
 
     @Test
     fun `chainFromAbsoluteLocation should return parachain when location has parachain junction`() = runBlocking {
-        val absoluteLocation = AbsoluteMultiLocation(ParachainId(paraId))
+        val absoluteLocation = AbsoluteMultiLocation(GlobalConsensus(polkadotId), ParachainId(paraId))
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation)
 
         assertEquals(pah, result)
     }
@@ -126,45 +124,34 @@ class RealChainLocationConverterTest {
     @Test
     fun `chainFromAbsoluteLocation should return null when parachain not found`() = runBlocking {
         val unknownParaId = 9999
-        val absoluteLocation = AbsoluteMultiLocation(ParachainId(unknownParaId))
+        val absoluteLocation = AbsoluteMultiLocation(GlobalConsensus(polkadotId), ParachainId(unknownParaId))
 
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
-
-        assertNull(result)
-    }
-
-    @Test
-    fun `chainFromAbsoluteLocation should return null when location has multiple junctions`() = runBlocking {
-        val absoluteLocation = AbsoluteMultiLocation(ParachainId(paraId), ParachainId(2000))
-
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation)
 
         assertNull(result)
     }
 
     @Test
-    fun `chainFromAbsoluteLocation should return null when junction is not ParachainId`() = runBlocking {
-        val absoluteLocation = AbsoluteMultiLocation(MultiLocation.Junction.GeneralIndex(BigInteger.ZERO))
-
-        val result = converter.chainFromAbsoluteLocation(absoluteLocation, polkadot)
-
+    fun `chainFromAbsoluteLocation should return null when global consensus is missing`() = runBlocking {
+        val absoluteLocation = AbsoluteMultiLocation(ParachainId(paraId))
+        val result = converter.chainFromAbsoluteLocation(absoluteLocation)
         assertNull(result)
     }
 
     @Test
-    fun `absoluteLocationFromChain should return Here location for relaychain`() = runBlocking {
-        val expected = Interior.Here.asLocation()
+    fun `absoluteLocationFromChain should return global consensus for relay`() = runBlocking {
+        val expected = AbsoluteMultiLocation(GlobalConsensus(polkadotId))
 
-        val result = converter.absoluteLocationFromChain(polkadotId)
+        val result = converter.absoluteLocationFromChain(polkadot)
 
         assertEquals(expected, result)
     }
 
     @Test
     fun `absoluteLocationFromChain should return parachain location for parachain`() = runBlocking {
-        val expected = AbsoluteMultiLocation(ParachainId(paraId))
+        val expected = AbsoluteMultiLocation(GlobalConsensus(polkadotId), ParachainId(paraId))
 
-        val result = converter.absoluteLocationFromChain(pahId)
+        val result = converter.absoluteLocationFromChain(pah)
 
         assertEquals(expected, result)
     }

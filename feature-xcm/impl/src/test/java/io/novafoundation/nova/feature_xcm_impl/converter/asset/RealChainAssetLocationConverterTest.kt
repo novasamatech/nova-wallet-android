@@ -8,17 +8,15 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocatio
 import io.novafoundation.nova.feature_xcm_api.multiLocation.Junctions
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.GeneralIndex
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.GlobalConsensus
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.PalletInstance
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction.ParachainId
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.ext.Geneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.whenever
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -80,15 +78,18 @@ class RealChainAssetLocationConverterTest {
     private val dotOnKusamaId = 23
 
 
-    // Locations
-    private val dotLocation = AbsoluteMultiLocation(Interior.Here)
+    // Chain locations
 
-    private val polkadotLocation = AbsoluteMultiLocation(Interior.Here)
-    private val pahLocation = AbsoluteMultiLocation(ParachainId(1000))
+    private val polkadotLocation = AbsoluteMultiLocation(GlobalConsensus(polkadotChainId))
+    private val pahLocation = AbsoluteMultiLocation(GlobalConsensus(polkadotChainId), ParachainId(1000))
+    private val kusamaLocation = AbsoluteMultiLocation(GlobalConsensus(kusamaChainId))
 
-    private val kusamaLocation = AbsoluteMultiLocation(Interior.Here)
+    // Token Locations
+
+    private val dotLocation = AbsoluteMultiLocation(GlobalConsensus(polkadotChainId))
 
     private val usdcLocation = AbsoluteMultiLocation(
+        GlobalConsensus(polkadotChainId),
         ParachainId(1000),
         PalletInstance(BigInteger.valueOf(50)),
         GeneralIndex(BigInteger.valueOf(1337))
@@ -209,7 +210,7 @@ class RealChainAssetLocationConverterTest {
         assertEquals(expectedRelativeLocation, result)
     }
 
-    private fun setupChains() {
+    private suspend fun setupChains() {
         setupChain(
             chain = polkadot,
             chainId = polkadotChainId,
@@ -232,12 +233,6 @@ class RealChainAssetLocationConverterTest {
                 dotOnKusamaId to dotOnKusama
             ),
         )
-
-        whenever(chainRegistry.chainsById).thenAnswer { flowOf(allChainsById()) }
-    }
-
-    private fun allChainsById(): Map<ChainId, Chain> {
-        return listOf(polkadot, pah, kusama).associateBy { it.id }
     }
 
     private fun setupAssets() {
@@ -248,9 +243,10 @@ class RealChainAssetLocationConverterTest {
         setupAsset(dotOnKusama, kusamaChainId, dotOnKusamaId, "DOT")
     }
 
-    private fun setupChain(chain: Chain, chainId: String, assets: Map<Int, Chain.Asset>) {
+    private suspend fun setupChain(chain: Chain, chainId: String, assets: Map<Int, Chain.Asset>) {
         whenever(chain.id).thenReturn(chainId)
         whenever(chain.assetsById).thenReturn(assets)
+        whenever(chainRegistry.getChain(chainId)).thenReturn(chain)
     }
 
     private fun setupAsset(asset: Chain.Asset, chainId: String, assetId: Int, symbol: String) {
@@ -260,18 +256,9 @@ class RealChainAssetLocationConverterTest {
     }
 
     private suspend fun setupChainLocationConverter() {
-        whenever(chainLocationConverter.absoluteLocationFromChain(polkadotChainId)).thenReturn(polkadotLocation)
-        whenever(chainLocationConverter.absoluteLocationFromChain(pahChainId)).thenReturn(pahLocation)
-        whenever(chainLocationConverter.absoluteLocationFromChain(kusamaChainId)).thenReturn(kusamaLocation)
-        whenever(chainLocationConverter.getConsensusRoot(any())).thenAnswer {
-            val chain = it.arguments[0] as Chain
-
-            when (chain.id) {
-                in listOf(polkadotChainId, pahChainId) -> polkadot
-                kusamaChainId -> kusama
-                else -> error("Unsupported chain for getConsensusRoot mock")
-            }
-        }
+        whenever(chainLocationConverter.absoluteLocationFromChain(polkadot)).thenReturn(polkadotLocation)
+        whenever(chainLocationConverter.absoluteLocationFromChain(pah)).thenReturn(pahLocation)
+        whenever(chainLocationConverter.absoluteLocationFromChain(kusama)).thenReturn(kusamaLocation)
     }
 
     private fun setupAssetSearchBySymbol() {

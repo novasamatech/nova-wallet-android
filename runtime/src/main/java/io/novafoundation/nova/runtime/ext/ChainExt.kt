@@ -120,6 +120,10 @@ fun Chain.evmChainIdOrNull(): BigInteger? {
     }
 }
 
+fun createEvmChainId(evmChainId: Int): String {
+    return "${EIP_155_PREFIX}:${evmChainId}"
+}
+
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
 
 fun List<Chain.Swap>.assetConversionSupported(): Boolean {

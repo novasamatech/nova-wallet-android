@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynami
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy.LegacyCrossChainTransfersConfigRemote
 import io.novafoundation.nova.feature_xcm_api.config.XcmConfigRepository
 import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +37,7 @@ class RealCrossChainTransfersRepository @Inject constructor(
     private val gson: Gson,
     private val xcmConfigRepository: XcmConfigRepository,
     private val locationConverterFactory: LocationConverterFactory,
+    private val chainRegistry: ChainRegistry,
 ) : CrossChainTransfersRepository {
 
     override suspend fun syncConfiguration() = withContext(Dispatchers.IO) {
@@ -83,7 +85,8 @@ class RealCrossChainTransfersRepository @Inject constructor(
         return xcmConfigRepository.xcmConfigFlow().map { xcmGeneralConfig ->
             TokenReserveRegistry(
                 xcmConfig = xcmGeneralConfig.assets,
-                chainLocationConverter = locationConverterFactory.createChainConverter()
+                chainLocationConverter = locationConverterFactory.createChainConverter(),
+                chainRegistry = chainRegistry
             )
         }
     }

@@ -52,7 +52,10 @@ abstract class MultiLocation(
 
         data class AccountId32(val accountId: AccountIdKey) : Junction()
 
-        data class GlobalConsensus(val networkId: NetworkId) : Junction()
+        data class GlobalConsensus(val networkId: NetworkId) : Junction() {
+
+            constructor(genesisHash: String): this(NetworkId.Substrate(genesisHash))
+        }
 
         object Unsupported : Junction()
     }

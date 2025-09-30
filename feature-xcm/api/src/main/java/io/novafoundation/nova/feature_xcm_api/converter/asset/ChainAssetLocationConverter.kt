@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocatio
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
+// TODO actually support GlobalConsensus junctions and move to V9
 interface ChainAssetLocationConverter {
 
     /**
