@@ -89,6 +89,8 @@ import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpReceiverApi
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
+import io.novafoundation.nova.common.utils.network.RealDeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -489,5 +491,11 @@ class CommonModule {
     ): GlobalConfigDataSource {
         val api = networkApiCreator.create(GlobalConfigApi::class.java)
         return RealGlobalConfigDataSource(api)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideDeviceNetworkManager(context: Context): DeviceNetworkStateObserver {
+        return RealDeviceNetworkStateObserver(context)
     }
 }

@@ -1,0 +1,22 @@
+apply plugin: 'kotlin-parcelize'
+
+android {
+    namespace 'io.novafoundation.nova.feature_ahm_api'
+}
+
+dependencies {
+    implementation coroutinesDep
+    implementation project(":common")
+    implementation project(':runtime')
+    implementation project(":feature-deep-linking")
+
+    implementation cardViewDep
+    implementation recyclerViewDep
+    implementation materialDep
+    implementation androidDep
+
+    implementation shimmerDep
+
+    implementation daggerDep
+    ksp daggerCompiler
+}

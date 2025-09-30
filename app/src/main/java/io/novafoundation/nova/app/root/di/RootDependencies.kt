@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
@@ -27,6 +28,10 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigrationDeepLinks
+import io.novafoundation.nova.feature_ahm_api.data.repository.ChainMigrationRepository
+import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepository
+import io.novafoundation.nova.feature_ahm_api.di.deeplinks.ChainMigrationDeepLinks
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationDetailsSelectToShowUseCase
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
@@ -71,6 +76,8 @@ interface RootDependencies {
     val buyDeepLinks: BuyDeepLinks
 
     val assetDeepLinks: AssetDeepLinks
+
+    val chainMigrationDeepLinks: ChainMigrationDeepLinks
 
     val walletConnectDeepLinks: WalletConnectDeepLinks
 
@@ -124,6 +131,10 @@ interface RootDependencies {
 
     val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
 
+    val chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase
+
+    val deviceNetworkStateObserver: DeviceNetworkStateObserver
+
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
     fun contributionsInteractor(): ContributionsInteractor
@@ -171,4 +182,8 @@ interface RootDependencies {
     fun toastMessageManager(): ToastMessageManager
 
     fun dialogMessageManager(): DialogMessageManager
+
+    fun chainMigrationRepository(): ChainMigrationRepository
+
+    fun migrationInfoRepository(): MigrationInfoRepository
 }

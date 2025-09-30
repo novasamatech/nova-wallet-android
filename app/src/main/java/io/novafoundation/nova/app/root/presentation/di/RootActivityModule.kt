@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.sequrity.SafeModeService
 import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -63,7 +64,8 @@ class RootActivityModule {
         actionBottomSheetLauncher: ActionBottomSheetLauncher,
         toastMessageManager: ToastMessageManager,
         dialogMessageManager: DialogMessageManager,
-        multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
+        multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
+        deviceNetworkStateObserver: DeviceNetworkStateObserver
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -86,7 +88,8 @@ class RootActivityModule {
             actionBottomSheetLauncher,
             toastMessageManager,
             dialogMessageManager,
-            multisigPushNotificationsAlertMixinFactory
+            multisigPushNotificationsAlertMixinFactory,
+            deviceNetworkStateObserver
         )
     }
 

@@ -115,6 +115,17 @@
                         android:paddingBottom="16dp"
                         tools:context=".presentation.balance.list.BalanceListFragment">
 
+                        <io.novafoundation.nova.common.view.AlertView
+                            android:id="@+id/balanceDetailsMigrationAlert"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            app:alertMode="info"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
+
                         <io.novafoundation.nova.feature_assets.presentation.balance.detail.AssetDetailBalancesView
                             android:id="@+id/balanceDetailsBalances"
                             android:layout_width="0dp"
@@ -124,7 +135,7 @@
                             android:layout_marginEnd="16dp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintTop_toBottomOf="@+id/balanceDetailsMigrationAlert"
                             app:title="@string/wallet_your_balance" />
 
                         <io.novafoundation.nova.feature_assets.presentation.balance.assetActions.AssetActionsView

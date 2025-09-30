@@ -12,6 +12,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
@@ -70,6 +71,7 @@ class RootFeatureHolder @Inject constructor(
             .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .accountMigrationFeatureApi(getFeature(AccountMigrationFeatureApi::class.java))
             .multisigOperationsFeatureApi(getFeature(MultisigOperationsFeatureApi::class.java))
+            .chainMigrationFeatureApi(getFeature(ChainMigrationFeatureApi::class.java))
             .build()
 
         return DaggerRootComponent.factory()

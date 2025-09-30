@@ -1,0 +1,47 @@
+apply plugin: 'kotlin-parcelize'
+
+android {
+    namespace 'io.novafoundation.nova.feature_ahm_impl'
+
+    defaultConfig {
+        buildConfigField "String", "AHM_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/migrations/asset_hub/migrations_dev.json\""
+    }
+
+    buildTypes {
+        debug {
+
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            buildConfigField "String", "AHM_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/migrations/asset_hub/migrations.json\""
+        }
+    }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/NOTICE.md")
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation coroutinesDep
+    implementation project(":common")
+    implementation project(':core-db')
+    implementation project(':runtime')
+    implementation project(":feature-ahm-api")
+    implementation project(":feature-banners-api")
+    implementation project(":feature-deep-linking")
+
+    implementation cardViewDep
+    implementation materialDep
+    implementation androidDep
+
+    implementation daggerDep
+    ksp daggerCompiler
+
+    testImplementation project(':test-shared')
+}

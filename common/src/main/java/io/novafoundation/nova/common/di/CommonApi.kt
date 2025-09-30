@@ -60,6 +60,7 @@ import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.location.LocationManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -137,6 +138,8 @@ interface CommonApi {
     val ipAddressReceiver: IpAddressReceiver
 
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
+
+    val deviceNetworkStateObserver: DeviceNetworkStateObserver
 
     fun copyTextMixin(): CopyTextLauncher.Presentation
 

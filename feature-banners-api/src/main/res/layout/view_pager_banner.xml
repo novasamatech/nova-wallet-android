@@ -27,6 +27,39 @@
 
     </com.google.android.material.card.MaterialCardView>
 
+    <LinearLayout
+        android:id="@+id/pagerBannerShimmering"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@drawable/bg_block_12"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:layout_editor_absoluteX="16dp"
+        tools:visibility="visible">
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="168dp"
+            android:layout_height="14dp"
+            android:background="@drawable/bg_shimmering" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="125dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_shimmering" />
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:layout_width="89dp"
+            android:layout_height="8dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_shimmering" />
+
+    </LinearLayout>
+
     <FrameLayout
         android:id="@+id/pagerBannerContent"
         android:layout_width="0dp"
