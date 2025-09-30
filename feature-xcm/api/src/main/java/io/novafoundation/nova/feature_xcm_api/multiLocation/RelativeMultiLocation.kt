@@ -18,6 +18,10 @@ data class RelativeMultiLocation(
         return toEncodableInstanceExt(xcmVersion)
     }
 
+    override fun toString(): String {
+        return "{ parents: $parents, interior: $interior }"
+    }
+
     /**
      * Restore an absolute location using this relative location and a given POV.
      *
