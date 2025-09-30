@@ -23,7 +23,7 @@ class ChainMigrationDetailsInteractor(
     }
 
     suspend fun getChainMigrationConfig(chainId: String): ChainMigrationConfig? {
-        return migrationInfoRepository.getConfigBySource(chainId)
+        return migrationInfoRepository.getConfigByOriginChain(chainId)
     }
 
     suspend fun markMigrationInfoAlreadyShown(chainId: String) {

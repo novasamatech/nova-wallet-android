@@ -14,7 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
-import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
@@ -106,7 +106,7 @@ class BalanceDetailModule {
         chartsInteractor: ChartsInteractor,
         buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
         amountFormatter: AmountFormatter,
-        assetMigrationUseCase: AssetMigrationUseCase
+        chainMigrationInfoUseCase: ChainMigrationInfoUseCase
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -125,7 +125,7 @@ class BalanceDetailModule {
             chartsInteractor = chartsInteractor,
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             amountFormatter = amountFormatter,
-            assetMigrationUseCase = assetMigrationUseCase
+            chainMigrationInfoUseCase = chainMigrationInfoUseCase
         )
     }
 

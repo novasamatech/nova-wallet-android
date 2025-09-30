@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_ahm_api.domain
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfigWithChains
 import kotlinx.coroutines.flow.Flow
 
-interface ChainMigrationConfigUseCase {
+interface ChainMigrationInfoUseCase {
 
     fun observeMigrationConfigOrNull(chainId: String, assetId: Int): Flow<ChainMigrationConfigWithChains?>
 

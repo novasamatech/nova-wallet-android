@@ -94,7 +94,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
-import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -245,7 +245,7 @@ interface AssetsFeatureDependencies {
 
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
-    val assetMigrationUseCase: AssetMigrationUseCase
+    val chainMigrationInfoUseCase: ChainMigrationInfoUseCase
 
     fun web3NamesInteractor(): Web3NamesInteractor
 

@@ -3,21 +3,21 @@ package io.novafoundation.nova.feature_ahm_impl.domain
 import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepository
-import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationConfigUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfigWithChains
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
-class RealChainMigrationConfigUseCase(
+class RealChainMigrationInfoUseCase(
     private val migrationInfoRepository: MigrationInfoRepository,
     private val toggleFeatureRepository: ToggleFeatureRepository,
     private val chainRegistry: ChainRegistry
-) : ChainMigrationConfigUseCase {
+) : ChainMigrationInfoUseCase {
 
     override fun observeMigrationConfigOrNull(chainId: String, assetId: Int): Flow<ChainMigrationConfigWithChains?> = flowOfAll {
-        val config = migrationInfoRepository.getConfigBySource(chainId)
-            ?: migrationInfoRepository.getConfigByDestination(chainId)
+        val config = migrationInfoRepository.getConfigByOriginChain(chainId)
+            ?: migrationInfoRepository.getConfigByDestinationChain(chainId)
             ?: return@flowOfAll emptyFlow()
 
         chainRegistry.observeMigrationConfigWithChains(config)

@@ -15,11 +15,11 @@ class RealMigrationInfoRepository(
         configResponse.map { it.toDomain() }
     }
 
-    override suspend fun getConfigBySource(chainId: String): ChainMigrationConfig? {
+    override suspend fun getConfigByOriginChain(chainId: String): ChainMigrationConfig? {
         return getConfigsInternal().getOrNull()?.firstOrNull { it.sourceData.chainId == chainId }
     }
 
-    override suspend fun getConfigByDestination(chainId: String): ChainMigrationConfig? {
+    override suspend fun getConfigByDestinationChain(chainId: String): ChainMigrationConfig? {
         return getConfigsInternal().getOrNull()?.firstOrNull { it.destinationData.chainId == chainId }
     }
 

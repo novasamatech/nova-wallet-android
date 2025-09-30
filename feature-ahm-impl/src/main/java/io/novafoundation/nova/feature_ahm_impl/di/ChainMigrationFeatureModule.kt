@@ -14,11 +14,9 @@ import io.novafoundation.nova.feature_ahm_impl.data.config.ChainMigrationConfigA
 import io.novafoundation.nova.feature_ahm_impl.data.repository.RealChainMigrationRepository
 import io.novafoundation.nova.feature_ahm_impl.data.repository.RealMigrationInfoRepository
 import io.novafoundation.nova.feature_ahm_impl.di.modules.DeepLinkModule
-import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
-import io.novafoundation.nova.feature_ahm_api.domain.StakingMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_ahm_impl.domain.ChainMigrationDetailsInteractor
-import io.novafoundation.nova.feature_ahm_impl.domain.RealAssetMigrationUseCase
-import io.novafoundation.nova.feature_ahm_impl.domain.RealStakingMigrationUseCase
+import io.novafoundation.nova.feature_ahm_impl.domain.RealChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_ahm_impl.domain.RealChainMigrationDetailsSelectToShowUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -76,22 +74,8 @@ class ChainMigrationFeatureModule {
         migrationInfoRepository: MigrationInfoRepository,
         toggleFeatureRepository: ToggleFeatureRepository,
         chainRegistry: ChainRegistry
-    ): AssetMigrationUseCase {
-        return RealAssetMigrationUseCase(
-            migrationInfoRepository,
-            toggleFeatureRepository,
-            chainRegistry
-        )
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideStakingMigrationUseCase(
-        migrationInfoRepository: MigrationInfoRepository,
-        toggleFeatureRepository: ToggleFeatureRepository,
-        chainRegistry: ChainRegistry
-    ): StakingMigrationUseCase {
-        return RealStakingMigrationUseCase(
+    ): ChainMigrationInfoUseCase {
+        return RealChainMigrationInfoUseCase(
             migrationInfoRepository,
             toggleFeatureRepository,
             chainRegistry

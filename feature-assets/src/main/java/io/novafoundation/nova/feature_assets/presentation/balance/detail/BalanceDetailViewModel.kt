@@ -17,7 +17,7 @@ import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
-import io.novafoundation.nova.feature_ahm_api.domain.AssetMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
 import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_assets.R
@@ -75,6 +75,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
+private const val ORIGIN_MIGRATION_ALERT = "ORIGIN_MIGRATION_ALERT"
+
 class BalanceDetailViewModel(
     private val walletInteractor: WalletInteractor,
     private val balanceLocksInteractor: BalanceLocksInteractor,
@@ -92,7 +94,7 @@ class BalanceDetailViewModel(
     private val chartsInteractor: ChartsInteractor,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val amountFormatter: AmountFormatter,
-    private val assetMigrationUseCase: AssetMigrationUseCase
+    private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase
 ) : BaseViewModel(), TransactionHistoryUi by transactionHistoryMixin, Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -125,7 +127,7 @@ class BalanceDetailViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    private val migrationConfigFlow = assetMigrationUseCase.observeMigrationConfigOrNull(assetPayload.chainId, assetPayload.chainAssetId)
+    private val migrationConfigFlow = chainMigrationInfoUseCase.observeMigrationConfigOrNull(assetPayload.chainId, assetPayload.chainAssetId)
         .shareInBackground()
 
     val assetDetailsModel = combine(assetFlow, externalBalancesFlow) { asset, externalBalances ->
@@ -180,10 +182,10 @@ class BalanceDetailViewModel(
 
     private val dateFormatter = getChainMigrationDateFormat()
 
-    val sourceMigrationAlertFlow = combine(
+    val originMigrationAlertFlow = combine(
         migrationConfigFlow,
         chainFlow,
-        assetMigrationUseCase.observeSourceShouldBeHidden(assetPayload.chainId, assetPayload.chainAssetId)
+        chainMigrationInfoUseCase.observeInfoShouldBeHidden(ORIGIN_MIGRATION_ALERT, assetPayload.chainId, assetPayload.chainAssetId)
     ) { configWithChains, chain, shouldBeHidden ->
         if (shouldBeHidden) return@combine null
         if (configWithChains == null) return@combine null
@@ -205,7 +207,7 @@ class BalanceDetailViewModel(
             linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreMigrationClicked(config) },
             buttonAction = AlertModel.ActionModel(
                 resourceManager.getString(R.string.asset_details_source_asset_alert_button, destinationChain.name),
-                { openAssetDetails(configWithChains.config.destinationData) }
+                { openAssetDetails(chainData = configWithChains.config.destinationData) }
             )
         )
     }.shareInBackground()
@@ -218,7 +220,7 @@ class BalanceDetailViewModel(
         val sourceChain = configWithChains.sourceChain
         TransactionHistoryBannerModel(
             resourceManager.getString(R.string.transaction_history_migration_source_message, sourceAsset.symbol.value, sourceChain.name),
-            { openAssetDetails(configWithChains.config.sourceData) }
+            { openAssetDetails(chainData = configWithChains.config.sourceData) }
         )
     }.shareInBackground()
 
@@ -299,7 +301,7 @@ class BalanceDetailViewModel(
     }
 
     fun closeMigrationAlert() {
-        assetMigrationUseCase.markRelayMigrationInfoAsHidden(assetPayload.chainId, assetPayload.chainAssetId)
+        chainMigrationInfoUseCase.markMigrationInfoAsHidden(ORIGIN_MIGRATION_ALERT, assetPayload.chainId, assetPayload.chainAssetId)
     }
 
     private fun checkControllableAsset(action: () -> Unit) {

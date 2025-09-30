@@ -12,7 +12,7 @@ import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_ahm_api.domain.StakingMigrationUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
 import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_staking_impl.R
@@ -35,6 +35,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
+private const val STAKING_MIGRATION_INFO = "STAKING_MIGRATION_INFO"
+
 class StakingViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
 
@@ -53,7 +55,7 @@ class StakingViewModel(
     private val stakingSharedState: StakingSharedState,
     private val resourceManager: ResourceManager,
     private val externalActionsMixin: ExternalActions.Presentation,
-    private val stakingMigrationUseCase: StakingMigrationUseCase,
+    private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
     stakingUpdateSystem: UpdateSystem,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -94,8 +96,8 @@ class StakingViewModel(
     val migrationAlertFlow = selectedAssetFlow.flatMapLatest {
         val chainAsset = it.token.configuration
         combine(
-            stakingMigrationUseCase.observeMigrationConfigOrNull(chainAsset.chainId, chainAsset.id),
-            stakingMigrationUseCase.observeAlertShouldBeHidden(chainAsset.chainId, chainAsset.id)
+            chainMigrationInfoUseCase.observeMigrationConfigOrNull(chainAsset.chainId, chainAsset.id),
+            chainMigrationInfoUseCase.observeInfoShouldBeHidden(STAKING_MIGRATION_INFO, chainAsset.chainId, chainAsset.id)
         ) { configWithChains, shouldBeHidden ->
             if (shouldBeHidden) return@combine null
             if (configWithChains == null) return@combine null
@@ -119,7 +121,7 @@ class StakingViewModel(
     fun closeMigrationAlert() {
         launch {
             val chainAsset = selectedAssetFlow.first().token.configuration
-            stakingMigrationUseCase.markMigrationInfoAsHidden(chainAsset.chainId, chainAsset.id)
+            chainMigrationInfoUseCase.markMigrationInfoAsHidden(STAKING_MIGRATION_INFO, chainAsset.chainId, chainAsset.id)
         }
     }
 
