@@ -2,8 +2,7 @@ name: Run balances tests
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 */8 * * *'
+  pull_request:
 
 jobs:
   build-app:
@@ -20,6 +19,14 @@ jobs:
     needs: [build-app]
     runs-on: macos-13
     steps:
+      - name: Free up disk space
+        run: |
+          sudo rm -rf /Applications/Xcode_*.app
+          sudo rm -rf /Library/Developer/CoreSimulator/Profiles/Runtimes/*
+          sudo rm -rf ~/Library/Developer/Xcode/DerivedData/*
+          sudo rm -rf ~/Library/Caches/*
+          sudo du -h -d 1 / | sort -hr | head -n 40
+
       - uses: actions/checkout@v4
 
       - name: Download built artifact
