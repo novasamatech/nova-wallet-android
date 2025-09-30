@@ -8,15 +8,15 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.feature_ahm_api.data.repository.ChainMigrationRepository
 import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepository
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationDetailsSelectToShowUseCase
 import io.novafoundation.nova.feature_ahm_impl.data.config.ChainMigrationConfigApi
 import io.novafoundation.nova.feature_ahm_impl.data.repository.RealChainMigrationRepository
 import io.novafoundation.nova.feature_ahm_impl.data.repository.RealMigrationInfoRepository
 import io.novafoundation.nova.feature_ahm_impl.di.modules.DeepLinkModule
 import io.novafoundation.nova.feature_ahm_impl.domain.ChainMigrationDetailsInteractor
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
+import io.novafoundation.nova.feature_ahm_impl.domain.RealChainMigrationDetailsSelectToShowUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import javax.inject.Named
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module(
     includes = [DeepLinkModule::class]
@@ -36,14 +36,10 @@ class ChainMigrationFeatureModule {
     fun provideChainMigrationRepository(
         assetDao: AssetDao,
         preferences: Preferences,
-        chainRegistry: ChainRegistry,
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
     ): ChainMigrationRepository {
         return RealChainMigrationRepository(
             assetDao,
-            preferences,
-            chainRegistry,
-            remoteStorageSource
+            preferences
         )
     }
 
@@ -66,6 +62,20 @@ class ChainMigrationFeatureModule {
             chainRegistry,
             chainMigrationRepository,
             migrationInfoRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideChainMigrationDetailsSelectToShowUseCase(
+        chainMigrationRepository: ChainMigrationRepository,
+        migrationInfoRepository: MigrationInfoRepository,
+        chainStateRepository: ChainStateRepository
+    ): ChainMigrationDetailsSelectToShowUseCase {
+        return RealChainMigrationDetailsSelectToShowUseCase(
+            migrationInfoRepository,
+            chainMigrationRepository,
+            chainStateRepository
         )
     }
 }
