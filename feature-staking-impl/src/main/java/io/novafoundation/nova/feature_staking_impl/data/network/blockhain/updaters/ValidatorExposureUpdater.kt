@@ -161,14 +161,14 @@ class ValidatorExposureUpdater(
     }
 
     private fun ExposureState.shouldTrySyncingPagedExposures(): Boolean {
-        return when(this) {
+        return when (this) {
             ExposureState.CERTAIN_PAGED, ExposureState.UNCERTAIN -> true
             ExposureState.CERTAIN_LEGACY -> false
         }
     }
 
     private fun ExposureState.shouldTrySyncingLegacyExposures(): Boolean {
-        return when(this) {
+        return when (this) {
             ExposureState.CERTAIN_LEGACY, ExposureState.UNCERTAIN -> true
             ExposureState.CERTAIN_PAGED -> false
         }
@@ -205,7 +205,7 @@ class ValidatorExposureUpdater(
     }
 
     private suspend fun saveIsExposuresUsedFlag(state: ExposureState, chainId: String) {
-        val isUsed = when(state) {
+        val isUsed = when (state) {
             ExposureState.CERTAIN_PAGED -> true
             ExposureState.CERTAIN_LEGACY -> false
             ExposureState.UNCERTAIN -> return

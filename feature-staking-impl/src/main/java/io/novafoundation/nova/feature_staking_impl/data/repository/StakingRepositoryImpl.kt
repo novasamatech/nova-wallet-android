@@ -61,6 +61,7 @@ import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
+import io.novafoundation.nova.runtime.storage.source.query.api.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.api.queryNonNull
 import io.novafoundation.nova.runtime.storage.source.queryCatching
 import io.novafoundation.nova.runtime.storage.source.queryNonNull
@@ -74,8 +75,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
 
@@ -100,7 +103,14 @@ class StakingRepositoryImpl(
 
     context(StorageQueryContext)
     private suspend fun eraStartSessionIndexNew(eraIndex: EraIndex): EraIndex? {
-        return metadata.staking.bondedErasOrNull?.query()?.findStartSessionIndexOf(eraIndex)
+        val storage = metadata.staking.bondedErasOrNull ?: return null
+
+        // We are waiting for present value since we expect the value to be always present for the active era
+        // But the first returned value might be a outdated bit delayed because of outdated cache
+        return storage.observeNonNull()
+            .map { it.findStartSessionIndexOf(eraIndex) }
+            .filterNotNull()
+            .first()
     }
 
     context(StorageQueryContext)
