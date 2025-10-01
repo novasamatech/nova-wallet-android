@@ -186,11 +186,13 @@ class BalanceDetailViewModel(
     val originMigrationAlertFlow = combine(
         migrationConfigFlow,
         chainFlow,
+        selectedAccountFlow,
         chainMigrationInfoUseCase.observeInfoShouldBeHidden(ORIGIN_MIGRATION_ALERT, assetPayload.chainId, assetPayload.chainAssetId)
-    ) { configWithChains, chain, shouldBeHidden ->
+    ) { configWithChains, chain, metaAccount, shouldBeHidden ->
         if (shouldBeHidden) return@combine null
         if (configWithChains == null) return@combine null
         if (configWithChains.originAsset.notMatchWithBalanceAsset()) return@combine null
+        if (!metaAccount.hasAccountIn(configWithChains.destinationChain)) return@combine null
 
         val config = configWithChains.config
         val sourceAsset = configWithChains.originAsset
@@ -213,9 +215,14 @@ class BalanceDetailViewModel(
         )
     }.shareInBackground()
 
-    val destinationMigrationBannerFlow = combine(migrationConfigFlow, chainFlow) { configWithChains, chain ->
+    val destinationMigrationBannerFlow = combine(
+        migrationConfigFlow,
+        chainFlow,
+        selectedAccountFlow,
+    ) { configWithChains, chain, metaAccount ->
         if (configWithChains == null) return@combine null
         if (configWithChains.destinationAsset.notMatchWithBalanceAsset()) return@combine null
+        if (!metaAccount.hasAccountIn(configWithChains.originChain)) return@combine null
 
         val sourceAsset = configWithChains.originAsset
         val sourceChain = configWithChains.originChain
