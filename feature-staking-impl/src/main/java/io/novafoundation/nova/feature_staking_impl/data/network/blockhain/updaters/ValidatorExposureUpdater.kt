@@ -10,10 +10,10 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater.Companion.STORAGE_KEY_PAGED_EXPOSURES
-import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.scope.ActiveEraScope
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
@@ -126,21 +126,52 @@ class ValidatorExposureUpdater(
     }
 
     private suspend fun syncNewExposures(era: BigInteger, runtimeSnapshot: RuntimeSnapshot, socketService: SocketService, chainId: String) {
-        var pagedExposureUsed = false
+        var pagedExposureState = runtimeSnapshot.detectExposureStateFromPallets()
 
-        if (runtimeSnapshot.pagedExposuresEnabled()) {
-            val pagedExposuresWerePresent = tryFetchingPagedExposures(era, runtimeSnapshot, socketService, chainId)
+        if (pagedExposureState.shouldTrySyncingPagedExposures()) {
+            val pagedExposuresPresent = tryFetchingPagedExposures(era, runtimeSnapshot, socketService, chainId)
 
-            if (!pagedExposuresWerePresent) {
-                fetchLegacyExposures(era, runtimeSnapshot, socketService, chainId)
-            } else {
-                pagedExposureUsed = true
+            if (pagedExposuresPresent) {
+                pagedExposureState = ExposureState.CERTAIN_PAGED
             }
-        } else {
-            fetchLegacyExposures(era, runtimeSnapshot, socketService, chainId)
         }
 
-        saveIsExposuresUsedFlag(pagedExposureUsed, chainId)
+        if (pagedExposureState.shouldTrySyncingLegacyExposures()) {
+            val legacyExposuresPresent = fetchLegacyExposures(era, runtimeSnapshot, socketService, chainId)
+
+            if (legacyExposuresPresent) {
+                pagedExposureState = ExposureState.CERTAIN_LEGACY
+            }
+        }
+
+        saveIsExposuresUsedFlag(pagedExposureState, chainId)
+    }
+
+    private fun RuntimeSnapshot.detectExposureStateFromPallets(): ExposureState {
+        return when {
+            legacyExposuresFullyRemoved() -> ExposureState.CERTAIN_PAGED
+            // Just because paged exposures are enabled does not mean they are actually used yet
+            pagedExposuresEnabled() -> ExposureState.UNCERTAIN
+            else -> ExposureState.CERTAIN_LEGACY
+        }
+    }
+
+    private enum class ExposureState {
+        CERTAIN_PAGED, UNCERTAIN, CERTAIN_LEGACY
+    }
+
+    private fun ExposureState.shouldTrySyncingPagedExposures(): Boolean {
+        return when(this) {
+            ExposureState.CERTAIN_PAGED, ExposureState.UNCERTAIN -> true
+            ExposureState.CERTAIN_LEGACY -> false
+        }
+    }
+
+    private fun ExposureState.shouldTrySyncingLegacyExposures(): Boolean {
+        return when(this) {
+            ExposureState.CERTAIN_LEGACY, ExposureState.UNCERTAIN -> true
+            ExposureState.CERTAIN_PAGED -> false
+        }
     }
 
     private suspend fun tryFetchingPagedExposures(
@@ -148,7 +179,7 @@ class ValidatorExposureUpdater(
         runtimeSnapshot: RuntimeSnapshot,
         socketService: SocketService,
         chainId: String
-    ): Boolean = runCatching {
+    ): Boolean {
         val overviewPrefix = runtimeSnapshot.eraStakersOverviewPrefixFor(era)
         val numberOfKeysSynced = bulkRetriever.fetchPrefixValuesToCache(socketService, overviewPrefix, storageCache, chainId)
 
@@ -159,20 +190,27 @@ class ValidatorExposureUpdater(
             bulkRetriever.fetchPrefixValuesToCache(socketService, pagedExposuresPrefix, storageCache, chainId)
         }
 
-        pagedExposuresPresent
-    }.getOrDefault(false)
+        return pagedExposuresPresent
+    }
 
     private suspend fun fetchLegacyExposures(
         era: BigInteger,
         runtimeSnapshot: RuntimeSnapshot,
         socketService: SocketService,
         chainId: String
-    ): Result<Unit> = runCatching {
+    ): Boolean {
         val prefix = runtimeSnapshot.eraStakersPrefixFor(era)
-        bulkRetriever.fetchPrefixValuesToCache(socketService, prefix, storageCache, chainId)
+        val keysFetched = bulkRetriever.fetchPrefixValuesToCache(socketService, prefix, storageCache, chainId)
+        return keysFetched > 0
     }
 
-    private suspend fun saveIsExposuresUsedFlag(isUsed: Boolean, chainId: String) {
+    private suspend fun saveIsExposuresUsedFlag(state: ExposureState, chainId: String) {
+        val isUsed = when(state) {
+            ExposureState.CERTAIN_PAGED -> true
+            ExposureState.CERTAIN_LEGACY -> false
+            ExposureState.UNCERTAIN -> return
+        }
+
         val encodedValue = isPagedExposuresValue(isUsed)
         val entry = StorageEntry(STORAGE_KEY_PAGED_EXPOSURES, encodedValue)
 
