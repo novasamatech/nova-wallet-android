@@ -15,7 +15,7 @@
     <string name="chain_migration_details_hint_auto_migration">Migration happens automatically, no action needed</string>
 
     <string name="chain_migration_details_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s</string>
-    <string name="chaim_migration_details_subtitle">What makes Asset Hub awesome?</string>
+    <string name="chain_migration_details_subtitle">What makes Asset Hub awesome?</string>
     <string name="chain_migration_details_minimal_balance">%1$sx reduction in minimal balance\n(from %2$s to %3$s)</string>
     <string name="chain_migration_details_lower_fee">%1$sx lower transaction fees\n(from %2$s to %3$s)</string>
     <string name="chain_migration_details_tokens">More tokens supported: %s, and other ecosystem tokens</string>
