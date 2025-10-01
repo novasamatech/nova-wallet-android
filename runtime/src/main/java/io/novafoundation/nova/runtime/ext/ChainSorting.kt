@@ -4,10 +4,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 val Chain.mainChainsFirstAscendingOrder
     get() = when (genesisHash) {
-        Chain.Geneses.POLKADOT -> 0
-        Chain.Geneses.POLKADOT_ASSET_HUB -> 1
-        Chain.Geneses.KUSAMA -> 2
-        Chain.Geneses.KUSAMA_ASSET_HUB -> 3
+        Chain.Geneses.POLKADOT_ASSET_HUB -> 0
+        Chain.Geneses.KUSAMA_ASSET_HUB -> 1
+        Chain.Geneses.POLKADOT -> 2
+        Chain.Geneses.KUSAMA -> 3
         else -> 4
     }
 
