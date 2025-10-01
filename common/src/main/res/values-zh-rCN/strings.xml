@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">输入合约地址</string>
     <string name="asset_add_token_enter_decimals">输入小数</string>
     <string name="asset_add_token_enter_symbol">输入符号</string>
+    <string name="asset_details_source_asset_alert_button">前往 %s</string>
+    <string name="asset_details_source_asset_alert_message">从 %1$s 开始，您的 %2$s 余额、质押和治理将移至 %3$s — 提升性能，降低成本。</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">您的 %s 代币现已在 %s 上</string>
     <string name="asset_view_networks">网络</string>
     <string name="asset_view_tokens">代币</string>
     <string name="assets_add_token">添加代币</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">购买已启动！请等待最多60分钟。您可以在电子邮件中跟踪状态。</string>
     <string name="buy_token_not_supported_message">当前没有供应商支持购买此代币。请选择其他代币、其他网络或稍后再试。</string>
     <string name="buy_token_not_supported_title">买入功能不支持此代币</string>
+    <string name="chain_migration_details_fee_in_any_tokens">可用任意代币支付费用</string>
+    <string name="chain_migration_details_hint_auto_migration">迁移会自动进行，无需操作</string>
+    <string name="chain_migration_details_hint_history">旧的交易历史仍然保留在 Kusama Relay</string>
+    <string name="chain_migration_details_in_progress_title">从%1$s您的%2$s余额开始，质押和治理在%3$s上。这些功能可能在长达24小时内不可用。</string>
+    <string name="chain_migration_details_lower_fee">%1$sx 交易费率降低（从 %2$s 到 %3$s）</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx 最低余额减少（从 %2$s 到 %3$s）</string>
+    <string name="chain_migration_details_subtitle">是什么让 Asset Hub 如此出色？</string>
+    <string name="chain_migration_details_title">从 %1$s 您的 %2$s 余额开始，质押和治理位于 %3$s</string>
+    <string name="chain_migration_details_tokens">支持更多代币：%s 和其他生态系统代币</string>
+    <string name="chain_migration_details_unified_access">统一访问 %s，资产，质押和治理</string>
     <string name="chain_network_management_auto_balance">自动平衡节点</string>
     <string name="chain_network_management_enabling">启用连接</string>
     <string name="change_cloud_backup_password_subtitle">请输入用于从云备份恢复钱包的密码。此密码将无法在未来恢复，请务必记住！</string>
@@ -551,6 +564,7 @@
     <string name="common_use_max">使用最大值</string>
     <string name="common_validation_invalid_address_message">接收者应该是一个有效的%s地址</string>
     <string name="common_validation_invalid_address_title">无效的接收者</string>
+    <string name="common_view">查看</string>
     <string name="common_waiting">等待中</string>
     <string name="common_wallet">钱包</string>
     <string name="common_warning">警告</string>
@@ -1377,6 +1391,7 @@
     <string name="staking_dashboard_browser_stake_header">通过Nova DApp浏览器质押</string>
     <string name="staking_dashboard_more_options">更多质押选项</string>
     <string name="staking_dashboard_no_stake_header">质押并赚取奖励</string>
+    <string name="staking_details_migration_alert_title">%1$s 质押在 %2$s 上线，始于 %3$s</string>
     <string name="staking_earnings_per_year">预计奖励</string>
     <string name="staking_era_title">时代 #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">预计收益</string>
@@ -1785,6 +1800,7 @@
     <string name="transaction_details_view_polkascan">在Polkascan中查看</string>
     <string name="transaction_details_view_subscan">在Subscan中查看</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s 在 %s</string>
+    <string name="transaction_history_migration_source_message" formatted="false">您之前的 %s 交易历史仍然可以在 %s 上查阅</string>
     <string name="transaction_status_completed">完成</string>
     <string name="transaction_status_failed">失败</string>
     <string name="transaction_status_pending">待定</string>
@@ -1921,7 +1937,6 @@
     <string name="wallet_tokens">代币</string>
     <string name="wallet_transfer_details_send_back">发送给此联系人</string>
     <string name="wallet_transfer_details_title">转账详情</string>
-    <string name="wallet_your_balance">您的余额</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s地址为%s</string>
     <string name="web3names_integrity_check_failed_message">Nova检测到关于%1$s地址信息完整性的问题。请联系%1$s的所有者解决完整性问题。</string>

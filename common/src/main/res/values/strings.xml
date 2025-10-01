@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <!--<string name="wallet_your_balance">Your balance</string>-->
 
     <string name="chain_migration_details_in_progress_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s. These features might be unavailable for up to 24 hours.</string>
     <string name="staking_details_migration_alert_title">%1$s staking is live on %2$s starting %3$s</string>
@@ -12,8 +11,8 @@
     <string name="asset_details_source_asset_alert_message">Starting %1$s, your %2$s balance, Staking, and Governance will be on %3$s — with improved performance and lower costs.</string>
     <string name="asset_details_source_asset_alert_button">Go to %s</string>
 
-    <string name="chaim_migration_details_hint_history">Old transaction history remains on Kusama Relay</string>
-    <string name="chaim_migration_details_hint_auto_migration">Migration happens automatically, no action needed</string>
+    <string name="chain_migration_details_hint_history">Old transaction history remains on Kusama Relay</string>
+    <string name="chain_migration_details_hint_auto_migration">Migration happens automatically, no action needed</string>
 
     <string name="chain_migration_details_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s</string>
     <string name="chaim_migration_details_subtitle">What makes Asset Hub awesome?</string>

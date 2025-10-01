@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">Sözleşme adresi girin</string>
     <string name="asset_add_token_enter_decimals">Ondalık sayısını girin</string>
     <string name="asset_add_token_enter_symbol">Sembol girin</string>
+    <string name="asset_details_source_asset_alert_button">Git %s</string>
+    <string name="asset_details_source_asset_alert_message">%1$s itibariyle, %2$s bakiyeniz, Staking ve Yönetim artık %3$s üzerinde olacak - daha iyi performans ve daha düşük maliyetlerle.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">%s tokenleriniz artık %s üzerinde</string>
     <string name="asset_view_networks">Ağlar</string>
     <string name="asset_view_tokens">Tokenler</string>
     <string name="assets_add_token">Token ekle</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">Satın alma başlatıldı! Lütfen 60 dakikaya kadar bekleyin. Durumu e-postadan takip edebilirsiniz.</string>
     <string name="buy_token_not_supported_message">Şu anda hiçbir sağlayıcımız bu tokenin satın alınmasını desteklemiyor. Lütfen farklı bir token, farklı bir ağ seçin veya daha sonra tekrar kontrol edin.</string>
     <string name="buy_token_not_supported_title">Bu token satın alma özelliği tarafından desteklenmiyor</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Herhangi bir token ile ücret ödeme olanağı</string>
+    <string name="chain_migration_details_hint_auto_migration">Taşınma otomatik gerçekleşir, hiçbir işlem yapmanız gerekmez</string>
+    <string name="chain_migration_details_hint_history">Eski işlem geçmişi Kusama Relay üzerinde kalır</string>
+    <string name="chain_migration_details_in_progress_title">%1$s başlangıç ​​bakiyeniz %2$s ile, Stake Etme ve Yönetişim %3$s üzerinde. Bu özellikler 24 saate kadar kullanılamayabilir.</string>
+    <string name="chain_migration_details_lower_fee">%1$sx daha düşük işlem ücretleri\n(%2$s\'den %3$s\'a)</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx minimum bakiye indirimi\n(%2$s\'den %3$s\'a)</string>
+    <string name="chain_migration_details_subtitle">Asset Hub\'ı harika yapan nedir?</string>
+    <string name="chain_migration_details_title">%1$s ile başlayan bakiyeniz %2$s, Staking etme ve Governance %3$s üzerinde</string>
+    <string name="chain_migration_details_tokens">Daha fazla token destekleniyor: %s, ve diğer ekosistem tokenleri</string>
+    <string name="chain_migration_details_unified_access">Birleşik erişim: %s, varlıklar, staking ve yönetim</string>
     <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>
     <string name="chain_network_management_enabling">Bağlantıyı etkinleştir</string>
     <string name="change_cloud_backup_password_subtitle">Cüzdanlarınızı bulut yedeklemesinden kurtarmak için kullanılacak bir parola girin. Bu parolanın gelecekte kurtarılamayacağını unutmayın, bu nedenle onu hatırladığınızdan emin olun!</string>
@@ -557,6 +570,7 @@
     <string name="common_use_max">Maksimumu Kullan</string>
     <string name="common_validation_invalid_address_message">Alıcı geçerli bir %s adresi olmalıdır</string>
     <string name="common_validation_invalid_address_title">Geçersiz alıcı</string>
+    <string name="common_view">Görüntüle</string>
     <string name="common_waiting">Bekleniyor</string>
     <string name="common_wallet">Cüzdan</string>
     <string name="common_warning">Uyarı</string>
@@ -1386,6 +1400,7 @@
     <string name="staking_dashboard_browser_stake_header">Nova DApp tarayıcısı ile Staking</string>
     <string name="staking_dashboard_more_options">Daha fazla staking seçeneği</string>
     <string name="staking_dashboard_no_stake_header">Stake yapın ve ödüller kazanın</string>
+    <string name="staking_details_migration_alert_title">%1$s staking %2$s itibariyle %3$s üzerinde canlı</string>
     <string name="staking_earnings_per_year">Tahmini ödüller</string>
     <string name="staking_era_title">dönem #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Tahmini kazançlar</string>
@@ -1797,6 +1812,7 @@
     <string name="transaction_details_view_polkascan">Polkascan\'da Görüntüle</string>
     <string name="transaction_details_view_subscan">Subscan\'de Görüntüle</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s, %s tarihinde</string>
+    <string name="transaction_history_migration_source_message" formatted="false">Önceki %s işlem geçmişiniz hâlâ %s üzerinde mevcut</string>
     <string name="transaction_status_completed">Tamamlandı</string>
     <string name="transaction_status_failed">Başarısız</string>
     <string name="transaction_status_pending">Beklemede</string>
@@ -1935,7 +1951,6 @@
     <string name="wallet_tokens">Tokenler</string>
     <string name="wallet_transfer_details_send_back">Bu kişiye gönder</string>
     <string name="wallet_transfer_details_title">Transfer detayları</string>
-    <string name="wallet_your_balance">Bakiyeniz</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s adresleri %s için</string>
     <string name="web3names_integrity_check_failed_message">Nova, %1$s adreslerinin bilgi bütünlüğüyle ilgili sorunları tespit etti. Lütfen bütünlük sorunlarını çözmek için %1$s sahibiyle iletişime geçin.</string>

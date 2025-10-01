@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">コントラクトアドレスを入力</string>
     <string name="asset_add_token_enter_decimals">小数を入力</string>
     <string name="asset_add_token_enter_symbol">シンボルを入力</string>
+    <string name="asset_details_source_asset_alert_button">%sに移動</string>
+    <string name="asset_details_source_asset_alert_message">%1$sより、あなたの%2$s の残高、Staking、およびガバナンスは%3$sで利用可能になります — 性能向上とコスト削減を実現します。</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">あなたの%s トークンが%sで利用可能です</string>
     <string name="asset_view_networks">ネットワーク</string>
     <string name="asset_view_tokens">トークン</string>
     <string name="assets_add_token">トークンを追加</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">購入が開始されました！60分までお待ちください。ステータスはメールで確認できます。</string>
     <string name="buy_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの購入をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
     <string name="buy_token_not_supported_title">このトークンは購入機能でサポートされていません</string>
+    <string name="chain_migration_details_fee_in_any_tokens">任意のトークンで手数料を支払う機能</string>
+    <string name="chain_migration_details_hint_auto_migration">移行は自動で行われ、アクションは不要です</string>
+    <string name="chain_migration_details_hint_history">古い取引履歴はKusama Relayに残ります</string>
+    <string name="chain_migration_details_in_progress_title">%1$s を使ってあなたの %2$s 残高に基づき、ステーキングとガバナンスは %3$s にあります。これらの機能は最長24時間ご利用いただけない場合があります。</string>
+    <string name="chain_migration_details_lower_fee">取引手数料が%1$sx低下\n（%2$sから%3$sへ）</string>
+    <string name="chain_migration_details_minimal_balance">最小残高が%1$sx低減\n（%2$sから%3$sへ）</string>
+    <string name="chain_migration_details_subtitle">Asset Hubが素晴らしい理由は？</string>
+    <string name="chain_migration_details_title">%1$s の開始時点の残高、%2$s の残高、ステーキングとガバナンスは %3$s 上にあります</string>
+    <string name="chain_migration_details_tokens">より多くのトークンがサポートされます：%sと他のエコシステムトークン</string>
+    <string name="chain_migration_details_unified_access">％s、アセット、Staking、およびガバナンスへの統合アクセス</string>
     <string name="chain_network_management_auto_balance">自動バランスノード</string>
     <string name="chain_network_management_enabling">接続を有効にする</string>
     <string name="change_cloud_backup_password_subtitle">クラウドバックアップからウォレットを復元するために使用するパスワードを入力してください。このパスワードは将来的に復元できないため、必ず覚えておいてください！</string>
@@ -551,6 +564,7 @@
     <string name="common_use_max">最大を使用</string>
     <string name="common_validation_invalid_address_message">受信者は有効な %s アドレスである必要があります</string>
     <string name="common_validation_invalid_address_title">無効な受信者</string>
+    <string name="common_view">表示</string>
     <string name="common_waiting">待機中</string>
     <string name="common_wallet">ウォレット</string>
     <string name="common_warning">警告</string>
@@ -1377,6 +1391,7 @@
     <string name="staking_dashboard_browser_stake_header">Nova DApp ブラウザを通じてのStaking</string>
     <string name="staking_dashboard_more_options">追加のStakingオプション</string>
     <string name="staking_dashboard_no_stake_header">Stakeして報酬を稼ぐ</string>
+    <string name="staking_details_migration_alert_title">%1$s Stakingは%2$sでライブ開始 %3$s</string>
     <string name="staking_earnings_per_year">推定報酬</string>
     <string name="staking_era_title">エラ #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">推定収益</string>
@@ -1785,6 +1800,7 @@
     <string name="transaction_details_view_polkascan">Polkascanで表示</string>
     <string name="transaction_details_view_subscan">Subscanで表示</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s（%sで）</string>
+    <string name="transaction_history_migration_source_message" formatted="false">以前の%s トランザクション履歴は%sで引き続き利用可能です</string>
     <string name="transaction_status_completed">完了</string>
     <string name="transaction_status_failed">失敗</string>
     <string name="transaction_status_pending">保留中</string>
@@ -1921,7 +1937,6 @@
     <string name="wallet_tokens">トークン</string>
     <string name="wallet_transfer_details_send_back">この連絡先に送信</string>
     <string name="wallet_transfer_details_title">転送の詳細</string>
-    <string name="wallet_your_balance">あなたのバランス</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s のアドレス %s</string>
     <string name="web3names_integrity_check_failed_message">Nova は %1$s アドレスの情報の整合性に問題を検出しました。整合性の問題を解決するために %1$s の所有者にご連絡ください。</string>

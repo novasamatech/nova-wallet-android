@@ -22,8 +22,8 @@ class ChainMigrationDetailsFragment : BaseFragment<ChainMigrationDetailsViewMode
 
     override fun initViews() {
         binder.chainMigrationDetailsHints.setHints(
-            HintModel(R.drawable.ic_recent_history, requireContext().getString(R.string.chaim_migration_details_hint_history)),
-            HintModel(R.drawable.ic_nova, requireContext().getString(R.string.chaim_migration_details_hint_auto_migration))
+            HintModel(R.drawable.ic_recent_history, requireContext().getString(R.string.chain_migration_details_hint_history)),
+            HintModel(R.drawable.ic_nova, requireContext().getString(R.string.chain_migration_details_hint_auto_migration))
         )
         binder.chainMigrationDetailsButton.setOnClickListener { viewModel.okButtonClicked() }
 

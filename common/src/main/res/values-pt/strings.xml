@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">Insira o endereço do contrato</string>
     <string name="asset_add_token_enter_decimals">Insira os decimais</string>
     <string name="asset_add_token_enter_symbol">Insira o símbolo</string>
+    <string name="asset_details_source_asset_alert_button">Ir para %s</string>
+    <string name="asset_details_source_asset_alert_message">A partir de %1$s, seu saldo de %2$s, Staking e Governança estarão em %3$s — com desempenho aprimorado e custos menores.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">Seus tokens %s agora estão em %s</string>
     <string name="asset_view_networks">Redes</string>
     <string name="asset_view_tokens">Tokens</string>
     <string name="assets_add_token">Adicionar token</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">Compra iniciada! Por favor, aguarde até 60 minutos. Você pode acompanhar o status no e-mail.</string>
     <string name="buy_token_not_supported_message">Nenhum de nossos provedores atualmente suporta a compra deste token. Por favor, escolha um token diferente, uma rede diferente ou volte mais tarde.</string>
     <string name="buy_token_not_supported_title">Este token não é suportado pela funcionalidade de compra</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Capacidade de pagar taxas em qualquer token</string>
+    <string name="chain_migration_details_hint_auto_migration">A migração acontece automaticamente, nenhuma ação é necessária</string>
+    <string name="chain_migration_details_hint_history">O histórico de transações antigo permanece no Kusama Relay</string>
+    <string name="chain_migration_details_in_progress_title">A partir de %1$s seu saldo de %2$s, Staking e Governança estão em %3$s. Esses recursos podem ficar indisponíveis por até 24 horas.</string>
+    <string name="chain_migration_details_lower_fee">Taxas de transação %1$sx menores\n(de %2$s para %3$s)</string>
+    <string name="chain_migration_details_minimal_balance">Redução %1$sx no saldo mínimo\n(de %2$s para %3$s)</string>
+    <string name="chain_migration_details_subtitle">O que torna o Asset Hub incrível?</string>
+    <string name="chain_migration_details_title">A começar %1$s seu saldo de %2$s, Staking e Governança estão em %3$s</string>
+    <string name="chain_migration_details_tokens">Mais tokens suportados: %s, e outros tokens do ecossistema</string>
+    <string name="chain_migration_details_unified_access">Acesso unificado a %s, ativos, staking e governança</string>
     <string name="chain_network_management_auto_balance">Equilibrar nós automaticamente</string>
     <string name="chain_network_management_enabling">Ativar conexão</string>
     <string name="change_cloud_backup_password_subtitle">Por favor, insira uma senha que será usada para recuperar suas carteiras do backup na nuvem. Essa senha não pode ser recuperada no futuro, então certifique-se de se lembrar dela!</string>
@@ -557,6 +570,7 @@
     <string name="common_use_max">Usar máximo</string>
     <string name="common_validation_invalid_address_message">O destinatário deve ser um endereço %s válido</string>
     <string name="common_validation_invalid_address_title">Destinatário inválido</string>
+    <string name="common_view">Ver</string>
     <string name="common_waiting">Aguardando</string>
     <string name="common_wallet">Carteira</string>
     <string name="common_warning">Aviso</string>
@@ -1386,6 +1400,7 @@
     <string name="staking_dashboard_browser_stake_header">Staking via navegador DApp Nova</string>
     <string name="staking_dashboard_more_options">Mais opções de staking</string>
     <string name="staking_dashboard_no_stake_header">Faça stake e ganhe recompensas</string>
+    <string name="staking_details_migration_alert_title">Staking de %1$s está ativo em %2$s a partir de %3$s</string>
     <string name="staking_earnings_per_year">Recompensas estimadas</string>
     <string name="staking_era_title">era #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Ganhos estimados</string>
@@ -1797,6 +1812,7 @@
     <string name="transaction_details_view_polkascan">Ver no Polkascan</string>
     <string name="transaction_details_view_subscan">Ver no Subscan</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s em %s</string>
+    <string name="transaction_history_migration_source_message" formatted="false">Seu histórico de transações %s anterior ainda está disponível em %s</string>
     <string name="transaction_status_completed">Concluído</string>
     <string name="transaction_status_failed">Falhou</string>
     <string name="transaction_status_pending">Pendente</string>
@@ -1935,7 +1951,6 @@
     <string name="wallet_tokens">Tokens</string>
     <string name="wallet_transfer_details_send_back">Enviar para este contato</string>
     <string name="wallet_transfer_details_title">Detalhes da transferência</string>
-    <string name="wallet_your_balance">Seu saldo</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">Endereços %s para %s</string>
     <string name="web3names_integrity_check_failed_message">Nova detectou problemas com a integridade das informações sobre os endereços %1$s. Entre em contato com o proprietário de %1$s para resolver os problemas de integridade.</string>
