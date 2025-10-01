@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Delegation
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -34,7 +33,11 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return emptyList()
     }
 
-    override suspend fun getDetailedDelegateStats(delegateAddress: String, recentVotesBlockThreshold: BlockNumber, chain: Chain): DelegateDetailedStats? {
+    override suspend fun getDetailedDelegateStats(
+        delegateAddress: String,
+        recentVotesDateThreshold: RecentVotesDateThreshold,
+        chain: Chain
+    ): DelegateDetailedStats? {
         return null
     }
 
@@ -61,7 +64,7 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
     override suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,
-        recentVotesBlockThreshold: BlockNumber?
+        recentVotesDateThreshold: RecentVotesDateThreshold?
     ): Map<ReferendumId, UserVote.Direct>? {
         return null
     }

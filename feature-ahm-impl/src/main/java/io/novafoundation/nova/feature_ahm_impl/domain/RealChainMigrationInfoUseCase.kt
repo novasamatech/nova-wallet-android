@@ -6,13 +6,16 @@ import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepos
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfigWithChains
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.map
 
 class RealChainMigrationInfoUseCase(
     private val migrationInfoRepository: MigrationInfoRepository,
     private val toggleFeatureRepository: ToggleFeatureRepository,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val chainStateRepository: ChainStateRepository
 ) : ChainMigrationInfoUseCase {
 
     override fun observeMigrationConfigOrNull(chainId: String, assetId: Int): Flow<ChainMigrationConfigWithChains?> = flowOfAll {
@@ -20,7 +23,21 @@ class RealChainMigrationInfoUseCase(
             ?: migrationInfoRepository.getConfigByDestinationChain(chainId)
             ?: return@flowOfAll emptyFlow()
 
-        chainRegistry.observeMigrationConfigWithChains(config)
+        if (chainStateRepository.isMigrationBlockNotPassed(config)) return@flowOfAll emptyFlow()
+
+        chainRegistry.chainsById
+            .map {
+                val sourceChain = it.getValue(config.originData.chainId)
+                val destinationChain = it.getValue(config.destinationData.chainId)
+
+                ChainMigrationConfigWithChains(
+                    config = config,
+                    originChain = sourceChain,
+                    originAsset = sourceChain.assetsById.getValue(config.originData.assetId),
+                    destinationChain = destinationChain,
+                    destinationAsset = destinationChain.assetsById.getValue(config.destinationData.assetId)
+                )
+            }
     }
 
     override fun observeInfoShouldBeHidden(key: String, chainId: String, assetId: Int): Flow<Boolean> {

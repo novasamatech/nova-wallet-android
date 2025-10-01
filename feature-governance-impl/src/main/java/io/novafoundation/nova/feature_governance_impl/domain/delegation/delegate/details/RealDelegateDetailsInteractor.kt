@@ -20,17 +20,14 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.details.model.DelegateDetailsInteractor
 import io.novafoundation.nova.feature_governance_api.domain.track.matchWith
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RecentVotesTimePointProvider
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapAccountTypeToDomain
-import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.blockDurationEstimator
 import io.novafoundation.nova.runtime.state.selectedOption
-import io.novafoundation.nova.runtime.util.blockInPast
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -43,7 +40,7 @@ class RealDelegateDetailsInteractor(
     private val identityRepository: OnChainIdentityRepository,
     private val governanceSharedState: GovernanceSharedState,
     private val accountRepository: AccountRepository,
-    private val tracksUseCase: TracksUseCase,
+    private val recentVotesTimePointProvider: RecentVotesTimePointProvider
 ) : DelegateDetailsInteractor {
 
     override fun delegateDetailsFlow(delegateAccountId: AccountId): Flow<DelegateDetails> {
@@ -85,11 +82,10 @@ class RealDelegateDetailsInteractor(
 
         return chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf()).map {
             coroutineScope {
-                val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
-                val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
+                val recentVotesTimePointThreshold = recentVotesTimePointProvider.getTimePointThresholdForChain(chain)
 
                 val delegatesStatsDeferred = async {
-                    delegationsRepository.getDetailedDelegateStats(delegateAddress, recentVotesBlockThreshold, chain)
+                    delegationsRepository.getDetailedDelegateStats(delegateAddress, recentVotesTimePointThreshold, chain)
                 }
                 val delegationsDeferred = async {
                     userAccountId?.let { governanceSource.convictionVoting.delegationsOf(it, delegateAccountId, chain.id) }

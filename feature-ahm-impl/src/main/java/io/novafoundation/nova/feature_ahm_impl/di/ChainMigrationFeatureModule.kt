@@ -73,12 +73,14 @@ class ChainMigrationFeatureModule {
     fun provideAssetMigrationUseCase(
         migrationInfoRepository: MigrationInfoRepository,
         toggleFeatureRepository: ToggleFeatureRepository,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        chainStateRepository: ChainStateRepository
     ): ChainMigrationInfoUseCase {
         return RealChainMigrationInfoUseCase(
             migrationInfoRepository,
             toggleFeatureRepository,
-            chainRegistry
+            chainRegistry,
+            chainStateRepository
         )
     }
 

@@ -1,23 +1,12 @@
 package io.novafoundation.nova.feature_ahm_impl.domain
 
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
-import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfigWithChains
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
-fun ChainRegistry.observeMigrationConfigWithChains(config: ChainMigrationConfig): Flow<ChainMigrationConfigWithChains> {
-    return chainsById
-        .map {
-            val sourceChain = it.getValue(config.originData.chainId)
-            val destinationChain = it.getValue(config.destinationData.chainId)
+suspend fun ChainStateRepository.isMigrationBlockPassed(config: ChainMigrationConfig): Boolean {
+    return currentRemoteBlock(config.originData.chainId) > config.blockNumberStartAt
+}
 
-            ChainMigrationConfigWithChains(
-                config = config,
-                originChain = sourceChain,
-                originAsset = sourceChain.assetsById.getValue(config.originData.assetId),
-                destinationChain = destinationChain,
-                destinationAsset = destinationChain.assetsById.getValue(config.destinationData.assetId)
-            )
-        }
+suspend fun ChainStateRepository.isMigrationBlockNotPassed(config: ChainMigrationConfig): Boolean {
+    return !isMigrationBlockPassed(config)
 }

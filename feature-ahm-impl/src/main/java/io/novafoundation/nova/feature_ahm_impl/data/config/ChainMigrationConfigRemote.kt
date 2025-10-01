@@ -12,6 +12,7 @@ class ChainMigrationConfigRemote(
     val timestamp: Long,
     val newTokenNames: List<String>,
     val bannerPath: String,
+    val migrationInProgress: Boolean,
     val wikiURL: String
 ) {
 
@@ -31,6 +32,7 @@ fun ChainMigrationConfigRemote.toDomain(): ChainMigrationConfig {
         timeStartAt = Date(timestamp.seconds.inWholeMilliseconds),
         newTokenNames = newTokenNames,
         bannerPath = bannerPath,
+        migrationInProgress = migrationInProgress,
         wikiURL = wikiURL
     )
 }

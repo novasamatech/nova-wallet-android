@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="chain_migration_details_in_progress_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s. These features might be unavailable for up to 24 hours.</string>
     <string name="staking_details_migration_alert_title">%1$s staking is live on %2$s starting %3$s</string>
 
     <string name="common_view">View</string>
@@ -13,8 +14,8 @@
     <string name="chain_migration_details_hint_history">Old transaction history remains on Kusama Relay</string>
     <string name="chain_migration_details_hint_auto_migration">Migration happens automatically, no action needed</string>
 
-    <string name="chain_migration_details_title">Starting %1$s your %2$s balance, Staking and Governance are now on %3$s</string>
-    <string name="chain_migration_details_subtitle">What makes Asset Hub awesome?</string>
+    <string name="chain_migration_details_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s</string>
+    <string name="chaim_migration_details_subtitle">What makes Asset Hub awesome?</string>
     <string name="chain_migration_details_minimal_balance">%1$sx reduction in minimal balance\n(from %2$s to %3$s)</string>
     <string name="chain_migration_details_lower_fee">%1$sx lower transaction fees\n(from %2$s to %3$s)</string>
     <string name="chain_migration_details_tokens">More tokens supported: %s, and other ecosystem tokens</string>

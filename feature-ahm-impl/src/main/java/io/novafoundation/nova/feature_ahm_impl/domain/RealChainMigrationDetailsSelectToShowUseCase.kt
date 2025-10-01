@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_ahm_impl.domain
 import io.novafoundation.nova.feature_ahm_api.data.repository.ChainMigrationRepository
 import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepository
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationDetailsSelectToShowUseCase
-import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 class RealChainMigrationDetailsSelectToShowUseCase(
@@ -18,12 +17,8 @@ class RealChainMigrationDetailsSelectToShowUseCase(
             .filter {
                 val detailsWasNotShown = !chainMigrationRepository.isMigrationDetailsWasShown(it.originData.chainId)
                 val chainRequireMigrationDetails = chainMigrationRepository.isChainMigrationDetailsNeeded(it.originData.chainId)
-                detailsWasNotShown && chainRequireMigrationDetails && isMigrationBlockPassed(it)
+                detailsWasNotShown && chainRequireMigrationDetails && chainStateRepository.isMigrationBlockPassed(it)
             }
             .map { it.originData.chainId }
-    }
-
-    private suspend fun isMigrationBlockPassed(config: ChainMigrationConfig): Boolean {
-        return chainStateRepository.currentRemoteBlock(config.originData.chainId) > config.blockNumberStartAt
     }
 }

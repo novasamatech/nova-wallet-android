@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.utils.withTokenSymbol
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -63,4 +64,8 @@ class RealTokenFormatter(
 
 fun TokenFormatter.formatToken(amountInPlanks: BigInteger, asset: Asset): CharSequence {
     return formatToken(asset.token.amountFromPlanks(amountInPlanks), asset.token.configuration.symbol)
+}
+
+fun TokenFormatter.formatToken(amountInPlanks: BigInteger, chainAsset: Chain.Asset): CharSequence {
+    return formatToken(chainAsset.amountFromPlanks(amountInPlanks), chainAsset.symbol)
 }

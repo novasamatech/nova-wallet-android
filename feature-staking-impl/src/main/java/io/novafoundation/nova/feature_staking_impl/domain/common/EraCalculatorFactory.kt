@@ -12,6 +12,7 @@ import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -110,14 +111,17 @@ class EraTimeCalculatorFactory(
         val genesisSlot = electionsSession.genesisSlot(timelineChainId)
         val sessionLength = electionsSession.sessionLength(timelineChainId)
 
+        val eraAndStartSessionIndex = activeEraFlow.map { activeEra ->
+            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(stakingChainId, activeEra)
+            activeEra to eraStartSessionIndex
+        }
+
         return combine(
-            activeEraFlow,
+            eraAndStartSessionIndex,
             sessionRepository.observeCurrentSessionIndex(timelineChainId),
             electionsSession.currentEpochIndexFlow(timelineChainId),
             electionsSession.currentSlotFlow(timelineChainId),
-        ) { activeEra, currentSessionIndex, currentEpochIndex, currentSlot ->
-            val eraStartSessionIndex = stakingRepository.eraStartSessionIndex(stakingChainId, activeEra)
-
+        ) { (activeEra, eraStartSessionIndex), currentSessionIndex, currentEpochIndex, currentSlot ->
             EraTimeCalculator(
                 startTimeStamp = System.currentTimeMillis().toBigInteger(),
                 eraLength = stakingRepository.eraLength(stakingChainId),
