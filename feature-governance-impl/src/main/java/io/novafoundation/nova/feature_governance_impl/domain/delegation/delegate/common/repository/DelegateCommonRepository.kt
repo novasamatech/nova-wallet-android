@@ -13,15 +13,8 @@ import io.novafoundation.nova.feature_governance_api.data.repository.getDelegate
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
-import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RecentVotesTimePointProvider
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
-import io.novafoundation.nova.runtime.ext.hasTimelineChain
-import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.blockDurationEstimator
-import io.novafoundation.nova.runtime.util.blockInPast
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 interface DelegateCommonRepository {
@@ -40,7 +33,7 @@ interface DelegateCommonRepository {
 class RealDelegateCommonRepository(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val accountRepository: AccountRepository,
-    private val chainStateRepository: ChainStateRepository,
+    private val recentVotesTimePointProvider: RecentVotesTimePointProvider
 ) : DelegateCommonRepository {
 
     override suspend fun getDelegatesStats(
@@ -49,7 +42,7 @@ class RealDelegateCommonRepository(
     ): List<DelegateStats> {
         val chain = governanceOption.assetWithChain.chain
         val delegationsRepository = governanceSourceRegistry.sourceFor(governanceOption).delegationsRepository
-        val timePointThreshold = getTimePointThresholdForChain(chain)
+        val timePointThreshold = recentVotesTimePointProvider.getTimePointThresholdForChain(chain)
 
         return if (accountIds == null) {
             delegationsRepository.getDelegatesStats(timePointThreshold, chain)
@@ -89,16 +82,5 @@ class RealDelegateCommonRepository(
             .mapKeys { tracks.getValue(it.key) }
             .toList()
             .groupBy { it.second.target.intoKey() }
-    }
-
-    private suspend fun getTimePointThresholdForChain(chain: Chain): RecentVotesDateThreshold {
-        return if (chain.hasTimelineChain()) {
-            val timestampMs = System.currentTimeMillis() - RECENT_VOTES_PERIOD.inWholeMilliseconds
-            RecentVotesDateThreshold.Timestamp(timestampMs)
-        } else {
-            val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
-            val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
-            RecentVotesDateThreshold.BlockNumber(recentVotesBlockThreshold)
-        }
     }
 }
