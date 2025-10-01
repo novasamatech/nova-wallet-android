@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">계약 주소 입력</string>
     <string name="asset_add_token_enter_decimals">소수 자릿수 입력</string>
     <string name="asset_add_token_enter_symbol">심볼 입력</string>
+    <string name="asset_details_source_asset_alert_button">이동 %s</string>
+    <string name="asset_details_source_asset_alert_message">%1$s부터, 귀하의 %2$s 잔고, Staking, Governance는 %3$s에 있으며 성능이 향상되고 비용이 낮아졌습니다.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">귀하의 %s 토큰이 이제 %s에 있습니다</string>
     <string name="asset_view_networks">네트워크</string>
     <string name="asset_view_tokens">토큰</string>
     <string name="assets_add_token">토큰 추가</string>
@@ -268,6 +271,15 @@
     <string name="buy_order_completed_message">구매 시작됨! 최대 60분 정도 기다려 주세요. 상태는 이메일에서 확인할 수 있습니다.</string>
     <string name="buy_token_not_supported_message">현재 제공업체 중 이 토큰을 구매할 수 있는 곳이 없습니다. 다른 토큰이나 네트워크를 선택하거나 나중에 다시 확인하세요.</string>
     <string name="buy_token_not_supported_title">이 토큰은 구매 기능에서 지원되지 않습니다</string>
+    <string name="chain_migration_details_fee_in_any_tokens">어떤 토큰으로든 수수료를 지불할 수 있는 기능</string>
+    <string name="chain_migration_details_hint_auto_migration">이전이 자동으로 발생하므로, 별도의 조치가 필요하지 않습니다</string>
+    <string name="chain_migration_details_hint_history">이전 거래 내역은 Kusama Relay에 남아 있습니다</string>
+    <string name="chain_migration_details_lower_fee">%1$sx 낮은 거래 수수료\n(%2$s에서 %3$s로)</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx 최소 잔고 감소\n(%2$s에서 %3$s로)</string>
+    <string name="chain_migration_details_subtitle">Asset Hub의 뛰어난 점은 무엇인가요?</string>
+    <string name="chain_migration_details_title">%1$s 시작, 귀하의 %2$s 잔고, Staking 및 Governance가 이제 %3$s에 있습니다</string>
+    <string name="chain_migration_details_tokens">더 많은 토큰 지원: %s 및 기타 생태계 토큰</string>
+    <string name="chain_migration_details_unified_access">통합 접근: %s, 자산, Staking, Governance</string>
     <string name="chain_network_management_auto_balance">자동 균형 노드</string>
     <string name="chain_network_management_enabling">연결 활성화</string>
     <string name="change_cloud_backup_password_subtitle">클라우드 백업에서 지갑을 복구하는 데 사용할 비밀번호를 입력하십시오. 이 비밀번호는 나중에 복구할 수 없으므로 반드시 기억해 두십시오!</string>
@@ -551,6 +563,7 @@
     <string name="common_use_max">최대 사용</string>
     <string name="common_validation_invalid_address_message">수신자는 유효한 %s 주소여야 합니다</string>
     <string name="common_validation_invalid_address_title">잘못된 수신자</string>
+    <string name="common_view">보기</string>
     <string name="common_waiting">기다리는 중</string>
     <string name="common_wallet">지갑</string>
     <string name="common_warning">경고</string>
@@ -1377,6 +1390,7 @@
     <string name="staking_dashboard_browser_stake_header">Nova DApp 브라우저를 통한 Staking</string>
     <string name="staking_dashboard_more_options">더 많은 Staking 옵션</string>
     <string name="staking_dashboard_no_stake_header">Stake하고 보상 받기</string>
+    <string name="staking_details_migration_alert_title">%1$s Staking은 %2$s에서 %3$s부터 활성화됩니다</string>
     <string name="staking_earnings_per_year">예상 보상</string>
     <string name="staking_era_title">era #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">예상 수익</string>
@@ -1785,6 +1799,7 @@
     <string name="transaction_details_view_polkascan">Polkascan에서 보기</string>
     <string name="transaction_details_view_subscan">Subscan에서 보기</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s 시 %s</string>
+    <string name="transaction_history_migration_source_message" formatted="false">이전 %s 거래 내역은 여전히 %s에서 확인 가능합니다</string>
     <string name="transaction_status_completed">완료됨</string>
     <string name="transaction_status_failed">실패</string>
     <string name="transaction_status_pending">대기 중</string>
@@ -1921,7 +1936,6 @@
     <string name="wallet_tokens">토큰</string>
     <string name="wallet_transfer_details_send_back">이 연락처로 전송</string>
     <string name="wallet_transfer_details_title">전송 세부 사항</string>
-    <string name="wallet_your_balance">귀하의 잔액</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s의 %s 주소</string>
     <string name="web3names_integrity_check_failed_message">Nova에서 %1$s 주소에 대한 정보의 무결성 문제를 감지했습니다. %1$s의 소유자에게 연락하여 무결성 문제를 해결하세요.</string>
