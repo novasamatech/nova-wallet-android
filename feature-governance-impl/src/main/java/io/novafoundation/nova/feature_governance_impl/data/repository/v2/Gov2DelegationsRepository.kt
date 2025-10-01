@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository.v2
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.subquery.SubQueryNodes
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.filterNotNull
@@ -31,6 +30,7 @@ import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.DirectVoteRemote
 import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.response.mapMultiVoteRemoteToAccountVote
 import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
+import io.novafoundation.nova.feature_governance_api.data.repository.common.zeroPoint
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
@@ -88,11 +88,11 @@ class Gov2DelegationsRepository(
 
     override suspend fun getDetailedDelegateStats(
         delegateAddress: String,
-        recentVotesBlockThreshold: BlockNumber,
+        recentVotesDateThreshold: RecentVotesDateThreshold,
         chain: Chain
     ): DelegateDetailedStats? {
         val externalApiLink = chain.externalApi<GovernanceDelegations>()?.url ?: return null
-        val request = DelegateDetailedStatsRequest(delegateAddress, recentVotesBlockThreshold)
+        val request = DelegateDetailedStatsRequest(delegateAddress, recentVotesDateThreshold)
 
         val response = delegationsSubqueryApi.getDetailedDelegateStats(externalApiLink, request)
         val delegateStats = response.data.delegates.nodes.firstOrNull() ?: return null
@@ -153,12 +153,12 @@ class Gov2DelegationsRepository(
     override suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,
-        recentVotesBlockThreshold: BlockNumber?
+        recentVotesDateThreshold: RecentVotesDateThreshold?
     ): Map<ReferendumId, UserVote.Direct>? {
-        val blockThreshold = recentVotesBlockThreshold ?: BlockNumber.ZERO
+        val timePointThreshold = recentVotesDateThreshold ?: RecentVotesDateThreshold.zeroPoint()
 
         return accountSubQueryRequest(user, chain) { externalApiLink, userAddress ->
-            val request = DirectHistoricalVotesRequest(userAddress, blockThreshold)
+            val request = DirectHistoricalVotesRequest(userAddress, timePointThreshold)
             val response = delegationsSubqueryApi.getDirectHistoricalVotes(externalApiLink, request)
 
             response.data.direct.toUserVoteMap().filterNotNull()

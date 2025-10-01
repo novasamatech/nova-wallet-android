@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_governance_api.data.repository
 
 import android.util.Log
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Delegation
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
@@ -34,7 +33,7 @@ interface DelegationsRepository {
 
     suspend fun getDetailedDelegateStats(
         delegateAddress: String,
-        recentVotesBlockThreshold: BlockNumber,
+        recentVotesDateThreshold: RecentVotesDateThreshold,
         chain: Chain,
     ): DelegateDetailedStats?
 
@@ -51,7 +50,7 @@ interface DelegationsRepository {
     suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,
-        recentVotesBlockThreshold: BlockNumber?
+        recentVotesDateThreshold: RecentVotesDateThreshold?
     ): Map<ReferendumId, UserVote.Direct>?
 
     suspend fun CallBuilder.delegate(
