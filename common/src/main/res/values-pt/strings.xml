@@ -274,10 +274,11 @@
     <string name="chain_migration_details_fee_in_any_tokens">Capacidade de pagar taxas em qualquer token</string>
     <string name="chain_migration_details_hint_auto_migration">A migração acontece automaticamente, nenhuma ação é necessária</string>
     <string name="chain_migration_details_hint_history">O histórico de transações antigo permanece no Kusama Relay</string>
+    <string name="chain_migration_details_in_progress_title">A partir de %1$s seu saldo de %2$s, Staking e Governança estão em %3$s. Esses recursos podem ficar indisponíveis por até 24 horas.</string>
     <string name="chain_migration_details_lower_fee">Taxas de transação %1$sx menores\n(de %2$s para %3$s)</string>
     <string name="chain_migration_details_minimal_balance">Redução %1$sx no saldo mínimo\n(de %2$s para %3$s)</string>
     <string name="chain_migration_details_subtitle">O que torna o Asset Hub incrível?</string>
-    <string name="chain_migration_details_title">A partir de %1$s seu saldo de %2$s, Staking e Governança estão agora em %3$s</string>
+    <string name="chain_migration_details_title">A começar %1$s seu saldo de %2$s, Staking e Governança estão em %3$s</string>
     <string name="chain_migration_details_tokens">Mais tokens suportados: %s, e outros tokens do ecossistema</string>
     <string name="chain_migration_details_unified_access">Acesso unificado a %s, ativos, staking e governança</string>
     <string name="chain_network_management_auto_balance">Equilibrar nós automaticamente</string>

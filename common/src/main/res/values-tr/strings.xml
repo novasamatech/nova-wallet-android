@@ -274,10 +274,11 @@
     <string name="chain_migration_details_fee_in_any_tokens">Herhangi bir token ile ücret ödeme olanağı</string>
     <string name="chain_migration_details_hint_auto_migration">Taşınma otomatik gerçekleşir, hiçbir işlem yapmanız gerekmez</string>
     <string name="chain_migration_details_hint_history">Eski işlem geçmişi Kusama Relay üzerinde kalır</string>
+    <string name="chain_migration_details_in_progress_title">%1$s başlangıç ​​bakiyeniz %2$s ile, Stake Etme ve Yönetişim %3$s üzerinde. Bu özellikler 24 saate kadar kullanılamayabilir.</string>
     <string name="chain_migration_details_lower_fee">%1$sx daha düşük işlem ücretleri\n(%2$s\'den %3$s\'a)</string>
     <string name="chain_migration_details_minimal_balance">%1$sx minimum bakiye indirimi\n(%2$s\'den %3$s\'a)</string>
     <string name="chain_migration_details_subtitle">Asset Hub\'ı harika yapan nedir?</string>
-    <string name="chain_migration_details_title">%1$s itibariyle %2$s bakiyeniz, Staking ve Yönetim artık %3$s üzerinde</string>
+    <string name="chain_migration_details_title">%1$s ile başlayan bakiyeniz %2$s, Staking etme ve Governance %3$s üzerinde</string>
     <string name="chain_migration_details_tokens">Daha fazla token destekleniyor: %s, ve diğer ekosistem tokenleri</string>
     <string name="chain_migration_details_unified_access">Birleşik erişim: %s, varlıklar, staking ve yönetim</string>
     <string name="chain_network_management_auto_balance">Otomatik denge düğümleri</string>

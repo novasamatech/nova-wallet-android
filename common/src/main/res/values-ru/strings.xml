@@ -274,10 +274,11 @@
     <string name="chain_migration_details_fee_in_any_tokens">Возможность оплатить комиссии любым токеном</string>
     <string name="chain_migration_details_hint_auto_migration">Миграция происходит автоматически, действия не требуются</string>
     <string name="chain_migration_details_hint_history">Старая история транзакций остаётся на Kusama Relay</string>
+    <string name="chain_migration_details_in_progress_title">Начиная с %1$s ваш баланс %2$s, Staking и Governance включены на %3$s. Эти функции могут быть недоступны до 24 часов.</string>
     <string name="chain_migration_details_lower_fee">%1$sx более низкие транзакционные комиссии\n(от %2$s до %3$s)</string>
     <string name="chain_migration_details_minimal_balance">%1$sx сокращение минимального баланса\n(от %2$s до %3$s)</string>
     <string name="chain_migration_details_subtitle">Что делает Asset Hub замечательным?</string>
-    <string name="chain_migration_details_title">Начиная с %1$s, ваш баланс %2$s, Staking и Governance теперь на %3$s</string>
+    <string name="chain_migration_details_title">Начиная с %1$s ваш баланс %2$s, Staking и Governance находятся на %3$s</string>
     <string name="chain_migration_details_tokens">Поддерживаются больше токенов: %s и другие токены экосистемы</string>
     <string name="chain_migration_details_unified_access">Унифицированный доступ к %s, активам, staking и governance</string>
     <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>

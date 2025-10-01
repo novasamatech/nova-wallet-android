@@ -274,10 +274,11 @@
     <string name="chain_migration_details_fee_in_any_tokens">Kemampuan untuk membayar biaya dalam token apa pun</string>
     <string name="chain_migration_details_hint_auto_migration">Migrasi terjadi secara otomatis, tidak perlu tindakan</string>
     <string name="chain_migration_details_hint_history">Riwayat transaksi lama tetap ada di Kusama Relay</string>
+    <string name="chain_migration_details_in_progress_title">Mulai dengan %1$s saldo %2$s Anda, Staking dan Tata Kelola ada di %3$s. Fitur-fitur ini mungkin tidak tersedia hingga 24 jam.</string>
     <string name="chain_migration_details_lower_fee">%1$sx biaya transaksi lebih rendah\n(dari %2$s ke %3$s)</string>
     <string name="chain_migration_details_minimal_balance">%1$sx pengurangan saldo minimal\n(dari %2$s ke %3$s)</string>
     <string name="chain_migration_details_subtitle">Apa yang membuat Asset Hub hebat?</string>
-    <string name="chain_migration_details_title">Mulai %1$s saldo %2$s Anda, Staking, dan Tata Kelola sekarang ada di %3$s</string>
+    <string name="chain_migration_details_title">Memulai %1$s saldo %2$s Anda, Staking dan Governance berada di %3$s</string>
     <string name="chain_migration_details_tokens">Lebih banyak token didukung: %s, dan token ekosistem lainnya</string>
     <string name="chain_migration_details_unified_access">Akses terpadu ke %s, aset, staking, dan tata kelola</string>
     <string name="chain_network_management_auto_balance">Node saldo otomatis</string>

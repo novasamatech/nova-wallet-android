@@ -274,10 +274,11 @@
     <string name="chain_migration_details_fee_in_any_tokens">可用任意代币支付费用</string>
     <string name="chain_migration_details_hint_auto_migration">迁移会自动进行，无需操作</string>
     <string name="chain_migration_details_hint_history">旧的交易历史仍然保留在 Kusama Relay</string>
+    <string name="chain_migration_details_in_progress_title">从%1$s您的%2$s余额开始，质押和治理在%3$s上。这些功能可能在长达24小时内不可用。</string>
     <string name="chain_migration_details_lower_fee">%1$sx 交易费率降低（从 %2$s 到 %3$s）</string>
     <string name="chain_migration_details_minimal_balance">%1$sx 最低余额减少（从 %2$s 到 %3$s）</string>
     <string name="chain_migration_details_subtitle">是什么让 Asset Hub 如此出色？</string>
-    <string name="chain_migration_details_title">自 %1$s 起，您的 %2$s 余额、质押和治理现已在 %3$s 上</string>
+    <string name="chain_migration_details_title">从 %1$s 您的 %2$s 余额开始，质押和治理位于 %3$s</string>
     <string name="chain_migration_details_tokens">支持更多代币：%s 和其他生态系统代币</string>
     <string name="chain_migration_details_unified_access">统一访问 %s，资产，质押和治理</string>
     <string name="chain_network_management_auto_balance">自动平衡节点</string>

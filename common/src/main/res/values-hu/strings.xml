@@ -274,10 +274,11 @@
     <string name="chain_migration_details_fee_in_any_tokens">Díjak kifizetése bármilyen tokennel lehetséges</string>
     <string name="chain_migration_details_hint_auto_migration">A migráció automatikusan történik, nincs szükség műveletekre</string>
     <string name="chain_migration_details_hint_history">A régi tranzakció történet marad a Kusama Relay-en</string>
+    <string name="chain_migration_details_in_progress_title">A %1$s %2$s egyenlegtől kezdve a Stakelés és a Kormányzás %3$s érhetők el. Ezek a funkciók akár 24 óráig is elérhetetlenek lehetnek.</string>
     <string name="chain_migration_details_lower_fee">%1$sx alacsonyabb tranzakciós költségek\n(%2$s-ról %3$s-ra)</string>
     <string name="chain_migration_details_minimal_balance">%1$sx csökkenés a minimális egyenlegben\n(%2$s-ról %3$s-ra)</string>
     <string name="chain_migration_details_subtitle">Miért nagyszerű az Asset Hub?</string>
-    <string name="chain_migration_details_title">Kezdve %1$s, a %2$s egyenleged, Staking és Kormányzás már a(z) %3$s-n</string>
+    <string name="chain_migration_details_title">A %1$s kezdő %2$s egyenlegetekkel, a Stakelés és a Kormányzás a(z) %3$s-n van</string>
     <string name="chain_migration_details_tokens">További token támogatás: %s, és más ökoszisztéma tokenek</string>
     <string name="chain_migration_details_unified_access">Egységes hozzáférés %s-hoz, eszközökhöz, staking-hez és kormányzáshoz</string>
     <string name="chain_network_management_auto_balance">Automatikus csomópontok egyensúlyozása</string>

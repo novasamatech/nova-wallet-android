@@ -274,10 +274,11 @@
     <string name="chain_migration_details_fee_in_any_tokens">Khả năng thanh toán phí bằng bất kỳ token nào</string>
     <string name="chain_migration_details_hint_auto_migration">Việc di chuyển diễn ra tự động, không cần hành động</string>
     <string name="chain_migration_details_hint_history">Lịch sử giao dịch cũ vẫn còn trên Kusama Relay</string>
+    <string name="chain_migration_details_in_progress_title">Bắt đầu %1$s số dư %2$s của bạn, Staking và Quản trị đang ở %3$s. Những tính năng này có thể không khả dụng trong tối đa 24 giờ.</string>
     <string name="chain_migration_details_lower_fee">%1$s phí giao dịch thấp hơn\n(từ %2$s đến %3$s)</string>
     <string name="chain_migration_details_minimal_balance">%1$s giảm số dư tối thiểu\n(từ %2$s đến %3$s)</string>
     <string name="chain_migration_details_subtitle">Điều gì khiến Asset Hub tuyệt vời?</string>
-    <string name="chain_migration_details_title">Bắt đầu %1$s số dư %2$s của bạn, Staking và Quản trị hiện trên %3$s</string>
+    <string name="chain_migration_details_title">Bắt đầu %1$s số dư %2$s của bạn, Staking và Governance trị đang ở %3$s</string>
     <string name="chain_migration_details_tokens">Hỗ trợ nhiều token hơn: %s, và các token hệ sinh thái khác</string>
     <string name="chain_migration_details_unified_access">Truy cập hợp nhất tới %s, tài sản, staking, và quản trị</string>
     <string name="chain_network_management_auto_balance">Tự động cân bằng nodes</string>
