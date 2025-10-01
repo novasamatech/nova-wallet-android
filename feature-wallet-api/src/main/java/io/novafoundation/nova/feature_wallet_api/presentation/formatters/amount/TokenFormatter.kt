@@ -69,4 +69,3 @@ fun TokenFormatter.formatToken(amountInPlanks: BigInteger, asset: Asset): CharSe
 fun TokenFormatter.formatToken(amountInPlanks: BigInteger, chainAsset: Chain.Asset): CharSequence {
     return formatToken(chainAsset.amountFromPlanks(amountInPlanks), chainAsset.symbol)
 }
-
