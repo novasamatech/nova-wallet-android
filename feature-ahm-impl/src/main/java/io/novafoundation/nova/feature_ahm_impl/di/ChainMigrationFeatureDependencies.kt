@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -35,6 +36,8 @@ interface ChainMigrationFeatureDependencies {
     val toggleFeatureRepository: ToggleFeatureRepository
 
     val chainStateRepository: ChainStateRepository
+
+    val tokenFormatter: TokenFormatter
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource

@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_ahm_impl.presentation.ChainMigrationRouter
 import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
+import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
@@ -21,6 +22,7 @@ class ChainMigrationFeatureHolder @Inject constructor(
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .bannersFeatureApi(getFeature(BannersFeatureApi::class.java))
+            .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .build()
 
         return DaggerChainMigrationFeatureComponent.factory()

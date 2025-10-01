@@ -11,6 +11,7 @@ class ChainMigrationConfig(
     val timeStartAt: Date,
     val newTokenNames: List<String>,
     val bannerPath: String,
+    val migrationInProgress: Boolean,
     val wikiURL: String
 ) {
 
