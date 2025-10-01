@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.amountFromPlanks
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
@@ -16,6 +17,8 @@ import io.novafoundation.nova.feature_ahm_impl.presentation.ChainMigrationRouter
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.forDirectory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -29,6 +32,7 @@ class ChainMigrationDetailsViewModel(
     private val payload: ChainMigrationDetailsPayload,
     private val promotionBannersMixinFactory: PromotionBannersMixinFactory,
     private val bannerSourceFactory: BannersSourceFactory,
+    private val tokenFormatter: TokenFormatter
 ) : BaseViewModel(), Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -62,14 +66,14 @@ class ChainMigrationDetailsViewModel(
             minimalBalance = resourceManager.getString(
                 R.string.chain_migration_details_minimal_balance,
                 minimalBalanceScale.format(),
-                config.originData.minBalance.amountFromPlanks(sourceAsset.precision).format(),
-                config.destinationData.minBalance.amountFromPlanks(destinationAsset.precision).format(),
+                tokenFormatter.formatToken(config.originData.minBalance, sourceAsset),
+                tokenFormatter.formatToken(config.destinationData.minBalance, destinationAsset),
             ),
             lowerFee = resourceManager.getString(
                 R.string.chain_migration_details_lower_fee,
                 lowerFeeScale.format(),
-                config.originData.averageFee.amountFromPlanks(sourceAsset.precision).format(),
-                config.destinationData.averageFee.amountFromPlanks(destinationAsset.precision).format(),
+                tokenFormatter.formatToken(config.originData.averageFee, sourceAsset),
+                tokenFormatter.formatToken(config.destinationData.averageFee, destinationAsset)
             ),
             tokens = resourceManager.getString(R.string.chain_migration_details_tokens, newTokens),
             unifiedAccess = resourceManager.getString(R.string.chain_migration_details_unified_access, tokenSymbol),

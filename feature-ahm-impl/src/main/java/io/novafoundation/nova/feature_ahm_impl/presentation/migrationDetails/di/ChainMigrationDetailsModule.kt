@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.Cha
 import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsViewModel
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSourceFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ChainMigrationDetailsModule {
@@ -29,6 +30,7 @@ class ChainMigrationDetailsModule {
         payload: ChainMigrationDetailsPayload,
         promotionBannersMixinFactory: PromotionBannersMixinFactory,
         bannerSourceFactory: BannersSourceFactory,
+        tokenFormatter: TokenFormatter
     ): ViewModel {
         return ChainMigrationDetailsViewModel(
             resourceManager,
@@ -36,7 +38,8 @@ class ChainMigrationDetailsModule {
             interactor,
             payload,
             promotionBannersMixinFactory,
-            bannerSourceFactory
+            bannerSourceFactory,
+            tokenFormatter
         )
     }
 

@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_ahm_impl.presentation.ChainMigrationRouter
 import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.di.ChainMigrationDetailsComponent
 import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
+import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -38,7 +39,8 @@ interface ChainMigrationFeatureComponent : ChainMigrationFeatureApi {
             CommonApi::class,
             DbApi::class,
             RuntimeApi::class,
-            BannersFeatureApi::class
+            BannersFeatureApi::class,
+            WalletFeatureApi::class
         ]
     )
     interface AccountFeatureDependenciesComponent : ChainMigrationFeatureDependencies
