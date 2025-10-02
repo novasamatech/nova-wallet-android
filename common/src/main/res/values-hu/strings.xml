@@ -273,7 +273,7 @@
     <string name="buy_token_not_supported_title">Ez a token nem támogatott a vásárlás funkció által</string>
     <string name="chain_migration_details_fee_in_any_tokens">Díjak kifizetése bármilyen tokennel lehetséges</string>
     <string name="chain_migration_details_hint_auto_migration">A migráció automatikusan történik, nincs szükség műveletekre</string>
-    <string name="chain_migration_details_hint_history">A régi tranzakció történet marad a Kusama Relay-en</string>
+    <string name="chain_migration_details_hint_history">A régi tranzakcióelőzmények megmaradnak a(z) %s rendszeren</string>
     <string name="chain_migration_details_in_progress_title">A %1$s %2$s egyenlegtől kezdve a Stakelés és a Kormányzás %3$s érhetők el. Ezek a funkciók akár 24 óráig is elérhetetlenek lehetnek.</string>
     <string name="chain_migration_details_lower_fee">%1$sx alacsonyabb tranzakciós költségek\n(%2$s-ról %3$s-ra)</string>
     <string name="chain_migration_details_minimal_balance">%1$sx csökkenés a minimális egyenlegben\n(%2$s-ról %3$s-ra)</string>
