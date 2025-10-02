@@ -89,7 +89,7 @@ class ValidatorExposureUpdater(
     private suspend fun isPagedExposuresInCache(era: BigInteger, chainId: String, runtimeSnapshot: RuntimeSnapshot): Boolean {
         if (!runtimeSnapshot.pagedExposuresEnabled()) return false
 
-        val prefix = runtimeSnapshot.eraStakersOverviewPrefixFor(era)
+        val prefix = runtimeSnapshot.eraStakersPagedPrefixFor(era)
 
         return storageCache.isPrefixInCache(prefix, chainId)
     }
