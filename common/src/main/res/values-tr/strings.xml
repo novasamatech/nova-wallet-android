@@ -273,7 +273,7 @@
     <string name="buy_token_not_supported_title">Bu token satın alma özelliği tarafından desteklenmiyor</string>
     <string name="chain_migration_details_fee_in_any_tokens">Herhangi bir token ile ücret ödeme olanağı</string>
     <string name="chain_migration_details_hint_auto_migration">Taşınma otomatik gerçekleşir, hiçbir işlem yapmanız gerekmez</string>
-    <string name="chain_migration_details_hint_history">Eski işlem geçmişi Kusama Relay üzerinde kalır</string>
+    <string name="chain_migration_details_hint_history">Eski işlem geçmişi %s üzerinde kalır</string>
     <string name="chain_migration_details_in_progress_title">%1$s başlangıç ​​bakiyeniz %2$s ile, Stake Etme ve Yönetişim %3$s üzerinde. Bu özellikler 24 saate kadar kullanılamayabilir.</string>
     <string name="chain_migration_details_lower_fee">%1$sx daha düşük işlem ücretleri\n(%2$s\'den %3$s\'a)</string>
     <string name="chain_migration_details_minimal_balance">%1$sx minimum bakiye indirimi\n(%2$s\'den %3$s\'a)</string>

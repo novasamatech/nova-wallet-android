@@ -273,7 +273,7 @@
     <string name="buy_token_not_supported_title">このトークンは購入機能でサポートされていません</string>
     <string name="chain_migration_details_fee_in_any_tokens">任意のトークンで手数料を支払う機能</string>
     <string name="chain_migration_details_hint_auto_migration">移行は自動で行われ、アクションは不要です</string>
-    <string name="chain_migration_details_hint_history">古い取引履歴はKusama Relayに残ります</string>
+    <string name="chain_migration_details_hint_history">古い取引履歴は%sに残ります</string>
     <string name="chain_migration_details_in_progress_title">%1$s を使ってあなたの %2$s 残高に基づき、ステーキングとガバナンスは %3$s にあります。これらの機能は最長24時間ご利用いただけない場合があります。</string>
     <string name="chain_migration_details_lower_fee">取引手数料が%1$sx低下\n（%2$sから%3$sへ）</string>
     <string name="chain_migration_details_minimal_balance">最小残高が%1$sx低減\n（%2$sから%3$sへ）</string>

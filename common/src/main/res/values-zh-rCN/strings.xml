@@ -273,7 +273,7 @@
     <string name="buy_token_not_supported_title">买入功能不支持此代币</string>
     <string name="chain_migration_details_fee_in_any_tokens">可用任意代币支付费用</string>
     <string name="chain_migration_details_hint_auto_migration">迁移会自动进行，无需操作</string>
-    <string name="chain_migration_details_hint_history">旧的交易历史仍然保留在 Kusama Relay</string>
+    <string name="chain_migration_details_hint_history">旧的交易历史保留在%s上</string>
     <string name="chain_migration_details_in_progress_title">从%1$s您的%2$s余额开始，质押和治理在%3$s上。这些功能可能在长达24小时内不可用。</string>
     <string name="chain_migration_details_lower_fee">%1$sx 交易费率降低（从 %2$s 到 %3$s）</string>
     <string name="chain_migration_details_minimal_balance">%1$sx 最低余额减少（从 %2$s 到 %3$s）</string>
