@@ -273,7 +273,7 @@
     <string name="buy_token_not_supported_title">Ten token nie jest obsługiwany przez funkcję zakupu</string>
     <string name="chain_migration_details_fee_in_any_tokens">Możliwość płacenia opłat w dowolnym tokenie</string>
     <string name="chain_migration_details_hint_auto_migration">Migracja odbywa się automatycznie, nie wymaga działania</string>
-    <string name="chain_migration_details_hint_history">Stara historia transakcji pozostaje na Kusama Relay</string>
+    <string name="chain_migration_details_hint_history">Stara historia transakcji pozostaje na %s</string>
     <string name="chain_migration_details_in_progress_title">Zaczynając od %1$s salda %2$s, Staking i Governance są włączone na %3$s. Te funkcje mogą być niedostępne nawet przez 24 godziny.</string>
     <string name="chain_migration_details_lower_fee">%1$sx niższe opłaty transakcyjne\n(z %2$s do %3$s)</string>
     <string name="chain_migration_details_minimal_balance">%1$sx redukcja minimalnego salda\n(z %2$s do %3$s)</string>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <!--<string name="chain_migration_details_hint_history">Old transaction history remains on Kusama Relay</string>-->
     <string name="chain_migration_details_hint_history">Old transaction history remains on %s</string>
 
     <string name="chain_migration_details_in_progress_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s. These features might be unavailable for up to 24 hours.</string>
