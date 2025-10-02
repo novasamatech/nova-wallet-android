@@ -2,14 +2,12 @@ package io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.mixin.hints.HintModel
 import io.novafoundation.nova.common.mixin.hints.setHints
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
-import io.novafoundation.nova.feature_ahm_impl.R
 import io.novafoundation.nova.feature_ahm_impl.di.ChainMigrationFeatureComponent
 import io.novafoundation.nova.feature_ahm_impl.databinding.FragmentChainMigrationDetailsBinding
 import io.novafoundation.nova.feature_banners_api.presentation.bind
