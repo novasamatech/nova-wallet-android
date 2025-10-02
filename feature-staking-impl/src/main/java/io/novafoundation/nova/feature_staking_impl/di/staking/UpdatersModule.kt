@@ -5,7 +5,6 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.TimelineDelegatingChainIdHolder
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.Mythos
@@ -26,6 +25,7 @@ import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpd
 import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
 import io.novafoundation.nova.runtime.network.updaters.multiChain.AsSharedStateUpdater
 import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimeLineChainUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -92,7 +92,7 @@ class UpdatersModule {
     @Provides
     @FeatureScope
     fun blockTimeUpdater(
-        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
+        timelineDelegatingChainIdHolder: DelegateToTimelineChainIdHolder,
         chainRegistry: ChainRegistry,
         sampledBlockTimeStorage: SampledBlockTimeStorage,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
@@ -102,7 +102,7 @@ class UpdatersModule {
     @FeatureScope
     fun provideBlockNumberUpdater(
         chainRegistry: ChainRegistry,
-        timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
+        timelineDelegatingChainIdHolder: DelegateToTimelineChainIdHolder,
         storageCache: StorageCache,
     ) = SharedAssetBlockNumberUpdater(chainRegistry, timelineDelegatingChainIdHolder, storageCache)
 

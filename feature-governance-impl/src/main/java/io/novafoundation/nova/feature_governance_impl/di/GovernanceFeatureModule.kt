@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -62,9 +63,9 @@ import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTra
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.di.common.SelectableAssetUseCaseModule
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SelectableSingleAssetSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -88,6 +89,10 @@ import javax.inject.Named
     ]
 )
 class GovernanceFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideTimelineDelegatingHolder(stakingSharedState: GovernanceSharedState) = DelegateToTimelineChainIdHolder(stakingSharedState)
 
     @Provides
     @FeatureScope

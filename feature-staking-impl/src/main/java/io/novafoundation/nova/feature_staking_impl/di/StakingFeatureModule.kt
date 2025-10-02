@@ -126,6 +126,7 @@ import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
@@ -144,6 +145,10 @@ class StakingFeatureModule {
         @Binds
         fun bindHoldsMigrationUseCase(real: RealStakingHoldsMigrationUseCase): StakingHoldsMigrationUseCase
     }
+
+    @Provides
+    @FeatureScope
+    fun provideTimelineDelegatingHolder(stakingSharedState: StakingSharedState) = DelegateToTimelineChainIdHolder(stakingSharedState)
 
     @Provides
     @FeatureScope

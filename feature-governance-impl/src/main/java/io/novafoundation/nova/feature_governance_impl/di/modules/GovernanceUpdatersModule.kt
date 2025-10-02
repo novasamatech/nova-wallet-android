@@ -10,12 +10,13 @@ import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.up
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
 import io.novafoundation.nova.runtime.network.updaters.InactiveIssuanceUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
 import io.novafoundation.nova.runtime.network.updaters.multiChain.AsSharedStateUpdater
 import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimeLineChainUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -48,11 +49,11 @@ class GovernanceUpdatersModule {
     @Provides
     @FeatureScope
     fun blockTimeUpdater(
-        singleAssetSharedState: GovernanceSharedState,
+        chainIdHolder: DelegateToTimelineChainIdHolder,
         chainRegistry: ChainRegistry,
         sampledBlockTimeStorage: SampledBlockTimeStorage,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
-    ) = BlockTimeUpdater(singleAssetSharedState, chainRegistry, sampledBlockTimeStorage, remoteStorage)
+    ) = BlockTimeUpdater(chainIdHolder, chainRegistry, sampledBlockTimeStorage, remoteStorage)
 
     @Provides
     @FeatureScope

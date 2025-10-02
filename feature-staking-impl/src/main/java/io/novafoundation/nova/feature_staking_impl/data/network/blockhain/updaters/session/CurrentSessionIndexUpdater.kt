@@ -4,16 +4,16 @@ import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.provideContext
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.GlobalScope
-import io.novafoundation.nova.feature_staking_impl.data.TimelineDelegatingChainIdHolder
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.currentIndex
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.api.session
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.TimelineDelegatingSingleKeyUpdater
-import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
+import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 
 class CurrentSessionIndexUpdater(
-    timelineDelegatingChainIdHolder: TimelineDelegatingChainIdHolder,
+    timelineDelegatingChainIdHolder: DelegateToTimelineChainIdHolder,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
 ) : TimelineDelegatingSingleKeyUpdater<Unit>(GlobalScope, chainRegistry, storageCache, timelineDelegatingChainIdHolder), SharedStateBasedUpdater<Unit> {
