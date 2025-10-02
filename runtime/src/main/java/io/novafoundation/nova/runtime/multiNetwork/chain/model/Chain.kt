@@ -63,6 +63,7 @@ data class Chain(
         val identityChain: ChainId?,
         val disabledCheckMetadataHash: Boolean?,
         val sessionLength: Int?,
+        val sessionsPerEra: Int?,
         val timelineChain: ChainId?
     )
 

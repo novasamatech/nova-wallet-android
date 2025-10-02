@@ -118,9 +118,12 @@ class StakingRepositoryImpl(
         return metadata.staking.erasStartSessionIndexOrNull?.query(eraIndex)
     }
 
-    override suspend fun eraLength(chainId: ChainId): BigInteger {
-        val runtime = runtimeFor(chainId)
+    override suspend fun eraLength(chain: Chain): BigInteger {
+        chain.additional?.sessionsPerEra?.let {
+            return it.toBigInteger()
+        }
 
+        val runtime = runtimeFor(chain.id)
         return runtime.metadata.staking().numberConstant("SessionsPerEra", runtime) // How many sessions per era
     }
 

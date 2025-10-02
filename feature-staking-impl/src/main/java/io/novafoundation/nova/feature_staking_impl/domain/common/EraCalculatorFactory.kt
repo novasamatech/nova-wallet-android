@@ -124,7 +124,7 @@ class EraTimeCalculatorFactory(
         ) { (activeEra, eraStartSessionIndex), currentSessionIndex, currentEpochIndex, currentSlot ->
             EraTimeCalculator(
                 startTimeStamp = System.currentTimeMillis().toBigInteger(),
-                eraLength = stakingRepository.eraLength(stakingChainId),
+                eraLength = stakingRepository.eraLength(stakingChain),
                 blockCreationTime = chainStateRepository.predictedBlockTime(timelineChainId),
                 currentSessionIndex = currentSessionIndex,
                 currentEpochIndex = currentEpochIndex ?: currentSessionIndex,
