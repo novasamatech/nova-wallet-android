@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Browserable
+import io.novafoundation.nova.common.mixin.hints.HintModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -77,6 +78,10 @@ class ChainMigrationDetailsViewModel(
             tokens = resourceManager.getString(R.string.chain_migration_details_tokens, newTokens),
             unifiedAccess = resourceManager.getString(R.string.chain_migration_details_unified_access, tokenSymbol),
             anyTokenFee = resourceManager.getString(R.string.chain_migration_details_fee_in_any_tokens),
+            hints = listOf(
+                HintModel(R.drawable.ic_recent_history, resourceManager.getString(R.string.chain_migration_details_hint_history, sourceChain.name)),
+                HintModel(R.drawable.ic_nova, resourceManager.getString(R.string.chain_migration_details_hint_auto_migration))
+            )
         )
     }
 
