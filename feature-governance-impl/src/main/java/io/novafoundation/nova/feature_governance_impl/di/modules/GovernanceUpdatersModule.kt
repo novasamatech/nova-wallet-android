@@ -59,9 +59,9 @@ class GovernanceUpdatersModule {
     @FeatureScope
     fun provideBlockNumberUpdater(
         chainRegistry: ChainRegistry,
-        crowdloanSharedState: GovernanceSharedState,
+        chainIdHolder: DelegateToTimelineChainIdHolder,
         storageCache: StorageCache,
-    ) = SharedAssetBlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
+    ) = SharedAssetBlockNumberUpdater(chainRegistry, chainIdHolder, storageCache)
 
     @Provides
     @FeatureScope
