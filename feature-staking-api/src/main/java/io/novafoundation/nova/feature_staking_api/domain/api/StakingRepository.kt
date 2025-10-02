@@ -22,7 +22,7 @@ interface StakingRepository {
 
     suspend fun eraStartSessionIndex(chainId: ChainId, era: EraIndex): EraIndex
 
-    suspend fun eraLength(chainId: ChainId): BigInteger
+    suspend fun eraLength(chain: Chain): BigInteger
 
     suspend fun getActiveEraIndex(chainId: ChainId): EraIndex
 
