@@ -96,7 +96,7 @@ class RealPushNotificationsService(
     override fun pushNotificationsAvaiabilityState(): PushNotificationsAvailabilityState {
         return when {
             !googleApiAvailabilityProvider.isAvailable() -> PushNotificationsAvailabilityState.PLAY_SERVICES_REQUIRED
-            !buildTypeProvider.isDebug() && !buildTypeProvider.isMarketRelease() -> PushNotificationsAvailabilityState.GOOGLE_PLAY_INSTALLATION_REQUIRED
+            !BuildConfig.DEBUG && !buildTypeProvider.isMarketRelease() -> PushNotificationsAvailabilityState.GOOGLE_PLAY_INSTALLATION_REQUIRED
             else -> PushNotificationsAvailabilityState.AVAILABLE
         }
     }
