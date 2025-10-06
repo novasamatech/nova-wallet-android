@@ -2,12 +2,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.throttleLast
-import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
@@ -34,6 +35,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -59,7 +61,8 @@ class StakingDashboardViewModel(
     private val presentationMapperFactory: StakingDashboardPresentationMapperFactory,
     private val dashboardUpdatePeriod: Duration = 200.milliseconds,
     private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel() {
 
     private val dashboardFormattersFlow = maskableValueFormatterProvider.provideFormatter()
@@ -144,8 +147,8 @@ class StakingDashboardViewModel(
         }
 
         return StakingDashboardModel.HasStakeItem(
-            chainUi = mapChainToUi(hasStake.chain).syncingIf(isSyncingPrimary),
-            assetId = hasStake.token.configuration.id,
+            assetLabel = resourceManager.getString(R.string.staking_rewards, hasStake.token.configuration.name).syncingIf(isSyncingPrimary),
+            assetId = hasStake.token.configuration.fullId,
             rewards = stats.map {
                 formatters.maskableValueFormatter.format {
                     amountFormatter.formatAmountToAmountModel(it.rewards, hasStake.token)
@@ -156,7 +159,8 @@ class StakingDashboardViewModel(
             }.syncingIf(isSyncingSecondary),
             status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
             earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
-            stakingTypeBadge = stakingTypBadge
+            stakingTypeBadge = stakingTypBadge,
+            assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary)
         )
     }
 

@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
@@ -604,8 +605,11 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapperFactory {
-        return StakingDashboardPresentationMapperFactory(resourceManager)
+    fun provideStakingDashboardPresentationMapper(
+        resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
+    ): StakingDashboardPresentationMapperFactory {
+        return StakingDashboardPresentationMapperFactory(resourceManager, assetIconProvider)
     }
 
     @Provides
