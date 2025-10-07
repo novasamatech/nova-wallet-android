@@ -1544,7 +1544,7 @@
     <string name="staking_reward_payouts_payout_all">Pagar todo (%s)</string>
     <string name="staking_reward_payouts_title">Recompensas pendientes</string>
     <string name="staking_reward_payouts_title_v2_2_0">Recompensas sin pagar</string>
-    <string name="staking_rewards">Recompensas</string>
+    <string name="staking_rewards">%s recompensas</string>
     <string name="staking_rewards_about">Acerca de las recompensas</string>
     <string name="staking_rewards_apy">Recompensas (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Destino de las recompensas</string>

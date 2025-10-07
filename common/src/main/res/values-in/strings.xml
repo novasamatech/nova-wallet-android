@@ -1533,7 +1533,7 @@
     <string name="staking_reward_payouts_payout_all">Bayar semua (%s)</string>
     <string name="staking_reward_payouts_title">Imbalan yang tertunda</string>
     <string name="staking_reward_payouts_title_v2_2_0">Imbalan yang belum dibayar</string>
-    <string name="staking_rewards">Imbalan</string>
+    <string name="staking_rewards">%s Imbalan</string>
     <string name="staking_rewards_about">Tentang imbalan</string>
     <string name="staking_rewards_apy">Imbalan (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Tujuan imbalan</string>

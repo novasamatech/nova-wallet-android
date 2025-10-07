@@ -1544,7 +1544,7 @@
     <string name="staking_reward_payouts_payout_all">Az összes kifizetése (%s)</string>
     <string name="staking_reward_payouts_title">Függőben lévő jutalmak</string>
     <string name="staking_reward_payouts_title_v2_2_0">Kifizetetlen jutalmak</string>
-    <string name="staking_rewards">Jutalmak</string>
+    <string name="staking_rewards">%s jutalmak</string>
     <string name="staking_rewards_about">A jutalmakról</string>
     <string name="staking_rewards_apy">Jutalmak (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Jutalmak érkezési helye</string>
