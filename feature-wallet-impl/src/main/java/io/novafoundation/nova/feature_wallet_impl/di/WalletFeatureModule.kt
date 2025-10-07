@@ -52,6 +52,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.AssetModelFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
@@ -93,6 +94,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorSto
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
+import io.novafoundation.nova.feature_wallet_impl.presentation.formatters.RealAssetModelFormatter
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -241,6 +243,18 @@ class WalletFeatureModule {
             tokenRepository = tokenRepository,
             assetSourceRegistry = assetSourceRegistry,
             customFeeCapabilityFacade = customFeeCapabilityFacade,
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAssetModelFormatter(
+        assetIconProvider: AssetIconProvider,
+        resourceManager: ResourceManager
+    ): AssetModelFormatter {
+        return RealAssetModelFormatter(
+            assetIconProvider,
+            resourceManager
         )
     }
 
