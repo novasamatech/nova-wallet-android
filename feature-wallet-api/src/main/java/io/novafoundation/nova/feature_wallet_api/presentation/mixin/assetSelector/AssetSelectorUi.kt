@@ -4,7 +4,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorBottomSheet
-import io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
 
 interface WithAssetSelector {
 
