@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.runtime.state.selectedChainFlow
+import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -67,7 +67,7 @@ class StakingViewModel(
     private val selectedAssetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
-    val titleFlow = stakingSharedState.selectedChainFlow()
+    val titleFlow = stakingSharedState.selectedAssetFlow()
         .map { resourceManager.getString(R.string.staking_title_format, it.name) }
         .shareInBackground()
 

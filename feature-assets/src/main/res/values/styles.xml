@@ -11,17 +11,4 @@
     <style name="TextAppearance.NovaFoundation.TransactionDetailToolbar" parent="TextAppearance.NovaFoundation.Regular.Footnote">
         <item name="android:textColor">@color/text_secondary</item>
     </style>
-
-    <style name="Widget.Nova.AssetIcon" parent="">
-        <item name="android:layout_height">40dp</item>
-        <item name="android:layout_width">40dp</item>
-    </style>
-
-    <style name="Widget.Nova.AssetIcon.Primary">
-        <item name="android:background">@drawable/bg_token_container</item>
-    </style>
-
-    <style name="Widget.Nova.AssetIcon.OnColor">
-        <item name="android:background">@drawable/bg_icon_container_on_color</item>
-    </style>
 </resources>

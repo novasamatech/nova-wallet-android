@@ -33,7 +33,8 @@ class DashboardNoStakeAdapter(
             when (it) {
                 NoStakeItem::earnings -> holder.bindEarnings(item)
                 NoStakeItem::availableBalance -> holder.bindAvailableBalance(item)
-                NoStakeItem::chainUi -> holder.bindChainUi(item)
+                NoStakeItem::tokenName -> holder.bindTokenName(item)
+                NoStakeItem::assetIcon -> holder.bindAssetIcon(item)
                 NoStakeItem::stakingTypeBadge -> holder.bindStakingType(item)
             }
         }
@@ -52,12 +53,13 @@ class DashboardNoStakeViewHolder(
     fun bind(model: NoStakeItem) {
         bindEarnings(model)
         bindAvailableBalance(model)
-        bindChainUi(model)
+        bindTokenName(model)
+        bindAssetIcon(model)
         bindStakingType(model)
     }
 
-    fun bindChainUi(model: NoStakeItem) {
-        containerView.setChainUi(model.chainUi)
+    fun bindTokenName(model: NoStakeItem) {
+        containerView.setTokenName(model.tokenName)
     }
 
     fun bindEarnings(model: NoStakeItem) {
@@ -72,6 +74,10 @@ class DashboardNoStakeViewHolder(
         containerView.setStakingTypeBadge(model.stakingTypeBadge)
     }
 
+    fun bindAssetIcon(model: NoStakeItem) {
+        containerView.setAssetIcon(model.assetIcon)
+    }
+
     override fun unbind() {
         containerView.unbind()
     }
@@ -82,12 +88,13 @@ private class DashboardNoStakeDiffCallback : DiffUtil.ItemCallback<NoStakeItem>(
     private val payloadGenerator = PayloadGenerator(
         NoStakeItem::earnings,
         NoStakeItem::availableBalance,
-        NoStakeItem::chainUi,
+        NoStakeItem::tokenName,
+        NoStakeItem::assetIcon,
         NoStakeItem::stakingTypeBadge
     )
 
     override fun areItemsTheSame(oldItem: NoStakeItem, newItem: NoStakeItem): Boolean {
-        return oldItem.chainUi.data.id == newItem.chainUi.data.id && oldItem.assetId == newItem.assetId
+        return oldItem.assetId == newItem.assetId
     }
 
     override fun areContentsTheSame(oldItem: NoStakeItem, newItem: NoStakeItem): Boolean {
