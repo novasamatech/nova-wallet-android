@@ -103,12 +103,17 @@ class StakingViewModel(
             if (configWithChains == null) return@combine null
 
             val config = configWithChains.config
-            val sourceChain = configWithChains.originChain
+            val destinationAsset = configWithChains.destinationAsset
             val destinationChain = configWithChains.destinationChain
             val formattedDate = dateFormatter.format(config.timeStartAt)
             AlertModel(
                 style = AlertView.Style.fromPreset(AlertView.StylePreset.INFO),
-                message = resourceManager.getString(R.string.staking_details_migration_alert_title, sourceChain.name, destinationChain.name, formattedDate),
+                message = resourceManager.getString(
+                    R.string.staking_details_migration_alert_title,
+                    destinationAsset.name,
+                    destinationChain.name,
+                    formattedDate
+                ),
                 linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreMigrationClicked(config) },
             )
         }

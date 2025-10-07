@@ -522,6 +522,7 @@
     </plurals>
     <string name="common_secret_derivation_path">Đường dẫn dẫn xuất bí mật</string>
     <string name="common_see_all">Xem tất cả</string>
+    <string name="common_select_token">Chọn token</string>
     <string name="common_settings">Cài đặt</string>
     <string name="common_share">Chia sẻ</string>
     <string name="common_share_call_data">Chia sẻ dữ liệu cuộc gọi</string>
@@ -1300,6 +1301,7 @@
     <string name="select_ledger_location_enable_request_message">Nova cần bật định vị để có thể thực hiện quét Bluetooth để tìm thiết bị Ledger của bạn</string>
     <string name="select_ledger_location_enable_request_title">Vui lòng bật định vị địa lý trong cài đặt thiết bị</string>
     <string name="select_network_title">Chọn mạng</string>
+    <string name="select_token_to_vote">Chọn token để bỏ phiếu</string>
     <string name="select_tracks_for">Chọn track cho</string>
     <string name="selected_tracks_quantity" formatted="false">%d trong %d</string>
     <string name="sell_network_flow_title">Chọn mạng để bán %s</string>

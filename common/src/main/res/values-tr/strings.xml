@@ -527,6 +527,7 @@
     </plurals>
     <string name="common_secret_derivation_path">Gizli türetme yolu</string>
     <string name="common_see_all">Hepsini Gör</string>
+    <string name="common_select_token">Token seç</string>
     <string name="common_settings">Ayarlar</string>
     <string name="common_share">Paylaş</string>
     <string name="common_share_call_data">Arama verisini paylaş</string>
@@ -1309,6 +1310,7 @@
     <string name="select_ledger_location_enable_request_message">Nova\'nın Bluetooth taraması yaparak Ledger cihazınızı bulabilmesi için konumun etkinleştirilmesi gerekiyor</string>
     <string name="select_ledger_location_enable_request_title">Lütfen cihaz ayarlarında coğrafi konumu etkinleştirin</string>
     <string name="select_network_title">Ağ seç</string>
+    <string name="select_token_to_vote">Oy vermek için token seçin</string>
     <string name="select_tracks_for">İçin şarkıları seçin</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="sell_network_flow_title">%s satışı için ağı seçin</string>

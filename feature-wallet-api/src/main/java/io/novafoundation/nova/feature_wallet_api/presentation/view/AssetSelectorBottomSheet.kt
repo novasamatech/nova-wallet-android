@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_wallet_api.databinding.ItemAssetSelectorBi
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.assetSelector.AssetSelectorModel
 
 class AssetSelectorBottomSheet(
+    private val title: String,
     private val imageLoader: ImageLoader,
     context: Context,
     payload: Payload<AssetSelectorModel>,
@@ -30,7 +31,7 @@ class AssetSelectorBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setTitle(R.string.select_network_title)
+        setTitle(title)
         setSubtitle(null)
     }
 

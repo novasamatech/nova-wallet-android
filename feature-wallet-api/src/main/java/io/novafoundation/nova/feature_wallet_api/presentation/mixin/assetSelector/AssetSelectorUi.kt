@@ -11,21 +11,6 @@ interface WithAssetSelector {
     val assetSelectorMixin: AssetSelectorMixin
 }
 
-fun <V> BaseFragment<V, *>.setupAssetSelector(
-    view: AssetSelectorView,
-    selectorMixin: AssetSelectorMixin,
-    imageLoader: ImageLoader
-) where V : BaseViewModel {
-    view.onClick {
-        selectorMixin.assetSelectorClicked()
-    }
-
-    subscribeOnAssetChange(selectorMixin) {
-        view.setState(imageLoader, it)
-    }
-    subscribeOnAssetClick(selectorMixin, imageLoader)
-}
-
 fun <V> BaseFragment<V, *>.subscribeOnAssetChange(
     selectorMixin: AssetSelectorMixin,
     onAssetChanged: (AssetSelectorModel) -> Unit
@@ -36,11 +21,13 @@ fun <V> BaseFragment<V, *>.subscribeOnAssetChange(
 }
 
 fun <V> BaseFragment<V, *>.subscribeOnAssetClick(
+    title: String,
     selectorMixin: AssetSelectorMixin,
     imageLoader: ImageLoader
 ) where V : BaseViewModel {
     selectorMixin.showAssetChooser.observeEvent {
         AssetSelectorBottomSheet(
+            title = title,
             imageLoader = imageLoader,
             context = requireContext(),
             payload = it,

@@ -522,6 +522,7 @@
     </plurals>
     <string name="common_secret_derivation_path">Jalur derivasi rahasia</string>
     <string name="common_see_all">Lihat Semua</string>
+    <string name="common_select_token">Pilih token</string>
     <string name="common_settings">Pengaturan</string>
     <string name="common_share">Bagikan</string>
     <string name="common_share_call_data">Bagikan data pemanggilan</string>
@@ -1300,6 +1301,7 @@
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
     <string name="select_network_title">Pilih jaringan</string>
+    <string name="select_token_to_vote">Pilih token untuk memberikan suara</string>
     <string name="select_tracks_for">Select tracks for</string>
     <string name="selected_tracks_quantity" formatted="false">%d of %d</string>
     <string name="sell_network_flow_title">Pilih jaringan untuk menjual %s</string>

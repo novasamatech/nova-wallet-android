@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="select_token_to_vote">Select token to vote</string>
+    <string name="common_select_token">Select token</string>
+
     <string name="staking_rewards">%s rewards</string>
 
     <string name="chain_migration_details_hint_history">Old transaction history remains on %s</string>
