@@ -112,7 +112,7 @@ class StakingViewModel(
                 linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreMigrationClicked(config) },
             )
         }
-    }
+    }.shareInBackground()
 
     fun backClicked() {
         router.back()
