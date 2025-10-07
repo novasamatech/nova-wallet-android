@@ -9,19 +9,18 @@
 
     <ImageView
         android:id="@+id/itemAssetSelectorIcon"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        style="@style/Widget.Nova.AssetIcon.OnColor"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/ic_fallback_network_icon" />
+        tools:src="@drawable/ic_nova" />
 
     <TextView
         android:id="@+id/itemAssetSelectorTokenName"
-        style="@style/TextAppearance.NovaFoundation.Body1"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -32,13 +31,15 @@
         android:textColor="@color/text_primary"
         app:layout_constraintEnd_toStartOf="@+id/itemAssetSelectorRadioButton"
         app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintBottom_toTopOf="@+id/itemAssetSelectorBalance"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@id/itemAssetSelectorIcon"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Polkadot" />
 
     <TextView
         android:id="@+id/itemAssetSelectorBalance"
-        style="@style/TextAppearance.NovaFoundation.Body2"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
