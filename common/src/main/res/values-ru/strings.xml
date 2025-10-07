@@ -1566,7 +1566,7 @@
     <string name="staking_reward_payouts_payout_all">Выплатить все (%s)</string>
     <string name="staking_reward_payouts_title">Ожидаемые вознаграждения</string>
     <string name="staking_reward_payouts_title_v2_2_0">Невыплаченные награды</string>
-    <string name="staking_rewards">Награды</string>
+    <string name="staking_rewards">%s награды</string>
     <string name="staking_rewards_about">О наградах</string>
     <string name="staking_rewards_apy">Вознаграждение (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Назначение наград</string>

@@ -1533,7 +1533,7 @@
     <string name="staking_reward_payouts_payout_all">모두 지급 (%s)</string>
     <string name="staking_reward_payouts_title">지급 대기 중인 보상</string>
     <string name="staking_reward_payouts_title_v2_2_0">지급되지 않은 보상</string>
-    <string name="staking_rewards">보상</string>
+    <string name="staking_rewards">%s 보상</string>
     <string name="staking_rewards_about">보상에 대하여</string>
     <string name="staking_rewards_apy">보상 (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">보상 목적지</string>

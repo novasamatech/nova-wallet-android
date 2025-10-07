@@ -1544,7 +1544,7 @@
     <string name="staking_reward_payouts_payout_all">Hepsini öde (%s)</string>
     <string name="staking_reward_payouts_title">Bekleyen ödüller</string>
     <string name="staking_reward_payouts_title_v2_2_0">Ödenmemiş ödüller</string>
-    <string name="staking_rewards">Ödüller</string>
+    <string name="staking_rewards">%s ödülleri</string>
     <string name="staking_rewards_about">Ödüller hakkında</string>
     <string name="staking_rewards_apy">Ödüller (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Ödüllerin hedefi</string>

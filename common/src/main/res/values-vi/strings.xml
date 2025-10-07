@@ -1533,7 +1533,7 @@
     <string name="staking_reward_payouts_payout_all">Thanh toán tất cả (%s)</string>
     <string name="staking_reward_payouts_title">Phần thưởng đang chờ xử lý</string>
     <string name="staking_reward_payouts_title_v2_2_0">Phần thưởng chưa trả</string>
-    <string name="staking_rewards">Phần thưởng</string>
+    <string name="staking_rewards">%s phần thưởng</string>
     <string name="staking_rewards_about">Về phần thưởng</string>
     <string name="staking_rewards_apy">Phần thưởng (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Đích đến phần thưởng</string>

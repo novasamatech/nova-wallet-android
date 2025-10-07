@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
-    <!--<string name="staking_rewards">Rewards</string>-->
     <string name="staking_rewards">%s rewards</string>
 
     <string name="chain_migration_details_hint_history">Old transaction history remains on %s</string>
