@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.SelectableAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.alphabeticalOrder
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.relaychainsFirstAscendingOrder
+import io.novafoundation.nova.runtime.ext.mainChainsFirstAscendingOrder
 import io.novafoundation.nova.runtime.ext.testnetsLastAscendingOrder
 import io.novafoundation.nova.runtime.state.SelectableAssetAdditionalData
 import io.novafoundation.nova.runtime.state.SelectableSingleAssetSharedState
@@ -36,7 +36,7 @@ class SelectableAssetUseCaseImpl<A : SelectableAssetAdditionalData>(
     }
 
     private fun assetsComparator(): Comparator<AssetAndOption<A>> {
-        return compareBy<AssetAndOption<A>> { it.option.assetWithChain.chain.relaychainsFirstAscendingOrder }
+        return compareBy<AssetAndOption<A>> { it.option.assetWithChain.chain.mainChainsFirstAscendingOrder }
             .thenBy { it.option.assetWithChain.chain.testnetsLastAscendingOrder }
             .thenByDescending { it.asset.token.amountToFiat(it.asset.transferable) }
             .thenByDescending { it.asset.transferable }

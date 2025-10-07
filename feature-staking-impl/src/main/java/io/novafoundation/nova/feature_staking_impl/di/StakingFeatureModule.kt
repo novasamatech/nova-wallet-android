@@ -110,8 +110,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.RealStakingDashboardPresentationMapper
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.display.RealPoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
@@ -127,6 +126,7 @@ import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
@@ -145,6 +145,10 @@ class StakingFeatureModule {
         @Binds
         fun bindHoldsMigrationUseCase(real: RealStakingHoldsMigrationUseCase): StakingHoldsMigrationUseCase
     }
+
+    @Provides
+    @FeatureScope
+    fun provideTimelineDelegatingHolder(stakingSharedState: StakingSharedState) = DelegateToTimelineChainIdHolder(stakingSharedState)
 
     @Provides
     @FeatureScope
@@ -600,8 +604,8 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapper {
-        return RealStakingDashboardPresentationMapper(resourceManager)
+    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapperFactory {
+        return StakingDashboardPresentationMapperFactory(resourceManager)
     }
 
     @Provides

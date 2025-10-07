@@ -29,6 +29,15 @@
             android:paddingTop="16dp"
             android:paddingBottom="8dp">
 
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/stakingMigrationAlert"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:visibility="gone"
+                app:alertMode="info"
+                tools:visibility="visible" />
+
             <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsView
                 android:id="@+id/stakingAlertsInfo"
                 android:layout_width="match_parent"

@@ -52,6 +52,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFractionStylingFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealTokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
@@ -240,10 +248,36 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideFeeLoaderMixinFactory(
         resourceManager: ResourceManager,
-        feeInteractor: FeeInteractor
+        feeInteractor: FeeInteractor,
+        amountFormatter: AmountFormatter
     ): FeeLoaderMixin.Factory {
-        return FeeLoaderProviderFactory(resourceManager, feeInteractor)
+        return FeeLoaderProviderFactory(resourceManager, feeInteractor, amountFormatter)
     }
+
+    @Provides
+    @FeatureScope
+    fun provideFractionStylingFormatter(resourceManager: ResourceManager): FractionStylingFormatter {
+        return RealFractionStylingFormatter(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAmountFormatter(
+        tokenFormatter: TokenFormatter,
+        fiatFormatter: FiatFormatter
+    ): AmountFormatter {
+        return RealAmountFormatter(tokenFormatter, fiatFormatter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideFiatFormatter(fractionStylingFormatter: FractionStylingFormatter): FiatFormatter {
+        return RealFiatFormatter(fractionStylingFormatter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideTokenFormatter(fractionStylingFormatter: FractionStylingFormatter): TokenFormatter = RealTokenFormatter(fractionStylingFormatter)
 
     @Provides
     @FeatureScope
@@ -252,8 +286,9 @@ class WalletFeatureModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
         interactor: FeeInteractor,
+        amountFormatter: AmountFormatter
     ): FeeLoaderMixinV2.Factory {
-        return FeeLoaderV2Factory(chainRegistry, actionAwaitableMixinFactory, resourceManager, interactor)
+        return FeeLoaderV2Factory(chainRegistry, actionAwaitableMixinFactory, resourceManager, interactor, amountFormatter)
     }
 
     @Provides

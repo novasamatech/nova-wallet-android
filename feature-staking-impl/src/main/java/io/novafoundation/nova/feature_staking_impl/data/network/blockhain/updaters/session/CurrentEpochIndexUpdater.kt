@@ -6,13 +6,21 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.ElectionsSessionRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 
 class CurrentEpochIndexUpdater(
     electionsSessionRegistry: ElectionsSessionRegistry,
     stakingSharedState: StakingSharedState,
+    timelineDelegatingChainIdHolder: DelegateToTimelineChainIdHolder,
     chainRegistry: ChainRegistry,
     storageCache: StorageCache
-) : ElectionsSessionParameterUpdater(electionsSessionRegistry, stakingSharedState, chainRegistry, storageCache) {
+) : ElectionsSessionParameterUpdater(
+    electionsSessionRegistry = electionsSessionRegistry,
+    stakingSharedState = stakingSharedState,
+    timelineDelegatingChainIdHolder = timelineDelegatingChainIdHolder,
+    chainRegistry = chainRegistry,
+    storageCache = storageCache
+) {
 
     override suspend fun ElectionsSession.updaterStorageKey(chainId: ChainId): String? {
         return currentEpochIndexStorageKey(chainId)

@@ -16,8 +16,8 @@ import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetBalance
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenAssetGroupToUi
-import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapGroupedAssetsToUi
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.BalanceListRvItem
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFl
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
@@ -40,7 +39,8 @@ class AssetSendFlowViewModel(
     resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
-    private val amountFormatter: AmountFormatter
+    private val networkAssetMapper: NetworkAssetFormatter,
+    private val tokenAssetFormatter: TokenAssetFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -51,7 +51,8 @@ class AssetSendFlowViewModel(
     resourceManager,
     assetIconProvider,
     assetViewModeInteractor,
-    amountFormatter
+    networkAssetMapper,
+    tokenAssetFormatter
 ) {
 
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
@@ -72,8 +73,8 @@ class AssetSendFlowViewModel(
     }
 
     override fun mapNetworkAssets(assets: Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>, currency: Currency): List<BalanceListRvItem> {
-        return assets.mapGroupedAssetsToUi(
-            amountFormatter,
+        return networkAssetMapper.mapGroupedAssetsToUi(
+            assets,
             assetIconProvider,
             currency,
             NetworkAssetGroup::groupTransferableBalanceFiat,
@@ -83,7 +84,7 @@ class AssetSendFlowViewModel(
 
     override fun mapTokensAssets(assets: Map<TokenAssetGroup, List<AssetWithNetwork>>): List<BalanceListRvItem> {
         return assets.map { (group, assets) ->
-            mapTokenAssetGroupToUi(amountFormatter, assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
+            tokenAssetFormatter.mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
     }
 

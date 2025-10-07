@@ -12,7 +12,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.StakeSummaryState
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.mapLatest
 class MythosStakeSummaryComponentFactory(
     private val mythosSharedComputation: MythosSharedComputation,
     private val interactor: MythosStakeSummaryInteractor,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -29,7 +31,8 @@ class MythosStakeSummaryComponentFactory(
         mythosSharedComputation = mythosSharedComputation,
         interactor = interactor,
         stakingOption = stakingOption,
-        hostContext = hostContext
+        hostContext = hostContext,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -39,6 +42,7 @@ private class MythosStakeSummaryComponent(
 
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
+    private val amountFormatter: AmountFormatter
 ) : BaseStakeSummaryComponent(hostContext.scope) {
 
     override val state: Flow<StakeSummaryState?> = mythosSharedComputation.loadUserStakeState(
@@ -53,7 +57,7 @@ private class MythosStakeSummaryComponent(
 
             hostContext.assetFlow.mapLatest { asset ->
                 StakeSummaryModel(
-                    totalStaked = mapAmountToAmountModel(stakeSummary.activeStake, asset),
+                    totalStaked = amountFormatter.formatAmountToAmountModel(stakeSummary.activeStake, asset),
                     status = status
                 )
             }

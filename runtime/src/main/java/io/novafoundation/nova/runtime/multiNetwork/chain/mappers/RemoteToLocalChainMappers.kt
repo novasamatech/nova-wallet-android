@@ -44,6 +44,8 @@ private const val SUPPORT_GENERIC_LEDGER_APP = "supportsGenericLedgerApp"
 private const val IDENTITY_CHAIN = "identityChain"
 private const val DISABLED_CHECK_METADATA_HASH = "disabledCheckMetadataHash"
 private const val SESSION_LENGTH = "sessionLength"
+private const val SESSIONS_PER_ERA = "sessionsPerEra"
+private const val TIMELINE_CHAIN = "timelineChain"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -70,7 +72,9 @@ fun mapRemoteChainToLocal(
             supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
             identityChain = it[IDENTITY_CHAIN] as? ChainId,
             disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean,
-            sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull()
+            sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull(),
+            sessionsPerEra = it[SESSIONS_PER_ERA].asGsonParsedIntOrNull(),
+            timelineChain = it[TIMELINE_CHAIN] as? ChainId
         )
     }
 
@@ -214,6 +218,7 @@ fun mapExternalApisToLocal(chainRemote: ChainRemote): List<ChainExternalApiLocal
 private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "history" -> ApiType.TRANSFERS
     "staking" -> ApiType.STAKING
+    "staking-rewards" -> ApiType.STAKING_REWARDS
     "crowdloans" -> ApiType.CROWDLOANS
     "governance" -> ApiType.GOVERNANCE_REFERENDA
     "governance-delegations" -> ApiType.GOVERNANCE_DELEGATIONS

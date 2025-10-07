@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
@@ -35,6 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRep
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class BalanceDetailModule {
@@ -102,7 +104,9 @@ class BalanceDetailModule {
         swapAvailabilityInteractor: SwapAvailabilityInteractor,
         assetIconProvider: AssetIconProvider,
         chartsInteractor: ChartsInteractor,
-        buySellSelectorMixinFactory: BuySellSelectorMixinFactory
+        buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+        amountFormatter: AmountFormatter,
+        chainMigrationInfoUseCase: ChainMigrationInfoUseCase
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -119,7 +123,9 @@ class BalanceDetailModule {
             swapAvailabilityInteractor = swapAvailabilityInteractor,
             assetIconProvider = assetIconProvider,
             chartsInteractor = chartsInteractor,
-            buySellSelectorMixinFactory = buySellSelectorMixinFactory
+            buySellSelectorMixinFactory = buySellSelectorMixinFactory,
+            amountFormatter = amountFormatter,
+            chainMigrationInfoUseCase = chainMigrationInfoUseCase
         )
     }
 

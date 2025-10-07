@@ -194,6 +194,7 @@ fun mapChainExternalApiToLocal(gson: Gson, chainId: String, api: ExternalApi): C
         is ExternalApi.GovernanceDelegations -> mapExternalApiGovernanceDelegations(chainId, api)
         is ExternalApi.GovernanceReferenda -> mapExternalApiGovernanceReferenda(gson, chainId, api)
         is ExternalApi.Staking -> mapExternalApiStaking(chainId, api)
+        is ExternalApi.StakingRewards -> mapExternalApiStakingRewards(chainId, api)
         is ExternalApi.ReferendumSummary -> mapExternalApiReferendumSummary(chainId, api)
     }
 }
@@ -260,6 +261,16 @@ private fun mapExternalApiStaking(chainId: String, api: ExternalApi.Staking): Ch
         chainId = chainId,
         sourceType = SourceType.SUBQUERY,
         apiType = ChainExternalApiLocal.ApiType.STAKING,
+        parameters = null,
+        url = api.url
+    )
+}
+
+fun mapExternalApiStakingRewards(chainId: String, api: ExternalApi.StakingRewards): ChainExternalApiLocal {
+    return ChainExternalApiLocal(
+        chainId = chainId,
+        sourceType = SourceType.SUBQUERY,
+        apiType = ChainExternalApiLocal.ApiType.STAKING_REWARDS,
         parameters = null,
         url = api.url
     )

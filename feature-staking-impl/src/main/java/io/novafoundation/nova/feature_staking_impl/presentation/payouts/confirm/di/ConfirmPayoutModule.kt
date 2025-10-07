@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmPayoutModule {
@@ -46,7 +47,8 @@ class ConfirmPayoutModule {
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmPayoutViewModel(
             interactor = interactor,
@@ -62,7 +64,8 @@ class ConfirmPayoutModule {
             selectedAssetState = singleAssetSharedState,
             walletUiUseCase = walletUiUseCase,
             partialRetriableMixinFactory = partialRetriableMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

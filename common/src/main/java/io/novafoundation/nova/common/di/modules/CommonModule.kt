@@ -42,7 +42,9 @@ import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferencesIm
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptionUtil
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.domain.interactor.RealAssetViewModeInteractor
+import io.novafoundation.nova.common.domain.usecase.RealMaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.interfaces.InternalFileSystemCache
@@ -57,6 +59,8 @@ import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.mixin.impl.CustomDialogProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.RealAssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -85,6 +89,8 @@ import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpReceiverApi
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
 import io.novafoundation.nova.common.utils.multiResult.RealPartialRetriableMixinFactory
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
+import io.novafoundation.nova.common.utils.network.RealDeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.permissions.PermissionsAskerFactory
 import io.novafoundation.nova.common.utils.progress.ProgressDialogMixinFactory
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -459,10 +465,37 @@ class CommonModule {
 
     @Provides
     @ApplicationScope
+    fun maskingModeUseCase(toggleFeatureRepository: ToggleFeatureRepository): MaskingModeUseCase {
+        return RealMaskingModeUseCase(toggleFeatureRepository)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideMaskableAmountFormatterFactory(): MaskableValueFormatterFactory {
+        return MaskableValueFormatterFactory()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideMaskableAmountFormatterProvider(
+        maskableValueFormatterFactory: MaskableValueFormatterFactory,
+        maskingModeUseCase: MaskingModeUseCase
+    ): MaskableValueFormatterProvider {
+        return MaskableValueFormatterProvider(maskableValueFormatterFactory, maskingModeUseCase)
+    }
+
+    @Provides
+    @ApplicationScope
     fun provideGlobalConfigDataSource(
         networkApiCreator: NetworkApiCreator
     ): GlobalConfigDataSource {
         val api = networkApiCreator.create(GlobalConfigApi::class.java)
         return RealGlobalConfigDataSource(api)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideDeviceNetworkManager(context: Context): DeviceNetworkStateObserver {
+        return RealDeviceNetworkStateObserver(context)
     }
 }

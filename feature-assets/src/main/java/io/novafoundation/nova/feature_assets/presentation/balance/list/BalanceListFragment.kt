@@ -122,6 +122,7 @@ class BalanceListFragment :
             }
         }
 
+        viewModel.maskingModeEnableFlow.observe(headerAdapter::setMaskingEnabled)
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
         viewModel.selectedWalletModelFlow.observe(headerAdapter::setSelectedWallet)
         viewModel.shouldShowPlaceholderFlow.observe(emptyAssetsPlaceholder::show)
@@ -195,6 +196,10 @@ class BalanceListFragment :
 
     override fun walletConnectClicked() {
         viewModel.walletConnectClicked()
+    }
+
+    override fun maskClicked() {
+        viewModel.toggleMasking()
     }
 
     override fun sendClicked() {

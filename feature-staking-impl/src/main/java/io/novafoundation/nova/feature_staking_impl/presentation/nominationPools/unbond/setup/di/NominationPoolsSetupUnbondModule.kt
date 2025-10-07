@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class, NominationPoolsCommonUnbondModule::class])
 class NominationPoolsSetupUnbondModule {
@@ -40,6 +41,7 @@ class NominationPoolsSetupUnbondModule {
         hintsFactory: NominationPoolsUnbondHintsFactory,
         maxActionProviderFactory: MaxActionProviderFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NominationPoolsSetupUnbondViewModel(
             router = router,
@@ -52,7 +54,8 @@ class NominationPoolsSetupUnbondModule {
             hintsFactory = hintsFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
             maxActionProviderFactory = maxActionProviderFactory,
-            stakingSharedState = stakingSharedState
+            stakingSharedState = stakingSharedState,
+            amountFormatter = amountFormatter
         )
     }
 

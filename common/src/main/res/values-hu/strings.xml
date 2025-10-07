@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">Szerződési cím megadása</string>
     <string name="asset_add_token_enter_decimals">Tizedesjegyek megadása</string>
     <string name="asset_add_token_enter_symbol">Szimbólum megadása</string>
+    <string name="asset_details_source_asset_alert_button">Ugrás a(z) %s</string>
+    <string name="asset_details_source_asset_alert_message">Kezdve %1$s, a %2$s egyenleged, Staking és Kormányzás a(z) %3$s-n lesz — javított teljesítménnyel és alacsonyabb költségekkel.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">A(z) %s tokened most a(z) %s-n</string>
     <string name="asset_view_networks">Hálózatok</string>
     <string name="asset_view_tokens">Tokenek</string>
     <string name="assets_add_token">Token hozzáadása</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">Vásárlás elindítva! Kérjük, várjon legfeljebb 60 percig. A státuszt nyomon követheti az e-mailben.</string>
     <string name="buy_token_not_supported_message">Egyik szolgáltatónk sem támogatja jelenleg ennek a tokennek a vásárlását. Kérjük, válasszon másik tokent, másik hálózatot, vagy térjen vissza később.</string>
     <string name="buy_token_not_supported_title">Ez a token nem támogatott a vásárlás funkció által</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Díjak kifizetése bármilyen tokennel lehetséges</string>
+    <string name="chain_migration_details_hint_auto_migration">A migráció automatikusan történik, nincs szükség műveletekre</string>
+    <string name="chain_migration_details_hint_history">A régi tranzakcióelőzmények megmaradnak a(z) %s rendszeren</string>
+    <string name="chain_migration_details_in_progress_title">A %1$s %2$s egyenlegtől kezdve a Stakelés és a Kormányzás %3$s érhetők el. Ezek a funkciók akár 24 óráig is elérhetetlenek lehetnek.</string>
+    <string name="chain_migration_details_lower_fee">%1$sx alacsonyabb tranzakciós költségek\n(%2$s-ról %3$s-ra)</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx csökkenés a minimális egyenlegben\n(%2$s-ról %3$s-ra)</string>
+    <string name="chain_migration_details_subtitle">Miért nagyszerű az Asset Hub?</string>
+    <string name="chain_migration_details_title">A %1$s kezdő %2$s egyenlegetekkel, a Stakelés és a Kormányzás a(z) %3$s-n van</string>
+    <string name="chain_migration_details_tokens">További token támogatás: %s, és más ökoszisztéma tokenek</string>
+    <string name="chain_migration_details_unified_access">Egységes hozzáférés %s-hoz, eszközökhöz, staking-hez és kormányzáshoz</string>
     <string name="chain_network_management_auto_balance">Automatikus csomópontok egyensúlyozása</string>
     <string name="chain_network_management_enabling">Kapcsolat engedélyezése</string>
     <string name="change_cloud_backup_password_subtitle">Kérjük, adjon meg egy jelszót, amely a pénztárcái felhőből történő visszaállításához lesz használva. Ezt a jelszót a jövőben nem lehet visszaállítani, ezért feltétlenül jegyezze meg!</string>
@@ -557,6 +570,7 @@
     <string name="common_use_max">Használja a maximumot</string>
     <string name="common_validation_invalid_address_message">A címzettnek érvényes %s címnek kell lennie</string>
     <string name="common_validation_invalid_address_title">Érvénytelen címzett</string>
+    <string name="common_view">Nézet</string>
     <string name="common_waiting">Várakozik</string>
     <string name="common_wallet">Tárca</string>
     <string name="common_warning">Figyelmeztetés</string>
@@ -1083,6 +1097,7 @@
     <string name="profile_accounts_title_2_0">Tárcák</string>
     <string name="profile_language_title">Nyelv</string>
     <string name="profile_pincode_change_title">PIN-kód módosítása</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Alkalmazás megnyitása rejtett egyenleggel</string>
     <string name="profile_settings_pin_code_verification_title">Jóváhagyás PIN-kóddal</string>
     <string name="profile_settings_safe_mode_title">Biztonságos mód</string>
     <string name="profile_settings_title">Beállítások</string>
@@ -1385,6 +1400,7 @@
     <string name="staking_dashboard_browser_stake_header">Stake-elés a Nova DApp böngészőn keresztül</string>
     <string name="staking_dashboard_more_options">További stake-elési lehetőségek</string>
     <string name="staking_dashboard_no_stake_header">Stake és jutalom szerzés</string>
+    <string name="staking_details_migration_alert_title">A(z) %1$s staking él a(z) %2$s-n, kezdve %3$s</string>
     <string name="staking_earnings_per_year">Becsült jutalmak</string>
     <string name="staking_era_title">korszak #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Becsült bevétel</string>
@@ -1796,6 +1812,7 @@
     <string name="transaction_details_view_polkascan">Megtekintés Polkascan-en</string>
     <string name="transaction_details_view_subscan">Megtekintés Subscan-en</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s - %s-kor</string>
+    <string name="transaction_history_migration_source_message" formatted="false">A korábbi %s tranzakció történeted még mindig elérhető a(z) %s-n</string>
     <string name="transaction_status_completed">Befejezett</string>
     <string name="transaction_status_failed">Sikertelen</string>
     <string name="transaction_status_pending">Függőben</string>
@@ -1934,7 +1951,6 @@
     <string name="wallet_tokens">Tokenek</string>
     <string name="wallet_transfer_details_send_back">Küldés ennek a kapcsolatnak</string>
     <string name="wallet_transfer_details_title">Átutalás részletei</string>
-    <string name="wallet_your_balance">Egyenleged</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s címek a következőhöz: %s</string>
     <string name="web3names_integrity_check_failed_message">A Nova problémákat észlet bizonyos %1$s címek integritásával kapcsolatban. Kérlek, vedd fel a kapcsolat a(z) %1$s tulajdonosával az integritási problémák kiküszöbölése érdekében.</string>

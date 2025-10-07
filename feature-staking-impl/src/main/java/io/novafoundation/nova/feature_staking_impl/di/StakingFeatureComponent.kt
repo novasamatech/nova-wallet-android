@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -296,7 +297,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
             AccountFeatureApi::class,
             ProxyFeatureApi::class,
             WalletFeatureApi::class,
-            DAppFeatureApi::class
+            DAppFeatureApi::class,
+            ChainMigrationFeatureApi::class
         ]
     )
     interface StakingFeatureDependenciesComponent : StakingFeatureDependencies

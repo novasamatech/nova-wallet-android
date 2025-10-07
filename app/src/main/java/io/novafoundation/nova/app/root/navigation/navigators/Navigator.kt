@@ -53,6 +53,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.startCreateWalle
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload.FlowType
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
+import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsFragment
+import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
@@ -618,6 +620,12 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openChainMigrationDetails(chainId: String) {
+        navigationBuilder().action(R.id.action_open_chain_migration_details)
+            .setArgs(ChainMigrationDetailsFragment.createPayload(ChainMigrationDetailsPayload(chainId)))
+            .navigateInRoot()
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {
@@ -648,6 +656,7 @@ class Navigator(
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
             .addCase(R.id.tradeWebFragment, R.id.action_tradeWebFragment_to_balanceDetailFragment)
+            .addCase(R.id.balanceDetailFragment, R.id.action_balanceDetailFragment_to_balanceDetailFragment)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }

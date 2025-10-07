@@ -5,6 +5,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.deeplinks.AccountDeepLinks
 import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigrationDeepLinks
+import io.novafoundation.nova.feature_ahm_api.di.deeplinks.ChainMigrationDeepLinks
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
 import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
@@ -32,7 +33,8 @@ class DeepLinksModule {
         assetDeepLinks: AssetDeepLinks,
         walletConnectDeepLinks: WalletConnectDeepLinks,
         accountMigrationDeepLinks: AccountMigrationDeepLinks,
-        multisigDeepLinks: MultisigDeepLinks
+        multisigDeepLinks: MultisigDeepLinks,
+        chainMigrationDeepLinks: ChainMigrationDeepLinks
     ): List<@JvmWildcard DeepLinkHandler> {
         return buildList {
             addAll(stakingDeepLinks.deepLinkHandlers)
@@ -44,6 +46,7 @@ class DeepLinksModule {
             addAll(walletConnectDeepLinks.deepLinkHandlers)
             addAll(accountMigrationDeepLinks.deepLinkHandlers)
             addAll(multisigDeepLinks.deepLinkHandlers)
+            addAll(chainMigrationDeepLinks.deepLinkHandlers)
         }
     }
 

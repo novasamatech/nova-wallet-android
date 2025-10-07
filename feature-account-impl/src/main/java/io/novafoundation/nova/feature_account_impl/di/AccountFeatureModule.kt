@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
@@ -459,13 +460,17 @@ class AccountFeatureModule {
         addressIconGenerator: AddressIconGenerator,
         walletUiUseCase: WalletUiUseCase,
         metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-        presentationMapper: MetaAccountTypePresentationMapper
+        presentationMapper: MetaAccountTypePresentationMapper,
+        maskableValueFormatterProvider: MaskableValueFormatterProvider,
+        resourceManager: ResourceManager
     ): SelectedAccountUseCase = RealSelectedAccountUseCase(
         accountRepository = accountRepository,
         walletUiUseCase = walletUiUseCase,
         addressIconGenerator = addressIconGenerator,
         metaAccountsUpdatesRegistry = metaAccountsUpdatesRegistry,
-        accountTypePresentationMapper = presentationMapper
+        accountTypePresentationMapper = presentationMapper,
+        maskableValueFormatterProvider = maskableValueFormatterProvider,
+        resourceManager = resourceManager
     )
 
     @Provides

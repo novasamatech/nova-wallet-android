@@ -6,14 +6,17 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.feature_governance_impl.data.network.blockchain.updaters.GovernanceUpdateSystem
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.BlockTimeUpdater
-import io.novafoundation.nova.runtime.network.updaters.ConstantSingleChainUpdateSystem
 import io.novafoundation.nova.runtime.network.updaters.InactiveIssuanceUpdater
+import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
 import io.novafoundation.nova.runtime.network.updaters.TotalIssuanceUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.AsSharedStateUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimeLineChainUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
@@ -31,29 +34,34 @@ class GovernanceUpdatersModule {
         chainRegistry: ChainRegistry,
         singleAssetSharedState: GovernanceSharedState,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-    ): UpdateSystem = ConstantSingleChainUpdateSystem(
-        updaters = listOf(totalIssuanceUpdater, inactiveIssuanceUpdater, blockNumberUpdater, blockTimeUpdater),
+    ): UpdateSystem = GovernanceUpdateSystem(
+        governanceUpdaters = listOf(
+            AsSharedStateUpdater(totalIssuanceUpdater),
+            AsSharedStateUpdater(inactiveIssuanceUpdater),
+            DelegateToTimeLineChainUpdater(blockNumberUpdater),
+            DelegateToTimeLineChainUpdater(blockTimeUpdater),
+        ),
         chainRegistry = chainRegistry,
-        singleAssetSharedState = singleAssetSharedState,
+        governanceSharedState = singleAssetSharedState,
         storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
     )
 
     @Provides
     @FeatureScope
     fun blockTimeUpdater(
-        singleAssetSharedState: GovernanceSharedState,
+        chainIdHolder: DelegateToTimelineChainIdHolder,
         chainRegistry: ChainRegistry,
         sampledBlockTimeStorage: SampledBlockTimeStorage,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorage: StorageDataSource,
-    ) = BlockTimeUpdater(singleAssetSharedState, chainRegistry, sampledBlockTimeStorage, remoteStorage)
+    ) = BlockTimeUpdater(chainIdHolder, chainRegistry, sampledBlockTimeStorage, remoteStorage)
 
     @Provides
     @FeatureScope
     fun provideBlockNumberUpdater(
         chainRegistry: ChainRegistry,
-        crowdloanSharedState: GovernanceSharedState,
+        chainIdHolder: DelegateToTimelineChainIdHolder,
         storageCache: StorageCache,
-    ) = SharedAssetBlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
+    ) = SharedAssetBlockNumberUpdater(chainRegistry, chainIdHolder, storageCache)
 
     @Provides
     @FeatureScope

@@ -17,7 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsAction
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsState
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -30,6 +31,7 @@ class MythosUserRewardsComponentFactory(
     private val interactor: MythosUserRewardsInteractor,
     private val rewardPeriodsInteractor: StakingRewardPeriodInteractor,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -42,7 +44,8 @@ class MythosUserRewardsComponentFactory(
         rewardPeriodsInteractor = rewardPeriodsInteractor,
         resourceManager = resourceManager,
         router = router,
-        mythosSharedComputation = mythosSharedComputation
+        mythosSharedComputation = mythosSharedComputation,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -54,7 +57,8 @@ private class MythosUserRewardsComponent(
     private val resourceManager: ResourceManager,
 
     private val stakingOption: StakingOption,
-    private val hostContext: ComponentHostContext
+    private val hostContext: ComponentHostContext,
+    private val amountFormatter: AmountFormatter
 ) : BaseRewardComponent(hostContext) {
 
     private val stateDiffing = { old: MythosDelegatorState.Staked, new: MythosDelegatorState.Staked ->
@@ -91,12 +95,12 @@ private class MythosUserRewardsComponent(
         if (rewardsState == null) return@combine null
 
         val total = rewardsState.flatMap { poolRewards ->
-            poolRewards.total.map { total -> mapAmountToAmountModel(total, asset) }
+            poolRewards.total.map { total -> amountFormatter.formatAmountToAmountModel(total, asset) }
         }
         val claimable = rewardsState.flatMap { poolRewards ->
             poolRewards.claimable.map { claimable ->
                 UserRewardsState.ClaimableRewards(
-                    amountModel = mapAmountToAmountModel(claimable, asset),
+                    amountModel = amountFormatter.formatAmountToAmountModel(claimable, asset),
                     canClaim = claimable.isPositive()
                 )
             }

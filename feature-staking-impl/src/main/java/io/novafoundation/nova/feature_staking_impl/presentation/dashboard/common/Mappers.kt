@@ -1,9 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 
+import android.text.SpannableStringBuilder
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.presentation.masking.getUnmaskedOrElse
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.appendEnd
+import io.novafoundation.nova.common.utils.drawableSpan
 import io.novafoundation.nova.common.utils.formatting.format
+import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
+import io.novafoundation.nova.common.utils.formatting.spannable.format
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NoStake
@@ -17,8 +23,17 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.m
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
 import io.novasama.substrate_sdk_android.hash.isPositive
+
+class StakingDashboardPresentationMapperFactory(
+    private val resourceManager: ResourceManager
+) {
+    fun create(maskableValueFormatter: MaskableValueFormatter): StakingDashboardPresentationMapper {
+        return RealStakingDashboardPresentationMapper(resourceManager, maskableValueFormatter)
+    }
+}
 
 interface StakingDashboardPresentationMapper {
 
@@ -28,11 +43,14 @@ interface StakingDashboardPresentationMapper {
 }
 
 class RealStakingDashboardPresentationMapper(
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val maskableValueFormatter: MaskableValueFormatter
 ) : StakingDashboardPresentationMapper {
 
     @Suppress("UNCHECKED_CAST")
-    override fun mapWithoutStakeItemToUi(withoutStake: AggregatedStakingDashboardOption<WithoutStake>): StakingDashboardModel.NoStakeItem {
+    override fun mapWithoutStakeItemToUi(
+        withoutStake: AggregatedStakingDashboardOption<WithoutStake>
+    ): StakingDashboardModel.NoStakeItem {
         return when (withoutStake.stakingState) {
             is NoStake -> mapNoStakeItemToUi(withoutStake as AggregatedStakingDashboardOption<NoStake>)
             NotYetResolved -> mapNotYetResolvedItemToUi(withoutStake as AggregatedStakingDashboardOption<NotYetResolved>)
@@ -69,8 +87,15 @@ class RealStakingDashboardPresentationMapper(
 
         val availableBalance = noStake.stakingState.availableBalance
         val formattedAvailableBalance = if (availableBalance.isPositive()) {
-            val formattedAmount = availableBalance.formatPlanks(noStake.token.configuration)
-            resourceManager.getString(R.string.common_available_format, formattedAmount)
+            val maskableValue = maskableValueFormatter.format<CharSequence> { availableBalance.formatPlanks(noStake.token.configuration) }
+                .getUnmaskedOrElse {
+                    val maskingDrawable = resourceManager.getDrawable(R.drawable.mask_dots_small)
+                    SpannableStringBuilder()
+                        .append(" ") // Small space before masking
+                        .appendEnd(drawableSpan(maskingDrawable, extendToLineHeight = true))
+                }
+
+            SpannableFormatter.format(resourceManager, R.string.common_available_format, maskableValue)
         } else {
             null
         }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.common.createSubqueryFilter
 
 class AllHistoricalVotesRequest(address: String) {
 
@@ -29,11 +30,11 @@ class AllHistoricalVotesRequest(address: String) {
     """.trimIndent()
 }
 
-class DirectHistoricalVotesRequest(address: String, recentVotesBlockThreshold: BlockNumber) {
+class DirectHistoricalVotesRequest(address: String, recentVotesDateThreshold: RecentVotesDateThreshold) {
 
     val query = """
         query {
-          castingVotings(filter: { and: { voter: {equalTo: "$address"}, at: { greaterThanOrEqualTo: $recentVotesBlockThreshold}}}) {
+          castingVotings(filter: { and: { voter: {equalTo: "$address"}, ${recentVotesDateThreshold.createSubqueryFilter()}}}) {
             nodes {
               referendumId
               standardVote

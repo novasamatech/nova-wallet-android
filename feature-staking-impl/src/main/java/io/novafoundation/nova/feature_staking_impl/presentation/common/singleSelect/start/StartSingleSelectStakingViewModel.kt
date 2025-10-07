@@ -41,7 +41,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
@@ -77,6 +78,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
     private val selectedAssetState: StakingSharedState,
     private val router: ReturnableRouter,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor
     where T : Identifiable, T : WithAccountId {
@@ -159,7 +161,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
         val minimumStake = logic.minimumStakeToGetRewards(it)
         val asset = assetFlow.first()
 
-        mapAmountToAmountModel(minimumStake, asset)
+        amountFormatter.formatAmountToAmountModel(minimumStake, asset)
     }.shareInBackground()
 
     val rewardsComponent = rewardsComponentFactory.create(

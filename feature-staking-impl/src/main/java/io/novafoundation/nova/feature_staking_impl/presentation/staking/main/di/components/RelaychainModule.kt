@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.relaychain.RelaychainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.relaychain.RelaychainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.relaychain.RelaychainUserRewardsComponentFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import javax.inject.Named
 
 @Module
@@ -55,10 +56,12 @@ class RelaychainModule {
         stakingInteractor: StakingInteractor,
         resourceManager: ResourceManager,
         stakingSharedComputation: StakingSharedComputation,
+        amountFormatter: AmountFormatter
     ) = RelaychainNetworkInfoComponentFactory(
         stakingInteractor = stakingInteractor,
         resourceManager = resourceManager,
         stakingSharedComputation = stakingSharedComputation,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -85,10 +88,12 @@ class RelaychainModule {
         stakingInteractor: StakingInteractor,
         resourceManager: ResourceManager,
         stakingSharedComputation: StakingSharedComputation,
+        amountFormatter: AmountFormatter
     ) = RelaychainStakeSummaryComponentFactory(
         stakingInteractor = stakingInteractor,
         resourceManager = resourceManager,
         stakingSharedComputation = stakingSharedComputation,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -101,6 +106,7 @@ class RelaychainModule {
         @Named(SYSTEM_MANAGE_STAKING_REDEEM) redeemValidationSystem: StakeActionsValidationSystem,
         router: StakingRouter,
         stakingSharedComputation: StakingSharedComputation,
+        amountFormatter: AmountFormatter
     ) = RelaychainUnbondingComponentFactory(
         unbondInteractor = unbondInteractor,
         validationExecutor = validationExecutor,
@@ -109,6 +115,7 @@ class RelaychainModule {
         redeemValidationSystem = redeemValidationSystem,
         router = router,
         stakingSharedComputation = stakingSharedComputation,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -117,11 +124,13 @@ class RelaychainModule {
         stakingInteractor: StakingInteractor,
         stakingSharedComputation: StakingSharedComputation,
         stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ) = RelaychainUserRewardsComponentFactory(
         stakingInteractor = stakingInteractor,
         stakingSharedComputation = stakingSharedComputation,
         rewardPeriodsInteractor = stakingRewardPeriodInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 }

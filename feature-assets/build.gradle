@@ -46,6 +46,7 @@ dependencies {
     implementation project(':feature-xcm:api')
     implementation project(':feature-banners-api')
     implementation project(':feature-deep-linking')
+    implementation project(':feature-ahm-api')
 
     implementation kotlinDep
 

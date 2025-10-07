@@ -13,11 +13,8 @@ import io.novafoundation.nova.feature_governance_api.data.repository.getDelegate
 import io.novafoundation.nova.feature_governance_api.data.source.GovernanceSourceRegistry
 import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovernanceOption
 import io.novafoundation.nova.feature_governance_api.domain.track.Track
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RecentVotesTimePointProvider
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.blockDurationEstimator
-import io.novafoundation.nova.runtime.util.blockInPast
 import io.novasama.substrate_sdk_android.runtime.AccountId
 
 interface DelegateCommonRepository {
@@ -36,7 +33,7 @@ interface DelegateCommonRepository {
 class RealDelegateCommonRepository(
     private val governanceSourceRegistry: GovernanceSourceRegistry,
     private val accountRepository: AccountRepository,
-    private val chainStateRepository: ChainStateRepository,
+    private val recentVotesTimePointProvider: RecentVotesTimePointProvider
 ) : DelegateCommonRepository {
 
     override suspend fun getDelegatesStats(
@@ -45,13 +42,12 @@ class RealDelegateCommonRepository(
     ): List<DelegateStats> {
         val chain = governanceOption.assetWithChain.chain
         val delegationsRepository = governanceSourceRegistry.sourceFor(governanceOption).delegationsRepository
-        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.id)
-        val recentVotesBlockThreshold = blockDurationEstimator.blockInPast(RECENT_VOTES_PERIOD)
+        val timePointThreshold = recentVotesTimePointProvider.getTimePointThresholdForChain(chain)
 
         return if (accountIds == null) {
-            delegationsRepository.getDelegatesStats(recentVotesBlockThreshold, chain)
+            delegationsRepository.getDelegatesStats(timePointThreshold, chain)
         } else {
-            delegationsRepository.getDelegatesStatsByAccountIds(recentVotesBlockThreshold, accountIds, chain)
+            delegationsRepository.getDelegatesStatsByAccountIds(timePointThreshold, accountIds, chain)
         }
     }
 

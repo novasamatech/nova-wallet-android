@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">Entrez l\'adresse du contrat</string>
     <string name="asset_add_token_enter_decimals">Entrez les décimales</string>
     <string name="asset_add_token_enter_symbol">Entrez le symbole</string>
+    <string name="asset_details_source_asset_alert_button">Aller à %s</string>
+    <string name="asset_details_source_asset_alert_message">À partir de %1$s, votre solde de %2$s, Staking et Gouvernance seront sur %3$s — avec des performances améliorées et des coûts réduits.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">Vos tokens %s maintenant sur %s</string>
     <string name="asset_view_networks">Réseaux</string>
     <string name="asset_view_tokens">Tokens</string>
     <string name="assets_add_token">Ajouter un jeton</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">Achat initié ! Veuillez patienter jusqu\'à 60 minutes. Vous pouvez suivre le statut par email.</string>
     <string name="buy_token_not_supported_message">Aucun de nos fournisseurs ne supporte actuellement l\'achat de ce jeton. Veuillez choisir un jeton différent, un réseau différent, ou revenir plus tard.</string>
     <string name="buy_token_not_supported_title">Ce jeton n\'est pas supporté par la fonction d\'achat</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Possibilité de payer les frais avec n\'importe quel token</string>
+    <string name="chain_migration_details_hint_auto_migration">La migration se fait automatiquement, aucune action nécessaire</string>
+    <string name="chain_migration_details_hint_history">L’historique des anciennes transactions reste sur %s</string>
+    <string name="chain_migration_details_in_progress_title">À partir de %1$s votre %2$s solde, le Staking et la Gouvernance sont sur %3$s. Ces fonctionnalités peuvent être indisponibles jusqu’à 24 heures.</string>
+    <string name="chain_migration_details_lower_fee">%1$sx frais de transaction plus bas\n(de %2$s à %3$s)</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx réduction du solde minimal\n(de %2$s à %3$s)</string>
+    <string name="chain_migration_details_subtitle">Qu\'est-ce qui rend Asset Hub extraordinaire ?</string>
+    <string name="chain_migration_details_title">À partir de %1$s votre solde %2$s, le Staking et la Gouvernance sont sur %3$s</string>
+    <string name="chain_migration_details_tokens">Plus de tokens supportés : %s, et autres tokens de l\'écosystème</string>
+    <string name="chain_migration_details_unified_access">Accès unifié à %s, actifs, staking et gouvernance</string>
     <string name="chain_network_management_auto_balance">Équilibrage automatique des nœuds</string>
     <string name="chain_network_management_enabling">Activer la connexion</string>
     <string name="change_cloud_backup_password_subtitle">Veuillez entrer un mot de passe qui sera utilisé pour récupérer vos portefeuilles à partir de la sauvegarde cloud. Ce mot de passe ne pourra pas être récupéré à l\'avenir, alors assurez-vous de vous en souvenir !</string>
@@ -557,6 +570,7 @@
     <string name="common_use_max">Utiliser la quantité max</string>
     <string name="common_validation_invalid_address_message">Le bénéficiaire doit être une adresse %s valide</string>
     <string name="common_validation_invalid_address_title">Bénéficiaire invalide</string>
+    <string name="common_view">Vue</string>
     <string name="common_waiting">En attente</string>
     <string name="common_wallet">Portefeuille</string>
     <string name="common_warning">Avertissement</string>
@@ -1083,6 +1097,7 @@
     <string name="profile_accounts_title_2_0">Portefeuilles</string>
     <string name="profile_language_title">Langue</string>
     <string name="profile_pincode_change_title">Modifier le code pin</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Ouvrir l’application avec le solde masqué</string>
     <string name="profile_settings_pin_code_verification_title">Approuver avec PIN</string>
     <string name="profile_settings_safe_mode_title">Mode sans échec</string>
     <string name="profile_settings_title">Paramètres</string>
@@ -1385,6 +1400,7 @@
     <string name="staking_dashboard_browser_stake_header">Staking via le navigateur DApp Nova</string>
     <string name="staking_dashboard_more_options">Plus d\'options de staking</string>
     <string name="staking_dashboard_no_stake_header">Stake et gagnez des récompenses</string>
+    <string name="staking_details_migration_alert_title">Le Staking %1$s est en ligne sur %2$s à partir de %3$s</string>
     <string name="staking_earnings_per_year">Récompenses estimées</string>
     <string name="staking_era_title">#%s ère</string>
     <string name="staking_estimate_earning_title_v1.9.0">Estimation des revenus</string>
@@ -1796,6 +1812,7 @@
     <string name="transaction_details_view_polkascan">Voir sur Polkascan</string>
     <string name="transaction_details_view_subscan">Voir sur Subscan</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s à %s</string>
+    <string name="transaction_history_migration_source_message" formatted="false">Votre ancien historique de transactions %s est toujours disponible sur %s</string>
     <string name="transaction_status_completed">Terminé</string>
     <string name="transaction_status_failed">Échec</string>
     <string name="transaction_status_pending">En attente</string>
@@ -1934,7 +1951,6 @@
     <string name="wallet_tokens">Actifs</string>
     <string name="wallet_transfer_details_send_back">Envoyer à ce contact</string>
     <string name="wallet_transfer_details_title">Détails du transfert</string>
-    <string name="wallet_your_balance">Votre solde</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s adresses pour %s</string>
     <string name="web3names_integrity_check_failed_message">Nova a détecté des problèmes d\'intégrité des informations concernant %1$s adresses. Veuillez contacter le propriétaire de %1$s pour résoudre les problèmes d\'intégrité.</string>

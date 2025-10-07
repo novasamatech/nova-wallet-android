@@ -32,7 +32,8 @@ import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -58,6 +59,7 @@ class ConfirmMultiStakingViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -99,7 +101,7 @@ class ConfirmMultiStakingViewModel(
         .shareInBackground()
 
     val amountModelFlow = combine(currentSelectionFlow, assetFlow) { currentSelection, asset ->
-        mapAmountToAmountModel(currentSelection.selection.stake, asset)
+        amountFormatter.formatAmountToAmountModel(currentSelection.selection.stake, asset)
     }
         .shareInBackground()
 
@@ -107,7 +109,7 @@ class ConfirmMultiStakingViewModel(
         .shareInBackground()
 
     val feeStatusFlow = assetFlow.map { asset ->
-        val feeModel = mapFeeToFeeModel(decimalFee, asset.token)
+        val feeModel = mapFeeToFeeModel(decimalFee, asset.token, amountFormatter = amountFormatter)
 
         FeeStatus.Loaded(feeModel)
     }

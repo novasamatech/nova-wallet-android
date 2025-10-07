@@ -1,8 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
+import io.novafoundation.nova.feature_governance_impl.data.offchain.delegation.v2.stats.request.common.createSubqueryFilter
 
-class DelegateStatsRequest(recentVotesBlockThreshold: BlockNumber) {
+class DelegateStatsRequest(recentVotesDateThreshold: RecentVotesDateThreshold) {
     val query = """
         query {
            delegates {
@@ -11,7 +12,7 @@ class DelegateStatsRequest(recentVotesBlockThreshold: BlockNumber) {
                 accountId
                 delegators
                 delegatorVotes
-                delegateVotes(filter: {at: {greaterThanOrEqualTo: ${recentVotesBlockThreshold.toInt()}}}) {
+                delegateVotes(filter: {${recentVotesDateThreshold.createSubqueryFilter()}}) {
                   totalCount
                 }
               }

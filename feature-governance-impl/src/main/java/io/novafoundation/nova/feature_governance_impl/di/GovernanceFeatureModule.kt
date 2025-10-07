@@ -4,9 +4,11 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
@@ -55,13 +57,15 @@ import io.novafoundation.nova.feature_governance_impl.presentation.common.voters
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.detail.DelegatesSharedComputation
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendaStatusFormatter
-import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.RealReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
+import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatterFactory
 import io.novafoundation.nova.feature_governance_impl.presentation.track.RealTrackFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.track.TrackFormatter
 import io.novafoundation.nova.feature_wallet_api.di.common.SelectableAssetUseCaseModule
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.SelectableSingleAssetSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -85,6 +89,10 @@ import javax.inject.Named
     ]
 )
 class GovernanceFeatureModule {
+
+    @Provides
+    @FeatureScope
+    fun provideTimelineDelegatingHolder(stakingSharedState: GovernanceSharedState) = DelegateToTimelineChainIdHolder(stakingSharedState)
 
     @Provides
     @FeatureScope
@@ -174,11 +182,24 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideReferendumFormatter(
+    fun provideReferendumFormatterFactory(
         resourceManager: ResourceManager,
         trackFormatter: TrackFormatter,
-        referendaStatusFormatter: ReferendaStatusFormatter
-    ): ReferendumFormatter = RealReferendumFormatter(resourceManager, trackFormatter, referendaStatusFormatter)
+        referendaStatusFormatter: ReferendaStatusFormatter,
+        amountFormatter: AmountFormatter
+    ) = ReferendumFormatterFactory(
+        resourceManager,
+        trackFormatter,
+        referendaStatusFormatter,
+        amountFormatter
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideDefaultReferendumFormatter(
+        referendumFormatterFactory: ReferendumFormatterFactory,
+        maskableValueFormatterFactory: MaskableValueFormatterFactory
+    ): ReferendumFormatter = referendumFormatterFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
 
     @Provides
     @FeatureScope
@@ -189,7 +210,10 @@ class GovernanceFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideLocksFormatter(resourceManager: ResourceManager): LocksFormatter = RealLocksFormatter(resourceManager)
+    fun provideLocksFormatter(
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
+    ): LocksFormatter = RealLocksFormatter(resourceManager, amountFormatter)
 
     @Provides
     @FeatureScope

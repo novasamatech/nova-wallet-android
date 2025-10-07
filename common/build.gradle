@@ -46,7 +46,7 @@ android {
 
         buildConfigField "long", "CLOUD_PROJECT_NUMBER", "171267697857L"
 
-        buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/global/config.json\""
+        buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/global/config_dev.json\""
     }
 
     buildTypes {
@@ -58,6 +58,8 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             buildConfigField "long", "CLOUD_PROJECT_NUMBER", "802342409053L"
+
+            buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/global/config.json\""
         }
 
         releaseGithub {

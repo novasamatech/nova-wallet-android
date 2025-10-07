@@ -503,6 +503,12 @@
         <item name="iconGravity">textStart</item>
     </style>
 
+    <style name="Widget.Nova.TextButton" parent="">
+        <item name="android:padding">8dp</item>
+        <item name="android:background">@drawable/bg_text_button_ripple</item>
+        <item name="android:textColor">@color/button_text_accent</item>
+    </style>
+
     <!-- Input -->
 
     <style name="Widget.Nova.Input.EditText" parent="@android:style/Widget.EditText">

@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">Введите адрес контракта</string>
     <string name="asset_add_token_enter_decimals">Введите число десятичных знаков</string>
     <string name="asset_add_token_enter_symbol">Введите символ</string>
+    <string name="asset_details_source_asset_alert_button">Перейти к %s</string>
+    <string name="asset_details_source_asset_alert_message">Начиная с %1$s, ваш баланс %2$s, Staking и Governance будут на %3$s — с улучшенной производительностью и меньшими затратами.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">Ваши %s токены теперь на %s</string>
     <string name="asset_view_networks">Сети</string>
     <string name="asset_view_tokens">Токены</string>
     <string name="assets_add_token">Добавить токен</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">Покупка инициирована! Пожалуйста, подождите до 60 минут. Вы можете отслеживать статус по email.</string>
     <string name="buy_token_not_supported_message">Ни один из наших провайдеров в настоящее время не поддерживает покупку этого токена. Пожалуйста, выберите другой токен, другую сеть или попробуйте позже.</string>
     <string name="buy_token_not_supported_title">Этот токен не поддерживается функцией покупки</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Возможность оплатить комиссии любым токеном</string>
+    <string name="chain_migration_details_hint_auto_migration">Миграция происходит автоматически, действия не требуются</string>
+    <string name="chain_migration_details_hint_history">Старая история транзакций остается на %s</string>
+    <string name="chain_migration_details_in_progress_title">Начиная с %1$s ваш баланс %2$s, Staking и Governance включены на %3$s. Эти функции могут быть недоступны до 24 часов.</string>
+    <string name="chain_migration_details_lower_fee">%1$sx более низкие транзакционные комиссии\n(от %2$s до %3$s)</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx сокращение минимального баланса\n(от %2$s до %3$s)</string>
+    <string name="chain_migration_details_subtitle">Что делает Asset Hub замечательным?</string>
+    <string name="chain_migration_details_title">Начиная с %1$s ваш баланс %2$s, Staking и Governance находятся на %3$s</string>
+    <string name="chain_migration_details_tokens">Поддерживаются больше токенов: %s и другие токены экосистемы</string>
+    <string name="chain_migration_details_unified_access">Унифицированный доступ к %s, активам, staking и governance</string>
     <string name="chain_network_management_auto_balance">Автоматическая балансировка нод</string>
     <string name="chain_network_management_enabling">Включить подключение</string>
     <string name="change_cloud_backup_password_subtitle">Введите пароль, который будет использоваться для восстановления ваших кошельков из облачного бэкапа. Этот пароль нельзя будет восстановить в будущем, поэтому обязательно запомните его!</string>
@@ -569,6 +582,7 @@
     <string name="common_use_max">Использовать максимум</string>
     <string name="common_validation_invalid_address_message">Получатель должен быть допустимым адресом %s</string>
     <string name="common_validation_invalid_address_title">Недопустимый получатель</string>
+    <string name="common_view">Посмотреть</string>
     <string name="common_waiting">Ожидание</string>
     <string name="common_wallet">Кошелек</string>
     <string name="common_warning">Предупреждение</string>
@@ -1099,6 +1113,7 @@
     <string name="profile_accounts_title_2_0">Кошельки</string>
     <string name="profile_language_title">Язык</string>
     <string name="profile_pincode_change_title">Изменить PIN-код</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Вход со скрытым балансом</string>
     <string name="profile_settings_pin_code_verification_title">Подтверждение с PIN</string>
     <string name="profile_settings_safe_mode_title">Безопасный режим</string>
     <string name="profile_settings_title">Настройки</string>
@@ -1403,6 +1418,7 @@
     <string name="staking_dashboard_browser_stake_header">Стейкинг через DApp браузер Nova</string>
     <string name="staking_dashboard_more_options">Больше вариантов стейкинга</string>
     <string name="staking_dashboard_no_stake_header">Стейкайте и получайте награды</string>
+    <string name="staking_details_migration_alert_title">%1$s Staking доступен на %2$s начиная с %3$s</string>
     <string name="staking_earnings_per_year">Примерный доход</string>
     <string name="staking_era_title">эра %s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Расчёт доходности</string>
@@ -1820,6 +1836,7 @@
     <string name="transaction_details_view_polkascan">Посмотреть в Polkascan</string>
     <string name="transaction_details_view_subscan">Просмотреть в Subscan</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s в %s</string>
+    <string name="transaction_history_migration_source_message" formatted="false">Ваша предыдущая история транзакций %s всё ещё доступна на %s</string>
     <string name="transaction_status_completed">Успешно</string>
     <string name="transaction_status_failed">Ошибка</string>
     <string name="transaction_status_pending">В ожидании</string>
@@ -1962,7 +1979,6 @@
     <string name="wallet_tokens">Токены</string>
     <string name="wallet_transfer_details_send_back">Отправить этому контакту</string>
     <string name="wallet_transfer_details_title">Детали перевода</string>
-    <string name="wallet_your_balance">Ваш баланс</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s адреса для %s</string>
     <string name="web3names_integrity_check_failed_message">Nova обнаружила проблемы с целостностью информации об адресах %1$s. Пожалуйста, свяжитесь с владельцем %1$s для решения проблем с целостностью.</string>

@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">Masukkan alamat kontrak</string>
     <string name="asset_add_token_enter_decimals">Masukkan desimal</string>
     <string name="asset_add_token_enter_symbol">Masukkan simbol</string>
+    <string name="asset_details_source_asset_alert_button">Pergi ke %s</string>
+    <string name="asset_details_source_asset_alert_message">Mulai %1$s, saldo %2$s Anda, Staking, dan Tata Kelola akan ada di %3$s — dengan kinerja yang lebih baik dan biaya yang lebih rendah.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">Token %s Anda sekarang di %s</string>
     <string name="asset_view_networks">Jaringan</string>
     <string name="asset_view_tokens">Token</string>
     <string name="assets_add_token">Tambahkan token</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">Pembelian dimulai! Harap tunggu hingga 60 menit. Anda dapat melacak statusnya di email.</string>
     <string name="buy_token_not_supported_message">Tidak ada penyedia kami yang saat ini mendukung pembelian token ini. Silakan pilih token lain, jaringan lain, atau periksa kembali nanti.</string>
     <string name="buy_token_not_supported_title">Token ini tidak didukung oleh fitur beli</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Kemampuan untuk membayar biaya dalam token apa pun</string>
+    <string name="chain_migration_details_hint_auto_migration">Migrasi terjadi secara otomatis, tidak perlu tindakan</string>
+    <string name="chain_migration_details_hint_history">Riwayat transaksi lama tetap ada di %s</string>
+    <string name="chain_migration_details_in_progress_title">Mulai dengan %1$s saldo %2$s Anda, Staking dan Tata Kelola ada di %3$s. Fitur-fitur ini mungkin tidak tersedia hingga 24 jam.</string>
+    <string name="chain_migration_details_lower_fee">%1$sx biaya transaksi lebih rendah\n(dari %2$s ke %3$s)</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx pengurangan saldo minimal\n(dari %2$s ke %3$s)</string>
+    <string name="chain_migration_details_subtitle">Apa yang membuat Asset Hub hebat?</string>
+    <string name="chain_migration_details_title">Memulai %1$s saldo %2$s Anda, Staking dan Governance berada di %3$s</string>
+    <string name="chain_migration_details_tokens">Lebih banyak token didukung: %s, dan token ekosistem lainnya</string>
+    <string name="chain_migration_details_unified_access">Akses terpadu ke %s, aset, staking, dan tata kelola</string>
     <string name="chain_network_management_auto_balance">Node saldo otomatis</string>
     <string name="chain_network_management_enabling">Aktifkan koneksi</string>
     <string name="change_cloud_backup_password_subtitle">Silakan masukkan kata sandi yang akan digunakan untuk memulihkan dompet Anda dari cadangan cloud. Kata sandi ini tidak dapat dipulihkan di masa depan, jadi pastikan untuk mengingatnya!</string>
@@ -551,6 +564,7 @@
     <string name="common_use_max">Gunakan maksimum</string>
     <string name="common_validation_invalid_address_message">Penerima harus merupakan alamat %s yang valid</string>
     <string name="common_validation_invalid_address_title">Penerima tidak valid</string>
+    <string name="common_view">Lihat</string>
     <string name="common_waiting">Menunggu</string>
     <string name="common_wallet">Dompet</string>
     <string name="common_warning">Peringatan</string>
@@ -1075,6 +1089,7 @@
     <string name="profile_accounts_title_2_0">Dompet</string>
     <string name="profile_language_title">Bahasa</string>
     <string name="profile_pincode_change_title">Ubah kode pin</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Buka aplikasi dengan saldo tersembunyi</string>
     <string name="profile_settings_pin_code_verification_title">Setujui dengan PIN</string>
     <string name="profile_settings_safe_mode_title">Mode Aman</string>
     <string name="profile_settings_title">Pengaturan</string>
@@ -1376,6 +1391,7 @@
     <string name="staking_dashboard_browser_stake_header">Staking melalui browser Nova DApp</string>
     <string name="staking_dashboard_more_options">Lebih banyak pilihan staking</string>
     <string name="staking_dashboard_no_stake_header">Stake dan dapatkan hadiah</string>
+    <string name="staking_details_migration_alert_title">Staking %1$s aktif di %2$s mulai %3$s</string>
     <string name="staking_earnings_per_year">Perkiraan hadiah</string>
     <string name="staking_era_title">era #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Perkiraan pendapatan</string>
@@ -1784,6 +1800,7 @@
     <string name="transaction_details_view_polkascan">Lihat di Polkascan</string>
     <string name="transaction_details_view_subscan">Lihat di Subscan</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s di %s</string>
+    <string name="transaction_history_migration_source_message" formatted="false">Riwayat transaksi %s Anda sebelumnya masih tersedia di %s</string>
     <string name="transaction_status_completed">Selesai</string>
     <string name="transaction_status_failed">Gagal</string>
     <string name="transaction_status_pending">Menunggu</string>
@@ -1920,7 +1937,6 @@
     <string name="wallet_tokens">Token</string>
     <string name="wallet_transfer_details_send_back">Kirim ke kontak ini</string>
     <string name="wallet_transfer_details_title">Rincian Transfer</string>
-    <string name="wallet_your_balance">Saldo Anda</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s alamat untuk %s</string>
     <string name="web3names_integrity_check_failed_message">Nova mendeteksi masalah dengan integritas informasi tentang alamat %1$s. Harap hubungi pemilik %1$s untuk menyelesaikan masalah integritas.</string>

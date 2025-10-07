@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.data.repository
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.Delegation
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.ReferendumId
 import io.novafoundation.nova.feature_governance_api.data.network.blockhain.model.TrackId
@@ -9,6 +8,7 @@ import io.novafoundation.nova.feature_governance_api.data.network.offchain.model
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.delegation.DelegateStats
 import io.novafoundation.nova.feature_governance_api.data.network.offchain.model.vote.UserVote
 import io.novafoundation.nova.feature_governance_api.data.repository.DelegationsRepository
+import io.novafoundation.nova.feature_governance_api.data.repository.common.RecentVotesDateThreshold
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -21,15 +21,23 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
         return false
     }
 
-    override suspend fun getDelegatesStats(recentVotesBlockThreshold: BlockNumber, chain: Chain): List<DelegateStats> {
+    override suspend fun getDelegatesStats(recentVotesBlockThreshold: RecentVotesDateThreshold, chain: Chain): List<DelegateStats> {
         return emptyList()
     }
 
-    override suspend fun getDelegatesStatsByAccountIds(recentVotesBlockThreshold: BlockNumber, accountIds: List<AccountId>, chain: Chain): List<DelegateStats> {
+    override suspend fun getDelegatesStatsByAccountIds(
+        recentVotesBlockThreshold: RecentVotesDateThreshold,
+        accountIds: List<AccountId>,
+        chain: Chain
+    ): List<DelegateStats> {
         return emptyList()
     }
 
-    override suspend fun getDetailedDelegateStats(delegateAddress: String, recentVotesBlockThreshold: BlockNumber, chain: Chain): DelegateDetailedStats? {
+    override suspend fun getDetailedDelegateStats(
+        delegateAddress: String,
+        recentVotesDateThreshold: RecentVotesDateThreshold,
+        chain: Chain
+    ): DelegateDetailedStats? {
         return null
     }
 
@@ -56,7 +64,7 @@ class UnsupportedDelegationsRepository : DelegationsRepository {
     override suspend fun directHistoricalVotesOf(
         user: AccountId,
         chain: Chain,
-        recentVotesBlockThreshold: BlockNumber?
+        recentVotesDateThreshold: RecentVotesDateThreshold?
     ): Map<ReferendumId, UserVote.Direct>? {
         return null
     }

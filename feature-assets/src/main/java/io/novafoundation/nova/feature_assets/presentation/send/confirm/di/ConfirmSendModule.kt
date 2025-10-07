@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.confirm.ConfirmSe
 import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.ConfirmSendHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmSendModule {
@@ -58,7 +59,8 @@ class ConfirmSendModule {
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
         confirmSendHintsMixinFactory: ConfirmSendHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmSendViewModel(
             interactor = interactor,
@@ -75,7 +77,8 @@ class ConfirmSendModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             transferDraft = transferDraft,
             hintsFactory = confirmSendHintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

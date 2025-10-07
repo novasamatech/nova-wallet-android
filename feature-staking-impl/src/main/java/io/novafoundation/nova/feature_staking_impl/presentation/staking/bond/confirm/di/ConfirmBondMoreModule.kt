@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.bond.BondM
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMorePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.bond.confirm.ConfirmBondMoreViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmBondMoreModule {
@@ -42,7 +43,8 @@ class ConfirmBondMoreModule {
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
         hintsMixinFactory: ResourcesHintsMixinFactory,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return ConfirmBondMoreViewModel(
             router = router,
@@ -57,7 +59,8 @@ class ConfirmBondMoreModule {
             selectedAssetState = singleAssetSharedState,
             walletUiUseCase = walletUiUseCase,
             hintsMixinFactory = hintsMixinFactory,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

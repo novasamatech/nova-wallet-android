@@ -80,6 +80,13 @@ class BannerPagerView @JvmOverloads constructor(
         binder.pagerBannerClose.setOnClickListener { closeCurrentPage() }
     }
 
+    fun setLoadingState(loading: Boolean) {
+        binder.pagerBannerShimmering.isVisible = loading
+        binder.pagerBannerCardView.isVisible = !loading
+        binder.pagerBannerIndicators.isVisible = !loading
+        binder.pagerBannerContent.isVisible = !loading
+    }
+
     fun setBanners(banners: List<BannerPageModel>) {
         val newIds = banners.mapToSet { it.id }
         val currentIds = pages.mapToSet { it.id }

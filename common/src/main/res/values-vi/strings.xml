@@ -209,6 +209,9 @@
     <string name="asset_add_token_enter_contract_address">Nhập địa chỉ hợp đồng</string>
     <string name="asset_add_token_enter_decimals">Nhập số thập phân</string>
     <string name="asset_add_token_enter_symbol">Nhập ký hiệu</string>
+    <string name="asset_details_source_asset_alert_button">Đi đến %s</string>
+    <string name="asset_details_source_asset_alert_message">Bắt đầu %1$s, số dư %2$s của bạn, Staking, và Quản trị sẽ trên %3$s — với hiệu suất cải thiện và chi phí thấp hơn.</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">Token %s của bạn hiện trên %s</string>
     <string name="asset_view_networks">Mạng</string>
     <string name="asset_view_tokens">Token</string>
     <string name="assets_add_token">Thêm token</string>
@@ -268,6 +271,16 @@
     <string name="buy_order_completed_message">Đã bắt đầu mua! Vui lòng chờ tối đa 60 phút. Bạn có thể theo dõi trạng thái trên email.</string>
     <string name="buy_token_not_supported_message">Không có nhà cung cấp nào của chúng tôi hiện đang hỗ trợ mua token này. Vui lòng chọn token khác, mạng khác hoặc kiểm tra lại sau.</string>
     <string name="buy_token_not_supported_title">Token này không được tính năng mua hỗ trợ</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Khả năng thanh toán phí bằng bất kỳ token nào</string>
+    <string name="chain_migration_details_hint_auto_migration">Việc di chuyển diễn ra tự động, không cần hành động</string>
+    <string name="chain_migration_details_hint_history">Lịch sử giao dịch cũ vẫn còn trên %s</string>
+    <string name="chain_migration_details_in_progress_title">Bắt đầu %1$s số dư %2$s của bạn, Staking và Quản trị đang ở %3$s. Những tính năng này có thể không khả dụng trong tối đa 24 giờ.</string>
+    <string name="chain_migration_details_lower_fee">%1$s phí giao dịch thấp hơn\n(từ %2$s đến %3$s)</string>
+    <string name="chain_migration_details_minimal_balance">%1$s giảm số dư tối thiểu\n(từ %2$s đến %3$s)</string>
+    <string name="chain_migration_details_subtitle">Điều gì khiến Asset Hub tuyệt vời?</string>
+    <string name="chain_migration_details_title">Bắt đầu %1$s số dư %2$s của bạn, Staking và Governance trị đang ở %3$s</string>
+    <string name="chain_migration_details_tokens">Hỗ trợ nhiều token hơn: %s, và các token hệ sinh thái khác</string>
+    <string name="chain_migration_details_unified_access">Truy cập hợp nhất tới %s, tài sản, staking, và quản trị</string>
     <string name="chain_network_management_auto_balance">Tự động cân bằng nodes</string>
     <string name="chain_network_management_enabling">Kích hoạt kết nối</string>
     <string name="change_cloud_backup_password_subtitle">Vui lòng nhập mật khẩu sẽ được sử dụng để khôi phục ví của bạn từ sao lưu đám mây. Mật khẩu này không thể khôi phục trong tương lai, vì vậy hãy đảm bảo ghi nhớ nó!</string>
@@ -551,6 +564,7 @@
     <string name="common_use_max">Sử dụng tối đa</string>
     <string name="common_validation_invalid_address_message">Người nhận phải là địa chỉ %s hợp lệ</string>
     <string name="common_validation_invalid_address_title">Người nhận không hợp lệ</string>
+    <string name="common_view">Xem</string>
     <string name="common_waiting">Đang chờ</string>
     <string name="common_wallet">Ví</string>
     <string name="common_warning">Cảnh báo</string>
@@ -1075,6 +1089,7 @@
     <string name="profile_accounts_title_2_0">Ví tiền</string>
     <string name="profile_language_title">Ngôn ngữ</string>
     <string name="profile_pincode_change_title">Đổi mã PIN</string>
+    <string name="profile_settings_hide_balances_on_launch_title">Mở ứng dụng với số dư ẩn</string>
     <string name="profile_settings_pin_code_verification_title">Xác nhận bằng mã PIN</string>
     <string name="profile_settings_safe_mode_title">Chế độ an toàn</string>
     <string name="profile_settings_title">Cài đặt</string>
@@ -1376,6 +1391,7 @@
     <string name="staking_dashboard_browser_stake_header">Staking qua trình duyệt Nova DApp</string>
     <string name="staking_dashboard_more_options">Thêm tùy chọn staking</string>
     <string name="staking_dashboard_no_stake_header">Stake và nhận phần thưởng</string>
+    <string name="staking_details_migration_alert_title">Staking %1$s đang hoạt động trên %2$s bắt đầu %3$s</string>
     <string name="staking_earnings_per_year">Phần thưởng ước tính</string>
     <string name="staking_era_title">kỷ nguyên #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">Thu nhập ước tính</string>
@@ -1784,6 +1800,7 @@
     <string name="transaction_details_view_polkascan">Xem trong Polkascan</string>
     <string name="transaction_details_view_subscan">Xem trong Subscan</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s vào %s</string>
+    <string name="transaction_history_migration_source_message" formatted="false">Lịch sử giao dịch trước đây của bạn %s vẫn còn trên %s</string>
     <string name="transaction_status_completed">Hoàn thành</string>
     <string name="transaction_status_failed">Thất bại</string>
     <string name="transaction_status_pending">Đang chờ xử lý</string>
@@ -1920,7 +1937,6 @@
     <string name="wallet_tokens">Token</string>
     <string name="wallet_transfer_details_send_back">Gửi đến liên hệ này</string>
     <string name="wallet_transfer_details_title">Chi tiết chuyển khoản</string>
-    <string name="wallet_your_balance">Số dư của bạn</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">Địa chỉ %s cho %s</string>
     <string name="web3names_integrity_check_failed_message">Nova phát hiện các vấn đề liên quan đến tính toàn vẹn của thông tin về địa chỉ %1$s. Vui lòng liên hệ với chủ sở hữu %1$s để giải quyết các vấn đề liên quan đến tính toàn vẹn.</string>

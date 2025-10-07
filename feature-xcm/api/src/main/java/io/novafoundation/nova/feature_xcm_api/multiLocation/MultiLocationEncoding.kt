@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.HexString
 import io.novafoundation.nova.common.utils.padEnd
 import io.novafoundation.nova.common.utils.structOf
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.NetworkId
 import io.novafoundation.nova.feature_xcm_api.versions.VersionedXcm
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.bindVersionedXcm
@@ -104,13 +105,16 @@ private fun bindGlobalConsensusJunction(instance: Any?): Junction {
     return when (asDictEnum.name) {
         "ByGenesis" -> {
             val genesis = bindByteArray(asDictEnum.value).toHexString(withPrefix = false)
-            Junction.GlobalConsensus(chainId = genesis)
+            Junction.GlobalConsensus(networkId = NetworkId.Substrate(genesis))
         }
 
-        "Polkadot" -> Junction.GlobalConsensus(chainId = Chain.Geneses.POLKADOT)
-        "Kusama" -> Junction.GlobalConsensus(chainId = Chain.Geneses.KUSAMA)
-        "Westend" -> Junction.GlobalConsensus(chainId = Chain.Geneses.WESTEND)
-        "Ethereum" -> Junction.GlobalConsensus(chainId = Chain.Ids.ETHEREUM)
+        "Polkadot" -> Junction.GlobalConsensus(NetworkId.Substrate(Chain.Geneses.POLKADOT))
+        "Kusama" -> Junction.GlobalConsensus(NetworkId.Substrate(Chain.Geneses.KUSAMA))
+        "Westend" -> Junction.GlobalConsensus(NetworkId.Substrate(Chain.Geneses.WESTEND))
+        "Ethereum" -> {
+            val chainId = bindInt(asDictEnum.value.castToStruct()["chain_id"])
+            Junction.GlobalConsensus(NetworkId.Ethereum(chainId))
+        }
         else -> Junction.Unsupported
     }
 }
@@ -164,15 +168,26 @@ private fun encodableGeneralKey(xcmVersion: XcmVersion, generalKey: HexString): 
 }
 
 private fun Junction.GlobalConsensus.toEncodableInstance(): Any {
-    val innerValue = when (chainId) {
+    val innerValue = when (networkId) {
+        is NetworkId.Ethereum -> networkId.toEncodableInstance()
+        is NetworkId.Substrate -> networkId.toEncodableInstance()
+    }
+
+    return DictEnum.Entry("GlobalConsensus", innerValue)
+}
+
+private fun NetworkId.Ethereum.toEncodableInstance(): Any {
+    return DictEnum.Entry("Ethereum", structOf("chain_id" to chainId.toBigInteger()))
+}
+
+private fun NetworkId.Substrate.toEncodableInstance(): Any {
+    return when (genesisHash) {
         Chain.Geneses.POLKADOT -> DictEnum.Entry("Polkadot", null)
         Chain.Geneses.KUSAMA -> DictEnum.Entry("Kusama", null)
         Chain.Geneses.WESTEND -> DictEnum.Entry("Westend", null)
         Chain.Ids.ETHEREUM -> DictEnum.Entry("Ethereum", null)
-        else -> DictEnum.Entry("ByGenesis", chainId.fromHex())
+        else -> DictEnum.Entry("ByGenesis", genesisHash.fromHex())
     }
-
-    return DictEnum.Entry("GlobalConsensus", innerValue)
 }
 
 private fun AccountIdKey.toJunctionAccountIdInstance(accountIdKey: String, xcmVersion: XcmVersion) = structOf(

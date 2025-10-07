@@ -82,19 +82,6 @@
                         app:layout_constraintTop_toTopOf="@+id/balanceDetailTokenIcon"
                         tools:text="KSM" />
 
-                    <io.novafoundation.nova.feature_account_api.view.ChainChipView
-                        android:id="@+id/balanceDetailsChain"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginEnd="16dp"
-                        app:layout_constrainedWidth="true"
-                        app:layout_constraintBottom_toBottomOf="@+id/balanceDetailTokenName"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintHorizontal_bias="1"
-                        app:layout_constraintStart_toEndOf="@+id/balanceDetailTokenName"
-                        app:layout_constraintTop_toTopOf="@+id/balanceDetailTokenName" />
-
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
@@ -115,6 +102,17 @@
                         android:paddingBottom="16dp"
                         tools:context=".presentation.balance.list.BalanceListFragment">
 
+                        <io.novafoundation.nova.common.view.AlertView
+                            android:id="@+id/balanceDetailsMigrationAlert"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="16dp"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            app:alertMode="info"
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:visibility="visible" />
+
                         <io.novafoundation.nova.feature_assets.presentation.balance.detail.AssetDetailBalancesView
                             android:id="@+id/balanceDetailsBalances"
                             android:layout_width="0dp"
@@ -124,8 +122,7 @@
                             android:layout_marginEnd="16dp"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent"
-                            app:title="@string/wallet_your_balance" />
+                            app:layout_constraintTop_toBottomOf="@+id/balanceDetailsMigrationAlert" />
 
                         <io.novafoundation.nova.feature_assets.presentation.balance.assetActions.AssetActionsView
                             android:id="@+id/balanceDetailActions"
