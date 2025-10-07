@@ -527,6 +527,7 @@
     </plurals>
     <string name="common_secret_derivation_path">Titkos származtatási útvonal</string>
     <string name="common_see_all">Összes megtekintése</string>
+    <string name="common_select_token">Válassz tokent</string>
     <string name="common_settings">Beállítások</string>
     <string name="common_share">Megosztás</string>
     <string name="common_share_call_data">Hívás adatok megosztása</string>
@@ -1309,6 +1310,7 @@
     <string name="select_ledger_location_enable_request_message">A Nova-nak szüksége van a helymeghatározáshoz, hogy megtalálhassa a Ledger eszköt bluetooth-on keresztül</string>
     <string name="select_ledger_location_enable_request_title">Kérlek, engedélyezd a helymeghatározást a készülék beállításaiban</string>
     <string name="select_network_title">Hálózat választása</string>
+    <string name="select_token_to_vote">Válassz tokent a szavazáshoz</string>
     <string name="select_tracks_for">Kategóriák választása:</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="sell_network_flow_title">Válasszon hálózatot a(z) %s eladásához</string>
