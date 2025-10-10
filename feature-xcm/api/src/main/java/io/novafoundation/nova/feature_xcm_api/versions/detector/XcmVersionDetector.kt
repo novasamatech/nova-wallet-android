@@ -10,6 +10,8 @@ interface XcmVersionDetector {
 
     suspend fun lowestPresentMultiAssetsVersion(chainId: ChainId): XcmVersion?
 
+    suspend fun lowestPresentMultiAssetIdVersion(chainId: ChainId): XcmVersion?
+
     suspend fun lowestPresentMultiAssetVersion(chainId: ChainId): XcmVersion?
 
     suspend fun detectMultiLocationVersion(chainId: ChainId, multiLocationType: RuntimeType<*, *>?): XcmVersion?
