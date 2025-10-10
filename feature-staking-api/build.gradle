@@ -13,6 +13,7 @@ dependencies {
     implementation project(':common')
     implementation project(':feature-proxy-api')
     implementation project(':feature-deep-linking')
+    implementation project(':feature-wallet-api')
 
     api project(":feature-wallet-api")
     api project(":feature-account-api")
