@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.validation.asDefault
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationPayload
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleWith
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
@@ -44,6 +43,5 @@ fun unbondValidationFailure(
             reason,
             resourceManager
         ).asDefault()
-
     }
 }
