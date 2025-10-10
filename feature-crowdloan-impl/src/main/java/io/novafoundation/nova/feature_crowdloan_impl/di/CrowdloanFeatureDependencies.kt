@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.AssetModelFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -54,6 +55,8 @@ interface CrowdloanFeatureDependencies {
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
     val externalBalanceDao: ExternalBalanceDao
+
+    val assetModelFormatter: AssetModelFormatter
 
     val assetIconProvider: AssetIconProvider
 

@@ -135,7 +135,7 @@ class StartStakingLandingViewModel(
             StartStakingInfoModel(
                 title = createTitle(it.asset.token.configuration, it.maxEarningRate, themeColor),
                 conditions = createConditions(it, themeColor),
-                moreInfo = createMoreInfoText(it.chain),
+                moreInfo = createMoreInfoText(it.chain, it.asset.token.configuration),
                 buttonColor = themeColor
             )
         }
@@ -252,7 +252,7 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun createMoreInfoText(chain: Chain): CharSequence {
+    private fun createMoreInfoText(chain: Chain, asset: Chain.Asset): CharSequence {
         val iconColor = resourceManager.getColor(R.color.chip_icon)
         val clickableTextColor = resourceManager.getColor(R.color.link_text)
         val chevronSize = resourceManager.measureInPx(20)
@@ -268,7 +268,7 @@ class StartStakingLandingViewModel(
 
         return SpannableFormatter.format(
             resourceManager.getString(R.string.start_staking_fragment_more_info),
-            chain.name,
+            asset.name,
             clickablePart
         )
     }

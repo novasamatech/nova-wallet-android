@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="select_token_to_vote">Select token to vote</string>
+    <string name="common_select_token">Select token</string>
+
+    <string name="staking_rewards">%s rewards</string>
+
     <string name="chain_migration_details_hint_history">Old transaction history remains on %s</string>
 
     <string name="chain_migration_details_in_progress_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s. These features might be unavailable for up to 24 hours.</string>
@@ -2000,7 +2005,6 @@
 
     <string name="staking_parachain_collator_own_stake">Collator\'s own stake</string>
     <string name="staking_parachain_collators_number_format">Collators: %s</string>
-    <string name="staking_rewards">Rewards</string>
     <string name="staking_min_stake">Min. stake</string>
 
     <string name="staking_parachain_reward_frequency_hint">Tokens in stake produce rewards each round (%s)</string>

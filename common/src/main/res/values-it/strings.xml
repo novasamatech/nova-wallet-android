@@ -527,6 +527,7 @@
     </plurals>
     <string name="common_secret_derivation_path">Percorso di derivazione segreto</string>
     <string name="common_see_all">Vedi tutto</string>
+    <string name="common_select_token">Seleziona token</string>
     <string name="common_settings">Impostazioni</string>
     <string name="common_share">Condividi</string>
     <string name="common_share_call_data">Condividi i dati della chiamata</string>
@@ -1309,6 +1310,7 @@
     <string name="select_ledger_location_enable_request_message">Nova ha bisogno che la posizione sia attivata per poter effettuare la scansione Bluetooth per trovare il tuo dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Si prega di abilitare la geolocalizzazione nelle impostazioni del dispositivo</string>
     <string name="select_network_title">Seleziona rete</string>
+    <string name="select_token_to_vote">Seleziona il token con cui votare</string>
     <string name="select_tracks_for">Seleziona brani per</string>
     <string name="selected_tracks_quantity" formatted="false">%d di %d</string>
     <string name="sell_network_flow_title">Seleziona la rete per vendere %s</string>
@@ -1544,7 +1546,7 @@
     <string name="staking_reward_payouts_payout_all">Paga tutto (%s)</string>
     <string name="staking_reward_payouts_title">Ricompense in sospeso</string>
     <string name="staking_reward_payouts_title_v2_2_0">Ricompense non pagate</string>
-    <string name="staking_rewards">Ricompense</string>
+    <string name="staking_rewards">%s ricompense</string>
     <string name="staking_rewards_about">Informazioni sulle ricompense</string>
     <string name="staking_rewards_apy">Ricompense (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Destinazione ricompense</string>

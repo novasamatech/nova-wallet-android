@@ -62,7 +62,8 @@ data class DiscoveringState(
         )
 
         // Perform initial automatic requests to requirements and permissions if needed
-        requestMissingDiscoveryRequirements(discoveryMethods, discoveryRequirementAvailability, usedAllowedRequirementAvailabilityRequests)
+        // It's important to request permissions firstly since bluetooth request will crash application without permissions after android 12
         requestPermissions(discoveryMethods, discoveryRequirementAvailability, usedAllowedRequirementAvailabilityRequests)
+        requestMissingDiscoveryRequirements(discoveryMethods, discoveryRequirementAvailability, usedAllowedRequirementAvailabilityRequests)
     }
 }

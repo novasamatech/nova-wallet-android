@@ -537,6 +537,7 @@
     </plurals>
     <string name="common_secret_derivation_path">Последовательность для вывода</string>
     <string name="common_see_all">Посмотреть все</string>
+    <string name="common_select_token">Выберите токен</string>
     <string name="common_settings">Настройки</string>
     <string name="common_share">Поделиться</string>
     <string name="common_share_call_data">Поделиться данными вызова</string>
@@ -1327,6 +1328,7 @@
     <string name="select_ledger_location_enable_request_message">Nova нуждается в включении местоположения, чтобы иметь возможность выполнять сканирование Bluetooth для поиска вашего устройства Ledger</string>
     <string name="select_ledger_location_enable_request_title">Пожалуйста, включите геолокацию в настройках устройства</string>
     <string name="select_network_title">Выберите сеть</string>
+    <string name="select_token_to_vote">Выберите токен для голосования</string>
     <string name="select_tracks_for">Выберите треки для</string>
     <string name="selected_tracks_quantity" formatted="false">%d из %d</string>
     <string name="sell_network_flow_title">Выберите сеть для продажи %s</string>
@@ -1566,7 +1568,7 @@
     <string name="staking_reward_payouts_payout_all">Выплатить все (%s)</string>
     <string name="staking_reward_payouts_title">Ожидаемые вознаграждения</string>
     <string name="staking_reward_payouts_title_v2_2_0">Невыплаченные награды</string>
-    <string name="staking_rewards">Награды</string>
+    <string name="staking_rewards">%s награды</string>
     <string name="staking_rewards_about">О наградах</string>
     <string name="staking_rewards_apy">Вознаграждение (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">Назначение наград</string>

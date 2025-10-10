@@ -522,6 +522,7 @@
     </plurals>
     <string name="common_secret_derivation_path">密钥派生路径</string>
     <string name="common_see_all">查看全部</string>
+    <string name="common_select_token">选择代币</string>
     <string name="common_settings">设置</string>
     <string name="common_share">分享</string>
     <string name="common_share_call_data">分享调用数据</string>
@@ -1300,6 +1301,7 @@
     <string name="select_ledger_location_enable_request_message">Nova需要启用地理位置，以便能够进行蓝牙扫描查找您的Ledger设备</string>
     <string name="select_ledger_location_enable_request_title">请在设备设置中启用地理位置</string>
     <string name="select_network_title">选择网络</string>
+    <string name="select_token_to_vote">选择代币进行投票</string>
     <string name="select_tracks_for">选择曲目</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="sell_network_flow_title">选择网络出售 %s</string>
@@ -1533,7 +1535,7 @@
     <string name="staking_reward_payouts_payout_all">全部支付（%s）</string>
     <string name="staking_reward_payouts_title">待发放奖励</string>
     <string name="staking_reward_payouts_title_v2_2_0">未支付奖励</string>
-    <string name="staking_rewards">奖励</string>
+    <string name="staking_rewards">%s奖励</string>
     <string name="staking_rewards_about">关于奖励</string>
     <string name="staking_rewards_apy">奖励（APY）</string>
     <string name="staking_rewards_destination_title_v2_0_0">奖励目的地</string>

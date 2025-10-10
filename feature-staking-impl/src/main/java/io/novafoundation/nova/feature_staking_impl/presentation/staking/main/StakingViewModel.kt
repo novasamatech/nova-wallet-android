@@ -27,7 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
-import io.novafoundation.nova.runtime.state.selectedChainFlow
+import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -67,7 +67,7 @@ class StakingViewModel(
     private val selectedAssetFlow = assetUseCase.currentAssetFlow()
         .shareInBackground()
 
-    val titleFlow = stakingSharedState.selectedChainFlow()
+    val titleFlow = stakingSharedState.selectedAssetFlow()
         .map { resourceManager.getString(R.string.staking_title_format, it.name) }
         .shareInBackground()
 
@@ -103,16 +103,21 @@ class StakingViewModel(
             if (configWithChains == null) return@combine null
 
             val config = configWithChains.config
-            val sourceChain = configWithChains.originChain
+            val destinationAsset = configWithChains.destinationAsset
             val destinationChain = configWithChains.destinationChain
             val formattedDate = dateFormatter.format(config.timeStartAt)
             AlertModel(
                 style = AlertView.Style.fromPreset(AlertView.StylePreset.INFO),
-                message = resourceManager.getString(R.string.staking_details_migration_alert_title, sourceChain.name, destinationChain.name, formattedDate),
+                message = resourceManager.getString(
+                    R.string.staking_details_migration_alert_title,
+                    destinationAsset.name,
+                    destinationChain.name,
+                    formattedDate
+                ),
                 linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreMigrationClicked(config) },
             )
         }
-    }
+    }.shareInBackground()
 
     fun backClicked() {
         router.back()

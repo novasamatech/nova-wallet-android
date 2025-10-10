@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.multiResult.PartialRetriableMixin
@@ -149,6 +150,8 @@ interface StakingFeatureDependencies {
     val amountFormatter: AmountFormatter
 
     val chainMigrationInfoUseCase: ChainMigrationInfoUseCase
+
+    val assetIconProvider: AssetIconProvider
 
     fun contextManager(): ContextManager
 
