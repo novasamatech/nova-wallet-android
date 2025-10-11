@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
+import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
@@ -140,6 +141,8 @@ interface CommonApi {
     val actionBottomSheetLauncher: ActionBottomSheetLauncher
 
     val deviceNetworkStateObserver: DeviceNetworkStateObserver
+
+    val deviceIdProvider: DeviceIdProvider
 
     fun copyTextMixin(): CopyTextLauncher.Presentation
 

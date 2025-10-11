@@ -18,5 +18,6 @@ class AttestRequest(
     val appIntegrityId: String,
     val publicKey: String,
     val integrityToken: String,
-    val challenge: String
+    val challenge: String,
+    val deviceIdHash: String
 )

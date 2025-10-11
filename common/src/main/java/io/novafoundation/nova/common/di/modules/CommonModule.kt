@@ -24,6 +24,8 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.providers.deviceid.AndroidDeviceIdProvider
+import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
@@ -497,5 +499,11 @@ class CommonModule {
     @ApplicationScope
     fun provideDeviceNetworkManager(context: Context): DeviceNetworkStateObserver {
         return RealDeviceNetworkStateObserver(context)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideDeviceIdProvider(context: Context): DeviceIdProvider {
+        return AndroidDeviceIdProvider(context)
     }
 }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_dapp_impl.utils.integrityCheck
 
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.ensureSuffix
@@ -12,7 +13,8 @@ import java.util.UUID
 class IntegrityCheckSessionFactory(
     private val apiCreator: NetworkApiCreator,
     private val preferences: Preferences,
-    private val integrityService: IntegrityService
+    private val integrityService: IntegrityService,
+    private val deviceIdProvider: DeviceIdProvider
 ) {
 
     fun createSession(
@@ -23,6 +25,7 @@ class IntegrityCheckSessionFactory(
         apiCreator.create(IntegrityCheckApi::class.java, baseUrl.ensureSuffix("/")),
         preferences,
         integrityService,
+        deviceIdProvider,
         callback
     )
 }
@@ -35,6 +38,7 @@ class IntegrityCheckSession(
     private val integrityCheckApi: IntegrityCheckApi,
     private val preferences: Preferences,
     private val integrityService: IntegrityService,
+    private val deviceIdProvider: DeviceIdProvider,
     private val callback: Callback
 ) {
 
@@ -59,9 +63,10 @@ class IntegrityCheckSession(
     private suspend fun runAttestation() {
         val challengeResponse = integrityCheckApi.getChallenge()
         val appIntegrityId = getAppIntegrityId()
+        val deviceIdHash = deviceIdProvider.getDeviceId().toByteArray().sha256().toString()
         val publicKey = IntegrityCheckKeyPairService.getPublicKey(appIntegrityId).toBase64()
 
-        val requestHash = createRequestHash(challengeResponse.challenge + appIntegrityId + publicKey)
+        val requestHash = createRequestHash(challengeResponse.challenge + appIntegrityId + publicKey + deviceIdHash)
         val integrityToken = integrityService.getIntegrityToken(requestHash = requestHash.toBase64())
 
         integrityCheckApi.attest(
@@ -69,7 +74,8 @@ class IntegrityCheckSession(
                 appIntegrityId = appIntegrityId,
                 publicKey = publicKey,
                 integrityToken = integrityToken,
-                challenge = challengeResponse.challenge
+                challenge = challengeResponse.challenge,
+                deviceIdHash = deviceIdHash
             )
         )
 
