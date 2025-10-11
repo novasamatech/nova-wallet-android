@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.orZero
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.plus
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.zero
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.destinationChainLocationOnOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.CrossChainFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.DeliveryFeeConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransferConfiguration
@@ -77,7 +78,7 @@ class LegacyCrossChainWeigher @Inject constructor(
     suspend fun estimateFee(amount: Balance, config: LegacyCrossChainTransferConfiguration): CrossChainFeeModel = with(config) {
         // Reserve fee may be zero if xcm transfer doesn't reserve tokens
         val reserveFeeAmount = calculateFee(amount, reserveFee, reserveChainLocation)
-        val destinationFeeAmount = calculateFee(amount, destinationFee, destinationChainLocation)
+        val destinationFeeAmount = calculateFee(amount, destinationFee, destinationChainLocationOnOrigin())
 
         return reserveFeeAmount + destinationFeeAmount
     }
@@ -270,7 +271,7 @@ class LegacyCrossChainWeigher @Inject constructor(
     private fun LegacyCrossChainTransferConfiguration.depositReserveAsset(): XcmInstruction {
         return XcmInstruction.DepositReserveAsset(
             assets = MultiAssetFilter.Wild.All,
-            dest = destinationChainLocation,
+            dest = destinationChainLocationOnOrigin(),
             xcm = XcmMessage(emptyList())
         )
     }

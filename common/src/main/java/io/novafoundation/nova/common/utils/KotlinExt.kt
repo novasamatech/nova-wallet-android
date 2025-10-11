@@ -322,6 +322,11 @@ fun <K, V> Map<K, V>.reversed() = HashMap<V, K>().also { newMap ->
     entries.forEach { newMap[it.value] = it.key }
 }
 
+fun <K, V> Map<K, V>.reversedManyToOne() = entries.groupBy(
+    keySelector = { it.value },
+    valueTransform = { it.key }
+)
+
 fun <K1, K2, KR, V> Map<K1, Map<K2, V>>.flattenKeys(keyTransform: (K1, K2) -> KR): Map<KR, V> {
     return flatMap { (key1, innerMap) ->
         innerMap.map { (key2, value) ->

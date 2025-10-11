@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.Dynami
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.TransferDestination
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
+import io.novafoundation.nova.feature_xcm_api.converter.chain.chainLocationOf
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -59,20 +60,24 @@ suspend fun DynamicCrossChainTransfersConfiguration.transferConfiguration(
     destinationXcmChain: XcmChain,
 ): DynamicCrossChainTransferConfiguration? {
     val destinationChain = destinationXcmChain.chain
+    val originChain = originXcmChain.chain
 
     val assetTransfers = outComingAssetTransfers(originAsset.fullId) ?: return null
     val targetTransfer = assetTransfers.getDestination(destinationChain.id) ?: return null
 
     val reserve = reserveRegistry.getReserve(originAsset)
+    val locationConverter = reserveRegistry.chainLocationConverter
 
     return DynamicCrossChainTransferConfiguration(
-        originChain = originXcmChain,
-        destinationChain = destinationXcmChain,
+        originChain = originXcmChain.chain,
+        destinationChain = destinationChain,
+        originChainLocation = locationConverter.chainLocationOf(originChain),
+        destinationChainLocation = locationConverter.chainLocationOf(destinationChain),
         originChainAsset = originAsset,
         transferType = XcmTransferType.determineTransferType(
             usesTeleports = canUseTeleport(originXcmChain, originAsset, destinationXcmChain),
-            originChain = originXcmChain,
-            destinationChain = destinationXcmChain,
+            originChain = originChain,
+            destinationChain = destinationChain,
             reserve = reserve
         ),
         features = targetTransfer.getTransferFeatures(),

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConvers
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrNull
+import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.assetConversionAssetIdType
 import io.novafoundation.nova.common.utils.graph.Path
@@ -41,15 +42,16 @@ import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDedu
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.feature_xcm_api.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
+import io.novafoundation.nova.feature_xcm_api.converter.asset.ChainAssetLocationConverter
+import io.novafoundation.nova.feature_xcm_api.converter.asset.relativeLocationFromChainAssetOrThrow
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.feature_xcm_api.versions.orDefault
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
+import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -68,11 +70,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
+import javax.inject.Inject
+import javax.inject.Named
 import kotlin.time.Duration
 
-class AssetConversionExchangeFactory(
-    private val multiLocationConverterFactory: MultiLocationConverterFactory,
-    private val remoteStorageSource: StorageDataSource,
+@FeatureScope
+class AssetConversionExchangeFactory @Inject constructor(
+    private val multiLocationConverterFactory: LocationConverterFactory,
+    @Named(REMOTE_STORAGE_SOURCE) val remoteStorageSource: StorageDataSource,
     private val runtimeCallsApi: MultiChainRuntimeCallsApi,
     private val chainStateRepository: ChainStateRepository,
     private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
@@ -83,7 +88,7 @@ class AssetConversionExchangeFactory(
         chain: Chain,
         swapHost: AssetExchange.SwapHost,
     ): AssetExchange {
-        val converter = multiLocationConverterFactory.defaultAsync(chain, swapHost.scope)
+        val converter = multiLocationConverterFactory.createAssetLocationConverter()
 
         return AssetConversionExchange(
             chain = chain,
@@ -100,7 +105,7 @@ class AssetConversionExchangeFactory(
 
 private class AssetConversionExchange(
     private val chain: Chain,
-    private val multiLocationConverter: MultiLocationConverter,
+    private val multiLocationConverter: ChainAssetLocationConverter,
     private val remoteStorageSource: StorageDataSource,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val chainStateRepository: ChainStateRepository,
@@ -134,8 +139,8 @@ private class AssetConversionExchange(
     private suspend fun constructAllAvailableDirections(pools: List<Pair<RelativeMultiLocation, RelativeMultiLocation>>): List<AssetConversionEdge> {
         return buildList {
             pools.forEach { (firstLocation, secondLocation) ->
-                val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@forEach
-                val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@forEach
+                val firstAsset = multiLocationConverter.chainAssetFromRelativeLocation(firstLocation, chain) ?: return@forEach
+                val secondAsset = multiLocationConverter.chainAssetFromRelativeLocation(secondLocation, chain) ?: return@forEach
 
                 add(AssetConversionEdge(firstAsset, secondAsset))
                 add(AssetConversionEdge(secondAsset, firstAsset))
@@ -161,8 +166,8 @@ private class AssetConversionExchange(
 
         val assetIdXcmVersion = detectAssetIdXcmVersion(runtime)
 
-        val asset1 = multiLocationConverter.toMultiLocationOrThrow(assetIn).toEncodableInstance(assetIdXcmVersion)
-        val asset2 = multiLocationConverter.toMultiLocationOrThrow(assetOut).toEncodableInstance(assetIdXcmVersion)
+        val asset1 = multiLocationConverter.relativeLocationFromChainAssetOrThrow(assetIn).toEncodableInstance(assetIdXcmVersion)
+        val asset2 = multiLocationConverter.relativeLocationFromChainAssetOrThrow(assetOut).toEncodableInstance(assetIdXcmVersion)
 
         return call(
             section = "AssetConversionApi",
@@ -364,11 +369,11 @@ private class AssetConversionExchange(
             }
         }
 
-        private suspend fun MultiLocationConverter.encodableMultiLocationOf(
+        private suspend fun ChainAssetLocationConverter.encodableMultiLocationOf(
             chainAsset: Chain.Asset,
             xcmVersion: XcmVersion
         ): Any {
-            return toMultiLocationOrThrow(chainAsset).toEncodableInstance(xcmVersion)
+            return relativeLocationFromChainAssetOrThrow(chainAsset).toEncodableInstance(xcmVersion)
         }
     }
 }

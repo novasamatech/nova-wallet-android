@@ -15,6 +15,8 @@ interface FileCache {
     suspend fun updateCache(fileName: String, value: String)
 
     fun observeCachedValue(fileName: String): Flow<String>
+
+    suspend fun getCachedValue(fileName: String): String?
 }
 
 private typealias OnCacheValueChanged = (String) -> Unit
@@ -44,6 +46,10 @@ internal class InternalFileSystemCache(
         }
             .onStart { emit(fileProvider.readCache(fileName)) }
             .filterNotNull()
+    }
+
+    override suspend fun getCachedValue(fileName: String): String? {
+        return fileProvider.readCache(fileName)
     }
 
     private fun putCallback(fileName: String, callback: OnCacheValueChanged) = synchronized(this) {

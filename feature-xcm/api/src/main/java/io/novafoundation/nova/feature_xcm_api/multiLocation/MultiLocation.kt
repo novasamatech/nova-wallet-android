@@ -15,7 +15,7 @@ abstract class MultiLocation(
 
     sealed class Interior {
 
-        object Here : Interior()
+        data object Here : Interior()
 
         class Junctions(junctions: List<Junction>) : Interior() {
             val junctions = junctions.sorted()
@@ -52,7 +52,10 @@ abstract class MultiLocation(
 
         data class AccountId32(val accountId: AccountIdKey) : Junction()
 
-        data class GlobalConsensus(val networkId: NetworkId) : Junction()
+        data class GlobalConsensus(val networkId: NetworkId) : Junction() {
+
+            constructor(genesisHash: String) : this(NetworkId.Substrate(genesisHash))
+        }
 
         object Unsupported : Junction()
     }

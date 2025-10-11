@@ -20,6 +20,10 @@ value class MultiAssetId(val multiLocation: RelativeMultiLocation) : VersionedTo
             )
         }
     }
+
+    override fun toString(): String {
+        return multiLocation.toString()
+    }
 }
 
 fun MultiAssetId.withAmount(amount: BalanceOf): MultiAsset {

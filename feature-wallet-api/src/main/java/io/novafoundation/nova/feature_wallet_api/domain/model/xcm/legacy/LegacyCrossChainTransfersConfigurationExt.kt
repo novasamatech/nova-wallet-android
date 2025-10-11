@@ -4,11 +4,16 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.data.network.runtime.binding.Weight
 import io.novafoundation.nova.common.utils.graph.Edge
 import io.novafoundation.nova.common.utils.graph.SimpleEdge
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.TokenReserve
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransfersConfiguration.AssetTransfers
 import io.novafoundation.nova.feature_xcm_api.chain.XcmChain
+import io.novafoundation.nova.feature_xcm_api.converter.chain.chainLocationOf
+import io.novafoundation.nova.feature_xcm_api.multiLocation.AbsoluteMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.ChainLocation
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
+import io.novafoundation.nova.feature_xcm_api.multiLocation.junctions
 import io.novafoundation.nova.feature_xcm_api.multiLocation.toInterior
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isParachain
@@ -87,23 +92,46 @@ suspend fun LegacyCrossChainTransfersConfiguration.transferConfiguration(
         destination.destination.chainId
     )
 
+    val originChainLocation = reserveRegistry.chainLocationConverter.chainLocationOf(originChain)
+        .dropGlobalConsensusJunctions()
+    val destinationChainLocation = reserveRegistry.chainLocationConverter.chainLocationOf(destinationChain)
+        .dropGlobalConsensusJunctions()
+
     return LegacyCrossChainTransferConfiguration(
-        originChain = originXcmChain,
-        destinationChain = destinationXcmChain,
+        originChain = originChain,
+        destinationChain = destinationChain,
         transferType = XcmReserveTransferType.determineTransferType(
             usesTeleports = XcmReserveTransferType.isSystemTeleport(originXcmChain, destinationXcmChain),
-            originChain = originXcmChain,
-            destinationChain = destinationXcmChain,
-            reserve = reserveRegistry.getReserve(originAsset)
+            originChain = originChain,
+            destinationChain = destinationChain,
+            // Dropping GlobalConsensus to match legacy format
+            reserve = reserveRegistry.getReserve(originAsset).dropGlobalConsensusJunctions()
         ),
         assetLocation = originAssetLocationOf(assetTransfers),
         reserveChainLocation = reserveAssetLocation.multiLocation,
-        destinationChainLocation = destinationLocation(originChain, destinationXcmChain.parachainId),
+        destinationChainLocation = destinationChainLocation,
+        originChainLocation = originChainLocation,
         destinationFee = destinationFee,
         reserveFee = reserveFee,
         originChainAsset = originAsset,
         transferMethod = destination.type
     )
+}
+
+private fun TokenReserve.dropGlobalConsensusJunctions(): TokenReserve {
+    return TokenReserve(
+        reserveChainLocation = reserveChainLocation.dropGlobalConsensusJunctions(),
+        tokenLocation = tokenLocation.dropGlobalConsensusJunctions()
+    )
+}
+
+private fun ChainLocation.dropGlobalConsensusJunctions(): ChainLocation {
+    return copy(location = location.dropGlobalConsensusJunctions())
+}
+
+private fun AbsoluteMultiLocation.dropGlobalConsensusJunctions(): AbsoluteMultiLocation {
+    val newJunctions = junctions.filter { it !is Junction.GlobalConsensus }
+    return AbsoluteMultiLocation(newJunctions)
 }
 
 fun LegacyCrossChainTransfersConfiguration.hasDeliveryFee(chainId: ChainId): Boolean {

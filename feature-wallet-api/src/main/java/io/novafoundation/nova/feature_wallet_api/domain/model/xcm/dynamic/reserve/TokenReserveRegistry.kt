@@ -1,32 +1,24 @@
 package io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve
 
-import io.novafoundation.nova.feature_wallet_api.data.repository.getChainLocation
-import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.normalizeSymbol
+import io.novafoundation.nova.feature_xcm_api.config.model.AssetsXcmConfig
+import io.novafoundation.nova.feature_xcm_api.config.model.getReserve
+import io.novafoundation.nova.feature_xcm_api.converter.chain.ChainLocationConverter
+import io.novafoundation.nova.feature_xcm_api.converter.chain.chainLocationOf
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 
 class TokenReserveRegistry(
-    private val parachainInfoRepository: ParachainInfoRepository,
-
-    private val reservesById: Map<TokenReserveId, TokenReserveConfig>,
-
-    // By default, asset reserve id is equal to its symbol
-    // This mapping allows to override that for cases like multiple reserves (Statemine & Polkadot for DOT)
-    private val assetToReserveIdOverrides: Map<FullChainAssetId, TokenReserveId>
+    private val xcmConfig: AssetsXcmConfig,
+    private val chainRegistry: ChainRegistry,
+    val chainLocationConverter: ChainLocationConverter,
 ) {
 
     suspend fun getReserve(chainAsset: Chain.Asset): TokenReserve {
-        val reserveId = getReserveId(chainAsset)
-        val reserve = reservesById.getValue(reserveId)
+        val reserve = xcmConfig.getReserve(chainAsset)
+        val reserveChain = chainRegistry.getChain(reserve.reserveAssetId.chainId)
         return TokenReserve(
-            reserveChainLocation = parachainInfoRepository.getChainLocation(reserve.reserveChainId),
-            tokenLocation = reserve.tokenReserveLocation
+            reserveChainLocation = chainLocationConverter.chainLocationOf(reserveChain),
+            tokenLocation = reserve.tokenLocation
         )
-    }
-
-    private fun getReserveId(chainAsset: Chain.Asset): TokenReserveId {
-        return assetToReserveIdOverrides[chainAsset.fullId] ?: chainAsset.normalizeSymbol()
     }
 }

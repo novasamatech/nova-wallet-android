@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.xcmPalletName
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.destinationChainLocationOnOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.legacy.LegacyXcmTransferMethod
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.common.TransferAssetUsingTypeTransactor
@@ -63,7 +64,7 @@ class LegacyCrossChainTransactor @Inject constructor(
         crossChainFee: Balance
     ) {
         val multiAsset = configuration.multiAssetFor(assetTransfer, crossChainFee)
-        val fullDestinationLocation = configuration.destinationChainLocation + assetTransfer.beneficiaryLocation()
+        val fullDestinationLocation = configuration.destinationChainLocationOnOrigin() + assetTransfer.beneficiaryLocation()
         val requiredDestWeight = weigher.estimateRequiredDestWeight(configuration)
 
         val lowestMultiLocationVersion = xcmVersionDetector.lowestPresentMultiLocationVersion(assetTransfer.originChain.id).orDefault()
@@ -135,7 +136,7 @@ class LegacyCrossChainTransactor @Inject constructor(
             moduleName = runtime.metadata.xcmPalletName(),
             callName = callName,
             arguments = mapOf(
-                "dest" to configuration.destinationChainLocation.versionedXcm(lowestMultiLocationVersion).toEncodableInstance(),
+                "dest" to configuration.destinationChainLocationOnOrigin().versionedXcm(lowestMultiLocationVersion).toEncodableInstance(),
                 "beneficiary" to assetTransfer.beneficiaryLocation().versionedXcm(lowestMultiLocationVersion).toEncodableInstance(),
                 "assets" to MultiAssets(multiAsset).versionedXcm(lowestMultiAssetsVersion).toEncodableInstance(),
                 "fee_asset_item" to BigInteger.ZERO,

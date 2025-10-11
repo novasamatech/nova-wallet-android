@@ -45,8 +45,11 @@ fun Any?.asGsonParsedIntOrNull(): Int? = when (this) {
     else -> null
 }
 
+fun Any?.asGsonParsedInt(): Int = asGsonParsedIntOrNull()
+    ?: throw IllegalArgumentException("Failed to convert gson-parsed object to number: $this")
+
 fun Any?.asGsonParsedNumber(): BigInteger = asGsonParsedNumberOrNull()
-    ?: throw IllegalArgumentException("Failed to convert gson-parsed object to number")
+    ?: throw IllegalArgumentException("Failed to convert gson-parsed object to number: $this")
 
 fun Gson.parseArbitraryObject(src: String): Map<String, Any?>? {
     val typeToken = object : TypeToken<Map<String, Any?>>() {}

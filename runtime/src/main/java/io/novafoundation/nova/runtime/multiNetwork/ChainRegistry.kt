@@ -83,7 +83,7 @@ class ChainRegistry(
         .inBackground()
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 
-    val chainsById = currentChains.map { chains -> chains.associateBy { it.id } }
+    val chainsById: Flow<Map<ChainId, Chain>> = currentChains.map { chains -> chains.associateBy { it.id } }
         .inBackground()
         .shareIn(this, SharingStarted.Eagerly, replay = 1)
 

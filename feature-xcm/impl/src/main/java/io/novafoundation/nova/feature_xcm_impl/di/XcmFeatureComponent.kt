@@ -11,7 +11,7 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         XcmFeatureDependencies::class,
     ],
     modules = [
-        XcmFeatureModule::class
+        XcmFeatureModule::class,
     ]
 )
 @FeatureScope

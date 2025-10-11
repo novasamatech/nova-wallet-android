@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.legacy
 
-import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.JunctionsRemote
+import io.novafoundation.nova.feature_xcm_api.config.remote.JunctionsRemote
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 

@@ -13,14 +13,14 @@ sealed class WeightLimit : ToDynamicScaleInstance {
         }
     }
 
-    object Unlimited : WeightLimit() {
+    data object Unlimited : WeightLimit() {
 
         override fun toEncodableInstance(): Any? {
             return DictEnum.Entry("Unlimited", null)
         }
     }
 
-    class Limited(val weightV2: WeightV2) : WeightLimit() {
+    data class Limited(val weightV2: WeightV2) : WeightLimit() {
 
         override fun toEncodableInstance(): Any? {
             return DictEnum.Entry("Limited", weightV2.toEncodableInstance())
