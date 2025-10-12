@@ -65,7 +65,7 @@ class AssetConversionSwapExtractor(
         val allSwaps = events.findEvents(Modules.ASSET_CONVERSION, "SwapExecuted")
 
         val swapExecutedEvent = when {
-            !success -> null // we wont be able to extract swap from event
+            !success -> null // we won't be able to extract swap from event
 
             isCustomFeeTokenUsed -> {
                 // Swaps with custom fee token produce up to free SwapExecuted events, in the following order:

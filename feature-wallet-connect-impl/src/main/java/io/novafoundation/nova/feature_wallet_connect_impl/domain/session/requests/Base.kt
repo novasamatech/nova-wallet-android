@@ -34,7 +34,7 @@ abstract class BaseWalletConnectRequest(
             Web3Wallet.respondSessionRequest(walletConnectResponse).getOrThrow()
 
             // TODO this code is untested since no dapp currently use redirect param
-            // We cant really enable this code without testing since we need to verify a corner-case when wc is used with redirect param inside dapp browser
+            // We can't really enable this code without testing since we need to verify a corner-case when wc is used with redirect param inside dapp browser
             // This might potentially break user flow since it might direct user to external browser instead of staying in our dapp browser
 
 //            val redirect = sessionRequest.peerMetaData?.redirect

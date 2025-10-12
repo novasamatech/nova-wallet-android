@@ -105,7 +105,7 @@ class SetControllerViewModel(
             NORMAL -> usingWrongAccountToChangeController
 
             // when controllers are deprecated, there is no point to show the switch to stash warning if user has not separate controller
-            // switching to stash wont allow to change controller anyway
+            // switching to stash won't allow to change controller anyway
             DEPRECATED -> usingWrongAccountToChangeController && stakingState.hasSeparateController()
         }
     }
@@ -127,7 +127,7 @@ class SetControllerViewModel(
                 DescriptiveButtonState.Enabled(resourceManager.getString(R.string.staking_set_controller_deprecated_action))
             }
 
-            // User cant do anything beneficial when controllers are deprecated and user doesn't have controller set up
+            // User can't do anything beneficial when controllers are deprecated and user doesn't have controller set up
             controllerDeprecationStage == DEPRECATED && stakingState.hasSeparateController().not() -> {
                 DescriptiveButtonState.Gone
             }

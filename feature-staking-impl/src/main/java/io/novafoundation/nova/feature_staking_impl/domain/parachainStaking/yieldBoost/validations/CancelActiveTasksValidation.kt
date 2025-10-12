@@ -12,7 +12,7 @@ class CancelActiveTasksValidation : YieldBoostValidation {
 
     override suspend fun validate(value: YieldBoostValidationPayload): ValidationStatus<YieldBoostValidationFailure> {
         return when {
-            // there is no active yield boost tasks so we wont cancel anything
+            // there is no active yield boost tasks so we won't cancel anything
             value.activeTasks.isEmpty() -> valid()
 
             // cancel transactions are always OK

@@ -31,7 +31,7 @@ class FeeContext(
 
         /**
          * The specified [operationChainUtilityAsset] should be used as utility asset
-         * This mode is usefull when we cannot provide guarantees that a [FeeContext.operationAsset] is present in ChainRegistry
+         * This mode is useful when we cannot provide guarantees that a [FeeContext.operationAsset] is present in ChainRegistry
          *
          * This might be the case for some logic that construct [Chain.Asset] on the fly to use components such as [FeeLoaderMixinV2]
          * For example, Dapp Browser tx signing flow might do so for unknown EVM chains

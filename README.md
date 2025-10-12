@@ -59,7 +59,7 @@ MOONPAY_PRODUCTION_SECRET=mock
 MOONPAY_TEST_SECRET=mock
 WALLET_CONNECT_PROJECT_ID=mock
 ```
-Note, that Firebase and Google related features (Notifications, Cloud Backups) wont work properly with this setup.
+Note, that Firebase and Google related features (Notifications, Cloud Backups) won't work properly with this setup.
 
 If you face `Secret X is not found` error, it means that README is not up-to-date. Add `X=mock` line to local.properties as well
 
