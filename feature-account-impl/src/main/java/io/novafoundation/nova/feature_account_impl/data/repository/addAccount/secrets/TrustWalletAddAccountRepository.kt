@@ -26,7 +26,7 @@ class TrustWalletAddAccountRepository @Inject constructor(
     )
 
     override suspend fun addAccountInternal(payload: Payload): AddAccountResult {
-        val (secrets, substrateCryptoType) = accountSecretsFactory.metaAccountSecrets(payload.mnemonic)
+        val (secrets, chainAccountSecrets, substrateCryptoType) = accountSecretsFactory.metaAccountSecrets(payload.mnemonic)
 
         val metaId = transformingAccountInsertionErrors {
             accountDataSource.insertMetaAccountFromSecrets(
@@ -34,6 +34,17 @@ class TrustWalletAddAccountRepository @Inject constructor(
                 substrateCryptoType = substrateCryptoType,
                 secrets = secrets
             )
+        }
+
+        transformingAccountInsertionErrors {
+            chainAccountSecrets.forEach { (chainId, derivationPath) ->
+                accountDataSource.insertChainAccount(
+                    metaId = metaId,
+                    chain = chainRegistry.getChain(chainId),
+                    cryptoType = substrateCryptoType,
+                    secrets = derivationPath
+                )
+            }
         }
 
         return AddAccountResult.AccountAdded(metaId, LightMetaAccount.Type.SECRETS)
