@@ -522,6 +522,7 @@
     </plurals>
     <string name="common_secret_derivation_path">シークレット導出パス</string>
     <string name="common_see_all">すべて見る</string>
+    <string name="common_select_token">トークンを選択</string>
     <string name="common_settings">設定</string>
     <string name="common_share">共有</string>
     <string name="common_share_call_data">コールデータを共有</string>
@@ -1300,6 +1301,7 @@
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
     <string name="select_network_title">ネットワークを選択</string>
+    <string name="select_token_to_vote">投票するトークンを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="sell_network_flow_title">%s を売るためのネットワークを選択</string>
@@ -1533,7 +1535,7 @@
     <string name="staking_reward_payouts_payout_all">すべて支払う (%s)</string>
     <string name="staking_reward_payouts_title">保留中の報酬</string>
     <string name="staking_reward_payouts_title_v2_2_0">未払いの報酬</string>
-    <string name="staking_rewards">報酬</string>
+    <string name="staking_rewards">%s 報酬</string>
     <string name="staking_rewards_about">報酬について</string>
     <string name="staking_rewards_apy">報酬 (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">報酬の宛先</string>

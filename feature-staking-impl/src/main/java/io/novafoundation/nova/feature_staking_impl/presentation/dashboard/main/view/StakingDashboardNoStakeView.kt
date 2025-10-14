@@ -10,13 +10,13 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setShimmerShown
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.unsafeLazy
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_account_api.presenatation.chain.ChainUi
-import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardNoStakeBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 
@@ -56,12 +56,14 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
         imageLoader = FeatureUtils.getCommonApi(context).imageLoader()
     }
 
-    fun setChainUi(chainUi: SyncingData<ChainUi>) {
-        binder.itemDashboardNoStakeChainIcon.loadChainIcon(chainUi.data.icon, imageLoader)
-        binder.itemDashboardNoStakeChainName.text = chainUi.data.name
+    fun setAssetIcon(icon: SyncingData<Icon>) {
+        binder.itemDashboardNoStakeTokenIcon.alpha = if (icon.isSyncing) 0.56f else 1.0f
+        binder.itemDashboardNoStakeTokenIcon.setIcon(icon.data, imageLoader)
+    }
 
-        binder.itemDashboardNoStakeChainIcon.alpha = if (chainUi.isSyncing) 0.56f else 1.0f
-        binder.itemDashboardNoStakeChainNameContainer.setShimmerShown(chainUi.isSyncing)
+    fun setTokenName(tokenName: SyncingData<String>) {
+        binder.itemDashboardNoStakeTokenName.text = tokenName.data
+        binder.itemDashboardNoStakeTokenNameContainer.setShimmerShown(tokenName.isSyncing)
     }
 
     fun setEarnings(earningsState: ExtendedLoadingState<SyncingData<String>>) {
@@ -80,6 +82,6 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
     }
 
     fun unbind() {
-        binder.itemDashboardNoStakeChainIcon.clear()
+        binder.itemDashboardNoStakeTokenIcon.clear()
     }
 }

@@ -35,7 +35,8 @@ class DashboardHasStakeAdapter(
                 HasStakeItem::rewards -> holder.bindRewards(item)
                 HasStakeItem::status -> holder.bindStatus(item)
                 HasStakeItem::earnings -> holder.bindEarnings(item)
-                HasStakeItem::chainUi -> holder.bindChain(item)
+                HasStakeItem::assetIcon -> holder.bindAssetIcon(item)
+                HasStakeItem::assetLabel -> holder.bindAssetLabel(item)
                 HasStakeItem::stakingTypeBadge -> holder.bindStakingType(item)
             }
         }
@@ -56,12 +57,17 @@ class DashboardHasStakeViewHolder(
         bindRewards(model)
         bindStake(model)
         bindStatus(model)
-        bindChain(model)
+        bindAssetIcon(model)
+        bindAssetLabel(model)
         bindStakingType(model)
     }
 
-    fun bindChain(model: HasStakeItem) {
-        containerView.setChainUi(model.chainUi)
+    fun bindAssetIcon(model: HasStakeItem) {
+        containerView.setAssetIcon(model.assetIcon)
+    }
+
+    fun bindAssetLabel(model: HasStakeItem) {
+        containerView.setAssetLabel(model.assetLabel)
     }
 
     fun bindEarnings(model: HasStakeItem) {
@@ -83,25 +89,23 @@ class DashboardHasStakeViewHolder(
     fun bindStatus(model: HasStakeItem) {
         containerView.setStatus(model.status)
     }
-
-    override fun unbind() {
-        containerView.unbind()
-    }
 }
 
 private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem>() {
 
     private val payloadGenerator = PayloadGenerator(
-        HasStakeItem::chainUi,
+        HasStakeItem::assetLabel,
         HasStakeItem::stake,
         HasStakeItem::earnings,
         HasStakeItem::status,
         HasStakeItem::rewards,
+        HasStakeItem::assetIcon,
+        HasStakeItem::assetLabel,
         HasStakeItem::stakingTypeBadge
     )
 
     override fun areItemsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {
-        return oldItem.chainUi.data.id == newItem.chainUi.data.id && oldItem.assetId == newItem.assetId
+        return oldItem.assetId == newItem.assetId
     }
 
     override fun areContentsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {
