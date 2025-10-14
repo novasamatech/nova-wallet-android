@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
 import io.novafoundation.nova.feature_account_api.domain.model.MetaIdWithType
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.model.ChainAccountInsertionData
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.model.MetaAccountInsertionData
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -71,6 +73,8 @@ interface AccountDataSource : SecretStoreV1 {
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
     suspend fun deleteMetaAccount(metaId: Long): List<MetaIdWithType>
 
+    suspend fun insertMetaAccountWithChainAccounts(metaAccount: MetaAccountInsertionData, chainAccounts: List<ChainAccountInsertionData>): Long
+
     /**
      * @return id of inserted meta account
      */
@@ -80,9 +84,6 @@ interface AccountDataSource : SecretStoreV1 {
         secrets: EncodableStruct<MetaAccountSecrets>
     ): Long
 
-    /**
-     * @return id of inserted meta account
-     */
     suspend fun insertChainAccount(
         metaId: Long,
         chain: Chain,
