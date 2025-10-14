@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.assetConversionAssetIdType
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFee
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
-import io.novafoundation.nova.feature_xcm_api.converter.toMultiLocationOrThrow
+import io.novafoundation.nova.feature_xcm_api.converter.asset.ChainAssetLocationConverter
+import io.novafoundation.nova.feature_xcm_api.converter.asset.relativeLocationFromChainAssetOrThrow
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Interior
 import io.novafoundation.nova.feature_xcm_api.multiLocation.RelativeMultiLocation
 import io.novafoundation.nova.feature_xcm_api.versions.XcmVersion
@@ -25,9 +25,9 @@ import java.math.BigInteger
 internal class AssetConversionFeePayment(
     private val paymentAsset: Chain.Asset,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
-    private val multiLocationConverter: MultiLocationConverter,
+    private val multiLocationConverter: ChainAssetLocationConverter,
     private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcher,
-    private val xcmVersionDetector: XcmVersionDetector
+    private val xcmVersionDetector: XcmVersionDetector,
 ) : FeePayment {
 
     override suspend fun modifyExtrinsic(extrinsicBuilder: ExtrinsicBuilder) {
@@ -52,7 +52,7 @@ internal class AssetConversionFeePayment(
     }
 
     private suspend fun encodableAssetId(xcmVersion: XcmVersion): Any {
-        return multiLocationConverter.toMultiLocationOrThrow(paymentAsset).toEncodableInstance(xcmVersion)
+        return multiLocationConverter.relativeLocationFromChainAssetOrThrow(paymentAsset).toEncodableInstance(xcmVersion)
     }
 
     private fun encodableNativeAssetId(xcmVersion: XcmVersion): Any {

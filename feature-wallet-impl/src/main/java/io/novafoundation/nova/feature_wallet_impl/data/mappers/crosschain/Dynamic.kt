@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.mappers.crosschain
 
-import io.novafoundation.nova.common.utils.flattenKeys
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransfersConfiguration.AssetTransfers
@@ -12,13 +11,13 @@ import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynami
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainOriginChainRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicCrossChainTransfersConfigRemote
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.dynamic.DynamicReserveLocationRemote
+import io.novafoundation.nova.feature_xcm_api.config.remote.toAbsoluteLocation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
-import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 
-fun DynamicCrossChainTransfersConfigRemote.toDomain(parachainInfoRepository: ParachainInfoRepository): DynamicCrossChainTransfersConfiguration {
+fun DynamicCrossChainTransfersConfigRemote.toDomain(reserveRegistry: TokenReserveRegistry): DynamicCrossChainTransfersConfiguration {
     return DynamicCrossChainTransfersConfiguration(
-        reserveRegistry = constructReserveRegistry(parachainInfoRepository, assetsLocation, reserveIdOverrides),
+        reserveRegistry = reserveRegistry,
         chains = constructChains(chains),
         customTeleports = constructCustomTeleports(customTeleports)
     )
@@ -32,20 +31,6 @@ private fun constructCustomTeleports(
             CustomTeleportEntry(FullChainAssetId(originChain, originAsset), destChain)
         }
     }
-}
-
-private fun constructReserveRegistry(
-    parachainInfoRepository: ParachainInfoRepository,
-    assetsLocation: Map<String, DynamicReserveLocationRemote>?,
-    reserveIdOverrides: Map<String, Map<Int, String>>?,
-): TokenReserveRegistry {
-    return TokenReserveRegistry(
-        parachainInfoRepository = parachainInfoRepository,
-        reservesById = assetsLocation.orEmpty().mapValues { (_, reserve) ->
-            reserve.toDomain()
-        },
-        assetToReserveIdOverrides = reserveIdOverrides.orEmpty().flattenKeys(::FullChainAssetId)
-    )
 }
 
 private fun constructChains(

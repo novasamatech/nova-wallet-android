@@ -8,14 +8,14 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.h
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.hydraDx.HydraDxOmniPoolSwapExtractor
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.hydraDx.HydraDxRouterSwapExtractor
+import io.novafoundation.nova.feature_xcm_api.converter.LocationConverterFactory
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.walkToList
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 
 internal class SubstrateRealtimeOperationFetcherFactory(
-    private val multiLocationConverterFactory: MultiLocationConverterFactory,
+    private val multiLocationConverterFactory: LocationConverterFactory,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val eventsRepository: EventsRepository,
     private val extrinsicWalk: ExtrinsicWalk,

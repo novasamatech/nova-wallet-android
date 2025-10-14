@@ -6,12 +6,10 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.destinationChainLocation
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainId
-import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.originChainLocation
 import io.novafoundation.nova.feature_wallet_impl.data.network.crosschain.common.TransferAssetUsingTypeTransactor
 import io.novafoundation.nova.feature_xcm_api.asset.MultiAssetFilter
 import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder

@@ -120,6 +120,10 @@ fun Chain.evmChainIdOrNull(): BigInteger? {
     }
 }
 
+fun createEvmChainId(evmChainId: Int): String {
+    return "$EIP_155_PREFIX:$evmChainId"
+}
+
 fun Chain.isSwapSupported(): Boolean = swap.isNotEmpty()
 
 fun List<Chain.Swap>.assetConversionSupported(): Boolean {
@@ -185,6 +189,11 @@ fun Chain.Asset.StakingType.isDirectStaking(): Boolean {
         StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> true
         else -> false
     }
+}
+
+fun Chain.findAssetByNormalizedSymbol(symbol: TokenSymbol): Chain.Asset? {
+    val normalized = symbol.normalize()
+    return assets.find { it.symbol.normalize() == normalized }
 }
 
 fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
