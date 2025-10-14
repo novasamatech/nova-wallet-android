@@ -39,6 +39,14 @@ class RealXcmVersionDetector @Inject constructor(
         )
     }
 
+    override suspend fun lowestPresentMultiAssetIdVersion(chainId: ChainId): XcmVersion? {
+        return lowestPresentXcmTypeVersionFromCallArgument(
+            chainId = chainId,
+            getCall = { it.moduleOrNull(it.xcmPalletName())?.callOrNull("transfer_assets_using_type_and_then") },
+            argumentName = "remote_fees_id"
+        )
+    }
+
     override suspend fun lowestPresentMultiAssetVersion(chainId: ChainId): XcmVersion? {
         return lowestPresentMultiAssetsVersion(chainId)
     }
