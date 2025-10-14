@@ -15,6 +15,7 @@ import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
+import io.novafoundation.nova.core_db.dao.withTransaction
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
@@ -29,6 +30,8 @@ import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeToLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.model.ChainAccountInsertionData
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.model.MetaAccountInsertionData
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -262,6 +265,17 @@ class AccountDataSourceImpl(
         val allAffectedMetaAccounts = metaAccountDao.delete(metaId)
         secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
         return allAffectedMetaAccounts.map { MetaIdWithType(it.id, accountMappers.mapMetaAccountTypeFromLocal(it.type)) }
+    }
+
+    override suspend fun insertMetaAccountWithChainAccounts(
+        metaAccount: MetaAccountInsertionData,
+        chainAccounts: List<ChainAccountInsertionData>
+    ) = withContext(Dispatchers.Default) {
+        metaAccountDao.withTransaction {
+            val metaId = insertMetaAccountFromSecrets(metaAccount.name, metaAccount.substrateCryptoType, metaAccount.secrets)
+            chainAccounts.forEach { insertChainAccount(metaId, it.chain, it.cryptoType, it.secrets) }
+            metaId
+        }
     }
 
     override suspend fun insertMetaAccountFromSecrets(
