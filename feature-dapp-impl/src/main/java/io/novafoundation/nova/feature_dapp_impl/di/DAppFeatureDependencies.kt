@@ -6,6 +6,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.FileProvider
@@ -81,6 +82,8 @@ interface DAppFeatureDependencies {
     val automaticInteractionGate: AutomaticInteractionGate
 
     val integrityService: IntegrityService
+
+    val deviceIdProvider: DeviceIdProvider
 
     fun currencyRepository(): CurrencyRepository
 
