@@ -49,9 +49,10 @@ class TransferAssetUsingTypeTransactor @Inject constructor(
         val multiAssetId = MultiAssetId(configuration.assetLocationOnOrigin())
 
         val multiLocationVersion = forceXcmVersion ?: xcmVersionDetector.lowestPresentMultiLocationVersion(transfer.originChain.id).orDefault()
-        val multiAssetVersion = forceXcmVersion ?: xcmVersionDetector.lowestPresentMultiAssetVersion(transfer.originChain.id).orDefault()
+        val multiAssetsVersion = forceXcmVersion ?: xcmVersionDetector.lowestPresentMultiAssetsVersion(transfer.originChain.id).orDefault()
+        val multiAssetIdVersion = forceXcmVersion ?: xcmVersionDetector.lowestPresentMultiAssetIdVersion(transfer.originChain.id).orDefault()
 
-        val transferTypeParam = configuration.transferTypeParam(multiAssetVersion)
+        val transferTypeParam = configuration.transferTypeParam(multiAssetsVersion)
 
         return chainRegistry.withRuntime(configuration.originChainId) {
             composeCall(
@@ -59,9 +60,9 @@ class TransferAssetUsingTypeTransactor @Inject constructor(
                 callName = "transfer_assets_using_type_and_then",
                 arguments = mapOf(
                     "dest" to configuration.destinationChainLocationOnOrigin().versionedXcm(multiLocationVersion).toEncodableInstance(),
-                    "assets" to MultiAssets(multiAsset).versionedXcm(multiAssetVersion).toEncodableInstance(),
+                    "assets" to MultiAssets(multiAsset).versionedXcm(multiAssetsVersion).toEncodableInstance(),
                     "assets_transfer_type" to transferTypeParam,
-                    "remote_fees_id" to multiAssetId.versionedXcm(multiAssetVersion).toEncodableInstance(),
+                    "remote_fees_id" to multiAssetId.versionedXcm(multiAssetIdVersion).toEncodableInstance(),
                     "fees_transfer_type" to transferTypeParam,
                     "custom_xcm_on_dest" to constructCustomXcmOnDest(configuration, transfer, multiLocationVersion).toEncodableInstance(),
                     "weight_limit" to WeightLimit.Unlimited.toEncodableInstance()

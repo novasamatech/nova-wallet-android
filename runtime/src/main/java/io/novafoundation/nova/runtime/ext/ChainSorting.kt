@@ -6,9 +6,7 @@ val Chain.mainChainsFirstAscendingOrder
     get() = when (genesisHash) {
         Chain.Geneses.POLKADOT_ASSET_HUB -> 0
         Chain.Geneses.KUSAMA_ASSET_HUB -> 1
-        Chain.Geneses.POLKADOT -> 2
-        Chain.Geneses.KUSAMA -> 3
-        else -> 4
+        else -> 2
     }
 
 val Chain.testnetsLastAscendingOrder
