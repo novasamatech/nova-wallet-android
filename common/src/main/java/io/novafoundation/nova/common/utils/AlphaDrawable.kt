@@ -10,7 +10,7 @@ import androidx.core.graphics.toRectF
 
 /**
  * Note: this implementation is very expensive (see [Canvas.saveLayerAlpha]).
- * This is usefull for drawables without implemented alpha and color filter support, such as PictureDrawable.
+ * This is useful for drawables without implemented alpha and color filter support, such as PictureDrawable.
  * In other cases it's recommended to use [Drawable.setAlpha] or [Drawable.setColorFilter] instead of this class.
  */
 class AlphaDrawable(private val nestedDrawable: Drawable, private var alpha: Float) : Drawable() {

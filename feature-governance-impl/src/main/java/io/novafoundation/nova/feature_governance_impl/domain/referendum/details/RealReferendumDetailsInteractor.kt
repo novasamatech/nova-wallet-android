@@ -101,7 +101,7 @@ class RealReferendumDetailsInteractor(
     }
 
     /**
-     * Emmit null if referendum is not exist
+     * Emit null if referendum is not exist
      */
     private suspend fun referendumDetailsFlowSuspend(
         referendumId: ReferendumId,
@@ -294,7 +294,7 @@ class RealReferendumDetailsInteractor(
                     return@transformLatest
                 }
 
-                // First time emmit without voting details
+                // First time emit without voting details
                 if (index == 0) {
                     emit(OnChainReferendaWithVotingDetails(onChainReferendum, votingDetails = ExtendedLoadingState.Loading))
                 }
