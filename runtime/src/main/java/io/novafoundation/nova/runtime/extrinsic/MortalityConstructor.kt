@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.extrinsic
 
+import io.novafoundation.nova.common.utils.atLeastZero
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -34,13 +35,15 @@ class MortalityConstructor(
         val currentNumber = currentHeader().number
         val finalizedNumber = finalizedHeader().number
 
-        val startBlockNumber = if (currentNumber - finalizedNumber > MAX_FINALITY_LAG) currentNumber else finalizedNumber
+        val finalityLag = (currentNumber - finalizedNumber).atLeastZero()
+
+        val startBlockNumber = finalizedNumber
 
         val blockHashCount = chainStateRepository.blockHashCount(chainId)?.toInt()
 
         val blockTime = chainStateRepository.predictedBlockTime(chainId).toInt()
 
-        val mortalPeriod = MORTAL_PERIOD / blockTime + MAX_FINALITY_LAG
+        val mortalPeriod = MORTAL_PERIOD / blockTime + finalityLag
 
         val unmappedPeriod = min(blockHashCount ?: FALLBACK_MAX_HASH_COUNT, mortalPeriod)
 
