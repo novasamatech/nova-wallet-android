@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="gifts_create">Create Gift</string>
+    <string name="gifts_placeholder_step_1">Enter your gift amount</string>
+    <string name="gifts_placeholder_step_2">%s with a special link and invite anyone to Nova</string>
+    <string name="gifts_placeholder_step_2_highlight">Share your gift directly</string>
+    <string name="gifts_placeholder_step_3">%s, and you can return unclaimed gifts anytime from this device</string>
+    <string name="gifts_placeholder_step_3_highlight">The gift is available instantly</string>
+
+    <string name="gifts_header_title">Share Crypto Gifts with Anyone, Anywhere</string>
+    <string name="gifts_header_subtitle">Send gifts fast, easily, and securely in Nova</string>
+    <string name="common_gift">Gift</string>
+
     <string name="select_token_to_vote">Select token to vote</string>
     <string name="common_select_token">Select token</string>
 

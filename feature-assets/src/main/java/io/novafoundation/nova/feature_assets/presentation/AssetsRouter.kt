@@ -112,4 +112,6 @@ interface AssetsRouter {
     fun openPendingMultisigOperations()
 
     fun openAssetDetailsFromDeepLink(payload: AssetPayload)
+
+    fun openGifts()
 }

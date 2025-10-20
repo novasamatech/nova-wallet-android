@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
+import io.novafoundation.nova.core_db.dao.GiftsDao
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -95,4 +96,6 @@ interface DbApi {
     fun browserTabsDao(): BrowserTabsDao
 
     fun multisigOperationsDao(): MultisigOperationsDao
+
+    fun giftsDao(): GiftsDao
 }
