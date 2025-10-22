@@ -61,7 +61,7 @@ class PushSettingsViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val permissionsAsker: PermissionsAsker.Presentation,
     private val payload: PushSettingsPayload
-) : BaseViewModel() {
+) : BaseViewModel(), PermissionsAsker by permissionsAsker {
 
     val closeConfirmationAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
