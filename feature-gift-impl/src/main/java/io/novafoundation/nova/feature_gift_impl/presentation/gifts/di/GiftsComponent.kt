@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsPayload
 
 @Subcomponent(
     modules = [
@@ -18,7 +19,8 @@ interface GiftsComponent {
     interface Factory {
 
         fun create(
-            @BindsInstance fragment: Fragment
+            @BindsInstance fragment: Fragment,
+            @BindsInstance payload: GiftsPayload
         ): GiftsComponent
     }
 

@@ -63,8 +63,6 @@ interface AssetsRouter {
 
     fun openSellFlow()
 
-    fun openGiftsFlow()
-
     fun openBuyFlowFromSendFlow()
 
     fun openNfts()
@@ -118,4 +116,7 @@ interface AssetsRouter {
     fun openAssetDetailsFromDeepLink(payload: AssetPayload)
 
     fun openGifts()
+
+    fun openGiftsByAsset(assetPayload: AssetPayload)
+    fun openSelectGiftAmount(assetPayload: AssetPayload)
 }

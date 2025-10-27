@@ -24,6 +24,7 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
@@ -43,6 +44,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceLocalDataSource
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.AssetGetOptionsUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
@@ -52,6 +54,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.MinAmountFieldValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.AssetModelFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -67,6 +71,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoade
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.provider.FeeLoaderProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderV2Factory
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.history.realtime.substrate.SubstrateRealtimeOperationFetcherFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance.RealPaymentUpdaterFactory
@@ -92,9 +97,14 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletReposito
 import io.novafoundation.nova.feature_wallet_impl.data.source.RealCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
+import io.novafoundation.nova.feature_wallet_impl.domain.asset.RealAssetGetOptionsUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
+import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
+import io.novafoundation.nova.feature_wallet_impl.presentation.common.fieldValidation.RealEnoughAmountValidatorFactory
+import io.novafoundation.nova.feature_wallet_impl.presentation.common.fieldValidation.RealMinAmountFieldValidatorFactory
 import io.novafoundation.nova.feature_wallet_impl.presentation.formatters.RealAssetModelFormatter
+import io.novafoundation.nova.feature_wallet_impl.presentation.getAsset.RealGetAssetOptionsMixinFactory
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
@@ -452,5 +462,49 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideMaxActionProviderFactory(assetSourceRegistry: AssetSourceRegistry): MaxActionProviderFactory {
         return MaxActionProviderFactory(assetSourceRegistry)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAssetGetOptionsUseCase(
+        crossChainTransfersUseCase: CrossChainTransfersUseCase,
+        accountRepository: AccountRepository
+    ): AssetGetOptionsUseCase {
+        return RealAssetGetOptionsUseCase(
+            crossChainTransfersUseCase,
+            accountRepository
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideGetAssetOptionsMixinFactory(
+        assetGetOptionsUseCase: AssetGetOptionsUseCase,
+        walletRouter: WalletRouter,
+        resourceManager: ResourceManager,
+        selectedAccountUseCase: SelectedAccountUseCase,
+        chainRegistry: ChainRegistry,
+        actionAwaitableFactory: ActionAwaitableMixin.Factory,
+    ): GetAssetOptionsMixin.Factory {
+        return RealGetAssetOptionsMixinFactory(
+            assetGetOptionsUseCase,
+            walletRouter,
+            resourceManager,
+            selectedAccountUseCase,
+            chainRegistry,
+            actionAwaitableFactory
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideEnoughAmountValidatorFactory(resourceManager: ResourceManager): EnoughAmountValidatorFactory {
+        return RealEnoughAmountValidatorFactory(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideMinAmountFieldValidatorFactory(resourceManager: ResourceManager): MinAmountFieldValidatorFactory {
+        return RealMinAmountFieldValidatorFactory(resourceManager)
     }
 }

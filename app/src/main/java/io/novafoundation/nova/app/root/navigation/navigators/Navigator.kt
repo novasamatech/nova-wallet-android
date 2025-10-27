@@ -95,6 +95,10 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountPayload
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
@@ -421,8 +425,9 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openGiftsFlow() {
-        navigationBuilder().action(R.id.action_mainFragment_to_giftsFlow)
+    override fun openSelectGiftAmount(assetPayload: AssetPayload) {
+        navigationBuilder().action(R.id.action_selectGiftAmount)
+            .setArgs(SelectGiftAmountFragment.createPayload(SelectGiftAmountPayload(assetPayload)))
             .navigateInFirstAttachedContext()
     }
 
@@ -678,6 +683,13 @@ class Navigator(
 
     override fun openGifts() {
         navigationBuilder().action(R.id.action_open_gifts)
+            .setArgs(GiftsFragment.createPayload(GiftsPayload.AllAssets))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openGiftsByAsset(assetPayload: AssetPayload) {
+        navigationBuilder().action(R.id.action_open_gifts)
+            .setArgs(GiftsFragment.createPayload(GiftsPayload.ByAsset(assetPayload)))
             .navigateInFirstAttachedContext()
     }
 

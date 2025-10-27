@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.common.validation.getReasonOrNull
 import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewChooseAmountBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountInputView
@@ -55,7 +56,10 @@ class ChooseAmountView @JvmOverloads constructor(
     }
 
     override fun setError(errorState: FieldValidationResult) {
-        // TODO not implemented
+        val isErrorEnabled = errorState is FieldValidationResult.Error
+        binder.chooseAmountInputError.isVisible = isErrorEnabled
+        binder.chooseAmountInputError.text = errorState.getReasonOrNull()
+        binder.chooseAmountInput.setErrorEnabled(errorState is FieldValidationResult.Error)
     }
 
     override fun setMaxAmountDisplay(maxAmountDisplay: String?) {

@@ -297,7 +297,7 @@ class BalanceDetailViewModel(
     }
 
     fun giftClicked() {
-        showError("Not implemented")
+        router.openGiftsByAsset(assetPayload)
     }
 
     fun lockedInfoClicked() = launch {

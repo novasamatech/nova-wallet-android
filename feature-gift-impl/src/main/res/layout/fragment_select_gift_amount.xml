@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/giftAmountToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.flexbox.FlexboxLayout
+        android:id="@+id/giftAmountTitleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:flexDirection="row"
+        app:flexWrap="wrap"
+        app:layout_constraintTop_toBottomOf="@+id/giftAmountToolbar">
+
+        <TextView
+            android:id="@+id/giftAmountTitle"
+            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_marginBottom="8dp"
+            android:includeFontPadding="false"
+            android:text="@string/select_gift_amount_title"
+            android:textColor="@color/text_primary" />
+
+        <io.novafoundation.nova.feature_account_api.view.ChainChipView
+            android:id="@+id/giftAmountChain"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp" />
+
+    </com.google.android.flexbox.FlexboxLayout>
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
+        android:id="@+id/giftsAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/giftAmountTitleContainer" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/giftAmountGetTokens"
+        style="@style/Widget.Nova.Button.AccentSecondaryTransparent.Small"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/giftsAmount"
+        tools:text="Get DOT"
+        tools:visibility="visible" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+        android:id="@+id/giftAmountFee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toBottomOf="@+id/giftAmountGetTokens" />
+
+    <io.novafoundation.nova.common.view.PrimaryButtonV2
+        android:id="@+id/giftAmountContinue"
+        style="@style/Widget.Nova.MaterialButton.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="@string/common_continue" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

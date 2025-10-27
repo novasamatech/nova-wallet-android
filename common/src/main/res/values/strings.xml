@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="select_gift_amount_title">Send gift on</string>
+
+    <string name="common_enter_other_amount">Enter another amount</string>
+
+    <string name="gift_min_balance_validation_message">The minimum gift is %s DOT</string>
+
+    <string name="gift_enter_amount_disabled_button_state">Enter amount</string>
+
     <string name="gifts_assets_flow_title">Select token to Gift</string>
     <string name="gifts_network_flow_title">Select network for %s gift</string>
     <string name="assets_gifts_flow_placeholder">You don’t have tokens to gift.\nBuy or Deposit tokens to your account.</string>

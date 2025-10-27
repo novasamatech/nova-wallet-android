@@ -4,6 +4,9 @@ import androidx.recyclerview.widget.ConcatAdapter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.utils.FragmentPayloadCreator
+import io.novafoundation.nova.common.utils.PayloadCreator
+import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
 import io.novafoundation.nova.feature_gift_impl.databinding.FragmentGiftsBinding
 import io.novafoundation.nova.feature_gift_impl.di.GiftFeatureComponent
@@ -11,6 +14,8 @@ import io.novafoundation.nova.feature_gift_impl.presentation.gifts.list.GiftsHea
 import io.novafoundation.nova.feature_gift_impl.presentation.gifts.list.GiftsInstructionsAdapter
 
 class GiftsFragment : BaseFragment<GiftsViewModel, FragmentGiftsBinding>(), GiftsHeaderAdapter.ItemHandler {
+
+    companion object : PayloadCreator<GiftsPayload> by FragmentPayloadCreator()
 
     override fun createBinding() = FragmentGiftsBinding.inflate(layoutInflater)
 
@@ -32,7 +37,7 @@ class GiftsFragment : BaseFragment<GiftsViewModel, FragmentGiftsBinding>(), Gift
     override fun inject() {
         FeatureUtils.getFeature<GiftFeatureComponent>(this, GiftFeatureApi::class.java)
             .giftsComponentFactory()
-            .create(this)
+            .create(this, payload())
             .inject(this)
     }
 
