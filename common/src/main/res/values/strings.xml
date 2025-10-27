@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="confirm_create_gift_hint">Confirming will transfer tokens from your account</string>
+    <string name="common_your_gift">Your gift</string>
+
     <string name="select_gift_amount_title">Send gift on</string>
 
     <string name="common_enter_other_amount">Enter another amount</string>

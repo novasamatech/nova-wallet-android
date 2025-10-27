@@ -12,6 +12,11 @@ class GiftNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry
 ) : GiftRouter, BaseNavigator(navigationHoldersRegistry) {
 
+    override fun finishCreateGift() {
+        navigationBuilder().action(R.id.action_finishCreateGift)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openGiftsFlow() {
         navigationBuilder().action(R.id.action_giftsFragment_to_giftsFlow)
             .navigateInFirstAttachedContext()

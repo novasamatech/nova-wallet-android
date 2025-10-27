@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_gift_impl.domain
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_gift_impl.domain.models.CreateGiftModel
+import io.novafoundation.nova.feature_gift_impl.domain.models.GiftAccount
 import io.novafoundation.nova.feature_gift_impl.domain.models.GiftFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.existentialDeposit
@@ -26,6 +27,8 @@ interface CreateGiftInteractor {
     ): GiftFee
 
     suspend fun getExistentialDeposit(chainAsset: Chain.Asset): BigDecimal
+
+    fun randomGiftAccount(): GiftAccount
 }
 
 class RealCreateGiftInteractor(
@@ -62,6 +65,10 @@ class RealCreateGiftInteractor(
 
     override suspend fun getExistentialDeposit(chainAsset: Chain.Asset): BigDecimal {
         return assetSourceRegistry.existentialDeposit(chainAsset)
+    }
+
+    override fun randomGiftAccount(): GiftAccount {
+
     }
 
     private suspend fun getSubmissionFee(model: CreateGiftModel, transferMax: Boolean, coroutineScope: CoroutineScope): SubmissionFee {
