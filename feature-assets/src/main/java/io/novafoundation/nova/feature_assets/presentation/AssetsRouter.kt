@@ -118,5 +118,6 @@ interface AssetsRouter {
     fun openGifts()
 
     fun openGiftsByAsset(assetPayload: AssetPayload)
+
     fun openSelectGiftAmount(assetPayload: AssetPayload)
 }
