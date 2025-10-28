@@ -30,7 +30,8 @@ class SelectGiftAmountFragment : BaseFragment<SelectGiftAmountViewModel, Fragmen
     override fun initViews() {
         binder.giftAmountToolbar.setHomeButtonListener { viewModel.back() }
 
-        binder.giftAmountToolbar.setOnClickListener { viewModel.confirmClicked() }
+        binder.giftAmountContinue.prepareForProgress(this)
+        binder.giftAmountContinue.setOnClickListener { viewModel.nextClicked() }
     }
 
     override fun inject() {

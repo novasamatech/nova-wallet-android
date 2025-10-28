@@ -19,7 +19,7 @@ class RealSendUseCase(
     private val assetSourceRegistry: AssetSourceRegistry
 ) : SendUseCase {
 
-    override suspend fun performTransfer(
+    override suspend fun performOnChainTransfer(
         transfer: WeightedAssetTransfer,
         fee: SubmissionFee,
         coroutineScope: CoroutineScope

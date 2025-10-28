@@ -6,5 +6,5 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import kotlinx.coroutines.CoroutineScope
 
 interface SendUseCase {
-    suspend fun performTransfer(transfer: WeightedAssetTransfer, fee: SubmissionFee, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission>
+    suspend fun performOnChainTransfer(transfer: WeightedAssetTransfer, fee: SubmissionFee, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission>
 }

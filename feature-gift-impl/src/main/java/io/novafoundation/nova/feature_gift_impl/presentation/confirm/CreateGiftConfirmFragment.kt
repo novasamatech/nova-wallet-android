@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
 import io.novafoundation.nova.feature_gift_impl.databinding.FragmentCreateGiftConfirmBinding
 import io.novafoundation.nova.feature_gift_impl.di.GiftFeatureComponent
-import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
 import io.novafoundation.nova.feature_wallet_api.presentation.view.showAmount
 
@@ -35,6 +34,9 @@ class CreateGiftConfirmFragment : BaseFragment<CreateGiftConfirmViewModel, Fragm
     override fun initViews() {
         binder.confirmCreateGiftToolbar.setHomeButtonListener { viewModel.back() }
 
+        binder.confirmCreateGiftAccount.setOnClickListener { viewModel.accountClicked() }
+
+        binder.confirmCreateGiftButton.prepareForProgress(this)
         binder.confirmCreateGiftButton.setOnClickListener { viewModel.confirmClicked() }
     }
 
@@ -50,7 +52,7 @@ class CreateGiftConfirmFragment : BaseFragment<CreateGiftConfirmViewModel, Fragm
         observeValidations(viewModel)
         viewModel.feeMixin.setupFeeLoading(binder.confirmCreateGiftFee)
 
-        viewModel.giftAccountFlow.observe(binder.confirmCreateGiftAccount::showAddress)
+        viewModel.senderGiftAccount.observe(binder.confirmCreateGiftAccount::showAddress)
 
         viewModel.confirmButtonStateLiveData.observe(binder.confirmCreateGiftButton::setState)
 

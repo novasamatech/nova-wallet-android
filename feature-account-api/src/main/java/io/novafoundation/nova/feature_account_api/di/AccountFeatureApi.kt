@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_account_api.data.multisig.repository.Multi
 import io.novafoundation.nova.feature_account_api.data.multisig.validation.MultisigExtrinsicValidationRequestBus
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
+import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.GenericLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.ledger.LegacyLedgerAddAccountRepository
@@ -130,6 +131,8 @@ interface AccountFeatureApi {
     val multisigDetailsRepository: MultisigDetailsRepository
 
     val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
+
+    val createSecretsRepository: CreateSecretsRepository
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

@@ -2,8 +2,11 @@ package io.novafoundation.nova.feature_gift_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.GiftsDao
+import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
 import io.novafoundation.nova.feature_gift_impl.data.RealGiftsRepository
 import io.novafoundation.nova.feature_gift_impl.domain.GiftsInteractor
@@ -12,6 +15,8 @@ import io.novafoundation.nova.feature_gift_impl.domain.RealCreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.GiftMinAmountProviderFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module()
 class GiftFeatureModule {
@@ -33,9 +38,23 @@ class GiftFeatureModule {
     @Provides
     @FeatureScope
     fun provideSelectGiftAmountInteractor(
-        assetSourceRegistry: AssetSourceRegistry
+        assetSourceRegistry: AssetSourceRegistry,
+        createSecretsRepository: CreateSecretsRepository,
+        chainRegistry: ChainRegistry,
+        encryptionDefaults: EncryptionDefaults,
+        secretsStore: SecretStoreV2,
+        giftsRepository: GiftsRepository,
+        sendUseCase: SendUseCase,
     ): CreateGiftInteractor {
-        return RealCreateGiftInteractor(assetSourceRegistry)
+        return RealCreateGiftInteractor(
+            assetSourceRegistry,
+            createSecretsRepository,
+            chainRegistry,
+            encryptionDefaults,
+            secretsStore,
+            giftsRepository,
+            sendUseCase
+        )
     }
 
     @Provides

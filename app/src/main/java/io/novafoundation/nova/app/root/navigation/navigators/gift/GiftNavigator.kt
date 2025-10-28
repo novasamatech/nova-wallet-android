@@ -5,6 +5,8 @@ import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
+import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 class GiftNavigator(
@@ -24,5 +26,11 @@ class GiftNavigator(
 
     override fun openSelectGiftAmount(assetPayload: AssetPayload) {
         commonDelegate.openSelectGiftAmount(assetPayload)
+    }
+
+    override fun openConfirmCreateGift(payload: CreateGiftConfirmPayload) {
+        navigationBuilder().action(R.id.action_openConfirmCreateGift)
+            .setArgs(CreateGiftConfirmFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
     }
 }

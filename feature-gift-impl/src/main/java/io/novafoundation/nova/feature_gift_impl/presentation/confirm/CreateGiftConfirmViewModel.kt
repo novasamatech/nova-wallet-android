@@ -13,10 +13,13 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
@@ -30,7 +33,7 @@ import io.novafoundation.nova.feature_gift_impl.presentation.common.buildGiftVal
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
@@ -38,7 +41,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.lo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainFlow
@@ -71,8 +73,6 @@ class CreateGiftConfirmViewModel(
     Validatable by validationExecutor,
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
-    private val giftAccount = createGiftInteractor.randomGiftAccount()
-
     private val chainFlow = chainRegistry.chainFlow(payload.assetPayload.chainId)
     private val chainAssetFlow = chainFlow.map { it.assetsById.getValue(payload.assetPayload.chainAssetId) }
 
@@ -90,9 +90,9 @@ class CreateGiftConfirmViewModel(
         .inBackground()
         .share()
 
-    val giftAccountFlow = chainFlow.map { chain ->
+    val senderGiftAccount = combine(metaAccountFlow, chainFlow) { metaAccount, chain ->
         createAddressModel(
-            address = chain.addressOf(giftAccount.account),
+            address = metaAccount.requireAddressIn(chain),
             chain = chain
         )
     }
@@ -106,17 +106,15 @@ class CreateGiftConfirmViewModel(
     )
 
     val totalAmountModel = combine(assetFlow, feeMixin.fee) { asset, fee ->
-        val feeAmount = fee.loadedFeeOrNull()?.amount
-        if (feeAmount == null) {
-            ExtendedLoadingState.Loading
-        } else {
-            amountFormatter.formatAmountToAmountModel(payload.amount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
-                .asLoaded()
-        }
+        val chainAsset = asset.token.configuration
+        val feePlanks = fee.loadedFeeOrNull() ?: return@combine ExtendedLoadingState.Loading
+        val claimGiftAmount = chainAsset.amountFromPlanks(feePlanks.claimGiftFee.amount)
+        amountFormatter.formatAmountToAmountModel(payload.amount + claimGiftAmount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
+            .asLoaded()
     }
 
     val giftAmountModel = assetFlow.map { asset ->
-        amountFormatter.formatAmountToAmountModel(payload.amount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
+        amountFormatter.formatAmountToAmountModel(payload.amount, asset)
     }
 
     private val validationInProgressFlow = MutableStateFlow(false)
@@ -136,16 +134,21 @@ class CreateGiftConfirmViewModel(
         router.back()
     }
 
+    fun accountClicked() = launchUnit {
+        val chain = chainFlow.first()
+        val address = senderGiftAccount.first()
+        externalActions.showAddressActions(address.address, chain)
+    }
+
     fun confirmClicked() = launchUnit {
         validationInProgressFlow.value = true
         val fee = feeMixin.awaitFee()
         val chain = chainFlow.first()
 
         val giftModel = CreateGiftModel(
-            metaAccount = selectedAccountUseCase.getSelectedMetaAccount(),
+            senderMetaAccount = selectedAccountUseCase.getSelectedMetaAccount(),
             chain = chain,
             chainAsset = chainAssetFlow.first(),
-            giftAccount = giftAccount.account,
             amount = payload.amount,
         )
 
@@ -171,19 +174,18 @@ class CreateGiftConfirmViewModel(
                 )
             },
         ) { validPayload ->
-            performTransfer(validPayload.transfer, validPayload.originFee)
+            performTransfer(giftModel, validPayload.transfer, validPayload.originFee.submissionFee)
         }
     }
 
     private fun performTransfer(
+        giftModel: CreateGiftModel,
         transfer: WeightedAssetTransfer,
-        originFee: OriginFee
+        fee: SubmissionFee
     ) = launch {
-        sendUseCase.performTransfer(transfer, originFee.submissionFee, viewModelScope)
+        createGiftInteractor.createAndSaveGift(giftModel, transfer, fee, viewModelScope)
             .onSuccess {
                 showToast(resourceManager.getString(io.novafoundation.nova.feature_assets.R.string.common_transaction_submitted))
-
-                //TODO("Save gift in memory")
 
                 startNavigation(it.submissionHierarchy) { finishCreateGift() }
             }.onFailure(::showError)
@@ -201,10 +203,9 @@ class CreateGiftConfirmViewModel(
             val chain = chainFlow.first()
 
             val createGiftModel = CreateGiftModel(
-                metaAccount = metaAccount,
+                senderMetaAccount = metaAccount,
                 chain = chain,
                 chainAsset = chainAssetFlow.first(),
-                giftAccount = giftAccount.account,
                 amount = payload.amount,
             )
 

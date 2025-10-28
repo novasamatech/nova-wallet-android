@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.StatemineAssets
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.AssetGetOptionsUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -103,6 +104,8 @@ interface WalletFeatureApi {
     val minAmountFieldValidatorFactory: MinAmountFieldValidatorFactory
 
     val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory
+
+    val sendUseCase: SendUseCase
 
     fun provideWalletRepository(): WalletRepository
 

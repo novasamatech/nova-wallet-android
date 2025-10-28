@@ -6,25 +6,23 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
-import io.novafoundation.nova.feature_gift_impl.presentation.amount.GiftMinAmountProviderFactory
-import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountPayload
-import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountViewModel
+import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.MinAmountFieldValidatorFactory
+import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -43,17 +41,16 @@ class CreateGiftConfirmModule {
         chainRegistry: ChainRegistry,
         validationExecutor: ValidationExecutor,
         assetUseCase: ArbitraryAssetUseCase,
-        payload: SelectGiftAmountPayload,
-        maxActionProviderFactory: MaxActionProviderFactory,
+        walletUiUseCase: WalletUiUseCase,
+        payload: CreateGiftConfirmPayload,
         amountFormatter: AmountFormatter,
         resourceManager: ResourceManager,
-        getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
+        externalActions: ExternalActions.Presentation,
         createGiftInteractor: CreateGiftInteractor,
+        addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
-        enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
-        minAmountFieldValidatorFactory: MinAmountFieldValidatorFactory,
-        giftMinAmountProviderFactory: GiftMinAmountProviderFactory,
-        amountChooserMixinFactory: AmountChooserMixin.Factory,
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        sendUseCase: SendUseCase,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     ): ViewModel {
         return CreateGiftConfirmViewModel(
@@ -61,18 +58,17 @@ class CreateGiftConfirmModule {
             chainRegistry = chainRegistry,
             validationExecutor = validationExecutor,
             assetUseCase = assetUseCase,
+            walletUiUseCase = walletUiUseCase,
             payload = payload,
-            maxActionProviderFactory = maxActionProviderFactory,
             amountFormatter = amountFormatter,
             resourceManager = resourceManager,
-            getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
+            externalActions = externalActions,
             createGiftInteractor = createGiftInteractor,
+            addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
-            enoughAmountValidatorFactory = enoughAmountValidatorFactory,
-            minAmountFieldValidatorFactory = minAmountFieldValidatorFactory,
-            giftMinAmountProviderFactory = giftMinAmountProviderFactory,
-            amountChooserMixinFactory = amountChooserMixinFactory,
-            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            sendUseCase = sendUseCase,
+            feeLoaderMixinFactory = feeLoaderMixinFactory
         )
     }
 }

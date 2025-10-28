@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 private const val ACCESS_SECRETS = "ACCESS_SECRETS"
+private const val GIFT_SECRETS = "GIFT_SECRETS"
 private const val ADDITIONAL_KNOWN_KEYS = "ADDITIONAL_KNOWN_KEYS"
 private const val ADDITIONAL_KNOWN_KEYS_DELIMITER = ","
 
@@ -37,6 +38,14 @@ class SecretStoreV2(
 
     suspend fun getChainAccountSecrets(metaId: Long, accountId: ByteArray): EncodableStruct<ChainAccountSecrets>? = withContext(Dispatchers.IO) {
         encryptedPreferences.getDecryptedString(chainAccountKey(metaId, accountId, ACCESS_SECRETS))?.let(ChainAccountSecrets::read)
+    }
+
+    suspend fun putGiftAccountSecrets(accountId: ByteArray, secrets: EncodableStruct<ChainAccountSecrets>) = withContext(Dispatchers.IO) {
+        encryptedPreferences.putEncryptedString(giftAccountKey(accountId), secrets.toHexString())
+    }
+
+    suspend fun getGiftAccountSecrets(accountId: ByteArray): EncodableStruct<ChainAccountSecrets>? = withContext(Dispatchers.IO) {
+        encryptedPreferences.getDecryptedString(giftAccountKey(accountId))?.let(ChainAccountSecrets::read)
     }
 
     suspend fun hasChainSecrets(metaId: Long, accountId: ByteArray) = withContext(Dispatchers.IO) {
@@ -101,6 +110,8 @@ class SecretStoreV2(
 
         encryptedPreferences.putEncryptedString(metaAccountAdditionalKnownKey(metaId), encodedKnownKeys)
     }
+
+    private fun giftAccountKey(accountId: ByteArray) = "${accountId.toHexString()}:$GIFT_SECRETS"
 
     private fun chainAccountKey(metaId: Long, accountId: ByteArray, secretName: String) = "$metaId:${accountId.toHexString()}:$secretName"
 

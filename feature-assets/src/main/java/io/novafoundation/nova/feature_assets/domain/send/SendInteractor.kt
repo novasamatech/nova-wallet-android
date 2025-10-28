@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
-import io.novafoundation.nova.feature_account_api.data.signer.isImmediate
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -16,7 +15,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
 import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
@@ -78,7 +76,7 @@ class SendInteractor(
                 crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amount)
             }
         } else {
-            sendUseCase.performTransfer(transfer, originFee.submissionFee, coroutineScope)
+            sendUseCase.performOnChainTransfer(transfer, originFee.submissionFee, coroutineScope)
         }
     }
 

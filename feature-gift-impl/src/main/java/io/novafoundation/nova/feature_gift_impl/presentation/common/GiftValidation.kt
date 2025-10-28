@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.emptyAccountIdKey
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -26,13 +27,13 @@ fun buildGiftValidationPayload(
     val transferAmount = createGiftModel.amount + createGiftModel.chainAsset.amountFromPlanks(fee.claimGiftFee.amount)
 
     val transfer = buildTransfer(
-        metaAccount = createGiftModel.metaAccount,
+        metaAccount = createGiftModel.senderMetaAccount,
         chain = createGiftModel.chain,
         chainAsset = createGiftModel.chainAsset,
         amount = transferAmount,
         transferringMaxAmount = transferMax,
         feePaymentCurrency = feePaymentCurrency,
-        address = createGiftModel.chain.addressOf(createGiftModel.giftAccount),
+        address = createGiftModel.chain.addressOf(createGiftModel.chain.emptyAccountIdKey()),
     )
 
     val originFee = OriginFee(
