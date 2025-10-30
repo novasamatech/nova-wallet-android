@@ -5,7 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.math.BigInteger
 
 class Gift(
-    val id: Int,
+    val id: Long,
     val amount: BigInteger,
     val chainId: ChainId,
     val assetId: ChainAssetId,

@@ -14,13 +14,11 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -49,8 +47,6 @@ class CreateGiftConfirmModule {
         createGiftInteractor: CreateGiftInteractor,
         addressIconGenerator: AddressIconGenerator,
         selectedAccountUseCase: SelectedAccountUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        sendUseCase: SendUseCase,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     ): ViewModel {
         return CreateGiftConfirmViewModel(
@@ -66,8 +62,6 @@ class CreateGiftConfirmModule {
             createGiftInteractor = createGiftInteractor,
             addressIconGenerator = addressIconGenerator,
             selectedAccountUseCase = selectedAccountUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            sendUseCase = sendUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory
         )
     }

@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.data.secrets.v2.keypair
 import io.novafoundation.nova.common.data.secrets.v2.publicKey
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.normalizeSeed
-import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
@@ -39,6 +38,8 @@ import kotlinx.coroutines.withContext
 
 private const val GIFT_SEED_SIZE_BYTES = 10
 
+typealias GiftId = Long
+
 interface CreateGiftInteractor {
     fun validationSystemFor(chainAsset: Chain.Asset, coroutineScope: CoroutineScope): AssetTransfersValidationSystem
 
@@ -55,7 +56,7 @@ interface CreateGiftInteractor {
         transfer: WeightedAssetTransfer,
         fee: SubmissionFee,
         coroutineScope: CoroutineScope
-    ): Result<ExtrinsicSubmission>
+    ): Result<GiftId>
 }
 
 class RealCreateGiftInteractor(
@@ -107,12 +108,12 @@ class RealCreateGiftInteractor(
         transfer: WeightedAssetTransfer,
         fee: SubmissionFee,
         coroutineScope: CoroutineScope
-    ): Result<ExtrinsicSubmission> {
+    ): Result<GiftId> {
         val giftAccountId = createAndStoreRandomGiftAccount(giftModel.chain.id)
         val gitAddress = giftModel.chain.addressOf(giftAccountId)
         val giftTransfer = transfer.copy(recipient = gitAddress)
         return sendUseCase.performOnChainTransfer(giftTransfer, fee, coroutineScope)
-            .onSuccess {
+            .map {
                 Log.d(LOG_TAG, "Gift was created successfully. Address in ${giftModel.chain.name}: $gitAddress")
 
                 giftsRepository.saveNewGift(

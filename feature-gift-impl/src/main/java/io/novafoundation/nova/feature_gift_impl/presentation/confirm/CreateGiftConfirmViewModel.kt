@@ -20,11 +20,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
-import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
 import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_gift_impl.R
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
+import io.novafoundation.nova.feature_gift_impl.domain.GiftId
 import io.novafoundation.nova.feature_gift_impl.domain.models.CreateGiftModel
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.GiftFeeDisplayFormatter
@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.createFo
 import io.novafoundation.nova.feature_gift_impl.presentation.common.buildGiftValidationPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
@@ -65,13 +64,10 @@ class CreateGiftConfirmViewModel(
     private val createGiftInteractor: CreateGiftInteractor,
     private val addressIconGenerator: AddressIconGenerator,
     private val selectedAccountUseCase: SelectedAccountUseCase,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-    private val sendUseCase: SendUseCase,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
     ExternalActions by externalActions,
-    Validatable by validationExecutor,
-    ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
+    Validatable by validationExecutor {
 
     private val chainFlow = chainRegistry.chainFlow(payload.assetPayload.chainId)
     private val chainAssetFlow = chainFlow.map { it.assetsById.getValue(payload.assetPayload.chainAssetId) }
@@ -187,14 +183,14 @@ class CreateGiftConfirmViewModel(
             .onSuccess {
                 showToast(resourceManager.getString(io.novafoundation.nova.feature_assets.R.string.common_transaction_submitted))
 
-                startNavigation(it.submissionHierarchy) { finishCreateGift() }
+                finishCreateGift(giftId = it)
             }.onFailure(::showError)
 
         validationInProgressFlow.value = false
     }
 
-    private fun finishCreateGift() {
-        showToast("Gift created. Next screen is not implemented")
+    private fun finishCreateGift(giftId: GiftId) {
+        router.openGiftSharing(giftId)
     }
 
     private fun setupFees() {

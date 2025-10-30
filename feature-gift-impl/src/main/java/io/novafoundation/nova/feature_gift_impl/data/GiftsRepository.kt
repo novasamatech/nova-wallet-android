@@ -9,17 +9,32 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 interface GiftsRepository {
+
+    suspend fun getGift(giftId: Long): Gift
+
+    fun observeGift(giftId: Long): Flow<Gift>
+
     fun observeGifts(): Flow<List<Gift>>
 
-    suspend fun saveNewGift(accountIdKey: AccountIdKey, amount: BigInteger, fullChainAssetId: FullChainAssetId)
+    suspend fun saveNewGift(accountIdKey: AccountIdKey, amount: BigInteger, fullChainAssetId: FullChainAssetId): Long
 }
 
 class RealGiftsRepository(
     private val giftsDao: GiftsDao
 ) : GiftsRepository {
+
+    override suspend fun getGift(giftId: Long): Gift {
+        return giftsDao.getGiftById(giftId).toDomain()
+    }
+
+    override fun observeGift(giftId: Long): Flow<Gift> {
+        return giftsDao.observeGiftById(giftId)
+            .map { it.toDomain() }
+    }
 
     override fun observeGifts(): Flow<List<Gift>> {
         return giftsDao.observeAllGifts()

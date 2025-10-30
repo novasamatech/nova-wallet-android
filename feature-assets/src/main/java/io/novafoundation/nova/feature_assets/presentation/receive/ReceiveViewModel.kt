@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.share.ImageWithTextSharing
 import io.novafoundation.nova.common.view.QrCodeModel
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.account.common.ChainWithAccountId
@@ -24,7 +25,6 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.receive.ReceiveInteractor
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.supportsLegacyAddressFormat
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -92,8 +92,8 @@ class ReceiveViewModel(
 
     val addressFlow = selectedMetaAccountFlow.map { it.addressIn(chainWithAssetAsync().chain)!! }
 
-    private val _shareEvent = MutableLiveData<Event<QrSharingPayload>>()
-    val shareEvent: LiveData<Event<QrSharingPayload>> = _shareEvent
+    private val _shareEvent = MutableLiveData<Event<ImageWithTextSharing>>()
+    val shareEvent: LiveData<Event<ImageWithTextSharing>> = _shareEvent
 
     fun copyAddressClicked() = launch {
         val chain = chainWithAssetAsync().chain
@@ -114,7 +114,7 @@ class ReceiveViewModel(
                 .onSuccess { fileUri ->
                     val message = generateShareMessage(chain, chainAsset, address)
 
-                    _shareEvent.value = Event(QrSharingPayload(fileUri, message))
+                    _shareEvent.value = Event(ImageWithTextSharing(fileUri, message))
                 }
                 .onFailure(::showError)
         }
