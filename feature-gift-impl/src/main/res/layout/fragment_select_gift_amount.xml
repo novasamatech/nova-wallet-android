@@ -68,6 +68,7 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
         app:dividerVisible="false"
+        app:title="@string/common_total_fee"
         app:layout_constraintTop_toBottomOf="@+id/giftAmountGetTokens" />
 
     <io.novafoundation.nova.common.view.PrimaryButtonV2

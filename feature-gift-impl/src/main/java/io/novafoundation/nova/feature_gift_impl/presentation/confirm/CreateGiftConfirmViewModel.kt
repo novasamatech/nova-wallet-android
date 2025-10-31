@@ -28,7 +28,7 @@ import io.novafoundation.nova.feature_gift_impl.domain.GiftId
 import io.novafoundation.nova.feature_gift_impl.domain.models.CreateGiftModel
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.GiftFeeDisplayFormatter
-import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.createForGifts
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.createForGiftsWithGiftFeeDisplay
 import io.novafoundation.nova.feature_gift_impl.presentation.common.buildGiftValidationPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
@@ -96,7 +96,7 @@ class CreateGiftConfirmViewModel(
         .share()
 
     private val feeFormatter = GiftFeeDisplayFormatter(amountFormatter)
-    val feeMixin = feeLoaderMixinFactory.createForGifts(
+    val feeMixin = feeLoaderMixinFactory.createForGiftsWithGiftFeeDisplay(
         chainAssetFlow,
         feeFormatter
     )
