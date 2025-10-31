@@ -1,0 +1,65 @@
+apply plugin: 'kotlin-parcelize'
+apply from: '../tests.gradle'
+apply from: "../scripts/secrets.gradle"
+
+android {
+    namespace 'io.novafoundation.nova.feature_gift_impl'
+
+
+    defaultConfig {
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/NOTICE.md")
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':core-db')
+    implementation project(':common')
+    implementation project(':feature-wallet-api')
+    implementation project(':feature-gift-api')
+    implementation project(':runtime')
+
+    implementation kotlinDep
+
+    implementation androidDep
+    implementation materialDep
+    implementation constraintDep
+
+    implementation coroutinesDep
+
+    implementation daggerDep
+    ksp daggerCompiler
+
+    implementation lifecycleDep
+    ksp lifecycleCompiler
+
+    implementation viewModelKtxDep
+    implementation liveDataKtxDep
+    implementation lifeCycleKtxDep
+
+    implementation retrofitDep
+
+    implementation web3jDep
+    implementation coroutinesFutureDep
+
+    implementation walletConnectCoreDep, withoutTransitiveAndroidX
+    implementation walletConnectWalletDep, withoutTransitiveAndroidX
+
+    testImplementation jUnitDep
+    testImplementation mockitoDep
+}

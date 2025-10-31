@@ -665,6 +665,11 @@ class Navigator(
         openSplitScreenWithInstantAction(R.id.action_mainFragment_to_balanceDetailFragment, BalanceDetailFragment.getBundle(payload))
     }
 
+    override fun openGifts() {
+        navigationBuilder().action(R.id.action_open_gifts)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun finishTradeOperation() {
         navigationBuilder().action(R.id.action_finishTradeOperation)
             .navigateInFirstAttachedContext()
