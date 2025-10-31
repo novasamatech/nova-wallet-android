@@ -9,7 +9,7 @@ private enum class GiftKnownTicker {
 
     companion object {
         fun tickerOrUnknown(symbol: TokenSymbol): GiftKnownTicker {
-            return GiftKnownTicker.entries.firstOrNull { it.name.contains(symbol.value) } ?: UNKNOW
+            return GiftKnownTicker.entries.firstOrNull { it.name == symbol.value } ?: UNKNOW
         }
     }
 }
