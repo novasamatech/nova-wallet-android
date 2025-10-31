@@ -106,16 +106,24 @@ class AssetsFeatureModule {
         assetViewModeRepository: AssetsViewModeRepository,
         assetSearchUseCase: AssetSearchUseCase,
         chainRegistry: ChainRegistry,
-        tradeTokenRegistry: TradeTokenRegistry
-    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry, tradeTokenRegistry)
+        tradeTokenRegistry: TradeTokenRegistry,
+        assetSourceRegistry: AssetSourceRegistry
+    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(
+        assetViewModeRepository,
+        assetSearchUseCase,
+        chainRegistry,
+        tradeTokenRegistry,
+        assetSourceRegistry
+    )
 
     @Provides
     @FeatureScope
     fun provideAssetNetworksInteractor(
         chainRegistry: ChainRegistry,
         assetSearchUseCase: AssetSearchUseCase,
-        tradeTokenRegistry: TradeTokenRegistry
-    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry)
+        tradeTokenRegistry: TradeTokenRegistry,
+        assetSourceRegistry: AssetSourceRegistry
+    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry, assetSourceRegistry)
 
     @Provides
     @FeatureScope

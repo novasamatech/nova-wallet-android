@@ -10,6 +10,8 @@ import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetBaseComp
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByToken
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSelfSufficientAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
@@ -28,7 +30,8 @@ import kotlinx.coroutines.flow.map
 class AssetNetworksInteractor(
     private val chainRegistry: ChainRegistry,
     private val assetSearchUseCase: AssetSearchUseCase,
-    private val tradeTokenRegistry: TradeTokenRegistry
+    private val tradeTokenRegistry: TradeTokenRegistry,
+    private val assetSourceRegistry: AssetSourceRegistry
 ) {
 
     fun tradeAssetFlow(
@@ -72,6 +75,23 @@ class AssetNetworksInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<List<AssetWithNetwork>> {
         return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filter = null)
+    }
+
+    fun giftsAssetFlow(
+        tokenSymbol: TokenSymbol,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+    ): Flow<List<AssetWithNetwork>> {
+        val filter = { asset: Asset ->
+            assetSourceRegistry.isSelfSufficientAsset(asset.token.configuration)
+        }
+
+        return searchAssetsByTokenSymbolInternalFlow(
+            tokenSymbol,
+            externalBalancesFlow,
+            assetGroupComparator = getTokenAssetGroupBaseComparator { it.groupBalance.transferable.fiat },
+            assetsComparator = getTokenAssetBaseComparator { it.balanceWithOffChain.transferable.fiat },
+            filter = filter
+        )
     }
 
     fun searchAssetsByTokenSymbolInternalFlow(

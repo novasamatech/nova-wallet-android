@@ -17,6 +17,6 @@ suspend fun AssetSourceRegistry.totalCanBeDroppedBelowMinimumBalance(chainAsset:
     return sourceFor(chainAsset).transfers.totalCanDropBelowMinimumBalance(chainAsset)
 }
 
-suspend fun AssetSourceRegistry.isSelfSufficientAsset(chainAsset: Chain.Asset): Boolean {
+fun AssetSourceRegistry.isSelfSufficientAsset(chainAsset: Chain.Asset): Boolean {
     return sourceFor(chainAsset).balance.isSelfSufficient(chainAsset)
 }

@@ -421,6 +421,11 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openGiftsFlow() {
+        navigationBuilder().action(R.id.action_mainFragment_to_giftsFlow)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openBuyFlowFromSendFlow() {
         navigationBuilder().action(R.id.action_sendFlow_to_buyFlow)
             .navigateInFirstAttachedContext()
@@ -492,6 +497,12 @@ class Navigator(
 
     override fun openSellNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_sellFlow_to_sellFlowNetwork)
+            .setArgs(NetworkFlowFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openGiftsNetworks(payload: NetworkFlowPayload) {
+        navigationBuilder().action(R.id.action_giftsFlow_to_giftsFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }

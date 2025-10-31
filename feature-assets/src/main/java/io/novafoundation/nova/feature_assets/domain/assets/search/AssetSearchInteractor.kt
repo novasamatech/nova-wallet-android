@@ -40,6 +40,11 @@ interface AssetSearchInteractor {
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<AssetsByViewModeResult>
 
+    fun giftAssetsSearch(
+        queryFlow: Flow<String>,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+    ): Flow<AssetsByViewModeResult>
+
     fun searchAssetsFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,

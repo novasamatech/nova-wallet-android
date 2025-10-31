@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="gifts_assets_flow_title">Select token to Gift</string>
+    <string name="gifts_network_flow_title">Select network for %s gift</string>
+    <string name="assets_gifts_flow_placeholder">You don’t have tokens to gift.\nBuy or Deposit tokens to your account.</string>
+
     <string name="gifts_create">Create Gift</string>
     <string name="gifts_placeholder_step_1">Enter your gift amount</string>
     <string name="gifts_placeholder_step_2">%s with a special link and invite anyone to Nova</string>

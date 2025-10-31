@@ -63,6 +63,8 @@ interface AssetsRouter {
 
     fun openSellFlow()
 
+    fun openGiftsFlow()
+
     fun openBuyFlowFromSendFlow()
 
     fun openNfts()
@@ -100,6 +102,8 @@ interface AssetsRouter {
     fun openBuyNetworks(payload: NetworkFlowPayload)
 
     fun openSellNetworks(payload: NetworkFlowPayload)
+
+    fun openGiftsNetworks(payload: NetworkFlowPayload)
 
     fun openBuyProviders(chainId: String, chainAssetId: Int)
 

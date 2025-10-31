@@ -7,6 +7,8 @@ import io.novafoundation.nova.feature_assets.domain.common.getAssetBaseComparato
 import io.novafoundation.nova.feature_assets.domain.common.getAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.isSelfSufficientAsset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
@@ -24,7 +26,8 @@ import kotlinx.coroutines.flow.map
 class ByNetworkAssetSearchInteractor(
     private val assetSearchUseCase: AssetSearchUseCase,
     private val chainRegistry: ChainRegistry,
-    private val tradeTokenRegistry: TradeTokenRegistry
+    private val tradeTokenRegistry: TradeTokenRegistry,
+    private val assetSourceRegistry: AssetSourceRegistry
 ) : AssetSearchInteractor {
 
     override fun tradeAssetSearch(
@@ -76,6 +79,17 @@ class ByNetworkAssetSearchInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<AssetsByViewModeResult> {
         return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = null)
+    }
+
+    override fun giftAssetsSearch(
+        queryFlow: Flow<String>,
+        externalBalancesFlow: Flow<List<ExternalBalance>>
+    ): Flow<AssetsByViewModeResult> {
+        val filter = { asset: Asset ->
+            assetSourceRegistry.isSelfSufficientAsset(asset.token.configuration)
+        }
+
+        return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
     }
 
     override fun searchAssetsFlow(
