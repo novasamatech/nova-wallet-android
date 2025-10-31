@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_gift_impl.domain
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.secrets.v2.keypair
 import io.novafoundation.nova.common.data.secrets.v2.publicKey
 import io.novafoundation.nova.common.utils.LOG_TAG
@@ -13,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.common.forChain
+import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
 import io.novafoundation.nova.feature_gift_impl.domain.models.CreateGiftModel
 import io.novafoundation.nova.feature_gift_impl.domain.models.GiftFee
@@ -64,7 +64,7 @@ class RealCreateGiftInteractor(
     private val createSecretsRepository: CreateSecretsRepository,
     private val chainRegistry: ChainRegistry,
     private val encryptionDefaults: EncryptionDefaults,
-    private val secretsStore: SecretStoreV2,
+    private val giftSecretsRepository: GiftSecretsRepository,
     private val giftsRepository: GiftsRepository,
     private val sendUseCase: SendUseCase,
 ) : CreateGiftInteractor {
@@ -164,7 +164,7 @@ class RealCreateGiftInteractor(
 
         val accountId = chain.accountIdOf(giftSecrets.keypair.publicKey)
 
-        secretsStore.putGiftAccountSecrets(accountId, giftSecrets)
+        giftSecretsRepository.putGiftAccountSecrets(accountId, giftSecrets)
 
         return accountId.intoKey()
     }

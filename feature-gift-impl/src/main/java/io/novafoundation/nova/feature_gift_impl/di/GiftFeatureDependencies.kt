@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -76,6 +77,8 @@ interface GiftFeatureDependencies {
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     val encryptionDefaults: EncryptionDefaults
+
+    val encryptedPreferences: EncryptedPreferences
 
     val linkBuilderFactory: LinkBuilderFactory
 

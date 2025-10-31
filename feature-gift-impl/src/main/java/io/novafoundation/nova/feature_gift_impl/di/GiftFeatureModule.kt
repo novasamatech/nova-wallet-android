@@ -2,12 +2,14 @@ package io.novafoundation.nova.feature_gift_impl.di
 
 import dagger.Module
 import dagger.Provides
-import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
+import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.GiftsDao
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
+import io.novafoundation.nova.feature_gift_impl.data.RealGiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.RealGiftsRepository
 import io.novafoundation.nova.feature_gift_impl.domain.GiftsInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.RealGiftsInteractor
@@ -41,12 +43,18 @@ class GiftFeatureModule {
 
     @Provides
     @FeatureScope
+    fun providesGiftSecretsRepository(encryptedPreferences: EncryptedPreferences): GiftSecretsRepository {
+        return RealGiftSecretsRepository(encryptedPreferences)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideSelectGiftAmountInteractor(
         assetSourceRegistry: AssetSourceRegistry,
         createSecretsRepository: CreateSecretsRepository,
         chainRegistry: ChainRegistry,
         encryptionDefaults: EncryptionDefaults,
-        secretsStore: SecretStoreV2,
+        giftSecretsRepository: GiftSecretsRepository,
         giftsRepository: GiftsRepository,
         sendUseCase: SendUseCase,
     ): CreateGiftInteractor {
@@ -55,7 +63,7 @@ class GiftFeatureModule {
             createSecretsRepository,
             chainRegistry,
             encryptionDefaults,
-            secretsStore,
+            giftSecretsRepository,
             giftsRepository,
             sendUseCase
         )
