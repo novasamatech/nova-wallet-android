@@ -101,7 +101,7 @@ fun AssetTransferBase(
     }
 }
 
-class BaseAssetTransfer(
+data class BaseAssetTransfer(
     override val sender: MetaAccount,
     override val recipient: String,
     override val originChain: Chain,

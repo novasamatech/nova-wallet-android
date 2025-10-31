@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.model.NetworkFlowRvItem
-import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -50,7 +49,7 @@ class NetworkGiftsFlowViewModel(
     }
 
     override fun networkClicked(network: NetworkFlowRvItem) {
-        router.openGifts()
+        router.openSelectGiftAmount(AssetPayload(network.chainId, network.assetId))
     }
 
     override fun getTitle(tokenSymbol: TokenSymbol): String {

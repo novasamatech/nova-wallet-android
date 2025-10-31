@@ -7,6 +7,51 @@
     <fragment
         android:id="@+id/giftsFragment"
         android:name="io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsFragment"
-        android:label="GiftsFragment" />
+        android:label="GiftsFragment">
+
+        <action
+            android:id="@+id/action_giftsFragment_to_giftsFlow"
+            app:destination="@id/giftsFlowFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/giftsFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.gifts.assets.AssetGiftsFlowFragment"
+        android:label="AssetGiftsFlowFragment">
+
+        <action
+            android:id="@+id/action_giftsFlow_to_giftsFlowNetwork"
+            app:destination="@id/giftsFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/sellFlowFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <action
+        android:id="@+id/action_selectGiftAmount"
+        app:destination="@id/selectGiftAmountFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <fragment
+        android:id="@+id/giftsFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.gifts.networks.NetworkGiftsFlowFragment"
+        android:label="NetworkGiftsFlowFragment"/>
+
+    <fragment
+        android:id="@+id/selectGiftAmountFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountFragment"
+        android:label="SelectGiftAmountFragment"/>
 
 </navigation>

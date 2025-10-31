@@ -8,8 +8,18 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.IntegrityService
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.GiftsDao
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.MinAmountFieldValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface GiftFeatureDependencies {
@@ -21,6 +31,26 @@ interface GiftFeatureDependencies {
     val preferences: Preferences
 
     val integrityService: IntegrityService
+
+    val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory
+
+    val assetSourceRegistry: AssetSourceRegistry
+
+    val validationExecutor: ValidationExecutor
+
+    val maxActionProviderFactory: MaxActionProviderFactory
+
+    val selectedAccountUseCase: SelectedAccountUseCase
+
+    val enoughAmountValidatorFactory: EnoughAmountValidatorFactory
+
+    val minAmountFieldValidatorFactory: MinAmountFieldValidatorFactory
+
+    val amountChooserMixinFactory: AmountChooserMixin.Factory
+
+    val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
+
+    val assetUseCase: ArbitraryAssetUseCase
 
     fun giftsDao(): GiftsDao
 

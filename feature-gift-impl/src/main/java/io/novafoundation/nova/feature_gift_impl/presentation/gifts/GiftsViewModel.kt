@@ -12,7 +12,8 @@ import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 class GiftsViewModel(
     private val router: GiftRouter,
     private val appLinksProvider: AppLinksProvider,
-    private val giftsInteractor: GiftsInteractor
+    private val giftsInteractor: GiftsInteractor,
+    private val giftsPayload: GiftsPayload
 ) : BaseViewModel(), Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -29,6 +30,9 @@ class GiftsViewModel(
     }
 
     fun createGiftClicked() {
-        // TODO: open create gift
+        when (giftsPayload) {
+            GiftsPayload.AllAssets -> router.openGiftsFlow()
+            is GiftsPayload.ByAsset -> router.openSelectGiftAmount(giftsPayload.assetPayload)
+        }
     }
 }

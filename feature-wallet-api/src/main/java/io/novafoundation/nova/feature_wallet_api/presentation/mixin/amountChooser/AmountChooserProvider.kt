@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser
 
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
@@ -15,13 +16,15 @@ class AmountChooserProviderFactory(
     override fun create(
         scope: CoroutineScope,
         assetFlow: Flow<Asset>,
-        maxActionProvider: MaxActionProvider?
+        maxActionProvider: MaxActionProvider?,
+        fieldValidator: FieldValidator?
     ): AmountChooserProvider {
         return AmountChooserProvider(
             coroutineScope = scope,
             usedAssetFlow = assetFlow,
             assetIconProvider = assetIconProvider,
-            maxActionProvider = maxActionProvider
+            maxActionProvider = maxActionProvider,
+            fieldValidator = fieldValidator
         )
     }
 }
@@ -30,11 +33,13 @@ class AmountChooserProvider(
     coroutineScope: CoroutineScope,
     override val usedAssetFlow: Flow<Asset>,
     private val assetIconProvider: AssetIconProvider,
-    maxActionProvider: MaxActionProvider?
+    maxActionProvider: MaxActionProvider?,
+    fieldValidator: FieldValidator?
 ) : BaseAmountChooserProvider(
     coroutineScope = coroutineScope,
     tokenFlow = usedAssetFlow.map { it.token },
     maxActionProvider = maxActionProvider,
+    fieldValidator = fieldValidator
 ),
     AmountChooserMixin.Presentation {
 

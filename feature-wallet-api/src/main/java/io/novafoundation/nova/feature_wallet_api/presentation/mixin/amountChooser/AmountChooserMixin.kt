@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.validation.FieldValidationResult
+import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -91,6 +92,7 @@ interface AmountChooserMixin : AmountChooserMixinBase {
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
             maxActionProvider: MaxActionProvider?,
+            fieldValidator: FieldValidator? = null
         ): Presentation
     }
 }

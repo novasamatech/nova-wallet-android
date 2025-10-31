@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_gift_impl.domain.GiftsInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsViewModel
 
 @Module(includes = [ViewModelModule::class])
@@ -26,13 +27,15 @@ class GiftsModule {
     @ViewModelKey(GiftsViewModel::class)
     fun provideViewModel(
         router: GiftRouter,
+        payload: GiftsPayload,
         appLinksProvider: AppLinksProvider,
         giftsInteractor: GiftsInteractor
     ): ViewModel {
         return GiftsViewModel(
             router = router,
             appLinksProvider = appLinksProvider,
-            giftsInteractor = giftsInteractor
+            giftsInteractor = giftsInteractor,
+            giftsPayload = payload
         )
     }
 }

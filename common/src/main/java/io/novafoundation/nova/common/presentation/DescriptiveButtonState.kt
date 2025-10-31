@@ -12,3 +12,13 @@ sealed class DescriptiveButtonState {
 
     object Invisible : DescriptiveButtonState()
 }
+
+fun DescriptiveButtonState.textOrNull(): String? {
+    return when (this) {
+        is DescriptiveButtonState.Enabled -> action
+        is DescriptiveButtonState.Disabled -> reason
+        DescriptiveButtonState.Gone,
+        DescriptiveButtonState.Invisible,
+        DescriptiveButtonState.Loading -> null
+    }
+}

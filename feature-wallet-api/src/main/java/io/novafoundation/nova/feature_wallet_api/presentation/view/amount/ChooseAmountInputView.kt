@@ -11,7 +11,9 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.shape.getInputBackground
+import io.novafoundation.nova.common.view.shape.getInputBackgroundError
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
+import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewChooseAmountInputBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
 
@@ -71,6 +73,16 @@ class ChooseAmountInputView @JvmOverloads constructor(
 
     fun setFiatAmount(priceAmount: CharSequence?) {
         binder.chooseAmountInputFiat.setTextOrHide(priceAmount)
+    }
+
+    fun setErrorEnabled(enabled: Boolean) {
+        if (enabled) {
+            amountInput.setTextColor(context.getColor(R.color.text_negative))
+            background = context.getInputBackgroundError()
+        } else {
+            amountInput.setTextColor(context.getColor(R.color.text_primary))
+            background = context.getInputBackground()
+        }
     }
 }
 

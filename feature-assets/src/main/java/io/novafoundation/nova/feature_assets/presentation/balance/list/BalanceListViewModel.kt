@@ -374,7 +374,7 @@ class BalanceListViewModel(
     }
 
     fun giftClicked() {
-        router.openGiftsFlow()
+        router.openGifts()
     }
 
     fun novaCardClicked() = launchUnit {

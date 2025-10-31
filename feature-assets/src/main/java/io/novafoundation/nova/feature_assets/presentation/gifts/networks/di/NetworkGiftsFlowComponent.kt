@@ -6,8 +6,6 @@ import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.gifts.networks.NetworkGiftsFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.send.flow.network.NetworkSendFlowFragment
-import io.novafoundation.nova.feature_assets.presentation.send.flow.network.di.NetworkSendFlowModule
 
 @Subcomponent(
     modules = [
