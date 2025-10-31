@@ -9,7 +9,8 @@ class Gift(
     val amount: BigInteger,
     val chainId: ChainId,
     val assetId: ChainAssetId,
-    val status: Status
+    val status: Status,
+    val giftAccountId: ByteArray
 ) {
     enum class Status {
         PENDING,

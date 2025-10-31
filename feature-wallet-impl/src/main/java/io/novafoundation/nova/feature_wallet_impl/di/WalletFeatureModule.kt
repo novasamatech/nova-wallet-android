@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteData
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.AssetGetOptionsUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -97,6 +98,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletReposito
 import io.novafoundation.nova.feature_wallet_impl.data.source.RealCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
 import io.novafoundation.nova.feature_wallet_impl.domain.RealCrossChainTransfersUseCase
+import io.novafoundation.nova.feature_wallet_impl.domain.RealSendUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.asset.RealAssetGetOptionsUseCase
 import io.novafoundation.nova.feature_wallet_impl.domain.fee.RealFeeInteractor
 import io.novafoundation.nova.feature_wallet_impl.domain.validaiton.context.AssetValidationContextFactory
@@ -506,5 +508,17 @@ class WalletFeatureModule {
     @FeatureScope
     fun provideMinAmountFieldValidatorFactory(resourceManager: ResourceManager): MinAmountFieldValidatorFactory {
         return RealMinAmountFieldValidatorFactory(resourceManager)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSendUseCase(
+        walletRepository: WalletRepository,
+        assetSourceRegistry: AssetSourceRegistry
+    ): SendUseCase {
+        return RealSendUseCase(
+            walletRepository,
+            assetSourceRegistry
+        )
     }
 }

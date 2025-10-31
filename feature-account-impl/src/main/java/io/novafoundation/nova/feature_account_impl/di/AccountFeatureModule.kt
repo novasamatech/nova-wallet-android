@@ -38,6 +38,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeC
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
@@ -89,6 +90,7 @@ import io.novafoundation.nova.feature_account_impl.data.network.blockchain.Accou
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
+import io.novafoundation.nova.feature_account_impl.data.repository.RealCreateSecretsRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
@@ -820,6 +822,14 @@ class AccountFeatureModule {
             walletUiUseCase,
             addressIconGenerator,
             identityProvider
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCreateSecretsRepository(accountSecretsFactory: AccountSecretsFactory): CreateSecretsRepository {
+        return RealCreateSecretsRepository(
+            accountSecretsFactory
         )
     }
 }

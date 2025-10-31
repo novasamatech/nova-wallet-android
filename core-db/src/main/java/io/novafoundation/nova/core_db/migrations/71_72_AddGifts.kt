@@ -8,6 +8,7 @@ val AddGifts_71_72 = object : Migration(71, 72) {
         db.execSQL(
             """CREATE TABLE IF NOT EXISTS `gifts` (
                     `amount` TEXT NOT NULL, 
+                    `giftAccountId` BLOB NOT NULL,
                     `chainId` TEXT NOT NULL, 
                     `assetId` INTEGER NOT NULL,
                     `status` TEXT NOT NULL,

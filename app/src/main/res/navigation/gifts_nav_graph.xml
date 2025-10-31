@@ -47,11 +47,29 @@
     <fragment
         android:id="@+id/giftsFlowNetworkFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.gifts.networks.NetworkGiftsFlowFragment"
-        android:label="NetworkGiftsFlowFragment"/>
+        android:label="NetworkGiftsFlowFragment" />
 
     <fragment
         android:id="@+id/selectGiftAmountFragment"
         android:name="io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountFragment"
-        android:label="SelectGiftAmountFragment"/>
+        android:label="SelectGiftAmountFragment">
 
+        <action
+            android:id="@+id/action_openConfirmCreateGift"
+            app:destination="@id/createGiftConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createGiftConfirmFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmFragment"
+        android:label="CreateGiftConfirmFragment">
+
+        <action
+            android:id="@+id/action_finishCreateGift"
+            app:popUpTo="@id/giftsFragment"/>
+    </fragment>
 </navigation>

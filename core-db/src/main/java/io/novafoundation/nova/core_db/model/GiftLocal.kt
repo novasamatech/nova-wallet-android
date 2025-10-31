@@ -17,8 +17,9 @@ import java.math.BigInteger
         )
     ]
 )
-data class GiftLocal(
+class GiftLocal(
     val amount: BigInteger,
+    val giftAccountId: ByteArray,
     val chainId: String,
     val assetId: Int,
     val status: Status

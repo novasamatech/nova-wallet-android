@@ -2,17 +2,25 @@ package io.novafoundation.nova.feature_gift_impl.di
 
 import android.content.Context
 import coil.ImageLoader
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.GiftsDao
+import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.MinAmountFieldValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
@@ -51,6 +59,22 @@ interface GiftFeatureDependencies {
     val feeLoaderMixinV2Factory: FeeLoaderMixinV2.Factory
 
     val assetUseCase: ArbitraryAssetUseCase
+
+    val createSecretsRepository: CreateSecretsRepository
+
+    val sendUseCase: SendUseCase
+
+    val walletUiUseCase: WalletUiUseCase
+
+    val externalAccountActions: ExternalActions.Presentation
+
+    val addressIconGenerator: AddressIconGenerator
+
+    val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+
+    val encryptionDefaults: EncryptionDefaults
+
+    val encryptedPreferences: EncryptedPreferences
 
     fun giftsDao(): GiftsDao
 

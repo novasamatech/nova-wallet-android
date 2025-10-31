@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.GiftFeeDisplayFormatter
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.createForGifts
 import io.novafoundation.nova.feature_gift_impl.presentation.common.buildGiftValidationPayload
+import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountFieldValidator
@@ -40,9 +41,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
-import io.novafoundation.nova.runtime.ext.emptyAccountIdKey
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainFlow
+import java.math.BigDecimal
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -142,14 +143,14 @@ class SelectGiftAmountViewModel(
         validationInProgressFlow.value = true
         val fee = feeMixin.awaitFee()
         val amountState = amountChooserMixin.amountState.first()
+        val giftAmount = amountState.value ?: return@launchUnit
         val chain = chainFlow.first()
 
         val giftModel = CreateGiftModel(
-            metaAccount = selectedAccountUseCase.getSelectedMetaAccount(),
+            senderMetaAccount = selectedAccountUseCase.getSelectedMetaAccount(),
             chain = chain,
             chainAsset = chainAssetFlow.first(),
-            giftAccount = chain.emptyAccountIdKey(),
-            amount = amountState.value.orZero(),
+            amount = giftAmount,
         )
 
         val payload = buildGiftValidationPayload(
@@ -176,12 +177,18 @@ class SelectGiftAmountViewModel(
         ) {
             validationInProgressFlow.value = false
 
-            openConfirmScreen(it)
+            openConfirmScreen(it, giftAmount)
         }
     }
 
-    private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
-        TODO("build payload to open confirm screen")
+    private fun openConfirmScreen(validPayload: AssetTransferPayload, giftAmount: BigDecimal) = launch {
+        val payload = CreateGiftConfirmPayload(
+            amount = giftAmount,
+            transferringMaxAmount = validPayload.transfer.transferringMaxAmount,
+            assetPayload = payload.assetPayload
+        )
+
+        router.openConfirmCreateGift(payload)
     }
 
     private fun setupFees() {
@@ -192,10 +199,9 @@ class SelectGiftAmountViewModel(
         ) { feePaymentCurrency, chain, chainAsset, amountState ->
             val metaAccount = metaAccountFlow.first()
             val createGiftModel = CreateGiftModel(
-                metaAccount = metaAccount,
+                senderMetaAccount = metaAccount,
                 chain = chain,
                 chainAsset = chainAsset,
-                giftAccount = chain.emptyAccountIdKey(),
                 amount = amountState.value.orZero(),
             )
 
