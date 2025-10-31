@@ -43,8 +43,8 @@ class RealGiftsRepository(
         accountIdKey: AccountIdKey,
         amount: BigInteger,
         fullChainAssetId: FullChainAssetId
-    ) {
-        giftsDao.createNewGift(
+    ): Long {
+        return giftsDao.createNewGift(
             GiftLocal(
                 amount = amount,
                 giftAccountId = accountIdKey.value,

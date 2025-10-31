@@ -81,9 +81,9 @@ class GiftFeatureModule {
     @FeatureScope
     fun providesShareGiftInteractor(
         giftsRepository: GiftsRepository,
-        secretStoreV2: SecretStoreV2
+        giftSecretsRepository: GiftSecretsRepository
     ): ShareGiftInteractor {
-        return RealShareGiftInteractor(giftsRepository, secretStoreV2)
+        return RealShareGiftInteractor(giftsRepository, giftSecretsRepository)
     }
 
     @Provides
