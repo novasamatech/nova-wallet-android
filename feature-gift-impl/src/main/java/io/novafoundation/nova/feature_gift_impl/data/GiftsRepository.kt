@@ -7,9 +7,7 @@ import io.novafoundation.nova.core_db.model.GiftLocal
 import io.novafoundation.nova.feature_gift_impl.domain.models.Gift
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 
 interface GiftsRepository {
     fun observeGifts(): Flow<List<Gift>>
@@ -30,7 +28,7 @@ class RealGiftsRepository(
         accountIdKey: AccountIdKey,
         amount: BigInteger,
         fullChainAssetId: FullChainAssetId
-    ) = withContext(Dispatchers.IO) {
+    ) {
         giftsDao.createNewGift(
             GiftLocal(
                 amount = amount,

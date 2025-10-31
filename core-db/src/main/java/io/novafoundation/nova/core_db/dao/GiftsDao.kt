@@ -16,5 +16,5 @@ interface GiftsDao {
     fun observeGiftsByAsset(chainId: String, assetId: Int): Flow<List<GiftLocal>>
 
     @Insert
-    fun createNewGift(giftLocal: GiftLocal)
+    suspend fun createNewGift(giftLocal: GiftLocal)
 }

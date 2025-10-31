@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -72,6 +73,8 @@ interface GiftFeatureDependencies {
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
 
     val encryptionDefaults: EncryptionDefaults
+
+    val encryptedPreferences: EncryptedPreferences
 
     fun giftsDao(): GiftsDao
 
