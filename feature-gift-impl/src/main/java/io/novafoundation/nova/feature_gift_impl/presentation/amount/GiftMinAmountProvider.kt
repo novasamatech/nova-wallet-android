@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 class GiftMinAmountProviderFactory(
     private val createGiftInteractor: CreateGiftInteractor,
@@ -31,8 +32,7 @@ class GiftMinAmountProvider(
 
     override fun provideMinAmount(): Flow<BigDecimal> {
         val feeFlow = feeMixin.fee
-            .map { it.loadedFeeOrNull() }
-            .filterNotNull()
+            .mapNotNull { it.loadedFeeOrNull() }
 
         val chainAssetWithEDFlow = feeMixin.feeChainAssetFlow
             .map { it to createGiftInteractor.getExistentialDeposit(it) }
