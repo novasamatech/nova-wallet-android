@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="share_gift_text">Hello! You’ve got a %s gift waiting for you!\n\nInstall Nova Wallet app, set up your wallet, and claim it via this special link:\n%s</string>
+
+    <string name="share_gift_title">Gift Has Been Prepared.\nShare It Now!</string>
+    <string name="share_gift_button">Share gift link</string>
+
     <string name="confirm_create_gift_hint">Confirming will transfer tokens from your account</string>
     <string name="common_your_gift">Your gift</string>
 

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/shareGiftToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0"
+        app:dividerVisible="false"
+        app:homeButtonIcon="@drawable/ic_close"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:alpha="1" />
+
+    <TextView
+        android:id="@+id/shareGiftTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:alpha="0"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:text="@string/share_gift_title"
+        app:layout_constraintTop_toBottomOf="@+id/shareGiftToolbar"
+        tools:alpha="1" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/shareGiftAnimation"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        app:layout_constraintVertical_bias="0.31"
+        app:layout_constraintBottom_toTopOf="@+id/shareGiftAmount"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/shareGiftTitle"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:lottie_rawRes="@raw/DOT_packing_optimized" />
+
+    <ImageView
+        android:id="@+id/shareGiftTokenIcon"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:alpha="0"
+        app:layout_constraintBottom_toBottomOf="@+id/shareGiftAmount"
+        app:layout_constraintEnd_toStartOf="@+id/shareGiftAmount"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="@+id/shareGiftAnimation"
+        app:layout_constraintTop_toTopOf="@+id/shareGiftAmount" />
+
+    <TextView
+        android:id="@+id/shareGiftAmount"
+        style="@style/TextAppearance.NovaFoundation.Bold.LargeTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:alpha="0"
+        android:gravity="center"
+        app:layout_constraintBottom_toTopOf="@+id/shareGiftButton"
+        app:layout_constraintEnd_toEndOf="@+id/shareGiftAnimation"
+        app:layout_constraintStart_toEndOf="@+id/shareGiftTokenIcon"
+        app:layout_constraintTop_toBottomOf="@+id/shareGiftAnimation"
+        tools:alpha="1"
+        tools:text="2 DOT" />
+
+    <io.novafoundation.nova.common.view.PrimaryButtonV2
+        android:id="@+id/shareGiftButton"
+        style="@style/Widget.Nova.MaterialButton.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:alpha="0"
+        android:text="@string/share_gift_button"
+        app:icon="@drawable/ic_share_outline"
+        app:iconGravity="textStart"
+        app:iconTint="@color/icon_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:alpha="1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -69,7 +69,22 @@
         android:label="CreateGiftConfirmFragment">
 
         <action
+            android:id="@+id/action_openShareGiftFragment"
+            app:destination="@id/shareGiftFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/giftsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/shareGiftFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftFragment"
+        android:label="ShareGiftFragment">
+
+        <action
             android:id="@+id/action_finishCreateGift"
-            app:popUpTo="@id/giftsFragment"/>
+            app:popUpTo="@id/giftsFragment" />
     </fragment>
 </navigation>

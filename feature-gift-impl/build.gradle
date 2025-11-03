@@ -32,6 +32,7 @@ dependencies {
     implementation project(':common')
     implementation project(':feature-wallet-api')
     implementation project(':feature-account-api')
+    implementation project(':feature-deep-linking')
     implementation project(':feature-assets')
     implementation project(':feature-gift-api')
     implementation project(':runtime')
@@ -42,6 +43,8 @@ dependencies {
     implementation materialDep
     implementation constraintDep
     implementation flexBoxDep
+
+    implementation lottie
 
     implementation coroutinesDep
 

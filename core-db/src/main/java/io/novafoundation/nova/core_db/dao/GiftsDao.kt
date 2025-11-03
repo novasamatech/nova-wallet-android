@@ -9,6 +9,12 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GiftsDao {
 
+    @Query("SELECT * from gifts WHERE id = :id")
+    suspend fun getGiftById(id: Long): GiftLocal
+
+    @Query("SELECT * from gifts WHERE id = :id")
+    fun observeGiftById(id: Long): Flow<GiftLocal>
+
     @Query("SELECT * from gifts")
     fun observeAllGifts(): Flow<List<GiftLocal>>
 
@@ -16,5 +22,5 @@ interface GiftsDao {
     fun observeGiftsByAsset(chainId: String, assetId: Int): Flow<List<GiftLocal>>
 
     @Insert
-    suspend fun createNewGift(giftLocal: GiftLocal)
+    suspend fun createNewGift(giftLocal: GiftLocal): Long
 }

@@ -15,7 +15,11 @@ import io.novafoundation.nova.feature_gift_impl.domain.GiftsInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.RealGiftsInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.RealCreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
+import io.novafoundation.nova.feature_gift_impl.domain.RealShareGiftInteractor
+import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.GiftMinAmountProviderFactory
+import io.novafoundation.nova.feature_gift_impl.presentation.common.PackingGiftAnimationFactory
+import io.novafoundation.nova.feature_gift_impl.presentation.common.UnpackingGiftAnimationFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -71,5 +75,26 @@ class GiftFeatureModule {
         createGiftInteractor: CreateGiftInteractor
     ): GiftMinAmountProviderFactory {
         return GiftMinAmountProviderFactory(createGiftInteractor)
+    }
+
+    @Provides
+    @FeatureScope
+    fun providesShareGiftInteractor(
+        giftsRepository: GiftsRepository,
+        giftSecretsRepository: GiftSecretsRepository
+    ): ShareGiftInteractor {
+        return RealShareGiftInteractor(giftsRepository, giftSecretsRepository)
+    }
+
+    @Provides
+    @FeatureScope
+    fun providesPackingGiftAnimationFactory(): PackingGiftAnimationFactory {
+        return PackingGiftAnimationFactory()
+    }
+
+    @Provides
+    @FeatureScope
+    fun providesUnpackingGiftAnimationFactory(): UnpackingGiftAnimationFactory {
+        return UnpackingGiftAnimationFactory()
     }
 }

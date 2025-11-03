@@ -4,9 +4,12 @@ import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
+import io.novafoundation.nova.feature_gift_impl.domain.GiftId
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmFragment
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmPayload
+import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 
 class GiftNavigator(
@@ -31,6 +34,12 @@ class GiftNavigator(
     override fun openConfirmCreateGift(payload: CreateGiftConfirmPayload) {
         navigationBuilder().action(R.id.action_openConfirmCreateGift)
             .setArgs(CreateGiftConfirmFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openGiftSharing(giftId: GiftId) {
+        navigationBuilder().action(R.id.action_openShareGiftFragment)
+            .setArgs(ShareGiftFragment.createPayload(ShareGiftPayload(giftId)))
             .navigateInFirstAttachedContext()
     }
 }

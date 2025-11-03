@@ -25,7 +25,7 @@ class GiftLocal(
     val status: Status
 ) {
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
+    var id: Long = 0
 
     enum class Status {
         PENDING,
