@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="gift_created_subtitle">Created: %s</string>
+    <string name="gift_claimed_subtitle">Claimed</string>
+    <string name="gift_reclaimed_subtitle">Reclaimed</string>
     <string name="gifts_claim_fee">Network fee on claim</string>
 
     <string name="share_gift_text">Hello! You’ve got a %s gift waiting for you!\n\nInstall Nova Wallet app, set up your wallet, and claim it via this special link:\n%s</string>
@@ -32,6 +35,7 @@
 
     <string name="gifts_header_title">Share Crypto Gifts with Anyone, Anywhere</string>
     <string name="gifts_header_subtitle">Send gifts fast, easily, and securely in Nova</string>
+    <string name="gifts_list_title">Gifts you created</string>
     <string name="common_gift">Gift</string>
 
     <string name="select_token_to_vote">Select token to vote</string>

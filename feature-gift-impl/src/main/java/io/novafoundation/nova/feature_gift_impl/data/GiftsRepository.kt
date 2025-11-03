@@ -7,6 +7,7 @@ import io.novafoundation.nova.core_db.model.GiftLocal
 import io.novafoundation.nova.feature_gift_impl.domain.models.Gift
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
+import java.util.Date
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -50,7 +51,8 @@ class RealGiftsRepository(
                 giftAccountId = accountIdKey.value,
                 chainId = fullChainAssetId.chainId,
                 assetId = fullChainAssetId.assetId,
-                status = GiftLocal.Status.PENDING
+                status = GiftLocal.Status.PENDING,
+                creationDate = Date().time
             )
         )
     }
@@ -65,6 +67,7 @@ class RealGiftsRepository(
             GiftLocal.Status.PENDING -> Gift.Status.PENDING
             GiftLocal.Status.CLAIMED -> Gift.Status.CLAIMED
             GiftLocal.Status.RECLAIMED -> Gift.Status.RECLAIMED
-        }
+        },
+        creationDate = Date(this.creationDate)
     )
 }

@@ -12,6 +12,7 @@ val AddGifts_71_72 = object : Migration(71, 72) {
                     `chainId` TEXT NOT NULL, 
                     `assetId` INTEGER NOT NULL,
                     `status` TEXT NOT NULL,
+                    `creationDate` INTEGER NOT NULL,
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                     FOREIGN KEY(`assetId`, `chainId`) REFERENCES `chain_assets`(`id`, `chainId`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimMargin()

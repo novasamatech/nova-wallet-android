@@ -17,7 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="@string/gifts_header_subtitle" />
+        android:text="@string/gifts_header_subtitle"
+        android:textColor="@color/text_secondary" />
 
     <io.novafoundation.nova.common.view.LinkView
         android:id="@+id/giftsHeaderLearnMore"

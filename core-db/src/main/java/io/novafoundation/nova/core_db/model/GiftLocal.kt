@@ -22,7 +22,8 @@ class GiftLocal(
     val giftAccountId: ByteArray,
     val chainId: String,
     val assetId: Int,
-    val status: Status
+    val status: Status,
+    val creationDate: Long
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0
