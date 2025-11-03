@@ -57,9 +57,15 @@
                 app:title="@string/common_your_gift" />
 
             <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
-                android:id="@+id/confirmCreateGiftFee"
+                android:id="@+id/confirmCreateGiftNetworkFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:id="@+id/confirmCreateGiftClaimFee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/gifts_claim_fee"/>
 
         </io.novafoundation.nova.common.view.TableView>
 

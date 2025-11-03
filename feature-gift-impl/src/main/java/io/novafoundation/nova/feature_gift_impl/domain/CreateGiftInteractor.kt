@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.data.secrets.v2.publicKey
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.normalizeSeed
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
@@ -84,7 +85,7 @@ class RealCreateGiftInteractor(
             transferMax = true,
             giftAccountId = model.chain.emptyAccountIdKey(),
             coroutineScope = coroutineScope
-        )
+        ).doubleFeeForEvm()
         val claimFeeAmount = model.chainAsset.amountFromPlanks(claimGiftFee.amount)
 
         val createGiftFee = getSubmissionFee(
@@ -167,5 +168,12 @@ class RealCreateGiftInteractor(
         giftSecretsRepository.putGiftAccountSecrets(accountId, giftSecrets)
 
         return accountId.intoKey()
+    }
+
+    private fun SubmissionFee.doubleFeeForEvm(): SubmissionFee {
+        return when (this) {
+            is EvmFee -> copy(gasLimit = gasLimit * 2.toBigInteger())
+            else -> this
+        }
     }
 }

@@ -22,9 +22,9 @@ import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferV
 import io.novafoundation.nova.feature_gift_impl.R
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.models.CreateGiftModel
+import io.novafoundation.nova.feature_gift_impl.domain.models.GiftFee
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
-import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.GiftFeeDisplayFormatter
-import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.createForGifts
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.createForGiftsWithDefaultDisplay
 import io.novafoundation.nova.feature_gift_impl.presentation.common.buildGiftValidationPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValida
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.isMaxAction
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.DefaultFeeFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
@@ -50,6 +51,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
 class SelectGiftAmountViewModel(
@@ -88,8 +90,8 @@ class SelectGiftAmountViewModel(
         )
     }.shareInBackground()
 
-    private val feeFormatter = GiftFeeDisplayFormatter(amountFormatter)
-    val feeMixin = feeLoaderMixinFactory.createForGifts(
+    private val feeFormatter = DefaultFeeFormatter<GiftFee>(amountFormatter)
+    val feeMixin = feeLoaderMixinFactory.createForGiftsWithDefaultDisplay(
         chainAssetFlow,
         feeFormatter
     )
@@ -129,7 +131,7 @@ class SelectGiftAmountViewModel(
             amountState.value.isNotEmpty() -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
             else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.gift_enter_amount_disabled_button_state))
         }
-    }
+    }.onStart { emit(DescriptiveButtonState.Disabled(resourceManager.getString(R.string.gift_enter_amount_disabled_button_state))) }
 
     init {
         setupFees()
@@ -214,7 +216,7 @@ class SelectGiftAmountViewModel(
     }
 
     private fun getAmountValidator(): FieldValidator {
-        val minAmountProvider = giftMinAmountProviderFactory.create(feeMixin)
+        val minAmountProvider = giftMinAmountProviderFactory.create(chainAssetFlow)
 
         return CompoundFieldValidator(
             enoughAmountValidatorFactory.create(maxActionProvider),
