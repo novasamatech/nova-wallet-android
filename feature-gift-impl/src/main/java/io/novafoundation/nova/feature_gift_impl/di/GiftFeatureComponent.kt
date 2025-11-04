@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
 import io.novafoundation.nova.feature_gift_impl.di.modules.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.di.SelectGiftAmountComponent
+import io.novafoundation.nova.feature_gift_impl.presentation.claim.di.ClaimGiftComponent
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.di.CreateGiftConfirmComponent
 import io.novafoundation.nova.feature_gift_impl.presentation.gifts.di.GiftsComponent
 import io.novafoundation.nova.feature_gift_impl.presentation.share.di.ShareGiftComponent
@@ -36,6 +37,8 @@ interface GiftFeatureComponent : GiftFeatureApi {
     fun createGiftConfirmComponentFactory(): CreateGiftConfirmComponent.Factory
 
     fun shareGiftComponentFactory(): ShareGiftComponent.Factory
+
+    fun claimGiftComponentFactory(): ClaimGiftComponent.Factory
 
     @Component.Factory
     interface Factory {

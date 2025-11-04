@@ -42,4 +42,8 @@ class GiftNavigator(
             .setArgs(ShareGiftFragment.createPayload(ShareGiftPayload(giftId)))
             .navigateInFirstAttachedContext()
     }
+
+    override fun openMainScreen() {
+        commonDelegate.openMain()
+    }
 }

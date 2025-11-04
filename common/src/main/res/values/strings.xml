@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="claim_gift_button">Claim the gift</string>
+    <string name="claim_gift_title">You’ve got a crypto gift!</string>
+
     <string name="gift_created_subtitle">Created: %s</string>
     <string name="gift_claimed_subtitle">Claimed</string>
     <string name="gift_reclaimed_subtitle">Reclaimed</string>

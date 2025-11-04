@@ -37,8 +37,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-private const val GIFT_SEED_SIZE_BYTES = 10
-
 typealias GiftId = Long
 
 interface CreateGiftInteractor {
@@ -62,12 +60,11 @@ interface CreateGiftInteractor {
 
 class RealCreateGiftInteractor(
     private val assetSourceRegistry: AssetSourceRegistry,
-    private val createSecretsRepository: CreateSecretsRepository,
     private val chainRegistry: ChainRegistry,
-    private val encryptionDefaults: EncryptionDefaults,
     private val giftSecretsRepository: GiftSecretsRepository,
     private val giftsRepository: GiftsRepository,
     private val sendUseCase: SendUseCase,
+    private val giftSecretsUseCase: GiftSecretsUseCase
 ) : CreateGiftInteractor {
 
     override fun validationSystemFor(chainAsset: Chain.Asset, coroutineScope: CoroutineScope): AssetTransfersValidationSystem {
@@ -153,15 +150,7 @@ class RealCreateGiftInteractor(
 
     private suspend fun createAndStoreRandomGiftAccount(chainId: String): AccountIdKey {
         val chain = chainRegistry.getChain(chainId)
-        val encryption = encryptionDefaults.forChain(chain)
-
-        val seed = SeedCreator.randomSeed(sizeBytes = GIFT_SEED_SIZE_BYTES)
-        val giftSecrets = createSecretsRepository.createSecretsWithSeed(
-            seed = seed.normalizeSeed(),
-            cryptoType = encryption.cryptoType,
-            derivationPath = encryption.derivationPath,
-            isEthereum = chain.isEthereumBased
-        )
+        val giftSecrets = giftSecretsUseCase.createRandomGiftSecrets(chain)
 
         val accountId = chain.accountIdOf(giftSecrets.keypair.publicKey)
 
