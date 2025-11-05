@@ -71,14 +71,9 @@ class PrimaryButtonV2 @JvmOverloads constructor(
 }
 
 fun PrimaryButtonV2.setState(state: DescriptiveButtonState) {
-    if (state == DescriptiveButtonState.Loading) {
-        checkPreparedForProgress()
-
-        showButtonProgress()
-    } else {
-        hideButtonProgress()
-    }
     isEnabled = state is DescriptiveButtonState.Enabled
+
+    text = state.textOrNull()
 
     visibility = when (state) {
         DescriptiveButtonState.Gone -> View.GONE
@@ -86,5 +81,11 @@ fun PrimaryButtonV2.setState(state: DescriptiveButtonState) {
         else -> View.VISIBLE
     }
 
-    text = state.textOrNull()
+    if (state == DescriptiveButtonState.Loading) {
+        checkPreparedForProgress()
+
+        showButtonProgress()
+    } else {
+        hideButtonProgress()
+    }
 }
