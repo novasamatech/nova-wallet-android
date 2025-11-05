@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_account_impl.domain
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.keypair
 import io.novafoundation.nova.common.data.secrets.v2.publicKey
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.common.forChain
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -13,7 +15,9 @@ import io.novasama.substrate_sdk_android.scale.EncodableStruct
 import java.util.UUID
 import kotlin.Long
 
-class RealCreateGiftMetaAccountUseCase : CreateGiftMetaAccountUseCase {
+class RealCreateGiftMetaAccountUseCase(
+    private val encryptionDefaults: EncryptionDefaults
+) : CreateGiftMetaAccountUseCase {
 
     override fun createTemporaryGiftMetaAccount(chain: Chain, chainSecrets: EncodableStruct<ChainAccountSecrets>): MetaAccount {
         val publicKey = chainSecrets.keypair.publicKey
@@ -22,7 +26,7 @@ class RealCreateGiftMetaAccountUseCase : CreateGiftMetaAccountUseCase {
             chainId = chain.id,
             publicKey = publicKey,
             accountId = chain.accountIdOf(publicKey),
-            cryptoType = null,
+            cryptoType = encryptionDefaults.forChain(chain).cryptoType,
         )
 
         return RealSecretsMetaAccount(

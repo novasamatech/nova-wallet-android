@@ -13,7 +13,7 @@ interface EvmTransactionService {
 
     suspend fun calculateFee(
         chainId: ChainId,
-        origin: TransactionOrigin = TransactionOrigin.SelectedWallet,
+        origin: TransactionOrigin,
         fallbackGasLimit: BigInteger = DefaultGasProvider.GAS_LIMIT,
         building: EvmTransactionBuilding,
     ): Fee
@@ -21,7 +21,7 @@ interface EvmTransactionService {
     suspend fun transact(
         chainId: ChainId,
         presetFee: Fee?,
-        origin: TransactionOrigin = TransactionOrigin.SelectedWallet,
+        origin: TransactionOrigin,
         fallbackGasLimit: BigInteger = DefaultGasProvider.GAS_LIMIT,
         building: EvmTransactionBuilding,
     ): Result<ExtrinsicSubmission>

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -50,7 +51,11 @@ class EvmErc20AssetTransfers(
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {
-        return evmTransactionService.calculateFee(transfer.originChain.id, fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT) {
+        return evmTransactionService.calculateFee(
+            transfer.originChain.id,
+            fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT,
+            origin = transfer.sender.intoOrigin()
+        ) {
             transfer(transfer)
         }
     }
@@ -59,7 +64,8 @@ class EvmErc20AssetTransfers(
         return evmTransactionService.transact(
             chainId = transfer.originChain.id,
             presetFee = transfer.fee.submissionFee,
-            fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT
+            fallbackGasLimit = ERC_20_UPPER_GAS_LIMIT,
+            origin = transfer.sender.intoOrigin()
         ) {
             transfer(transfer)
         }

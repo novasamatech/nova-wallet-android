@@ -5,7 +5,6 @@ import io.novafoundation.nova.common.utils.normalizeSeed
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.account.common.forChain
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedCreator
 import io.novasama.substrate_sdk_android.scale.EncodableStruct

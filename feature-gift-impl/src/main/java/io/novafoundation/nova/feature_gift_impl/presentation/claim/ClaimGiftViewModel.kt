@@ -74,8 +74,8 @@ class ClaimGiftViewModel(
         .shareInBackground()
 
     private val claimingInProgressFlow = MutableStateFlow(false)
-    val confirmButtonStateFlow = claimingInProgressFlow.map { submitting ->
-        if (submitting) {
+    val confirmButtonStateFlow = claimingInProgressFlow.map { claimingInProgress ->
+        if (claimingInProgress) {
             DescriptiveButtonState.Loading
         } else {
             DescriptiveButtonState.Enabled(resourceManager.getString(R.string.claim_gift_button))

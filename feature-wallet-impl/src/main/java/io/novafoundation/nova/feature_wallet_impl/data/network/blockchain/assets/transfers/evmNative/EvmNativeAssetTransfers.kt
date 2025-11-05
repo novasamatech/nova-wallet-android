@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -46,7 +47,11 @@ class EvmNativeAssetTransfers(
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {
-        return evmTransactionService.calculateFee(transfer.originChain.id, fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT) {
+        return evmTransactionService.calculateFee(
+            transfer.originChain.id,
+            fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT,
+            origin = transfer.sender.intoOrigin()
+        ) {
             nativeTransfer(transfer)
         }
     }
@@ -56,6 +61,7 @@ class EvmNativeAssetTransfers(
             chainId = transfer.originChain.id,
             fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT,
             presetFee = transfer.fee.submissionFee,
+            origin = transfer.sender.intoOrigin()
         ) {
             nativeTransfer(transfer)
         }

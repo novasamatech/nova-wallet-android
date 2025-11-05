@@ -6,13 +6,9 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.secrets.v2.keypair
 import io.novafoundation.nova.common.data.secrets.v2.publicKey
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.common.utils.normalizeSeed
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
-import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
-import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
-import io.novafoundation.nova.feature_account_api.domain.account.common.forChain
 import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
 import io.novafoundation.nova.feature_gift_impl.domain.models.CreateGiftModel
@@ -31,7 +27,6 @@ import io.novafoundation.nova.runtime.ext.emptyAccountIdKey
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.encrypt.seed.SeedCreator
 import java.math.BigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

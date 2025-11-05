@@ -837,7 +837,7 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideCreateGiftMetaAccountUseCase(): CreateGiftMetaAccountUseCase {
-        return RealCreateGiftMetaAccountUseCase()
+    fun provideCreateGiftMetaAccountUseCase(encryptionDefaults: EncryptionDefaults): CreateGiftMetaAccountUseCase {
+        return RealCreateGiftMetaAccountUseCase(encryptionDefaults)
     }
 }

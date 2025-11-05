@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink
 
 import android.net.Uri
 import io.novafoundation.nova.common.utils.DialogMessageManager
-import io.novafoundation.nova.common.utils.normalizeSeed
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
