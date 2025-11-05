@@ -11,11 +11,14 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.IntegrityService
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.GiftsDao
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -87,6 +90,12 @@ interface GiftFeatureDependencies {
     val tokenFormatter: TokenFormatter
 
     val fileProvider: FileProvider
+
+    val createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase
+
+    val automaticInteractionGate: AutomaticInteractionGate
+
+    val dialogMessageManager: DialogMessageManager
 
     fun giftsDao(): GiftsDao
 

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_gift_impl.presentation.share.deeplink
+package io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink
 
 import android.net.Uri
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -6,28 +6,34 @@ import io.novafoundation.nova.feature_deep_linking.presentation.configuring.Deep
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.LinkBuilderFactory
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.addParamIfNotNull
 
-class ShareGiftDeepLinkData(
+class ClaimGiftDeepLinkData(
     val seed: String,
     val chainId: String,
     val symbol: TokenSymbol
 )
 
-class ShareGiftDeepLinkConfigurator(
+class ClaimGiftDeepLinkConfigurator(
     private val linkBuilderFactory: LinkBuilderFactory
-) : DeepLinkConfigurator<ShareGiftDeepLinkData> {
+) : DeepLinkConfigurator<ClaimGiftDeepLinkData> {
 
     val action = "open"
     val screen = "gift"
     val deepLinkPrefix = "/$action/$screen"
-    val dataParam = "data"
+    val payloadParam = "payload"
+    val chainIdLength = 6
 
-    override fun configure(payload: ShareGiftDeepLinkData, type: DeepLinkConfigurator.Type): Uri {
-        val shortenChainId = payload.chainId.substring(startIndex = 0, endIndex = 6)
+    override fun configure(payload: ClaimGiftDeepLinkData, type: DeepLinkConfigurator.Type): Uri {
+        val shortenChainId = normaliseChainId(payload.chainId)
+            .substring(startIndex = 0, endIndex = chainIdLength)
         val data = "${payload.seed}_${shortenChainId}_${payload.symbol.value}"
         return linkBuilderFactory.newLink(type)
             .setAction(action)
             .setScreen(screen)
-            .addParamIfNotNull(dataParam, data)
+            .addParamIfNotNull(payloadParam, data)
             .build()
+    }
+
+    fun normaliseChainId(chainId: String): String {
+        return chainId.removePrefix("eip155:")
     }
 }

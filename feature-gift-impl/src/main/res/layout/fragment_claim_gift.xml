@@ -23,6 +23,7 @@
         android:gravity="center"
         android:paddingHorizontal="16dp"
         android:text="@string/claim_gift_title"
+        android:textColor="@color/text_primary"
         app:layout_constraintTop_toBottomOf="@+id/claimGiftToolbar" />
 
     <com.airbnb.lottie.LottieAnimationView
@@ -35,7 +36,7 @@
         app:layout_constraintTop_toBottomOf="@+id/claimGiftTitle"
         app:layout_constraintVertical_bias="0.31"
         app:layout_constraintVertical_chainStyle="packed"
-        tools:lottie_rawRes="@raw/DOT_packing_optimized" />
+        tools:lottie_rawRes="@raw/dot_unpacking" />
 
     <ImageView
         android:id="@+id/claimGiftTokenIcon"
@@ -55,11 +56,24 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:gravity="center"
+        android:textColor="@color/text_primary"
         app:layout_constraintBottom_toTopOf="@+id/claimGiftAccount"
         app:layout_constraintEnd_toEndOf="@+id/claimGiftAnimation"
         app:layout_constraintStart_toEndOf="@+id/claimGiftTokenIcon"
         app:layout_constraintTop_toBottomOf="@+id/claimGiftAnimation"
         tools:text="2 DOT" />
+
+    <TextView
+        android:id="@+id/claimGiftAccountTitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toTopOf="@+id/claimGiftAccount"
+        app:layout_constraintStart_toStartOf="@+id/claimGiftAccount"
+        tools:text="Your wallet to receive the gift" />
 
     <io.novafoundation.nova.feature_account_api.view.AccountView
         android:id="@+id/claimGiftAccount"

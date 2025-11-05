@@ -50,6 +50,7 @@ import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalS
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.RealAccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -116,6 +117,7 @@ import io.novafoundation.nova.feature_account_impl.di.modules.signers.SignersMod
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
+import io.novafoundation.nova.feature_account_impl.domain.RealCreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
@@ -831,5 +833,11 @@ class AccountFeatureModule {
         return RealCreateSecretsRepository(
             accountSecretsFactory
         )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCreateGiftMetaAccountUseCase(): CreateGiftMetaAccountUseCase {
+        return RealCreateGiftMetaAccountUseCase()
     }
 }

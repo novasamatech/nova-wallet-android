@@ -8,16 +8,15 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
+import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftViewModel
-import io.novafoundation.nova.feature_gift_impl.presentation.common.PackingGiftAnimationFactory
-import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftPayload
-import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftViewModel
-import io.novafoundation.nova.feature_gift_impl.presentation.share.deeplink.ShareGiftDeepLinkConfigurator
+import io.novafoundation.nova.feature_gift_impl.presentation.common.UnpackingGiftAnimationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -34,27 +33,27 @@ class ClaimGiftModule {
     @ViewModelKey(ClaimGiftViewModel::class)
     fun provideViewModel(
         router: GiftRouter,
-        payload: ShareGiftPayload,
-        shareGiftInteractor: ShareGiftInteractor,
+        payload: ClaimGiftPayload,
+        claimGiftInteractor: ClaimGiftInteractor,
         chainRegistry: ChainRegistry,
-        packingGiftAnimationFactory: PackingGiftAnimationFactory,
+        unpackingGiftAnimationFactory: UnpackingGiftAnimationFactory,
         assetIconProvider: AssetIconProvider,
         tokenFormatter: TokenFormatter,
-        shareGiftDeepLinkConfigurator: ShareGiftDeepLinkConfigurator,
-        fileProvider: FileProvider,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        selectedAccountUseCase: SelectedAccountUseCase,
+        walletUiUseCase: WalletUiUseCase
     ): ViewModel {
         return ClaimGiftViewModel(
             router = router,
             payload = payload,
-            shareGiftInteractor = shareGiftInteractor,
+            claimGiftInteractor = claimGiftInteractor,
             chainRegistry = chainRegistry,
-            packingGiftAnimationFactory = packingGiftAnimationFactory,
+            unpackingGiftAnimationFactory = unpackingGiftAnimationFactory,
             assetIconProvider = assetIconProvider,
             tokenFormatter = tokenFormatter,
-            shareGiftDeepLinkConfigurator = shareGiftDeepLinkConfigurator,
-            fileProvider = fileProvider,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            selectedAccountUseCase = selectedAccountUseCase,
+            walletUiUseCase = walletUiUseCase
         )
     }
 }
