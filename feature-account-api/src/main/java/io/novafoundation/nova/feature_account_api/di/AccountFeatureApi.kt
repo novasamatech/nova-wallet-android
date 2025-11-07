@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalS
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -133,6 +134,8 @@ interface AccountFeatureApi {
     val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry
 
     val createSecretsRepository: CreateSecretsRepository
+
+    val createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

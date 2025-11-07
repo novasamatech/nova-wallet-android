@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
+import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
@@ -72,6 +73,7 @@ class RootFeatureHolder @Inject constructor(
             .accountMigrationFeatureApi(getFeature(AccountMigrationFeatureApi::class.java))
             .multisigOperationsFeatureApi(getFeature(MultisigOperationsFeatureApi::class.java))
             .chainMigrationFeatureApi(getFeature(ChainMigrationFeatureApi::class.java))
+            .giftFeatureApi(getFeature(GiftFeatureApi::class.java))
             .build()
 
         return DaggerRootComponent.factory()

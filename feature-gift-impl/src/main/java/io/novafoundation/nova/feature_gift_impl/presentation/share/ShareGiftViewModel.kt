@@ -18,8 +18,8 @@ import io.novafoundation.nova.feature_gift_impl.R
 import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.common.PackingGiftAnimationFactory
-import io.novafoundation.nova.feature_gift_impl.presentation.share.deeplink.ShareGiftDeepLinkConfigurator
-import io.novafoundation.nova.feature_gift_impl.presentation.share.deeplink.ShareGiftDeepLinkData
+import io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink.ClaimGiftDeepLinkConfigurator
+import io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink.ClaimGiftDeepLinkData
 import io.novafoundation.nova.feature_gift_impl.presentation.share.model.GiftAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
@@ -41,7 +41,7 @@ class ShareGiftViewModel(
     private val packingGiftAnimationFactory: PackingGiftAnimationFactory,
     private val assetIconProvider: AssetIconProvider,
     private val tokenFormatter: TokenFormatter,
-    private val shareGiftDeepLinkConfigurator: ShareGiftDeepLinkConfigurator,
+    private val claimGiftDeepLinkConfigurator: ClaimGiftDeepLinkConfigurator,
     private val fileProvider: FileProvider,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
@@ -86,8 +86,8 @@ class ShareGiftViewModel(
     private suspend fun getSharingLink(): Uri {
         val chainAsset = chainAssetFlow.first()
         val giftSeed = shareGiftInteractor.getGiftSeed(payload.giftId)
-        val sharingPayload = ShareGiftDeepLinkData(giftSeed, chainAsset.chainId, chainAsset.symbol)
-        return shareGiftDeepLinkConfigurator.configure(sharingPayload, type = DeepLinkConfigurator.Type.APP_LINK)
+        val sharingPayload = ClaimGiftDeepLinkData(giftSeed, chainAsset.chainId, chainAsset.symbol)
+        return claimGiftDeepLinkConfigurator.configure(sharingPayload, type = DeepLinkConfigurator.Type.APP_LINK)
     }
 
     suspend fun generateShareImageFile(): Uri = withContext(Dispatchers.IO) {

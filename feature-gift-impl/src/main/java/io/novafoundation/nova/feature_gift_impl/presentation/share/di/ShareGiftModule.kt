@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.common.PackingGiftAnimationFactory
 import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftViewModel
-import io.novafoundation.nova.feature_gift_impl.presentation.share.deeplink.ShareGiftDeepLinkConfigurator
+import io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink.ClaimGiftDeepLinkConfigurator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -39,7 +39,7 @@ class ShareGiftModule {
         packingGiftAnimationFactory: PackingGiftAnimationFactory,
         assetIconProvider: AssetIconProvider,
         tokenFormatter: TokenFormatter,
-        shareGiftDeepLinkConfigurator: ShareGiftDeepLinkConfigurator,
+        claimGiftDeepLinkConfigurator: ClaimGiftDeepLinkConfigurator,
         fileProvider: FileProvider,
         resourceManager: ResourceManager
     ): ViewModel {
@@ -51,7 +51,7 @@ class ShareGiftModule {
             packingGiftAnimationFactory = packingGiftAnimationFactory,
             assetIconProvider = assetIconProvider,
             tokenFormatter = tokenFormatter,
-            shareGiftDeepLinkConfigurator = shareGiftDeepLinkConfigurator,
+            claimGiftDeepLinkConfigurator = claimGiftDeepLinkConfigurator,
             fileProvider = fileProvider,
             resourceManager = resourceManager
         )

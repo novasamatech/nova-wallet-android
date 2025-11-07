@@ -6,6 +6,8 @@ import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRe
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_gift_impl.domain.GiftId
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
+import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmFragment
 import io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftFragment
@@ -41,5 +43,15 @@ class GiftNavigator(
         navigationBuilder().action(R.id.action_openShareGiftFragment)
             .setArgs(ShareGiftFragment.createPayload(ShareGiftPayload(giftId)))
             .navigateInFirstAttachedContext()
+    }
+
+    override fun openMainScreen() {
+        commonDelegate.openMain()
+    }
+
+    override fun openClaimGift(payload: ClaimGiftPayload) {
+        navigationBuilder().action(R.id.action_openClaimGiftFragment)
+            .setArgs(ClaimGiftFragment.createPayload(payload))
+            .navigateInRoot()
     }
 }

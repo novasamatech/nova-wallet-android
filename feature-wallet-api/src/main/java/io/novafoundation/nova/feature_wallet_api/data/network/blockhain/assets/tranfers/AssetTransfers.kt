@@ -181,3 +181,5 @@ suspend fun AssetTransfers.tryParseTransfer(call: GenericCall.Instance, chain: C
         .onFailure { Log.e(LOG_TAG, "Failed to parse call: $call", it) }
         .getOrNull()
 }
+
+fun AssetTransfer.asWeighted(fee: OriginFee) = WeightedAssetTransfer(this, fee)

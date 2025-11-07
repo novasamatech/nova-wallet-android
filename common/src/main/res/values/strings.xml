@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="claim_gift_success_message">You’ve successfully claimed a gift. Tokens will appear in your balance shortly.</string>
+
+    <string name="claim_gift_already_claimed_title">The gift cannot be received</string>
+    <string name="claim_gift_already_claimed_message">Oops, the gift has already been  claimed</string>
+
+    <string name="claim_gift_default_error_title">Oops, something went wrong</string>
+    <string name="claim_gift_default_error_message">There may be a problem with the server. Please, try again later.</string>
+    <string name="claim_gift_button">Claim the gift</string>
+    <string name="claim_gift_title">You’ve got a crypto gift!</string>
+
     <string name="gift_created_subtitle">Created: %s</string>
     <string name="gift_claimed_subtitle">Claimed</string>
     <string name="gift_reclaimed_subtitle">Reclaimed</string>
