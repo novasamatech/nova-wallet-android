@@ -94,6 +94,19 @@ fun Context.getBlockDrawable(@ColorRes strokeColorRes: Int? = null): Drawable {
     return getRoundedCornerDrawable(fillColorRes = R.color.block_background, strokeColorRes = strokeColorRes)
 }
 
+fun Context.getRoundedCornerDrawableWithRipple(
+    @ColorRes fillColorRes: Int? = R.color.secondary_screen_background,
+    @ColorRes strokeColorRes: Int? = null,
+    cornerSizeInDp: Int = DEFAULT_CORNER_RADIUS,
+    strokeSizeInDp: Float = 1.0f,
+    @ColorInt rippleColor: Int = getColor(R.color.cell_background_pressed)
+): Drawable {
+    val ripple = getRippleMask(cornerSizeInDp)
+    val drawable = getRoundedCornerDrawable(fillColorRes, strokeColorRes, cornerSizeInDp, strokeSizeInDp)
+
+    return addRipple(drawable, ripple, rippleColor)
+}
+
 fun Context.getRoundedCornerDrawable(
     @ColorRes fillColorRes: Int? = R.color.secondary_screen_background,
     @ColorRes strokeColorRes: Int? = null,
