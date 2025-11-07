@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDial
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.payload
+import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.feature_push_notifications.R
 import io.novafoundation.nova.feature_push_notifications.databinding.FragmentPushSettingsBinding
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
@@ -43,6 +44,7 @@ class PushSettingsFragment : BaseFragment<PushSettingsViewModel, FragmentPushSet
 
     override fun subscribe(viewModel: PushSettingsViewModel) {
         setupConfirmationDialog(R.style.AccentNegativeAlertDialogTheme_Reversed, viewModel.closeConfirmationAction)
+        setupPermissionAsker(viewModel)
 
         viewModel.pushSettingsWasChangedState.observe { binder.pushSettingsToolbar.setRightActionEnabled(it) }
         viewModel.savingInProgress.observe { binder.pushSettingsToolbar.showProgress(it) }

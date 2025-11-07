@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileProvider
@@ -63,11 +64,13 @@ class BrowserTabsModule {
     fun provideIntegrityCheckSessionFactory(
         apiCreator: NetworkApiCreator,
         preferences: Preferences,
-        integrityService: IntegrityService
+        integrityService: IntegrityService,
+        deviceIdProvider: DeviceIdProvider
     ) = IntegrityCheckSessionFactory(
         apiCreator,
         preferences,
-        integrityService
+        integrityService,
+        deviceIdProvider
     )
 
     @FeatureScope

@@ -238,6 +238,8 @@ fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
 fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
 
+fun Int.atLeastZero() = coerceAtLeast(0)
+
 fun BigDecimal.lessEpsilon(): BigDecimal = when {
     this.isZero -> this
     else -> this.subtract(BigInteger.ONE.toBigDecimal(scale = MathContext.DECIMAL64.precision))
