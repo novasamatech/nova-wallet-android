@@ -145,11 +145,11 @@ class RealCreateGiftInteractor(
 
     private suspend fun createAndStoreRandomGiftAccount(chainId: String): AccountIdKey {
         val chain = chainRegistry.getChain(chainId)
-        val giftSecrets = giftSecretsUseCase.createRandomGiftSecrets(chain)
+        val giftSeed = giftSecretsUseCase.createRandomGiftSeed()
+        val giftSecrets = giftSecretsUseCase.createGiftSecrets(chain, giftSeed)
 
         val accountId = chain.accountIdOf(giftSecrets.keypair.publicKey)
-
-        giftSecretsRepository.putGiftAccountSecrets(accountId, giftSecrets)
+        giftSecretsRepository.putGiftAccountSeed(accountId, giftSeed)
 
         return accountId.intoKey()
     }

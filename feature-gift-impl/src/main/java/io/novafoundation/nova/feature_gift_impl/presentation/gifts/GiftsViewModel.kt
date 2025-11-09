@@ -58,7 +58,7 @@ class GiftsViewModel(
     }
 
     fun learnMoreClicked() {
-        openBrowserEvent.value = Event(appLinksProvider.wikiBase)
+        openBrowserEvent.value = Event(appLinksProvider.giftsWikiUrl)
     }
 
     fun createGiftClicked() {

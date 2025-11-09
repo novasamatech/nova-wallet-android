@@ -27,7 +27,6 @@
         android:layout_marginTop="4dp"
         android:minHeight="32dp"
         android:paddingVertical="8dp"
-        android:visibility="gone"
         app:linkText="Learn more" /> <!--Hide until we have a special wiki page for gifts-->
 
 </LinearLayout>

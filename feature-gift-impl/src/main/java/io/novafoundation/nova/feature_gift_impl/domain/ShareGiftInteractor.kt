@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.utils.removeSpacing
 import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
 import io.novafoundation.nova.feature_gift_impl.domain.models.Gift
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.flow.Flow
 
 interface ShareGiftInteractor {
@@ -27,10 +28,8 @@ class RealShareGiftInteractor(
 
     override suspend fun getGiftSeed(giftId: Long): String {
         val gift = giftsRepository.getGift(giftId)
-        val secrets = giftSecretsRepository.getGiftAccountSecrets(gift.giftAccountId) ?: error("No secrets for gift found")
-        val seed = secrets.seed ?: error("No seed for gift found")
-        return seed.decodeToString()
-            .removeSpacing()
+        val seed = giftSecretsRepository.getGiftAccountSeed(gift.giftAccountId) ?: error("No secrets for gift found")
+        return seed.toHexString()
     }
 
     override suspend fun setGiftStateAsReclaimed(id: Long) {
