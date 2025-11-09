@@ -112,6 +112,7 @@ class RealCreateGiftInteractor(
                 giftsRepository.saveNewGift(
                     accountIdKey = giftAccountId,
                     amount = giftModel.chainAsset.planksFromAmount(giftModel.amount),
+                    creatorMetaId = giftModel.senderMetaAccount.id,
                     fullChainAssetId = giftModel.chainAsset.fullId
                 )
             }

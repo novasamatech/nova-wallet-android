@@ -9,6 +9,7 @@ import java.util.Date
 class Gift(
     val id: Long,
     val amount: BigInteger,
+    val creatorMetaId: Long,
     val chainId: ChainId,
     val assetId: ChainAssetId,
     val status: Status,

@@ -48,9 +48,10 @@ class GiftFeatureModule {
     fun providesGiftsInteractor(
         repository: GiftsRepository,
         assetSourceRegistry: AssetSourceRegistry,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        selectedAccountUseCase: SelectedAccountUseCase
     ): GiftsInteractor {
-        return RealGiftsInteractor(repository, assetSourceRegistry, chainRegistry)
+        return RealGiftsInteractor(repository, assetSourceRegistry, chainRegistry, selectedAccountUseCase)
     }
 
     @Provides

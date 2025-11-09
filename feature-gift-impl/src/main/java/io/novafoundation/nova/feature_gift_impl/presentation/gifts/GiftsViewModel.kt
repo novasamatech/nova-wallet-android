@@ -15,9 +15,11 @@ import io.novafoundation.nova.feature_gift_impl.domain.models.isClaimed
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.coroutines.flow.combine
@@ -41,7 +43,7 @@ class GiftsViewModel(
     private val chains = chainRegistry.chainsById
 
     val gifts = combine(
-        giftsInteractor.observeGifts(),
+        giftsInteractor.observeGifts(giftsPayload.fullChainAssetIdOrNull()),
         chains
     ) { gifts, chains ->
         gifts.mapNotNull { mapGift(it, chains) }
@@ -94,5 +96,12 @@ class GiftsViewModel(
             subtitle = subtitle,
             imageRes = if (isClaimed) R.drawable.ic_gift_unpacked else R.drawable.ic_gift_packed,
         )
+    }
+}
+
+private fun GiftsPayload.fullChainAssetIdOrNull(): FullChainAssetId? {
+    return when (this) {
+        is GiftsPayload.ByAsset -> assetPayload.fullChainAssetId
+        GiftsPayload.AllAssets -> null
     }
 }

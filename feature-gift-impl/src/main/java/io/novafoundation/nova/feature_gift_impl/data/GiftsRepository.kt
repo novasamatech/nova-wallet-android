@@ -21,7 +21,12 @@ interface GiftsRepository {
 
     fun observeGifts(): Flow<List<Gift>>
 
-    suspend fun saveNewGift(accountIdKey: AccountIdKey, amount: BigInteger, fullChainAssetId: FullChainAssetId): Long
+    suspend fun saveNewGift(
+        accountIdKey: AccountIdKey,
+        amount: BigInteger,
+        creatorMetaId: Long,
+        fullChainAssetId: FullChainAssetId
+    ): Long
 
     suspend fun setGiftState(id: Long, status: Gift.Status)
 }
@@ -51,12 +56,14 @@ class RealGiftsRepository(
     override suspend fun saveNewGift(
         accountIdKey: AccountIdKey,
         amount: BigInteger,
+        creatorMetaId: Long,
         fullChainAssetId: FullChainAssetId
     ): Long {
         return giftsDao.createNewGift(
             GiftLocal(
                 amount = amount,
                 giftAccountId = accountIdKey.value,
+                creatorMetaId = creatorMetaId,
                 chainId = fullChainAssetId.chainId,
                 assetId = fullChainAssetId.assetId,
                 status = GiftLocal.Status.PENDING,
@@ -71,6 +78,7 @@ class RealGiftsRepository(
 
     private fun GiftLocal.toDomain() = Gift(
         id = id,
+        creatorMetaId = creatorMetaId,
         chainId = chainId,
         giftAccountId = giftAccountId,
         assetId = assetId,
