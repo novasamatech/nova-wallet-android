@@ -80,10 +80,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginBottom="24dp"
-        app:layout_constraintBottom_toTopOf="@+id/claimGiftButton"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintBottom_toTopOf="@+id/claimGiftAlert"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_goneMarginBottom="24dp" />
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/claimGiftAlert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="24dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/claimGiftButton" />
 
     <io.novafoundation.nova.common.view.PrimaryButtonV2
         android:id="@+id/claimGiftButton"

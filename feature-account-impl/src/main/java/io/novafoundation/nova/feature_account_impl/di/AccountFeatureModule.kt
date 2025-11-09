@@ -72,6 +72,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
@@ -136,12 +138,14 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Real
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.addressActions.AddressActionsMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealMultisigFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectSingleWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.common.address.RealCopyAddressMixin
@@ -839,5 +843,35 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideCreateGiftMetaAccountUseCase(encryptionDefaults: EncryptionDefaults): CreateGiftMetaAccountUseCase {
         return RealCreateGiftMetaAccountUseCase(encryptionDefaults)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAccountListingMixinValidForTransactionsFactory(
+        walletUiUseCase: WalletUiUseCase,
+        resourceManager: ResourceManager,
+        chainRegistry: ChainRegistry,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+        accountTypePresentationMapper: MetaAccountTypePresentationMapper,
+    ): MetaAccountValidForTransactionListingMixinFactory {
+        return MetaAccountValidForTransactionListingMixinFactory(
+            walletUiUseCase = walletUiUseCase,
+            resourceManager = resourceManager,
+            chainRegistry = chainRegistry,
+            metaAccountGroupingInteractor = metaAccountGroupingInteractor,
+            accountTypePresentationMapper = accountTypePresentationMapper
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSelectSingleWalletMixinFactory(
+        selectSingleWalletRequester: SelectSingleWalletCommunicator,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+    ): SelectSingleWalletMixin.Factory {
+        return SelectSingleWalletMixinFactory(
+            selectSingleWalletRequester,
+            metaAccountGroupingInteractor
+        )
     }
 }

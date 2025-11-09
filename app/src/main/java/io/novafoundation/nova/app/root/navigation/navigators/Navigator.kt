@@ -363,6 +363,12 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openSelectSingleWallet(arguments: Bundle) {
+        navigationBuilder().action(R.id.action_open_select_single_wallet)
+            .setArgs(arguments)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openSelectMultipleWallets(arguments: Bundle) {
         navigationBuilder().action(R.id.action_open_select_multiple_wallets)
             .setArgs(arguments)

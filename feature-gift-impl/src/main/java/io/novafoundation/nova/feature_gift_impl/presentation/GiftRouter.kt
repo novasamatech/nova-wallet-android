@@ -21,4 +21,6 @@ interface GiftRouter : ReturnableRouter {
     fun openMainScreen()
 
     fun openClaimGift(claimGiftPayload: ClaimGiftPayload)
+
+    fun openManageWallets()
 }

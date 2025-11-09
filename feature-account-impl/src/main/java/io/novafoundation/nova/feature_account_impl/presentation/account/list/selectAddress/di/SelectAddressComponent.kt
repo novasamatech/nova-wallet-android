@@ -5,7 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
-import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressFragment
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressBottomSheet
 
 @Subcomponent(
     modules = [
@@ -24,5 +24,5 @@ interface SelectAddressComponent {
         ): SelectAddressComponent
     }
 
-    fun inject(fragment: SelectAddressFragment)
+    fun inject(fragment: SelectAddressBottomSheet)
 }

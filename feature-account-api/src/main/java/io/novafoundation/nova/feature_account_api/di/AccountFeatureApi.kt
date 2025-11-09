@@ -56,6 +56,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.identity.IdentityMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 
@@ -136,6 +137,8 @@ interface AccountFeatureApi {
     val createSecretsRepository: CreateSecretsRepository
 
     val createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase
+
+    val selectSingleWalletMixin: SelectSingleWalletMixin.Factory
 
     @LocalIdentity
     fun localIdentityProvider(): IdentityProvider

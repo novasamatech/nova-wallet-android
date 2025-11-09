@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.mixin
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.toRequestFilter
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.common.toRequestFilter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
