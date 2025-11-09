@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -157,6 +158,8 @@ interface AssetTransfers {
     suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee
 
     suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission>
+
+    suspend fun performTransferAndAwaitExecution(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<TransactionExecution>
 
     suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         return true

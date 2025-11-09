@@ -151,14 +151,19 @@ class RealClaimGiftInteractor(
             recipientAccountId = selectedAccount.requireAccountIdIn(giftModel.chain),
             amount = giftAmountWithFee.amount
         ).asWeighted(originFee)
-        return sendUseCase.performOnChainTransfer(giftTransfer, originFee.submissionFee, coroutineScope)
+
+        return sendUseCase.performOnChainTransferAndAwaitExecution(giftTransfer, originFee.submissionFee, coroutineScope)
             .coerceToUnit()
     }
 
     private suspend fun getGiftAccountBalance(claimableGift: ClaimableGift): BigInteger {
         val assetBalanceSource = assetSourceRegistry.sourceFor(claimableGift.chainAsset).balance
 
-        return assetBalanceSource.queryAccountBalance(claimableGift.chain, claimableGift.chainAsset, claimableGift.accountId).transferable
+        return assetBalanceSource.queryAccountBalance(
+            claimableGift.chain,
+            claimableGift.chainAsset,
+            claimableGift.accountId
+        ).transferable
     }
 
     private fun createTransfer(

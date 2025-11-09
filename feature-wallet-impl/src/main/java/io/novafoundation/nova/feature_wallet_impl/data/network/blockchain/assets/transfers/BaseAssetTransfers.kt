@@ -6,11 +6,13 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.into
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.createDefault
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystemBuilder
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.TransactionExecution
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.PhishingValidationFactory
@@ -57,6 +59,16 @@ abstract class BaseAssetTransfers(
             .submitExtrinsic(transfer.originChain, transfer.sender.intoOrigin(), submissionOptions = submissionOptions) {
                 transfer(transfer)
             }
+    }
+
+    override suspend fun performTransferAndAwaitExecution(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<TransactionExecution> {
+        val submissionOptions = ExtrinsicService.SubmissionOptions(transfer.feePaymentCurrency)
+
+        return extrinsicServiceFactory
+            .createDefault(coroutineScope)
+            .submitExtrinsicAndAwaitExecution(transfer.originChain, transfer.sender.intoOrigin(), submissionOptions = submissionOptions) {
+                transfer(transfer)
+            }.map { TransactionExecution.Substrate(it) }
     }
 
     override suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee {

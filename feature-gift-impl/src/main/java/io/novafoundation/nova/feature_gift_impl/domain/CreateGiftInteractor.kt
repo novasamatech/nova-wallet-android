@@ -105,7 +105,7 @@ class RealCreateGiftInteractor(
         val giftAccountId = createAndStoreRandomGiftAccount(giftModel.chain.id)
         val gitAddress = giftModel.chain.addressOf(giftAccountId)
         val giftTransfer = transfer.copy(recipient = gitAddress)
-        return sendUseCase.performOnChainTransfer(giftTransfer, fee, coroutineScope)
+        return sendUseCase.performOnChainTransferAndAwaitExecution(giftTransfer, fee, coroutineScope)
             .map {
                 Log.d(LOG_TAG, "Gift was created successfully. Address in ${giftModel.chain.name}: $gitAddress")
 

@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_gift_impl.domain
 
-import io.novafoundation.nova.common.data.secrets.v2.seed
-import io.novafoundation.nova.common.utils.removeSpacing
 import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
 import io.novafoundation.nova.feature_gift_impl.domain.models.Gift
