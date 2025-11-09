@@ -6,26 +6,36 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
+import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.share.ImageWithTextSharing
 import io.novafoundation.nova.common.utils.write
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.DeepLinkConfigurator
 import io.novafoundation.nova.feature_gift_impl.R
+import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.common.PackingGiftAnimationFactory
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink.ClaimGiftDeepLinkConfigurator
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink.ClaimGiftDeepLinkData
+import io.novafoundation.nova.feature_gift_impl.presentation.common.claim.ClaimGiftException
+import io.novafoundation.nova.feature_gift_impl.presentation.common.claim.ClaimGiftMixinFactory
 import io.novafoundation.nova.feature_gift_impl.presentation.share.model.GiftAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
+import io.novasama.substrate_sdk_android.extensions.fromHex
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -43,6 +53,9 @@ class ShareGiftViewModel(
     private val tokenFormatter: TokenFormatter,
     private val claimGiftDeepLinkConfigurator: ClaimGiftDeepLinkConfigurator,
     private val fileProvider: FileProvider,
+    private val claimGiftMixinFactory: ClaimGiftMixinFactory,
+    private val claimGiftInteractor: ClaimGiftInteractor,
+    private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -55,7 +68,12 @@ class ShareGiftViewModel(
 
     val giftAnimationRes = giftFlow.map {
         val chainAsset = chainRegistry.asset(it.chainId, it.assetId)
-        packingGiftAnimationFactory.getAnimationForAsset(chainAsset.symbol)
+        val animationRes = packingGiftAnimationFactory.getAnimationForAsset(chainAsset.symbol)
+
+        when (payload.isSecondOpen) {
+            true -> ShareGiftAnimationState(animationRes, ShareGiftAnimationState.State.IDLE_END)
+            false -> ShareGiftAnimationState(animationRes, ShareGiftAnimationState.State.START)
+        }
     }.distinctUntilChanged()
         .shareInBackground()
 
@@ -68,6 +86,15 @@ class ShareGiftViewModel(
 
     private val _shareEvent = MutableLiveData<Event<ImageWithTextSharing>>()
     val shareEvent: LiveData<Event<ImageWithTextSharing>> = _shareEvent
+
+    private val claimGiftMixin = claimGiftMixinFactory.create(this)
+
+    private val _isReclaimInProgress = MutableStateFlow(false)
+    val isReclaimInProgress: Flow<Boolean> = _isReclaimInProgress
+
+    val reclaimButtonVisible = flowOf { payload.isSecondOpen }
+
+    val confirmReclaimGiftAction = actionAwaitableMixinFactory.confirmingAction<GiftAmountModel>()
 
     fun back() {
         router.finishCreateGift()
@@ -96,5 +123,37 @@ class ShareGiftViewModel(
         file.write(shareBitmap)
 
         fileProvider.uriOf(file)
+    }
+
+    fun reclaimClicked() = launchUnit {
+        val giftAmount = amountModel.first()
+        confirmReclaimGiftAction.awaitAction(giftAmount)
+
+        _isReclaimInProgress.value = true
+        val giftModel = giftFlow.first()
+        val giftSeed = shareGiftInteractor.getGiftSeed(payload.giftId)
+        val claimableGift = claimGiftInteractor.getClaimableGift(giftSeed.fromHex(), giftModel.chainId, giftModel.assetId)
+        val tempMetaAccount = claimGiftInteractor.createTempMetaAccount(claimableGift)
+        val amountWithFee = claimGiftInteractor.getGiftAmountWithFee(claimableGift, tempMetaAccount, coroutineScope)
+
+        claimGiftMixin.claimGift(claimableGift, amountWithFee, tempMetaAccount)
+            .onSuccess {
+                shareGiftInteractor.setGiftStateAsReclaimed(giftModel.id)
+                router.back()
+            }
+            .onFailure {
+                _isReclaimInProgress.value = false
+                when (it as ClaimGiftException) {
+                    is ClaimGiftException.GiftAlreadyClaimed -> showError(
+                        resourceManager.getString(R.string.claim_gift_already_claimed_title),
+                        resourceManager.getString(R.string.claim_gift_already_claimed_message)
+                    )
+
+                    is ClaimGiftException.UnknownError -> showError(
+                        resourceManager.getString(R.string.claim_gift_default_error_title),
+                        resourceManager.getString(R.string.claim_gift_default_error_message)
+                    )
+                }
+            }
     }
 }

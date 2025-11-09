@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="reclaim_gift_confirmation_title">Reclaim %s Gift?</string>
+    <string name="reclaim_gift_confirmation_message">If you reclaim this gift, the shared link will be disabled, and tokens will be refunded to your wallet./nDo you want to continue?</string>
+
+    <string name="share_gift_reclaim">Reclaim</string>
     <string name="account_secrets">secrets</string>
 
     <string name="account_chain_not_found">No account on %s</string>

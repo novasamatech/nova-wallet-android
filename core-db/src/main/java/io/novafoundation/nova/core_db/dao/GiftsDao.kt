@@ -12,6 +12,9 @@ interface GiftsDao {
     @Query("SELECT * from gifts WHERE id = :id")
     suspend fun getGiftById(id: Long): GiftLocal
 
+    @Query("SELECT * from gifts")
+    suspend fun getAllGifts(): List<GiftLocal>
+
     @Query("SELECT * from gifts WHERE id = :id")
     fun observeGiftById(id: Long): Flow<GiftLocal>
 
@@ -23,4 +26,7 @@ interface GiftsDao {
 
     @Insert
     suspend fun createNewGift(giftLocal: GiftLocal): Long
+
+    @Query("UPDATE gifts SET status = :status WHERE id = :id")
+    suspend fun setGiftState(id: Long, status: GiftLocal.Status)
 }

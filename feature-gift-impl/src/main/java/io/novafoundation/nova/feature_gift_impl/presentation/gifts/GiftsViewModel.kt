@@ -21,6 +21,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 
 class GiftsViewModel(
     private val router: GiftRouter,
@@ -46,6 +47,12 @@ class GiftsViewModel(
         gifts.mapNotNull { mapGift(it, chains) }
     }
 
+    init {
+        launch {
+            giftsInteractor.syncGiftsState()
+        }
+    }
+
     fun back() {
         router.back()
     }
@@ -62,7 +69,9 @@ class GiftsViewModel(
     }
 
     fun giftClicked(gift: GiftRVItem) {
-        router.openGiftSharing(gift.id)
+        if (gift.isClaimed) return
+
+        router.openGiftSharing(gift.id, isSecondOpen = true)
     }
 
     private fun mapGift(gift: Gift, chains: Map<ChainId, Chain>): GiftRVItem? {

@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_gift_impl.presentation.gifts
 
+import android.graphics.drawable.Drawable
 import android.view.ViewGroup
+import androidx.annotation.ColorRes
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import coil.ImageLoader
@@ -76,10 +79,11 @@ class GiftViewHolder(
         giftAmount.setTextColorRes(amountColor)
         giftAssetIcon.colorFilter = AlphaColorFilter(assetIconAlpha)
 
-        root.background = if (item.isClaimed) {
-            context.getRoundedCornerDrawableWithRipple(fillColorRes = R.color.block_background, cornerSizeInDp = 12)
-        } else {
-            context.getRoundedCornerDrawableWithRipple(fillColorRes = R.color.gift_block_background, cornerSizeInDp = 12)
-        }
+        giftAmountChevron.isVisible = !item.isClaimed
+        root.background = if (item.isClaimed) background(R.color.block_background) else background(R.color.gift_block_background)
+    }
+
+    private fun background(@ColorRes colorRes: Int): Drawable {
+        return context.getRoundedCornerDrawableWithRipple(fillColorRes = colorRes, cornerSizeInDp = 12)
     }
 }

@@ -16,7 +16,7 @@ interface GiftRouter : ReturnableRouter {
 
     fun openConfirmCreateGift(payload: CreateGiftConfirmPayload)
 
-    fun openGiftSharing(giftId: GiftId)
+    fun openGiftSharing(giftId: GiftId, isSecondOpen: Boolean = false)
 
     fun openMainScreen()
 

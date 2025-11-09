@@ -39,9 +39,9 @@ class GiftNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openGiftSharing(giftId: GiftId) {
+    override fun openGiftSharing(giftId: GiftId, isSecondOpen: Boolean) {
         navigationBuilder().action(R.id.action_openShareGiftFragment)
-            .setArgs(ShareGiftFragment.createPayload(ShareGiftPayload(giftId)))
+            .setArgs(ShareGiftFragment.createPayload(ShareGiftPayload(giftId, isSecondOpen)))
             .navigateInFirstAttachedContext()
     }
 
