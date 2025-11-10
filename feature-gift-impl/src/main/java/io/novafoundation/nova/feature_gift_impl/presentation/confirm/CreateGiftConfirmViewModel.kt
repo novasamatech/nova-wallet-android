@@ -181,8 +181,6 @@ class CreateGiftConfirmViewModel(
     ) = launch {
         createGiftInteractor.createAndSaveGift(giftModel, transfer, fee, viewModelScope)
             .onSuccess {
-                showToast(resourceManager.getString(io.novafoundation.nova.feature_assets.R.string.common_transaction_submitted))
-
                 finishCreateGift(giftId = it)
             }.onFailure(::showError)
 

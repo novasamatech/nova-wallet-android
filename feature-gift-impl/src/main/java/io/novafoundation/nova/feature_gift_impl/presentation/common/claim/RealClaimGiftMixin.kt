@@ -30,7 +30,8 @@ class RealClaimGiftMixin(
     override suspend fun claimGift(
         gift: ClaimableGift,
         amountWithFee: GiftAmountWithFee,
-        giftMetaAccount: MetaAccount
+        giftMetaAccount: MetaAccount,
+        giftRecipient: MetaAccount
     ): Result<Unit> {
         claimingInProgressFlow.value = true
 
@@ -40,7 +41,13 @@ class RealClaimGiftMixin(
             return Result.failure(ClaimGiftException.GiftAlreadyClaimed())
         }
 
-        return claimGiftInteractor.claimGift(gift, amountWithFee, giftMetaAccount, coroutineScope)
+        return claimGiftInteractor.claimGift(
+            claimableGift = gift,
+            giftAmountWithFee = amountWithFee,
+            giftMetaAccount = giftMetaAccount,
+            giftRecipient = giftRecipient,
+            coroutineScope = coroutineScope
+        )
             .mapFailure {
                 claimingInProgressFlow.value = false
 

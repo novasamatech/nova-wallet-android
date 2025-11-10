@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletMixin
 import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
@@ -43,6 +44,7 @@ class ClaimGiftModule {
         resourceManager: ResourceManager,
         walletUiUseCase: WalletUiUseCase,
         claimGiftMixinFactory: ClaimGiftMixinFactory,
+        accountInteractor: AccountInteractor,
         selectSingleWalletMixin: SelectSingleWalletMixin.Factory,
     ): ViewModel {
         return ClaimGiftViewModel(
@@ -56,7 +58,8 @@ class ClaimGiftModule {
             resourceManager = resourceManager,
             walletUiUseCase = walletUiUseCase,
             claimGiftMixinFactory = claimGiftMixinFactory,
-            selectSingleWalletMixin = selectSingleWalletMixin
+            selectSingleWalletMixin = selectSingleWalletMixin,
+            accountInteractor = accountInteractor
         )
     }
 }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_gift_impl.presentation.claim
 
 import android.animation.Animator
+import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.core.view.postDelayed
 import coil.ImageLoader
@@ -78,6 +79,7 @@ class ClaimGiftFragment : BaseFragment<ClaimGiftViewModel, FragmentClaimGiftBind
 
         viewModel.giftClaimedEvent.observeEvent {
             hideAllViewsWithAnimation()
+            binder.claimGiftButton.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         }
 
         viewModel.selectedWalletModel.observe {

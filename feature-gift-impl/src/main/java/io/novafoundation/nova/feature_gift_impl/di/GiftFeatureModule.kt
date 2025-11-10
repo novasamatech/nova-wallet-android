@@ -118,7 +118,6 @@ class GiftFeatureModule {
         sendUseCase: SendUseCase,
         createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase,
         secretStoreV2: SecretStoreV2,
-        selectedAccountUseCase: SelectedAccountUseCase,
         accountRepository: AccountRepository
     ): ClaimGiftInteractor {
         return RealClaimGiftInteractor(
@@ -128,7 +127,6 @@ class GiftFeatureModule {
             sendUseCase,
             createGiftMetaAccountUseCase,
             secretStoreV2,
-            selectedAccountUseCase,
             accountRepository
         )
     }

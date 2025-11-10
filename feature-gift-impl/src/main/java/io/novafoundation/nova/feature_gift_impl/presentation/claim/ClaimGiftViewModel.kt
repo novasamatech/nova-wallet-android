@@ -15,6 +15,8 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.isControllableWallet
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -52,6 +54,7 @@ class ClaimGiftViewModel(
     private val resourceManager: ResourceManager,
     private val walletUiUseCase: WalletUiUseCase,
     private val claimGiftMixinFactory: ClaimGiftMixinFactory,
+    private val accountInteractor: AccountInteractor,
     selectSingleWalletMixin: SelectSingleWalletMixin.Factory,
 ) : BaseViewModel() {
 
@@ -60,7 +63,7 @@ class ClaimGiftViewModel(
 
     private val metaIdToClaimGiftFlow = MutableStateFlow<Long?>(null)
 
-    private val metaAccountToClaimGift = metaIdToClaimGiftFlow.filterNotNull()
+    private val metaAccountToClaimGiftFlow = metaIdToClaimGiftFlow.filterNotNull()
         .map { claimGiftInteractor.getMetaAccount(it) }
         .shareInBackground()
 
@@ -71,7 +74,7 @@ class ClaimGiftViewModel(
         claimGiftInteractor.getGiftAmountWithFee(gift, metaAccount, coroutineScope)
     }.shareInBackground()
 
-    val selectedWalletModel = combine(giftFlow, metaAccountToClaimGift) { gift, metaAccountToClaimGift ->
+    val selectedWalletModel = combine(giftFlow, metaAccountToClaimGiftFlow) { gift, metaAccountToClaimGift ->
         val addressModel = walletUiUseCase.walletAddressModelOrNull(
             metaAccountToClaimGift,
             gift.chain,
@@ -108,7 +111,7 @@ class ClaimGiftViewModel(
         onWalletSelect = ::onWalletSelect
     )
 
-    val alertModelFlow = combine(giftFlow, metaAccountToClaimGift) { gift, metaAccount ->
+    val alertModelFlow = combine(giftFlow, metaAccountToClaimGiftFlow) { gift, metaAccount ->
         when {
             !metaAccount.type.isControllableWallet() -> {
                 val metaAccountTypeName = resourceManager.getString(metaAccount.type.mapMetaAccountTypeToNameRes())
@@ -141,7 +144,7 @@ class ClaimGiftViewModel(
     val confirmButtonStateFlow = combine(
         claimGiftMixin.claimingInProgressFlow,
         giftFlow,
-        metaAccountToClaimGift
+        metaAccountToClaimGiftFlow
     ) { claimingInProgress, giftFlow, claimMetaAccount ->
         when {
             claimingInProgress -> DescriptiveButtonState.Loading
@@ -171,9 +174,19 @@ class ClaimGiftViewModel(
         val gift = giftFlow.first()
         val amountWithFee = giftAmountWithFee.first()
         val tempMetaAccount = tempMetaAccountFlow.first()
+        val metaAccountToClaimGift = metaAccountToClaimGiftFlow.first()
 
-        claimGiftMixin.claimGift(gift, amountWithFee, tempMetaAccount)
-            .onSuccess { _giftClaimedEvent.value = Unit.event() }
+        claimGiftMixin.claimGift(
+            gift = gift,
+            amountWithFee = amountWithFee,
+            giftMetaAccount = tempMetaAccount,
+            giftRecipient = metaAccountToClaimGift
+        )
+            .onSuccess {
+                val metaAccountToClaimGift = metaAccountToClaimGiftFlow.first()
+                accountInteractor.selectMetaAccount(metaAccountToClaimGift.id)
+                _giftClaimedEvent.value = Unit.event()
+            }
             .onFailure {
                 when (it as ClaimGiftException) {
                     is ClaimGiftException.GiftAlreadyClaimed -> showError(
@@ -189,7 +202,7 @@ class ClaimGiftViewModel(
             }
     }
 
-    fun onGiftClaimAnimationFinished() {
+    fun onGiftClaimAnimationFinished() = launchUnit {
         showToast(resourceManager.getString(R.string.claim_gift_success_message))
 
         router.openMainScreen()
@@ -197,7 +210,7 @@ class ClaimGiftViewModel(
 
     fun selectWalletToClaim() {
         launch {
-            val selectedMetaAccount = metaAccountToClaimGift.first()
+            val selectedMetaAccount = metaAccountToClaimGiftFlow.first()
             selectWalletMixin.openSelectWallet(selectedMetaAccount.id)
         }
     }
@@ -206,7 +219,7 @@ class ClaimGiftViewModel(
         metaIdToClaimGiftFlow.value = metaId
     }
 
-    private fun manageWallets() {
+    private fun manageWallets() = launchUnit {
         router.openManageWallets()
     }
 

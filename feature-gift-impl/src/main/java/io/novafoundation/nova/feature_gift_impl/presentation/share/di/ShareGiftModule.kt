@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
@@ -47,6 +48,7 @@ class ShareGiftModule {
         claimGiftMixinFactory: ClaimGiftMixinFactory,
         claimGiftInteractor: ClaimGiftInteractor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        selectedAccountUseCase: SelectedAccountUseCase,
         resourceManager: ResourceManager
     ): ViewModel {
         return ShareGiftViewModel(
@@ -62,6 +64,7 @@ class ShareGiftModule {
             claimGiftMixinFactory = claimGiftMixinFactory,
             claimGiftInteractor = claimGiftInteractor,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            selectedAccountUseCase = selectedAccountUseCase,
             resourceManager = resourceManager
         )
     }
