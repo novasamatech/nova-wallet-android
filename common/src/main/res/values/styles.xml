@@ -455,7 +455,7 @@
 
     <style name="Widget.Nova.MaterialButton.Primary" parent="Widget.Nova.MaterialButton">
         <item name="android:backgroundTint">@color/selector_button_background_primary</item>
-        <item name="android:textColor">@color/button_text</item>
+        <item name="android:textColor">@color/selector_button_text</item>
     </style>
 
     <style name="Widget.Nova.MaterialButton.Secondary" parent="Widget.Nova.MaterialButton">
