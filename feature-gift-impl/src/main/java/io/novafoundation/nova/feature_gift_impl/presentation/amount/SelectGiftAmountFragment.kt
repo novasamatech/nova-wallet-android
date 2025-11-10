@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
+import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.payload
@@ -28,7 +29,10 @@ class SelectGiftAmountFragment : BaseFragment<SelectGiftAmountViewModel, Fragmen
     }
 
     override fun initViews() {
-        binder.giftAmountToolbar.setHomeButtonListener { viewModel.back() }
+        binder.giftAmountToolbar.setHomeButtonListener {
+            hideKeyboard()
+            viewModel.back()
+        }
 
         binder.giftAmountContinue.prepareForProgress(this)
         binder.giftAmountContinue.setOnClickListener { viewModel.nextClicked() }
