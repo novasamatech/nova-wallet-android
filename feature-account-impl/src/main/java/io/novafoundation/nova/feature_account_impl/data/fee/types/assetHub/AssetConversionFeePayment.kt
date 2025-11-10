@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_xcm_api.versions.orDefault
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.isCommissionAsset
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.extrinsic.extensions.ChargeAssetTxPayment.Companion.chargeAssetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
@@ -37,7 +38,7 @@ internal class AssetConversionFeePayment(
     }
 
     override suspend fun convertNativeFee(nativeFee: Fee): Fee {
-        if (paymentAsset.isCommissionAsset) return nativeFee
+        if (paymentAsset.isUtilityAsset) return nativeFee
 
         val quote = multiChainRuntimeCallsApi.forChain(paymentAsset.chainId).convertNativeFee(nativeFee.amount)
         requireNotNull(quote) {
