@@ -170,7 +170,7 @@ class RealClaimGiftInteractor(
             claimableGift.chain,
             claimableGift.chainAsset,
             claimableGift.accountId
-        ).transferable
+        ).total
     }
 
     private fun createTransfer(
