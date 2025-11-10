@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_gift_impl.presentation.claim
 
 import android.animation.Animator
-import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.core.view.postDelayed
 import coil.ImageLoader

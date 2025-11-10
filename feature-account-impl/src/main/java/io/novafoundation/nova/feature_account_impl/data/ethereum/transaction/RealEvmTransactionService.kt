@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.data.ethereum.transaction
 
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.toEcdsaSignatureData
 import io.novafoundation.nova.core.ethereum.Web3Api
@@ -10,8 +9,6 @@ import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmT
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType

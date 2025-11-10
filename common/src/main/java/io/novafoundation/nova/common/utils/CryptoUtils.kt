@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.utils
 
 import android.util.Base64
-import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import org.bouncycastle.jcajce.provider.digest.SHA256
 import org.bouncycastle.jcajce.provider.digest.SHA512

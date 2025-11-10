@@ -16,7 +16,6 @@ import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.isControllableWallet
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase

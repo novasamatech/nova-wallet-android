@@ -16,7 +16,6 @@ import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetect
 import io.novafoundation.nova.feature_xcm_api.versions.orDefault
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
-import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.extrinsic.extensions.ChargeAssetTxPayment.Companion.chargeAssetTxPayment
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
