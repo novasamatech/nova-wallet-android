@@ -71,6 +71,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_assets.data.CanPayFeeAssetSharedComputation
+import io.novafoundation.nova.feature_assets.data.RealCanPayFeeAssetSharedComputation
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -107,13 +111,13 @@ class AssetsFeatureModule {
         assetSearchUseCase: AssetSearchUseCase,
         chainRegistry: ChainRegistry,
         tradeTokenRegistry: TradeTokenRegistry,
-        assetSourceRegistry: AssetSourceRegistry
+        canPayFeeAssetSharedComputation: CanPayFeeAssetSharedComputation
     ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(
         assetViewModeRepository,
         assetSearchUseCase,
         chainRegistry,
         tradeTokenRegistry,
-        assetSourceRegistry
+        canPayFeeAssetSharedComputation
     )
 
     @Provides
@@ -349,6 +353,20 @@ class AssetsFeatureModule {
             chainRegistry,
             resourceManager,
             buySellRestrictionCheckMixin
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCanPayFeeAssetSharedComputation(
+        computationalCache: ComputationalCache,
+        feePaymentProviderRegistry: FeePaymentProviderRegistry,
+        customFeeCapabilityFacade: CustomFeeCapabilityFacade,
+    ): CanPayFeeAssetSharedComputation {
+        return RealCanPayFeeAssetSharedComputation(
+            computationalCache,
+            feePaymentProviderRegistry,
+            customFeeCapabilityFacade
         )
     }
 }

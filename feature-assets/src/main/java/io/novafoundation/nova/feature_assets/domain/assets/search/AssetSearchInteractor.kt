@@ -43,6 +43,7 @@ interface AssetSearchInteractor {
     fun giftAssetsSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
+        coroutineScope: CoroutineScope
     ): Flow<AssetsByViewModeResult>
 
     fun searchAssetsFlow(

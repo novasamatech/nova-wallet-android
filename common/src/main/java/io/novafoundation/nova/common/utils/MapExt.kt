@@ -9,6 +9,6 @@ fun <K, V> mapOfNotNullValues(vararg pairs: Pair<K, V?>): Map<K, V> {
     return mapOf(*pairs).filterNotNull()
 }
 
-fun <K, V> Map<K, List<V>>.filterValueList(action: (V) -> Boolean): Map<K, List<V>> {
+inline fun <K, V> Map<K, List<V>>.filterValueList(action: (V) -> Boolean): Map<K, List<V>> {
     return mapValues { (_, list) -> list.filter { action(it) } }
 }
