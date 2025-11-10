@@ -59,7 +59,10 @@ class ClaimGiftDeepLinkConfigurator(
     }
 
     fun fromPayload(payload: String): ClaimGiftPayloadParams {
-        val (seed, symbol: String?, chainIdPrefix: String?) = payload.split("_")
+        val payloadParams = payload.split("_")
+        val seed = payloadParams[0]
+        val symbol = payloadParams.getOrNull(1)
+        val chainIdPrefix = payloadParams.getOrNull(2)
 
         return ClaimGiftPayloadParams(
             seed = seed,
