@@ -101,11 +101,8 @@ class CreateGiftConfirmViewModel(
         feeFormatter
     )
 
-    val totalAmountModel = combine(assetFlow, feeMixin.fee) { asset, fee ->
-        val chainAsset = asset.token.configuration
-        val feePlanks = fee.loadedFeeOrNull() ?: return@combine ExtendedLoadingState.Loading
-        val claimGiftAmount = chainAsset.amountFromPlanks(feePlanks.claimGiftFee.amount)
-        amountFormatter.formatAmountToAmountModel(payload.amount + claimGiftAmount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
+    val totalAmountModel = assetFlow.map { asset ->
+        amountFormatter.formatAmountToAmountModel(payload.amount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
             .asLoaded()
     }
 

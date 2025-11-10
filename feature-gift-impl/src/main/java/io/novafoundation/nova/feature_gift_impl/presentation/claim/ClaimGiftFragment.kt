@@ -79,7 +79,6 @@ class ClaimGiftFragment : BaseFragment<ClaimGiftViewModel, FragmentClaimGiftBind
 
         viewModel.giftClaimedEvent.observeEvent {
             hideAllViewsWithAnimation()
-            binder.claimGiftButton.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
         }
 
         viewModel.selectedWalletModel.observe {

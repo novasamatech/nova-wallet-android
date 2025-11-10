@@ -31,7 +31,6 @@ class ShareGiftFragment : BaseFragment<ShareGiftViewModel, FragmentShareGiftBind
         override fun onAnimationStart(animation: Animator) {}
 
         override fun onAnimationEnd(animation: Animator) {
-            binder.shareGiftAnimation.performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
             showAllViews()
         }
     }
