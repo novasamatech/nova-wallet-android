@@ -54,7 +54,7 @@ class RealGiftsInteractor(
                 val balanceSource = assetSourceRegistry.sourceFor(chainAsset).balance
                 val giftBalance = balanceSource.queryAccountBalance(chain, chainAsset, it.giftAccountId)
 
-                if (giftBalance.transferable.isZero) {
+                if (giftBalance.total.isZero) {
                     giftsRepository.setGiftState(it.id, Gift.Status.CLAIMED)
                 }
             }
