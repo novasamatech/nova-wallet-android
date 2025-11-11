@@ -12,6 +12,7 @@ import com.github.razir.progressbutton.isProgressActive
 import com.github.razir.progressbutton.showProgress
 import com.google.android.material.button.MaterialButton
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
+import io.novafoundation.nova.common.presentation.textOrNull
 
 class PrimaryButtonV2 @JvmOverloads constructor(
     context: Context,
@@ -71,6 +72,8 @@ class PrimaryButtonV2 @JvmOverloads constructor(
 
 fun PrimaryButtonV2.setState(state: DescriptiveButtonState) {
     isEnabled = state is DescriptiveButtonState.Enabled
+
+    text = state.textOrNull()
 
     visibility = when (state) {
         DescriptiveButtonState.Gone -> View.GONE

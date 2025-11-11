@@ -24,7 +24,17 @@ sealed interface FeePaymentCurrency {
      *
      * The actual asset used to pay fees will be available in [Fee.asset]
      */
-    class Asset(val asset: Chain.Asset) : FeePaymentCurrency {
+    class Asset private constructor(val asset: Chain.Asset) : FeePaymentCurrency {
+
+        companion object {
+
+            fun Chain.Asset.toFeePaymentCurrency(): FeePaymentCurrency {
+                return when {
+                    isCommissionAsset -> Native
+                    else -> Asset(this)
+                }
+            }
+        }
 
         override fun equals(other: Any?): Boolean {
             if (other !is Asset) return false
@@ -38,15 +48,6 @@ sealed interface FeePaymentCurrency {
         override fun toString(): String {
             return "Asset(${asset.symbol})"
         }
-    }
-
-    companion object
-}
-
-fun Chain.Asset.toFeePaymentCurrency(): FeePaymentCurrency {
-    return when {
-        isCommissionAsset -> FeePaymentCurrency.Native
-        else -> FeePaymentCurrency.Asset(this)
     }
 }
 

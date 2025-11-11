@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Bold.Title1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/gifts_header_title" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/gifts_header_subtitle"
+        android:textColor="@color/text_secondary" />
+
+    <io.novafoundation.nova.common.view.LinkView
+        android:id="@+id/giftsHeaderLearnMore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:minHeight="32dp"
+        android:paddingVertical="8dp"
+        app:linkText="Learn more" /> <!--Hide until we have a special wiki page for gifts-->
+
+</LinearLayout>

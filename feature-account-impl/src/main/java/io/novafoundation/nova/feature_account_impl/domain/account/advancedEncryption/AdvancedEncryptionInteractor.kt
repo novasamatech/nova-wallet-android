@@ -35,7 +35,7 @@ class AdvancedEncryptionInteractor(
         return accountRepository.getEncryptionTypes()
     }
 
-    suspend fun getRecommendedAdvancedEncryption(): AdvancedEncryption {
+    fun getRecommendedAdvancedEncryption(): AdvancedEncryption {
         return AdvancedEncryption(
             substrateCryptoType = encryptionDefaults.substrateCryptoType,
             ethereumCryptoType = encryptionDefaults.ethereumCryptoType,

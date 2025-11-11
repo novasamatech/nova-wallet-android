@@ -24,9 +24,7 @@ class DefaultFeePaymentProvider : FeePaymentProvider {
     }
 }
 
-class DefaultFastLookupCustomFeeCapability : FastLookupCustomFeeCapability {
+class DefaultFastLookupCustomFeeCapability() : FastLookupCustomFeeCapability {
 
-    override fun canPayFeeInNonUtilityToken(chainAssetId: ChainAssetId): Boolean {
-        return false
-    }
+    override val nonUtilityFeeCapableTokens: Set<ChainAssetId> = emptySet()
 }

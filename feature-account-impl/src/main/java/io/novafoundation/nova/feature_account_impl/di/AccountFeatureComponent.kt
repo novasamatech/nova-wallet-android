@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.chan
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.di.DelegatedAccountUpdatesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.di.SelectMultipleWalletsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.singleSelecting.di.SelectSingleWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.changePassword.di.ChangeBackupPasswordComponent
@@ -113,6 +115,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun selectMultipleWalletsComponentFactory(): SelectMultipleWalletsComponent.Factory
 
+    fun selectSingleWalletComponentFactory(): SelectSingleWalletComponent.Factory
+
     fun delegatedAccountUpdatesFactory(): DelegatedAccountUpdatesComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
@@ -168,6 +172,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
             @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
             @BindsInstance restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
+            @BindsInstance selectSingleWalletCommunicator: SelectSingleWalletCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

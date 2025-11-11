@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount.ChainAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModel
+import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAccountAddressModelOrNull
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressIcon
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletModel
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -144,6 +145,14 @@ class WalletUiUseCaseImpl(
 
     override suspend fun walletAddressModel(metaAccount: MetaAccount, chain: Chain, iconSize: Int): AddressModel {
         return addressIconGenerator.createAccountAddressModel(
+            chain = chain,
+            account = metaAccount,
+            name = metaAccount.name
+        )
+    }
+
+    override suspend fun walletAddressModelOrNull(metaAccount: MetaAccount, chain: Chain, iconSize: Int): AddressModel? {
+        return addressIconGenerator.createAccountAddressModelOrNull(
             chain = chain,
             account = metaAccount,
             name = metaAccount.name

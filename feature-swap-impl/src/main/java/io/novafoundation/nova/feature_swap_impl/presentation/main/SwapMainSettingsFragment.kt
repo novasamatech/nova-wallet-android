@@ -19,8 +19,8 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.feature_swap_impl.di.SwapFeatureComponent
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.setupSwapAmountInput
 import io.novafoundation.nova.feature_swap_impl.databinding.FragmentMainSwapSettingsBinding
-import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.setupFeeLoading
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.bindGetAsset
 
 class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, FragmentMainSwapSettingsBinding>() {
 
@@ -56,8 +56,6 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
 
             hideKeyboard()
         }
-
-        binder.swapMainSettingsGetAssetIn.setOnClickListener { viewModel.getAssetInClicked() }
     }
 
     override fun inject() {
@@ -75,6 +73,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
         observeValidations(viewModel)
         setupSwapAmountInput(viewModel.amountInInput, binder.swapMainSettingsPayInput, binder.swapMainSettingsMaxAmount)
         setupSwapAmountInput(viewModel.amountOutInput, binder.swapMainSettingsReceiveInput, maxAvailableView = null)
+        viewModel.getAssetOptionsMixin.bindGetAsset(binder.swapMainSettingsGetAssetIn)
 
         viewModel.feeMixin.setupFeeLoading(binder.swapMainSettingsDetailsNetworkFee)
 
@@ -97,16 +96,5 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
         }
 
         viewModel.validationProgress.observe(binder.swapMainSettingsContinue::setProgressState)
-
-        viewModel.getAssetInOptionsButtonState.observe(binder.swapMainSettingsGetAssetIn::setState)
-
-        viewModel.selectGetAssetInOption.awaitableActionLiveData.observeEvent {
-            GetAssetInBottomSheet(
-                context = requireContext(),
-                onCancel = it.onCancel,
-                payload = it.payload,
-                onClicked = it.onSuccess
-            ).show()
-        }
     }
 }

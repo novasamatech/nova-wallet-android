@@ -83,6 +83,10 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
             viewModel.receiveClicked()
         }
 
+        binder.balanceDetailActions.gift.setOnClickListener {
+            viewModel.giftClicked()
+        }
+
         binder.balanceDetailsBalances.locked.setOnClickListener {
             viewModel.lockedInfoClicked()
         }

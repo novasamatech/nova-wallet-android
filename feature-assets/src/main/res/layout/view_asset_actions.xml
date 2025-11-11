@@ -47,4 +47,14 @@
         android:text="@string/wallet_asset_buy_sell"
         app:drawableTopCompat="@drawable/ic_buy"
         tools:drawableTop="@drawable/ic_buy" />
+
+    <TextView
+        android:id="@+id/assetActionsGift"
+        style="@style/Widget.Nova.ActionButton"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:text="@string/common_gift"
+        app:drawableTopCompat="@drawable/ic_gift_card"
+        tools:drawableTop="@drawable/ic_gift_card" />
 </merge>

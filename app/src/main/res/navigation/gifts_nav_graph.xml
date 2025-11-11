@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/gifts_nav_graph"
+    app:startDestination="@id/giftsFragment">
+
+    <fragment
+        android:id="@+id/giftsFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsFragment"
+        android:label="GiftsFragment">
+
+        <action
+            android:id="@+id/action_giftsFragment_to_giftsFlow"
+            app:destination="@id/giftsFlowFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
+            android:id="@+id/action_openShareGiftFragment"
+            app:destination="@id/shareGiftFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/giftsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/giftsFlowFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.gifts.assets.AssetGiftsFlowFragment"
+        android:label="AssetGiftsFlowFragment">
+
+        <action
+            android:id="@+id/action_giftsFlow_to_giftsFlowNetwork"
+            app:destination="@id/giftsFlowNetworkFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@+id/sellFlowFragment"
+            app:popUpToInclusive="true" />
+
+    </fragment>
+
+    <action
+        android:id="@+id/action_selectGiftAmount"
+        app:destination="@id/selectGiftAmountFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <fragment
+        android:id="@+id/giftsFlowNetworkFragment"
+        android:name="io.novafoundation.nova.feature_assets.presentation.gifts.networks.NetworkGiftsFlowFragment"
+        android:label="NetworkGiftsFlowFragment" />
+
+    <fragment
+        android:id="@+id/selectGiftAmountFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountFragment"
+        android:label="SelectGiftAmountFragment">
+
+        <action
+            android:id="@+id/action_openConfirmCreateGift"
+            app:destination="@id/createGiftConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/createGiftConfirmFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.confirm.CreateGiftConfirmFragment"
+        android:label="CreateGiftConfirmFragment">
+
+        <action
+            android:id="@+id/action_openShareGiftFragment"
+            app:destination="@id/shareGiftFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/giftsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/shareGiftFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftFragment"
+        android:label="ShareGiftFragment">
+
+        <action
+            android:id="@+id/action_finishCreateGift"
+            app:popUpTo="@id/giftsFragment" />
+    </fragment>
+</navigation>

@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.9.0'
+        substrateSdkVersion = '2.9.3'
 
         gifVersion = '1.2.19'
 
@@ -224,6 +224,8 @@ buildscript {
         playServiceIdentifier = "com.google.android.gms:play-services-ads-identifier:18.2.0"
 
         playIntegrity = "com.google.android.play:integrity:1.4.0"
+
+        lottie = "com.airbnb.android:lottie:6.6.6"
     }
 
     repositories {

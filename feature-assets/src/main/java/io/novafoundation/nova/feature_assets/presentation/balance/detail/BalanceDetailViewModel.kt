@@ -296,11 +296,8 @@ class BalanceDetailViewModel(
         }
     }
 
-    fun buyClicked() = checkControllableAsset {
-        launch {
-            val chainAsset = assetFlow.first().token.configuration
-            buySellSelectorMixin.openSelector()
-        }
+    fun giftClicked() {
+        router.openGiftsByAsset(assetPayload)
     }
 
     fun lockedInfoClicked() = launch {

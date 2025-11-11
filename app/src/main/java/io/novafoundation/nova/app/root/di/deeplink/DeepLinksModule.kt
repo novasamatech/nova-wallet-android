@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.Pending
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIOLinkHandler
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
+import io.novafoundation.nova.feature_gift_api.di.GiftDeepLinks
 import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
 import io.novafoundation.nova.feature_multisig_operations.di.deeplink.MultisigDeepLinks
 import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
@@ -34,7 +35,8 @@ class DeepLinksModule {
         walletConnectDeepLinks: WalletConnectDeepLinks,
         accountMigrationDeepLinks: AccountMigrationDeepLinks,
         multisigDeepLinks: MultisigDeepLinks,
-        chainMigrationDeepLinks: ChainMigrationDeepLinks
+        chainMigrationDeepLinks: ChainMigrationDeepLinks,
+        giftDeepLinks: GiftDeepLinks
     ): List<@JvmWildcard DeepLinkHandler> {
         return buildList {
             addAll(stakingDeepLinks.deepLinkHandlers)
@@ -47,6 +49,7 @@ class DeepLinksModule {
             addAll(accountMigrationDeepLinks.deepLinkHandlers)
             addAll(multisigDeepLinks.deepLinkHandlers)
             addAll(chainMigrationDeepLinks.deepLinkHandlers)
+            addAll(giftDeepLinks.deepLinkHandlers)
         }
     }
 
