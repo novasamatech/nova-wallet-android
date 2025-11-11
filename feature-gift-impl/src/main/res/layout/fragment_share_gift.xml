@@ -14,6 +14,8 @@
         app:dividerVisible="false"
         app:homeButtonIcon="@drawable/ic_close"
         app:layout_constraintTop_toTopOf="parent"
+        app:textRight="@string/share_gift_reclaim"
+        app:textRightVisible="false"
         tools:alpha="1" />
 
     <TextView
@@ -33,11 +35,11 @@
         android:id="@+id/shareGiftAnimation"
         android:layout_width="280dp"
         android:layout_height="280dp"
-        app:layout_constraintVertical_bias="0.31"
         app:layout_constraintBottom_toTopOf="@+id/shareGiftAmount"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/shareGiftTitle"
+        app:layout_constraintVertical_bias="0.31"
         app:layout_constraintVertical_chainStyle="packed"
         tools:lottie_rawRes="@raw/DOT_packing_optimized" />
 

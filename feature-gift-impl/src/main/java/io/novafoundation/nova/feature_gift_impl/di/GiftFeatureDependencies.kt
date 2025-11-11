@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.IntegrityService
@@ -102,6 +103,8 @@ interface GiftFeatureDependencies {
     val accountRepository: AccountRepository
 
     val selectSingleWalletMixin: SelectSingleWalletMixin.Factory
+
+    val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     fun giftsDao(): GiftsDao
 

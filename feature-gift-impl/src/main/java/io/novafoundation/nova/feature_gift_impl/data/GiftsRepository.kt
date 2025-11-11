@@ -15,11 +15,15 @@ interface GiftsRepository {
 
     suspend fun getGift(giftId: Long): Gift
 
+    suspend fun getGifts(): List<Gift>
+
     fun observeGift(giftId: Long): Flow<Gift>
 
     fun observeGifts(): Flow<List<Gift>>
 
     suspend fun saveNewGift(accountIdKey: AccountIdKey, amount: BigInteger, fullChainAssetId: FullChainAssetId): Long
+
+    suspend fun setGiftState(id: Long, status: Gift.Status)
 }
 
 class RealGiftsRepository(
@@ -28,6 +32,10 @@ class RealGiftsRepository(
 
     override suspend fun getGift(giftId: Long): Gift {
         return giftsDao.getGiftById(giftId).toDomain()
+    }
+
+    override suspend fun getGifts(): List<Gift> {
+        return giftsDao.getAllGifts().map { it.toDomain() }
     }
 
     override fun observeGift(giftId: Long): Flow<Gift> {
@@ -57,6 +65,10 @@ class RealGiftsRepository(
         )
     }
 
+    override suspend fun setGiftState(id: Long, status: Gift.Status) {
+        giftsDao.setGiftState(id, status.toDomain())
+    }
+
     private fun GiftLocal.toDomain() = Gift(
         id = id,
         chainId = chainId,
@@ -70,4 +82,12 @@ class RealGiftsRepository(
         },
         creationDate = Date(this.creationDate)
     )
+
+    private fun Gift.Status.toDomain(): GiftLocal.Status {
+        return when (this) {
+            Gift.Status.PENDING -> GiftLocal.Status.PENDING
+            Gift.Status.CLAIMED -> GiftLocal.Status.CLAIMED
+            Gift.Status.RECLAIMED -> GiftLocal.Status.RECLAIMED
+        }
+    }
 }

@@ -12,6 +12,8 @@ interface ShareGiftInteractor {
     fun observeGift(giftId: Long): Flow<Gift>
 
     suspend fun getGiftSeed(giftId: Long): String
+
+    suspend fun setGiftStateAsReclaimed(id: Long)
 }
 
 class RealShareGiftInteractor(
@@ -29,5 +31,9 @@ class RealShareGiftInteractor(
         val seed = secrets.seed ?: error("No seed for gift found")
         return seed.decodeToString()
             .removeSpacing()
+    }
+
+    override suspend fun setGiftStateAsReclaimed(id: Long) {
+        giftsRepository.setGiftState(id, Gift.Status.RECLAIMED)
     }
 }

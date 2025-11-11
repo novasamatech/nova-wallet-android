@@ -25,7 +25,9 @@ import io.novafoundation.nova.feature_account_api.view.AccountView
 import io.novafoundation.nova.feature_gift_impl.R
 import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
+import io.novafoundation.nova.feature_gift_impl.presentation.common.claim.ClaimGiftMixinFactory
 import io.novafoundation.nova.feature_gift_impl.presentation.common.UnpackingGiftAnimationFactory
+import io.novafoundation.nova.feature_gift_impl.presentation.common.claim.ClaimGiftException
 import io.novafoundation.nova.feature_gift_impl.presentation.share.model.GiftAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -49,6 +51,7 @@ class ClaimGiftViewModel(
     private val tokenFormatter: TokenFormatter,
     private val resourceManager: ResourceManager,
     private val walletUiUseCase: WalletUiUseCase,
+    private val claimGiftMixinFactory: ClaimGiftMixinFactory,
     selectSingleWalletMixin: SelectSingleWalletMixin.Factory,
 ) : BaseViewModel() {
 
@@ -111,7 +114,10 @@ class ClaimGiftViewModel(
                 val metaAccountTypeName = resourceManager.getString(metaAccount.type.mapMetaAccountTypeToNameRes())
                 AlertModel(
                     style = AlertView.Style.fromPreset(AlertView.StylePreset.WARNING),
-                    message = resourceManager.getString(R.string.claim_gift_uncontrollable_wallet_title, metaAccountTypeName.lowercase()),
+                    message = resourceManager.getString(
+                        R.string.claim_gift_uncontrollable_wallet_title,
+                        metaAccountTypeName.lowercase()
+                    ),
                     subMessages = listOf(resourceManager.getString(R.string.claim_gift_uncontrollable_wallet_message)),
                     linkAction = AlertModel.ActionModel(
                         text = resourceManager.getString(R.string.common_manage_wallets),
@@ -130,9 +136,10 @@ class ClaimGiftViewModel(
         }
     }
 
-    private val claimingInProgressFlow = MutableStateFlow(false)
+    private val claimGiftMixin = claimGiftMixinFactory.create(this)
+
     val confirmButtonStateFlow = combine(
-        claimingInProgressFlow,
+        claimGiftMixin.claimingInProgressFlow,
         giftFlow,
         metaAccountToClaimGift
     ) { claimingInProgress, giftFlow, claimMetaAccount ->
@@ -161,34 +168,24 @@ class ClaimGiftViewModel(
     }
 
     fun claimGift() = launchUnit {
-        claimingInProgressFlow.value = true
-
         val gift = giftFlow.first()
-
-        if (claimGiftInteractor.isGiftAlreadyClaimed(gift)) {
-            showError(
-                resourceManager.getString(R.string.claim_gift_already_claimed_title),
-                resourceManager.getString(R.string.claim_gift_already_claimed_message)
-            )
-
-            claimingInProgressFlow.value = false
-
-            return@launchUnit
-        }
-
         val amountWithFee = giftAmountWithFee.first()
         val tempMetaAccount = tempMetaAccountFlow.first()
-        claimGiftInteractor.claimGift(gift, amountWithFee, tempMetaAccount, coroutineScope)
-            .onSuccess {
-                _giftClaimedEvent.value = Unit.event()
-            }
-            .onFailure {
-                claimingInProgressFlow.value = false
 
-                showError(
-                    resourceManager.getString(R.string.claim_gift_default_error_title),
-                    resourceManager.getString(R.string.claim_gift_default_error_message)
-                )
+        claimGiftMixin.claimGift(gift, amountWithFee, tempMetaAccount)
+            .onSuccess { _giftClaimedEvent.value = Unit.event() }
+            .onFailure {
+                when (it as ClaimGiftException) {
+                    is ClaimGiftException.GiftAlreadyClaimed -> showError(
+                        resourceManager.getString(R.string.claim_gift_already_claimed_title),
+                        resourceManager.getString(R.string.claim_gift_already_claimed_message)
+                    )
+
+                    is ClaimGiftException.UnknownError -> showError(
+                        resourceManager.getString(R.string.claim_gift_default_error_title),
+                        resourceManager.getString(R.string.claim_gift_default_error_message)
+                    )
+                }
             }
     }
 

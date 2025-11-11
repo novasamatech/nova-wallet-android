@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftViewModel
 import io.novafoundation.nova.feature_gift_impl.presentation.common.UnpackingGiftAnimationFactory
+import io.novafoundation.nova.feature_gift_impl.presentation.common.claim.ClaimGiftMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -41,6 +42,7 @@ class ClaimGiftModule {
         tokenFormatter: TokenFormatter,
         resourceManager: ResourceManager,
         walletUiUseCase: WalletUiUseCase,
+        claimGiftMixinFactory: ClaimGiftMixinFactory,
         selectSingleWalletMixin: SelectSingleWalletMixin.Factory,
     ): ViewModel {
         return ClaimGiftViewModel(
@@ -53,6 +55,7 @@ class ClaimGiftModule {
             tokenFormatter = tokenFormatter,
             resourceManager = resourceManager,
             walletUiUseCase = walletUiUseCase,
+            claimGiftMixinFactory = claimGiftMixinFactory,
             selectSingleWalletMixin = selectSingleWalletMixin
         )
     }

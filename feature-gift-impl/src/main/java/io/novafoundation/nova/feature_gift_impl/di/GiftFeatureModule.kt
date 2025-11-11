@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.amount.GiftMinAmountProviderFactory
 import io.novafoundation.nova.feature_gift_impl.presentation.common.PackingGiftAnimationFactory
 import io.novafoundation.nova.feature_gift_impl.presentation.common.UnpackingGiftAnimationFactory
+import io.novafoundation.nova.feature_gift_impl.presentation.common.claim.ClaimGiftMixinFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -44,8 +45,12 @@ class GiftFeatureModule {
 
     @Provides
     @FeatureScope
-    fun providesGiftsInteractor(repository: GiftsRepository): GiftsInteractor {
-        return RealGiftsInteractor(repository)
+    fun providesGiftsInteractor(
+        repository: GiftsRepository,
+        assetSourceRegistry: AssetSourceRegistry,
+        chainRegistry: ChainRegistry
+    ): GiftsInteractor {
+        return RealGiftsInteractor(repository, assetSourceRegistry, chainRegistry)
     }
 
     @Provides
@@ -138,4 +143,8 @@ class GiftFeatureModule {
             encryptionDefaults
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideClaimGiftMixinFactory(claimGiftInteractor: ClaimGiftInteractor) = ClaimGiftMixinFactory(claimGiftInteractor)
 }

@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class ShareGiftPayload(val giftId: Long) : Parcelable
+class ShareGiftPayload(val giftId: Long, val isSecondOpen: Boolean) : Parcelable

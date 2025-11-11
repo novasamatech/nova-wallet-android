@@ -9,14 +9,17 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.common.PackingGiftAnimationFactory
 import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftPayload
 import io.novafoundation.nova.feature_gift_impl.presentation.share.ShareGiftViewModel
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink.ClaimGiftDeepLinkConfigurator
+import io.novafoundation.nova.feature_gift_impl.presentation.common.claim.ClaimGiftMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -41,6 +44,9 @@ class ShareGiftModule {
         tokenFormatter: TokenFormatter,
         claimGiftDeepLinkConfigurator: ClaimGiftDeepLinkConfigurator,
         fileProvider: FileProvider,
+        claimGiftMixinFactory: ClaimGiftMixinFactory,
+        claimGiftInteractor: ClaimGiftInteractor,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager
     ): ViewModel {
         return ShareGiftViewModel(
@@ -53,6 +59,9 @@ class ShareGiftModule {
             tokenFormatter = tokenFormatter,
             claimGiftDeepLinkConfigurator = claimGiftDeepLinkConfigurator,
             fileProvider = fileProvider,
+            claimGiftMixinFactory = claimGiftMixinFactory,
+            claimGiftInteractor = claimGiftInteractor,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             resourceManager = resourceManager
         )
     }
