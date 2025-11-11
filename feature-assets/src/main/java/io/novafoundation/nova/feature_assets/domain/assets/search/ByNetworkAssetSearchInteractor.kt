@@ -1,11 +1,8 @@
 package io.novafoundation.nova.feature_assets.domain.assets.search
 
-import io.novafoundation.nova.common.utils.filterValueList
-import io.novafoundation.nova.common.utils.scopeAsync
-import io.novafoundation.nova.feature_assets.data.CanPayFeeAssetSharedComputation
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
-import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
+import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.getAssetBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.getAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByNetwork
@@ -13,25 +10,20 @@ import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegis
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
-import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.transform
 
 class ByNetworkAssetSearchInteractor(
     private val assetSearchUseCase: AssetSearchUseCase,
     private val chainRegistry: ChainRegistry,
     private val tradeTokenRegistry: TradeTokenRegistry,
-    private val canPayFeeAssetSharedComputation: CanPayFeeAssetSharedComputation
 ) : AssetSearchInteractor {
 
     override fun tradeAssetSearch(
@@ -65,16 +57,7 @@ class ByNetworkAssetSearchInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<AssetsByViewModeResult> {
-        val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAsset, coroutineScope).map { availableAssetsForSwap ->
-            val filter: AssetSearchFilter = { asset ->
-                val chainAsset = asset.token.configuration
-
-                chainAsset.fullId in availableAssetsForSwap
-            }
-
-            filter
-        }
-
+        val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAsset, coroutineScope).mapToAssetSearchFilter()
         return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
     }
 
@@ -90,17 +73,8 @@ class ByNetworkAssetSearchInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<AssetsByViewModeResult> {
-        return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filter = null)
-            .transform { assetGroup ->
-                val commissionAssets = assetGroup.assets
-                    .filterValueList { it.asset.token.configuration.isCommissionAsset }
-                emit(AssetsByViewModeResult.ByNetworks(commissionAssets))
-
-                val allAvailableAssets = assetGroup.assets.mapValues { (_, assets) ->
-                    canPayFeeAssetSharedComputation.assetsCanPayFeeFlow(assets, coroutineScope)
-                }
-                emit(AssetsByViewModeResult.ByNetworks(allAvailableAssets))
-            }
+        val filterFlow = assetSearchUseCase.getAvailableGiftAssets(coroutineScope).mapToAssetSearchFilter()
+        return searchAssetsByNetworksInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
     }
 
     override fun searchAssetsFlow(
@@ -140,23 +114,5 @@ class ByNetworkAssetSearchInteractor(
             val assetGroups = groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById, assetGroupComparator, assetsComparator)
             AssetsByViewModeResult.ByNetworks(assetGroups)
         }
-    }
-
-    private suspend fun CanPayFeeAssetSharedComputation.assetsCanPayFeeFlow(
-        assets: List<AssetWithOffChainBalance>,
-        coroutineScope: CoroutineScope
-    ): List<AssetWithOffChainBalance> {
-        val assetsFlow = assets.map { asset ->
-            scopeAsync {
-                if (canPayFeeInAsset(asset.asset.token.configuration, coroutineScope)) {
-                    asset
-                } else {
-                    null
-                }
-            }
-        }
-
-        return assetsFlow.awaitAll()
-            .filterNotNull()
     }
 }

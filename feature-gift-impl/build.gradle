@@ -33,6 +33,7 @@ dependencies {
     implementation project(':feature-wallet-api')
     implementation project(':feature-account-api')
     implementation project(':feature-deep-linking')
+    // TODO we need to invert assets -> gift dependency by moving transfer-related common logic to wallet
     implementation project(':feature-assets')
     implementation project(':feature-gift-api')
     implementation project(':runtime')

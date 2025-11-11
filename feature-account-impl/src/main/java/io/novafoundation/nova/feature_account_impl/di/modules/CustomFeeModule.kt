@@ -7,9 +7,8 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProviderRegistry
-import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProviderFactory
+import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.HydrationFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub.AssetHubFeePaymentAssetsFetcherFactory
@@ -18,10 +17,7 @@ import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.RealHydr
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
-import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
-import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
-import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -74,42 +70,10 @@ class CustomFeeModule {
 
     @Provides
     @FeatureScope
-    fun provideAssetHubFeePaymentProviderFactory(
-        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
-        multiLocationConverterFactory: MultiLocationConverterFactory,
-        assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
-        chainRegistry: ChainRegistry,
-        xcmVersionDetector: XcmVersionDetector
-    ) = AssetHubFeePaymentProviderFactory(
-        multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
-        multiLocationConverterFactory = multiLocationConverterFactory,
-        assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher,
-        chainRegistry = chainRegistry,
-        xcmVersionDetector = xcmVersionDetector
-    )
-
-    @Provides
-    @FeatureScope
     fun provideHydraFeesInjector(
         hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     ): HydrationFeeInjector = RealHydrationFeeInjector(
         hydraDxAssetIdConverter,
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideHydrationFeePaymentProvider(
-        chainRegistry: ChainRegistry,
-        hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
-        hydrationFeeInjector: HydrationFeeInjector,
-        accountRepository: AccountRepository,
-        hydrationPriceConversionFallback: HydrationPriceConversionFallback
-    ) = HydrationFeePaymentProvider(
-        chainRegistry = chainRegistry,
-        hydraDxQuoteSharedComputation = hydraDxQuoteSharedComputation,
-        hydrationFeeInjector = hydrationFeeInjector,
-        hydrationPriceConversionFallback = hydrationPriceConversionFallback,
-        accountRepository = accountRepository,
     )
 
     @Provides
@@ -120,11 +84,13 @@ class CustomFeeModule {
     @FeatureScope
     fun provideFeePaymentProviderRegistry(
         defaultFeePaymentProvider: DefaultFeePaymentProvider,
-        assetHubFeePaymentProviderFactory: AssetHubFeePaymentProviderFactory,
-        hydrationFeePaymentProvider: HydrationFeePaymentProvider
+        assetHubFeePaymentProviderFactory: AssetHubFeePaymentProvider.Factory,
+        hydrationFeePaymentProviderFactory: HydrationFeePaymentProvider.Factory,
+        chainRegistry: ChainRegistry
     ): FeePaymentProviderRegistry = RealFeePaymentProviderRegistry(
         defaultFeePaymentProvider,
         assetHubFeePaymentProviderFactory,
-        hydrationFeePaymentProvider
+        hydrationFeePaymentProviderFactory,
+        chainRegistry
     )
 }
