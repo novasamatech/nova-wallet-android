@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">パスフレーズを書き留めてください</string>
     <string name="account_backup_secret_caption">フレーズが正確かつ判読可能に書かれていることを確認してください。</string>
     <string name="account_chain_address_format">%s アドレス</string>
+    <string name="account_chain_not_found">アカウントが%sにありません</string>
     <string name="account_confirm_mnemonic">ニーモニックを確認</string>
     <string name="account_confirm_mnemonic_title">ダブルチェックしましょう</string>
     <string name="account_confirmation_details">正しい順序で言葉を選んでください</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">非転送</string>
     <string name="account_proxy_type_staking">Stake</string>
     <string name="account_restore_account">すでにアカウントを持っています</string>
+    <string name="account_secrets">シークレット</string>
     <string name="account_seed_hex_symbols">64の16進数記号</string>
     <string name="account_select_hardware_wallet">ハードウェアウォレットを選択</string>
     <string name="account_select_secret_source">秘密のタイプを選択</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">クラウドローンからDOTを受け取りましたか？ DOTを今日からステークして最大限の報酬を得ましょう！</string>
     <string name="assets_crowdloan_unlock_banner_title">DOTをブースト 🚀</string>
     <string name="assets_filter_title">トークンをフィルター</string>
+    <string name="assets_gifts_flow_placeholder">贈り物にできるトークンがありません。\nアカウントにトークンを購入または入金してください。</string>
     <string name="assets_manage_tokens_all_networks">すべてのネットワーク</string>
     <string name="assets_manage_tokens_title">トークンを管理</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">%sをLedgerで管理されたアカウントに送信しないでください。Ledgerは%sの送信をサポートしていないため、資産がこのアカウントで凍結される可能性があります。</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">転送手数料</string>
     <string name="choose_amount_network_error">ネットワークが応答していません</string>
     <string name="choose_amount_to">宛先</string>
+    <string name="claim_gift_already_claimed_message">おっと、贈り物はすでに受け取られています</string>
+    <string name="claim_gift_already_claimed_title">贈り物を受け取れません</string>
+    <string name="claim_gift_button">贈り物を受け取る</string>
+    <string name="claim_gift_default_error_message">サーバーに問題があるかもしれません。後でもう一度お試しください。</string>
+    <string name="claim_gift_default_error_title">おっと、何かが間違っています</string>
+    <string name="claim_gift_no_account_alert_title">別のウォレットを使用するか、新しいアカウントを作成するか、または設定でこのウォレットに%sアカウントを追加してください。</string>
+    <string name="claim_gift_success_message">贈り物を正常に受け取りました。トークンは間もなくあなたの残高に表示されます。</string>
+    <string name="claim_gift_title">暗号通貨の贈り物を受け取りました！</string>
+    <string name="claim_gift_uncontrollable_wallet_message">贈り物を受け取るために、新しいウォレットを作成するか既存のウォレットをインポートしてください</string>
+    <string name="claim_gift_uncontrollable_wallet_title">%sウォレットでは贈り物を受け取ることができません</string>
     <string name="close_dapp_tabs_message">DAppブラウザーで開いているすべてのタブが閉じられます。</string>
     <string name="close_dapp_tabs_title">すべてのDAppを閉じますか？</string>
     <string name="cloud_backup_delete_action_subtitle">%s と、いつでも復元できるように必ずオフラインで保持してください。バックアップ設定でこれを行うことができます。</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">アドレスを入力…</string>
     <string name="common_enter_amount">金額を入力...</string>
     <string name="common_enter_details">詳細を入力してください</string>
+    <string name="common_enter_other_amount">別の金額を入力</string>
     <string name="common_enter_password">パスワードを入力</string>
     <string name="common_error_general_title">エラー</string>
     <string name="common_error_not_enough_tokens">トークンが足りません</string>
@@ -435,6 +449,7 @@
     <string name="common_frequency_days_everyday">毎日</string>
     <string name="common_full_details">詳細</string>
     <string name="common_get_token_format">%sを取得</string>
+    <string name="common_gift">贈り物</string>
     <string name="common_got_it">了解しました</string>
     <string name="common_governance">ガバナンス</string>
     <string name="common_hexadecimal_string">16進文字列</string>
@@ -450,6 +465,7 @@
     <string name="common_learn_more_v2_2_0">についてもっと知る</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">残り%s</string>
+    <string name="common_manage_wallets">ウォレットを管理</string>
     <string name="common_maximum">最大</string>
     <string name="common_maximum_format">%s最大</string>
     <plurals name="common_minutes_format">
@@ -570,9 +586,11 @@
     <string name="common_wallet">ウォレット</string>
     <string name="common_warning">警告</string>
     <string name="common_yes">はい</string>
+    <string name="common_your_gift">あなたの贈り物</string>
     <string name="common_zero_amount_error">金額は正の数である必要があります</string>
     <string name="confirm_cloud_backup_password_subtitle">バックアッププロセス中に作成したパスワードを入力してください</string>
     <string name="confirm_cloud_backup_password_title">現在のバックアップパスワードを入力してください</string>
+    <string name="confirm_create_gift_hint">確認すると、トークンがあなたのアカウントから転送されます</string>
     <string name="confirm_mnemonic_disabled_button_state">単語を選択してください...</string>
     <string name="confirm_mnemonic_not_matching_error_message">無効なパスフレーズです。単語の順序をもう一度確認してください。</string>
     <string name="confirm_referendum_vote_referendum">国民投票</string>
@@ -807,6 +825,23 @@
     <string name="fragment_top_up_card_title">カードに%sをチャージ</string>
     <string name="fragment_waiting_top_up_time_out_error_message">support@novawallet.ioに連絡してください。カードを発行するために使用したメールアドレスを添えてください。</string>
     <string name="fragment_waiting_top_up_time_out_error_title">サポートに連絡</string>
+    <string name="gift_claimed_subtitle">請求済み</string>
+    <string name="gift_created_subtitle">作成済み: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">金額を入力</string>
+    <string name="gift_min_balance_validation_message">最小贈り物は%sです</string>
+    <string name="gift_reclaimed_subtitle">回収済み</string>
+    <string name="gifts_assets_flow_title">贈るトークンを選択</string>
+    <string name="gifts_claim_fee">請求時のネットワーク料金</string>
+    <string name="gifts_create">贈り物を作成</string>
+    <string name="gifts_header_subtitle">Novaで迅速、簡単、安全に贈り物を送る</string>
+    <string name="gifts_header_title">誰にでも、どこにでもクリプトギフトを共有</string>
+    <string name="gifts_list_title">あなたが作成した贈り物</string>
+    <string name="gifts_network_flow_title">%sの贈り物のネットワークを選択</string>
+    <string name="gifts_placeholder_step_1">贈り物の金額を入力</string>
+    <string name="gifts_placeholder_step_2">%sをリンクとして共有し、誰でもNovaに招待</string>
+    <string name="gifts_placeholder_step_2_highlight">贈り物を直接共有</string>
+    <string name="gifts_placeholder_step_3">%s、そして、このデバイスからいつでも請求されていないギフトを回収できます</string>
+    <string name="gifts_placeholder_step_3_highlight">贈り物は瞬時に利用可能</string>
     <string name="governance_notification_channel_name">ガバナンス通知チャンネル</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">少なくとも %d トラックを選択する必要があります</item>
@@ -1149,6 +1184,8 @@
     <string name="push_welcome_title">お見逃しなく！</string>
     <string name="receive_network_flow_title">受信するネットワークを選択 %s</string>
     <string name="receive_screen_copy_address">住所をコピー</string>
+    <string name="reclaim_gift_confirmation_message">この贈り物を回収すると、共有リンクが無効になり、トークンがウォレットに返金されます。\n続行しますか？</string>
+    <string name="reclaim_gift_confirmation_title">%sギフトを回収しますか？</string>
     <string name="recover_json_hint">jsonを貼り付けるかファイルをアップロード...</string>
     <string name="recover_json_upload">ファイルをアップロード</string>
     <string name="recovery_json">JSONを復元</string>
@@ -1297,6 +1334,7 @@
     <string name="select_delegation_tracks_edit_title">デリゲーションを編集するトラックを選択</string>
     <string name="select_delegation_tracks_revoke_title">デリゲーションを取り消すトラックを選択</string>
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
+    <string name="select_gift_amount_title">贈り物を送る</string>
     <string name="select_ledger_grant_permissions">Bluetoothを有効にして権限を付与</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
@@ -1346,6 +1384,10 @@
     <string name="setup_staking_type_pool_staking">プールステーキング</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">ステークが報酬を得るための最低額を下回っています</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">サポートされていないステーキングタイプ</string>
+    <string name="share_gift_button">贈り物リンクを共有</string>
+    <string name="share_gift_reclaim">回収</string>
+    <string name="share_gift_text" formatted="false">こんにちは！あなたには%sの贈り物が待っています！\n\nNovaウォレットアプリをインストールし、ウォレットを設定して、この特別リンクで請求してください：\n%s</string>
+    <string name="share_gift_title">贈り物が準備できました。\n今すぐ共有しましょう！</string>
     <string name="sr25519_selection_subtitle">sr25519 (推奨)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">選択されたアカウントはすでにコントローラーとして使用されています</string>
