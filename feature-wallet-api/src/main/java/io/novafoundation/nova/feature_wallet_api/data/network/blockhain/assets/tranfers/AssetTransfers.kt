@@ -158,6 +158,8 @@ interface AssetTransfers {
 
     suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission>
 
+    suspend fun performTransferAndAwaitExecution(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<TransactionExecution>
+
     suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         return true
     }

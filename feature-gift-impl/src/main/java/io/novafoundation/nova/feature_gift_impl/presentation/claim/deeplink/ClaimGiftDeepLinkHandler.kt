@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_gift_impl.presentation.claim.deeplink
 
 import android.net.Uri
 import io.novafoundation.nova.common.utils.DialogMessageManager
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
@@ -13,6 +14,8 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_gift_impl.R
 import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftPayload
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.findChain
 import io.novasama.substrate_sdk_android.extensions.fromHex
@@ -39,10 +42,10 @@ class ClaimGiftDeepLinkHandler(
         automaticInteractionGate.awaitInteractionAllowed()
 
         val data = uri.getQueryParameter(claimGiftDeepLinkConfigurator.payloadParam) ?: throw InvalidParameterException()
-        val (secret, chainIdPrefix, symbol) = data.split("_")
-        val secretBytes = secret.fromHex()
-        val chain = findChain(chainIdPrefix) ?: throw InvalidParameterException()
-        val chainAsset = chain.assets.first { it.symbol.value == symbol }
+        val payloadParams = claimGiftDeepLinkConfigurator.fromPayload(data)
+        val secretBytes = payloadParams.seed.fromHex()
+        val chain = findChain(payloadParams.chainIdPrefix) ?: throw InvalidParameterException()
+        val chainAsset = findAsset(chain, payloadParams.symbol)
         require(chain.isEnabled)
 
         val claimableGift = claimGiftInteractor.getClaimableGift(secretBytes, chain.id, chainAsset.id)
@@ -60,14 +63,15 @@ class ClaimGiftDeepLinkHandler(
         router.openClaimGift(ClaimGiftPayload(secretBytes, chain.id, chainAsset.id))
     }
 
-    private suspend fun findChain(chainIdPrefix: String): Chain? {
-        return chainRegistry.findChain {
-            val normalisedChainId = claimGiftDeepLinkConfigurator.normaliseChainId(it.id)
-            if (normalisedChainId.length >= claimGiftDeepLinkConfigurator.chainIdLength) {
-                it.id.contains(chainIdPrefix)
-            } else {
-                it.id == chainIdPrefix
-            }
-        }
+    private suspend fun findChain(chainIdPrefix: String?): Chain? {
+        if (chainIdPrefix == null) return chainRegistry.getChain(ChainGeneses.POLKADOT_ASSET_HUB)
+
+        return chainRegistry.findChain { chainIdPrefix == claimGiftDeepLinkConfigurator.normaliseChainId(it.id) }
+    }
+
+    private fun findAsset(chain: Chain, tokenSymbol: TokenSymbol?): Chain.Asset {
+        if (tokenSymbol == null) return chain.utilityAsset
+
+        return chain.assets.first { it.symbol.value == tokenSymbol.value }
     }
 }

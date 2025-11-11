@@ -42,7 +42,7 @@
 
     <string name="common_enter_other_amount">Enter another amount</string>
 
-    <string name="gift_min_balance_validation_message">The minimum gift is %s DOT</string>
+    <string name="gift_min_balance_validation_message">The minimum gift is %s</string>
 
     <string name="gift_enter_amount_disabled_button_state">Enter amount</string>
 

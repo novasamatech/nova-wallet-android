@@ -25,4 +25,12 @@ interface EvmTransactionService {
         fallbackGasLimit: BigInteger = DefaultGasProvider.GAS_LIMIT,
         building: EvmTransactionBuilding,
     ): Result<ExtrinsicSubmission>
+
+    suspend fun transactAndAwaitExecution(
+        chainId: ChainId,
+        presetFee: Fee?,
+        origin: TransactionOrigin,
+        fallbackGasLimit: BigInteger,
+        building: EvmTransactionBuilding
+    ): Result<EthereumTransactionExecution>
 }

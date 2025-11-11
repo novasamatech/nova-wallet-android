@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_gift_impl.presentation.confirm
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.asLoaded
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -32,11 +31,9 @@ import io.novafoundation.nova.feature_gift_impl.presentation.amount.fee.createFo
 import io.novafoundation.nova.feature_gift_impl.presentation.common.buildGiftValidationPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
@@ -101,11 +98,8 @@ class CreateGiftConfirmViewModel(
         feeFormatter
     )
 
-    val totalAmountModel = combine(assetFlow, feeMixin.fee) { asset, fee ->
-        val chainAsset = asset.token.configuration
-        val feePlanks = fee.loadedFeeOrNull() ?: return@combine ExtendedLoadingState.Loading
-        val claimGiftAmount = chainAsset.amountFromPlanks(feePlanks.claimGiftFee.amount)
-        amountFormatter.formatAmountToAmountModel(payload.amount + claimGiftAmount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
+    val totalAmountModel = assetFlow.map { asset ->
+        amountFormatter.formatAmountToAmountModel(payload.amount, asset, AmountConfig(tokenAmountSign = AmountSign.NEGATIVE))
             .asLoaded()
     }
 
@@ -181,8 +175,6 @@ class CreateGiftConfirmViewModel(
     ) = launch {
         createGiftInteractor.createAndSaveGift(giftModel, transfer, fee, viewModelScope)
             .onSuccess {
-                showToast(resourceManager.getString(io.novafoundation.nova.feature_assets.R.string.common_transaction_submitted))
-
                 finishCreateGift(giftId = it)
             }.onFailure(::showError)
 

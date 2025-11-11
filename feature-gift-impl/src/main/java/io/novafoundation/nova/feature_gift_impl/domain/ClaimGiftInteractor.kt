@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.isControllableWallet
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -49,6 +48,7 @@ interface ClaimGiftInteractor {
         claimableGift: ClaimableGift,
         giftAmountWithFee: GiftAmountWithFee,
         giftMetaAccount: MetaAccount,
+        giftRecipient: MetaAccount,
         coroutineScope: CoroutineScope
     ): Result<Unit>
 
@@ -64,7 +64,6 @@ class RealClaimGiftInteractor(
     private val sendUseCase: SendUseCase,
     private val createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase,
     private val secretStoreV2: SecretStoreV2,
-    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val accountRepository: AccountRepository
 ) : ClaimGiftInteractor {
 
@@ -111,12 +110,19 @@ class RealClaimGiftInteractor(
         claimableGift: ClaimableGift,
         giftAmountWithFee: GiftAmountWithFee,
         giftMetaAccount: MetaAccount,
+        giftRecipient: MetaAccount,
         coroutineScope: CoroutineScope
     ): Result<Unit> {
         // Put secrets for temporary meta account in storage but for this operation only since signer logic requires secrets in secret storage
         secretStoreV2.putChainAccountSecrets(giftMetaAccount.id, claimableGift.accountId, claimableGift.secrets)
 
-        return claimGiftInternal(claimableGift, giftMetaAccount, giftAmountWithFee, coroutineScope)
+        return claimGiftInternal(
+            giftModel = claimableGift,
+            giftMetaAccount = giftMetaAccount,
+            giftRecipient = giftRecipient,
+            giftAmountWithFee = giftAmountWithFee,
+            coroutineScope = coroutineScope
+        )
             .finally {
                 // Remove secrets for temporary meta account from storage after claim or failure
                 secretStoreV2.clearChainAccountsSecrets(giftMetaAccount.id, listOf(claimableGift.accountId))
@@ -140,25 +146,30 @@ class RealClaimGiftInteractor(
     private suspend fun claimGiftInternal(
         giftModel: ClaimableGift,
         giftMetaAccount: MetaAccount,
+        giftRecipient: MetaAccount,
         giftAmountWithFee: GiftAmountWithFee,
         coroutineScope: CoroutineScope
     ): Result<Unit> {
         val originFee = OriginFee(submissionFee = giftAmountWithFee.fee, deliveryFee = null)
-        val selectedAccount = selectedAccountUseCase.getSelectedMetaAccount()
         val giftTransfer = createTransfer(
             giftModel,
             giftMetaAccount,
-            recipientAccountId = selectedAccount.requireAccountIdIn(giftModel.chain),
+            recipientAccountId = giftRecipient.requireAccountIdIn(giftModel.chain),
             amount = giftAmountWithFee.amount
         ).asWeighted(originFee)
-        return sendUseCase.performOnChainTransfer(giftTransfer, originFee.submissionFee, coroutineScope)
+
+        return sendUseCase.performOnChainTransferAndAwaitExecution(giftTransfer, originFee.submissionFee, coroutineScope)
             .coerceToUnit()
     }
 
     private suspend fun getGiftAccountBalance(claimableGift: ClaimableGift): BigInteger {
         val assetBalanceSource = assetSourceRegistry.sourceFor(claimableGift.chainAsset).balance
 
-        return assetBalanceSource.queryAccountBalance(claimableGift.chain, claimableGift.chainAsset, claimableGift.accountId).transferable
+        return assetBalanceSource.queryAccountBalance(
+            claimableGift.chain,
+            claimableGift.chainAsset,
+            claimableGift.accountId
+        ).total
     }
 
     private fun createTransfer(

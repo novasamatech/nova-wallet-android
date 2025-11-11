@@ -44,6 +44,8 @@ android {
 
         buildConfigField "String", "MULTISIGS_WIKI_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/multisig-wallets\""
 
+        buildConfigField "String", "GIFTS_WIKI_URL", "\"https://docs.novawallet.io/nova-wallet-wiki/asset-management/gifting-tokens\""
+
         buildConfigField "long", "CLOUD_PROJECT_NUMBER", "171267697857L"
 
         buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/global/config_dev.json\""

@@ -29,7 +29,9 @@ class AppLinksProvider(
 
     val novaCardWidgetUrl: String,
     val unifiedAddressArticle: String,
-    val multisigsWikiUrl: String
+    val multisigsWikiUrl: String,
+
+    val giftsWikiUrl: String,
 ) {
 
     fun getTwitterAccountUrl(

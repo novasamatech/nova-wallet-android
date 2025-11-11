@@ -1,7 +1,6 @@
 package io.novafoundation.nova.common.utils
 
 import android.util.Base64
-import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import org.bouncycastle.jcajce.provider.digest.SHA256
 import org.bouncycastle.jcajce.provider.digest.SHA512
@@ -49,12 +48,3 @@ fun ByteArray.md5(): String {
 }
 
 fun ByteArray.toBase64() = Base64.encodeToString(this, Base64.NO_WRAP)
-
-fun ByteArray.normalizeSeed(): ByteArray {
-    if (size == 32) return this
-    if (size > 32) throw IllegalStateException("Seed size is too big. Max size is 32 bytes")
-
-    return toHexString()
-        .padEnd(32, ' ')
-        .encodeToByteArray()
-}

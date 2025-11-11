@@ -9,7 +9,12 @@ interface ClaimGiftMixin {
 
     val claimingInProgressFlow: MutableStateFlow<Boolean>
 
-    suspend fun claimGift(gift: ClaimableGift, amountWithFee: GiftAmountWithFee, giftMetaAccount: MetaAccount): Result<Unit>
+    suspend fun claimGift(
+        gift: ClaimableGift,
+        amountWithFee: GiftAmountWithFee,
+        giftMetaAccount: MetaAccount,
+        giftRecipient: MetaAccount
+    ): Result<Unit>
 }
 
 sealed class ClaimGiftException : Exception() {

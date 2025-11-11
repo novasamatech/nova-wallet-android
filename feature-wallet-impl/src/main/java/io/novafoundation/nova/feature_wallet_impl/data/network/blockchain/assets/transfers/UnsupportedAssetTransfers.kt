@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfers
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfersValidationSystem
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.TransactionExecution
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -22,6 +23,13 @@ open class UnsupportedAssetTransfers : AssetTransfers {
     }
 
     override suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission> {
+        return Result.failure(UnsupportedOperationException("Unsupported"))
+    }
+
+    override suspend fun performTransferAndAwaitExecution(
+        transfer: WeightedAssetTransfer,
+        coroutineScope: CoroutineScope
+    ): Result<TransactionExecution> {
         return Result.failure(UnsupportedOperationException("Unsupported"))
     }
 

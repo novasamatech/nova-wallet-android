@@ -48,9 +48,10 @@ class GiftFeatureModule {
     fun providesGiftsInteractor(
         repository: GiftsRepository,
         assetSourceRegistry: AssetSourceRegistry,
-        chainRegistry: ChainRegistry
+        chainRegistry: ChainRegistry,
+        selectedAccountUseCase: SelectedAccountUseCase
     ): GiftsInteractor {
-        return RealGiftsInteractor(repository, assetSourceRegistry, chainRegistry)
+        return RealGiftsInteractor(repository, assetSourceRegistry, chainRegistry, selectedAccountUseCase)
     }
 
     @Provides
@@ -117,7 +118,6 @@ class GiftFeatureModule {
         sendUseCase: SendUseCase,
         createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase,
         secretStoreV2: SecretStoreV2,
-        selectedAccountUseCase: SelectedAccountUseCase,
         accountRepository: AccountRepository
     ): ClaimGiftInteractor {
         return RealClaimGiftInteractor(
@@ -127,7 +127,6 @@ class GiftFeatureModule {
             sendUseCase,
             createGiftMetaAccountUseCase,
             secretStoreV2,
-            selectedAccountUseCase,
             accountRepository
         )
     }

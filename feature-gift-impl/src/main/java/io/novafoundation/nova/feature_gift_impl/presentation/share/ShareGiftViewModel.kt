@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
-import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,6 +15,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.share.ImageWithTextSharing
 import io.novafoundation.nova.common.utils.write
+import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_deep_linking.presentation.configuring.DeepLinkConfigurator
 import io.novafoundation.nova.feature_gift_impl.R
@@ -56,6 +56,7 @@ class ShareGiftViewModel(
     private val claimGiftMixinFactory: ClaimGiftMixinFactory,
     private val claimGiftInteractor: ClaimGiftInteractor,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val resourceManager: ResourceManager
 ) : BaseViewModel() {
 
@@ -135,8 +136,9 @@ class ShareGiftViewModel(
         val claimableGift = claimGiftInteractor.getClaimableGift(giftSeed.fromHex(), giftModel.chainId, giftModel.assetId)
         val tempMetaAccount = claimGiftInteractor.createTempMetaAccount(claimableGift)
         val amountWithFee = claimGiftInteractor.getGiftAmountWithFee(claimableGift, tempMetaAccount, coroutineScope)
+        val recipientMetaAccount = selectedAccountUseCase.getSelectedMetaAccount()
 
-        claimGiftMixin.claimGift(claimableGift, amountWithFee, tempMetaAccount)
+        claimGiftMixin.claimGift(gift = claimableGift, amountWithFee = amountWithFee, giftMetaAccount = tempMetaAccount, giftRecipient = recipientMetaAccount)
             .onSuccess {
                 shareGiftInteractor.setGiftStateAsReclaimed(giftModel.id)
                 router.back()

@@ -10,6 +10,7 @@ class AssetGiftsFlowFragment : AssetFlowFragment<AssetGiftsFlowViewModel>() {
 
     override fun initViews() {
         super.initViews()
+        binder.assetFlowToolbar.toolbar.setHomeButtonIcon(R.drawable.ic_arrow_back)
         setTitle(R.string.gifts_assets_flow_title)
     }
 

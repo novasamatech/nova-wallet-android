@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.presentation.gifts.assets
 import io.novafoundation.nova.common.domain.interactor.AssetViewModeInteractor
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.PlaceholderModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewModeResult
@@ -84,9 +83,5 @@ class AssetGiftsFlowViewModel(
         return assets.map { (group, assets) ->
             tokenAssetFormatter.mapTokenAssetGroupToUi(assetIconProvider, group, assets = assets) { it.groupBalance.transferable }
         }
-    }
-
-    override fun getPlaceholder(query: String, assets: List<Any>): PlaceholderModel? {
-        return null
     }
 }

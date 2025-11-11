@@ -19,6 +19,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.GiftsDao
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -105,6 +106,8 @@ interface GiftFeatureDependencies {
     val selectSingleWalletMixin: SelectSingleWalletMixin.Factory
 
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+
+    val accountInteractor: AccountInteractor
 
     fun giftsDao(): GiftsDao
 

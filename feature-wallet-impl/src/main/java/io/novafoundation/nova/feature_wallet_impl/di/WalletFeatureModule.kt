@@ -506,8 +506,8 @@ class WalletFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMinAmountFieldValidatorFactory(resourceManager: ResourceManager): MinAmountFieldValidatorFactory {
-        return RealMinAmountFieldValidatorFactory(resourceManager)
+    fun provideMinAmountFieldValidatorFactory(resourceManager: ResourceManager, tokenFormatter: TokenFormatter): MinAmountFieldValidatorFactory {
+        return RealMinAmountFieldValidatorFactory(resourceManager, tokenFormatter)
     }
 
     @Provides

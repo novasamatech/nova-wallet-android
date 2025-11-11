@@ -220,7 +220,7 @@ class SelectGiftAmountViewModel(
 
         return CompoundFieldValidator(
             enoughAmountValidatorFactory.create(maxActionProvider),
-            minAmountFieldValidatorFactory.create(minAmountProvider, R.string.gift_min_balance_validation_message)
+            minAmountFieldValidatorFactory.create(chainAssetFlow, minAmountProvider, R.string.gift_min_balance_validation_message)
         )
     }
 }

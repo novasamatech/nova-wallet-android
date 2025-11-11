@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.TransactionExecution
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.checkForFeeChanges
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.positiveAmount
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers.validations.recipientIsNotSystemAccount
@@ -65,6 +66,17 @@ class EvmNativeAssetTransfers(
         ) {
             nativeTransfer(transfer)
         }
+    }
+
+    override suspend fun performTransferAndAwaitExecution(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<TransactionExecution> {
+        return evmTransactionService.transactAndAwaitExecution(
+            chainId = transfer.originChain.id,
+            fallbackGasLimit = NATIVE_COIN_TRANSFER_GAS_LIMIT,
+            presetFee = transfer.fee.submissionFee,
+            origin = transfer.sender.intoOrigin()
+        ) {
+            nativeTransfer(transfer)
+        }.map { TransactionExecution.Ethereum(it) }
     }
 
     override suspend fun areTransfersEnabled(chainAsset: Chain.Asset): Boolean {
