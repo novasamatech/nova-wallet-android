@@ -6,7 +6,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 
 class GiftMinAmountProviderFactory(
     private val createGiftInteractor: CreateGiftInteractor,
