@@ -10,8 +10,8 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletMixin
 import io.novafoundation.nova.feature_gift_impl.domain.ClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.presentation.GiftRouter
 import io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftPayload
@@ -40,8 +40,8 @@ class ClaimGiftModule {
         assetIconProvider: AssetIconProvider,
         tokenFormatter: TokenFormatter,
         resourceManager: ResourceManager,
-        selectedAccountUseCase: SelectedAccountUseCase,
-        walletUiUseCase: WalletUiUseCase
+        walletUiUseCase: WalletUiUseCase,
+        selectSingleWalletMixin: SelectSingleWalletMixin.Factory,
     ): ViewModel {
         return ClaimGiftViewModel(
             router = router,
@@ -52,8 +52,8 @@ class ClaimGiftModule {
             assetIconProvider = assetIconProvider,
             tokenFormatter = tokenFormatter,
             resourceManager = resourceManager,
-            selectedAccountUseCase = selectedAccountUseCase,
-            walletUiUseCase = walletUiUseCase
+            walletUiUseCase = walletUiUseCase,
+            selectSingleWalletMixin = selectSingleWalletMixin
         )
     }
 }

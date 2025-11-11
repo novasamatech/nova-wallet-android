@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.GiftsDao
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
@@ -111,7 +112,8 @@ class GiftFeatureModule {
         sendUseCase: SendUseCase,
         createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase,
         secretStoreV2: SecretStoreV2,
-        selectedAccountUseCase: SelectedAccountUseCase
+        selectedAccountUseCase: SelectedAccountUseCase,
+        accountRepository: AccountRepository
     ): ClaimGiftInteractor {
         return RealClaimGiftInteractor(
             giftSecretsUseCase,
@@ -120,7 +122,8 @@ class GiftFeatureModule {
             sendUseCase,
             createGiftMetaAccountUseCase,
             secretStoreV2,
-            selectedAccountUseCase
+            selectedAccountUseCase,
+            accountRepository
         )
     }
 

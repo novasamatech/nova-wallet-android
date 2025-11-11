@@ -8,10 +8,12 @@ import io.novafoundation.nova.common.utils.finally
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_account_api.domain.model.isControllableWallet
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_gift_impl.domain.models.ClaimableGift
 import io.novafoundation.nova.feature_gift_impl.domain.models.GiftAmountWithFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -21,7 +23,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +51,10 @@ interface ClaimGiftInteractor {
         giftMetaAccount: MetaAccount,
         coroutineScope: CoroutineScope
     ): Result<Unit>
+
+    suspend fun getMetaAccount(metaId: Long): MetaAccount
+
+    suspend fun getMetaAccountToClaimGift(): MetaAccount
 }
 
 class RealClaimGiftInteractor(
@@ -55,7 +64,8 @@ class RealClaimGiftInteractor(
     private val sendUseCase: SendUseCase,
     private val createGiftMetaAccountUseCase: CreateGiftMetaAccountUseCase,
     private val secretStoreV2: SecretStoreV2,
-    private val selectedAccountUseCase: SelectedAccountUseCase
+    private val selectedAccountUseCase: SelectedAccountUseCase,
+    private val accountRepository: AccountRepository
 ) : ClaimGiftInteractor {
 
     override suspend fun getClaimableGift(secret: ByteArray, chainId: String, assetId: Int): ClaimableGift {
@@ -84,7 +94,12 @@ class RealClaimGiftInteractor(
         coroutineScope: CoroutineScope
     ): GiftAmountWithFee {
         val accountBalance = claimableGift.chainAsset.amountFromPlanks(getGiftAccountBalance(claimableGift))
-        val transferModel = createTransfer(claimableGift, giftMetaAccount, accountBalance)
+        val transferModel = createTransfer(
+            claimableGift,
+            giftMetaAccount,
+            recipientAccountId = claimableGift.chain.emptyAccountId(),
+            accountBalance
+        )
         val claimFee = assetSourceRegistry.sourceFor(claimableGift.chainAsset)
             .transfers
             .calculateFee(transferModel, coroutineScope)
@@ -108,6 +123,20 @@ class RealClaimGiftInteractor(
             }
     }
 
+    override suspend fun getMetaAccount(metaId: Long): MetaAccount {
+        return accountRepository.getMetaAccount(metaId)
+    }
+
+    override suspend fun getMetaAccountToClaimGift(): MetaAccount {
+        val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
+        if (selectedMetaAccount.type.isControllableWallet()) return selectedMetaAccount
+
+        val firstControllableWallet = accountRepository.getActiveMetaAccounts()
+            .firstOrNull { it.type.isControllableWallet() }
+
+        return firstControllableWallet ?: selectedMetaAccount
+    }
+
     private suspend fun claimGiftInternal(
         giftModel: ClaimableGift,
         giftMetaAccount: MetaAccount,
@@ -115,7 +144,13 @@ class RealClaimGiftInteractor(
         coroutineScope: CoroutineScope
     ): Result<Unit> {
         val originFee = OriginFee(submissionFee = giftAmountWithFee.fee, deliveryFee = null)
-        val giftTransfer = createTransfer(giftModel, giftMetaAccount, amount = giftAmountWithFee.amount).asWeighted(originFee)
+        val selectedAccount = selectedAccountUseCase.getSelectedMetaAccount()
+        val giftTransfer = createTransfer(
+            giftModel,
+            giftMetaAccount,
+            recipientAccountId = selectedAccount.requireAccountIdIn(giftModel.chain),
+            amount = giftAmountWithFee.amount
+        ).asWeighted(originFee)
         return sendUseCase.performOnChainTransfer(giftTransfer, originFee.submissionFee, coroutineScope)
             .coerceToUnit()
     }
@@ -126,15 +161,15 @@ class RealClaimGiftInteractor(
         return assetBalanceSource.queryAccountBalance(claimableGift.chain, claimableGift.chainAsset, claimableGift.accountId).transferable
     }
 
-    private suspend fun createTransfer(
+    private fun createTransfer(
         giftModel: ClaimableGift,
         giftMetaAccount: MetaAccount,
+        recipientAccountId: AccountId,
         amount: BigDecimal
     ): BaseAssetTransfer {
-        val selectedAccount = selectedAccountUseCase.getSelectedMetaAccount()
         return BaseAssetTransfer(
             sender = giftMetaAccount,
-            recipient = selectedAccount.requireAddressIn(giftModel.chain),
+            recipient = giftModel.chain.addressOf(recipientAccountId),
             originChain = giftModel.chain,
             originChainAsset = giftModel.chainAsset,
             destinationChain = giftModel.chain,

@@ -52,6 +52,10 @@ class GiftNavigator(
     override fun openClaimGift(payload: ClaimGiftPayload) {
         navigationBuilder().action(R.id.action_openClaimGiftFragment)
             .setArgs(ClaimGiftFragment.createPayload(payload))
-            .navigateInRoot()
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openManageWallets() {
+        commonDelegate.openWallets()
     }
 }

@@ -200,6 +200,14 @@
         app:destination="@id/selectAddressFragment" />
 
     <action
+        android:id="@+id/action_open_select_single_wallet"
+        app:destination="@id/selectSingleWalletFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_select_multiple_wallets"
         app:destination="@id/selectMultipleWalletsFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -218,6 +226,14 @@
     <action
         android:id="@+id/action_open_account_details"
         app:destination="@id/walletDetailsFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_openClaimGiftFragment"
+        app:destination="@id/claimGiftFragment"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -673,7 +689,7 @@
 
     <dialog
         android:id="@+id/selectAddressFragment"
-        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.SelectAddressBottomSheet"
         android:label="SelectAddressFragment"
         tools:layout="@layout/bottom_sheet_dynamic_list" />
 
@@ -1370,5 +1386,17 @@
             app:popUpToInclusive="true" />
 
     </dialog>
+
+    <fragment
+        android:id="@+id/selectSingleWalletFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.singleSelecting.SelectSingleWalletFragment"
+        android:label="SelectSingleWalletFragment"
+        tools:layout="@layout/fragment_select_single_wallet" />
+
+    <fragment
+        android:id="@+id/claimGiftFragment"
+        android:name="io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftFragment"
+        android:label="ClaimGiftFragment"
+        tools:layout="@layout/fragment_claim_gift" />
 
 </navigation>

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="account_secrets">secrets</string>
+
+    <string name="account_chain_not_found">No account on %s</string>
+    <string name="claim_gift_no_account_alert_title">Use another wallet, create a new one, or add a %s account to this wallet in Settings.</string>
+
+    <string name="claim_gift_uncontrollable_wallet_title">You can’t receive a gift with a %s wallet</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Create a new wallet or import an existing one to claim the gift</string>
+
+    <string name="common_manage_wallets">Manage Wallets</string>
+
     <string name="claim_gift_success_message">You’ve successfully claimed a gift. Tokens will appear in your balance shortly.</string>
 
     <string name="claim_gift_already_claimed_title">The gift cannot be received</string>

@@ -10,8 +10,12 @@ import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.makeInvisible
 import io.novafoundation.nova.common.utils.payload
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.common.view.setState
+import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.bindSelectWallet
+import io.novafoundation.nova.feature_account_api.view.setSelectable
 import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
 import io.novafoundation.nova.feature_gift_impl.databinding.FragmentClaimGiftBinding
 import io.novafoundation.nova.feature_gift_impl.di.GiftFeatureComponent
@@ -54,6 +58,13 @@ class ClaimGiftFragment : BaseFragment<ClaimGiftViewModel, FragmentClaimGiftBind
     }
 
     override fun subscribe(viewModel: ClaimGiftViewModel) {
+        bindSelectWallet(viewModel.selectWalletMixin) { isAvailableToSelect ->
+            binder.claimGiftAccount.setSelectable(isAvailableToSelect) {
+                viewModel.selectWalletToClaim()
+            }
+            binder.claimGiftAccount.setActionTint(R.color.icon_secondary)
+        }
+
         viewModel.giftAnimationRes.observe {
             binder.claimGiftAnimation.setMinAndMaxFrame(0, UNPACKING_START_FRAME)
             binder.claimGiftAnimation.setAnimation(it)
@@ -70,11 +81,15 @@ class ClaimGiftFragment : BaseFragment<ClaimGiftViewModel, FragmentClaimGiftBind
         }
 
         viewModel.selectedWalletModel.observe {
-            binder.claimGiftAccount.setAddressModel(it)
+            binder.claimGiftAccount.setModel(it)
         }
 
         viewModel.confirmButtonStateFlow.observe {
             binder.claimGiftButton.setState(it)
+        }
+
+        viewModel.alertModelFlow.observe {
+            binder.claimGiftAlert.setModelOrHide(it)
         }
     }
 
