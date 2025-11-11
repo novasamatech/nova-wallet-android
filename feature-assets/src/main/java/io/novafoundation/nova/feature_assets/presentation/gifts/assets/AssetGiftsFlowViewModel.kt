@@ -53,7 +53,7 @@ class AssetGiftsFlowViewModel(
 ) {
 
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
-        return interactor.giftAssetsSearch(query, externalBalancesFlow)
+        return interactor.giftAssetsSearch(query, externalBalancesFlow, coroutineScope)
     }
 
     override fun assetClicked(asset: Chain.Asset) {

@@ -4,9 +4,11 @@ import io.novafoundation.nova.feature_assets.domain.assets.models.AssetsByViewMo
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 interface AssetSearchInteractorFactory {
 
@@ -43,10 +45,21 @@ interface AssetSearchInteractor {
     fun giftAssetsSearch(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
+        coroutineScope: CoroutineScope
     ): Flow<AssetsByViewModeResult>
 
     fun searchAssetsFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<AssetsByViewModeResult>
+}
+
+fun Flow<Set<FullChainAssetId>>.mapToAssetSearchFilter(): Flow<AssetSearchFilter> {
+    return map { assetsSet ->
+        { asset ->
+            val chainAsset = asset.token.configuration
+
+            chainAsset.fullId in assetsSet
+        }
+    }
 }
