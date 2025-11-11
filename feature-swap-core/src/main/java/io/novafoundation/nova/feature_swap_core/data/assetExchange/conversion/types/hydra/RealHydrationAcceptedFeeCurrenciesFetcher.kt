@@ -11,21 +11,20 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Inject
 import javax.inject.Named
 
-
 internal class RealHydrationAcceptedFeeCurrenciesFetcher @Inject constructor(
     @Named(REMOTE_STORAGE_SOURCE) private val remoteStorage: StorageDataSource,
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter
-): HydrationAcceptedFeeCurrenciesFetcher {
+) : HydrationAcceptedFeeCurrenciesFetcher {
 
     override suspend fun fetchAcceptedFeeCurrencies(chain: Chain): Result<Set<ChainAssetId>> {
-       return runCatching {
-           val acceptedOnChainIds = remoteStorage.query(chain.id) {
-               metadata.multiTransactionPayment.acceptedCurrencies.keys()
-           }
+        return runCatching {
+            val acceptedOnChainIds = remoteStorage.query(chain.id) {
+                metadata.multiTransactionPayment.acceptedCurrencies.keys()
+            }
 
-           val onChainToLocalIds = hydraDxAssetIdConverter.allOnChainIds(chain)
+            val onChainToLocalIds = hydraDxAssetIdConverter.allOnChainIds(chain)
 
-           acceptedOnChainIds.mapNotNullToSet { onChainToLocalIds[it]?.id }
-       }
+            acceptedOnChainIds.mapNotNullToSet { onChainToLocalIds[it]?.id }
+        }
     }
 }

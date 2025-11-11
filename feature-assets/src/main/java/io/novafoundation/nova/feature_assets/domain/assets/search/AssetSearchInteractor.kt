@@ -54,7 +54,6 @@ interface AssetSearchInteractor {
     ): Flow<AssetsByViewModeResult>
 }
 
-
 fun Flow<Set<FullChainAssetId>>.mapToAssetSearchFilter(): Flow<AssetSearchFilter> {
     return map { assetsSet ->
         { asset ->

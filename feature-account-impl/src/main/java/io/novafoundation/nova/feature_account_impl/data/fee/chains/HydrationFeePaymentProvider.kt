@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.data.fee.chains.CustomOrNative
 import io.novafoundation.nova.feature_account_api.data.fee.types.NativeFeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub.AssetHubFastLookupFeeCapability
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQuoteSharedComputation
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydrationConversionFeePayment
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydrationFastLookupFeeCapability
@@ -17,7 +16,6 @@ import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAc
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 
