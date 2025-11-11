@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">Ghi lại cụm mật khẩu của bạn</string>
     <string name="account_backup_secret_caption">Vui lòng đảm bảo ghi đúng và rõ ràng cụm từ của bạn.</string>
     <string name="account_chain_address_format">địa chỉ %s</string>
+    <string name="account_chain_not_found">Không có tài khoản trên %s</string>
     <string name="account_confirm_mnemonic">Xác nhận cụm từ ghi nhớ</string>
     <string name="account_confirm_mnemonic_title">Hãy kiểm tra lại lần nữa</string>
     <string name="account_confirmation_details">Chọn các từ theo đúng thứ tự</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">Không chuyển</string>
     <string name="account_proxy_type_staking">Staking</string>
     <string name="account_restore_account">Đã có tài khoản</string>
+    <string name="account_secrets">bí mật</string>
     <string name="account_seed_hex_symbols">64 ký tự hex</string>
     <string name="account_select_hardware_wallet">Chọn ví cứng</string>
     <string name="account_select_secret_source">Chọn loại bí mật của bạn</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">Bạn đã nhận lại DOT từ crowdloans? Bắt đầu Stake DOT ngay hôm nay để nhận phần thưởng tối đa!</string>
     <string name="assets_crowdloan_unlock_banner_title">Tăng cường DOT của bạn 🚀</string>
     <string name="assets_filter_title">Lọc token</string>
+    <string name="assets_gifts_flow_placeholder">Bạn không có token để tặng.\nMua hoặc Nạp token vào tài khoản của bạn.</string>
     <string name="assets_manage_tokens_all_networks">Tất cả mạng</string>
     <string name="assets_manage_tokens_title">Quản lý token</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Không chuyển %s vào tài khoản Ledger kiểm soát vì Ledger không hỗ trợ việc gửi %s, do đó tài sản sẽ bị kẹt trên tài khoản này</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">Phí chuyển khoản</string>
     <string name="choose_amount_network_error">Mạng không phản hồi</string>
     <string name="choose_amount_to">Đến</string>
+    <string name="claim_gift_already_claimed_message">Rất tiếc, món quà đã được nhận</string>
+    <string name="claim_gift_already_claimed_title">Món quà không thể được nhận</string>
+    <string name="claim_gift_button">Nhận món quà</string>
+    <string name="claim_gift_default_error_message">Có thể có vấn đề với máy chủ. Vui lòng thử lại sau.</string>
+    <string name="claim_gift_default_error_title">Rất tiếc, đã xảy ra lỗi</string>
+    <string name="claim_gift_no_account_alert_title">Sử dụng ví khác, tạo ví mới hoặc thêm tài khoản %s vào ví này trong Cài đặt.</string>
+    <string name="claim_gift_success_message">Bạn đã nhận thành công một món quà. Token sẽ sớm xuất hiện trong số dư của bạn.</string>
+    <string name="claim_gift_title">Bạn đã nhận được một món quà crypto!</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Tạo ví mới hoặc nhập một ví hiện có để nhận món quà</string>
+    <string name="claim_gift_uncontrollable_wallet_title">Bạn không thể nhận quà với ví %s</string>
     <string name="close_dapp_tabs_message">Tất cả các tab mở trong trình duyệt DApp sẽ bị đóng.</string>
     <string name="close_dapp_tabs_title">Đóng tất cả DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s và nhớ luôn giữ chúng ngoại tuyến để khôi phục bất cứ lúc nào. Bạn có thể thực hiện việc này trong Cài đặt Sao lưu.</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">Nhập địa chỉ...</string>
     <string name="common_enter_amount">Nhập số lượng...</string>
     <string name="common_enter_details">Nhập chi tiết</string>
+    <string name="common_enter_other_amount">Nhập số lượng khác</string>
     <string name="common_enter_password">Nhập mật khẩu</string>
     <string name="common_error_general_title">Lỗi</string>
     <string name="common_error_not_enough_tokens">Không đủ token</string>
@@ -435,6 +449,7 @@
     <string name="common_frequency_days_everyday">mỗi ngày</string>
     <string name="common_full_details">Chi tiết đầy đủ</string>
     <string name="common_get_token_format">Nhận %s</string>
+    <string name="common_gift">Quà</string>
     <string name="common_got_it">Hiểu rồi</string>
     <string name="common_governance">Quản trị</string>
     <string name="common_hexadecimal_string">Chuỗi thập lục phân</string>
@@ -450,6 +465,7 @@
     <string name="common_learn_more_v2_2_0">Tìm hiểu thêm về</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">còn lại %s</string>
+    <string name="common_manage_wallets">Quản lý Ví</string>
     <string name="common_maximum">Tối đa</string>
     <string name="common_maximum_format">tối đa %s</string>
     <plurals name="common_minutes_format">
@@ -570,9 +586,11 @@
     <string name="common_wallet">Ví</string>
     <string name="common_warning">Cảnh báo</string>
     <string name="common_yes">Có</string>
+    <string name="common_your_gift">Quà của bạn</string>
     <string name="common_zero_amount_error">Số lượng phải lớn hơn 0</string>
     <string name="confirm_cloud_backup_password_subtitle">Vui lòng nhập mật khẩu bạn đã tạo trong quá trình sao lưu</string>
     <string name="confirm_cloud_backup_password_title">Nhập mật khẩu sao lưu hiện tại</string>
+    <string name="confirm_create_gift_hint">Xác nhận sẽ chuyển token từ tài khoản của bạn</string>
     <string name="confirm_mnemonic_disabled_button_state">Chọn các từ...</string>
     <string name="confirm_mnemonic_not_matching_error_message">Cụm mật khẩu không hợp lệ, vui lòng kiểm tra lại thứ tự các từ</string>
     <string name="confirm_referendum_vote_referendum">Trưng cầu dân ý</string>
@@ -807,6 +825,23 @@
     <string name="fragment_top_up_card_title">Nạp thẻ với %s</string>
     <string name="fragment_waiting_top_up_time_out_error_message">Vui lòng liên hệ support@novawallet.io. Bao gồm địa chỉ email mà bạn đã sử dụng để phát hành thẻ.</string>
     <string name="fragment_waiting_top_up_time_out_error_title">Liên hệ hỗ trợ</string>
+    <string name="gift_claimed_subtitle">Đã nhận</string>
+    <string name="gift_created_subtitle">Đã tạo: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">Nhập số lượng</string>
+    <string name="gift_min_balance_validation_message">Món quà tối thiểu là %s</string>
+    <string name="gift_reclaimed_subtitle">Đã đòi lại</string>
+    <string name="gifts_assets_flow_title">Chọn một token để tặng</string>
+    <string name="gifts_claim_fee">Phí mạng khi nhận</string>
+    <string name="gifts_create">Tạo Quà</string>
+    <string name="gifts_header_subtitle">Gửi quà nhanh chóng, dễ dàng và an toàn trong Nova</string>
+    <string name="gifts_header_title">Chia sẻ Quà Crypto với Bất kỳ Ai, Ở Bất kỳ Đâu</string>
+    <string name="gifts_list_title">Các món quà bạn đã tạo</string>
+    <string name="gifts_network_flow_title">Chọn mạng cho quà %s</string>
+    <string name="gifts_placeholder_step_1">Nhập số lượng quà của bạn</string>
+    <string name="gifts_placeholder_step_2">%s như một liên kết và mời bất kỳ ai đến với Nova</string>
+    <string name="gifts_placeholder_step_2_highlight">Chia sẻ quà trực tiếp</string>
+    <string name="gifts_placeholder_step_3">%s và bạn có thể trả lại các món quà chưa nhận bất cứ lúc nào từ thiết bị này</string>
+    <string name="gifts_placeholder_step_3_highlight">Món quà có sẵn ngay lập tức</string>
     <string name="governance_notification_channel_name">Kênh thông báo quản trị</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">Bạn cần chọn ít nhất %d track</item>
@@ -1149,6 +1184,8 @@
     <string name="push_welcome_title">Đừng bỏ lỡ điều gì!</string>
     <string name="receive_network_flow_title">Chọn mạng để nhận %s</string>
     <string name="receive_screen_copy_address">Sao chép Địa chỉ</string>
+    <string name="reclaim_gift_confirmation_message">Nếu bạn đòi lại món quà này, liên kết chia sẻ sẽ bị tắt và token sẽ được hoàn lại vào ví của bạn.\nBạn có muốn tiếp tục không?</string>
+    <string name="reclaim_gift_confirmation_title">Đòi lại Quà %s?</string>
     <string name="recover_json_hint">Dán mã JSON hoặc tải lên tệp...</string>
     <string name="recover_json_upload">Tải lên tệp</string>
     <string name="recovery_json">Khôi phục JSON</string>
@@ -1297,6 +1334,7 @@
     <string name="select_delegation_tracks_edit_title">Chọn track để chỉnh sửa ủy quyền</string>
     <string name="select_delegation_tracks_revoke_title">Chọn track để hủy ủy quyền</string>
     <string name="select_delegation_tracks_unavailable_tracks">Track không có sẵn</string>
+    <string name="select_gift_amount_title">Gửi quà vào</string>
     <string name="select_ledger_grant_permissions">Bật Bluetooth &amp; Cấp Quyền</string>
     <string name="select_ledger_location_enable_request_message">Nova cần bật định vị để có thể thực hiện quét Bluetooth để tìm thiết bị Ledger của bạn</string>
     <string name="select_ledger_location_enable_request_title">Vui lòng bật định vị địa lý trong cài đặt thiết bị</string>
@@ -1346,6 +1384,10 @@
     <string name="setup_staking_type_pool_staking">Pool staking</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Stake của bạn ít hơn mức tối thiểu để nhận thưởng</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Loại staking không được hỗ trợ</string>
+    <string name="share_gift_button">Chia sẻ liên kết quà</string>
+    <string name="share_gift_reclaim">Đòi lại</string>
+    <string name="share_gift_text" formatted="false">Xin chào! Bạn đã có một món quà %s đang chờ bạn!\n\nCài đặt ứng dụng Nova Wallet, thiết lập ví của bạn và nhận nó qua liên kết đặc biệt này:\n%s</string>
+    <string name="share_gift_title">Quà Đã Được Chuẩn Bị.\nChia sẻ Ngay!</string>
     <string name="sr25519_selection_subtitle">sr25519 (được khuyến nghị)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">Tài khoản được chọn đã được sử dụng làm controller</string>

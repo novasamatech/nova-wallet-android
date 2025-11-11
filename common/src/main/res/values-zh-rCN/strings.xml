@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">写下你的密码短语</string>
     <string name="account_backup_secret_caption">请确保您的短语正确且清晰地写下。</string>
     <string name="account_chain_address_format">%s地址</string>
+    <string name="account_chain_not_found">在%s上无账户</string>
     <string name="account_confirm_mnemonic">确认助记词</string>
     <string name="account_confirm_mnemonic_title">让我们再次检查一下</string>
     <string name="account_confirmation_details">按正确的顺序选择单词</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">非转移</string>
     <string name="account_proxy_type_staking">质押</string>
     <string name="account_restore_account">已有账户</string>
+    <string name="account_secrets">密钥</string>
     <string name="account_seed_hex_symbols">64 个十六进制符号</string>
     <string name="account_select_hardware_wallet">选择硬件钱包</string>
     <string name="account_select_secret_source">选择您的秘密类型</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">从众贷中收回你的 DOT 了吗？今天开始质押你的 DOT，以获得最大可能的奖励！</string>
     <string name="assets_crowdloan_unlock_banner_title">提升你的 DOT 🚀</string>
     <string name="assets_filter_title">筛选代币</string>
+    <string name="assets_gifts_flow_placeholder">您没有可赠送的代币。\n购买或存入代币到您的账户。</string>
     <string name="assets_manage_tokens_all_networks">所有网络</string>
     <string name="assets_manage_tokens_title">代币管理</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">不要将 %s 转账至 Ledger 控制的账户，因为 Ledger 不支持 %s 的发送，所以资产将被卡在这个账户上</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">转账费</string>
     <string name="choose_amount_network_error">网络无响应</string>
     <string name="choose_amount_to">至</string>
+    <string name="claim_gift_already_claimed_message">哦哦，礼物已经被领取了</string>
+    <string name="claim_gift_already_claimed_title">礼物无法领取</string>
+    <string name="claim_gift_button">领取礼物</string>
+    <string name="claim_gift_default_error_message">服务器可能出现问题。请稍后再试。</string>
+    <string name="claim_gift_default_error_title">哦哦，出了点问题</string>
+    <string name="claim_gift_no_account_alert_title">使用其他钱包，创建新钱包，或在设置中添加%s账户到此钱包。</string>
+    <string name="claim_gift_success_message">您已成功领取礼物。代币很快会出现在您的余额中。</string>
+    <string name="claim_gift_title">您收到了一份加密礼物！</string>
+    <string name="claim_gift_uncontrollable_wallet_message">创建一个新钱包或导入现有钱包以领取礼物</string>
+    <string name="claim_gift_uncontrollable_wallet_title">您无法使用%s钱包领取礼物</string>
     <string name="close_dapp_tabs_message">DApp浏览器中所有打开的标签页将被关闭。</string>
     <string name="close_dapp_tabs_title">关闭所有DApps？</string>
     <string name="cloud_backup_delete_action_subtitle">%s 并且记住始终将它们离线保存，以便随时恢复它们。您可以在备份设置中执行此操作。</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">输入地址…</string>
     <string name="common_enter_amount">输入金额…</string>
     <string name="common_enter_details">输入详情</string>
+    <string name="common_enter_other_amount">输入其他金额</string>
     <string name="common_enter_password">输入密码</string>
     <string name="common_error_general_title">错误</string>
     <string name="common_error_not_enough_tokens">代币不足</string>
@@ -435,6 +449,7 @@
     <string name="common_frequency_days_everyday">每天</string>
     <string name="common_full_details">完整详情</string>
     <string name="common_get_token_format">获取%s</string>
+    <string name="common_gift">礼物</string>
     <string name="common_got_it">知道了</string>
     <string name="common_governance">治理</string>
     <string name="common_hexadecimal_string">十六进制字符串</string>
@@ -450,6 +465,7 @@
     <string name="common_learn_more_v2_2_0">了解更多关于</string>
     <string name="common_ledger">账本</string>
     <string name="common_left">%s 剩余</string>
+    <string name="common_manage_wallets">管理钱包</string>
     <string name="common_maximum">最大</string>
     <string name="common_maximum_format">%s 最大值</string>
     <plurals name="common_minutes_format">
@@ -570,9 +586,11 @@
     <string name="common_wallet">钱包</string>
     <string name="common_warning">警告</string>
     <string name="common_yes">是</string>
+    <string name="common_your_gift">您的礼物</string>
     <string name="common_zero_amount_error">金额必须为正</string>
     <string name="confirm_cloud_backup_password_subtitle">请输入您在备份过程中创建的密码</string>
     <string name="confirm_cloud_backup_password_title">输入当前备份密码</string>
+    <string name="confirm_create_gift_hint">确认将从您的账户转移代币</string>
     <string name="confirm_mnemonic_disabled_button_state">选择单词...</string>
     <string name="confirm_mnemonic_not_matching_error_message">无效的助记词，请再次检查单词顺序</string>
     <string name="confirm_referendum_vote_referendum">公投</string>
@@ -807,6 +825,23 @@
     <string name="fragment_top_up_card_title">使用%s充值卡</string>
     <string name="fragment_waiting_top_up_time_out_error_message">请联系support@novawallet.io。包括您用于发卡的电子邮件地址。</string>
     <string name="fragment_waiting_top_up_time_out_error_title">联系支持</string>
+    <string name="gift_claimed_subtitle">已领取</string>
+    <string name="gift_created_subtitle">创建时间：%s</string>
+    <string name="gift_enter_amount_disabled_button_state">输入金额</string>
+    <string name="gift_min_balance_validation_message">最小礼物为%s</string>
+    <string name="gift_reclaimed_subtitle">已追回</string>
+    <string name="gifts_assets_flow_title">选择一个代币赠送</string>
+    <string name="gifts_claim_fee">领取的网络费用</string>
+    <string name="gifts_create">创建礼物</string>
+    <string name="gifts_header_subtitle">在Nova中快速、安全、轻松地发送礼物</string>
+    <string name="gifts_header_title">与任何人、任何地方分享加密礼物</string>
+    <string name="gifts_list_title">您创建的礼物</string>
+    <string name="gifts_network_flow_title">选择%s礼物的网络</string>
+    <string name="gifts_placeholder_step_1">输入您的礼物金额</string>
+    <string name="gifts_placeholder_step_2">%s作为链接并邀请任何人到Nova</string>
+    <string name="gifts_placeholder_step_2_highlight">直接分享礼物</string>
+    <string name="gifts_placeholder_step_3">%s，您可以随时从此设备返回未领取的礼物</string>
+    <string name="gifts_placeholder_step_3_highlight">礼物可立即使用</string>
     <string name="governance_notification_channel_name">治理通知渠道</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">您至少需要选择%d轨道</item>
@@ -1149,6 +1184,8 @@
     <string name="push_welcome_title">不要错过任何事情！</string>
     <string name="receive_network_flow_title">选择接收%s的网络</string>
     <string name="receive_screen_copy_address">复制地址</string>
+    <string name="reclaim_gift_confirmation_message">如果您追回此礼物，分享链接将被禁用，代币将退回到您的钱包。\n您想继续吗？</string>
+    <string name="reclaim_gift_confirmation_title">追回%s礼物？</string>
     <string name="recover_json_hint">粘贴 json 字符串或上传文件…</string>
     <string name="recover_json_upload">上传文件</string>
     <string name="recovery_json">恢复 JSON</string>
@@ -1297,6 +1334,7 @@
     <string name="select_delegation_tracks_edit_title">选择要编辑委托的轨道</string>
     <string name="select_delegation_tracks_revoke_title">选择要撤销委托的轨道</string>
     <string name="select_delegation_tracks_unavailable_tracks">不可用的轨道</string>
+    <string name="select_gift_amount_title">发送礼物到</string>
     <string name="select_ledger_grant_permissions">启用蓝牙并授予权限</string>
     <string name="select_ledger_location_enable_request_message">Nova需要启用地理位置，以便能够进行蓝牙扫描查找您的Ledger设备</string>
     <string name="select_ledger_location_enable_request_title">请在设备设置中启用地理位置</string>
@@ -1346,6 +1384,10 @@
     <string name="setup_staking_type_pool_staking">池质押</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">您的质押小于获得奖励的最小金额</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">不支持的质押类型</string>
+    <string name="share_gift_button">分享礼物链接</string>
+    <string name="share_gift_reclaim">追回</string>
+    <string name="share_gift_text" formatted="false">您好！您有一个%s礼物在等您！\n\n安装Nova Wallet应用，设置您的钱包，并通过此特定链接领取：\n%s</string>
+    <string name="share_gift_title">礼物已准备好。\n立即分享！</string>
     <string name="sr25519_selection_subtitle">sr25519（推荐）</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">所选账户已作为控制器使用</string>
