@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.data.secrets.v2.publicKey
 import io.novafoundation.nova.common.utils.coerceToUnit
 import io.novafoundation.nova.common.utils.finally
 import io.novafoundation.nova.common.utils.isZero
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency.Asset.Companion.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
@@ -26,9 +26,9 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import kotlinx.coroutines.CoroutineScope
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlinx.coroutines.CoroutineScope
 
 interface ClaimGiftInteractor {
 
@@ -185,7 +185,7 @@ class RealClaimGiftInteractor(
             originChainAsset = giftModel.chainAsset,
             destinationChain = giftModel.chain,
             destinationChainAsset = giftModel.chainAsset,
-            feePaymentCurrency = FeePaymentCurrency.Asset(giftModel.chainAsset),
+            feePaymentCurrency = giftModel.chainAsset.toFeePaymentCurrency(),
             amount = amount,
             transferringMaxAmount = true
         )

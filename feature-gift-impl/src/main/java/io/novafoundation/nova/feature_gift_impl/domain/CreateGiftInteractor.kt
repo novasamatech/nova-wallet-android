@@ -6,7 +6,7 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.secrets.v2.keypair
 import io.novafoundation.nova.common.data.secrets.v2.publicKey
 import io.novafoundation.nova.common.utils.LOG_TAG
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency.Asset.Companion.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.EvmFee
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
@@ -27,10 +27,10 @@ import io.novafoundation.nova.runtime.ext.emptyAccountIdKey
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigDecimal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
 
 typealias GiftId = Long
 
@@ -139,7 +139,7 @@ class RealCreateGiftInteractor(
         originChainAsset = chainAsset,
         destinationChain = chain,
         destinationChainAsset = chainAsset,
-        feePaymentCurrency = FeePaymentCurrency.Asset(chainAsset),
+        feePaymentCurrency = chainAsset.toFeePaymentCurrency(),
         amount = amount,
         transferringMaxAmount = transferMax
     )

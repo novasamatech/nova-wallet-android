@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.presenatation.fee
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency.Asset.Companion.toFeePaymentCurrency
 import io.novafoundation.nova.runtime.util.ChainAssetParcel
 import kotlinx.android.parcel.Parcelize
 
@@ -23,7 +24,7 @@ fun FeePaymentCurrency.toParcel(): FeePaymentCurrencyParcel {
 
 fun FeePaymentCurrencyParcel.toDomain(): FeePaymentCurrency {
     return when (this) {
-        is FeePaymentCurrencyParcel.Asset -> FeePaymentCurrency.Asset(asset.value)
+        is FeePaymentCurrencyParcel.Asset -> asset.value.toFeePaymentCurrency()
         FeePaymentCurrencyParcel.Native -> FeePaymentCurrency.Native
     }
 }
