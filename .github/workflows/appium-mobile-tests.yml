@@ -47,7 +47,7 @@ jobs:
               owner: 'novasamatech', 
               repo: 'appium-mobile-tests', 
               workflow_id: 'browserstack-tests.yml',
-              ref: 'develop', 
+              ref: 'master', 
               inputs: {
                 app_url: '${{ inputs.app_url }}',                
                 ALLURE_JOB_RUN_ID: '${{ inputs.allure_job_run_id }}',
