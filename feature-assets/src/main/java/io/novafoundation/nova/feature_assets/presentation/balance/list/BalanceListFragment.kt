@@ -230,6 +230,10 @@ class BalanceListFragment :
         viewModel.swapClicked()
     }
 
+    override fun giftClicked() {
+        viewModel.giftClicked()
+    }
+
     private fun setupRecyclerViewSpacing() {
         binder.balanceListAssets.addSpaceItemDecoration {
             add(SpaceBetween(AssetsHeaderHolder, BannerHolder, spaceDp = 4))

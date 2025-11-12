@@ -101,7 +101,7 @@ fun AssetTransferBase(
     }
 }
 
-class BaseAssetTransfer(
+data class BaseAssetTransfer(
     override val sender: MetaAccount,
     override val recipient: String,
     override val originChain: Chain,
@@ -158,6 +158,8 @@ interface AssetTransfers {
 
     suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission>
 
+    suspend fun performTransferAndAwaitExecution(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<TransactionExecution>
+
     suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         return true
     }
@@ -181,3 +183,5 @@ suspend fun AssetTransfers.tryParseTransfer(call: GenericCall.Instance, chain: C
         .onFailure { Log.e(LOG_TAG, "Failed to parse call: $call", it) }
         .getOrNull()
 }
+
+fun AssetTransfer.asWeighted(fee: OriginFee) = WeightedAssetTransfer(this, fee)

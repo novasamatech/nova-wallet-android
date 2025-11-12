@@ -2,14 +2,18 @@ package io.novafoundation.nova.feature_account_api.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.TextUtils
 import android.util.AttributeSet
+import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.utils.setDrawableStart
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.setVisible
@@ -27,8 +31,21 @@ class AccountView @JvmOverloads constructor(
 
     private val binder = ViewAccountBinding.inflate(inflater(), this)
 
+    sealed interface Model {
+        class Address(val addressModel: AddressModel) : Model
+
+        class NoAddress(val title: String, val subTitle: String) : Model
+    }
+
     init {
         attrs?.let(::applyAttributes)
+    }
+
+    fun setModel(model: Model) {
+        when (model) {
+            is Model.Address -> setAddressModel(model.addressModel)
+            is Model.NoAddress -> setNoAddress(model.title, model.subTitle)
+        }
     }
 
     fun setAddressModel(addressModel: AddressModel) {
@@ -43,7 +60,17 @@ class AccountView @JvmOverloads constructor(
             binder.addressSubtitle.makeGone()
         }
 
+        binder.addressSubtitle.setDrawableStart(null)
+        binder.addressSubtitle.ellipsize = TextUtils.TruncateAt.MIDDLE
         binder.addressPrimaryIcon.setImageDrawable(addressModel.image)
+    }
+
+    fun setNoAddress(title: String, subTitle: String) {
+        setTitle(title)
+        setIcon(ContextCompat.getDrawable(context, R.drawable.ic_identicon_placeholder))
+        binder.addressSubtitle.setDrawableStart(R.drawable.ic_warning_filled, widthInDp = 16, paddingInDp = 4)
+        binder.addressSubtitle.ellipsize = TextUtils.TruncateAt.END
+        setSubTitle(subTitle)
     }
 
     fun setTitle(title: String) {
@@ -52,9 +79,11 @@ class AccountView @JvmOverloads constructor(
 
     fun setSubTitle(subTitle: String?) {
         binder.addressSubtitle.setTextOrHide(subTitle)
+        binder.addressSubtitle.setDrawableStart(null)
+        binder.addressSubtitle.ellipsize = TextUtils.TruncateAt.MIDDLE
     }
 
-    fun setIcon(icon: Drawable) {
+    fun setIcon(icon: Drawable?) {
         binder.addressPrimaryIcon.setImageDrawable(icon)
     }
 
@@ -66,7 +95,7 @@ class AccountView @JvmOverloads constructor(
         }
     }
 
-    fun setActionClickListener(listener: OnClickListener) {
+    fun setActionClickListener(listener: OnClickListener?) {
         setOnClickListener(listener)
     }
 
@@ -89,5 +118,15 @@ class AccountView @JvmOverloads constructor(
 
         val shouldShowBackground = typedArray.getBoolean(R.styleable.AccountView_showBackground, SHOW_BACKGROUND_DEFAULT)
         setShowBackground(shouldShowBackground)
+    }
+}
+
+fun AccountView.setSelectable(isSelectable: Boolean, onClickListener: View.OnClickListener) {
+    if (isSelectable) {
+        setActionIcon(R.drawable.ic_chevron_right)
+        setActionClickListener(onClickListener)
+    } else {
+        setActionIcon(null as Drawable?)
+        setActionClickListener(null)
     }
 }

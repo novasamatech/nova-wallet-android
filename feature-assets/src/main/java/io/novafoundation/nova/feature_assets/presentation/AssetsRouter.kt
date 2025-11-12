@@ -41,6 +41,8 @@ interface AssetsRouter {
 
     fun openSelectAddress(arguments: Bundle)
 
+    fun openSelectSingleWallet(arguments: Bundle)
+
     fun openSelectMultipleWallets(arguments: Bundle)
 
     fun openReceive(assetPayload: AssetPayload)
@@ -101,6 +103,8 @@ interface AssetsRouter {
 
     fun openSellNetworks(payload: NetworkFlowPayload)
 
+    fun openGiftsNetworks(payload: NetworkFlowPayload)
+
     fun openBuyProviders(chainId: String, chainAssetId: Int)
 
     fun openSellProviders(chainId: String, chainAssetId: Int)
@@ -112,4 +116,10 @@ interface AssetsRouter {
     fun openPendingMultisigOperations()
 
     fun openAssetDetailsFromDeepLink(payload: AssetPayload)
+
+    fun openGifts()
+
+    fun openGiftsByAsset(assetPayload: AssetPayload)
+
+    fun openSelectGiftAmount(assetPayload: AssetPayload)
 }

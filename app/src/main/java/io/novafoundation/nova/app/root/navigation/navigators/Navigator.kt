@@ -95,6 +95,10 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountPayload
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
@@ -359,6 +363,12 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openSelectSingleWallet(arguments: Bundle) {
+        navigationBuilder().action(R.id.action_open_select_single_wallet)
+            .setArgs(arguments)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openSelectMultipleWallets(arguments: Bundle) {
         navigationBuilder().action(R.id.action_open_select_multiple_wallets)
             .setArgs(arguments)
@@ -418,6 +428,12 @@ class Navigator(
 
     override fun openSellFlow() {
         navigationBuilder().action(R.id.action_mainFragment_to_sellFlow)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSelectGiftAmount(assetPayload: AssetPayload) {
+        navigationBuilder().action(R.id.action_selectGiftAmount)
+            .setArgs(SelectGiftAmountFragment.createPayload(SelectGiftAmountPayload(assetPayload)))
             .navigateInFirstAttachedContext()
     }
 
@@ -492,6 +508,12 @@ class Navigator(
 
     override fun openSellNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_sellFlow_to_sellFlowNetwork)
+            .setArgs(NetworkFlowFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openGiftsNetworks(payload: NetworkFlowPayload) {
+        navigationBuilder().action(R.id.action_giftsFlow_to_giftsFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
@@ -663,6 +685,18 @@ class Navigator(
 
     override fun openAssetDetailsFromDeepLink(payload: AssetPayload) {
         openSplitScreenWithInstantAction(R.id.action_mainFragment_to_balanceDetailFragment, BalanceDetailFragment.getBundle(payload))
+    }
+
+    override fun openGifts() {
+        navigationBuilder().action(R.id.action_open_gifts)
+            .setArgs(GiftsFragment.createPayload(GiftsPayload.AllAssets))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openGiftsByAsset(assetPayload: AssetPayload) {
+        navigationBuilder().action(R.id.action_open_gifts)
+            .setArgs(GiftsFragment.createPayload(GiftsPayload.ByAsset(assetPayload)))
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishTradeOperation() {

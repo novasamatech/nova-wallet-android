@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
@@ -49,7 +48,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSw
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.RealSwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.updater.AccountInfoUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
@@ -116,9 +114,6 @@ class SwapFeatureModule {
         priceImpactThresholds: PriceImpactThresholds,
         swapService: SwapService,
         tokenRepository: TokenRepository,
-        accountRepository: AccountRepository,
-        buyTokenRegistry: TradeTokenRegistry,
-        crossChainTransfersUseCase: CrossChainTransfersUseCase,
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
         assetsValidationContextFactory: AssetsValidationContext.Factory,
         canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
@@ -126,9 +121,6 @@ class SwapFeatureModule {
         return SwapInteractor(
             priceImpactThresholds = priceImpactThresholds,
             swapService = swapService,
-            buyTokenRegistry = buyTokenRegistry,
-            crossChainTransfersUseCase = crossChainTransfersUseCase,
-            accountRepository = accountRepository,
             canReceiveAssetOutValidationFactory = canReceiveAssetOutValidationFactory,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
             assetsValidationContextFactory = assetsValidationContextFactory,

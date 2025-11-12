@@ -9,7 +9,7 @@ class AssetViewModeAssetSearchInteractorFactory(
     private val assetViewModeRepository: AssetsViewModeRepository,
     private val assetSearchUseCase: AssetSearchUseCase,
     private val chainRegistry: ChainRegistry,
-    private val tradeTokenRegistry: TradeTokenRegistry
+    private val tradeTokenRegistry: TradeTokenRegistry,
 ) : AssetSearchInteractorFactory {
 
     override fun createByAssetViewMode(): AssetSearchInteractor {

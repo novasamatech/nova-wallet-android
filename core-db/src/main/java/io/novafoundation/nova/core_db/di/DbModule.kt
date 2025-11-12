@@ -18,6 +18,7 @@ import io.novafoundation.nova.core_db.dao.CurrencyDao
 import io.novafoundation.nova.core_db.dao.DappAuthorizationDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.FavouriteDAppsDao
+import io.novafoundation.nova.core_db.dao.GiftsDao
 import io.novafoundation.nova.core_db.dao.GovernanceDAppsDao
 import io.novafoundation.nova.core_db.dao.HoldsDao
 import io.novafoundation.nova.core_db.dao.LockDao
@@ -225,5 +226,11 @@ class DbModule {
     @ApplicationScope
     fun provideMultisigOperationsDao(appDatabase: AppDatabase): MultisigOperationsDao {
         return appDatabase.multisigOperationsDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideGiftsDao(appDatabase: AppDatabase): GiftsDao {
+        return appDatabase.giftsDao()
     }
 }

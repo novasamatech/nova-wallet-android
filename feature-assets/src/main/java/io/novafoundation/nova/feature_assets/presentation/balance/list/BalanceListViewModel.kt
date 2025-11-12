@@ -373,6 +373,10 @@ class BalanceListViewModel(
         router.openSwapFlow()
     }
 
+    fun giftClicked() {
+        router.openGifts()
+    }
+
     fun novaCardClicked() = launchUnit {
         novaCardRestrictionCheckMixin.checkRestrictionAndDo {
             router.openNovaCard()

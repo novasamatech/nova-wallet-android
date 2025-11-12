@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
-import io.novafoundation.nova.feature_account_api.data.signer.isImmediate
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -14,8 +13,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainValidationSystemProvider
 import io.novafoundation.nova.feature_wallet_api.data.repository.getXcmChain
+import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
@@ -26,13 +25,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class SendInteractor(
-    private val walletRepository: WalletRepository,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val crossChainTransactor: CrossChainTransactor,
     private val crossChainTransfersRepository: CrossChainTransfersRepository,
     private val parachainInfoRepository: ParachainInfoRepository,
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val extrinsicService: ExtrinsicService,
+    private val sendUseCase: SendUseCase,
     private val crossChainValidationProvider: CrossChainValidationSystemProvider
 ) {
 
@@ -77,16 +76,7 @@ class SendInteractor(
                 crossChainTransactor.performTransfer(config, transfer, crossChainFee!!.amount)
             }
         } else {
-            val submissionFee = originFee.submissionFee
-
-            getAssetTransfers(transfer).performTransfer(transfer, coroutineScope)
-                .onSuccess { submission ->
-                    // Only add pending history items for calls that are executed immediately
-                    if (submission.callExecutionType.isImmediate()) {
-                        // Insert used fee regardless of who paid it
-                        walletRepository.insertPendingTransfer(submission.hash, transfer, submissionFee)
-                    }
-                }
+            sendUseCase.performOnChainTransfer(transfer, originFee.submissionFee, coroutineScope)
         }
     }
 

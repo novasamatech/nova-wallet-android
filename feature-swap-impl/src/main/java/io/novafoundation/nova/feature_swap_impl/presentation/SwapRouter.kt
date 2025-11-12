@@ -22,13 +22,7 @@ interface SwapRouter : ReturnableRouter {
 
     fun openRetrySwap(payload: SwapSettingsPayload)
 
-    fun openSendCrossChain(destination: AssetPayload, recipientAddress: String?)
-
-    fun openReceive(assetPayload: AssetPayload)
-
     fun openBalanceDetails(assetPayload: AssetPayload)
-
-    fun openBuyToken(chainId: String, assetId: Int)
 
     fun openMain()
 }

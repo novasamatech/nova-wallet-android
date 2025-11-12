@@ -38,7 +38,6 @@ class SecretStoreV2(
     suspend fun getChainAccountSecrets(metaId: Long, accountId: ByteArray): EncodableStruct<ChainAccountSecrets>? = withContext(Dispatchers.IO) {
         encryptedPreferences.getDecryptedString(chainAccountKey(metaId, accountId, ACCESS_SECRETS))?.let(ChainAccountSecrets::read)
     }
-
     suspend fun hasChainSecrets(metaId: Long, accountId: ByteArray) = withContext(Dispatchers.IO) {
         encryptedPreferences.hasKey(chainAccountKey(metaId, accountId, ACCESS_SECRETS))
     }

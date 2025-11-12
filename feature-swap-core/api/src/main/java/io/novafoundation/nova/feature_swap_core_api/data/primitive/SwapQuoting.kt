@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_swap_core_api.data.primitive
 
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
@@ -27,6 +26,4 @@ interface SwapQuoting {
         userAccountId: AccountId,
         subscriptionBuilder: SharedRequestsBuilder
     ): Flow<Unit>
-
-    suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean
 }

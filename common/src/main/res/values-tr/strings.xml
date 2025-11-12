@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">Parolanızı not edin</string>
     <string name="account_backup_secret_caption">Lütfen ifadenizi doğru ve okunaklı bir şekilde yazdığınızdan emin olun.</string>
     <string name="account_chain_address_format">%s adresi</string>
+    <string name="account_chain_not_found">Hesap %s üzerinde yok</string>
     <string name="account_confirm_mnemonic">Anımsatıcıyı onayla</string>
     <string name="account_confirm_mnemonic_title">Hadi bunu bir daha kontrol edelim</string>
     <string name="account_confirmation_details">Kelimeleri doğru sıradaki gibi seçin</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">Transfer Dışı</string>
     <string name="account_proxy_type_staking">Staking</string>
     <string name="account_restore_account">Zaten bir hesabım var</string>
+    <string name="account_secrets">gizli bilgiler</string>
     <string name="account_seed_hex_symbols">64 onaltılık sembol</string>
     <string name="account_select_hardware_wallet">Donanım cüzdanı seçin</string>
     <string name="account_select_secret_source">Sırrınızın tipini seçin</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">Crowdloan\'larınızdan DOT\'unuzu geri aldınız mı? Bugün DOT\'unuzu stake etmeye başlayın ve mümkün olan en yüksek ödülleri alın!</string>
     <string name="assets_crowdloan_unlock_banner_title">DOT\'unuzu Artırın 🚀</string>
     <string name="assets_filter_title">Token\'ları Filtrele</string>
+    <string name="assets_gifts_flow_placeholder">Hediye etmek için token\'iniz yok.\nHesabınıza token alın veya yatırın.</string>
     <string name="assets_manage_tokens_all_networks">Tüm Ağlar</string>
     <string name="assets_manage_tokens_title">Token\'ları Yönet</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">%s\'yi Ledger kontrolü altındaki hesaba aktarmayın çünkü Ledger %s gönderimini desteklemiyor, bu nedenle varlıklar bu hesapta takılı kalacak</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">Transfer ücreti</string>
     <string name="choose_amount_network_error">Ağ yanıt vermiyor</string>
     <string name="choose_amount_to">Kime</string>
+    <string name="claim_gift_already_claimed_message">Oops, hediye zaten talep edilmiş</string>
+    <string name="claim_gift_already_claimed_title">Hediye alınamaz</string>
+    <string name="claim_gift_button">Hediyeyi talep et</string>
+    <string name="claim_gift_default_error_message">Sunucuda bir sorun olabilir. Lütfen daha sonra tekrar deneyin.</string>
+    <string name="claim_gift_default_error_title">Oops, bir sorun oluştu</string>
+    <string name="claim_gift_no_account_alert_title">Başka bir cüzdan kullanın, yeni bir cüzdan oluşturun veya Ayarlar\'dan bu cüzdana bir %s hesabı ekleyin.</string>
+    <string name="claim_gift_success_message">Hediye başarıyla talep edildi. Token\'ler kısa sürede bakiyenizde görünecek.</string>
+    <string name="claim_gift_title">Kripto bir hediye aldınız!</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Hediyeyi talep etmek için yeni bir cüzdan oluşturun veya mevcut bir cüzdanı içe aktarın</string>
+    <string name="claim_gift_uncontrollable_wallet_title">%s cüzdanı ile hediye alamazsınız</string>
     <string name="close_dapp_tabs_message">DApp tarayıcısındaki tüm açık sekmeler kapatılacak.</string>
     <string name="close_dapp_tabs_title">Tüm DApp\'leri Kapat?</string>
     <string name="cloud_backup_delete_action_subtitle">%s ve her zaman çevrimdışı tutup istediğiniz zaman geri yükleyebilmek için hatırlayın. Bunu Yedekleme Ayarlarında yapabilirsiniz.</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">Adres girin…</string>
     <string name="common_enter_amount">Miktar girin...</string>
     <string name="common_enter_details">Detayları girin</string>
+    <string name="common_enter_other_amount">Başka bir miktar girin</string>
     <string name="common_enter_password">Parolayı girin</string>
     <string name="common_error_general_title">Hata</string>
     <string name="common_error_not_enough_tokens">Yeterli token yok</string>
@@ -436,6 +450,7 @@
     <string name="common_frequency_days_everyday">her gün</string>
     <string name="common_full_details">Tam detaylar</string>
     <string name="common_get_token_format">%s alın</string>
+    <string name="common_gift">Hediye</string>
     <string name="common_got_it">Anladım</string>
     <string name="common_governance">Yönetim</string>
     <string name="common_hexadecimal_string">Onaltılık dizi</string>
@@ -452,6 +467,7 @@
     <string name="common_learn_more_v2_2_0">Hakkında daha fazla bilgi edinin</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">%s kaldı</string>
+    <string name="common_manage_wallets">Cüzdanları Yönet</string>
     <string name="common_maximum">Maksimum</string>
     <string name="common_maximum_format">%s maksimum</string>
     <plurals name="common_minutes_format">
@@ -576,9 +592,11 @@
     <string name="common_wallet">Cüzdan</string>
     <string name="common_warning">Uyarı</string>
     <string name="common_yes">Evet</string>
+    <string name="common_your_gift">Hediyeniz</string>
     <string name="common_zero_amount_error">Miktar pozitif olmalıdır</string>
     <string name="confirm_cloud_backup_password_subtitle">Yedekleme işlemi sırasında oluşturduğunuz parolayı girin</string>
     <string name="confirm_cloud_backup_password_title">Geçerli yedekleme parolasını girin</string>
+    <string name="confirm_create_gift_hint">Onaylamak hesap bakiyenizden token transferi yapacaktır</string>
     <string name="confirm_mnemonic_disabled_button_state">Kelimeleri seçin...</string>
     <string name="confirm_mnemonic_not_matching_error_message">Geçersiz şifre cümlesi. Lütfen kelime sırasını tekrar kontrol edin</string>
     <string name="confirm_referendum_vote_referendum">Referandum</string>
@@ -813,6 +831,23 @@
     <string name="fragment_top_up_card_title">Kartı %s ile doldur</string>
     <string name="fragment_waiting_top_up_time_out_error_message">Lütfen support@novawallet.io ile iletişime geçin. Kartınızı almak için kullandığınız e-posta adresini belirtin.</string>
     <string name="fragment_waiting_top_up_time_out_error_title">Destek ile iletişime geçin</string>
+    <string name="gift_claimed_subtitle">Talep Edildi</string>
+    <string name="gift_created_subtitle">Oluşturuldu: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">Miktar girin</string>
+    <string name="gift_min_balance_validation_message">Minimum hediye %s</string>
+    <string name="gift_reclaimed_subtitle">Geri Alındı</string>
+    <string name="gifts_assets_flow_title">Hediye için bir token seçin</string>
+    <string name="gifts_claim_fee">Talepte ağ ücreti</string>
+    <string name="gifts_create">Hediye Oluştur</string>
+    <string name="gifts_header_subtitle">Nova\'da hızlı, kolay ve güvenli bir şekilde hediye gönderin</string>
+    <string name="gifts_header_title">Kripto Hediyelerini Herkese Her Yerde Paylaşın</string>
+    <string name="gifts_list_title">Oluşturulan Hediyeler</string>
+    <string name="gifts_network_flow_title">%s hediyesi için ağ seçin</string>
+    <string name="gifts_placeholder_step_1">Hediye miktarınızı girin</string>
+    <string name="gifts_placeholder_step_2">%s bir bağlantı olarak paylaşın ve Nova\'ya herkesi davet edin</string>
+    <string name="gifts_placeholder_step_2_highlight">Hediyeyi doğrudan paylaşın</string>
+    <string name="gifts_placeholder_step_3">%s, ve bu cihazdan talep edilmeyen hediyeleri istediğiniz zaman geri alabilirsiniz</string>
+    <string name="gifts_placeholder_step_3_highlight">Hediye anında kullanılabilir</string>
     <string name="governance_notification_channel_name">Yönetim Bildirim Kanalı</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">En az %d parça seçmelisiniz</item>
@@ -1157,6 +1192,8 @@
     <string name="push_welcome_title">Hiçbir şeyi kaçırmayın!</string>
     <string name="receive_network_flow_title">Alma için ağ seçin %s</string>
     <string name="receive_screen_copy_address">Adresi Kopyala</string>
+    <string name="reclaim_gift_confirmation_message">Bu hediyeyi geri alırsanız, paylaşılan bağlantı devre dışı bırakılacak ve token\'ler cüzdanınıza geri yüklenecektir.\nDevam etmek istiyor musunuz?</string>
+    <string name="reclaim_gift_confirmation_title">%s Hediyeyi Geri Al?</string>
     <string name="recover_json_hint">Json yapıştırın ya da dosya yükleyin...</string>
     <string name="recover_json_upload">Dosya yükle</string>
     <string name="recovery_json">JSON Kurtar</string>
@@ -1306,6 +1343,7 @@
     <string name="select_delegation_tracks_edit_title">Delegasyonu düzenlemek için yolları seçin</string>
     <string name="select_delegation_tracks_revoke_title">Delegasyonunuzu iptal etmek için yolları seçin</string>
     <string name="select_delegation_tracks_unavailable_tracks">Ulaşılamayan yollar</string>
+    <string name="select_gift_amount_title">Hediyeyi gönder</string>
     <string name="select_ledger_grant_permissions">Bluetooth\'u Etkinleştir &amp; İzin Ver</string>
     <string name="select_ledger_location_enable_request_message">Nova\'nın Bluetooth taraması yaparak Ledger cihazınızı bulabilmesi için konumun etkinleştirilmesi gerekiyor</string>
     <string name="select_ledger_location_enable_request_title">Lütfen cihaz ayarlarında coğrafi konumu etkinleştirin</string>
@@ -1355,6 +1393,10 @@
     <string name="setup_staking_type_pool_staking">Havuz staking\'i</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Stake miktarınız ödül kazanmak için gerekli minimumun altında</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Desteklenmeyen staking türü</string>
+    <string name="share_gift_button">Hediye bağlantısını paylaş</string>
+    <string name="share_gift_reclaim">Geri Al</string>
+    <string name="share_gift_text" formatted="false">Merhaba! Sizi bekleyen bir %s hediye var!\n\nNova Wallet uygulamasını yükleyin, cüzdanınızı kurun ve bu özel bağlantı ile talep edin:\n%s</string>
+    <string name="share_gift_title">Hediye Hazırlandı.\nŞimdi Paylaş!</string>
     <string name="sr25519_selection_subtitle">sr25519 (önerilir)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">Seçilen hesap zaten kontrolör olarak kullanılmakta</string>

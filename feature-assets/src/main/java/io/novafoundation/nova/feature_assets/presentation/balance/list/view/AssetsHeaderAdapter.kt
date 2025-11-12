@@ -39,6 +39,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 
         fun swapClicked()
 
+        fun giftClicked()
+
         fun novaCardClick()
 
         fun pendingOperationsClicked()
@@ -166,6 +168,7 @@ class AssetsHeaderHolder(
             balanceListTotalBalance.onSendClick { handler.sendClicked() }
             balanceListTotalBalance.onReceiveClick { handler.receiveClicked() }
             balanceListTotalBalance.onBuyClick { handler.buySellClicked() }
+            balanceListTotalBalance.onGiftClick { handler.giftClicked() }
             balanceListNovaCard.setOnClickListener { handler.novaCardClick() }
             balanceListPendingOperations.setOnClickListener { handler.pendingOperationsClicked() }
 

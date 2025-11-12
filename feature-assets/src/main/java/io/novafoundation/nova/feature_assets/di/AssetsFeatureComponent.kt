@@ -13,6 +13,8 @@ import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.Bala
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
+import io.novafoundation.nova.feature_assets.presentation.gifts.assets.di.AssetGiftsFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.gifts.networks.di.NetworkGiftsFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.di.NovaCardComponent
 import io.novafoundation.nova.feature_assets.presentation.topup.di.TopUpAddressComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.di.WaitingNovaCardTopUpComponent
@@ -108,6 +110,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun sellFlowComponent(): AssetSellFlowComponent.Factory
 
+    fun giftsFlowComponent(): AssetGiftsFlowComponent.Factory
+
     fun tradeProviderListComponent(): TradeProviderListComponent.Factory
 
     fun tradeWebComponent(): TradeWebComponent.Factory
@@ -123,6 +127,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun networkSwapFlowComponent(): NetworkSwapFlowComponent.Factory
 
     fun topUpCardComponentFactory(): TopUpAddressComponent.Factory
+
+    fun networkGiftsFlowComponent(): NetworkGiftsFlowComponent.Factory
 
     fun novaCardComponentFactory(): NovaCardComponent.Factory
 

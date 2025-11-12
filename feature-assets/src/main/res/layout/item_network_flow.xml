@@ -23,19 +23,30 @@
     <TextView
         android:id="@+id/itemNetworkName"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:ellipsize="end"
+        android:lines="1"
         android:textColor="@color/text_primary"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/itemNetworkBarrier"
         app:layout_constraintStart_toEndOf="@+id/itemNetworkImage"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Polkadot" />
 
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/itemNetworkBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:barrierDirection="start"
+        app:constraint_referenced_ids="itemNetworkBalance, itemNetworkPriceAmount" />
+
     <TextView
         android:id="@+id/itemNetworkBalance"
         style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:ellipsize="end"
@@ -45,7 +56,6 @@
         app:layout_constraintBottom_toTopOf="@+id/itemNetworkPriceAmount"
         app:layout_constraintEnd_toEndOf="@+id/itemNetworkPriceAmount"
         app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintStart_toEndOf="@+id/itemNetworkName"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         tools:text="120.0849" />

@@ -1,22 +1,38 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.capability
 
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapability
+import android.util.Log
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requestedAccountPaysFees
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
-import io.novafoundation.nova.runtime.ext.isCommissionAsset
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 class RealCustomCustomFeeCapabilityFacade(
     private val accountRepository: AccountRepository,
+    private val feePaymentProviderRegistry: FeePaymentProviderRegistry
 ) : CustomFeeCapabilityFacade {
 
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset, customFeeCapability: CustomFeeCapability): Boolean {
-        val isCustomFeeToken = !chainAsset.isCommissionAsset
-        val currentMetaAccount = accountRepository.getSelectedMetaAccount()
+    override suspend fun canPayFeeInCurrency(currency: FeePaymentCurrency): Boolean {
+        return when (currency) {
+            is FeePaymentCurrency.Asset -> canPayFeeInNonUtilityAsset(currency)
 
-        // TODO we disable custom fee tokens payment for account types where current account is not the one who pays fees (e.g. it is proxied).
-        // This restriction can be removed once we consider all corner-cases
-        return isCustomFeeToken && customFeeCapability.canPayFeeInNonUtilityToken(chainAsset) && currentMetaAccount.type.requestedAccountPaysFees()
+            FeePaymentCurrency.Native -> true
+        }
+    }
+
+    private suspend fun canPayFeeInNonUtilityAsset(
+        currency: FeePaymentCurrency.Asset,
+    ): Boolean {
+        if (hasGlobalFeePaymentRestrictions()) return false
+
+        return feePaymentProviderRegistry.providerFor(currency.asset.chainId)
+            .canPayFee(currency)
+            .onFailure { Log.e("RealCustomCustomFeeCapabilityFacade", "Failed to check canPayFee", it) }
+            .getOrDefault(false)
+    }
+
+    override suspend fun hasGlobalFeePaymentRestrictions(): Boolean {
+        val currentMetaAccount = accountRepository.getSelectedMetaAccount()
+        return !currentMetaAccount.type.requestedAccountPaysFees()
     }
 }

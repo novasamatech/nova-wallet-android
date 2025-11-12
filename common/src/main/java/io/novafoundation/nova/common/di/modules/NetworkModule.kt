@@ -69,7 +69,8 @@ class NetworkModule {
             ledgerMigrationArticle = BuildConfig.LEDGER_MIGRATION_ARTICLE,
             novaCardWidgetUrl = BuildConfig.NOVA_CARD_WIDGET_URL,
             unifiedAddressArticle = BuildConfig.UNIFIED_ADDRESS_ARTICLE,
-            multisigsWikiUrl = BuildConfig.MULTISIGS_WIKI_URL
+            multisigsWikiUrl = BuildConfig.MULTISIGS_WIKI_URL,
+            giftsWikiUrl = BuildConfig.GIFTS_WIKI_URL
         )
     }
 

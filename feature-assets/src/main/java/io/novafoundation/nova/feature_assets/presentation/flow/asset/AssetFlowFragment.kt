@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
@@ -50,7 +51,10 @@ abstract class AssetFlowFragment<T : AssetFlowViewModel> :
     }
 
     override fun initViews() {
-        binder.assetFlowToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.assetFlowToolbar.setHomeButtonListener {
+            hideKeyboard()
+            viewModel.backClicked()
+        }
 
         with(binder.assetFlowList) {
             setHasFixedSize(true)

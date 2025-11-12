@@ -9,9 +9,13 @@ import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.OperationDao
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -31,12 +35,12 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
-import io.novafoundation.nova.feature_assets.domain.novaCard.RealNovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.RealNovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
@@ -64,13 +68,11 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
-import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
-import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -97,8 +99,21 @@ class AssetsFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        swapService: SwapService
-    ) = AssetSearchUseCase(walletRepository, accountRepository, chainRegistry, swapService)
+        swapService: SwapService,
+        computationalCache: ComputationalCache,
+        feePaymentRegistry: FeePaymentProviderRegistry,
+        feePaymentFacade: CustomFeeCapabilityFacade,
+        assetSourceRegistry: AssetSourceRegistry,
+    ) = AssetSearchUseCase(
+        walletRepository = walletRepository,
+        accountRepository = accountRepository,
+        chainRegistry = chainRegistry,
+        swapService = swapService,
+        computationalCache = computationalCache,
+        feePaymentRegistry = feePaymentRegistry,
+        feePaymentFacade = feePaymentFacade,
+        assetSourceRegistry = assetSourceRegistry
+    )
 
     @Provides
     @FeatureScope
@@ -106,16 +121,22 @@ class AssetsFeatureModule {
         assetViewModeRepository: AssetsViewModeRepository,
         assetSearchUseCase: AssetSearchUseCase,
         chainRegistry: ChainRegistry,
-        tradeTokenRegistry: TradeTokenRegistry
-    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry, tradeTokenRegistry)
+        tradeTokenRegistry: TradeTokenRegistry,
+    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(
+        assetViewModeRepository,
+        assetSearchUseCase,
+        chainRegistry,
+        tradeTokenRegistry,
+    )
 
     @Provides
     @FeatureScope
     fun provideAssetNetworksInteractor(
         chainRegistry: ChainRegistry,
         assetSearchUseCase: AssetSearchUseCase,
-        tradeTokenRegistry: TradeTokenRegistry
-    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry)
+        tradeTokenRegistry: TradeTokenRegistry,
+        assetSourceRegistry: AssetSourceRegistry
+    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry, assetSourceRegistry)
 
     @Provides
     @FeatureScope

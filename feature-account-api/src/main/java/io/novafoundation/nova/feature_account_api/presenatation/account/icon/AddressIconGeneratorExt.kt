@@ -147,6 +147,22 @@ suspend fun AddressIconGenerator.createAccountAddressModel(
     background = AddressIconGenerator.BACKGROUND_TRANSPARENT
 )
 
+suspend fun AddressIconGenerator.createAccountAddressModelOrNull(
+    chain: Chain,
+    account: MetaAccount,
+    name: String? = account.name
+): AddressModel? {
+    val address = account.addressIn(chain) ?: return null
+
+    return createAddressModel(
+        chain = chain,
+        address = address,
+        sizeInDp = AddressIconGenerator.SIZE_SMALL,
+        accountName = name,
+        background = AddressIconGenerator.BACKGROUND_TRANSPARENT
+    )
+}
+
 suspend fun AddressIconGenerator.createAccountAddressModel(
     chain: Chain,
     address: String,

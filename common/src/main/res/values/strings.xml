@@ -1,5 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="reclaim_gift_confirmation_title">Reclaim %s Gift?</string>
+    <string name="reclaim_gift_confirmation_message">If you reclaim this gift, the shared link will be disabled, and tokens will be refunded to your wallet.\nDo you want to continue?</string>
+
+    <string name="share_gift_reclaim">Reclaim</string>
+    <string name="account_secrets">secrets</string>
+
+    <string name="account_chain_not_found">No account on %s</string>
+    <string name="claim_gift_no_account_alert_title">Use another wallet, create a new one, or add a %s account to this wallet in Settings.</string>
+
+    <string name="claim_gift_uncontrollable_wallet_title">You can’t receive a gift with a %s wallet</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Create a new wallet or import an existing one to claim the gift</string>
+
+    <string name="common_manage_wallets">Manage Wallets</string>
+
+    <string name="claim_gift_success_message">You’ve successfully claimed a gift. Tokens will appear in your balance shortly.</string>
+
+    <string name="claim_gift_already_claimed_title">The gift cannot be received</string>
+    <string name="claim_gift_already_claimed_message">Oops, the gift has already been  claimed</string>
+
+    <string name="claim_gift_default_error_title">Oops, something went wrong</string>
+    <string name="claim_gift_default_error_message">There may be a problem with the server. Please, try again later.</string>
+    <string name="claim_gift_button">Claim the gift</string>
+    <string name="claim_gift_title">You’ve got a crypto gift!</string>
+
+    <string name="gift_created_subtitle">Created: %s</string>
+    <string name="gift_claimed_subtitle">Claimed</string>
+    <string name="gift_reclaimed_subtitle">Reclaimed</string>
+    <string name="gifts_claim_fee">Network fee on claim</string>
+
+    <string name="share_gift_text">Hello! You’ve got a %s gift waiting for you!\n\nInstall Nova Wallet app, set up your wallet, and claim it via this special link:\n%s</string>
+
+    <string name="share_gift_title">Gift Has Been Prepared.\nShare It Now!</string>
+    <string name="share_gift_button">Share gift link</string>
+
+    <string name="confirm_create_gift_hint">Confirming will transfer tokens from your account</string>
+    <string name="common_your_gift">Your Gift</string>
+
+    <string name="select_gift_amount_title">Send gift on</string>
+
+    <string name="common_enter_other_amount">Enter another amount</string>
+
+    <string name="gift_min_balance_validation_message">The minimum gift is %s</string>
+
+    <string name="gift_enter_amount_disabled_button_state">Enter amount</string>
+
+    <string name="gifts_assets_flow_title">Select a token to gift</string>
+    <string name="gifts_network_flow_title">Select network for %s gift</string>
+    <string name="assets_gifts_flow_placeholder">You don’t have tokens to gift.\nBuy or Deposit tokens to your account.</string>
+
+    <string name="gifts_create">Create Gift</string>
+    <string name="gifts_placeholder_step_1">Enter your gift amount</string>
+    <string name="gifts_placeholder_step_2">%s as a link and invite anyone to Nova</string>
+    <string name="gifts_placeholder_step_2_highlight">Share the gift directly</string>
+    <string name="gifts_placeholder_step_3">%s, and you can return unclaimed gifts anytime from this device</string>
+    <string name="gifts_placeholder_step_3_highlight">The gift is available instantly</string>
+
+    <string name="gifts_header_title">Share Crypto Gifts with Anyone, Anywhere</string>
+    <string name="gifts_header_subtitle">Send gifts fast, easily, and securely in Nova</string>
+    <string name="gifts_list_title">Gifts you created</string>
+    <string name="common_gift">Gift</string>
+
     <string name="select_token_to_vote">Select token to vote</string>
     <string name="common_select_token">Select token</string>
 

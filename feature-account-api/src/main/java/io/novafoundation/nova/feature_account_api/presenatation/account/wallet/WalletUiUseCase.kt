@@ -39,6 +39,7 @@ interface WalletUiUseCase {
 
     // TODO: Method is a crutch. Should be changed to return WalletModel when we migrate to new wallet icons
     suspend fun walletAddressModel(metaAccount: MetaAccount, chain: Chain, iconSize: Int): AddressModel
+    suspend fun walletAddressModelOrNull(metaAccount: MetaAccount, chain: Chain, iconSize: Int): AddressModel?
 }
 
 fun WalletUiUseCase.walletUiFlowFor(metaId: Long, chainId: String?, showAddressIcon: Boolean = false): Flow<WalletModel> {

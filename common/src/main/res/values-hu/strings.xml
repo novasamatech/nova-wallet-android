@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">Írd le a titkos kulcsod és tedd biztonságos helyre</string>
     <string name="account_backup_secret_caption">Kérlek, ügyelj arra, hogy a mondatot helyesen és olvashatóan írd le.</string>
     <string name="account_chain_address_format">%s cím</string>
+    <string name="account_chain_not_found">Nincs fiók a(z) %s láncon.</string>
     <string name="account_confirm_mnemonic">Mnemonika megerősítése</string>
     <string name="account_confirm_mnemonic_title">Ellenőrizd még egyszer</string>
     <string name="account_confirmation_details">Válaszd ki a szavakat a megfelelő sorrendben</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">Nem átutaló</string>
     <string name="account_proxy_type_staking">Stake-elés</string>
     <string name="account_restore_account">Már rendelkezem fiókkal</string>
+    <string name="account_secrets">titkok</string>
     <string name="account_seed_hex_symbols">64 hexadecimális szimbólum</string>
     <string name="account_select_hardware_wallet">Válaszd ki a fizikai tárcát</string>
     <string name="account_select_secret_source">Válaszd ki a titkos kulcs típusát</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">Visszakaptad DOT-odat a közösségi hitelekből? Kezd el stake-elni még ma, hogy megkapd a maximális jutalmakat.</string>
     <string name="assets_crowdloan_unlock_banner_title">Maximalizálja DOT jutalmait 🚀</string>
     <string name="assets_filter_title">Tokenek szűrése</string>
+    <string name="assets_gifts_flow_placeholder">Nincsenek tokenjeid ajándékozni.\nVásárolj vagy helyezz el tokeneket a számládon.</string>
     <string name="assets_manage_tokens_all_networks">Minden hálózat</string>
     <string name="assets_manage_tokens_title">Tokenek kezelése</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Ne küldj %s-ot a Ledger által vezérelt fiókra, mivel az nem támogatja a(z) %s küldését. emiatt ezen a fiókon fognak ragadni</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">Átutalási díj</string>
     <string name="choose_amount_network_error">A hálózat nem elérhető</string>
     <string name="choose_amount_to">Ide</string>
+    <string name="claim_gift_already_claimed_message">Hoppá, az ajándék már be lett igényelve</string>
+    <string name="claim_gift_already_claimed_title">Az ajándék nem fogadható el</string>
+    <string name="claim_gift_button">Igényeld az ajándékot</string>
+    <string name="claim_gift_default_error_message">Lehet, hogy problémát észleltünk a szerverrel. Kérlek, próbáld újra később.</string>
+    <string name="claim_gift_default_error_title">Hoppá, valami baj történt</string>
+    <string name="claim_gift_no_account_alert_title">Használj másik pénztárcát, hozz létre egy újat, vagy adj hozzá egy %s fiókot ehhez a pénztárcához a Beállításokban.</string>
+    <string name="claim_gift_success_message">Sikeresen igényeltél egy ajándékot. A tokenek hamarosan megjelennek az egyenlegeden.</string>
+    <string name="claim_gift_title">Kaptál egy kripto ajándékot!</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Hozz létre egy új pénztárcát, vagy importálj egy meglévőt az ajándék igényléséhez</string>
+    <string name="claim_gift_uncontrollable_wallet_title">Nem fogadhatsz ajándékot egy %s pénztárcával</string>
     <string name="close_dapp_tabs_message">Az összes megnyitott fül a DApp böngészőben be lesz zárva.</string>
     <string name="close_dapp_tabs_title">Összes DApp bezárása?</string>
     <string name="cloud_backup_delete_action_subtitle">%s és ne felejtse el mindig offline módban tartani őket, hogy bármikor visszaállíthassa őket. Ezt megteheti a Biztonsági Mentés Beállításokban.</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">Cím megadása...</string>
     <string name="common_enter_amount">Összeg megadása...</string>
     <string name="common_enter_details">Adja meg az adatokat</string>
+    <string name="common_enter_other_amount">Adj meg másik összeget</string>
     <string name="common_enter_password">Adja meg a jelszót</string>
     <string name="common_error_general_title">Hiba</string>
     <string name="common_error_not_enough_tokens">Nincs elegendő token</string>
@@ -436,6 +450,7 @@
     <string name="common_frequency_days_everyday">minden nap</string>
     <string name="common_full_details">Minden részlet</string>
     <string name="common_get_token_format">%s beszerzése</string>
+    <string name="common_gift">Ajándék</string>
     <string name="common_got_it">Értem</string>
     <string name="common_governance">Kormányzás</string>
     <string name="common_hexadecimal_string">Hexadecimális szöveg</string>
@@ -452,6 +467,7 @@
     <string name="common_learn_more_v2_2_0">További információ</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">%s van vissza</string>
+    <string name="common_manage_wallets">Pénztárcák kezelése</string>
     <string name="common_maximum">Maximum</string>
     <string name="common_maximum_format">%s maximum</string>
     <plurals name="common_minutes_format">
@@ -576,9 +592,11 @@
     <string name="common_wallet">Tárca</string>
     <string name="common_warning">Figyelmeztetés</string>
     <string name="common_yes">Igen</string>
+    <string name="common_your_gift">Az ajándékod</string>
     <string name="common_zero_amount_error">Az összegnek pozitívnak kell lennie</string>
     <string name="confirm_cloud_backup_password_subtitle">Kérjük, adja meg a jelszót, amit a biztonsági mentés során létrehozott</string>
     <string name="confirm_cloud_backup_password_title">Írja be az aktuális biztonsági mentés jelszavát</string>
+    <string name="confirm_create_gift_hint">A megerősítés áthelyezi a tokeneket a számládról</string>
     <string name="confirm_mnemonic_disabled_button_state">Válassza ki a szavakat...</string>
     <string name="confirm_mnemonic_not_matching_error_message">Érvénytelen titkos kifejezés, kérjük ellenőrizze még egyszer a szavak sorrendjét</string>
     <string name="confirm_referendum_vote_referendum">Referendum</string>
@@ -813,6 +831,23 @@
     <string name="fragment_top_up_card_title">Töltsd fel a kártyát %s-val/vel</string>
     <string name="fragment_waiting_top_up_time_out_error_message">Kérjük, vedd fel a kapcsolatot a support@novawallet.io címen. Add meg az e-mail címed, amelyet használtál a kártya kiállításához.</string>
     <string name="fragment_waiting_top_up_time_out_error_title">Lépj kapcsolatba a támogatással</string>
+    <string name="gift_claimed_subtitle">Igényelve</string>
+    <string name="gift_created_subtitle">Létrehozva: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">Adja meg az összeget</string>
+    <string name="gift_min_balance_validation_message">A minimum ajándékérték %s</string>
+    <string name="gift_reclaimed_subtitle">Visszakövetelve</string>
+    <string name="gifts_assets_flow_title">Válassz egy tokent ajándékként</string>
+    <string name="gifts_claim_fee">Hálózati díj igényléskor</string>
+    <string name="gifts_create">Ajándék Létrehozása</string>
+    <string name="gifts_header_subtitle">Küldj ajándékokat gyorsan, egyszerűen és biztonságosan a Nova segítségével</string>
+    <string name="gifts_header_title">Küldj Kripto Ajándékot Bárkinek, Bárhol</string>
+    <string name="gifts_list_title">Létrehozott ajándékaid</string>
+    <string name="gifts_network_flow_title">Válassz hálózatot a(z) %s ajándékhoz</string>
+    <string name="gifts_placeholder_step_1">Adja meg ajándékának összegét</string>
+    <string name="gifts_placeholder_step_2">%s linkként és hívd meg bárkit a Novához</string>
+    <string name="gifts_placeholder_step_2_highlight">Oszd meg közvetlenül az ajándékot</string>
+    <string name="gifts_placeholder_step_3">%s, és bármikor visszakérheted a fel nem használt ajándékokat erről az eszközről</string>
+    <string name="gifts_placeholder_step_3_highlight">Az ajándék azonnal elérhető</string>
     <string name="governance_notification_channel_name">Kormányzási Értesítési Csatorna</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Válassz legalább %d kategóriát</item>
@@ -1157,6 +1192,8 @@
     <string name="push_welcome_title">Ne maradj le semmiről!</string>
     <string name="receive_network_flow_title">Válassza ki a hálózatot a %s fogadásához</string>
     <string name="receive_screen_copy_address">Cím másolása</string>
+    <string name="reclaim_gift_confirmation_message">Ha visszakéred ezt az ajándékot, akkor a megosztott link le lesz tiltva, és a tokenek visszatérnek a pénztárcádba.\nTovább szeretnél lépni?</string>
+    <string name="reclaim_gift_confirmation_title">Visszakérni a(z) %s Ajándékot?</string>
     <string name="recover_json_hint">JSON beillesztése vagy fájl feltöltése…</string>
     <string name="recover_json_upload">Fájl feltöltése</string>
     <string name="recovery_json">JSON visszaállítása</string>
@@ -1306,6 +1343,7 @@
     <string name="select_delegation_tracks_edit_title">Kategóriák választása delegálás szerkesztéséhez</string>
     <string name="select_delegation_tracks_revoke_title">Kategóriák választána delegálás visszavonásához</string>
     <string name="select_delegation_tracks_unavailable_tracks">Nem elérhető kategóriák</string>
+    <string name="select_gift_amount_title">Ajándék küldése</string>
     <string name="select_ledger_grant_permissions">Bluetooth engedélyezése és engedélyek megadása</string>
     <string name="select_ledger_location_enable_request_message">A Nova-nak szüksége van a helymeghatározáshoz, hogy megtalálhassa a Ledger eszköt bluetooth-on keresztül</string>
     <string name="select_ledger_location_enable_request_title">Kérlek, engedélyezd a helymeghatározást a készülék beállításaiban</string>
@@ -1355,6 +1393,10 @@
     <string name="setup_staking_type_pool_staking">Pool stake-elés</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">A stake-ed kevesebb, mint a jutalmak megszerzéséhez szükséges minimum</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Nem támogatott stake-elési típus</string>
+    <string name="share_gift_button">Ajándék link megosztása</string>
+    <string name="share_gift_reclaim">Visszakövetelés</string>
+    <string name="share_gift_text" formatted="false">Helló! Van egy %s ajándékod, ami rád vár!\n\nTelepítsd a Nova Wallet alkalmazást, állítsd be a pénztárcád, és igényeld ezt a különleges linken keresztül:\n%s</string>
+    <string name="share_gift_title">Ajándék Előkészítve.\nOszd Meg Most!</string>
     <string name="sr25519_selection_subtitle">sr25519 (ajánlott)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">A kiválasztott fiók már használatban van, mint vezérlő</string>

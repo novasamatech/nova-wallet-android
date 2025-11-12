@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">당신의 암호구절을 작성하세요</string>
     <string name="account_backup_secret_caption">문구를 정확하고 읽기 쉽게 적어 두셨는지 확인하세요.</string>
     <string name="account_chain_address_format">%s 주소</string>
+    <string name="account_chain_not_found">계정이 %s에 없습니다</string>
     <string name="account_confirm_mnemonic">니모닉 확인</string>
     <string name="account_confirm_mnemonic_title">다시 한번 확인해 보겠습니다</string>
     <string name="account_confirmation_details">올바른 순서로 단어를 선택하세요</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">전송 불가</string>
     <string name="account_proxy_type_staking">Staking</string>
     <string name="account_restore_account">이미 계정이 있습니다</string>
+    <string name="account_secrets">비밀</string>
     <string name="account_seed_hex_symbols">64 16진수 기호</string>
     <string name="account_select_hardware_wallet">하드웨어 지갑 선택</string>
     <string name="account_select_secret_source">비밀 유형 선택</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">크라우드론에서 DOT을 돌려받았나요? 최대한의 보상을 받기 위해 오늘부터 DOT을 스테이킹하세요!</string>
     <string name="assets_crowdloan_unlock_banner_title">당신의 DOT 부스트 🚀</string>
     <string name="assets_filter_title">토큰 필터링</string>
+    <string name="assets_gifts_flow_placeholder">증여할 토큰이 없습니다.\n계정에 토큰을 구매하거나 입금하세요.</string>
     <string name="assets_manage_tokens_all_networks">모든 네트워크</string>
     <string name="assets_manage_tokens_title">토큰 관리</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Ledger가 %s 전송을 지원하지 않으므로 %s을 Ledger 제어 계정으로 전송하지 마세요. 그렇지 않으면 자산이 이 계정에 고정될 수 있습니다.</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">전송 수수료</string>
     <string name="choose_amount_network_error">네트워크가 응답하지 않습니다</string>
     <string name="choose_amount_to">받는 사람</string>
+    <string name="claim_gift_already_claimed_message">이미 선물이 수령되었습니다</string>
+    <string name="claim_gift_already_claimed_title">선물을 받을 수 없습니다</string>
+    <string name="claim_gift_button">선물 받기</string>
+    <string name="claim_gift_default_error_message">서버에 문제가 있을 수 있습니다. 나중에 다시 시도하세요.</string>
+    <string name="claim_gift_default_error_title">문제가 발생했습니다</string>
+    <string name="claim_gift_no_account_alert_title">다른 지갑을 사용하거나, 새로 만들거나, 설정에서 %s 계정을 이 지갑에 추가하세요.</string>
+    <string name="claim_gift_success_message">성공적으로 선물을 수령했습니다. 곧 잔액에 반영될 것입니다.</string>
+    <string name="claim_gift_title">암호화폐 선물을 받았습니다!</string>
+    <string name="claim_gift_uncontrollable_wallet_message">새 지갑을 만들거나 기존 지갑을 가져와 선물을 받으세요</string>
+    <string name="claim_gift_uncontrollable_wallet_title">%s 지갑으로는 선물을 받을 수 없습니다</string>
     <string name="close_dapp_tabs_message">DApp 브라우저의 모든 열린 탭이 닫힙니다.</string>
     <string name="close_dapp_tabs_title">모든 DApp 닫기?</string>
     <string name="cloud_backup_delete_action_subtitle">%s 및 언제든지 복원할 수 있도록 항상 오프라인으로 보관하십시오. 백업 설정에서 이 작업을 수행할 수 있습니다.</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">주소 입력...</string>
     <string name="common_enter_amount">금액 입력...</string>
     <string name="common_enter_details">세부사항 입력</string>
+    <string name="common_enter_other_amount">다른 금액 입력</string>
     <string name="common_enter_password">비밀번호 입력</string>
     <string name="common_error_general_title">오류</string>
     <string name="common_error_not_enough_tokens">토큰이 부족합니다</string>
@@ -435,6 +449,7 @@
     <string name="common_frequency_days_everyday">매일</string>
     <string name="common_full_details">전체 세부 정보</string>
     <string name="common_get_token_format">%s 받기</string>
+    <string name="common_gift">선물</string>
     <string name="common_got_it">알겠습니다</string>
     <string name="common_governance">거버넌스</string>
     <string name="common_hexadecimal_string">16진수 문자열</string>
@@ -450,6 +465,7 @@
     <string name="common_learn_more_v2_2_0">더 알아보기</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">%s 남음</string>
+    <string name="common_manage_wallets">지갑 관리</string>
     <string name="common_maximum">최대</string>
     <string name="common_maximum_format">%s 최대</string>
     <plurals name="common_minutes_format">
@@ -570,9 +586,11 @@
     <string name="common_wallet">지갑</string>
     <string name="common_warning">경고</string>
     <string name="common_yes">예</string>
+    <string name="common_your_gift">당신의 선물</string>
     <string name="common_zero_amount_error">금액은 0보다 커야 합니다</string>
     <string name="confirm_cloud_backup_password_subtitle">백업 과정 중 생성한 비밀번호를 입력하십시오</string>
     <string name="confirm_cloud_backup_password_title">현재 백업 비밀번호를 입력하십시오</string>
+    <string name="confirm_create_gift_hint">확인하면 계정에서 토큰이 전송됩니다</string>
     <string name="confirm_mnemonic_disabled_button_state">단어 선택...</string>
     <string name="confirm_mnemonic_not_matching_error_message">잘못된 비밀번호입니다. 단어 순서를 다시 확인하십시오</string>
     <string name="confirm_referendum_vote_referendum">국민투표</string>
@@ -807,6 +825,23 @@
     <string name="fragment_top_up_card_title">카드에 %s 충전</string>
     <string name="fragment_waiting_top_up_time_out_error_message">support@novawallet.io에 문의하세요. 카드 발급에 사용된 이메일 주소를 포함하세요.</string>
     <string name="fragment_waiting_top_up_time_out_error_title">지원에 문의</string>
+    <string name="gift_claimed_subtitle">수령됨</string>
+    <string name="gift_created_subtitle">생성됨: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">금액 입력</string>
+    <string name="gift_min_balance_validation_message">최소 선물 금액은 %s입니다</string>
+    <string name="gift_reclaimed_subtitle">회수됨</string>
+    <string name="gifts_assets_flow_title">증여할 토큰 선택</string>
+    <string name="gifts_claim_fee">청구 시 네트워크 수수료</string>
+    <string name="gifts_create">선물 생성</string>
+    <string name="gifts_header_subtitle">Nova에서 빠르고 쉽게 안전하게 선물을 보내세요</string>
+    <string name="gifts_header_title">누구와도 언제 어디서나 암호화폐 선물 공유</string>
+    <string name="gifts_list_title">생성한 선물</string>
+    <string name="gifts_network_flow_title">%s 선물에 대한 네트워크 선택</string>
+    <string name="gifts_placeholder_step_1">선물 금액 입력</string>
+    <string name="gifts_placeholder_step_2">%s를 링크로 공유하고 Nova로 초대하세요</string>
+    <string name="gifts_placeholder_step_2_highlight">선물을 직접 공유</string>
+    <string name="gifts_placeholder_step_3">%s, 그리고 이 디바이스에서 언제든지 회수 가능</string>
+    <string name="gifts_placeholder_step_3_highlight">선물이 즉시 사용 가능합니다</string>
     <string name="governance_notification_channel_name">거버넌스 알림 채널</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">최소한 %d개의 트랙을 선택해야 합니다</item>
@@ -1149,6 +1184,8 @@
     <string name="push_welcome_title">중요한 것을 놓치지 마세요!</string>
     <string name="receive_network_flow_title">%s 수신을 위한 네트워크 선택</string>
     <string name="receive_screen_copy_address">주소 복사</string>
+    <string name="reclaim_gift_confirmation_message">이 선물을 회수하면 공유된 링크가 비활성화되고 토큰이 지갑으로 반환됩니다. 계속하시겠습니까?</string>
+    <string name="reclaim_gift_confirmation_title">%s 선물을 회수하시겠습니까?</string>
     <string name="recover_json_hint">json을 붙여넣거나 파일을 업로드하세요...</string>
     <string name="recover_json_upload">파일 업로드</string>
     <string name="recovery_json">JSON 복원</string>
@@ -1297,6 +1334,7 @@
     <string name="select_delegation_tracks_edit_title">위임 수정할 트랙 선택</string>
     <string name="select_delegation_tracks_revoke_title">위임 취소할 트랙 선택</string>
     <string name="select_delegation_tracks_unavailable_tracks">사용할 수 없는 트랙</string>
+    <string name="select_gift_amount_title">선물 발송</string>
     <string name="select_ledger_grant_permissions">Bluetooth 활성화 및 권한 부여</string>
     <string name="select_ledger_location_enable_request_message">Ledger 장치를 찾기 위해 블루투스 스캔을 수행하려면 Nova는 위치 기능을 활성화해야 합니다.</string>
     <string name="select_ledger_location_enable_request_title">기기 설정에서 지리적 위치를 활성화해주세요.</string>
@@ -1346,6 +1384,10 @@
     <string name="setup_staking_type_pool_staking">풀 스테이킹</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">보상을 받기 위한 최소 금액 이하의 Stake입니다</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">지원되지 않는 스테이킹 유형</string>
+    <string name="share_gift_button">선물 링크 공유</string>
+    <string name="share_gift_reclaim">회수</string>
+    <string name="share_gift_text" formatted="false">안녕하세요! %s 선물이 기다리고 있습니다!\n\nNova Wallet 앱을 설치하고 지갑을 설정한 후 이 특별한 링크를 통해 수령하세요:\n%s</string>
+    <string name="share_gift_title">선물이 준비되었습니다.\n지금 공유하세요!</string>
     <string name="sr25519_selection_subtitle">sr25519 (추천)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">선택된 계정이 이미 컨트롤러로 사용 중입니다</string>

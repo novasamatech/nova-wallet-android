@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">Anote sua Frase de Passagem</string>
     <string name="account_backup_secret_caption">Por favor, certifique-se de que sua frase está escrita de forma correta e legível.</string>
     <string name="account_chain_address_format">Endereço %s</string>
+    <string name="account_chain_not_found">Nenhuma conta em %s</string>
     <string name="account_confirm_mnemonic">Confirmar mnemônica</string>
     <string name="account_confirm_mnemonic_title">Vamos verificar novamente</string>
     <string name="account_confirmation_details">Escolha as palavras na ordem correta</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">Não Transferência</string>
     <string name="account_proxy_type_staking">Staking</string>
     <string name="account_restore_account">Já tenho uma conta</string>
+    <string name="account_secrets">segredos</string>
     <string name="account_seed_hex_symbols">64 símbolos hex</string>
     <string name="account_select_hardware_wallet">Selecione a carteira de hardware</string>
     <string name="account_select_secret_source">Selecione o tipo do seu segredo</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">Recebeu de volta seus DOTs dos crowdloans? Comece a fazer staking dos seus DOTs hoje mesmo para obter as recompensas máximas possíveis!</string>
     <string name="assets_crowdloan_unlock_banner_title">Impulsione seus DOTs 🚀</string>
     <string name="assets_filter_title">Filtrar tokens</string>
+    <string name="assets_gifts_flow_placeholder">Você não tem tokens para presentear.\nCompre ou Deposite tokens na sua conta.</string>
     <string name="assets_manage_tokens_all_networks">Todas as redes</string>
     <string name="assets_manage_tokens_title">Gerenciar tokens</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Não transfira %s para a conta controlada por Ledger já que Ledger não suporta o envio de %s, assim os ativos ficarão presos nesta conta</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">Taxa de transferência</string>
     <string name="choose_amount_network_error">Rede não está respondendo</string>
     <string name="choose_amount_to">Para</string>
+    <string name="claim_gift_already_claimed_message">Ops, o presente já foi reivindicado</string>
+    <string name="claim_gift_already_claimed_title">O presente não pode ser recebido</string>
+    <string name="claim_gift_button">Reivindicar o presente</string>
+    <string name="claim_gift_default_error_message">Pode haver um problema com o servidor. Por favor, tente novamente mais tarde.</string>
+    <string name="claim_gift_default_error_title">Ops, algo deu errado</string>
+    <string name="claim_gift_no_account_alert_title">Utilize outra carteira, crie uma nova, ou adicione uma conta %s a esta carteira em Configurações.</string>
+    <string name="claim_gift_success_message">Você reivindicou um presente com sucesso. Os tokens aparecerão em seu saldo em breve.</string>
+    <string name="claim_gift_title">Você recebeu um presente cripto!</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Crie uma nova carteira ou importe uma existente para reivindicar o presente</string>
+    <string name="claim_gift_uncontrollable_wallet_title">Você não pode receber um presente com uma carteira %s</string>
     <string name="close_dapp_tabs_message">Todas as abas abertas no navegador DApp serão fechadas.</string>
     <string name="close_dapp_tabs_title">Fechar Todos os DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">%s e lembre-se de sempre mantê-los offline para restaurá-los a qualquer momento. Você pode fazer isso nas Configurações de Backup.</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">Digite o endereço…</string>
     <string name="common_enter_amount">Digite o valor...</string>
     <string name="common_enter_details">Inserir detalhes</string>
+    <string name="common_enter_other_amount">Insira outro valor</string>
     <string name="common_enter_password">Digite a senha</string>
     <string name="common_error_general_title">Erro</string>
     <string name="common_error_not_enough_tokens">Tokens insuficientes</string>
@@ -436,6 +450,7 @@
     <string name="common_frequency_days_everyday">todos os dias</string>
     <string name="common_full_details">Detalhes completos</string>
     <string name="common_get_token_format">Obter %s</string>
+    <string name="common_gift">Presente</string>
     <string name="common_got_it">Entendido</string>
     <string name="common_governance">Governança</string>
     <string name="common_hexadecimal_string">String hexadecimal</string>
@@ -452,6 +467,7 @@
     <string name="common_learn_more_v2_2_0">Descubra mais sobre</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">%s restantes</string>
+    <string name="common_manage_wallets">Gerenciar Carteiras</string>
     <string name="common_maximum">Máximo</string>
     <string name="common_maximum_format">%s máximo</string>
     <plurals name="common_minutes_format">
@@ -576,9 +592,11 @@
     <string name="common_wallet">Carteira</string>
     <string name="common_warning">Aviso</string>
     <string name="common_yes">Sim</string>
+    <string name="common_your_gift">Seu Presente</string>
     <string name="common_zero_amount_error">O valor deve ser positivo</string>
     <string name="confirm_cloud_backup_password_subtitle">Por favor, insira a senha que você criou durante o processo de backup</string>
     <string name="confirm_cloud_backup_password_title">Insira a senha atual do backup</string>
+    <string name="confirm_create_gift_hint">Confirmar transferirá tokens da sua conta</string>
     <string name="confirm_mnemonic_disabled_button_state">Selecione as palavras...</string>
     <string name="confirm_mnemonic_not_matching_error_message">Frase secreta inválida, por favor, verifique novamente a ordem das palavras</string>
     <string name="confirm_referendum_vote_referendum">Referendo</string>
@@ -813,6 +831,23 @@
     <string name="fragment_top_up_card_title">Recarregar cartão com %s</string>
     <string name="fragment_waiting_top_up_time_out_error_message">Por favor, entre em contato com support@novawallet.io. Inclua o endereço de email que você usou para emitir o cartão.</string>
     <string name="fragment_waiting_top_up_time_out_error_title">Entre em contato com o suporte</string>
+    <string name="gift_claimed_subtitle">Reivindicado</string>
+    <string name="gift_created_subtitle">Criado: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">Insira o valor</string>
+    <string name="gift_min_balance_validation_message">O presente mínimo é de %s</string>
+    <string name="gift_reclaimed_subtitle">Reclamado</string>
+    <string name="gifts_assets_flow_title">Selecione um token para presentear</string>
+    <string name="gifts_claim_fee">Taxa de rede ao reivindicar</string>
+    <string name="gifts_create">Criar Presente</string>
+    <string name="gifts_header_subtitle">Envie presentes de forma rápida, fácil e segura na Nova</string>
+    <string name="gifts_header_title">Compartilhe Presentes Cripto com Qualquer Um, em Qualquer Lugar</string>
+    <string name="gifts_list_title">Presentes que você criou</string>
+    <string name="gifts_network_flow_title">Selecione a rede para o presente de %s</string>
+    <string name="gifts_placeholder_step_1">Insira o valor do seu presente</string>
+    <string name="gifts_placeholder_step_2">%s como um link e convide qualquer um para Nova</string>
+    <string name="gifts_placeholder_step_2_highlight">Compartilhe o presente diretamente</string>
+    <string name="gifts_placeholder_step_3">%s, e você pode retornar presentes não reivindicados a qualquer momento deste dispositivo</string>
+    <string name="gifts_placeholder_step_3_highlight">O presente está disponível instantaneamente</string>
     <string name="governance_notification_channel_name">Canal de Notificação da Governança</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="one">Você precisa selecionar pelo menos %d trilha</item>
@@ -1157,6 +1192,8 @@
     <string name="push_welcome_title">Não perca nada!</string>
     <string name="receive_network_flow_title">Selecione a rede para receber %s</string>
     <string name="receive_screen_copy_address">Copiar Endereço</string>
+    <string name="reclaim_gift_confirmation_message">Se você reclamar este presente, o link compartilhado será desativado e os tokens serão reembolsados para sua carteira.\nVocê deseja continuar?</string>
+    <string name="reclaim_gift_confirmation_title">Reclamar Presente de %s?</string>
     <string name="recover_json_hint">Cole o json ou faça upload do arquivo…</string>
     <string name="recover_json_upload">Fazer upload de arquivo</string>
     <string name="recovery_json">Restaurar JSON</string>
@@ -1306,6 +1343,7 @@
     <string name="select_delegation_tracks_edit_title">Selecionar faixas para editar delegação</string>
     <string name="select_delegation_tracks_revoke_title">Selecionar faixas para revogar sua delegação</string>
     <string name="select_delegation_tracks_unavailable_tracks">Faixas indisponíveis</string>
+    <string name="select_gift_amount_title">Enviar presente em</string>
     <string name="select_ledger_grant_permissions">Ativar Bluetooth &amp; Conceder Permissões</string>
     <string name="select_ledger_location_enable_request_message">Nova precisa que a localização seja ativada para poder realizar a varredura Bluetooth para encontrar seu dispositivo Ledger</string>
     <string name="select_ledger_location_enable_request_title">Por favor, ative a localização geográfica nas configurações do dispositivo</string>
@@ -1355,6 +1393,10 @@
     <string name="setup_staking_type_pool_staking">Staking em Pool</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Sua aposta é menor que o mínimo para ganhar recompensas</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Tipo de staking não suportado</string>
+    <string name="share_gift_button">Compartilhar link do presente</string>
+    <string name="share_gift_reclaim">Reclamar</string>
+    <string name="share_gift_text" formatted="false">Olá! Você tem um presente de %s esperando por você!\n\nInstale o aplicativo Nova Wallet, configure sua carteira e reivindique-o através deste link especial:\n%s</string>
+    <string name="share_gift_title">O Presente foi Preparado.\nCompartilhe Agora!</string>
     <string name="sr25519_selection_subtitle">sr25519 (recomendado)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">A conta selecionada já está em uso como controladora</string>
