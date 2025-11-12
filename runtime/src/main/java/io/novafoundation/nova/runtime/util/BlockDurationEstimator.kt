@@ -18,6 +18,8 @@ interface BlockDurationEstimator {
     fun timestampOf(block: BlockNumber): Long
 
     fun blockInFuture(duration: Duration): BlockNumber
+
+    fun durationToBlocks(duration: Duration): BlockNumber
 }
 
 fun BlockDurationEstimator.blockInPast(duration: Duration): BlockNumber {
@@ -65,9 +67,13 @@ internal class RealBlockDurationEstimator(
 
     override fun blockInFuture(duration: Duration): BlockNumber {
         val totalInTheFuture = duration + timePassedSinceCreated()
-        val offsetInBlocks = totalInTheFuture.inWholeMilliseconds.toBigInteger() / blockTimeMillis
+        val offsetInBlocks = durationToBlocks(totalInTheFuture)
 
         return currentBlock + offsetInBlocks
+    }
+
+    override fun durationToBlocks(duration: Duration): BlockNumber {
+        return duration.inWholeMilliseconds.toBigInteger() / blockTimeMillis
     }
 
     private fun timePassedSinceCreated(): Duration {

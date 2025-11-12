@@ -79,10 +79,6 @@ class RealContributionsInteractor(
         }.getOrDefault(emptyMap())
     }
 
-    private fun List<ContributionWithMetadata>.sortByTimeLeft(): List<ContributionWithMetadata> {
-        return sortedBy { it.metadata.claimStatus }
-    }
-
     private suspend fun observeChainContributionsWithMetadata(
         metaAccount: MetaAccount,
         chain: Chain,
@@ -107,7 +103,10 @@ class RealContributionsInteractor(
                     )
                 )
             }
-                .sortByTimeLeft()
+                .sortedWith(
+                    compareBy<ContributionWithMetadata> { it.contribution.unlockBlock  }
+                        .thenBy { it.contribution.paraId }
+                )
                 .totalContributions { it.contribution.amountInPlanks }
         }
     }

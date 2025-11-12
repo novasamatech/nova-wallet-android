@@ -12,7 +12,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.util.BlockDurationEstimator
 import io.novafoundation.nova.runtime.util.timerUntil
 import java.math.BigInteger
-import kotlin.math.sign
 
 class Contribution(
     val chain: Chain,
@@ -36,18 +35,7 @@ class ContributionMetadata(
     val parachainMetadata: ParachainMetadata?,
 )
 
-sealed class ContributionClaimStatus : Comparable<ContributionClaimStatus> {
-
-    override fun compareTo(other: ContributionClaimStatus): Int {
-        return when {
-            this is ReturnsIn && other is ReturnsIn -> {
-                (timer.millis - other.timer.millis).sign
-            }
-            this is Claimable && other is ReturnsIn -> -1
-            this is ReturnsIn && other is Claimable -> 1
-            else -> 0
-        }
-    }
+sealed class ContributionClaimStatus {
 
     object Claimable : ContributionClaimStatus()
 

@@ -35,6 +35,7 @@ class UserContributionsFragment : BaseFragment<UserContributionsViewModel, Fragm
         binder.myContributionsList.setHasFixedSize(true)
 
         binder.myContributionsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.myContributionsClaim.setOnClickListener { viewModel.claimClicked() }
     }
 
     override fun inject() {
