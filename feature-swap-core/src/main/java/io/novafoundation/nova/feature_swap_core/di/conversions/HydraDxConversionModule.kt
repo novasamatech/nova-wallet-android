@@ -9,12 +9,8 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.OmniPoolQuotingSourceFactory
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.StableSwapQuotingSourceFactory
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.XYKSwapQuotingSourceFactory
-import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
-import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import javax.inject.Named
 
 @Module(includes = [HydraDxBindsModule::class])
 class HydraDxConversionModule {
@@ -46,14 +42,10 @@ class HydraDxConversionModule {
     @Provides
     @FeatureScope
     fun provideHydraDxAssetConversionFactory(
-        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         conversionSourceFactories: Set<@JvmSuppressWildcards HydraDxQuotingSource.Factory<*>>,
-        hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     ): HydraDxQuoting.Factory {
         return RealHydraDxQuotingFactory(
-            remoteStorageSource = remoteStorageSource,
             conversionSourceFactories = conversionSourceFactories,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter
         )
     }
 }

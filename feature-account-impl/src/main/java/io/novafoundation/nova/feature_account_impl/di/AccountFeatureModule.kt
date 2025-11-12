@@ -782,8 +782,9 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideCustomFeeCapabilityFacade(
-        accountRepository: AccountRepository
-    ): CustomFeeCapabilityFacade = RealCustomCustomFeeCapabilityFacade(accountRepository)
+        accountRepository: AccountRepository,
+        feePaymentProviderRegistry: FeePaymentProviderRegistry,
+    ): CustomFeeCapabilityFacade = RealCustomCustomFeeCapabilityFacade(accountRepository, feePaymentProviderRegistry)
 
     @Provides
     @FeatureScope

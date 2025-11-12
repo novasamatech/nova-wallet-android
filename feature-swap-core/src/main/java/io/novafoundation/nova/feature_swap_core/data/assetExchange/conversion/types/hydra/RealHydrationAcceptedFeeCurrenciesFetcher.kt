@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
+import io.novafoundation.nova.feature_swap_core_api.data.network.isSystemAsset
+import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -25,6 +27,20 @@ internal class RealHydrationAcceptedFeeCurrenciesFetcher @Inject constructor(
             val onChainToLocalIds = hydraDxAssetIdConverter.allOnChainIds(chain)
 
             acceptedOnChainIds.mapNotNullToSet { onChainToLocalIds[it]?.id }
+        }
+    }
+
+    override suspend fun isAcceptedCurrency(chainAsset: Chain.Asset): Result<Boolean> {
+        return runCatching {
+            val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(chainAsset)
+
+            if (hydraDxAssetIdConverter.isSystemAsset(onChainId)) return@runCatching true
+
+            val fallbackPrice = remoteStorage.query(chainAsset.chainId) {
+                metadata.multiTransactionPayment.acceptedCurrencies.query(onChainId)
+            }
+
+            fallbackPrice != null
         }
     }
 }

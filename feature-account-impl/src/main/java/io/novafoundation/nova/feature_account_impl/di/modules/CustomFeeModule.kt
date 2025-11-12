@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderReg
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
 import io.novafoundation.nova.feature_account_impl.data.fee.RealFeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.AssetHubFeePaymentProvider
-import io.novafoundation.nova.feature_account_impl.data.fee.chains.DefaultFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.chains.HydrationFeePaymentProvider
 import io.novafoundation.nova.feature_account_impl.data.fee.types.assetHub.AssetHubFeePaymentAssetsFetcherFactory
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQuoteSharedComputation
@@ -78,17 +77,11 @@ class CustomFeeModule {
 
     @Provides
     @FeatureScope
-    fun provideDefaultFeePaymentProvider() = DefaultFeePaymentProvider()
-
-    @Provides
-    @FeatureScope
     fun provideFeePaymentProviderRegistry(
-        defaultFeePaymentProvider: DefaultFeePaymentProvider,
         assetHubFeePaymentProviderFactory: AssetHubFeePaymentProvider.Factory,
         hydrationFeePaymentProviderFactory: HydrationFeePaymentProvider.Factory,
         chainRegistry: ChainRegistry
     ): FeePaymentProviderRegistry = RealFeePaymentProviderRegistry(
-        defaultFeePaymentProvider,
         assetHubFeePaymentProviderFactory,
         hydrationFeePaymentProviderFactory,
         chainRegistry

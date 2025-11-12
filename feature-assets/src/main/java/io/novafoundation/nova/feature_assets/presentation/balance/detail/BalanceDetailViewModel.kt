@@ -23,9 +23,10 @@ import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDate
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.balance.detail.BalanceDetailInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
-import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
+import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -52,14 +53,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.unlabeledReserves
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -70,6 +71,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -95,7 +97,8 @@ class BalanceDetailViewModel(
     private val chartsInteractor: ChartsInteractor,
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val amountFormatter: AmountFormatter,
-    private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase
+    private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
+    private val interactor: BalanceDetailInteractor,
 ) : BaseViewModel(), TransactionHistoryUi by transactionHistoryMixin, Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -114,6 +117,9 @@ class BalanceDetailViewModel(
     private val assetFlow = walletInteractor.assetFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .inBackground()
         .share()
+
+    private val chainAssetFlow = assetFlow.map { it.token.configuration }
+        .distinctUntilChangedBy { it.fullId }
 
     private val balanceLocksFlow = balanceLocksInteractor.balanceLocksFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .shareInBackground()
@@ -153,8 +159,14 @@ class BalanceDetailViewModel(
 
     val chainUI = chainFlow.map { mapChainToUi(it) }
 
-    val swapButtonEnabled = assetFlow.flatMapLatest {
-        swapAvailabilityInteractor.swapAvailableFlow(it.token.configuration, viewModelScope)
+    val swapButtonEnabled = chainAssetFlow.flatMapLatest {
+        swapAvailabilityInteractor.swapAvailableFlow(it, viewModelScope)
+    }
+        .onStart { emit(false) }
+        .shareInBackground()
+
+    val giftsButtonEnabled = chainAssetFlow.map {
+        interactor.isGiftingEnabled(it)
     }
         .onStart { emit(false) }
         .shareInBackground()

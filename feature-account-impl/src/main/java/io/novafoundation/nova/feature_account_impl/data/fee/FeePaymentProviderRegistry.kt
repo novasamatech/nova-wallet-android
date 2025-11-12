@@ -11,7 +11,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 internal class RealFeePaymentProviderRegistry(
-    private val default: DefaultFeePaymentProvider,
     private val assetHubFactory: AssetHubFeePaymentProvider.Factory,
     private val hydrationFactory: HydrationFeePaymentProvider.Factory,
     private val chainRegistry: ChainRegistry,
@@ -23,7 +22,7 @@ internal class RealFeePaymentProviderRegistry(
         return when (chainId) {
             Chain.Geneses.POLKADOT_ASSET_HUB -> assetHubFactory.create(chain)
             Chain.Geneses.HYDRA_DX -> hydrationFactory.create(chain)
-            else -> default
+            else -> DefaultFeePaymentProvider(chain)
         }
     }
 }

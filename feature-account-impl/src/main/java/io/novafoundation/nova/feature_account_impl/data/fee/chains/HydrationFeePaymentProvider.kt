@@ -20,7 +20,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrin
 import kotlinx.coroutines.CoroutineScope
 
 class HydrationFeePaymentProvider @AssistedInject constructor(
-    @Assisted private val chain: Chain,
+    @Assisted override val chain: Chain,
     private val chainRegistry: ChainRegistry,
     private val hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
     private val hydrationFeeInjector: HydrationFeeInjector,
@@ -43,8 +43,13 @@ class HydrationFeePaymentProvider @AssistedInject constructor(
             hydraDxQuoteSharedComputation = hydraDxQuoteSharedComputation,
             accountRepository = accountRepository,
             coroutineScope = coroutineScope!!,
-            hydrationPriceConversionFallback = hydrationPriceConversionFallback
+            hydrationPriceConversionFallback = hydrationPriceConversionFallback,
+            hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher
         )
+    }
+
+    override suspend fun canPayFeeInNonUtilityToken(customFeeAsset: Chain.Asset): Result<Boolean> {
+        return hydrationAcceptedFeeCurrenciesFetcher.isAcceptedCurrency(customFeeAsset)
     }
 
     override suspend fun detectFeePaymentFromExtrinsic(extrinsic: SendableExtrinsic): FeePayment {
@@ -52,7 +57,7 @@ class HydrationFeePaymentProvider @AssistedInject constructor(
         return NativeFeePayment()
     }
 
-    override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?> {
+    override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability> {
         return hydrationAcceptedFeeCurrenciesFetcher.fetchAcceptedFeeCurrencies(chain)
             .map(::HydrationFastLookupFeeCapability)
     }

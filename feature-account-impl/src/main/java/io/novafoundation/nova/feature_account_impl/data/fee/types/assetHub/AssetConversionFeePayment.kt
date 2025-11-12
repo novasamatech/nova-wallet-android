@@ -26,7 +26,6 @@ internal class AssetConversionFeePayment(
     private val paymentAsset: Chain.Asset,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val multiLocationConverter: MultiLocationConverter,
-    private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcher,
     private val xcmVersionDetector: XcmVersionDetector
 ) : FeePayment {
 
@@ -44,11 +43,6 @@ internal class AssetConversionFeePayment(
         }
 
         return SubstrateFee(amount = quote, submissionOrigin = nativeFee.submissionOrigin, asset = paymentAsset)
-    }
-
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-        val availableFeeAssets = assetHubFeePaymentAssetsFetcher.fetchAvailablePaymentAssets()
-        return chainAsset.id in availableFeeAssets
     }
 
     private suspend fun encodableAssetId(xcmVersion: XcmVersion): Any {
