@@ -27,6 +27,6 @@
         android:layout_marginTop="4dp"
         android:minHeight="32dp"
         android:paddingVertical="8dp"
-        app:linkText="Learn more" /> <!--Hide until we have a special wiki page for gifts-->
+        app:linkText="@string/common_learn_more" />
 
 </LinearLayout>
