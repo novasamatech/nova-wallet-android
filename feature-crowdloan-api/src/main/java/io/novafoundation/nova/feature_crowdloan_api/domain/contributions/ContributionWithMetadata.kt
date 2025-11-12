@@ -5,12 +5,14 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.formatting.TimerValue
-import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.util.BlockDurationEstimator
+import io.novafoundation.nova.runtime.util.timerUntil
 import java.math.BigInteger
+import kotlin.math.sign
 
 class Contribution(
     val chain: Chain,
@@ -30,23 +32,53 @@ class Contribution(
 }
 
 class ContributionMetadata(
-    val returnsIn: TimerValue,
+    val claimStatus: ContributionClaimStatus,
     val parachainMetadata: ParachainMetadata?,
 )
+
+sealed class ContributionClaimStatus : Comparable<ContributionClaimStatus> {
+
+    override fun compareTo(other: ContributionClaimStatus): Int {
+        return when {
+            this is ReturnsIn && other is ReturnsIn -> {
+                (timer.millis - other.timer.millis).sign
+            }
+            this is Claimable && other is ReturnsIn -> -1
+            this is ReturnsIn && other is Claimable -> 1
+            else -> 0
+        }
+    }
+
+    object Claimable : ContributionClaimStatus()
+
+    class ReturnsIn(val timer: TimerValue): ContributionClaimStatus()
+}
+
 
 class ContributionWithMetadata(
     val contribution: Contribution,
     val metadata: ContributionMetadata
 )
 
-fun ContributionWithMetadata.isClaimable(): Boolean {
-    return metadata.returnsIn.remainingTime() == 0L
+fun BlockDurationEstimator.claimStatusOf(contribution: Contribution): ContributionClaimStatus {
+    return if (contribution.unlockBlock > currentBlock) {
+        ContributionClaimStatus.ReturnsIn(timerUntil(contribution.unlockBlock))
+    } else {
+        ContributionClaimStatus.Claimable
+    }
 }
 
 class ContributionsWithTotalAmount<T>(val totalContributed: BigInteger, val contributions: List<T>) {
     companion object {
         fun <T> empty(): ContributionsWithTotalAmount<T> {
             return ContributionsWithTotalAmount(BigInteger.ZERO, emptyList())
+        }
+
+        fun fromContributions(contributions: List<Contribution>): ContributionsWithTotalAmount<Contribution> {
+            return ContributionsWithTotalAmount(
+                totalContributed = contributions.sumOf { it.amountInPlanks },
+                contributions = contributions
+            )
         }
     }
 }

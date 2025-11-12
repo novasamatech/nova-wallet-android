@@ -61,5 +61,7 @@ class UserContributionsFragment : BaseFragment<UserContributionsViewModel, Fragm
                 listAdapter.submitList(loadingState.data)
             }
         }
+
+        viewModel.claimContributionsVisible.observe(binder.myContributionsClaim::setVisible)
     }
 }

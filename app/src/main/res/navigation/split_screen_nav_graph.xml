@@ -508,8 +508,8 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
-            android:id="@+id/action_mainFragment_to_userContributionsFragment"
-            app:destination="@id/userContributionsFragment"
+            android:id="@+id/action_mainFragment_to_userContributionsGraph"
+            app:destination="@+id/crowdloan_contributions_graph"
             app:enterAnim="@anim/fragment_open_enter"
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
@@ -1018,11 +1018,7 @@
             app:popUpTo="@id/mainFragment" />
     </fragment>
 
-    <fragment
-        android:id="@+id/userContributionsFragment"
-        android:name="io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.UserContributionsFragment"
-        android:label="UserContributionsFragment"
-        tools:layout="@layout/fragment_my_contributions" />
+    <include app:graph="@navigation/crowdloan_contributions_graph" />
 
     <include app:graph="@navigation/dapp_search_graph" />
 

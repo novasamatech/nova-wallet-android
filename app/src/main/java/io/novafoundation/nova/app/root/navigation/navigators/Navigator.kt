@@ -101,8 +101,8 @@ import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsFragment
 import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
 import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedBottomSheet
 import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedPayload
@@ -663,6 +663,12 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openClaimContribution() {
+       navigationBuilder()
+           .action(R.id.action_userContributionsFragment_to_claimContributionFragment)
+           .navigateInFirstAttachedContext()
+    }
+
     override fun openNodeDetails(nodeId: Int) {
         val extras = NodeDetailsFragment.getBundle(nodeId)
         navigationBuilder().action(R.id.action_nodesFragment_to_nodeDetailsFragment)
@@ -724,7 +730,7 @@ class Navigator(
     }
 
     override fun openUserContributions() {
-        navigationBuilder().action(R.id.action_mainFragment_to_userContributionsFragment)
+        navigationBuilder().action(R.id.action_mainFragment_to_userContributionsGraph)
             .navigateInFirstAttachedContext()
     }
 

@@ -6,9 +6,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.capitalize
 import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionClaimStatus
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
-import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.isClaimable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
@@ -23,6 +23,7 @@ import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 class UserContributionsViewModel(
     private val interactor: ContributionsInteractor,
@@ -56,8 +57,18 @@ class UserContributionsViewModel(
     }
         .shareInBackground()
 
+    val claimContributionsVisible = contributionsWitTotalAmountFlow.map {
+        it.contributions.any { it.metadata.claimStatus is ContributionClaimStatus.Claimable }
+    }
+        .onStart { emit(false) }
+        .shareInBackground()
+
     fun backClicked() {
         router.back()
+    }
+
+    fun claimClicked() {
+        router.openClaimContribution()
     }
 
     private suspend fun mapCrowdloanToContributionModel(
@@ -71,12 +82,15 @@ class UserContributionsViewModel(
         val claimStatus: ContributionModel.ClaimStatus
         val claimStatusColorRes: Int
 
-        if (contributionWithMetadata.isClaimable()) {
-            claimStatus = ContributionModel.ClaimStatus.Text(resourceManager.getString(R.string.crowdloan_contribution_claimable))
-            claimStatusColorRes = R.color.text_positive
-        } else {
-            claimStatus = ContributionModel.ClaimStatus.Timer(contributionWithMetadata.metadata.returnsIn)
-            claimStatusColorRes = R.color.text_secondary
+        when(val status = contributionWithMetadata.metadata.claimStatus) {
+            ContributionClaimStatus.Claimable -> {
+                claimStatus = ContributionModel.ClaimStatus.Text(resourceManager.getString(R.string.crowdloan_contribution_claimable))
+                claimStatusColorRes = R.color.text_positive
+            }
+            is ContributionClaimStatus.ReturnsIn -> {
+                claimStatus = ContributionModel.ClaimStatus.Timer(status.timer)
+                claimStatusColorRes = R.color.text_secondary
+            }
         }
 
         return ContributionModel(
