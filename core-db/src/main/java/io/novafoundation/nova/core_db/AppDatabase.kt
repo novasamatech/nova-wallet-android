@@ -57,7 +57,7 @@ import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddChainForeignKeyForProxy_63_64
 import io.novafoundation.nova.core_db.migrations.AddConnectionStateToChains_53_54
-import io.novafoundation.nova.core_db.migrations.AddContributionUnlockBlock_72_73
+import io.novafoundation.nova.core_db.migrations.AddFieldsToContributions
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
@@ -270,7 +270,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
                     .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
                     .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70, AddMultisigSupportFlag_70_71)
-                    .addMigrations(AddGifts_71_72, AddContributionUnlockBlock_72_73)
+                    .addMigrations(AddGifts_71_72, AddFieldsToContributions)
                     .build()
             }
             return instance!!

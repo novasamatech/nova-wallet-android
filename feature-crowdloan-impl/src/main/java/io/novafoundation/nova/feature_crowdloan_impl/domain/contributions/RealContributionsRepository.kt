@@ -1,7 +1,10 @@
 package io.novafoundation.nova.feature_crowdloan_impl.domain.contributions
 
 import android.util.Log
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
+import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -71,9 +74,10 @@ class RealContributionsRepository(
             remoteStorage.queryCatching(chain.id) {
                 val reserves = metadata.ahOps.rcLeaseReserve.keys()
                 val contributionKeys = reserves.map { (unlockBlock, paraId, _) -> Triple(unlockBlock, paraId, accountId.intoKey()) }
-                metadata.ahOps.rcCrowdloanContribution.entries(contributionKeys)
-            }.map { contributions ->
-                contributions.map { (key, balance) ->
+
+                val contributionEntries = metadata.ahOps.rcCrowdloanContribution.entries(contributionKeys)
+
+                contributionEntries.map { (key, balance) ->
                     val (unlockBlock, paraId) = key
                     Contribution(
                         chain = chain,
@@ -81,11 +85,16 @@ class RealContributionsRepository(
                         amountInPlanks = balance,
                         paraId = paraId,
                         sourceId = DIRECT_SOURCE_ID,
-                        unlockBlock = unlockBlock
+                        unlockBlock = unlockBlock,
+                        leaseDepositor = reserves.getLeaseDepositor(paraId)
                     )
                 }
             }
         }
+    }
+
+    private fun LeaseReserves.getLeaseDepositor(paraId: ParaId): AccountIdKey {
+        return first { it.second == paraId }.third
     }
 
     override suspend fun deleteContributions(assetIds: List<FullChainAssetId>) {
@@ -94,3 +103,4 @@ class RealContributionsRepository(
         contributionDao.deleteAssetContributions(params)
     }
 }
+private typealias LeaseReserves = Set<Triple<BlockNumber, ParaId, AccountIdKey>>

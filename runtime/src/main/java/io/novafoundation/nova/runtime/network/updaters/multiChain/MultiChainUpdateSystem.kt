@@ -35,3 +35,16 @@ abstract class MultiChainUpdateSystem<E>(
 
     override fun start(): Flow<Updater.SideEffect> = updateFlow
 }
+
+
+class GroupBySyncChainMultiChainUpdateSystem<E>(
+    chainRegistry: ChainRegistry,
+    singleAssetSharedState: SelectedAssetOptionSharedState<E>,
+    storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+    private val updaters: List<SharedStateBasedUpdater<*>>
+) : MultiChainUpdateSystem<E>(chainRegistry, singleAssetSharedState, storageSharedRequestsBuilderFactory) {
+
+    override fun getUpdaters(option: SupportedAssetOption<E>): MultiMap<ChainId, Updater<*>> {
+        return updaters.groupBySyncingChain(option.assetWithChain.chain)
+    }
+}

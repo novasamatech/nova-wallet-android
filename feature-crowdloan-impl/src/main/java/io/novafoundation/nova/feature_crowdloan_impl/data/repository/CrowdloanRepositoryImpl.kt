@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
-import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.crowdloan
-import io.novafoundation.nova.common.utils.hasModule
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.slots
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
@@ -34,10 +32,6 @@ class CrowdloanRepositoryImpl(
     private val chainRegistry: ChainRegistry,
     private val parachainMetadataApi: ParachainMetadataApi
 ) : CrowdloanRepository {
-
-    override suspend fun isCrowdloansAvailable(chainId: ChainId): Boolean {
-        return runtimeFor(chainId).metadata.hasModule(Modules.CROWDLOAN)
-    }
 
     override suspend fun allFundInfos(chainId: ChainId): Map<ParaId, FundInfo> {
         return remoteStorage.query(chainId) {

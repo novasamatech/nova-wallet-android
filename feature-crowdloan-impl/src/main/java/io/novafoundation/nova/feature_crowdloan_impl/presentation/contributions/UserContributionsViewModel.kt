@@ -64,7 +64,7 @@ class UserContributionsViewModel(
         chain: Chain,
         token: Token,
     ): ContributionModel {
-        val depositorAddress = chain.addressOf(contributionWithMetadata.metadata.fundInfo.depositor)
+        val depositorAddress = chain.addressOf(contributionWithMetadata.contribution.leaseDepositor)
         val contributionTitle = mapContributionTitle(contributionWithMetadata)
 
         return ContributionModel(
