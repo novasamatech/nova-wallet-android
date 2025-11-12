@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_crowdloan_api.domain.contributions
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.formatting.TimerValue
 import io.novafoundation.nova.core_db.model.ContributionLocal
@@ -15,6 +16,7 @@ class Contribution(
     val amountInPlanks: BigInteger,
     val paraId: ParaId,
     val sourceId: String,
+    val unlockBlock: BlockNumber
 ) {
 
     companion object {
@@ -51,6 +53,7 @@ fun mapContributionToLocal(metaId: Long, contribution: Contribution): Contributi
         contribution.paraId,
         contribution.amountInPlanks,
         contribution.sourceId,
+        unlockBlock = contribution.unlockBlock
     )
 }
 
@@ -64,5 +67,6 @@ fun mapContributionFromLocal(
         contribution.amountInPlanks,
         contribution.paraId,
         contribution.sourceId,
+        unlockBlock = contribution.unlockBlock
     )
 }
