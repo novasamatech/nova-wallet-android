@@ -45,7 +45,7 @@ dependencies {
     implementation constraintDep
     implementation flexBoxDep
 
-    implementation lottie
+    implementation lottie, withoutTransitiveAndroidX
 
     implementation coroutinesDep
 
@@ -61,11 +61,7 @@ dependencies {
 
     implementation retrofitDep
 
-    implementation web3jDep
     implementation coroutinesFutureDep
-
-    implementation walletConnectCoreDep, withoutTransitiveAndroidX
-    implementation walletConnectWalletDep, withoutTransitiveAndroidX
 
     testImplementation jUnitDep
     testImplementation mockitoDep
