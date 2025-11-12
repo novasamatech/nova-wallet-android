@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_crowdloan_impl.domain.contributions
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.combineToPair
-import io.novafoundation.nova.common.utils.mapListNotNull
+import io.novafoundation.nova.common.utils.formatting.toTimerValue
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -24,16 +24,17 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.blockDurationEstimator
+import io.novafoundation.nova.runtime.repository.blockDurationEstimatorFlow
 import io.novafoundation.nova.runtime.state.SingleAssetSharedState
 import io.novafoundation.nova.runtime.state.selectedChainFlow
-import io.novafoundation.nova.runtime.util.timerUntil
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import java.math.BigInteger
+import kotlin.time.Duration.Companion.days
 
 class RealContributionsInteractor(
     private val crowdloanRepository: CrowdloanRepository,
@@ -89,12 +90,16 @@ class RealContributionsInteractor(
         asset: Chain.Asset
     ): Flow<ContributionsWithTotalAmount<ContributionWithMetadata>> {
         val parachainMetadatas = getParachainMetadata(chain)
-        val blockDurationEstimator = chainStateRepository.blockDurationEstimator(chain.timelineChainIdOrSelf())
 
-        return contributionsRepository.observeContributions(metaAccount, chain, asset)
-            .mapListNotNull { contribution ->
+        return combine(
+            chainStateRepository.blockDurationEstimatorFlow(chain.timelineChainIdOrSelf()),
+            contributionsRepository.observeContributions(metaAccount, chain, asset)
+        ) { blockDurationEstimator, contributions ->
+            contributions.map { contribution ->
                 val parachainMetadata = parachainMetadatas[contribution.paraId]
-                val returnsIn = blockDurationEstimator.timerUntil(contribution.unlockBlock)
+                // TODO test code
+                val returnsIn = (blockDurationEstimator.durationUntil(contribution.unlockBlock) - 10.days).toTimerValue()
+//                val returnsIn = blockDurationEstimator.timerUntil(contribution.unlockBlock)
 
                 ContributionWithMetadata(
                     contribution = contribution,
@@ -103,11 +108,10 @@ class RealContributionsInteractor(
                         parachainMetadata = parachainMetadata,
                     )
                 )
-            }.map { contributions ->
-                contributions
-                    .sortByTimeLeft()
-                    .totalContributions { it.contribution.amountInPlanks }
             }
+                .sortByTimeLeft()
+                .totalContributions { it.contribution.amountInPlanks }
+        }
     }
 
     private fun <T> List<T>.totalContributions(amount: (T) -> BigInteger): ContributionsWithTotalAmount<T> {

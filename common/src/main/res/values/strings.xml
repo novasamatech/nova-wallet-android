@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+    <string name="crowdloan_contribution_claimable">Claimable</string>
 
     <string name="reclaim_gift_confirmation_title">Reclaim %s Gift?</string>
     <string name="reclaim_gift_confirmation_message">If you reclaim this gift, the shared link will be disabled, and tokens will be refunded to your wallet.\nDo you want to continue?</string>

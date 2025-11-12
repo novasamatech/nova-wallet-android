@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.formatting.TimerValue
+import io.novafoundation.nova.common.utils.formatting.remainingTime
 import io.novafoundation.nova.core_db.model.ContributionLocal
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -37,6 +38,10 @@ class ContributionWithMetadata(
     val contribution: Contribution,
     val metadata: ContributionMetadata
 )
+
+fun ContributionWithMetadata.isClaimable(): Boolean {
+    return metadata.returnsIn.remainingTime() == 0L
+}
 
 class ContributionsWithTotalAmount<T>(val totalContributed: BigInteger, val contributions: List<T>) {
     companion object {

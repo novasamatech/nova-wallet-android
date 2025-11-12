@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.withLoading
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contribution
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionWithMetadata
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
+import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.isClaimable
 import io.novafoundation.nova.feature_crowdloan_impl.R
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.CrowdloanRouter
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
@@ -67,11 +68,23 @@ class UserContributionsViewModel(
         val depositorAddress = chain.addressOf(contributionWithMetadata.contribution.leaseDepositor)
         val contributionTitle = mapContributionTitle(contributionWithMetadata)
 
+        val claimStatus: ContributionModel.ClaimStatus
+        val claimStatusColorRes: Int
+
+        if (contributionWithMetadata.isClaimable()) {
+            claimStatus = ContributionModel.ClaimStatus.Text(resourceManager.getString(R.string.crowdloan_contribution_claimable))
+            claimStatusColorRes = R.color.text_positive
+        } else {
+            claimStatus = ContributionModel.ClaimStatus.Timer(contributionWithMetadata.metadata.returnsIn)
+            claimStatusColorRes = R.color.text_secondary
+        }
+
         return ContributionModel(
             title = contributionTitle,
             icon = generateCrowdloanIcon(contributionWithMetadata.metadata.parachainMetadata, depositorAddress, iconGenerator),
             amount = amountFormatter.formatAmountToAmountModel(contributionWithMetadata.contribution.amountInPlanks, token),
-            returnsIn = contributionWithMetadata.metadata.returnsIn
+            claimStatus = claimStatus,
+            claimStatusColorRes = claimStatusColorRes
         )
     }
 

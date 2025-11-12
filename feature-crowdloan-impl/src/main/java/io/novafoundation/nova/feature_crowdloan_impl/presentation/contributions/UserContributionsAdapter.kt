@@ -10,9 +10,11 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.recyclerview.item.OperationListItem
 import io.novafoundation.nova.common.view.startTimer
+import io.novafoundation.nova.common.view.stopTimer
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions.model.ContributionModel
 import kotlinx.android.extensions.LayoutContainer
 
@@ -75,11 +77,20 @@ class ContributionHolder(
         icon.setIcon(item.icon, imageLoader)
 
         header.text = item.title
-        subHeader.startTimer(
-            value = item.returnsIn,
-            customMessageFormat = R.string.crowdloan_contributions_returns_in,
-            onFinish = { subHeader.setText(R.string.crowdloan_contributions_to_be_returned) }
-        )
+
+        subHeader.setTextColorRes(item.claimStatusColorRes)
+        when(val status = item.claimStatus) {
+            is ContributionModel.ClaimStatus.Text -> {
+                subHeader.stopTimer()
+                subHeader.text = status.text
+            }
+
+            is ContributionModel.ClaimStatus.Timer -> subHeader.startTimer(
+                value = status.timer,
+                customMessageFormat = R.string.crowdloan_contributions_returns_in,
+                onFinish = { subHeader.setText(R.string.crowdloan_contribution_claimable) }
+            )
+        }
 
         bindAmount(item)
     }
