@@ -39,9 +39,8 @@ sealed class ContributionClaimStatus {
 
     object Claimable : ContributionClaimStatus()
 
-    class ReturnsIn(val timer: TimerValue): ContributionClaimStatus()
+    class ReturnsIn(val timer: TimerValue) : ContributionClaimStatus()
 }
-
 
 class ContributionWithMetadata(
     val contribution: Contribution,

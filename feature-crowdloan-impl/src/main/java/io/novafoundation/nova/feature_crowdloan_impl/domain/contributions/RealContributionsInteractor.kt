@@ -104,14 +104,12 @@ class RealContributionsInteractor(
                 )
             }
                 .sortedWith(
-                    compareBy<ContributionWithMetadata> { it.contribution.unlockBlock  }
+                    compareBy<ContributionWithMetadata> { it.contribution.unlockBlock }
                         .thenBy { it.contribution.paraId }
                 )
                 .totalContributions { it.contribution.amountInPlanks }
         }
     }
-
-
 
     private fun <T> List<T>.totalContributions(amount: (T) -> BigInteger): ContributionsWithTotalAmount<T> {
         return ContributionsWithTotalAmount(

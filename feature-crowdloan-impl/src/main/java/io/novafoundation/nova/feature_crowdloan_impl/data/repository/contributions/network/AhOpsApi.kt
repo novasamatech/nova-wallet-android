@@ -15,7 +15,6 @@ import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 
-
 @JvmInline
 value class AhOpsApi(override val module: Module) : QueryableModule
 

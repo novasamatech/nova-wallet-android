@@ -79,7 +79,7 @@ class ContributionHolder(
         header.text = item.title
 
         subHeader.setTextColorRes(item.claimStatusColorRes)
-        when(val status = item.claimStatus) {
+        when (val status = item.claimStatus) {
             is ContributionModel.ClaimStatus.Text -> {
                 subHeader.stopTimer()
                 subHeader.text = status.text

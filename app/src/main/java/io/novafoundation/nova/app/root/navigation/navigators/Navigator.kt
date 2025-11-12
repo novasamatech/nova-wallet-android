@@ -664,9 +664,9 @@ class Navigator(
     }
 
     override fun openClaimContribution() {
-       navigationBuilder()
-           .action(R.id.action_userContributionsFragment_to_claimContributionFragment)
-           .navigateInFirstAttachedContext()
+        navigationBuilder()
+            .action(R.id.action_userContributionsFragment_to_claimContributionFragment)
+            .navigateInFirstAttachedContext()
     }
 
     override fun openNodeDetails(nodeId: Int) {

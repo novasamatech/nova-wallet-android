@@ -36,7 +36,6 @@ abstract class MultiChainUpdateSystem<E>(
     override fun start(): Flow<Updater.SideEffect> = updateFlow
 }
 
-
 class GroupBySyncChainMultiChainUpdateSystem<E>(
     chainRegistry: ChainRegistry,
     singleAssetSharedState: SelectedAssetOptionSharedState<E>,

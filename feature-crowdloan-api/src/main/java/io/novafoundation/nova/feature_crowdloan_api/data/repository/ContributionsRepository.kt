@@ -19,6 +19,5 @@ interface ContributionsRepository {
 
     suspend fun getDirectContributions(chain: Chain, asset: Chain.Asset, accountId: ByteArray): Result<List<Contribution>>
 
-
     suspend fun deleteContributions(assetIds: List<FullChainAssetId>)
 }

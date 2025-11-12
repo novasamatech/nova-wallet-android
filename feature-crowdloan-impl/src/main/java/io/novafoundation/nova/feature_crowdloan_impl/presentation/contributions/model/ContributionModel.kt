@@ -15,8 +15,8 @@ data class ContributionModel(
 
     sealed class ClaimStatus {
 
-        class Timer(val timer: TimerValue): ClaimStatus()
+        class Timer(val timer: TimerValue) : ClaimStatus()
 
-        class Text(val text: String): ClaimStatus()
+        class Text(val text: String) : ClaimStatus()
     }
 }

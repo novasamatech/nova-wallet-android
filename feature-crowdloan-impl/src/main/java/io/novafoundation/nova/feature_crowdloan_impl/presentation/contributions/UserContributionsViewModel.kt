@@ -82,7 +82,7 @@ class UserContributionsViewModel(
         val claimStatus: ContributionModel.ClaimStatus
         val claimStatusColorRes: Int
 
-        when(val status = contributionWithMetadata.metadata.claimStatus) {
+        when (val status = contributionWithMetadata.metadata.claimStatus) {
             ContributionClaimStatus.Claimable -> {
                 claimStatus = ContributionModel.ClaimStatus.Text(resourceManager.getString(R.string.crowdloan_contribution_claimable))
                 claimStatusColorRes = R.color.text_positive
