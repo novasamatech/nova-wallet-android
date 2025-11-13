@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ParachainMetadata
-import io.novafoundation.nova.feature_crowdloan_api.data.repository.hasWonAuction
 import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic.contribute
 import io.novafoundation.nova.feature_crowdloan_impl.di.customCrowdloan.CustomContributeManager
@@ -20,16 +19,13 @@ import io.novafoundation.nova.feature_crowdloan_impl.domain.contribute.custom.Pr
 import io.novafoundation.nova.feature_crowdloan_impl.domain.main.Crowdloan
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.BonusPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.state.assetWithChain
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -49,32 +45,7 @@ class CrowdloanContributeInteractor(
     fun crowdloanStateFlow(
         parachainId: ParaId,
         parachainMetadata: ParachainMetadata?,
-    ): Flow<Crowdloan> = crowdloanSharedState.assetWithChain.flatMapLatest { (chain, _) ->
-        val selectedMetaAccount = accountRepository.getSelectedMetaAccount()
-        val accountId = selectedMetaAccount.accountIdIn(chain)!! // TODO optional for ethereum chains
-
-        val expectedBlockTime = chainStateRepository.expectedBlockTimeInMillis(chain.id)
-        val leasePeriodToBlocksConverter = crowdloanRepository.leasePeriodToBlocksConverter(chain.id)
-
-        combine(
-            crowdloanRepository.fundInfoFlow(chain.id, parachainId),
-            chainStateRepository.currentBlockNumberFlow(chain.id)
-        ) { fundInfo, blockNumber ->
-            val contribution = contributionsRepository.getDirectContribution(chain, chain.utilityAsset, accountId, parachainId, fundInfo.trieIndex)
-            val hasWonAuction = crowdloanRepository.hasWonAuction(chain.id, fundInfo)
-
-            mapFundInfoToCrowdloan(
-                fundInfo = fundInfo,
-                parachainMetadata = parachainMetadata,
-                parachainId = parachainId,
-                currentBlockNumber = blockNumber,
-                expectedBlockTimeInMillis = expectedBlockTime,
-                leasePeriodToBlocksConverter = leasePeriodToBlocksConverter,
-                contribution = contribution,
-                hasWonAuction = hasWonAuction
-            )
-        }
-    }
+    ): Flow<Crowdloan> = emptyFlow() // this flow is no longer accessible and deprecated. We will remove entire crowdloan feature soon
 
     suspend fun estimateFee(
         crowdloan: Crowdloan,

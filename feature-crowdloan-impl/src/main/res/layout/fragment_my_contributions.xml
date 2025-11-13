@@ -12,8 +12,8 @@
         android:id="@+id/myContributionsToolbar"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
         app:dividerVisible="false"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:titleText="@string/crowdloan_your_contributions" />
@@ -23,15 +23,15 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:clipToPadding="false"
+        android:paddingBottom="16dp"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/myContributionsToolbar"
-        android:paddingBottom="16dp"
-        android:visibility="gone"
-        tools:visibility="visible"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_operation_list_item" />
+        tools:listitem="@layout/item_operation_list_item"
+        tools:visibility="visible" />
 
     <ProgressBar
         android:id="@+id/myContributionsProgress"
@@ -57,6 +57,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/myContributionsToolbar"
         app:layout_constraintVertical_bias="0.4"
-        app:placeholderBackgroundStyle="no_background"/>
+        app:placeholderBackgroundStyle="no_background" />
 
+    <io.novafoundation.nova.common.view.PrimaryButtonV2
+        android:id="@+id/myContributionsClaim"
+        style="@style/Widget.Nova.MaterialButton.Primary"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/crowdloan_contribution_claim_title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
