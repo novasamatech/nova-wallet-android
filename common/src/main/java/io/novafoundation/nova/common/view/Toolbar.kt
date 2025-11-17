@@ -56,7 +56,7 @@ class Toolbar @JvmOverloads constructor(
             val action = typedArray.getString(R.styleable.Toolbar_textRight)
             action?.let { setTextRight(it) }
 
-            val textRightVisible = typedArray.getBoolean(R.styleable.Toolbar_textRightVisible, false)
+            val textRightVisible = typedArray.getBoolean(R.styleable.Toolbar_textRightVisible, true)
             setRightTextVisible(textRightVisible)
 
             val homeButtonIcon = typedArray.getDrawable(R.styleable.Toolbar_homeButtonIcon)
