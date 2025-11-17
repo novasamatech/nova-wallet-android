@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.Contrib
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapContributionFromLocal
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.network.ahOps
 import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.network.rcCrowdloanContribution
-import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.network.rcLeaseReserve
+import io.novafoundation.nova.feature_crowdloan_impl.data.repository.contributions.network.rcCrowdloanReserve
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -72,7 +72,7 @@ class RealContributionsRepository(
     ): Result<List<Contribution>> {
         return withContext(Dispatchers.Default) {
             remoteStorage.queryCatching(chain.id) {
-                val reserves = metadata.ahOps.rcLeaseReserve.keys()
+                val reserves = metadata.ahOps.rcCrowdloanReserve.keys()
                 val contributionKeys = reserves.map { (unlockBlock, paraId, _) -> Triple(unlockBlock, paraId, accountId.intoKey()) }
 
                 val contributionEntries = metadata.ahOps.rcCrowdloanContribution.entries(contributionKeys)

@@ -23,9 +23,9 @@ val RuntimeMetadata.ahOps: AhOpsApi
     get() = AhOpsApi(module("AhOps"))
 
 context(StorageQueryContext)
-val AhOpsApi.rcLeaseReserve: QueryableStorageEntry3<BlockNumber, ParaId, AccountIdKey, Any>
+val AhOpsApi.rcCrowdloanReserve: QueryableStorageEntry3<BlockNumber, ParaId, AccountIdKey, Any>
     get() = storage3(
-        name = "RcLeaseReserve",
+        name = "RcCrowdloanReserve",
         binding = { _, _, _, decoded -> decoded },
         key3ToInternalConverter = { it.value },
         key3FromInternalConverter = ::bindAccountIdKey
