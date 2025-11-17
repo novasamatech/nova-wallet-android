@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_crowdloan_impl.data.network.blockhain.extrinsic
 
+import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import java.math.BigInteger
@@ -32,6 +34,18 @@ fun ExtrinsicBuilder.addMemo(parachainId: ParaId, memo: ByteArray): ExtrinsicBui
         arguments = mapOf(
             "index" to parachainId,
             "memo" to memo
+        )
+    )
+}
+
+fun ExtrinsicBuilder.claimContribution(parachainId: ParaId, block: BlockNumber, depositor: AccountId) {
+    call(
+        moduleName = "AhOps",
+        callName = "withdraw_crowdloan_contribution",
+        arguments = mapOf(
+            "block" to block,
+            "para_id" to parachainId,
+            "depositor" to depositor
         )
     )
 }

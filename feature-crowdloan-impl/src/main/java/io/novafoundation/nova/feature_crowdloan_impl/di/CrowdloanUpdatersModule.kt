@@ -9,18 +9,24 @@ import io.novafoundation.nova.feature_crowdloan_impl.data.CrowdloanSharedState
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.updaters.SharedAssetBlockNumberUpdater
-import io.novafoundation.nova.runtime.network.updaters.ConstantSingleChainUpdateSystem
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimeLineChainUpdater
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
+import io.novafoundation.nova.runtime.network.updaters.multiChain.GroupBySyncChainMultiChainUpdateSystem
 
 @Module
 class CrowdloanUpdatersModule {
 
     @Provides
     @FeatureScope
+    fun provideTimelineDelegatingHolder(sharedState: CrowdloanSharedState) = DelegateToTimelineChainIdHolder(sharedState)
+
+    @Provides
+    @FeatureScope
     fun provideBlockNumberUpdater(
         chainRegistry: ChainRegistry,
-        crowdloanSharedState: CrowdloanSharedState,
+        chainIdHolder: DelegateToTimelineChainIdHolder,
         storageCache: StorageCache,
-    ) = SharedAssetBlockNumberUpdater(chainRegistry, crowdloanSharedState, storageCache)
+    ) = SharedAssetBlockNumberUpdater(chainRegistry, chainIdHolder, storageCache)
 
     @Provides
     @FeatureScope
@@ -29,9 +35,9 @@ class CrowdloanUpdatersModule {
         crowdloanSharedState: CrowdloanSharedState,
         blockNumberUpdater: SharedAssetBlockNumberUpdater,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
-    ): UpdateSystem = ConstantSingleChainUpdateSystem(
+    ): UpdateSystem = GroupBySyncChainMultiChainUpdateSystem(
         updaters = listOf(
-            blockNumberUpdater
+            DelegateToTimeLineChainUpdater(blockNumberUpdater)
         ),
         chainRegistry = chainRegistry,
         singleAssetSharedState = crowdloanSharedState,
