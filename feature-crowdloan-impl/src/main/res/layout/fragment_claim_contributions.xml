@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:dividerVisible="false"
-        app:titleText="@string/crowdloan_contribution_claim_title" />
+        app:titleText="@string/governance_unlock" />
 
     <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
         android:id="@+id/crowdloanClaimContributionsAmount"

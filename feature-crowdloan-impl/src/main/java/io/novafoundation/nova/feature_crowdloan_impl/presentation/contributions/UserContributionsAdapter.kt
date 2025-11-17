@@ -88,7 +88,7 @@ class ContributionHolder(
             is ContributionModel.ClaimStatus.Timer -> subHeader.startTimer(
                 value = status.timer,
                 customMessageFormat = R.string.crowdloan_contributions_returns_in,
-                onFinish = { subHeader.setText(R.string.crowdloan_contribution_claimable) }
+                onFinish = { subHeader.setText(R.string.referendum_unlock_unlockable) }
             )
         }
 
