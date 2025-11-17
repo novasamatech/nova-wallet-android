@@ -11,8 +11,10 @@ import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.common.SelectedAccountPayload
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -28,7 +30,7 @@ class MetaAccountValidForTransactionListingMixinFactory(
     fun create(
         coroutineScope: CoroutineScope,
         chainId: ChainId,
-        selectedAddress: String?,
+        selectedAccount: SelectedAccountPayload?,
         metaAccountFilter: Filter<MetaAccount>
     ): MetaAccountListingMixin {
         return MetaAccountValidForTransactionListingMixin(
@@ -37,7 +39,7 @@ class MetaAccountValidForTransactionListingMixinFactory(
             metaAccountGroupingInteractor = metaAccountGroupingInteractor,
             chainRegistry = chainRegistry,
             chainId = chainId,
-            selectedAddress = selectedAddress,
+            selectedAccount = selectedAccount,
             accountTypePresentationMapper = accountTypePresentationMapper,
             metaAccountFilter = metaAccountFilter,
             coroutineScope = coroutineScope
@@ -51,7 +53,7 @@ private class MetaAccountValidForTransactionListingMixin(
     private val metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
     private val chainRegistry: ChainRegistry,
     private val chainId: ChainId,
-    private val selectedAddress: String?,
+    private val selectedAccount: SelectedAccountPayload?,
     private val accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     private val metaAccountFilter: Filter<MetaAccount>,
     coroutineScope: CoroutineScope,
@@ -71,14 +73,14 @@ private class MetaAccountValidForTransactionListingMixin(
     private suspend fun mapMetaAccountToUi(metaAccount: MetaAccount): AccountUi {
         val icon = walletUiUseCase.walletIcon(metaAccount)
 
-        val chainAddress = metaAccount.addressIn(chainFlow.await())
-        val isSelected = chainAddress != null && chainAddress == selectedAddress
+        val chain = chainFlow.await()
+        val chainAddress = metaAccount.addressIn(chain)
 
         return AccountUi(
             id = metaAccount.id,
             title = metaAccount.name,
-            subtitle = mapSubtitle(chainAddress),
-            isSelected = isSelected,
+            subtitle = mapSubtitle(chainAddress, chain),
+            isSelected = isSelected(metaAccount, chainAddress),
             isClickable = chainAddress != null,
             picture = icon,
             chainIcon = null,
@@ -88,7 +90,15 @@ private class MetaAccountValidForTransactionListingMixin(
         )
     }
 
-    private fun mapSubtitle(address: String?): String {
-        return address ?: resourceManager.getString(R.string.account_no_chain_projection)
+    private fun isSelected(metaAccount: MetaAccount, chainAddress: String?): Boolean {
+        return when (selectedAccount) {
+            is SelectedAccountPayload.MetaAccount -> selectedAccount.metaId == metaAccount.id
+            is SelectedAccountPayload.Address -> selectedAccount.address == chainAddress
+            null -> false
+        }
+    }
+
+    private fun mapSubtitle(address: String?, chain: Chain): String {
+        return address ?: resourceManager.getString(R.string.account_chain_not_found, chain.name)
     }
 }

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_assets.presentation.receive
 
-import android.content.Intent
 import android.os.Bundle
 
 import androidx.core.view.drawToBitmap
@@ -8,13 +7,13 @@ import androidx.core.view.isVisible
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.share.shareImageWithText
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.databinding.FragmentReceiveBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_assets.presentation.receive.model.QrSharingPayload
 import javax.inject.Inject
 
 private const val KEY_PAYLOAD = "KEY_PAYLOAD"
@@ -71,16 +70,8 @@ class ReceiveFragment : BaseFragment<ReceiveViewModel, FragmentReceiveBinding>()
             binder.receiveAddressesButton.isVisible = it
         }
 
-        viewModel.shareEvent.observeEvent(::startQrSharingIntent)
-    }
-
-    private fun startQrSharingIntent(qrSharingPayload: QrSharingPayload) {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "image/*"
-            putExtra(Intent.EXTRA_STREAM, qrSharingPayload.fileUri)
-            putExtra(Intent.EXTRA_TEXT, qrSharingPayload.shareMessage)
+        viewModel.shareEvent.observeEvent {
+            shareImageWithText(it, getString(R.string.wallet_receive_description_v2_2_0))
         }
-
-        startActivity(Intent.createChooser(intent, getString(R.string.wallet_receive_description_v2_2_0)))
     }
 }

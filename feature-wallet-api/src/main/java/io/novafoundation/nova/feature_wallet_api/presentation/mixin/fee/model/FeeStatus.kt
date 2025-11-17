@@ -47,3 +47,11 @@ inline fun <F, D> FeeStatus<F, D>.onLoaded(action: (FeeModel<F, D>) -> Unit) {
         action(feeModel)
     }
 }
+
+fun <F, D> FeeStatus<F, D>.loadedFeeOrNull(): F? {
+    if (this is FeeStatus.Loaded<F, D>) {
+        return this.feeModel.fee
+    }
+
+    return null
+}

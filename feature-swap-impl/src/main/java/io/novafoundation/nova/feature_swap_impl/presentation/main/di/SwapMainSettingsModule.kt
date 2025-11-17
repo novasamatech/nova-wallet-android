@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
@@ -33,7 +32,9 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmou
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -61,12 +62,6 @@ class SwapMainSettingsModule {
 
     @Provides
     @ScreenScope
-    fun provideEnoughAmountToSwapValidatorFactory(resourceManager: ResourceManager): EnoughAmountToSwapValidatorFactory {
-        return EnoughAmountToSwapValidatorFactory(resourceManager)
-    }
-
-    @Provides
-    @ScreenScope
     fun provideSwapAmountAboveEDFieldValidatorFactory(
         resourceManager: ResourceManager,
         chainRegistry: ChainRegistry,
@@ -89,7 +84,6 @@ class SwapMainSettingsModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
-        enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
         swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
         payload: SwapSettingsPayload,
         swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
@@ -101,6 +95,8 @@ class SwapMainSettingsModule {
         swapStateStoreProvider: SwapStateStoreProvider,
         swapRouteFormatter: SwapRouteFormatter,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
+        enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
+        getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -116,11 +112,12 @@ class SwapMainSettingsModule {
             swapInputMixinPriceImpactFiatFormatterFactory = swapInputMixinPriceImpactFiatFormatterFactory,
             validationExecutor = validationExecutor,
             liquidityFieldValidatorFactory = liquidityFieldValidatorFactory,
-            enoughAmountToSwapValidatorFactory = enoughAmountToSwapValidatorFactory,
             swapReceiveAmountAboveEDFieldValidatorFactory = swapReceiveAmountAboveEDFieldValidatorFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
+            getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
             swapRateFormatter = swapRateFormatter,
             selectedAccountUseCase = accountUseCase,
+            enoughAmountValidatorFactory = enoughAmountValidatorFactory,
             swapStateStoreProvider = swapStateStoreProvider,
             maxActionProviderFactory = maxActionProviderFactory,
             swapRouteFormatter = swapRouteFormatter,

@@ -36,6 +36,7 @@
         <attr name="titleText" format="string" />
         <attr name="iconRight" format="reference|color" />
         <attr name="textRight" format="string" />
+        <attr name="textRightVisible" format="boolean" />
         <attr name="homeButtonIcon" format="reference|color" />
         <attr name="homeButtonVisible" format="boolean" />
         <attr name="titleTextAppearance" format="reference" />
@@ -365,14 +366,14 @@
     </declare-styleable>
 
     <declare-styleable name="MaskableDrawable">
-        <attr name="md_dotSize" format="dimension"/>
-        <attr name="md_dotSpacing" format="dimension"/>
-        <attr name="md_dotColor" format="color"/>
-        <attr name="md_dotCount" format="integer"/>
+        <attr name="md_dotSize" format="dimension" />
+        <attr name="md_dotSpacing" format="dimension" />
+        <attr name="md_dotColor" format="color" />
+        <attr name="md_dotCount" format="integer" />
         <attr name="md_gravity" format="enum">
-            <enum name="start" value="0"/>
-            <enum name="center" value="1"/>
-            <enum name="end" value="2"/>
+            <enum name="start" value="0" />
+            <enum name="center" value="1" />
+            <enum name="end" value="2" />
         </attr>
     </declare-styleable>
 </resources>

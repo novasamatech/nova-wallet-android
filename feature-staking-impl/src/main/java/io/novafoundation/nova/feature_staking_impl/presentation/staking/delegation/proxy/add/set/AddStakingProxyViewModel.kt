@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
-import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressRequester
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.common.SelectWalletFilterPayload
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -238,18 +238,18 @@ class AddStakingProxyViewModel(
         }
     }
 
-    private suspend fun getMetaAccountsFilterPayload(chain: Chain, accountId: AccountId): SelectAddressRequester.Request.Filter.ExcludeMetaIds {
+    private suspend fun getMetaAccountsFilterPayload(chain: Chain, accountId: AccountId): SelectWalletFilterPayload.ExcludeMetaIds {
         val filteredMetaAccounts = accountRepository.getActiveMetaAccounts()
             .filter { it.accountIdIn(chain)?.intoKey() == accountId.intoKey() }
             .map { it.id }
 
-        return SelectAddressRequester.Request.Filter.ExcludeMetaIds(filteredMetaAccounts)
+        return SelectWalletFilterPayload.ExcludeMetaIds(filteredMetaAccounts)
     }
 
-    private suspend fun metaAccountsFilter(chain: Chain, accountId: AccountId): SelectAddressAccountFilter {
+    private suspend fun metaAccountsFilter(chain: Chain, accountId: AccountId): SelectAccountFilter {
         val metaAccountsFilterPayload = getMetaAccountsFilterPayload(chain, accountId)
 
-        return SelectAddressAccountFilter.ExcludeMetaAccounts(
+        return SelectAccountFilter.ExcludeMetaAccounts(
             metaAccountsFilterPayload.metaIds
         )
     }

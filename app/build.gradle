@@ -10,7 +10,7 @@ android {
         applicationId rootProject.applicationId
         versionCode computeVersionCode()
         versionName computeVersionName()
-        
+
     }
     signingConfigs {
         dev {
@@ -263,6 +263,9 @@ dependencies {
     implementation project(':feature-ahm-api')
     implementation project(':feature-ahm-impl')
 
+    implementation project(':feature-gift-api')
+    implementation project(':feature-gift-impl')
+
     implementation project(':bindings:metadata_shortener')
 
     implementation project(":feature-xcm:impl")
@@ -275,7 +278,7 @@ dependencies {
 
     implementation biometricDep
 
-    
+
     implementation androidDep
     implementation constraintDep
 

@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">Tuliskan Frasa Rahasiamu</string>
     <string name="account_backup_secret_caption">Pastikan untuk menulis frasa Anda dengan benar dan rapi.</string>
     <string name="account_chain_address_format">Alamat %s</string>
+    <string name="account_chain_not_found">Tidak ada akun di %s</string>
     <string name="account_confirm_mnemonic">Konfirmasi mnemonik</string>
     <string name="account_confirm_mnemonic_title">Mari kita memeriksanya sekali lagi</string>
     <string name="account_confirmation_details">Pilih kata-kata dalam urutan yang benar</string>
@@ -152,6 +153,7 @@
     <string name="account_proxy_type_non_transfer">Non-transfer</string>
     <string name="account_proxy_type_staking">Staking</string>
     <string name="account_restore_account">Sudah memiliki akun</string>
+    <string name="account_secrets">rahasia</string>
     <string name="account_seed_hex_symbols">64 simbol hexadesimal</string>
     <string name="account_select_hardware_wallet">Pilih dompet hardware</string>
     <string name="account_select_secret_source">Pilih jenis rahasia Anda</string>
@@ -230,6 +232,7 @@
     <string name="assets_crowdloan_unlock_banner_description">Menerima DOT Anda kembali dari crowdloans? Mulai melakukan staking DOT Anda hari ini untuk mendapatkan imbalan maksimal yang mungkin!</string>
     <string name="assets_crowdloan_unlock_banner_title">Tingkatkan DOT Anda 🚀</string>
     <string name="assets_filter_title">Filter token</string>
+    <string name="assets_gifts_flow_placeholder">Anda tidak memiliki token untuk diberikan.\nBeli atau Setor token ke akun Anda.</string>
     <string name="assets_manage_tokens_all_networks">Semua jaringan</string>
     <string name="assets_manage_tokens_title">Kelola token</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Jangan transfer %s ke akun yang dikendalikan Ledger karena Ledger tidak mendukung pengiriman %s, sehingga aset akan terjebak di akun ini</string>
@@ -293,6 +296,16 @@
     <string name="choose_amount_fee">Biaya transfer</string>
     <string name="choose_amount_network_error">Jaringan tidak merespons</string>
     <string name="choose_amount_to">Ke</string>
+    <string name="claim_gift_already_claimed_message">Ups, hadiah tersebut sudah diklaim</string>
+    <string name="claim_gift_already_claimed_title">Hadiah tidak dapat diterima</string>
+    <string name="claim_gift_button">Klaim hadiah</string>
+    <string name="claim_gift_default_error_message">Mungkin ada masalah dengan server. Silakan coba lagi nanti.</string>
+    <string name="claim_gift_default_error_title">Ups, sesuatu tidak beres</string>
+    <string name="claim_gift_no_account_alert_title">Gunakan dompet lain, buat yang baru, atau tambahkan akun %s ke dompet ini di Pengaturan.</string>
+    <string name="claim_gift_success_message">Anda berhasil mengklaim hadiah. Token akan segera muncul di saldo Anda.</string>
+    <string name="claim_gift_title">Anda mendapatkan hadiah kripto!</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Buat dompet baru atau impor yang sudah ada untuk mengklaim hadiah</string>
+    <string name="claim_gift_uncontrollable_wallet_title">Anda tidak dapat menerima hadiah dengan dompet %s</string>
     <string name="close_dapp_tabs_message">Semua tab yang terbuka di browser DApp akan ditutup.</string>
     <string name="close_dapp_tabs_title">Tutup Semua DApps?</string>
     <string name="cloud_backup_delete_action_subtitle">Lakukan %s dan selalu simpan offline untuk memulihkannya kapan saja. Anda dapat melakukannya di Pengaturan Cadangan.</string>
@@ -410,6 +423,7 @@
     <string name="common_enter_address">Masukkan alamat...</string>
     <string name="common_enter_amount">Masukkan jumlah...</string>
     <string name="common_enter_details">Masukkan detail</string>
+    <string name="common_enter_other_amount">Masukkan jumlah lain</string>
     <string name="common_enter_password">Masukkan kata sandi</string>
     <string name="common_error_general_title">Kesalahan</string>
     <string name="common_error_not_enough_tokens">Token tidak mencukupi</string>
@@ -435,6 +449,7 @@
     <string name="common_frequency_days_everyday">setiap hari</string>
     <string name="common_full_details">Detail lengkap</string>
     <string name="common_get_token_format">Dapatkan %s</string>
+    <string name="common_gift">Hadiah</string>
     <string name="common_got_it">Dimengerti</string>
     <string name="common_governance">Tata Kelola</string>
     <string name="common_hexadecimal_string">String heksadesimal</string>
@@ -450,6 +465,7 @@
     <string name="common_learn_more_v2_2_0">Temukan lebih banyak tentang</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">%s tersisa</string>
+    <string name="common_manage_wallets">Kelola Dompet</string>
     <string name="common_maximum">Maksimum</string>
     <string name="common_maximum_format">%s maksimum</string>
     <plurals name="common_minutes_format">
@@ -570,9 +586,11 @@
     <string name="common_wallet">Dompet</string>
     <string name="common_warning">Peringatan</string>
     <string name="common_yes">Ya</string>
+    <string name="common_your_gift">Hadiah Anda</string>
     <string name="common_zero_amount_error">Jumlah harus positif</string>
     <string name="confirm_cloud_backup_password_subtitle">Silakan masukkan kata sandi yang Anda buat selama proses pencadangan</string>
     <string name="confirm_cloud_backup_password_title">Masukkan kata sandi cadangan saat ini</string>
+    <string name="confirm_create_gift_hint">Mengonfirmasi akan mentransfer token dari akun Anda</string>
     <string name="confirm_mnemonic_disabled_button_state">Pilih kata-kata...</string>
     <string name="confirm_mnemonic_not_matching_error_message">Passphrase tidak valid, silakan periksa kembali urutan kata-kata</string>
     <string name="confirm_referendum_vote_referendum">Referendum</string>
@@ -807,6 +825,23 @@
     <string name="fragment_top_up_card_title">Isi ulang kartu dengan %s</string>
     <string name="fragment_waiting_top_up_time_out_error_message">Silakan hubungi support@novawallet.io. Sertakan alamat email yang Anda gunakan untuk menerbitkan kartu.</string>
     <string name="fragment_waiting_top_up_time_out_error_title">Hubungi dukungan</string>
+    <string name="gift_claimed_subtitle">Diambil</string>
+    <string name="gift_created_subtitle">Dibuat: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">Masukkan jumlah</string>
+    <string name="gift_min_balance_validation_message">Hadiah minimum adalah %s</string>
+    <string name="gift_reclaimed_subtitle">Diklaim kembali</string>
+    <string name="gifts_assets_flow_title">Pilih token untuk hadiah</string>
+    <string name="gifts_claim_fee">Biaya jaringan pada klaim</string>
+    <string name="gifts_create">Buat Hadiah</string>
+    <string name="gifts_header_subtitle">Kirim hadiah dengan cepat, mudah, dan aman di Nova</string>
+    <string name="gifts_header_title">Bagikan Hadiah Kripto kepada Siapa Saja, Di Mana Saja</string>
+    <string name="gifts_list_title">Hadiah yang Anda buat</string>
+    <string name="gifts_network_flow_title">Pilih jaringan untuk hadiah %s</string>
+    <string name="gifts_placeholder_step_1">Masukkan jumlah hadiah Anda</string>
+    <string name="gifts_placeholder_step_2">%s sebagai link dan undang siapa saja ke Nova</string>
+    <string name="gifts_placeholder_step_2_highlight">Bagikan hadiah secara langsung</string>
+    <string name="gifts_placeholder_step_3">%s, dan Anda dapat mengembalikan hadiah yang tidak diklaim kapan saja dari perangkat ini</string>
+    <string name="gifts_placeholder_step_3_highlight">Hadiah tersedia seketika</string>
     <string name="governance_notification_channel_name">Saluran Pemberitahuan Pemerintahan</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">Anda perlu memilih setidaknya %d trek</item>
@@ -1149,6 +1184,8 @@
     <string name="push_welcome_title">Jangan lewatkan hal apa pun!</string>
     <string name="receive_network_flow_title">Pilih jaringan untuk menerima %s</string>
     <string name="receive_screen_copy_address">Salin Alamat</string>
+    <string name="reclaim_gift_confirmation_message">Jika Anda mengambil kembali hadiah ini, tautan yang dibagikan akan dinonaktifkan, dan token akan dikembalikan ke dompet Anda.\nApakah Anda ingin melanjutkan?</string>
+    <string name="reclaim_gift_confirmation_title">Klaim kembali Hadiah %s?</string>
     <string name="recover_json_hint">Tempelkan json atau unggah file...</string>
     <string name="recover_json_upload">Unggah file</string>
     <string name="recovery_json">Pulihkan JSON</string>
@@ -1297,6 +1334,7 @@
     <string name="select_delegation_tracks_edit_title">Select tracks to edit delegation</string>
     <string name="select_delegation_tracks_revoke_title">Select tracks to revoke your delegation</string>
     <string name="select_delegation_tracks_unavailable_tracks">Unavailable tracks</string>
+    <string name="select_gift_amount_title">Kirim hadiah pada</string>
     <string name="select_ledger_grant_permissions">Aktifkan Bluetooth &amp; Berikan Izin</string>
     <string name="select_ledger_location_enable_request_message">Nova needs location to be enabled to be able to perform bluetooth scanning to find your Ledger device</string>
     <string name="select_ledger_location_enable_request_title">Please enable geo-location in device settings</string>
@@ -1346,6 +1384,10 @@
     <string name="setup_staking_type_pool_staking">Staking Kolam</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">Staking Anda kurang dari minimum untuk mendapatkan imbalan</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">Jenis staking tidak didukung</string>
+    <string name="share_gift_button">Bagikan tautan hadiah</string>
+    <string name="share_gift_reclaim">Klaim kembali</string>
+    <string name="share_gift_text" formatted="false">Halo! Anda memiliki hadiah %s yang menunggu Anda!\n\nPasang aplikasi Nova Wallet, atur dompet Anda, dan klaim melalui tautan khusus ini:\n%s</string>
+    <string name="share_gift_title">Hadiah Telah Disiapkan.\nBagikan Sekarang!</string>
     <string name="sr25519_selection_subtitle">sr25519 (direkomendasikan)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">Akun yang dipilih sudah digunakan sebagai controller</string>

@@ -37,4 +37,7 @@ class AssetActionsView @JvmOverloads constructor(
 
     val buySell: TextView
         get() = binder.assetActionsBuy
+
+    val gift: TextView
+        get() = binder.assetActionsGift
 }

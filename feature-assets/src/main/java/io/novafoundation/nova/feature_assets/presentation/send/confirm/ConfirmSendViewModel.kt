@@ -238,14 +238,13 @@ class ConfirmSendViewModel(
         address: String,
         chain: Chain,
         resolveName: Boolean
-    ) =
-        addressIconGenerator.createAddressModel(
-            chain = chain,
-            sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
-            address = address,
-            background = AddressIconGenerator.BACKGROUND_TRANSPARENT,
-            addressDisplayUseCase = addressDisplayUseCase.takeIf { resolveName }
-        )
+    ) = addressIconGenerator.createAddressModel(
+        chain = chain,
+        sizeInDp = AddressIconGenerator.SIZE_MEDIUM,
+        address = address,
+        background = AddressIconGenerator.BACKGROUND_TRANSPARENT,
+        addressDisplayUseCase = addressDisplayUseCase.takeIf { resolveName }
+    )
 
     private fun performTransfer(
         transfer: WeightedAssetTransfer,

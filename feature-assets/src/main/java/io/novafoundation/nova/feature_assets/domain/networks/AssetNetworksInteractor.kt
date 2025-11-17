@@ -4,16 +4,17 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.filterList
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchFilter
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
+import io.novafoundation.nova.feature_assets.domain.assets.search.mapToAssetSearchFilter
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.TokenAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByToken
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
-import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.normalize
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -28,7 +29,8 @@ import kotlinx.coroutines.flow.map
 class AssetNetworksInteractor(
     private val chainRegistry: ChainRegistry,
     private val assetSearchUseCase: AssetSearchUseCase,
-    private val tradeTokenRegistry: TradeTokenRegistry
+    private val tradeTokenRegistry: TradeTokenRegistry,
+    private val assetSourceRegistry: AssetSourceRegistry
 ) {
 
     fun tradeAssetFlow(
@@ -62,8 +64,7 @@ class AssetNetworksInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<List<AssetWithNetwork>> {
-        val filterFlow = getSwapAssetsFilter(forAssetId, coroutineScope)
-
+        val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAssetId, coroutineScope).mapToAssetSearchFilter()
         return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filterFlow = filterFlow)
     }
 
@@ -72,6 +73,21 @@ class AssetNetworksInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<List<AssetWithNetwork>> {
         return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filter = null)
+    }
+
+    fun giftsAssetFlow(
+        tokenSymbol: TokenSymbol,
+        externalBalancesFlow: Flow<List<ExternalBalance>>,
+        coroutineScope: CoroutineScope
+    ): Flow<List<AssetWithNetwork>> {
+        val filterFlow = assetSearchUseCase.getAvailableGiftAssets(coroutineScope).mapToAssetSearchFilter()
+        return searchAssetsByTokenSymbolInternalFlow(
+            tokenSymbol,
+            externalBalancesFlow,
+            assetGroupComparator = getTokenAssetGroupBaseComparator { it.groupBalance.transferable.fiat },
+            assetsComparator = getTokenAssetBaseComparator { it.balanceWithOffChain.transferable.fiat },
+            filterFlow = filterFlow
+        )
     }
 
     fun searchAssetsByTokenSymbolInternalFlow(
@@ -95,14 +111,7 @@ class AssetNetworksInteractor(
     }
 
     private fun getSwapAssetsFilter(sourceAsset: FullChainAssetId?, coroutineScope: CoroutineScope): Flow<AssetSearchFilter> {
-        return assetSearchUseCase.getAvailableSwapAssets(sourceAsset, coroutineScope)
-            .map { availableAssetsForSwap ->
-                val assetFilter: suspend (Asset) -> Boolean = { asset: Asset ->
-                    asset.token.configuration.fullId in availableAssetsForSwap
-                }
-
-                assetFilter
-            }
+        return assetSearchUseCase.getAvailableSwapAssets(sourceAsset, coroutineScope).mapToAssetSearchFilter()
     }
 }
 

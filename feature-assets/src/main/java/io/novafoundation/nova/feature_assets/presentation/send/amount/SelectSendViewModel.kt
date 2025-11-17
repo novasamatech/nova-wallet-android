@@ -16,7 +16,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -537,18 +537,18 @@ class SelectSendViewModel(
         }
     }
 
-    private suspend fun getMetaAccountsFilter(origin: Chain, destination: Chain): SelectAddressAccountFilter {
+    private suspend fun getMetaAccountsFilter(origin: Chain, destination: Chain): SelectAccountFilter {
         val isCrossChain = origin.id != destination.id
 
         return if (isCrossChain) {
-            SelectAddressAccountFilter.Everything()
+            SelectAccountFilter.Everything()
         } else {
             val destinationAccountId = selectedAccount.first().requireAccountIdIn(destination)
             val notOriginMetaAccounts = accountRepository.getActiveMetaAccounts()
                 .filter { it.accountIdIn(origin)?.intoKey() == destinationAccountId.intoKey() }
                 .map { it.id }
 
-            SelectAddressAccountFilter.ExcludeMetaAccounts(
+            SelectAccountFilter.ExcludeMetaAccounts(
                 notOriginMetaAccounts
             )
         }

@@ -3,7 +3,6 @@ package io.novafoundation.nova.common.utils.insets
 import android.os.Build
 
 enum class ImeInsetsState(val enabled: Boolean) {
-    ENABLE(true),
     DISABLE(false),
 
     /**

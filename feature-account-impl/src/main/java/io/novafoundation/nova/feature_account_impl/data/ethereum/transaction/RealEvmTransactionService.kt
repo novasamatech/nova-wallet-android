@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.data.ethereum.transaction
 import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.toEcdsaSignatureData
 import io.novafoundation.nova.core.ethereum.Web3Api
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EthereumTransactionExecution
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionBuilding
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.EvmTransactionService
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -37,6 +38,10 @@ import org.web3j.protocol.core.methods.request.Transaction
 import org.web3j.rlp.RlpEncoder
 import org.web3j.rlp.RlpList
 import java.math.BigInteger
+import kotlinx.coroutines.delay
+import org.web3j.protocol.core.methods.response.TransactionReceipt
+import kotlin.String
+import kotlin.time.Duration.Companion.seconds
 
 internal class RealEvmTransactionService(
     private val accountRepository: AccountRepository,
@@ -130,6 +135,50 @@ internal class RealEvmTransactionService(
         val eip155SignatureData: Sign.SignatureData = TransactionEncoder.createEip155SignatureData(signatureData, ethereumChainId)
 
         return txForSign.encodeWith(eip155SignatureData).toHexString(withPrefix = true)
+    }
+
+    override suspend fun transactAndAwaitExecution(
+        chainId: ChainId,
+        presetFee: Fee?,
+        origin: TransactionOrigin,
+        fallbackGasLimit: BigInteger,
+        building: EvmTransactionBuilding
+    ): Result<EthereumTransactionExecution> {
+        return transact(chainId, presetFee, origin, fallbackGasLimit, building)
+            .mapCatching {
+                val transactionReceipt = it.awaitExecution(chainId)
+                EthereumTransactionExecution(
+                    extrinsicHash = transactionReceipt.transactionHash,
+                    blockHash = transactionReceipt.blockHash,
+                    it.submissionHierarchy
+                )
+            }
+    }
+
+    private suspend fun ExtrinsicSubmission.awaitExecution(chainId: ChainId): TransactionReceipt {
+        val deadline = System.currentTimeMillis() + 60.seconds.inWholeMilliseconds
+
+        while (true) {
+            val web3Api = chainRegistry.getCallEthereumApiOrThrow(chainId)
+            val response = web3Api.ethGetTransactionReceipt(hash).sendSuspend()
+            val optionalReceipt = response.transactionReceipt
+
+            if (optionalReceipt.isPresent) {
+                val receipt = optionalReceipt.get()
+
+                if (!receipt.isStatusOK()) {
+                    throw RuntimeException("EVM tx reverted: $hash")
+                }
+
+                return receipt
+            }
+
+            if (System.currentTimeMillis() > deadline) {
+                throw RuntimeException("Timeout while waiting for tx: $hash")
+            }
+
+            delay(3.seconds.inWholeMilliseconds)
+        }
     }
 
     private suspend fun Web3Api.getNonce(address: String): BigInteger {

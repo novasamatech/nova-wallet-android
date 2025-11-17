@@ -13,6 +13,7 @@ dependencies {
     implementation project(':runtime')
     implementation project(":feature-account-api")
     implementation project(":feature-currency-api")
+    implementation project(':runtime')
     implementation project(":common")
 
     implementation androidDep

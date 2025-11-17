@@ -70,6 +70,10 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         binder.viewAssetsTotalBalanceBuy.setOnClickListener(clickListener)
     }
 
+    fun onGiftClick(clickListener: OnClickListener) {
+        binder.viewAssetsTotalBalanceGift.setOnClickListener(clickListener)
+    }
+
     fun setMaskingEnabled(maskingEnabled: Boolean) {
         val buttonImageRes = when (maskingEnabled) {
             true -> R.drawable.ic_eye_hide
