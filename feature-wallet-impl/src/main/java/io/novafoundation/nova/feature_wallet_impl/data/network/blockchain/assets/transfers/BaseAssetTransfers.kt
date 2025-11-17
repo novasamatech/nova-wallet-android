@@ -78,7 +78,7 @@ abstract class BaseAssetTransfers(
 
         return extrinsicServiceFactory
             .createDefault(coroutineScope)
-            .estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet, submissionOptions = submissionOptions) {
+            .estimateFee(transfer.originChain, transfer.sender.intoOrigin(), submissionOptions = submissionOptions) {
                 transfer(transfer)
             }
     }
