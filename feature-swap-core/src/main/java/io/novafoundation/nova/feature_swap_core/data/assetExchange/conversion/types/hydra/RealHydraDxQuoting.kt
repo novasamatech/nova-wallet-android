@@ -3,32 +3,23 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 import io.novafoundation.nova.common.utils.flatMapAsync
 import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.mergeIfMultiple
-import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
-import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_swap_core_api.data.network.isSystemAsset
-import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrThrow
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.Flow
 
 class RealHydraDxQuotingFactory(
-    private val remoteStorageSource: StorageDataSource,
     private val conversionSourceFactories: Iterable<HydraDxQuotingSource.Factory<*>>,
-    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
 ) : HydraDxQuoting.Factory {
 
     override fun create(chain: Chain, host: SwapQuoting.QuotingHost): HydraDxQuoting {
         return RealHydraDxQuoting(
             chain = chain,
-            remoteStorageSource = remoteStorageSource,
             quotingSourceFactories = conversionSourceFactories,
-            hydraDxAssetIdConverter = hydraDxAssetIdConverter,
             host = host
         )
     }
@@ -36,9 +27,7 @@ class RealHydraDxQuotingFactory(
 
 private class RealHydraDxQuoting(
     private val chain: Chain,
-    private val remoteStorageSource: StorageDataSource,
     private val quotingSourceFactories: Iterable<HydraDxQuotingSource.Factory<*>>,
-    private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
     private val host: SwapQuoting.QuotingHost,
 ) : HydraDxQuoting {
 
@@ -50,18 +39,6 @@ private class RealHydraDxQuoting(
 
     override suspend fun sync() {
         quotingSources.values.forEachAsync { it.sync() }
-    }
-
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-        val onChainId = hydraDxAssetIdConverter.toOnChainIdOrThrow(chainAsset)
-
-        if (hydraDxAssetIdConverter.isSystemAsset(onChainId)) return true
-
-        val fallbackPrice = remoteStorageSource.query(chain.id) {
-            metadata.multiTransactionPayment.acceptedCurrencies.query(onChainId)
-        }
-
-        return fallbackPrice != null
     }
 
     override suspend fun availableSwapDirections(): List<QuotableEdge> {

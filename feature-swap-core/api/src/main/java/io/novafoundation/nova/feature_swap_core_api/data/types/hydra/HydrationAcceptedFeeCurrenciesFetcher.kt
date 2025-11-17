@@ -6,4 +6,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 interface HydrationAcceptedFeeCurrenciesFetcher {
 
     suspend fun fetchAcceptedFeeCurrencies(chain: Chain): Result<Set<ChainAssetId>>
+
+    suspend fun isAcceptedCurrency(chainAsset: Chain.Asset): Result<Boolean>
 }

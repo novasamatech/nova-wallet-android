@@ -21,7 +21,7 @@ import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrin
 import kotlinx.coroutines.CoroutineScope
 
 class AssetHubFeePaymentProvider @AssistedInject constructor(
-    @Assisted private val chain: Chain,
+    @Assisted override val chain: Chain,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
@@ -41,9 +41,14 @@ class AssetHubFeePaymentProvider @AssistedInject constructor(
             paymentAsset = customFeeAsset,
             multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
             multiLocationConverter = multiLocationConverter,
-            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher.create(chain, multiLocationConverter),
             xcmVersionDetector = xcmVersionDetector
         )
+    }
+
+    override suspend fun canPayFeeInNonUtilityToken(customFeeAsset: Chain.Asset): Result<Boolean> {
+        // Asset hub does not support per-asset optimized query
+        return fastLookupCustomFeeCapability()
+            .map { it.canPayFeeInNonUtilityToken(customFeeAsset.id) }
     }
 
     override suspend fun detectFeePaymentFromExtrinsic(extrinsic: SendableExtrinsic): FeePayment {
@@ -54,7 +59,6 @@ class AssetHubFeePaymentProvider @AssistedInject constructor(
             paymentAsset = feePaymentAsset,
             multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
             multiLocationConverter = multiLocationConverter,
-            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher.create(chain, multiLocationConverter),
             xcmVersionDetector = xcmVersionDetector
         )
     }

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.fee.fastLookupCustomFeeCapabilityOrDefault
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
@@ -113,8 +114,8 @@ class AssetSearchUseCase(
     private suspend fun collectAllAssetsAllowedForGiftsInChain(chain: Chain): Set<FullChainAssetId> {
         val canBeUsedForFeePayment = feePaymentRegistry
             .providerFor(chain.id)
-            .fastLookupCustomFeeCapability()
-            .getOrNull()?.nonUtilityFeeCapableTokens.orEmpty()
+            .fastLookupCustomFeeCapabilityOrDefault()
+            .nonUtilityFeeCapableTokens
 
         return canBeUsedForFeePayment.mapNotNullToSet {
             val asset = chain.getAssetOrThrow(it)

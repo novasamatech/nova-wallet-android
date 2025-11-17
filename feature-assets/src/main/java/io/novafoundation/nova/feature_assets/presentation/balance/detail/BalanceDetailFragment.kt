@@ -8,9 +8,9 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.insets.applyBarMargin
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
-import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceDetailBinding
@@ -156,6 +156,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         viewModel.sendEnabled.observe(binder.balanceDetailActions.send::setEnabled)
 
         viewModel.swapButtonEnabled.observe(binder.balanceDetailActions.swap::setEnabled)
+
+        viewModel.giftsButtonEnabled.observe(binder.balanceDetailActions.gift::setEnabled)
 
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
             LedgerNotSupportedWarningBottomSheet(

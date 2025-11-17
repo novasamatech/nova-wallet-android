@@ -29,7 +29,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.sh
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.userCanChangeFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeContext.OperationUtilityAssetSource
 import io.novafoundation.nova.runtime.ext.fullId
-import io.novafoundation.nova.runtime.ext.isCommissionAsset
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -351,7 +350,7 @@ internal class FeeLoaderV2Provider<F, D>(
     }
 
     private suspend fun canPayFeeIn(chainAsset: Chain.Asset): Boolean {
-        return chainAsset.isCommissionAsset || interactor.canPayFeeInNonUtilityAsset(chainAsset, this)
+        return interactor.canPayFeeInAsset(chainAsset)
     }
 
     private fun FeeLoaderMixinV2.Configuration<*, *>.toFeeFormatterConfiguration(): FeeFormatter.Configuration {

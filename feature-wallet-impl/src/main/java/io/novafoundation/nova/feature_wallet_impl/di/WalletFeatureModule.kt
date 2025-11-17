@@ -21,7 +21,6 @@ import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -60,9 +59,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValida
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.AssetModelFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFiatFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealFractionStylingFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.RealTokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -239,7 +238,6 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideCustomFeeInteractor(
-        feePaymentProviderRegistry: FeePaymentProviderRegistry,
         chainRegistry: ChainRegistry,
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
@@ -248,7 +246,6 @@ class WalletFeatureModule {
         tokenRepository: TokenRepository,
     ): FeeInteractor {
         return RealFeeInteractor(
-            feePaymentProviderRegistry = feePaymentProviderRegistry,
             chainRegistry = chainRegistry,
             walletRepository = walletRepository,
             accountRepository = accountRepository,

@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency.As
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
+import io.novafoundation.nova.feature_account_api.data.fee.fastLookupCustomFeeCapabilityOrDefault
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
@@ -860,7 +861,7 @@ internal class RealSwapService(
         val selectedAccount: MetaAccount,
     ) : EdgeVisitFilter<SwapGraphEdge> {
 
-        private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
+        private val feePaymentCapabilityCache: MutableMap<ChainId, FastLookupCustomFeeCapability> = mutableMapOf()
         private val callExecutionType = lazyAsync {
             signerProvider.rootSignerFor(selectedAccount)
                 .callExecutionType()
@@ -920,19 +921,15 @@ internal class RealSwapService(
             return balance.isSelfSufficient(chainAndAsset.asset)
         }
 
-        private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability? {
-            val fromCache = feePaymentCapabilityCache.getOrPut(chainId) {
-                createFastLookupFeeCapability(chainId, computationScope).boxNullable()
+        private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability {
+            return feePaymentCapabilityCache.getOrPut(chainId) {
+                createFastLookupFeeCapability(chainId, computationScope)
             }
-
-            return fromCache.unboxNullable()
         }
 
-        private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability? {
+        private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability {
             val feePaymentRegistry = exchangeRegistry(computationScope).getFeePaymentRegistry()
-            return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
-                .onFailure { Log.e("Swap", "Failed to construct fast custom fee lookup for chain $chainId", it) }
-                .getOrNull()
+            return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapabilityOrDefault()
         }
     }
 
@@ -948,13 +945,6 @@ internal class RealSwapService(
             return blockNumberCache.getOrCompute(chainId)
         }
     }
-
-    private object NULL
-
-    fun <T> T.boxNullable(): Any = this ?: NULL
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T> Any.unboxNullable(): T? = if (this == NULL) null else this as T
 }
 
 private typealias QuotedTrade = QuotedPath<SwapGraphEdge>

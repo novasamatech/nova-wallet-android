@@ -531,10 +531,16 @@ private class HydraDxAssetExchange(
     }
 
     // This is an optimization to reuse swap quoting state for hydra fee estimation instead of letting ExtrinsicService to spin up its own quoting
-    private inner class ReusableQuoteFeePaymentProvider : CustomOrNativeFeePaymentProvider() {
+    private inner class ReusableQuoteFeePaymentProvider() : CustomOrNativeFeePaymentProvider() {
+
+        override val chain: Chain = this@HydraDxAssetExchange.chain
 
         override suspend fun feePaymentFor(customFeeAsset: Chain.Asset, coroutineScope: CoroutineScope?): FeePayment {
             return ReusableQuoteFeePayment(customFeeAsset)
+        }
+
+        override suspend fun canPayFeeInNonUtilityToken(customFeeAsset: Chain.Asset): Result<Boolean> {
+            return hydrationAcceptedFeeCurrenciesFetcher.isAcceptedCurrency(customFeeAsset)
         }
 
         override suspend fun detectFeePaymentFromExtrinsic(extrinsic: SendableExtrinsic): FeePayment {
@@ -542,7 +548,7 @@ private class HydraDxAssetExchange(
             return NativeFeePayment()
         }
 
-        override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability?> {
+        override suspend fun fastLookupCustomFeeCapability(): Result<FastLookupCustomFeeCapability> {
             return runCatching {
                 val acceptedCurrencies = hydrationAcceptedFeeCurrenciesFetcher.fetchAcceptedFeeCurrencies(chain)
                     .getOrDefault(emptySet())
@@ -587,10 +593,6 @@ private class HydraDxAssetExchange(
                 submissionOrigin = nativeFee.submissionOrigin,
                 asset = customFeeAsset
             )
-        }
-
-        override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-            return delegate.canPayFeeInNonUtilityToken(chainAsset)
         }
     }
 
