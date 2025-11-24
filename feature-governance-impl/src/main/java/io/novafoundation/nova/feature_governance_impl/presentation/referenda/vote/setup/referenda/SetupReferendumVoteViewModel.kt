@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.referenda
 
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
