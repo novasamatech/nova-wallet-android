@@ -90,12 +90,10 @@ class ContributionsModule {
     @FeatureScope
     fun provideContributionsUpdaterFactory(
         contributionsRepository: ContributionsRepository,
-        crowdloanRepository: CrowdloanRepository,
         contributionDao: ContributionDao,
         externalBalanceDao: ExternalBalanceDao
     ): ContributionsUpdaterFactory = RealContributionsUpdaterFactory(
         contributionsRepository,
-        crowdloanRepository,
         contributionDao,
         externalBalanceDao
     )

@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBa
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.AssetBalanceScope.ScopeValue
 import io.novafoundation.nova.feature_crowdloan_api.data.network.updater.ContributionsUpdaterFactory
 import io.novafoundation.nova.feature_crowdloan_api.data.repository.ContributionsRepository
-import io.novafoundation.nova.feature_crowdloan_api.data.repository.CrowdloanRepository
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.mapContributionToLocal
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -25,7 +24,6 @@ import kotlinx.coroutines.flow.onEach
 
 class RealContributionsUpdaterFactory(
     private val contributionsRepository: ContributionsRepository,
-    private val crowdloanRepository: CrowdloanRepository,
     private val contributionDao: ContributionDao,
     private val externalBalanceDao: ExternalBalanceDao,
 ) : ContributionsUpdaterFactory {
@@ -35,7 +33,6 @@ class RealContributionsUpdaterFactory(
             assetBalanceScope,
             chain,
             contributionsRepository,
-            crowdloanRepository,
             contributionDao,
             externalBalanceDao,
         )
@@ -46,7 +43,6 @@ class ContributionsUpdater(
     override val scope: AssetBalanceScope,
     private val chain: Chain,
     private val contributionsRepository: ContributionsRepository,
-    private val crowdloanRepository: CrowdloanRepository,
     private val contributionDao: ContributionDao,
     private val externalBalanceDao: ExternalBalanceDao,
 ) : Updater<ScopeValue> {
@@ -71,12 +67,9 @@ class ContributionsUpdater(
         val chainAsset = chain.utilityAsset
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
-        val fundInfos = crowdloanRepository.allFundInfos(chain.id)
-
         return contributionsRepository.loadContributionsGraduallyFlow(
             chain = chain,
             accountId = accountId,
-            fundInfos = fundInfos,
         ).onEach { (sourceId, contributionsResult) ->
             contributionsResult.onSuccess { contributions ->
                 val newContributions = contributions.map { mapContributionToLocal(metaAccount.id, it) }
