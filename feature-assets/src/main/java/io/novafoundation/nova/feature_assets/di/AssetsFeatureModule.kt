@@ -14,8 +14,6 @@ import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValu
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.OperationDao
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope

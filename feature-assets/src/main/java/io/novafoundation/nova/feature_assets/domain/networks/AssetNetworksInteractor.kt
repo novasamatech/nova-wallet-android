@@ -12,7 +12,6 @@ import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetGroupBas
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByToken
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
