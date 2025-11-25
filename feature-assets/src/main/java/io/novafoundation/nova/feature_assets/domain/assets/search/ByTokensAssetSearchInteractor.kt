@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetBaseComp
 import io.novafoundation.nova.feature_assets.domain.common.getTokenAssetGroupBaseComparator
 import io.novafoundation.nova.feature_assets.domain.common.groupAndSortAssetsByToken
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
+import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
@@ -24,6 +25,7 @@ class ByTokensAssetSearchInteractor(
     private val assetSearchUseCase: AssetSearchUseCase,
     private val chainRegistry: ChainRegistry,
     private val tradeTokenRegistry: TradeTokenRegistry,
+    private val availableGiftAssetsUseCase: AvailableGiftAssetsUseCase
 ) : AssetSearchInteractor {
 
     override fun tradeAssetSearch(
@@ -73,7 +75,7 @@ class ByTokensAssetSearchInteractor(
         externalBalancesFlow: Flow<List<ExternalBalance>>,
         coroutineScope: CoroutineScope
     ): Flow<AssetsByViewModeResult> {
-        val filterFlow = assetSearchUseCase.getAvailableGiftAssets(coroutineScope).mapToAssetSearchFilter()
+        val filterFlow = availableGiftAssetsUseCase.getAvailableGiftAssets(coroutineScope).mapToAssetSearchFilter()
         return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
     }
 

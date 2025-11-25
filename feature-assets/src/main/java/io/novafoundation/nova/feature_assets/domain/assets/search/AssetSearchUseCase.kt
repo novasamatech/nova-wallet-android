@@ -40,17 +40,8 @@ class AssetSearchUseCase(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val swapService: SwapService,
-    private val computationalCache: ComputationalCache,
-    private val feePaymentRegistry: FeePaymentProviderRegistry,
-    private val feePaymentFacade: CustomFeeCapabilityFacade,
-    private val assetSourceRegistry: AssetSourceRegistry,
+    private val swapService: SwapService
 ) {
-
-    companion object {
-
-        private const val GIFT_ASSETS_CACHE = "AssetSearchUseCase.GIFT_ASSETS_CACHE"
-    }
 
     fun filteredAssetFlow(filterFlow: Flow<AssetSearchFilter?>): Flow<List<Asset>> {
         val assetsFlow = accountRepository.selectedMetaAccountFlow()
@@ -84,51 +75,5 @@ class AssetSearchUseCase(
                 swapService.availableSwapDirectionsFor(chainAsset, coroutineScope)
             }
         }
-    }
-
-    fun getAvailableGiftAssets(coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>> {
-        return computationalCache.useSharedFlow(GIFT_ASSETS_CACHE, coroutineScope) {
-            flow {
-                // Fast first emission - show all native assets
-                emit(chainRegistry.allNativeAssetIds())
-
-                if (feePaymentFacade.hasGlobalFeePaymentRestrictions()) return@flow
-
-                // Then do the full scan - via slower fee capability check
-                emitPerChainAvailableAssets()
-            }
-                .runningFold(emptySet<FullChainAssetId>()) { acc, newAssets -> if (newAssets.isEmpty()) acc else acc + newAssets }
-                .distinctUntilChangedBy { it.size } // we are only adding so deduplication by size is enough
-                .onEach { Log.d("AssetSearchUseCase", "# of assets available for gifts: ${it.size}") }
-        }
-    }
-
-    context(FlowCollector<Set<FullChainAssetId>>)
-    private suspend fun emitPerChainAvailableAssets() {
-        val chains = chainRegistry.currentChains.first()
-        chains.map { chain -> flowOf { collectAllAssetsAllowedForGiftsInChain(chain) } }
-            .merge()
-            .collect { emit(it) }
-    }
-
-    private suspend fun collectAllAssetsAllowedForGiftsInChain(chain: Chain): Set<FullChainAssetId> {
-        val canBeUsedForFeePayment = feePaymentRegistry
-            .providerFor(chain.id)
-            .fastLookupCustomFeeCapabilityOrDefault()
-            .nonUtilityFeeCapableTokens
-
-        return canBeUsedForFeePayment.mapNotNullToSet {
-            val asset = chain.getAssetOrThrow(it)
-            val isSufficient = assetSourceRegistry.isSelfSufficientAsset(asset)
-            if (isSufficient) {
-                asset.fullId
-            } else {
-                null
-            }
-        }
-    }
-
-    private suspend fun ChainRegistry.allNativeAssetIds(): Set<FullChainAssetId> {
-        return currentChains.first().mapToSet { it.utilityAsset.fullId }
     }
 }
