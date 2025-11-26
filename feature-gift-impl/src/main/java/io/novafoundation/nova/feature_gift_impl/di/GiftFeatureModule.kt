@@ -2,15 +2,19 @@ package io.novafoundation.nova.feature_gift_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.dao.GiftsDao
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
 import io.novafoundation.nova.feature_gift_impl.data.RealGiftSecretsRepository
@@ -21,6 +25,7 @@ import io.novafoundation.nova.feature_gift_impl.domain.RealGiftsInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.RealCreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.GiftSecretsUseCase
+import io.novafoundation.nova.feature_gift_impl.domain.RealAvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_gift_impl.domain.RealClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.RealShareGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.ShareGiftInteractor
@@ -146,4 +151,22 @@ class GiftFeatureModule {
     @Provides
     @FeatureScope
     fun provideClaimGiftMixinFactory(claimGiftInteractor: ClaimGiftInteractor) = ClaimGiftMixinFactory(claimGiftInteractor)
+
+    @Provides
+    @FeatureScope
+    fun provideAvailableGiftAssetsUseCase(
+        chainRegistry: ChainRegistry,
+        computationalCache: ComputationalCache,
+        feePaymentRegistry: FeePaymentProviderRegistry,
+        feePaymentFacade: CustomFeeCapabilityFacade,
+        assetSourceRegistry: AssetSourceRegistry,
+    ): AvailableGiftAssetsUseCase {
+        return RealAvailableGiftAssetsUseCase(
+            chainRegistry,
+            computationalCache,
+            feePaymentRegistry,
+            feePaymentFacade,
+            assetSourceRegistry
+        )
+    }
 }

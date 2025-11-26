@@ -14,8 +14,6 @@ import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValu
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.OperationDao
-import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
-import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -59,6 +57,7 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.filter.His
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
@@ -99,20 +98,12 @@ class AssetsFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        swapService: SwapService,
-        computationalCache: ComputationalCache,
-        feePaymentRegistry: FeePaymentProviderRegistry,
-        feePaymentFacade: CustomFeeCapabilityFacade,
-        assetSourceRegistry: AssetSourceRegistry,
+        swapService: SwapService
     ) = AssetSearchUseCase(
         walletRepository = walletRepository,
         accountRepository = accountRepository,
         chainRegistry = chainRegistry,
-        swapService = swapService,
-        computationalCache = computationalCache,
-        feePaymentRegistry = feePaymentRegistry,
-        feePaymentFacade = feePaymentFacade,
-        assetSourceRegistry = assetSourceRegistry
+        swapService = swapService
     )
 
     @Provides
@@ -122,11 +113,13 @@ class AssetsFeatureModule {
         assetSearchUseCase: AssetSearchUseCase,
         chainRegistry: ChainRegistry,
         tradeTokenRegistry: TradeTokenRegistry,
+        availableGiftAssetsUseCase: AvailableGiftAssetsUseCase
     ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(
         assetViewModeRepository,
         assetSearchUseCase,
         chainRegistry,
         tradeTokenRegistry,
+        availableGiftAssetsUseCase
     )
 
     @Provides
@@ -135,8 +128,8 @@ class AssetsFeatureModule {
         chainRegistry: ChainRegistry,
         assetSearchUseCase: AssetSearchUseCase,
         tradeTokenRegistry: TradeTokenRegistry,
-        assetSourceRegistry: AssetSourceRegistry
-    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry, assetSourceRegistry)
+        giftAssetsUseCase: AvailableGiftAssetsUseCase
+    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry, giftAssetsUseCase)
 
     @Provides
     @FeatureScope

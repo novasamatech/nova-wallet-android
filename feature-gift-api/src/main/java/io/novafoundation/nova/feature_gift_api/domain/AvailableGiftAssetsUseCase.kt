@@ -1,0 +1,9 @@
+package io.novafoundation.nova.feature_gift_api.domain
+
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+
+interface AvailableGiftAssetsUseCase {
+    fun getAvailableGiftAssets(coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>>
+}
