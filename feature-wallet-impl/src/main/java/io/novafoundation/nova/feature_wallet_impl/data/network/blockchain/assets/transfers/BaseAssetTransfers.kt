@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.transfers
 
 import io.novafoundation.nova.common.validation.ValidationSystem
-import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.intoOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmission
@@ -78,7 +77,7 @@ abstract class BaseAssetTransfers(
 
         return extrinsicServiceFactory
             .createDefault(coroutineScope)
-            .estimateFee(transfer.originChain, TransactionOrigin.SelectedWallet, submissionOptions = submissionOptions) {
+            .estimateFee(transfer.originChain, transfer.sender.intoOrigin(), submissionOptions = submissionOptions) {
                 transfer(transfer)
             }
     }

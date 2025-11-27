@@ -141,6 +141,7 @@ class ShareGiftViewModel(
         claimGiftMixin.claimGift(gift = claimableGift, amountWithFee = amountWithFee, giftMetaAccount = tempMetaAccount, giftRecipient = recipientMetaAccount)
             .onSuccess {
                 shareGiftInteractor.setGiftStateAsReclaimed(giftModel.id)
+                showToast(resourceManager.getString(R.string.reclaim_gift_success))
                 router.back()
             }
             .onFailure {
