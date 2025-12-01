@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <!--<string name="account_polkadot_vault_import_start_step_2">%s Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>-->
+    <!--<string name="account_polkadot_vault_import_start_step_2_highlighted">Go to “Key Sets” tab.</string>-->
+    <string name="account_polkadot_vault_import_start_step_2">%s you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Tap on Derived Key</string>
+
+    <string name="account_pair_public_key">Pair public key</string>
+    <string name="account_import_private_key">Import private key</string>
+
+    <string name="account_polkadot_vault_import_start_step_3_private">Tap the icon in the top-right corner and select %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Export Private Key</string>
+
     <string name="reclaim_gift_confirmation_title">Reclaim %s Gift?</string>
     <string name="reclaim_gift_confirmation_message">If you reclaim this gift, the shared link will be disabled, and tokens will be refunded to your wallet.\nDo you want to continue?</string>
 
@@ -530,9 +542,6 @@
 
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault will provide you %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR code to scan</string>
-
-    <string name="account_polkadot_vault_import_start_step_2">%s Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Go to “Key Sets” tab.</string>
 
     <string name="account_polkadot_vault_import_start_step_1">%s application on your smartphone</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Open Polkadot Vault</string>

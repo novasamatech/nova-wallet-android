@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.data.secrets
 
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
+import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.mapKeypairStructToKeypair
@@ -30,11 +31,14 @@ class AccountSecretsFactory(
 ) {
 
     sealed class AccountSource {
+
         class Mnemonic(val cryptoType: CryptoType, val mnemonic: String) : AccountSource()
 
         class Seed(val cryptoType: CryptoType, val seed: String) : AccountSource()
 
         class Json(val json: String, val password: String) : AccountSource()
+
+        class RawKey(val key: ByteArray, val cryptoType: CryptoType) : AccountSource()
     }
 
     sealed class SecretsError : Exception() {
@@ -73,24 +77,36 @@ class AccountSecretsFactory(
             is AccountSource.Mnemonic -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Seed -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Json -> decodedJson!!.multiChainEncryption.encryptionType
+            is AccountSource.RawKey -> mapCryptoTypeToEncryption(accountSource.cryptoType)
         }
 
         val seed = when (accountSource) {
             is AccountSource.Mnemonic -> deriveSeed(accountSource.mnemonic, decodedDerivationPath?.password, ethereum = isEthereum).seed
             is AccountSource.Seed -> accountSource.seed.fromHex()
             is AccountSource.Json -> null
+            is AccountSource.RawKey -> null
         }
 
-        val keypair = if (seed != null) {
-            val junctions = decodedDerivationPath?.junctions.orEmpty()
+        val keypair = when {
+            seed != null -> {
+                val junctions = decodedDerivationPath?.junctions.orEmpty()
 
-            if (isEthereum) {
-                Bip32EcdsaKeypairFactory.generate(seed, junctions)
-            } else {
-                SubstrateKeypairFactory.generate(encryptionType, seed, junctions)
+                if (isEthereum) {
+                    Bip32EcdsaKeypairFactory.generate(seed, junctions)
+                } else {
+                    SubstrateKeypairFactory.generate(encryptionType, seed, junctions)
+                }
             }
-        } else { // seed is null for some cases when importing with JSON
-            decodedJson!!.keypair
+
+            decodedJson != null -> {
+                decodedJson.keypair
+            }
+
+            else -> {
+                val junctions = decodedDerivationPath?.junctions.orEmpty()
+                val rawKey = accountSource.cast<AccountSource.RawKey>()
+                SubstrateKeypairFactory.generateFromRaw(encryptionType, rawKey.key, junctions)
+            }
         }
 
         val secrets = ChainAccountSecrets(

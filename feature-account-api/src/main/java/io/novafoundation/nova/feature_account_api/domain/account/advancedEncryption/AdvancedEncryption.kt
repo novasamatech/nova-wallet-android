@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_api.domain.account.advancedEncryp
 
 import io.novafoundation.nova.common.utils.input.Input
 import io.novafoundation.nova.core.model.CryptoType
+import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 
 class AdvancedEncryptionInput(
     val substrateCryptoType: Input<CryptoType>,
@@ -25,3 +26,12 @@ class AdvancedEncryption(
         }
     }
 }
+
+fun EncryptionDefaults.recommended() = AdvancedEncryption(
+    substrateCryptoType = substrateCryptoType,
+    ethereumCryptoType = ethereumCryptoType,
+    derivationPaths = AdvancedEncryption.DerivationPaths(
+        substrate = substrateDerivationPath,
+        ethereum = ethereumDerivationPath
+    )
+)

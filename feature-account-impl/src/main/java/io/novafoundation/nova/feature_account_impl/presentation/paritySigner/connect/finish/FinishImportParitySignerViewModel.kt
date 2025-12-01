@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish
 
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.createName.CreateWalletNameViewModel
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish.FinishImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
-import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.toDomain
 
 class FinishImportParitySignerViewModel(
     private val router: AccountRouter,
@@ -16,12 +17,23 @@ class FinishImportParitySignerViewModel(
     private val interactor: FinishImportParitySignerInteractor
 ) : CreateWalletNameViewModel(router, resourceManager) {
 
-    override fun proceed(name: String) {
-        launch {
-            interactor.createWallet(name, payload.accountId, payload.variant)
-                .onSuccess { continueBasedOnCodeStatus() }
-                .onFailure(::showError)
+    override fun proceed(name: String) = launchUnit {
+        val result = when (payload) {
+            is ParitySignerAccountPayload.AsPublic -> interactor.createWalletPolkadotVaultWallet(
+                name,
+                payload.accountId,
+                payload.variant
+            )
+
+            is ParitySignerAccountPayload.AsSecret -> interactor.createSecretWallet(
+                name,
+                secret = payload.secret.toDomain(),
+                payload.variant
+            )
         }
+
+        result.onSuccess { continueBasedOnCodeStatus() }
+            .onFailure(::showError)
     }
 
     private suspend fun continueBasedOnCodeStatus() {

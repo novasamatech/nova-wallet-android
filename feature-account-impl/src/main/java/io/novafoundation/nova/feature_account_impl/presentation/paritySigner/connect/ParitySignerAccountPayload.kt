@@ -2,10 +2,48 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.co
 
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
+import io.novasama.substrate_sdk_android.encrypt.qr.ScanSecret
+import io.novasama.substrate_sdk_android.encrypt.qr.formats.SecretQrFormat
 import kotlinx.parcelize.Parcelize
 
-@Parcelize
-class ParitySignerAccountPayload(
-    val accountId: ByteArray,
+sealed interface ParitySignerAccountPayload : Parcelable {
+
+    val accountId: ByteArray
+
     val variant: PolkadotVaultVariant
-) : Parcelable
+
+    @Parcelize
+    class AsPublic(
+        override val accountId: ByteArray,
+        override val variant: PolkadotVaultVariant
+    ) : ParitySignerAccountPayload
+
+    @Parcelize
+    class AsSecret(
+        override val accountId: ByteArray,
+        override val variant: PolkadotVaultVariant,
+        val secret: ScanSecretPayload
+    ) : ParitySignerAccountPayload
+}
+
+
+sealed interface ScanSecretPayload : Parcelable {
+
+    val data: ByteArray
+
+    @Parcelize
+    class Seed(override val data: ByteArray) : ScanSecretPayload
+
+    @Parcelize
+    class RawKey(override val data: ByteArray) : ScanSecretPayload
+}
+
+fun ScanSecretPayload.toDomain(): ScanSecret = when (this) {
+    is ScanSecretPayload.RawKey -> ScanSecret.RawKey(data)
+    is ScanSecretPayload.Seed -> ScanSecret.Seed(data)
+}
+
+fun ScanSecret.fromDomain(): ScanSecretPayload = when (this) {
+    is ScanSecret.RawKey -> ScanSecretPayload.RawKey(data)
+    is ScanSecret.Seed -> ScanSecretPayload.Seed(data)
+}

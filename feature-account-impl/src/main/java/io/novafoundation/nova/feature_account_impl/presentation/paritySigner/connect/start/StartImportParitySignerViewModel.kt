@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.list.instruction.InstructionItem
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig.*
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.formatWithPolkadotVaultLabel
 import io.novafoundation.nova.feature_account_impl.R
@@ -17,8 +19,7 @@ class StartImportParitySignerViewModel(
 
     private val variantConfig = polkadotVaultVariantConfigProvider.variantConfigFor(payload.variant)
 
-    val instructions = variantConfig
-        .connect.instructions
+    val pages = createPages()
 
     val polkadotVaultVariantIcon = variantConfig.common.iconRes
 
@@ -30,5 +31,20 @@ class StartImportParitySignerViewModel(
 
     fun scanQrCodeClicked() {
         router.openScanImportParitySigner(payload)
+    }
+
+    private fun createPages(): List<ParitySignerPageModel> {
+        return variantConfig.pages.map {
+            it.instructions
+            ParitySignerPageModel(
+                modeName = it.pageName,
+                guideItems = it.instructions.map { instruction ->
+                    when (instruction) {
+                        is ConnectPage.Instruction.Image -> InstructionItem.Image(instruction.imageRes, instruction.label)
+                        is ConnectPage.Instruction.Step -> InstructionItem.Step(instruction.index, instruction.content)
+                    }
+                }
+            )
+        }
     }
 }

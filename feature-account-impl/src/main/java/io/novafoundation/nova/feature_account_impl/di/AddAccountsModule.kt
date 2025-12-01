@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.le
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RawKeyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RealMnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
@@ -68,6 +69,21 @@ class AddAccountsModule {
         accountDataSource,
         accountSecretsFactory,
         JsonDecoder,
+        chainRegistry,
+        metaAccountChangesEventBus
+    )
+
+
+    @Provides
+    @FeatureScope
+    fun provideRawKeyAddAccountRepository(
+        accountDataSource: AccountDataSource,
+        accountSecretsFactory: AccountSecretsFactory,
+        chainRegistry: ChainRegistry,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus
+    ) = RawKeyAddAccountRepository(
+        accountDataSource,
+        accountSecretsFactory,
         chainRegistry,
         metaAccountChangesEventBus
     )

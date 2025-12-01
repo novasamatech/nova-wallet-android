@@ -14,7 +14,9 @@ internal fun ParitySignerConfig(resourceManager: ResourceManager, appLinksProvid
             supportsProofSigning = false
         }
 
-        connect {
+        connectPage {
+            name(resourceManager.getString(R.string.account_pair_public_key))
+
             instructions {
                 step(
                     resourceManager.highlightedText(
