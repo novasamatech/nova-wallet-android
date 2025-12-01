@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.co
 import android.os.Parcelable
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novasama.substrate_sdk_android.encrypt.qr.ScanSecret
-import io.novasama.substrate_sdk_android.encrypt.qr.formats.SecretQrFormat
 import kotlinx.parcelize.Parcelize
 
 sealed interface ParitySignerAccountPayload : Parcelable {
@@ -25,7 +24,6 @@ sealed interface ParitySignerAccountPayload : Parcelable {
         val secret: ScanSecretPayload
     ) : ParitySignerAccountPayload
 }
-
 
 sealed interface ScanSecretPayload : Parcelable {
 

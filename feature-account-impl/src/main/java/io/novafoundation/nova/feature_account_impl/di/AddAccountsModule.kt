@@ -73,7 +73,6 @@ class AddAccountsModule {
         metaAccountChangesEventBus
     )
 
-
     @Provides
     @FeatureScope
     fun provideRawKeyAddAccountRepository(

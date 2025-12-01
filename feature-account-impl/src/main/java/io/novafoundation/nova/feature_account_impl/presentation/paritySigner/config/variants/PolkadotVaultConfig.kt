@@ -61,7 +61,6 @@ internal fun PolkadotVaultConfig(resourceManager: ResourceManager, appLinksProvi
                 )
                 image(labelRes = null, R.drawable.polkadot_vault_account)
 
-
                 step(
                     resourceManager.highlightedText(
                         R.string.account_polkadot_vault_import_start_step_3_private,

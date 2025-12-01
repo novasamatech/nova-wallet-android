@@ -5,7 +5,6 @@ import android.util.AttributeSet
 import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.databinding.ViewInstructionImageBinding
-import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setTextOrHide
 

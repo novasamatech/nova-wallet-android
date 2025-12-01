@@ -1,9 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan
 
-import io.novafoundation.nova.common.utils.nullIfBlank
 import io.novafoundation.nova.common.utils.runAnotherOnFailure
-import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
-import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.encrypt.Sr25519
 import io.novasama.substrate_sdk_android.encrypt.qr.ScanSecret
 import io.novasama.substrate_sdk_android.encrypt.qr.formats.SecretQrFormat
