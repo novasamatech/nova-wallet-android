@@ -68,6 +68,8 @@
     <declare-styleable name="InputField">
         <attr name="android:inputType" />
         <attr name="android:text" />
+        <attr name="android:maxLines" />
+        <attr name="android:gravity" />
         <attr name="editTextHint" format="string" />
         <attr name="editTextHintColor" format="color" />
         <attr name="android:textAppearance" />
