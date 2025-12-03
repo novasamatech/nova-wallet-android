@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.text.InputType
+import android.text.method.ScrollingMovementMethod
 import android.util.AttributeSet
 import android.widget.EditText
 import com.google.android.material.textfield.TextInputLayout
@@ -75,6 +76,19 @@ class InputField @JvmOverloads constructor(
         val textAppearanceRes = typedArray.getResourceIdOrNull(R.styleable.InputField_android_textAppearance)
         if (textAppearanceRes != null) {
             content.setTextAppearance(textAppearanceRes)
+        }
+
+        val maxLines = typedArray.getInt(R.styleable.InputField_android_maxLines, -1)
+        if (maxLines != -1) {
+            content.maxLines = maxLines
+            content.isVerticalScrollBarEnabled = true
+            content.movementMethod = ScrollingMovementMethod.getInstance()
+        }
+
+        val gravity = typedArray.getInt(R.styleable.InputField_android_gravity, -1)
+
+        if (gravity != -1) {
+            content.gravity = gravity
         }
 
         typedArray.recycle()
