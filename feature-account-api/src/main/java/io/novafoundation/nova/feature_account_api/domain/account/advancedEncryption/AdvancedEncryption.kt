@@ -11,13 +11,15 @@ class AdvancedEncryptionInput(
     val ethereumDerivationPath: Input<String>
 )
 
-class AdvancedEncryption(
+data class AdvancedEncryption(
     val substrateCryptoType: CryptoType?,
     val ethereumCryptoType: CryptoType?,
     val derivationPaths: DerivationPaths
 ) {
 
-    class DerivationPaths(
+    companion object;
+
+    data class DerivationPaths(
         val substrate: String?,
         val ethereum: String?
     ) {
@@ -33,5 +35,17 @@ fun EncryptionDefaults.recommended() = AdvancedEncryption(
     derivationPaths = AdvancedEncryption.DerivationPaths(
         substrate = substrateDerivationPath,
         ethereum = ethereumDerivationPath
+    )
+)
+
+fun AdvancedEncryption.Companion.substrate(
+    cryptoType: CryptoType,
+    substrateDerivationPaths: String?
+) = AdvancedEncryption(
+    substrateCryptoType = cryptoType,
+    ethereumCryptoType = null,
+    derivationPaths = AdvancedEncryption.DerivationPaths(
+        substrate = substrateDerivationPaths,
+        ethereum = null
     )
 )

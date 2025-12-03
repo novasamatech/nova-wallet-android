@@ -16,6 +16,7 @@ import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
 import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
 import io.novasama.substrate_sdk_android.encrypt.keypair.bip32.Bip32EcdsaKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.keypair.generate
+import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
@@ -104,9 +105,8 @@ class AccountSecretsFactory(
             }
 
             else -> {
-                val junctions = decodedDerivationPath?.junctions.orEmpty()
                 val encodedSr25519Keypair = accountSource.cast<AccountSource.EncodedSr25519Keypair>()
-                SubstrateKeypairFactory.decodeSr25519Keypair(encodedSr25519Keypair.key, junctions)
+                Sr25519SubstrateKeypairFactory.createKeypairFromSecret(encodedSr25519Keypair.key)
             }
         }
 

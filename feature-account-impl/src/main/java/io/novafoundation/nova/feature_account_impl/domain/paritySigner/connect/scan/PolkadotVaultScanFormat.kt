@@ -3,8 +3,9 @@ package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.
 import io.novafoundation.nova.feature_account_impl.domain.utils.ScanSecret
 import io.novasama.substrate_sdk_android.encrypt.Sr25519
 import io.novafoundation.nova.feature_account_impl.domain.utils.SecretQrFormat
+import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519SubstrateKeypairFactory
+import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.getPublicKeyFromSeed
 import io.novasama.substrate_sdk_android.encrypt.qr.formats.SubstrateQrFormat
-import io.novasama.substrate_sdk_android.encrypt.sr25519PublicKeyFromSeed
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.publicKeyToSubstrateAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 
@@ -26,7 +27,7 @@ class PolkadotVaultScanFormat(
         val parsed = secretQrFormat.decode(scanResult)
         val publicKey = when (val secret = parsed.secret) {
             is ScanSecret.EncryptedKeypair -> Sr25519.getPublicKeyFromSecret(secret.data)
-            is ScanSecret.Seed -> sr25519PublicKeyFromSeed(secret.data)
+            is ScanSecret.Seed -> Sr25519SubstrateKeypairFactory.getPublicKeyFromSeed(secret.data)
         }
 
         return ParitySignerAccount.Secret(

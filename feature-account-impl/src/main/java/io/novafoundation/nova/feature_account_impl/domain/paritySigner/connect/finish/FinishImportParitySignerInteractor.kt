@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish
 
+import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.addAccountWithSingleChange
-import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.recommended
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.substrate
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
@@ -79,7 +81,7 @@ class RealFinishImportParitySignerInteractor(
     ): AddAccountResult.SingleAccountChange = seedAddAccountRepository.addAccountWithSingleChange(
         SeedAddAccountRepository.Payload(
             seed = secret.toHexString(),
-            advancedEncryption = encryptionDefaults.recommended(),
+            advancedEncryption = getAdvancedEncryption(),
             addAccountType = AddAccountType.MetaAccount(name),
         )
     )
@@ -90,8 +92,10 @@ class RealFinishImportParitySignerInteractor(
     ): AddAccountResult.SingleAccountChange = encryptedKeyAddAccountRepository.addAccountWithSingleChange(
         EncryptedKeyAddAccountRepository.Payload(
             encryptedKeypair = secret,
-            advancedEncryption = encryptionDefaults.recommended(),
+            advancedEncryption = getAdvancedEncryption(),
             addAccountType = AddAccountType.MetaAccount(name),
         )
     )
+
+    private fun getAdvancedEncryption() = AdvancedEncryption.substrate(CryptoType.SR25519, substrateDerivationPaths = null)
 }
