@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.deriveSeed32
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
 import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
@@ -38,7 +39,7 @@ class AccountSecretsFactory(
 
         class Json(val json: String, val password: String) : AccountSource()
 
-        class RawKey(val key: ByteArray, val cryptoType: CryptoType) : AccountSource()
+        class EncodedSr25519Keypair(val key: ByteArray) : AccountSource()
     }
 
     sealed class SecretsError : Exception() {
@@ -77,14 +78,14 @@ class AccountSecretsFactory(
             is AccountSource.Mnemonic -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Seed -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Json -> decodedJson!!.multiChainEncryption.encryptionType
-            is AccountSource.RawKey -> mapCryptoTypeToEncryption(accountSource.cryptoType)
+            is AccountSource.EncodedSr25519Keypair -> EncryptionType.SR25519
         }
 
         val seed = when (accountSource) {
             is AccountSource.Mnemonic -> deriveSeed(accountSource.mnemonic, decodedDerivationPath?.password, ethereum = isEthereum).seed
             is AccountSource.Seed -> accountSource.seed.fromHex()
             is AccountSource.Json -> null
-            is AccountSource.RawKey -> null
+            is AccountSource.EncodedSr25519Keypair -> null
         }
 
         val keypair = when {
@@ -104,8 +105,8 @@ class AccountSecretsFactory(
 
             else -> {
                 val junctions = decodedDerivationPath?.junctions.orEmpty()
-                val rawKey = accountSource.cast<AccountSource.RawKey>()
-                SubstrateKeypairFactory.generateFromRaw(encryptionType, rawKey.key, junctions)
+                val encodedSr25519Keypair = accountSource.cast<AccountSource.EncodedSr25519Keypair>()
+                SubstrateKeypairFactory.decodeSr25519Keypair(encodedSr25519Keypair.key, junctions)
             }
         }
 

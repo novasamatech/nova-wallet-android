@@ -390,13 +390,6 @@ fun List<Boolean>.findPartitionPoint(): Int? {
     return findPartitionPoint { it }
 }
 
-fun <T> Result<T>.runAnotherOnFailure(transform: (Throwable) -> T): Result<T> {
-    return when {
-        isFailure -> runCatching { transform(exceptionOrNull()!!) }
-        else -> this
-    }
-}
-
 fun <T> Result<T>.mapFailure(transform: (Throwable) -> Throwable): Result<T> {
     return when {
         isFailure -> Result.failure(transform(requireException()))

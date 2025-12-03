@@ -19,7 +19,7 @@ class FinishImportParitySignerViewModel(
 
     override fun proceed(name: String) = launchUnit {
         val result = when (payload) {
-            is ParitySignerAccountPayload.AsPublic -> interactor.createWalletPolkadotVaultWallet(
+            is ParitySignerAccountPayload.AsPublic -> interactor.createPolkadotVaultWallet(
                 name,
                 payload.accountId,
                 payload.variant

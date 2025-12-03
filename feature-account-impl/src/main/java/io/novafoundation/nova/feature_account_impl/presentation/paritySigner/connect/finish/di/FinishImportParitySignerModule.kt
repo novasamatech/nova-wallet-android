@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RawKeyAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.EncryptedKeyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish.FinishImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish.RealFinishImportParitySignerInteractor
@@ -29,13 +29,13 @@ class FinishImportParitySignerModule {
     @ScreenScope
     fun provideInteractor(
         paritySignerAddAccountRepository: ParitySignerAddAccountRepository,
-        rawKeyAddAccountRepository: RawKeyAddAccountRepository,
+        encryptedKeyAddAccountRepository: EncryptedKeyAddAccountRepository,
         seedAddAccountRepository: SeedAddAccountRepository,
         accountRepository: AccountRepository,
         encryptionDefaults: EncryptionDefaults
     ): FinishImportParitySignerInteractor = RealFinishImportParitySignerInteractor(
         paritySignerAddAccountRepository,
-        rawKeyAddAccountRepository,
+        encryptedKeyAddAccountRepository,
         seedAddAccountRepository,
         accountRepository,
         encryptionDefaults

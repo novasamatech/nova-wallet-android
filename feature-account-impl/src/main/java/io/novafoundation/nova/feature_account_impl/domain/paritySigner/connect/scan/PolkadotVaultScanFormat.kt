@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan
 
-import io.novafoundation.nova.common.utils.runAnotherOnFailure
+import io.novafoundation.nova.feature_account_impl.domain.utils.ScanSecret
 import io.novasama.substrate_sdk_android.encrypt.Sr25519
-import io.novasama.substrate_sdk_android.encrypt.qr.ScanSecret
-import io.novasama.substrate_sdk_android.encrypt.qr.formats.SecretQrFormat
+import io.novafoundation.nova.feature_account_impl.domain.utils.SecretQrFormat
 import io.novasama.substrate_sdk_android.encrypt.qr.formats.SubstrateQrFormat
+import io.novasama.substrate_sdk_android.encrypt.sr25519PublicKeyFromSeed
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.publicKeyToSubstrateAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 
@@ -14,7 +14,7 @@ class PolkadotVaultScanFormat(
 ) {
     fun decode(scanResult: String): Result<ParitySignerAccount> {
         return runCatching { publicFormat(scanResult) }
-            .runAnotherOnFailure { secretFormat(scanResult) }
+            .recoverCatching { secretFormat(scanResult) }
     }
 
     private fun publicFormat(scanResult: String): ParitySignerAccount.Public {
@@ -25,8 +25,8 @@ class PolkadotVaultScanFormat(
     private fun secretFormat(scanResult: String): ParitySignerAccount.Secret {
         val parsed = secretQrFormat.decode(scanResult)
         val publicKey = when (val secret = parsed.secret) {
-            is ScanSecret.RawKey -> Sr25519.getPublicKeyFromSecret(secret.data)
-            is ScanSecret.Seed -> Sr25519.getPublicKeyFromSeed(secret.data)
+            is ScanSecret.EncryptedKeypair -> Sr25519.getPublicKeyFromSecret(secret.data)
+            is ScanSecret.Seed -> sr25519PublicKeyFromSeed(secret.data)
         }
 
         return ParitySignerAccount.Secret(

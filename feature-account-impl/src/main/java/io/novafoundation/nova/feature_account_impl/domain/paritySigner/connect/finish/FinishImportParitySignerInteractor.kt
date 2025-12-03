@@ -8,9 +8,9 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RawKeyAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.EncryptedKeyAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
-import io.novasama.substrate_sdk_android.encrypt.qr.ScanSecret
+import io.novafoundation.nova.feature_account_impl.domain.utils.ScanSecret
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +19,7 @@ import kotlin.String
 
 interface FinishImportParitySignerInteractor {
 
-    suspend fun createWalletPolkadotVaultWallet(
+    suspend fun createPolkadotVaultWallet(
         name: String,
         substrateAccountId: AccountId,
         variant: PolkadotVaultVariant
@@ -34,13 +34,13 @@ interface FinishImportParitySignerInteractor {
 
 class RealFinishImportParitySignerInteractor(
     private val paritySignerAddAccountRepository: ParitySignerAddAccountRepository,
-    private val rawKeyAddAccountRepository: RawKeyAddAccountRepository,
+    private val encryptedKeyAddAccountRepository: EncryptedKeyAddAccountRepository,
     private val seedAddAccountRepository: SeedAddAccountRepository,
     private val accountRepository: AccountRepository,
     private val encryptionDefaults: EncryptionDefaults
 ) : FinishImportParitySignerInteractor {
 
-    override suspend fun createWalletPolkadotVaultWallet(
+    override suspend fun createPolkadotVaultWallet(
         name: String,
         substrateAccountId: AccountId,
         variant: PolkadotVaultVariant
@@ -66,7 +66,7 @@ class RealFinishImportParitySignerInteractor(
         runCatching {
             val addAccountResult = when (secret) {
                 is ScanSecret.Seed -> createBySeed(secret.data, name)
-                is ScanSecret.RawKey -> createByRawKey(secret.data, name)
+                is ScanSecret.EncryptedKeypair -> createByRawKey(secret.data, name)
             }
 
             accountRepository.selectMetaAccount(addAccountResult.metaId)
@@ -87,9 +87,9 @@ class RealFinishImportParitySignerInteractor(
     private suspend fun createByRawKey(
         secret: ByteArray,
         name: String
-    ): AddAccountResult.SingleAccountChange = rawKeyAddAccountRepository.addAccountWithSingleChange(
-        RawKeyAddAccountRepository.Payload(
-            rawKey = secret,
+    ): AddAccountResult.SingleAccountChange = encryptedKeyAddAccountRepository.addAccountWithSingleChange(
+        EncryptedKeyAddAccountRepository.Payload(
+            encryptedKeypair = secret,
             advancedEncryption = encryptionDefaults.recommended(),
             addAccountType = AddAccountType.MetaAccount(name),
         )

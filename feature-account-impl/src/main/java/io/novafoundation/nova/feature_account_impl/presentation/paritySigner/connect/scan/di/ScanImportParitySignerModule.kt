@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.s
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan.ScanImportParitySignerViewModel
-import io.novasama.substrate_sdk_android.encrypt.qr.formats.SecretQrFormat
+import io.novafoundation.nova.feature_account_impl.domain.utils.SecretQrFormat
 import io.novasama.substrate_sdk_android.encrypt.qr.formats.SubstrateQrFormat
 
 @Module(includes = [ViewModelModule::class])
