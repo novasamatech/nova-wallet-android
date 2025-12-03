@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.s
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.fromDomain
 import kotlinx.coroutines.delay
 
 class ScanImportParitySignerViewModel(
@@ -43,7 +44,18 @@ class ScanImportParitySignerViewModel(
     }
 
     private fun openPreview(signerAccount: ParitySignerAccount) {
-        val payload = ParitySignerAccountPayload(signerAccount.accountId, payload.variant)
+        val payload = when (signerAccount) {
+            is ParitySignerAccount.Public -> ParitySignerAccountPayload.AsPublic(
+                accountId = signerAccount.accountId,
+                variant = payload.variant
+            )
+
+            is ParitySignerAccount.Secret -> ParitySignerAccountPayload.AsSecret(
+                accountId = signerAccount.accountId,
+                variant = payload.variant,
+                secret = signerAccount.secret.fromDomain()
+            )
+        }
 
         router.openPreviewImportParitySigner(payload)
     }

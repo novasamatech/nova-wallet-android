@@ -13,52 +13,51 @@
         android:layout_height="wrap_content"
         app:dividerVisible="false" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="vertical"
-            android:paddingBottom="16dp">
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/startImportParitySignerTitle"
                 style="@style/TextAppearance.NovaFoundation.Bold.Title2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="16dp"
-                tools:text="@string/account_parity_signer_import_start_title"
-                android:textColor="@color/text_primary" />
+                android:textColor="@color/text_primary"
+                tools:text="@string/account_parity_signer_import_start_title" />
 
-            <io.novafoundation.nova.common.view.NovaConnectView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="32dp"
-                android:id="@+id/startImportParitySignerConnectOverview"
-                tools:targetImage="@drawable/ic_parity_signer" />
-
-            <LinearLayout
-                android:id="@+id/startImportParitySignerInstructionContainer"
+            <io.novafoundation.nova.common.view.SegmentedTabLayout
+                android:id="@+id/startImportParitySignerMode"
+                style="@style/SegmentedTab"
                 android:layout_width="match_parent"
-                android:layout_marginTop="8dp"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" />
+                android:layout_height="40dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="12dp" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/startImportParitySignerPages"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:overScrollMode="never" />
 
         </LinearLayout>
 
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/startImportParitySignerScanQrCode"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/contacts_scan" />
 
 </LinearLayout>
