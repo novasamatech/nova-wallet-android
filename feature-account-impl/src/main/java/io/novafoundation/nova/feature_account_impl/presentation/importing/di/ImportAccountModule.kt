@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.imp
 import io.novafoundation.nova.feature_account_impl.presentation.importing.FileReader
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.ImportSourceFactory
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedCommunicator
 
 @Module(includes = [ViewModelModule::class])
 class ImportAccountModule {
@@ -34,12 +35,14 @@ class ImportAccountModule {
         clipboardManager: ClipboardManager,
         advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
         fileReader: FileReader,
+        scanSeedRequester: ScanSeedCommunicator,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     ) = ImportSourceFactory(
         addAccountInteractor = addAccountInteractor,
         clipboardManager = clipboardManager,
         advancedEncryptionInteractor = advancedEncryptionInteractor,
         advancedEncryptionSelectionStoreProvider = advancedEncryptionSelectionStoreProvider,
+        scanSeedRequester = scanSeedRequester,
         fileReader = fileReader
     )
 

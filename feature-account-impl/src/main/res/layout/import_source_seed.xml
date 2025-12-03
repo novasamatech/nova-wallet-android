@@ -8,75 +8,57 @@
     tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.LinearLayout">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/importSeedContentContainer"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        tools:background="@drawable/bg_big_input_shape_selector">
+        android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/importSeedTitle"
-            style="@style/TextAppearance.NovaFoundation.Body2"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="24dp"
             android:text="@string/recovery_raw_seed"
             android:textColor="@color/text_secondary"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/importSeedHexSymbols"
-            style="@style/TextAppearance.NovaFoundation.Body2"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="24dp"
             android:text="@string/account_seed_hex_symbols"
             android:textColor="@color/text_secondary"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <EditText
-            android:id="@+id/importSeedContent"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="8dp"
-            android:background="@null"
-            android:gravity="top"
-            android:hint="@string/account_import_seed_hint"
-            android:inputType="textMultiLine|textVisiblePassword"
-            android:minLines="5"
-            android:padding="0dp"
-            android:textColor="@color/text_primary"
-            android:textColorHint="@color/hint_text"
-            android:textCursorDrawable="@null"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/importSeedTitle" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
-    <io.novafoundation.nova.common.view.InputField
-        android:id="@+id/importSeedUsernameInput"
-        style="@style/Widget.Nova.Input.Primary.External"
+    <io.novafoundation.nova.common.view.InsertableInputField
+        android:id="@+id/importSeedInput"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="@string/account_wallet_nickname"
-        android:visibility="visible" />
+        android:layout_marginTop="8dp"
+        android:hint="@string/account_import_seed_hint"
+        app:supportInsertion="false"
+        app:supportScan="true" />
 
     <TextView
-        android:id="@+id/importSeedUsernameHint"
-        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/account_wallet_name"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <io.novafoundation.nova.common.view.input.TextInputView
+        android:id="@+id/importSeedUsernameInput"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="12dp"
-        android:layout_weight="1"
-        android:text="@string/wallet_nickname_create_caption_v2_2_0"
-        android:textColor="@color/text_secondary" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="@string/common_name" />
+
 </merge>

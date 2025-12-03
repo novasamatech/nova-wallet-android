@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="account_wallet_name">Wallet name</string>
+    <string name="common_name">Name</string>
+    <string name="common_invalid_qr_code">Invalid QR code</string>
+
     <!--<string name="account_polkadot_vault_import_start_step_2">%s Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>-->
     <!--<string name="account_polkadot_vault_import_start_step_2_highlighted">Go to “Key Sets” tab.</string>-->
     <string name="account_polkadot_vault_import_start_step_2">%s you would like to add to Nova Wallet</string>

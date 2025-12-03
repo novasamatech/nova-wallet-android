@@ -3,15 +3,15 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing.sourc
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.lifecycle.LifecycleOwner
-import io.novafoundation.nova.common.view.InputField
 import io.novafoundation.nova.feature_account_impl.presentation.common.mixin.impl.setupAccountNameChooserUi
 import io.novafoundation.nova.feature_account_impl.presentation.importing.ImportAccountViewModel
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.ImportSource
 
 class ImportAccountNameViews(
-    val nameInput: InputField,
+    val nameInput: EditText,
     val visibilityDependent: List<View>,
 )
 
