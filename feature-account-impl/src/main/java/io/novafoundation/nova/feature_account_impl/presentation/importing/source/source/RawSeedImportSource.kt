@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSee
 import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedRequester
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -40,9 +39,7 @@ class RawSeedImportSource(
     init {
         scanSeedRequester.responseFlow
             .onEach {
-                // A short delay to wait until view will be attached to fragment. Otherwise the input view clear provided value on attach to fragment
-                delay(150)
-                rawSeedFlow.value = it.seed
+                rawSeedFlow.value = it.secret
             }
             .launchIn(this)
     }
@@ -51,7 +48,7 @@ class RawSeedImportSource(
         val advancedEncryption = advancedEncryptionSelectionStore().getCurrentSelection()
             ?: advancedEncryptionInteractor.getRecommendedAdvancedEncryption()
 
-        return addAccountInteractor.importFromSeed(rawSeedFlow.value, advancedEncryption, addAccountType)
+        return addAccountInteractor.importFromSecret(rawSeedFlow.value, advancedEncryption, addAccountType)
     }
 
     override fun initializeView(viewModel: ImportAccountViewModel, fragment: BaseFragment<*, *>): SeedImportView {

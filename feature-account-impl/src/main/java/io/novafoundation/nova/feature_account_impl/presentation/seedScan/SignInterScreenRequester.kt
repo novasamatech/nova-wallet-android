@@ -15,5 +15,5 @@ interface ScanSeedCommunicator : ScanSeedRequester, ScanSeedResponder {
     class Request : Parcelable
 
     @Parcelize
-    class Response(val seed: String) : Parcelable
+    class Response(val secret: String) : Parcelable
 }

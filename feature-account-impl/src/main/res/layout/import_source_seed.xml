@@ -41,6 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:hint="@string/account_import_seed_hint"
+        app:fieldSaveEnabled="false"
         app:supportInsertion="false"
         app:supportScan="true" />
 

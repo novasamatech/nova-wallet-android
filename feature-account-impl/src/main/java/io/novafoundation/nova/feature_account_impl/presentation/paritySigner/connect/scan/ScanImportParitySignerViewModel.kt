@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.fromDomain
-import kotlinx.coroutines.delay
 
 class ScanImportParitySignerViewModel(
     private val router: AccountRouter,
@@ -36,10 +35,7 @@ class ScanImportParitySignerViewModel(
                 val message = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_import_scan_invalid_qr, payload.variant)
                 showToast(message)
 
-                // wait a bit until re-enabling scanner otherwise user might experience a lot of error messages shown due to fast scanning
-                delay(1000)
-
-                resetScanning()
+                resetScanningThrottled()
             }
     }
 

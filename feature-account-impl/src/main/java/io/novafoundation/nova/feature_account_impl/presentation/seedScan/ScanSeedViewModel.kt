@@ -31,10 +31,7 @@ class ScanSeedViewModel(
                 val message = resourceManager.getString(R.string.common_invalid_qr_code)
                 showToast(message)
 
-                // wait a bit until re-enabling scanner otherwise user might experience a lot of error messages shown due to fast scanning
-                delay(1000)
-
-                resetScanning()
+                resetScanningThrottled()
             }
     }
 

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.domain.scanSeed
 
-import io.novafoundation.nova.feature_account_impl.domain.utils.ScanSecret
 import io.novafoundation.nova.feature_account_impl.domain.utils.SecretQrFormat
 import io.novasama.substrate_sdk_android.extensions.toHexString
 
@@ -13,11 +12,9 @@ class RealScanSeedInteractor(
 ) : ScanSeedInteractor {
 
     override fun decodeSeed(content: String): Result<String> = runCatching {
-        val payload = secretQrFormat.decode(content)
-
-        when (val secret = payload.secret) {
-            is ScanSecret.EncryptedKeypair -> error("Encoded key can't be decoded to seed")
-            is ScanSecret.Seed -> secret.data.toHexString(withPrefix = true)
-        }
+        secretQrFormat.decode(content)
+            .secret
+            .data
+            .toHexString(withPrefix = true)
     }
 }

@@ -8,19 +8,19 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
-class EncryptedKeyAddAccountRepository(
+class SubstrateKeypairAddAccountRepository(
     accountDataSource: AccountDataSource,
     accountSecretsFactory: AccountSecretsFactory,
     chainRegistry: ChainRegistry,
     metaAccountChangesEventBus: MetaAccountChangesEventBus
-) : SecretsAddAccountRepository<EncryptedKeyAddAccountRepository.Payload>(
+) : SecretsAddAccountRepository<SubstrateKeypairAddAccountRepository.Payload>(
     accountDataSource,
     accountSecretsFactory,
     chainRegistry,
     metaAccountChangesEventBus
 ) {
     class Payload(
-        val encryptedKeypair: ByteArray,
+        val substrateKeypair: ByteArray,
         val advancedEncryption: AdvancedEncryption,
         val addAccountType: AddAccountType
     )
@@ -29,7 +29,7 @@ class EncryptedKeyAddAccountRepository(
         return addSecretsAccount(
             derivationPaths = payload.advancedEncryption.derivationPaths,
             addAccountType = payload.addAccountType,
-            accountSource = AccountSecretsFactory.AccountSource.EncodedSr25519Keypair(key = payload.encryptedKeypair)
+            accountSource = AccountSecretsFactory.AccountSource.EncodedSr25519Keypair(key = payload.substrateKeypair)
         )
     }
 }

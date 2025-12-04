@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
-import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.EncryptedKeyAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SubstrateKeypairAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.utils.ScanSecret
 import io.novasama.substrate_sdk_android.extensions.toHexString
@@ -36,10 +36,9 @@ interface FinishImportParitySignerInteractor {
 
 class RealFinishImportParitySignerInteractor(
     private val paritySignerAddAccountRepository: ParitySignerAddAccountRepository,
-    private val encryptedKeyAddAccountRepository: EncryptedKeyAddAccountRepository,
+    private val substrateKeypairAddAccountRepository: SubstrateKeypairAddAccountRepository,
     private val seedAddAccountRepository: SeedAddAccountRepository,
-    private val accountRepository: AccountRepository,
-    private val encryptionDefaults: EncryptionDefaults
+    private val accountRepository: AccountRepository
 ) : FinishImportParitySignerInteractor {
 
     override suspend fun createPolkadotVaultWallet(
@@ -89,9 +88,9 @@ class RealFinishImportParitySignerInteractor(
     private suspend fun createByRawKey(
         secret: ByteArray,
         name: String
-    ): AddAccountResult.SingleAccountChange = encryptedKeyAddAccountRepository.addAccountWithSingleChange(
-        EncryptedKeyAddAccountRepository.Payload(
-            encryptedKeypair = secret,
+    ): AddAccountResult.SingleAccountChange = substrateKeypairAddAccountRepository.addAccountWithSingleChange(
+        SubstrateKeypairAddAccountRepository.Payload(
+            substrateKeypair = secret,
             advancedEncryption = getAdvancedEncryption(),
             addAccountType = AddAccountType.MetaAccount(name),
         )

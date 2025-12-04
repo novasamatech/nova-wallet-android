@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.common.utils.sendEvent
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -29,6 +30,13 @@ abstract class ScanQrViewModel(
 
     fun onStart() {
         requirePermissions()
+    }
+
+    // wait a bit until re-enabling scanner otherwise user might experience a lot of error messages shown due to fast scanning
+    protected suspend fun resetScanningThrottled() {
+        delay(1000)
+
+        resetScanning()
     }
 
     protected fun resetScanning() {

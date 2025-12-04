@@ -111,6 +111,7 @@ class InsertableInputField @JvmOverloads constructor(
 
         supportScan = it.getBoolean(R.styleable.ActionInputField_supportScan, supportScan)
         supportInsertion = it.getBoolean(R.styleable.ActionInputField_supportInsertion, supportInsertion)
+        content.isSaveEnabled = it.getBoolean(R.styleable.ActionInputField_fieldSaveEnabled, true)
 
         hint?.let { content.hint = hint }
     }
