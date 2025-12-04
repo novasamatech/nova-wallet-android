@@ -5,7 +5,6 @@ import io.novafoundation.nova.feature_account_api.data.repository.addAccount.Add
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.addAccountWithSingleChange
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.substrate
-import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant

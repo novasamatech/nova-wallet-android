@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.utils.permissions.PermissionsAsker
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.scanSeed.ScanSeedInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
-import kotlinx.coroutines.delay
 
 class ScanSeedViewModel(
     private val router: AccountRouter,
