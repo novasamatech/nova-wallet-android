@@ -19,7 +19,7 @@ val AddFieldsToContributions = object : Migration(72, 73) {
              `sourceId` TEXT NOT NULL,
              `unlockBlock` TEXT NOT NULL,
              `leaseDepositor` BLOB NOT NULL,
-             PRIMARY KEY(`metaId`, `chainId`, `assetId`, `paraId`, `sourceId`))");
+             PRIMARY KEY(`metaId`, `chainId`, `assetId`, `paraId`, `sourceId`));
             """.trimIndent()
         )
     }

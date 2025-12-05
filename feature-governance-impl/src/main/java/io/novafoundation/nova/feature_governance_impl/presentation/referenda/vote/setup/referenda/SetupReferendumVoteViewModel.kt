@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.setup.referenda
 
-import androidx.annotation.StringRes
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -71,15 +70,15 @@ class SetupReferendumVoteViewModel(
         resourceManager.getString(R.string.referendum_vote_setup_title, formattedNumber)
     }.shareInBackground()
 
-    val ayeButtonStateFlow = validatingVoteType.map { buttonStateFlow(VoteType.AYE, validationVoteType = it, R.string.referendum_vote_aye) }
+    val ayeButtonStateFlow = validatingVoteType.map { buttonState(VoteType.AYE, validationVoteType = it) }
     val abstainButtonStateFlow = combine(validatingVoteType, abstainVotingSupported) { type, isAbstainSupported ->
         if (isAbstainSupported) {
-            buttonStateFlow(VoteType.ABSTAIN, validationVoteType = type, R.string.referendum_vote_abstain)
+            buttonState(VoteType.ABSTAIN, validationVoteType = type)
         } else {
             DescriptiveButtonState.Invisible
         }
     }
-    val nayButtonStateFlow = validatingVoteType.map { buttonStateFlow(VoteType.NAY, validationVoteType = it, R.string.referendum_vote_nay) }
+    val nayButtonStateFlow = validatingVoteType.map { buttonState(VoteType.NAY, validationVoteType = it) }
 
     fun ayeClicked() {
         validateVote(VoteType.AYE)
@@ -114,11 +113,11 @@ class SetupReferendumVoteViewModel(
         }
     }
 
-    private fun buttonStateFlow(targetVoteType: VoteType, validationVoteType: VoteType?, @StringRes labelRes: Int): DescriptiveButtonState {
+    private fun buttonState(targetVoteType: VoteType, validationVoteType: VoteType?): DescriptiveButtonState {
         return when (validationVoteType) {
-            null -> DescriptiveButtonState.Enabled(resourceManager.getString(labelRes))
+            null -> DescriptiveButtonState.Enabled("")
             targetVoteType -> DescriptiveButtonState.Loading
-            else -> DescriptiveButtonState.Disabled(resourceManager.getString(labelRes))
+            else -> DescriptiveButtonState.Disabled("")
         }
     }
 }
