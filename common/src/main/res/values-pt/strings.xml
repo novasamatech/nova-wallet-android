@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">Escreva as palavras separadas por um espaço, sem vírgulas ou outros sinais</string>
     <string name="account_import_mnemonic_title">Insira as palavras na ordem correta</string>
     <string name="account_import_password_placeholder">Senha</string>
+    <string name="account_import_private_key">Importar chave privada</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Insira seu seed bruto</string>
     <string name="account_import_wallet_subtitle">A Nova é compatível com todos os aplicativos</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">Você não tem uma conta para esta rede, você pode criar ou importar uma conta.</string>
     <string name="account_needed_title">Conta necessária</string>
     <string name="account_no_chain_projection">Nenhuma conta encontrada</string>
+    <string name="account_pair_public_key">Emparelhar chave pública</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s não suporta %s</string>
     <string name="account_parity_signer_import_preview_description">As seguintes contas foram lidas com sucesso de %s</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Atenção, o nome do caminho de derivação deve estar vazio</string>
     <string name="account_polkadot_vault_import_start_step_1">%s no seu smartphone</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Abra o Polkadot Vault</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s Selecione seu conjunto de Chaves, Rede e, em seguida, a conta que você gostaria de adicionar à Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Vá para a aba de \'Conjuntos de Chaves\'.</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s que você gostaria de adicionar ao Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Toque em Chave Derivada</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault fornecerá a você %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">código QR para escanear</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">Toque no ícone no canto superior direito e selecione %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Exportar Chave Privada</string>
     <string name="account_private_key">Chave privada</string>
     <string name="account_proxied">Delegado</string>
     <string name="account_proxieds">Delegado para você (Proxied)</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Contas Substrate</string>
     <string name="account_substrate_crypto_type">Tipo de criptografia de par de chaves Substrate</string>
     <string name="account_substrate_derivation_path">Caminho de derivação secreta Substrate</string>
+    <string name="account_wallet_name">Nome da carteira</string>
     <string name="account_wallet_nickname">Apelido da carteira</string>
     <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver e outras redes</string>
     <string name="account_watch_add_evm_address_optional">Endereço EVM (Opcional)</string>
@@ -463,6 +468,7 @@
     <string name="common_i_understand">Entendi</string>
     <string name="common_info">Informação</string>
     <string name="common_invalid_qr">Código QR é inválido</string>
+    <string name="common_invalid_qr_code">Código QR inválido</string>
     <string name="common_learn_more">Saiba mais</string>
     <string name="common_learn_more_v2_2_0">Descubra mais sobre</string>
     <string name="common_ledger">Ledger</string>
@@ -477,6 +483,7 @@
     <string name="common_missing_account_title">Conta %s está faltando</string>
     <string name="common_modify">Modificar</string>
     <string name="common_module">Módulo</string>
+    <string name="common_name">Nome</string>
     <string name="common_network">Rede</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s não é suportado</string>
@@ -1194,6 +1201,7 @@
     <string name="receive_screen_copy_address">Copiar Endereço</string>
     <string name="reclaim_gift_confirmation_message">Se você reclamar este presente, o link compartilhado será desativado e os tokens serão reembolsados para sua carteira.\nVocê deseja continuar?</string>
     <string name="reclaim_gift_confirmation_title">Reclamar Presente de %s?</string>
+    <string name="reclaim_gift_success">Você recuperou seu presente com sucesso</string>
     <string name="recover_json_hint">Cole o json ou faça upload do arquivo…</string>
     <string name="recover_json_upload">Fazer upload de arquivo</string>
     <string name="recovery_json">Restaurar JSON</string>
@@ -1900,7 +1908,7 @@
     <string name="waiting_top_up_card_description">Pode levar até 5 minutos.\nEsta janela será fechada automaticamente.</string>
     <string name="waiting_top_up_card_timer">Estimativa %s</string>
     <string name="wallet_asset_buy">Comprar</string>
-    <string name="wallet_asset_buy_sell">Comprar/Vender</string>
+    <string name="wallet_asset_buy_sell">Comp./Vend.</string>
     <string name="wallet_asset_buy_tokens">Comprar tokens</string>
     <string name="wallet_asset_buy_with">Comprar com</string>
     <string name="wallet_asset_receive">Receber</string>

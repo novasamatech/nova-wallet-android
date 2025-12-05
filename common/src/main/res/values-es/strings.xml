@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">Escribe las palabras separadas por un espacio, sin comas u otros signos</string>
     <string name="account_import_mnemonic_title">Introduce las palabras en el orden correcto</string>
     <string name="account_import_password_placeholder">Contraseña</string>
+    <string name="account_import_private_key">Importar clave privada</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Introduce tu seed bruto</string>
     <string name="account_import_wallet_subtitle">Nova es compatible con todas las aplicaciones</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">No tienes una cuenta para esta red, puedes crear o importar una cuenta.</string>
     <string name="account_needed_title">Se necesita cuenta</string>
     <string name="account_no_chain_projection">No se encontró ninguna cuenta</string>
+    <string name="account_pair_public_key">Emparejar clave pública</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s no soporta %s</string>
     <string name="account_parity_signer_import_preview_description">Las siguientes cuentas han sido leídas exitosamente de %s</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Preste atención, el nombre de la ruta de derivación debe estar vacío</string>
     <string name="account_polkadot_vault_import_start_step_1">%s en tu smartphone</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Abrir Polkadot Vault</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s Seleccione su conjunto de claves, Red y luego la cuenta que desea agregar a Nova Wallet.</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Ve a la pestaña “Conjuntos de Claves”.</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s que te gustaría agregar a Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Toca en Derived Key</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault le proporcionará un %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">código QR para escanear</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">Toca el ícono en la esquina superior derecha y selecciona %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Exportar clave privada</string>
     <string name="account_private_key">Clave privada</string>
     <string name="account_proxied">Delegado</string>
     <string name="account_proxieds">Delegado a usted (Proxied)</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Cuentas Substrate</string>
     <string name="account_substrate_crypto_type">Tipo de criptografía de par de claves Substrate</string>
     <string name="account_substrate_derivation_path">Ruta de derivación del secreto Substrate</string>
+    <string name="account_wallet_name">Nombre de la billetera</string>
     <string name="account_wallet_nickname">Apodo del monedero</string>
     <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver y otras redes</string>
     <string name="account_watch_add_evm_address_optional">Dirección EVM (Opcional)</string>
@@ -463,6 +468,7 @@
     <string name="common_i_understand">Entiendo</string>
     <string name="common_info">Información</string>
     <string name="common_invalid_qr">El código QR no es válido</string>
+    <string name="common_invalid_qr_code">Código QR inválido</string>
     <string name="common_learn_more">Aprender más</string>
     <string name="common_learn_more_v2_2_0">Descubrir más sobre</string>
     <string name="common_ledger">Ledger</string>
@@ -477,6 +483,7 @@
     <string name="common_missing_account_title">Falta la cuenta %s</string>
     <string name="common_modify">Modificar</string>
     <string name="common_module">Módulo</string>
+    <string name="common_name">Nombre</string>
     <string name="common_network">Red</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s no es compatible</string>
@@ -1194,6 +1201,7 @@
     <string name="receive_screen_copy_address">Copiar dirección</string>
     <string name="reclaim_gift_confirmation_message">Si reclamas este regalo, el enlace compartido será desactivado y los tokens serán devueltos a tu billetera.\n¿Quieres continuar?</string>
     <string name="reclaim_gift_confirmation_title">¿Reclamar el regalo de %s?</string>
+    <string name="reclaim_gift_success">Has reclamado exitosamente tu regalo</string>
     <string name="recover_json_hint">Pega el json o sube un archivo…</string>
     <string name="recover_json_upload">Subir archivo</string>
     <string name="recovery_json">Restaurar JSON</string>
@@ -1900,7 +1908,7 @@
     <string name="waiting_top_up_card_description">Puede tardar hasta 5 minutos.\nEsta ventana se cerrará automáticamente.</string>
     <string name="waiting_top_up_card_timer">Estimado %s</string>
     <string name="wallet_asset_buy">Comprar</string>
-    <string name="wallet_asset_buy_sell">Comprar/Vender</string>
+    <string name="wallet_asset_buy_sell">Comp./Vend.</string>
     <string name="wallet_asset_buy_tokens">Comprar tokens</string>
     <string name="wallet_asset_buy_with">Comprar con</string>
     <string name="wallet_asset_receive">Recibir</string>
@@ -1909,7 +1917,7 @@
     <string name="wallet_asset_sell">Vender</string>
     <string name="wallet_asset_sell_tokens">Vender tokens</string>
     <string name="wallet_asset_send">Enviar</string>
-    <string name="wallet_asset_swap">Intercambiar</string>
+    <string name="wallet_asset_swap">Cambiar</string>
     <string name="wallet_assets">Activos</string>
     <string name="wallet_assets_empty">Tus activos aparecerán aquí.\nAsegúrate de que el filtro \"Ocultar saldos en cero\"\nesté desactivado</string>
     <string name="wallet_assets_total_title">Valor de los activos</string>
