@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">Tulis kata-kata secara terpisah dengan satu spasi, tanpa koma atau tanda lainnya</string>
     <string name="account_import_mnemonic_title">Masukkan kata-kata dalam urutan yang benar</string>
     <string name="account_import_password_placeholder">Kata Sandi</string>
+    <string name="account_import_private_key">Impor kunci pribadi</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Masukkan seed mentah Anda</string>
     <string name="account_import_wallet_subtitle">Nova kompatibel dengan semua aplikasi</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">Anda tidak memiliki akun untuk jaringan ini, Anda dapat membuat atau mengimpor akun.</string>
     <string name="account_needed_title">Akun Diperlukan</string>
     <string name="account_no_chain_projection">Tidak ditemukan akun</string>
+    <string name="account_pair_public_key">Pasangkan kunci publik</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s tidak mendukung %s</string>
     <string name="account_parity_signer_import_preview_description">Akun-akun berikut telah berhasil dibaca dari %s</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Perhatikan, nama jalur derivasi harus kosong</string>
     <string name="account_polkadot_vault_import_start_step_1">Aplikasi %s di smartphone Anda</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Buka Polkadot Vault</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s Pilih kumpulan Kunci Anda, Jaringan, lalu akun yang ingin Anda tambahkan ke Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Pergi ke tab \'Key Sets\'.</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s yang ingin Anda tambahkan ke Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Ketuk pada Kunci Turunan</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault akan memberikan Anda %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">kode QR untuk dipindai</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">Ketuk ikon di pojok kanan atas dan pilih %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Ekspor Kunci Pribadi</string>
     <string name="account_private_key">Kunci privat</string>
     <string name="account_proxied">Diwakilkan</string>
     <string name="account_proxieds">Didelegasikan kepada Anda (Proxied)</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Akun Substrate</string>
     <string name="account_substrate_crypto_type">Tipe kripto pasangan kunci Substrate</string>
     <string name="account_substrate_derivation_path">Jalur pemutusan rahasia Substrate</string>
+    <string name="account_wallet_name">Nama dompet</string>
     <string name="account_wallet_nickname">Nama panggilan dompet</string>
     <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver dan jaringan lainnya</string>
     <string name="account_watch_add_evm_address_optional">Alamat EVM (Opsional)</string>
@@ -461,6 +466,7 @@
     <string name="common_i_understand">Saya mengerti</string>
     <string name="common_info">Informasi</string>
     <string name="common_invalid_qr">Kode QR tidak valid</string>
+    <string name="common_invalid_qr_code">Kode QR tidak valid</string>
     <string name="common_learn_more">Pelajari lebih lanjut</string>
     <string name="common_learn_more_v2_2_0">Temukan lebih banyak tentang</string>
     <string name="common_ledger">Ledger</string>
@@ -474,6 +480,7 @@
     <string name="common_missing_account_title">Akun %s tidak ditemukan</string>
     <string name="common_modify">Ubah</string>
     <string name="common_module">Modul</string>
+    <string name="common_name">Nama</string>
     <string name="common_network">Jaringan</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s tidak didukung</string>
@@ -1186,6 +1193,7 @@
     <string name="receive_screen_copy_address">Salin Alamat</string>
     <string name="reclaim_gift_confirmation_message">Jika Anda mengambil kembali hadiah ini, tautan yang dibagikan akan dinonaktifkan, dan token akan dikembalikan ke dompet Anda.\nApakah Anda ingin melanjutkan?</string>
     <string name="reclaim_gift_confirmation_title">Klaim kembali Hadiah %s?</string>
+    <string name="reclaim_gift_success">Anda berhasil mengambil kembali hadiah Anda</string>
     <string name="recover_json_hint">Tempelkan json atau unggah file...</string>
     <string name="recover_json_upload">Unggah file</string>
     <string name="recovery_json">Pulihkan JSON</string>
