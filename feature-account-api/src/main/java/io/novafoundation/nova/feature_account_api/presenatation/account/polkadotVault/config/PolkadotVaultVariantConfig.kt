@@ -4,18 +4,18 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 
 class PolkadotVaultVariantConfig(
-    val connect: Connect,
+    val pages: List<ConnectPage>,
     val sign: Sign,
     val common: Common
 ) {
 
-    class Connect(val instructions: List<Instruction>) {
+    class ConnectPage(val pageName: String, val instructions: List<Instruction>) {
 
         sealed class Instruction {
 
             class Step(val index: Int, val content: CharSequence) : Instruction()
 
-            class Image(val label: String, @DrawableRes val imageRes: Int) : Instruction()
+            class Image(val label: String?, @DrawableRes val imageRes: Int) : Instruction()
         }
     }
 

@@ -364,6 +364,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_scan_seed"
+        app:destination="@id/scanSeedFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_networkManagement"
         app:destination="@id/network_management_graph"
         app:enterAnim="@anim/fragment_open_enter"
@@ -1394,5 +1402,10 @@
         android:name="io.novafoundation.nova.feature_gift_impl.presentation.claim.ClaimGiftFragment"
         android:label="ClaimGiftFragment"
         tools:layout="@layout/fragment_claim_gift" />
+
+    <fragment
+        android:id="@+id/scanSeedFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedFragment"
+        android:label="ScanSeedFragment" />
 
 </navigation>

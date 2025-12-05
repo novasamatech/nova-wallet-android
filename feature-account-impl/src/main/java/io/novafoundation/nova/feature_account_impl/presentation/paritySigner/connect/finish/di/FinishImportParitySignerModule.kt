@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SubstrateKeypairAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish.FinishImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.finish.RealFinishImportParitySignerInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -26,8 +28,15 @@ class FinishImportParitySignerModule {
     @ScreenScope
     fun provideInteractor(
         paritySignerAddAccountRepository: ParitySignerAddAccountRepository,
+        substrateKeypairAddAccountRepository: SubstrateKeypairAddAccountRepository,
+        seedAddAccountRepository: SeedAddAccountRepository,
         accountRepository: AccountRepository
-    ): FinishImportParitySignerInteractor = RealFinishImportParitySignerInteractor(paritySignerAddAccountRepository, accountRepository)
+    ): FinishImportParitySignerInteractor = RealFinishImportParitySignerInteractor(
+        paritySignerAddAccountRepository,
+        substrateKeypairAddAccountRepository,
+        seedAddAccountRepository,
+        accountRepository
+    )
 
     @Provides
     @IntoMap

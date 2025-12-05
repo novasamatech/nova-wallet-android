@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.importing.source
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.JsonImportSource
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.MnemonicImportSource
 import io.novafoundation.nova.feature_account_impl.presentation.importing.source.source.RawSeedImportSource
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedRequester
 import kotlinx.coroutines.CoroutineScope
 
 class ImportSourceFactory(
@@ -19,6 +20,7 @@ class ImportSourceFactory(
     private val clipboardManager: ClipboardManager,
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     private val advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
+    private val scanSeedRequester: ScanSeedRequester,
     private val fileReader: FileReader,
 ) {
 
@@ -40,9 +42,9 @@ class ImportSourceFactory(
 
             ImportType.Seed -> RawSeedImportSource(
                 addAccountInteractor = addAccountInteractor,
-                addAccountPayload = payload,
                 advancedEncryptionInteractor = advancedEncryptionInteractor,
                 advancedEncryptionSelectionStoreProvider = advancedEncryptionSelectionStoreProvider,
+                scanSeedRequester = scanSeedRequester,
                 coroutineScope = coroutineScope
             )
 

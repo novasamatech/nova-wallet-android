@@ -22,7 +22,7 @@ class JsonImportView @JvmOverloads constructor(
 
     override val nameInputViews: ImportAccountNameViews
         get() = ImportAccountNameViews(
-            nameInput = binder.importJsonUsernameInput,
+            nameInput = binder.importJsonUsernameInput.content,
             visibilityDependent = emptyList()
         )
 

@@ -1,19 +1,14 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start
 
 import android.os.Bundle
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.view.ViewGroup.MarginLayoutParams
-
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.view.InstructionStepView
+import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfig.Connect.Instruction
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentImportParitySignerStartBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
-import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.start.view.InstructionImageView
 
 class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerViewModel, FragmentImportParitySignerStartBinding>() {
 
@@ -28,12 +23,18 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
         }
     }
 
+    private val pageAdapter by lazy(LazyThreadSafetyMode.NONE) { StartImportParitySignerPagerAdapter(viewModel.pages) }
+
     override fun createBinding() = FragmentImportParitySignerStartBinding.inflate(layoutInflater)
 
     override fun initViews() {
         binder.startImportParitySignerToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.startImportParitySignerScanQrCode.setOnClickListener { viewModel.scanQrCodeClicked() }
+
+        binder.startImportParitySignerMode.isVisible = pageAdapter.itemCount > 1
+        binder.startImportParitySignerPages.adapter = pageAdapter
+        binder.startImportParitySignerMode.setupWithViewPager2(binder.startImportParitySignerPages, pageAdapter::getPageTitle)
     }
 
     override fun inject() {
@@ -44,37 +45,7 @@ class StartImportParitySignerFragment : BaseFragment<StartImportParitySignerView
     }
 
     override fun subscribe(viewModel: StartImportParitySignerViewModel) {
-        viewModel.instructions.forEach(::showInstruction)
-
         binder.startImportParitySignerTitle.text = viewModel.title
-        binder.startImportParitySignerConnectOverview.setTargetImage(viewModel.polkadotVaultVariantIcon)
-    }
-
-    private fun showInstruction(instruction: Instruction) {
-        when (instruction) {
-            is Instruction.Image -> showImageInstruction(instruction)
-            is Instruction.Step -> showStepInstruction(instruction)
-        }
-    }
-
-    private fun showStepInstruction(step: Instruction.Step) {
-        val view = InstructionStepView(requireContext()).apply {
-            layoutParams = MarginLayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-                setMargins(0, 24.dp, 0, 0)
-            }
-
-            setStepNumber(step.index)
-            setStepText(step.content)
-        }
-
-        binder.startImportParitySignerInstructionContainer.addView(view)
-    }
-
-    private fun showImageInstruction(step: Instruction.Image) {
-        val view = InstructionImageView.createWithDefaultLayoutParams(requireContext()).apply {
-            setModel(step)
-        }
-
-        binder.startImportParitySignerInstructionContainer.addView(view)
+        pageAdapter.setTargetImage(viewModel.polkadotVaultVariantIcon)
     }
 }
