@@ -61,7 +61,7 @@
     <string name="account_import_mnemonic_subtitle">Слова должны быть разделены пробелом</string>
     <string name="account_import_mnemonic_title">Введите слова в правильном порядке</string>
     <string name="account_import_password_placeholder">Пароль</string>
-    <string name="account_import_private_key">Импорт приватного ключа</string>
+    <string name="account_import_private_key">приватный ключ</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Введите ваш сид</string>
     <string name="account_import_wallet_subtitle">Nova совместима со всеми приложениями</string>
@@ -110,7 +110,7 @@
     <string name="account_needed_message">У вас нет учетной записи в этой сети, вы можете создать или импортировать учетную запись.</string>
     <string name="account_needed_title">Необходим аккаунт</string>
     <string name="account_no_chain_projection">Аккаунт не найден</string>
-    <string name="account_pair_public_key">Импорт публичного ключа</string>
+    <string name="account_pair_public_key">публичный ключ</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s не поддерживает %s</string>
     <string name="account_parity_signer_import_preview_description">Следующие аккаунты были успешно считаны с %s</string>
