@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">Слова должны быть разделены пробелом</string>
     <string name="account_import_mnemonic_title">Введите слова в правильном порядке</string>
     <string name="account_import_password_placeholder">Пароль</string>
+    <string name="account_import_private_key">Импортировать приватный ключ</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Введите ваш сид</string>
     <string name="account_import_wallet_subtitle">Nova совместима со всеми приложениями</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">У вас нет учетной записи в этой сети, вы можете создать или импортировать учетную запись.</string>
     <string name="account_needed_title">Необходим аккаунт</string>
     <string name="account_no_chain_projection">Аккаунт не найден</string>
+    <string name="account_pair_public_key">Парный публичный ключ</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s не поддерживает %s</string>
     <string name="account_parity_signer_import_preview_description">Следующие аккаунты были успешно считаны с %s</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Обратите внимание, имя пути деривации должно быть пустым</string>
     <string name="account_polkadot_vault_import_start_step_1">%s на смартфоне</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Откройте приложение Polkadot Vault</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s Выберите свой набор ключей, сеть, а затем учетную запись, которую вы хотите добавить в Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Перейдите на вкладку «Key Sets».</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s, который вы хотите добавить в Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Нажмите на Derived Key</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault предоставит вам %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-код для сканирования</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">Нажмите на значок в правом верхнем углу и выберите %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Экспортировать приватный ключ</string>
     <string name="account_private_key">Приватный ключ</string>
     <string name="account_proxied">Проксированный</string>
     <string name="account_proxieds">Делегировано вам (Proxied)</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Substrate Аккаунты</string>
     <string name="account_substrate_crypto_type">Тип ключевой пары Substrate</string>
     <string name="account_substrate_derivation_path">Последовательность для вывода секрета Substrate</string>
+    <string name="account_wallet_name">Имя кошелька</string>
     <string name="account_wallet_nickname">Имя кошелька</string>
     <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver и другие сети</string>
     <string name="account_watch_add_evm_address_optional">EVM Адрес (необязательно)</string>
@@ -452,7 +457,7 @@
     <string name="common_frequency_days_everyday">ежедневно</string>
     <string name="common_full_details">Полная информация</string>
     <string name="common_get_token_format">Получить %s</string>
-    <string name="common_gift">Подарок</string>
+    <string name="common_gift">Подарить</string>
     <string name="common_got_it">Понятно</string>
     <string name="common_governance">Демократия</string>
     <string name="common_hexadecimal_string">Шестнадцатеричная строка</string>
@@ -467,6 +472,7 @@
     <string name="common_i_understand">Понятно</string>
     <string name="common_info">Информация</string>
     <string name="common_invalid_qr">QR-код недействителен</string>
+    <string name="common_invalid_qr_code">Недействительный QR-код</string>
     <string name="common_learn_more">Узнать больше</string>
     <string name="common_learn_more_v2_2_0">Узнать больше</string>
     <string name="common_ledger">Ledger</string>
@@ -483,6 +489,7 @@
     <string name="common_missing_account_title">%s аккаунт отсутствует</string>
     <string name="common_modify">Изменить</string>
     <string name="common_module">Модуль</string>
+    <string name="common_name">Имя</string>
     <string name="common_network">Сеть</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">Сеть %s не поддерживается</string>
@@ -1210,6 +1217,7 @@
     <string name="receive_screen_copy_address">Скопировать адрес</string>
     <string name="reclaim_gift_confirmation_message">Если вы вернете этот подарок, общая ссылка будет отключена, а токены будут возвращены в ваш кошелек.\nХотите продолжить?</string>
     <string name="reclaim_gift_confirmation_title">Вернуть подарок %s?</string>
+    <string name="reclaim_gift_success">Вы успешно забрали свой подарок</string>
     <string name="recover_json_hint">Вставьте json строку или загрузите файл…</string>
     <string name="recover_json_upload">Загрузите файл</string>
     <string name="recovery_json">JSON для восстановления</string>
@@ -1924,7 +1932,7 @@
     <string name="waiting_top_up_card_description">Это может занять до 5 минут.\nЭто окно закроется автоматически.</string>
     <string name="waiting_top_up_card_timer">Примерно %s</string>
     <string name="wallet_asset_buy">Купить</string>
-    <string name="wallet_asset_buy_sell">Купить/Продать</string>
+    <string name="wallet_asset_buy_sell">Куп./Прод.</string>
     <string name="wallet_asset_buy_tokens">Купить токены</string>
     <string name="wallet_asset_buy_with">Купить с</string>
     <string name="wallet_asset_receive">Получить</string>

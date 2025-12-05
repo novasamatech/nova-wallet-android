@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">単語はスペースで区切り、カンマやその他の記号は使わないでください</string>
     <string name="account_import_mnemonic_title">単語を正しい順序で入力</string>
     <string name="account_import_password_placeholder">パスワード</string>
+    <string name="account_import_private_key">秘密鍵をインポート</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">生のSeedを入力</string>
     <string name="account_import_wallet_subtitle">Novaは全てのアプリに対応しています</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">このネットワークにはアカウントがありません。アカウントを作成するか、インポートすることができます。</string>
     <string name="account_needed_title">アカウントが必要です</string>
     <string name="account_no_chain_projection">アカウントが見つかりません</string>
+    <string name="account_pair_public_key">公開鍵をペアリング</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%sが%sをサポートしていません</string>
     <string name="account_parity_signer_import_preview_description">次のアカウントが%sから正常に読み取られました</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">派生パス名が空であることに注意してください</string>
     <string name="account_polkadot_vault_import_start_step_1">スマートフォンの%sアプリケーション</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Polkadot Vault を開く</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s キーセット、ネットワーク、Nova Walletに追加するアカウントを選択します</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Key Sets タブに行く。</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s をNova Walletに追加しますか</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">派生キーをタップ</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが%s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">スキャン用のQRコード</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">右上のアイコンをタップして%sを選択</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">秘密鍵をエクスポート</string>
     <string name="account_private_key">プライベートキー</string>
     <string name="account_proxied">プロキシ</string>
     <string name="account_proxieds">委任された（プロキシ）</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Substrateアカウント</string>
     <string name="account_substrate_crypto_type">Substrateキーの暗号タイプ</string>
     <string name="account_substrate_derivation_path">Substrate秘密の導出パス</string>
+    <string name="account_wallet_name">ウォレット名</string>
     <string name="account_wallet_nickname">ウォレットのニックネーム</string>
     <string name="account_watch_add_evm_address_description">Moonbeam、Moonriverおよびその他のネットワーク</string>
     <string name="account_watch_add_evm_address_optional">EVMアドレス（任意）</string>
@@ -461,6 +466,7 @@
     <string name="common_i_understand">了解しました</string>
     <string name="common_info">情報</string>
     <string name="common_invalid_qr">QRコードが無効です</string>
+    <string name="common_invalid_qr_code">無効なQRコード</string>
     <string name="common_learn_more">さらに詳しく</string>
     <string name="common_learn_more_v2_2_0">についてもっと知る</string>
     <string name="common_ledger">Ledger</string>
@@ -474,6 +480,7 @@
     <string name="common_missing_account_title">%sアカウントがありません</string>
     <string name="common_modify">修正</string>
     <string name="common_module">モジュール</string>
+    <string name="common_name">名前</string>
     <string name="common_network">ネットワーク</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%sはサポートされていません</string>
@@ -1186,6 +1193,7 @@
     <string name="receive_screen_copy_address">住所をコピー</string>
     <string name="reclaim_gift_confirmation_message">この贈り物を回収すると、共有リンクが無効になり、トークンがウォレットに返金されます。\n続行しますか？</string>
     <string name="reclaim_gift_confirmation_title">%sギフトを回収しますか？</string>
+    <string name="reclaim_gift_success">ギフトを正常に再取得しました</string>
     <string name="recover_json_hint">jsonを貼り付けるかファイルをアップロード...</string>
     <string name="recover_json_upload">ファイルをアップロード</string>
     <string name="recovery_json">JSONを復元</string>

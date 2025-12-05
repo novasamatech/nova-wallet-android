@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources>
     <string name="about_contact_us">联系我们</string>
+    <string name="about_github">Github源代码</string>
     <string name="about_github_v2_2_0">Github</string>
     <string name="about_privacy">隐私政策</string>
     <string name="about_rate_app">给我们评分</string>
+    <string name="about_telegram">加入Telegram群组</string>
     <string name="about_telegram_v2_2_0">Telegram</string>
     <string name="about_terms">条款和条件</string>
     <string name="about_terms_v2_2_0">条款与条件</string>
     <string name="about_title">关于</string>
     <string name="about_version">应用版本</string>
+    <string name="about_website">官方网站</string>
     <string name="about_website_v2_2_0">网站</string>
     <string name="accoount_enter_chain_address_format">输入有效的%s地址…</string>
     <string name="accoount_enter_evm_address">EVM地址必须有效或为空…</string>
@@ -26,8 +29,12 @@
     <string name="account_confirm_mnemonic_title">让我们再次检查一下</string>
     <string name="account_confirmation_details">按正确的顺序选择单词</string>
     <string name="account_create_account">创建一个新账户</string>
+    <string name="account_create_details">使用非数字方式进行备份，例如将其写在纸上。</string>
     <string name="account_create_details_v2_2_0">不要在您的移动设备上使用剪贴板或截图，请尝试寻找备份的安全方法（例如纸张）</string>
+    <string name="account_create_name_examples">例如：储蓄、投资、众筹、质押。</string>
+    <string name="account_create_name_subtitle">这个昵称只会在您的移动设备上本地显示和存储。</string>
     <string name="account_create_name_subtitle_v2_2_0">名称将仅在此应用中本地使用。您可以稍后编辑它</string>
+    <string name="account_create_name_title">创建钱包昵称</string>
     <string name="account_create_name_title_v2_2_0">创建钱包名称</string>
     <string name="account_create_title">备份助记词</string>
     <string name="account_create_wallet">创建新钱包</string>
@@ -53,6 +60,8 @@
     <string name="account_export_json_password_title">设置一个新密码</string>
     <string name="account_export_json_title">保存您的密钥并将其存放在安全的地方</string>
     <string name="account_export_seed_title">记录您的密钥并将其存放在安全的地方</string>
+    <string name="account_export_warning_message">共享或复制您的密钥是一个高风险操作，不要将它发送给任何人。您想继续共享/复制过程吗？</string>
+    <string name="account_export_warning_title">请小心</string>
     <string name="account_import_invalid_keystore">恢复json无效。请确保输入包含有效的json。</string>
     <string name="account_import_invalid_seed">Seed无效。请确保您的输入包含64个十六进制符号。</string>
     <string name="account_import_json_no_network">JSON不包含网络信息。请在下面指定。</string>
@@ -61,11 +70,13 @@
     <string name="account_import_mnemonic_subtitle">单词之间用一个空格分开，没有逗号或其他符号</string>
     <string name="account_import_mnemonic_title">按正确顺序输入单词</string>
     <string name="account_import_password_placeholder">密码</string>
+    <string name="account_import_private_key">导入私钥</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">输入您的原始seed</string>
     <string name="account_import_wallet_subtitle">Nova与所有应用程序兼容</string>
     <string name="account_import_wallet_title">导入钱包</string>
     <string name="account_info_title">账户</string>
+    <string name="account_invalid_derivation_path_message">派生路径包含不支持的符号或结构不正确</string>
     <string name="account_invalid_derivation_path_message_v2_2_0">您的派生路径包含不支持的符号或结构不正确</string>
     <string name="account_invalid_derivation_path_title">无效的派生路径</string>
     <string name="account_json_file">JSON文件</string>
@@ -109,6 +120,7 @@
     <string name="account_needed_message">您在这个网络上没有账户，您可以创建或导入账户。</string>
     <string name="account_needed_title">需要账户</string>
     <string name="account_no_chain_projection">没有找到账户</string>
+    <string name="account_pair_public_key">配对公钥</string>
     <string name="account_parity_signer">Parity 签名器</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s不支持%s</string>
     <string name="account_parity_signer_import_preview_description">以下账户已经成功从%s读取</string>
@@ -137,10 +149,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">注意，衍生路径名称应为空</string>
     <string name="account_polkadot_vault_import_start_step_1">您智能手机上的 %s 应用程序</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">打开Polkadot Vault</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s 选择您的密钥集、网络，然后选择您想要添加到 Nova 钱包的帐户</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">前往“Key Sets”标签页。</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s 您想要添加到 Nova 钱包</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">点击派生密钥</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault 将提供给您%s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR 码扫描</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">点击右上角的图标并选择 %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">导出私钥</string>
     <string name="account_private_key">私钥</string>
     <string name="account_proxied">代理</string>
     <string name="account_proxieds">代理给你（代理）</string>
@@ -162,6 +176,7 @@
     <string name="account_substrate_accounts">Substrate账户</string>
     <string name="account_substrate_crypto_type">Substrate 密钥对加密类型</string>
     <string name="account_substrate_derivation_path">Substrate 秘密衍生路径</string>
+    <string name="account_wallet_name">钱包名称</string>
     <string name="account_wallet_nickname">钱包昵称</string>
     <string name="account_watch_add_evm_address_description">Moonbeam、Moonriver 以及其他网络</string>
     <string name="account_watch_add_evm_address_optional">EVM 地址（可选）</string>
@@ -175,6 +190,7 @@
     <string name="account_welcome_hardware_wallet_title">连接硬件钱包</string>
     <string name="account_welcome_trust_wallet_subtitle">在 Nova 中使用您的 Trust Wallet 账户</string>
     <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
+    <string name="accounts_add_account">添加帐户</string>
     <string name="accounts_add_chain_account">添加%s帐户</string>
     <string name="accounts_add_wallet">添加钱包</string>
     <string name="accounts_change_chain_account">更改%s帐户</string>
@@ -430,6 +446,7 @@
     <string name="common_event">事件</string>
     <string name="common_evm">EVM</string>
     <string name="common_evm_address">EVM 地址</string>
+    <string name="common_existential_warning_message">此操作将因总余额低于最小余额而从区块存储中移除账户。</string>
     <string name="common_existential_warning_message_v2_2_0">此操作后，如果您的总余额低于最低余额，您的账户将从区块链中移除</string>
     <string name="common_existential_warning_title">操作将移除账户</string>
     <string name="common_expired">已过期</string>
@@ -461,6 +478,7 @@
     <string name="common_i_understand">我明白了</string>
     <string name="common_info">信息</string>
     <string name="common_invalid_qr">二维码无效</string>
+    <string name="common_invalid_qr_code">无效的二维码</string>
     <string name="common_learn_more">了解更多</string>
     <string name="common_learn_more_v2_2_0">了解更多关于</string>
     <string name="common_ledger">账本</string>
@@ -474,6 +492,7 @@
     <string name="common_missing_account_title">%s 账户缺失</string>
     <string name="common_modify">修改</string>
     <string name="common_module">模块</string>
+    <string name="common_name">名称</string>
     <string name="common_network">网络</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s 不支持</string>
@@ -487,7 +506,9 @@
     <string name="common_no_app_to_handle_import_intent">设备上未发现文件导入应用。请安装后重试</string>
     <string name="common_no_app_to_handle_intent">设备上未发现适合处理此意图的应用</string>
     <string name="common_no_changes">无变化</string>
+    <string name="common_no_screenshot_message">请不要截屏，可能会被第三方恶意软件收集</string>
     <string name="common_no_screenshot_message_v2_2_0">我们即将显示您的助记词。确保没有人能看到您的屏幕并且不要截屏 —— 它们可能被第三方恶意软件收集</string>
+    <string name="common_no_screenshot_title">请不要截屏</string>
     <string name="common_none">无</string>
     <string name="common_not_available">不可用</string>
     <string name="common_not_enough_funds_message">抱歉，您没有足够的资金支付网络费用。</string>
@@ -601,6 +622,7 @@
     <string name="connection_add_unsupported_error">不幸的是，网络不支持。请尝试以下之一：%s。</string>
     <string name="connection_delete_description">确认删除%s。</string>
     <string name="connection_delete_title">删除网络？</string>
+    <string name="connection_error_message">请检查互联网连接，然后再试一次。</string>
     <string name="connection_error_message_v2_2_0">请检查您的连接或稍后再试</string>
     <string name="connection_management_custom_title">自定义</string>
     <string name="connection_management_default_title">默认</string>
@@ -629,6 +651,7 @@
     <string name="crowdloan_acala_direct">直接</string>
     <string name="crowdloan_acala_learn_types">了解Acala不同贡献类型的更多信息</string>
     <string name="crowdloan_acala_liquid">流动性贡献</string>
+    <string name="crowdloan_active_section">活跃</string>
     <string name="crowdloan_active_section_format">活跃 (%s)</string>
     <string name="crowdloan_agree_with_policy">同意条款和条件</string>
     <string name="crowdloan_app_bonus_format">Nova Wallet 奖金 (%s)</string>
@@ -636,6 +659,7 @@
     <string name="crowdloan_cap_reached_amount_message">由于结果增加的金额将超过众贷上限，无法贡献选定金额。允许的最大贡献为 %s。</string>
     <string name="crowdloan_cap_reached_raised_message">由于已达到上限，无法对选定的众贷进行贡献。</string>
     <string name="crowdloan_cap_reached_title">众贷上限超出</string>
+    <string name="crowdloan_completed_section">已完成</string>
     <string name="crowdloan_contribute_title">对众贷进行贡献</string>
     <string name="crowdloan_contribution">贡献</string>
     <string name="crowdloan_contribution_format">你已贡献：%s</string>
@@ -647,6 +671,7 @@
     <string name="crowdloan_contributions_with_source" formatted="false">%s (通过 %s)</string>
     <string name="crowdloan_crowdloan">众贷</string>
     <string name="crowdloan_empty_bonus_title">获得特别奖励</string>
+    <string name="crowdloan_empty_message">众贷信息\n将显示在这里</string>
     <string name="crowdloan_empty_message_v2_2_0">众贷将显示在这里</string>
     <string name="crowdloan_ended_message">由于已经结束，无法对选定的众贷进行贡献。</string>
     <string name="crowdloan_ended_title">众贷已结束</string>
@@ -655,6 +680,7 @@
     <string name="crowdloan_learn">了解 %s 的众贷</string>
     <string name="crowdloan_learn_v2_2_0">%s 的众贷网站</string>
     <string name="crowdloan_leasing_period">租赁期</string>
+    <string name="crowdloan_main_description">选择平行链以贡献你的 %s。如果平行链在拍卖结束时获得一个插槽，你将收到奖励。</string>
     <string name="crowdloan_main_description_v2_2_0">选择要贡献您的%s的平行链。您将收回您贡献的代币，如果平行链赢得了一个插槽，您将在拍卖结束后收到奖励</string>
     <string name="crowdloan_missing_account_message">您需要在钱包中添加一个%s账户以便贡献</string>
     <string name="crowdloan_missing_bonus_action">应用奖金</string>
@@ -808,10 +834,13 @@
     <string name="existing_cloud_backup_found_title">找到现有的云备份</string>
     <string name="export_json_download_btn">下载恢复 JSON</string>
     <string name="export_json_password_confirm">确认密码</string>
+    <string name="export_json_password_explanation">密码是加密您的账户并存储为恢复JSON所必需的。请创建密码以继续操作。</string>
     <string name="export_json_password_match_error">密码不匹配</string>
     <string name="export_json_password_new">设置密码</string>
     <string name="export_mnemonic_with_derivation" formatted="false">网络：%s\n助记词：%s\n推导路径：%s</string>
     <string name="export_mnemonic_without_derivation" formatted="false">网络：%s\n助记词：%s</string>
+    <string name="export_seed_with_derivation" formatted="false">网络：%s\n种子：%s\n推导路径：%s</string>
+    <string name="export_seed_without_derivation" formatted="false">网络：%s\n种子：%s</string>
     <string name="fee_not_yet_loaded_message">请等待费用计算</string>
     <string name="fee_not_yet_loaded_title">费用计算正在进行中</string>
     <string name="fragment_assets_nova_card">管理借记卡</string>
@@ -1074,6 +1103,7 @@
     <string name="onboarding_privacy_policy">隐私政策</string>
     <string name="onboarding_restore_account">导入账户</string>
     <string name="onboarding_restore_wallet">已有钱包</string>
+    <string name="onboarding_terms_and_conditions_1">我已阅读并同意\n使用条款和隐私政策</string>
     <string name="onboarding_terms_and_conditions_1_v2_2_1">继续访问即表示您同意我们的\n%1$s和%2$s</string>
     <string name="onboarding_terms_and_conditions_2">使用条款</string>
     <string name="operations_swap_title">交换</string>
@@ -1186,6 +1216,7 @@
     <string name="receive_screen_copy_address">复制地址</string>
     <string name="reclaim_gift_confirmation_message">如果您追回此礼物，分享链接将被禁用，代币将退回到您的钱包。\n您想继续吗？</string>
     <string name="reclaim_gift_confirmation_title">追回%s礼物？</string>
+    <string name="reclaim_gift_success">您已成功领取您的礼物</string>
     <string name="recover_json_hint">粘贴 json 字符串或上传文件…</string>
     <string name="recover_json_upload">上传文件</string>
     <string name="recovery_json">恢复 JSON</string>
@@ -1323,6 +1354,7 @@
     <string name="search_header_my_accounts">我的账户</string>
     <string name="search_pool_no_pools_found_placeholder">未找到输入名称或池ID的池。请确保输入的数据正确</string>
     <string name="search_recipient_hint">账户地址或账户名称</string>
+    <string name="search_recipient_welcome">您曾经发送转账的账户和联系人将出现在这里</string>
     <string name="search_recipient_welcome_v2_2_0">搜索结果将在此显示</string>
     <string name="search_result_header">搜索结果</string>
     <string name="select_custom_pool_active_pools_count">活跃池：%d</string>
@@ -1474,6 +1506,7 @@
     <string name="staking_no_access_to_controller_account_title">无法访问控制器账户</string>
     <string name="staking_nominated">已提名：</string>
     <string name="staking_nominations_rewarded_format">%s已奖励</string>
+    <string name="staking_nominator_status_active">活跃</string>
     <string name="staking_nominator_status_alert_active_message">你的一个验证者已被网络选中。</string>
     <string name="staking_nominator_status_alert_active_title">活跃状态</string>
     <string name="staking_nominator_status_alert_inactive_title">非活跃状态</string>
@@ -1520,6 +1553,8 @@
     <plurals name="staking_payouts_days_left">
         <item quantity="other">%d天后到期</item>
     </plurals>
+    <string name="staking_pending_rewards_info">验证人每2-5天支付一次奖励。然而，您可以自己支付它们，尤其是当奖励即将到期时，但您将支付费用。</string>
+    <string name="staking_pending_rewards_info_v2_2_0">验证人每2-3天支付一次奖励。当它们接近过期时，您可以自己支付，但您将支付费用</string>
     <string name="staking_pending_rewards_subtitle">您可以自行支付它们，当它们即将到期时，但您将支付费用</string>
     <string name="staking_pending_rewards_title">奖励每2-3天由验证人支付</string>
     <string name="staking_period_all_short">全部</string>
@@ -1570,6 +1605,8 @@
     <string name="staking_reward_details_era">时代</string>
     <string name="staking_reward_details_title">奖励详情</string>
     <string name="staking_reward_details_validator">验证器</string>
+    <string name="staking_reward_info_avg">平均APY</string>
+    <string name="staking_reward_info_max">最大APY</string>
     <string name="staking_reward_info_title_restake">再投资收益</string>
     <string name="staking_reward_info_title_transferrable">无需再投资的收益</string>
     <string name="staking_reward_payouts_empty_rewards">太好了！所有奖励都已支付。</string>
@@ -1580,7 +1617,10 @@
     <string name="staking_rewards">%s奖励</string>
     <string name="staking_rewards_about">关于奖励</string>
     <string name="staking_rewards_apy">奖励（APY）</string>
+    <string name="staking_rewards_destination_title">奖励去向</string>
     <string name="staking_rewards_destination_title_v2_0_0">奖励目的地</string>
+    <string name="staking_rewards_learn_more">了解更多关于奖励的信息</string>
+    <string name="staking_rewards_learn_more_v2_2_0">更多关于奖励的信息</string>
     <string name="staking_select_custom">自行选择</string>
     <string name="staking_select_payout_account">选择支付账户</string>
     <string name="staking_select_recommended">选择推荐</string>
@@ -1591,6 +1631,8 @@
     <string name="staking_set_controller_deprecated_title">控制器账户正在被弃用</string>
     <string name="staking_set_controller_subtitle">选择另一个帐户作为控制器，将质押管理操作委托给它</string>
     <string name="staking_set_controller_title">提高质押安全性</string>
+    <string name="staking_set_separate_account_controller">设置一个单独的帐户作为控制器以增加质押管理的安全性。</string>
+    <string name="staking_set_separate_account_controller_v2_2_0">选择另一个帐户作为控制器，通过将质押管理操作委托给它来提高质押安全性</string>
     <string name="staking_set_validators">设置验证人</string>
     <string name="staking_set_validators_message">验证人未被选择</string>
     <string name="staking_set_validators_title">选择验证人开始质押</string>
@@ -1603,6 +1645,7 @@
     <string name="staking_setup_reward_destination_section_title_v2_2_0">选择您的奖励类型</string>
     <string name="staking_setup_reward_payout_account">支付账户</string>
     <string name="staking_slash">惩罚</string>
+    <string name="staking_stake">质押</string>
     <string name="staking_stake_format">质押%s</string>
     <string name="staking_stake_max">最大质押</string>
     <string name="staking_staking_period">质押期</string>
@@ -1611,9 +1654,11 @@
     <string name="staking_start_change_validators_custom_subtitle_v2_2_0">谨慎选择您的验证者，因为他们应该专业且诚实地行事。仅基于盈利性来做出决定可能会导致奖励减少甚至赌注损失</string>
     <string name="staking_start_change_validators_custom_title">与您的验证者一起抵押</string>
     <string name="staking_start_change_validators_recommended_subtitle">Nova Wallet将根据安全和盈利性标准选择顶级验证者</string>
+    <string name="staking_start_change_validators_recommended_subtitle_v2_2_0">Nova Wallet根据区块链数据和以下标准创建了推荐验证者名单：</string>
     <string name="staking_start_change_validators_recommended_title">与推荐的验证者一起抵押</string>
     <string name="staking_start_title">开始抵押</string>
     <string name="staking_stash">保管库</string>
+    <string name="staking_stash_account">保管库账户</string>
     <string name="staking_stash_can_hint">使用保管库账户可以绑定更多并设置控制器。</string>
     <string name="staking_stash_can_hint_v2_2_0">保管库用于：抵押更多并设置控制器</string>
     <string name="staking_stash_missing_message">保管库账户 %s 无法更新抵押设置。</string>
@@ -1676,6 +1721,7 @@
     <string name="staking_your_elected_format">已选（%s）</string>
     <string name="staking_your_inactive_description">本时代未被选中的验证者。</string>
     <string name="staking_your_inactive_description_v2_2_0">没有足够质押以被选中的验证者</string>
+    <string name="staking_your_nominated_format">已提名：%s</string>
     <string name="staking_your_not_allocated_description">未分配您的质押的其他活跃验证者。</string>
     <string name="staking_your_not_allocated_description_v2_2_0">没有您的质押分配的活跃验证者</string>
     <string name="staking_your_not_elected_format">未选中（%s）</string>
@@ -1908,6 +1954,7 @@
     <string name="wallet_balance_details_total_after">转账后总计</string>
     <string name="wallet_balance_frozen">已冻结</string>
     <string name="wallet_balance_locked">已锁定</string>
+    <string name="wallet_balance_locked_template">已锁定 %s</string>
     <string name="wallet_balance_redeemable">可赎回</string>
     <string name="wallet_balance_reserved">已预留</string>
     <string name="wallet_balance_transferable">可转让</string>
@@ -1942,6 +1989,7 @@
     <string name="wallet_management_add_account_title">如何添加钱包？</string>
     <string name="wallet_management_create_account_btn">如何添加钱包？</string>
     <string name="wallet_management_import_account_btn">如何添加钱包？</string>
+    <string name="wallet_nickname_create_caption">例如：储蓄、投资、众贷、质押。</string>
     <string name="wallet_nickname_create_caption_v2_2_0">名称示例：主账户、我的验证器、Dotsama 众贷等。</string>
     <string name="wallet_receive_description">将此 QR 码分享给发送方</string>
     <string name="wallet_receive_description_v2_2_0">让发送方扫描此 QR 码</string>
@@ -1953,6 +2001,7 @@
     <string name="wallet_send_balance_minimal">最小余额</string>
     <string name="wallet_send_cannot_dust_before_delivery_fee_message">由于跨链限制，您转账的金额不能超过%s</string>
     <string name="wallet_send_cannot_pay_cross_chain_fee" formatted="false">您的余额不足以支付%s的跨链费用。\n转账后的剩余余额：%s</string>
+    <string name="wallet_send_cannot_pay_network_fee" formatted="false">您的余额不足以支付%s的网络费用。可转账余额：%s</string>
     <string name="wallet_send_confirm_hint">跨链费用将加在输入金额之上。接收者可能会收到部分跨链费用</string>
     <string name="wallet_send_confirm_transfer">确认转账</string>
     <string name="wallet_send_cross_chain">跨链</string>
