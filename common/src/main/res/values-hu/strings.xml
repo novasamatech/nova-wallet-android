@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">A szavakat külön-külön, egy szóközzel, vessző vagy egyéb jelek nélkül kell beírni.</string>
     <string name="account_import_mnemonic_title">Írd be a szavakat a megfelelő sorrendben</string>
     <string name="account_import_password_placeholder">Jelszó</string>
+    <string name="account_import_private_key">Privát kulcs importálása</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Add meg a nyers seed-et</string>
     <string name="account_import_wallet_subtitle">A Nova minden alkalmazással kompatibilis</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">Nem rendelkezel fiókkal ezen a hálózaton, hozzáadhatsz vagy importálhatsz egyet.</string>
     <string name="account_needed_title">Fiók szükséges</string>
     <string name="account_no_chain_projection">A fiók nem található</string>
+    <string name="account_pair_public_key">Párosítás nyilvános kulccsal</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s nem támogatja a következő: %s</string>
     <string name="account_parity_signer_import_preview_description">A következő fiókok sikeresen be lettek olvasva innen: %s</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Ügyelj arra, hogy a származtatási útvonal nevének üresnek kell lennie</string>
     <string name="account_polkadot_vault_import_start_step_1"><font color="#FFFFFF">Nyisd meg a Polkadot Vault</font> alkalmazást okostelefonodon</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Nyisd meg a Polkadot Vault-ot</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s Válaszd a \"your Key set-et\", majd válaszd ki a fiókot, amit hozzá szeretnél adni Nova Wallet-hez</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Menj a \"Key Sets\" fülre.</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s szeretnéd hozzáadni a Nova Wallethez</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Érints rá a <font>Származtatott kulcs</font> elemre</string>
     <string name="account_polkadot_vault_import_start_step_3">A Polkadot Vault egy %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR-kód a beolvasáshoz</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">Érintsd meg az ikont a jobb felső sarokban és válaszd a %s lehetőséget</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Privát kulcs exportálása</string>
     <string name="account_private_key">Privát kulcs</string>
     <string name="account_proxied">Meghatalmazott</string>
     <string name="account_proxieds">Hozzád delegálva (Proxied)</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Substrate Fiókok</string>
     <string name="account_substrate_crypto_type">Substrate kulcspár titkosítási típusa</string>
     <string name="account_substrate_derivation_path">Substrate titkos származtatási útvonal</string>
+    <string name="account_wallet_name">Tárca neve</string>
     <string name="account_wallet_nickname">Tárca beceneve</string>
     <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver és egyéb hálózatok</string>
     <string name="account_watch_add_evm_address_optional">EVM-cím (opcionális)</string>
@@ -463,6 +468,7 @@
     <string name="common_i_understand">Megértettem</string>
     <string name="common_info">Információ</string>
     <string name="common_invalid_qr">A QR-kód érvénytelen</string>
+    <string name="common_invalid_qr_code">Érvénytelen QR-kód</string>
     <string name="common_learn_more">Tudj meg többet</string>
     <string name="common_learn_more_v2_2_0">További információ</string>
     <string name="common_ledger">Ledger</string>
@@ -477,6 +483,7 @@
     <string name="common_missing_account_title">A(z) %s fiók hiányzik</string>
     <string name="common_modify">Módosít</string>
     <string name="common_module">Modul</string>
+    <string name="common_name">Név</string>
     <string name="common_network">Hálózat</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s nem támogatott</string>
@@ -1194,6 +1201,7 @@
     <string name="receive_screen_copy_address">Cím másolása</string>
     <string name="reclaim_gift_confirmation_message">Ha visszakéred ezt az ajándékot, akkor a megosztott link le lesz tiltva, és a tokenek visszatérnek a pénztárcádba.\nTovább szeretnél lépni?</string>
     <string name="reclaim_gift_confirmation_title">Visszakérni a(z) %s Ajándékot?</string>
+    <string name="reclaim_gift_success">Sikeresen visszakaptad az ajándékodat</string>
     <string name="recover_json_hint">JSON beillesztése vagy fájl feltöltése…</string>
     <string name="recover_json_upload">Fájl feltöltése</string>
     <string name="recovery_json">JSON visszaállítása</string>

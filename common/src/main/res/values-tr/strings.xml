@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">Kelimeleri virgül ya da başka işaretler olmadan sadece bir boşluk ile ayırın</string>
     <string name="account_import_mnemonic_title">Kelimeleri doğru sırayla girin</string>
     <string name="account_import_password_placeholder">Şifre</string>
+    <string name="account_import_private_key">Özel anahtarı içe aktar</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Ham seed\'inizi girin</string>
     <string name="account_import_wallet_subtitle">Nova, tüm uygulamalarla uyumludur</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">Bu ağ için bir hesabınız yok, hesap oluşturabilir veya hesap aktarabilirsiniz.</string>
     <string name="account_needed_title">Hesap Gerekli</string>
     <string name="account_no_chain_projection">Hesap bulunamadı</string>
+    <string name="account_pair_public_key">Anahtar çiftleştir</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s, %s\'yi desteklemiyor</string>
     <string name="account_parity_signer_import_preview_description">%s\'ten başarıyla okunan hesaplar</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Dikkat edin, türev yol adı boş olmalıdır</string>
     <string name="account_polkadot_vault_import_start_step_1">%s uygulamasını açın</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Polkadot Vault\'u açın</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s Anahtar setinizi, Ağınızı ve ardından Nova Wallet\'a eklemek istediğiniz hesabı seçin.</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">‘Key Sets’ sekmesine gidin.</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s\'yi Nova Cüzdanına eklemek istiyorsun</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Türemiş Anahtar\'a dokunun</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault size %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">taramak için QR kodu</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">Sağ üst köşedeki simgeye dokunun ve %s\'yi seçin</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Özel Anahtarı Dışa Aktar</string>
     <string name="account_private_key">Özel anahtar</string>
     <string name="account_proxied">Vekil</string>
     <string name="account_proxieds">Size Delege Edilenler (Proxied)</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Substrate Hesapları</string>
     <string name="account_substrate_crypto_type">Substrate anahtar çifti kripto tipi</string>
     <string name="account_substrate_derivation_path">Substrate sır türetme yolu</string>
+    <string name="account_wallet_name">Cüzdan adı</string>
     <string name="account_wallet_nickname">Cüzdan adı</string>
     <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver ve diğer ağlar</string>
     <string name="account_watch_add_evm_address_optional">EVM Adresi (İsteğe bağlı)</string>
@@ -463,6 +468,7 @@
     <string name="common_i_understand">Anladım</string>
     <string name="common_info">Bilgi</string>
     <string name="common_invalid_qr">QR kodu geçersiz</string>
+    <string name="common_invalid_qr_code">Geçersiz QR kodu</string>
     <string name="common_learn_more">Daha fazla bilgi edinin</string>
     <string name="common_learn_more_v2_2_0">Hakkında daha fazla bilgi edinin</string>
     <string name="common_ledger">Ledger</string>
@@ -477,6 +483,7 @@
     <string name="common_missing_account_title">%s hesabı eksik</string>
     <string name="common_modify">Düzenle</string>
     <string name="common_module">Modül</string>
+    <string name="common_name">İsim</string>
     <string name="common_network">Ağ</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s desteklenmiyor</string>
@@ -1194,6 +1201,7 @@
     <string name="receive_screen_copy_address">Adresi Kopyala</string>
     <string name="reclaim_gift_confirmation_message">Bu hediyeyi geri alırsanız, paylaşılan bağlantı devre dışı bırakılacak ve token\'ler cüzdanınıza geri yüklenecektir.\nDevam etmek istiyor musunuz?</string>
     <string name="reclaim_gift_confirmation_title">%s Hediyeyi Geri Al?</string>
+    <string name="reclaim_gift_success">Hediyenizi başarıyla aldınız</string>
     <string name="recover_json_hint">Json yapıştırın ya da dosya yükleyin...</string>
     <string name="recover_json_upload">Dosya yükle</string>
     <string name="recovery_json">JSON Kurtar</string>

@@ -61,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">Ghi các từ riêng biệt với một khoảng trắng, không có dấu phẩy hoặc ký tự khác</string>
     <string name="account_import_mnemonic_title">Nhập các từ theo thứ tự đúng</string>
     <string name="account_import_password_placeholder">Mật khẩu</string>
+    <string name="account_import_private_key">Nhập khóa riêng tư</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">Nhập seed gốc của bạn</string>
     <string name="account_import_wallet_subtitle">Nova tương thích với tất cả các ứng dụng</string>
@@ -109,6 +110,7 @@
     <string name="account_needed_message">Bạn không có tài khoản cho mạng này, bạn có thể tạo hoặc nhập tài khoản.</string>
     <string name="account_needed_title">Cần tài khoản</string>
     <string name="account_no_chain_projection">Không tìm thấy tài khoản</string>
+    <string name="account_pair_public_key">Ghép khóa công khai</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%s không hỗ trợ %s</string>
     <string name="account_parity_signer_import_preview_description">Các tài khoản sau đã được đọc thành công từ %s</string>
@@ -137,10 +139,12 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">Hãy chú ý, tên đường dẫn dẫn xuất nên để trống</string>
     <string name="account_polkadot_vault_import_start_step_1">ứng dụng %s trên điện thoại thông minh của bạn</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Mở Polkadot Vault</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s Chọn bộ khóa, Mạng và sau đó chọn tài khoản bạn muốn thêm vào Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Đi tới tab \'Key Sets\'.</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s bạn muốn thêm vào Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Chạm vào Khóa dẫn xuất</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault sẽ cung cấp cho bạn %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">quét mã QR</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">Chạm vào biểu tượng ở góc trên bên phải và chọn %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Xuất Khóa Riêng Tư</string>
     <string name="account_private_key">Khoá riêng tư</string>
     <string name="account_proxied">Được ủy quyền</string>
     <string name="account_proxieds">Được ủy quyền cho bạn (Proxied)</string>
@@ -162,6 +166,7 @@
     <string name="account_substrate_accounts">Tài khoản Substrate</string>
     <string name="account_substrate_crypto_type">Loại mã hóa keypair Substrate</string>
     <string name="account_substrate_derivation_path">Đường dẫn dẫn xuất bí mật Substrate</string>
+    <string name="account_wallet_name">Tên ví</string>
     <string name="account_wallet_nickname">Biệt danh ví</string>
     <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver và các mạng khác</string>
     <string name="account_watch_add_evm_address_optional">Địa chỉ EVM (Không bắt buộc)</string>
@@ -461,6 +466,7 @@
     <string name="common_i_understand">Hiểu rồi</string>
     <string name="common_info">Thông tin</string>
     <string name="common_invalid_qr">Mã QR không hợp lệ</string>
+    <string name="common_invalid_qr_code">Mã QR không hợp lệ</string>
     <string name="common_learn_more">Tìm hiểu thêm</string>
     <string name="common_learn_more_v2_2_0">Tìm hiểu thêm về</string>
     <string name="common_ledger">Ledger</string>
@@ -474,6 +480,7 @@
     <string name="common_missing_account_title">tài khoản %s đang thiếu</string>
     <string name="common_modify">Chỉnh sửa</string>
     <string name="common_module">Mô đun</string>
+    <string name="common_name">Tên</string>
     <string name="common_network">Mạng</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%s không được hỗ trợ</string>
@@ -1186,6 +1193,7 @@
     <string name="receive_screen_copy_address">Sao chép Địa chỉ</string>
     <string name="reclaim_gift_confirmation_message">Nếu bạn đòi lại món quà này, liên kết chia sẻ sẽ bị tắt và token sẽ được hoàn lại vào ví của bạn.\nBạn có muốn tiếp tục không?</string>
     <string name="reclaim_gift_confirmation_title">Đòi lại Quà %s?</string>
+    <string name="reclaim_gift_success">Bạn đã thu hồi thành công món quà của mình</string>
     <string name="recover_json_hint">Dán mã JSON hoặc tải lên tệp...</string>
     <string name="recover_json_upload">Tải lên tệp</string>
     <string name="recovery_json">Khôi phục JSON</string>
