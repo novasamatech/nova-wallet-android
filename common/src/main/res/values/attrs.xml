@@ -63,6 +63,9 @@
 
     <declare-styleable name="ActionInputField">
         <attr name="android:hint" format="string" />
+        <attr name="supportScan" format="boolean" />
+        <attr name="supportInsertion" format="boolean" />
+        <attr name="fieldSaveEnabled" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="InputField">

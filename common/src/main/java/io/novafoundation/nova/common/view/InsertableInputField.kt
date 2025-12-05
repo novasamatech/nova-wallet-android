@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.databinding.ViewInsertableInputFieldBinding
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ClipboardManager
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.useAttributes
@@ -30,12 +31,16 @@ class InsertableInputField @JvmOverloads constructor(
 
     private var clipboardManager: ClipboardManager? = getClipboardManager()
 
+    var supportScan: Boolean = false
+    var supportInsertion: Boolean = true
+
     val content: EditText
         get() = binder.actionInputField
 
     init {
         orientation = HORIZONTAL
         gravity = Gravity.CENTER_VERTICAL
+        minimumHeight = 48.dp
 
         setAddStatesFromChildren(true)
 
@@ -45,6 +50,10 @@ class InsertableInputField @JvmOverloads constructor(
 
         content.addTextChangedListener {
             updateButtonsVisibility(it)
+        }
+
+        binder.actionInputFieldAction.setOnClickListener {
+            paste()
         }
 
         binder.actionInputFieldAction.setOnClickListener {
@@ -63,9 +72,14 @@ class InsertableInputField @JvmOverloads constructor(
         } else {
             binder.actionInputFieldAction.makeGone()
             binder.actionInputFieldClear.makeGone()
+            binder.actionInputFieldScan.makeGone()
         }
 
         content.isEnabled = enabled
+    }
+
+    fun onScanClicked(onClickListener: OnClickListener?) {
+        binder.actionInputFieldScan.setOnClickListener(onClickListener)
     }
 
     private fun updateButtonsVisibility(text: CharSequence?) {
@@ -74,13 +88,15 @@ class InsertableInputField @JvmOverloads constructor(
         val textIsEmpty = TextUtils.isEmpty(text)
 
         binder.actionInputFieldClear.isGone = textIsEmpty
-        binder.actionInputFieldAction.isVisible = textIsEmpty && clipboardIsNotEmpty
+        binder.actionInputFieldAction.isVisible = textIsEmpty && clipboardIsNotEmpty && supportInsertion
+        binder.actionInputFieldScan.isVisible = textIsEmpty && supportScan
     }
 
     private fun setBackgrounds() = with(context) {
         background = context.getInputBackground()
 
         binder.actionInputFieldAction.background = buttonBackground()
+        binder.actionInputFieldScan.background = buttonBackground()
     }
 
     private fun paste() {
@@ -92,6 +108,11 @@ class InsertableInputField @JvmOverloads constructor(
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.ActionInputField) {
         val hint = it.getString(R.styleable.ActionInputField_android_hint)
+
+        supportScan = it.getBoolean(R.styleable.ActionInputField_supportScan, supportScan)
+        supportInsertion = it.getBoolean(R.styleable.ActionInputField_supportInsertion, supportInsertion)
+        content.isSaveEnabled = it.getBoolean(R.styleable.ActionInputField_fieldSaveEnabled, true)
+
         hint?.let { content.hint = hint }
     }
 

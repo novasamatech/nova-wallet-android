@@ -46,9 +46,9 @@ class SecretQrFormat : QrFormat<SecretQrFormat.Payload> {
 
         val secretBytes = secretEncoded.fromHex()
 
-        val secret = when (secretBytes.size) {
-            32 -> ScanSecret.Seed(secretBytes)
-            64 -> ScanSecret.EncryptedKeypair(secretBytes)
+        val secret = when {
+            secretBytes.isSubstrateSeed() -> ScanSecret.Seed(secretBytes)
+            secretBytes.isSubstrateKeypair() -> ScanSecret.EncryptedKeypair(secretBytes)
             else -> throw QrFormat.InvalidFormatException("Invalid secret length: ${secretBytes.size}. Expected 32 or 64 bytes.")
         }
 
