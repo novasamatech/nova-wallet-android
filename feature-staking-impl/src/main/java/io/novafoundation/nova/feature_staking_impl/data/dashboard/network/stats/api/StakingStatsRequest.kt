@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats
 
 import io.novafoundation.nova.common.data.network.subquery.SubQueryFilters
 import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.and
-import io.novafoundation.nova.common.data.network.subquery.SubqueryExpressions.anyOf
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.StakingAccounts
@@ -13,7 +12,6 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 
 class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>) {
@@ -86,49 +84,42 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
     }
 
     private fun constructFilters(chains: List<Chain>, filterParent: FilterParent): String = with(SubQueryFilters) {
-        val perChain = chains.mapNotNull { chain ->
-            val hasTypeAndAddressOptions = hasTypeAndAddressOptions(chain, filterParent)
+        val targetAddresses = mutableSetOf<String>()
+        val targetNetworks = mutableSetOf<String>()
+        val targetStakingTypes = mutableSetOf<String>()
 
-            if (hasTypeAndAddressOptions.isEmpty()) return@mapNotNull null
+        chains.forEach { chain ->
+            val utilityAsset = chain.utilityAsset
 
-            hasNetwork(chain.id.requireHexPrefix()) and anyOf(hasTypeAndAddressOptions)
+            utilityAsset.supportedStakingOptions().forEach { stakingType ->
+                val stakingOption = createStakingOption(chain, utilityAsset, stakingType)
+                val stakingOptionId = stakingOption.fullId
+
+                val stakingKeys = stakingKeysMapping[stakingOptionId] ?: return@forEach
+                val address = stakingKeys.addressFor(filterParent) ?: return@forEach
+
+                val requestStakingType = stakingKeys.stakingTypeFor(filterParent)
+                val requestStakingTypeId = mapStakingTypeToSubQueryId(requestStakingType) ?: return@forEach
+
+                targetAddresses.add(address)
+                targetNetworks.add(chain.id.requireHexPrefix())
+                targetStakingTypes.add(requestStakingTypeId)
+            }
         }
 
-        val filters = appendFiltersSpecificToParent(baseFilters = anyOf(perChain), filterParent)
-
-        queryParams(filter = filters)
-    }
-
-    private fun SubQueryFilters.Companion.hasTypeAndAddressOptions(
-        chain: Chain,
-        filterParent: FilterParent,
-    ): List<String> {
-        val utilityAsset = chain.utilityAsset
-
-        return utilityAsset.supportedStakingOptions().mapNotNull { stakingType ->
-            val stakingOption = createStakingOption(chain, utilityAsset, stakingType)
-            val stakingOptionId = stakingOption.fullId
-
-            val stakingKeys = stakingKeysMapping[stakingOptionId] ?: return@mapNotNull null
-            val address = stakingKeys.addressFor(filterParent) ?: return@mapNotNull null
-
-            val requestStakingType = stakingKeys.stakingTypeFor(filterParent)
-            val requestStakingTypeId = mapStakingTypeToSubQueryId(requestStakingType) ?: return@mapNotNull null
-
-            hasAddress(address) and hasStakingType(requestStakingTypeId)
+        if (targetAddresses.isEmpty() || targetNetworks.isEmpty() || targetStakingTypes.isEmpty()) {
+            return@with ""
         }
-    }
 
-    private fun SubQueryFilters.hasNetwork(chainId: ChainId): String {
-        return "networkId" equalTo chainId
-    }
+        val addressFilter = "address" containedIn targetAddresses
+        val networkFilter = "networkId" containedIn targetNetworks
+        val typeFilter = "stakingType" containedIn targetStakingTypes
 
-    private fun SubQueryFilters.hasStakingType(stakingType: String): String {
-        return "stakingType" equalTo stakingType
-    }
+        val aggregatedFilters = and(addressFilter, networkFilter, typeFilter)
 
-    private fun SubQueryFilters.hasAddress(address: String): String {
-        return "address" equalTo address
+        val finalFilters = appendFiltersSpecificToParent(baseFilters = aggregatedFilters, filterParent)
+
+        queryParams(filter = finalFilters)
     }
 
     private fun SubQueryFilters.hasRewardType(type: String): String {
@@ -157,8 +148,12 @@ class StakingStatsRequest(stakingAccounts: StakingAccounts, chains: List<Chain>)
         }
     }
 
-    private enum class FilterParent {
+    private infix fun String.containedIn(values: Set<String>): String {
+        val joinedValues = values.joinToString(separator = "\", \"", prefix = "\"", postfix = "\"")
+        return "$this: { in: [$joinedValues] }"
+    }
 
+    private enum class FilterParent {
         REWARD, SLASH, STAKING_STATUS
     }
 
