@@ -34,6 +34,7 @@ class CustomChainFactory(
     suspend fun createSubstrateChain(
         payload: CustomNetworkPayload,
         prefilledChain: Chain?,
+        displayPriority: Int?,
         coroutineScope: CoroutineScope
     ): Chain {
         val nodeConnection = nodeConnectionFactory.createNodeConnection(payload.nodeUrl, coroutineScope)
@@ -51,12 +52,14 @@ class CustomChainFactory(
             assetType = prefilledChain?.utilityAsset?.type ?: Chain.Asset.Type.Native,
             payload = payload,
             prefilledChain = prefilledChain,
+            displayPriority = displayPriority
         )
     }
 
     fun createEvmChain(
         payload: CustomNetworkPayload,
-        prefilledChain: Chain?
+        prefilledChain: Chain?,
+        displayPriority: Int?
     ): Chain {
         val evmChainId = payload.evmChainId!!
         val chainId = evmChainIdFrom(evmChainId)
@@ -70,6 +73,7 @@ class CustomChainFactory(
             assetType = Chain.Asset.Type.EvmNative,
             payload = payload,
             prefilledChain = prefilledChain,
+            displayPriority = displayPriority
         )
     }
 
@@ -81,7 +85,8 @@ class CustomChainFactory(
         assetDecimals: Precision,
         assetType: Chain.Asset.Type,
         payload: CustomNetworkPayload,
-        prefilledChain: Chain?
+        prefilledChain: Chain?,
+        displayPriority: Int?
     ): Chain {
         val priceId = payload.coingeckoLinkUrl?.let { coinGeckoLinkParser.parse(it).getOrNull()?.priceId }
 
@@ -135,7 +140,8 @@ class CustomChainFactory(
             swap = prefilledChain?.swap.orEmpty(),
             customFee = prefilledChain?.customFee.orEmpty(),
             connectionState = Chain.ConnectionState.FULL_SYNC,
-            additional = prefilledChain?.additional
+            additional = prefilledChain?.additional,
+            displayPriority = displayPriority
         )
     }
 

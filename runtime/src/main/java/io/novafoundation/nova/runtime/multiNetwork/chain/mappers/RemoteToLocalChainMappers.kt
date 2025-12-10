@@ -51,6 +51,7 @@ fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
     oldChain: ChainLocal?,
     source: ChainLocal.Source,
+    displayPriority: Int?,
     gson: Gson
 ): ChainLocal {
     val types = chainRemote.types?.let {
@@ -102,6 +103,7 @@ fun mapRemoteChainToLocal(
             connectionState = determineConnectionState(chainRemote, oldChain),
             additional = gson.toJson(additional),
             nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(nodeSelectionStrategy),
+            displayPriority = displayPriority,
             source = source
         )
     }

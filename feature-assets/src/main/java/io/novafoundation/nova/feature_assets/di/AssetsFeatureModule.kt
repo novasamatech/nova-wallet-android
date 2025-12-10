@@ -73,6 +73,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.ext.TokenSortingProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(
@@ -113,13 +114,15 @@ class AssetsFeatureModule {
         assetSearchUseCase: AssetSearchUseCase,
         chainRegistry: ChainRegistry,
         tradeTokenRegistry: TradeTokenRegistry,
-        availableGiftAssetsUseCase: AvailableGiftAssetsUseCase
+        availableGiftAssetsUseCase: AvailableGiftAssetsUseCase,
+        tokenSortingProvider: TokenSortingProvider
     ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(
         assetViewModeRepository,
         assetSearchUseCase,
         chainRegistry,
         tradeTokenRegistry,
-        availableGiftAssetsUseCase
+        availableGiftAssetsUseCase,
+        tokenSortingProvider
     )
 
     @Provides
@@ -128,8 +131,9 @@ class AssetsFeatureModule {
         chainRegistry: ChainRegistry,
         assetSearchUseCase: AssetSearchUseCase,
         tradeTokenRegistry: TradeTokenRegistry,
-        giftAssetsUseCase: AvailableGiftAssetsUseCase
-    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry, giftAssetsUseCase)
+        giftAssetsUseCase: AvailableGiftAssetsUseCase,
+        tokenSortingProvider: TokenSortingProvider
+    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry, giftAssetsUseCase, tokenSortingProvider)
 
     @Provides
     @FeatureScope

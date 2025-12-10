@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
+import io.novafoundation.nova.runtime.ext.TokenSortingProvider
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
@@ -25,7 +26,8 @@ class ByNetworkAssetSearchInteractor(
     private val assetSearchUseCase: AssetSearchUseCase,
     private val chainRegistry: ChainRegistry,
     private val tradeTokenRegistry: TradeTokenRegistry,
-    private val availableGiftAssetsUseCase: AvailableGiftAssetsUseCase
+    private val availableGiftAssetsUseCase: AvailableGiftAssetsUseCase,
+    private val tokenSortingProvider: TokenSortingProvider
 ) : AssetSearchInteractor {
 
     override fun tradeAssetSearch(
@@ -109,11 +111,23 @@ class ByNetworkAssetSearchInteractor(
 
         val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
 
-        return combine(assetsFlow, aggregatedExternalBalances, queryFlow) { assets, externalBalances, query ->
+        return combine(
+            assetsFlow,
+            aggregatedExternalBalances,
+            tokenSortingProvider.tokenDisplayPriorityFlow(),
+            queryFlow
+        ) { assets, externalBalances, tokenDisplayPriorities, query ->
             val chainsById = chainRegistry.enabledChainById()
             val filtered = assetSearchUseCase.filterAssetsByQuery(query, assets, chainsById)
 
-            val assetGroups = groupAndSortAssetsByNetwork(filtered, externalBalances, chainsById, assetGroupComparator, assetsComparator)
+            val assetGroups = groupAndSortAssetsByNetwork(
+                filtered,
+                externalBalances,
+                chainsById,
+                tokenDisplayPriorities,
+                assetGroupComparator,
+                assetsComparator
+            )
             AssetsByViewModeResult.ByNetworks(assetGroups)
         }
     }

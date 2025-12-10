@@ -278,7 +278,8 @@ fun mapChainLocalToChain(
             customFee = mapCustomFeeFromLocal(customFee),
             connectionState = mapConnectionStateFromLocal(connectionState),
             additional = additional,
-            source = mapSourceFromLocal(source)
+            source = mapSourceFromLocal(source),
+            displayPriority = chainLocal.displayPriority
         )
     }
 }

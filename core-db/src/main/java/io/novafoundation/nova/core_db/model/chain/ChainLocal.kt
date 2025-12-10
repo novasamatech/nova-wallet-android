@@ -40,7 +40,8 @@ data class ChainLocal(
     @ColumnInfo(defaultValue = NODE_SELECTION_STRATEGY_DEFAULT)
     val nodeSelectionStrategy: AutoBalanceStrategyLocal,
     @ColumnInfo(defaultValue = DEFAULT_NETWORK_SOURCE_STR)
-    val source: Source
+    val source: Source,
+    val displayPriority: Int?
 ) : Identifiable {
 
     @Suppress("DEPRECATION")

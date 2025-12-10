@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
+import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.ext.normalize
@@ -14,7 +15,8 @@ import java.math.BigDecimal
 class TokenAssetGroup(
     val tokenInfo: TokenInfo,
     val groupBalance: AssetBalance,
-    val itemsCount: Int
+    val itemsCount: Int,
+    val displayPriority: Int?
 ) {
 
     val groupId: String = tokenInfo.symbol.value
@@ -39,6 +41,7 @@ fun groupAndSortAssetsByToken(
     assets: List<Asset>,
     externalBalances: Map<FullChainAssetId, Balance>,
     chainsById: Map<String, Chain>,
+    tokenDisplayPriorities: Map<TokenSymbol, Int>,
     assetGroupComparator: Comparator<TokenAssetGroup> = getTokenAssetGroupBaseComparator(),
     assetComparator: Comparator<AssetWithNetwork> = getTokenAssetBaseComparator()
 ): Map<TokenAssetGroup, List<AssetWithNetwork>> {
@@ -51,7 +54,8 @@ fun groupAndSortAssetsByToken(
             TokenAssetGroup(
                 tokenInfo = tokenWrapper.tokenInfo,
                 groupBalance = assets.fold(AssetBalance.ZERO) { acc, element -> acc + element.balanceWithOffChain },
-                itemsCount = assets.size
+                itemsCount = assets.size,
+                displayPriority = tokenDisplayPriorities[tokenWrapper.tokenInfo.symbol]
             )
         }.toSortedMap(assetGroupComparator)
 }
@@ -66,11 +70,11 @@ fun getTokenAssetBaseComparator(
 }
 
 fun getTokenAssetGroupBaseComparator(
-    comparing: (TokenAssetGroup) -> Comparable<*> = { it.groupBalance.total.fiat }
+    baseComparing: (TokenAssetGroup) -> Comparable<*> = { it.groupBalance.total.fiat }
 ): Comparator<TokenAssetGroup> {
-    return compareByDescending(comparing)
+    return compareByDescending(baseComparing)
         .thenByDescending { it.groupBalance.total.amount > BigDecimal.ZERO } // non-zero balances first
-        .then(TokenSymbol.defaultComparatorFrom { it.tokenInfo.symbol })
+        .then(TokenSymbol.defaultComparator(displayPriority = { it.displayPriority }, symbolExtractor = { it.tokenInfo.symbol }))
 }
 
 private fun mapToTokenGroup(it: AssetWithNetwork) = TokenGroupWrapper(

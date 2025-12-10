@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -31,7 +32,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainByIdFlow
-import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -178,19 +178,21 @@ class WalletInteractorImpl(
 
     override suspend fun groupAssetsByNetwork(
         assets: List<Asset>,
-        externalBalances: List<ExternalBalance>
+        externalBalances: List<ExternalBalance>,
+        tokenDisplayPriority: Map<TokenSymbol, Int>
     ): Map<NetworkAssetGroup, List<AssetWithOffChainBalance>> {
         val chains = chainRegistry.enabledChainByIdFlow().first()
 
-        return groupAndSortAssetsByNetwork(assets, externalBalances.aggregatedBalanceByAsset(), chains)
+        return groupAndSortAssetsByNetwork(assets, externalBalances.aggregatedBalanceByAsset(), chains, tokenDisplayPriority)
     }
 
     override suspend fun groupAssetsByToken(
         assets: List<Asset>,
-        externalBalances: List<ExternalBalance>
+        externalBalances: List<ExternalBalance>,
+        tokenDisplayPriority: Map<TokenSymbol, Int>
     ): Map<TokenAssetGroup, List<AssetWithNetwork>> {
         val chains = chainRegistry.enabledChainByIdFlow().first()
 
-        return groupAndSortAssetsByToken(assets, externalBalances.aggregatedBalanceByAsset(), chains)
+        return groupAndSortAssetsByToken(assets, externalBalances.aggregatedBalanceByAsset(), chains, tokenDisplayPriority)
     }
 }

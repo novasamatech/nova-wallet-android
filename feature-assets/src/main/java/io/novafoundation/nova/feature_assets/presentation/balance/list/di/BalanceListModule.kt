@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
+import io.novafoundation.nova.runtime.ext.TokenSortingProvider
 
 @Module(includes = [ViewModelModule::class])
 class BalanceListModule {
@@ -68,13 +69,15 @@ class BalanceListModule {
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
-        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
+        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory,
+        tokenSortingProvider: TokenSortingProvider,
     ): AssetListMixinFactory {
         return AssetListMixinFactory(
             walletInteractor,
             assetsListInteractor,
             externalBalancesInteractor,
-            expandableAssetsMixinFactory
+            expandableAssetsMixinFactory,
+            tokenSortingProvider
         )
     }
 

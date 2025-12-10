@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
+import io.novafoundation.nova.runtime.ext.TokenSortingProvider
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
 import io.novafoundation.nova.runtime.extrinsic.MortalityConstructor
@@ -70,6 +71,8 @@ interface RuntimeApi {
     fun runtimeVersionsRepository(): RuntimeVersionsRepository
 
     fun eventsRepository(): EventsRepository
+
+    fun tokenSortingProvider(): TokenSortingProvider
 
     val multiChainQrSharingFactory: MultiChainQrSharingFactory
 

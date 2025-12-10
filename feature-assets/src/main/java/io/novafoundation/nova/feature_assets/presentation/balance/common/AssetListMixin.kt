@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
+import io.novafoundation.nova.runtime.ext.TokenSortingProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
@@ -23,7 +24,8 @@ class AssetListMixinFactory(
     private val walletInteractor: WalletInteractor,
     private val assetsListInteractor: AssetsListInteractor,
     private val externalBalancesInteractor: ExternalBalancesInteractor,
-    private val expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
+    private val expandableAssetsMixinFactory: ExpandableAssetsMixinFactory,
+    private val tokenSortingProvider: TokenSortingProvider,
 ) {
 
     fun create(coroutineScope: CoroutineScope): AssetListMixin = RealAssetListMixin(
@@ -31,6 +33,7 @@ class AssetListMixinFactory(
         assetsListInteractor,
         externalBalancesInteractor,
         expandableAssetsMixinFactory,
+        tokenSortingProvider,
         coroutineScope
     )
 }
@@ -55,6 +58,7 @@ class RealAssetListMixin(
     private val assetsListInteractor: AssetsListInteractor,
     private val externalBalancesInteractor: ExternalBalancesInteractor,
     private val expandableAssetsMixinFactory: ExpandableAssetsMixinFactory,
+    private val tokenSortingProvider: TokenSortingProvider,
     private val coroutineScope: CoroutineScope
 ) : AssetListMixin, CoroutineScope by coroutineScope {
 
@@ -75,11 +79,12 @@ class RealAssetListMixin(
 
     private val assetsByViewMode = combine(
         throttledBalance,
-        assetsViewModeFlow
-    ) { (assets, externalBalances), viewMode ->
+        assetsViewModeFlow,
+        tokenSortingProvider.tokenDisplayPriorityFlow(),
+    ) { (assets, externalBalances), viewMode, tokenDisplayPriority ->
         when (viewMode) {
-            AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances).byNetworks()
-            AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances).byTokens()
+            AssetViewMode.NETWORKS -> walletInteractor.groupAssetsByNetwork(assets, externalBalances, tokenDisplayPriority).byNetworks()
+            AssetViewMode.TOKENS -> walletInteractor.groupAssetsByToken(assets, externalBalances, tokenDisplayPriority).byTokens()
         }
     }.shareInBackground()
 

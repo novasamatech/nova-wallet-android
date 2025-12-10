@@ -55,9 +55,10 @@ import io.novafoundation.nova.core_db.migrations.AddBrowserHostSettings_34_35
 import io.novafoundation.nova.core_db.migrations.AddBrowserTabs_64_65
 import io.novafoundation.nova.core_db.migrations.AddBuyProviders_7_8
 import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
+import io.novafoundation.nova.core_db.migrations.AddChainDisplayPriority_73_74
 import io.novafoundation.nova.core_db.migrations.AddChainForeignKeyForProxy_63_64
 import io.novafoundation.nova.core_db.migrations.AddConnectionStateToChains_53_54
-import io.novafoundation.nova.core_db.migrations.AddFieldsToContributions
+import io.novafoundation.nova.core_db.migrations.AddFieldsToContributions_72_73
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
 import io.novafoundation.nova.core_db.migrations.AddDAppAuthorizations_1_2
@@ -166,7 +167,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 73,
+    version = 74,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -270,7 +271,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(TinderGovBasket_62_63, AddChainForeignKeyForProxy_63_64, AddBrowserTabs_64_65)
                     .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
                     .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70, AddMultisigSupportFlag_70_71)
-                    .addMigrations(AddGifts_71_72, AddFieldsToContributions)
+                    .addMigrations(AddGifts_71_72, AddFieldsToContributions_72_73, AddChainDisplayPriority_73_74)
                     .build()
             }
             return instance!!
