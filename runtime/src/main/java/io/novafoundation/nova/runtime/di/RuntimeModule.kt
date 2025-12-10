@@ -6,7 +6,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
-import io.novafoundation.nova.common.utils.TokenSortingStore
+import io.novafoundation.nova.common.utils.TokenPriorityStore
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
@@ -285,7 +285,7 @@ class RuntimeModule {
 
     @Provides
     @ApplicationScope
-    fun provideTokenSortingProvider(tokenSortStorage: TokenSortingStore): TokenSortingProvider {
+    fun provideTokenSortingProvider(tokenSortStorage: TokenPriorityStore): TokenSortingProvider {
         return TokenSortingProvider(tokenSortStorage)
     }
 }

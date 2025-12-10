@@ -54,7 +54,7 @@ import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.ToastMessageManager
-import io.novafoundation.nova.common.utils.TokenSortingStore
+import io.novafoundation.nova.common.utils.TokenPriorityStore
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooserFactory
 import io.novafoundation.nova.common.utils.browser.permissions.WebViewPermissionAskerFactory
@@ -145,7 +145,7 @@ interface CommonApi {
 
     val deviceIdProvider: DeviceIdProvider
 
-    val tokenSortingStore: TokenSortingStore
+    val tokenPriorityStore: TokenPriorityStore
 
     fun copyTextMixin(): CopyTextLauncher.Presentation
 

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.map
 
 private const val PREFS_TOKEN_SORTING = "PREFS_TOKEN_SORTING"
 
-interface TokenSortingStore {
+interface TokenPriorityStore {
     fun setTokenSorting(sorting: Map<TokenSymbol, Int>)
 
     fun getTokenSorting(): Map<TokenSymbol, Int>
@@ -14,7 +14,7 @@ interface TokenSortingStore {
     fun tokenSortingFlow(): Flow<Map<TokenSymbol, Int>>
 }
 
-class RealTokenSortingStore(val preferences: Preferences) : TokenSortingStore {
+class RealTokenPriorityStore(val preferences: Preferences) : TokenPriorityStore {
     override fun setTokenSorting(sorting: Map<TokenSymbol, Int>) {
         val sortingSet = sorting.map { (symbol, priority) -> "${symbol.value}:$priority" }
             .toSet()

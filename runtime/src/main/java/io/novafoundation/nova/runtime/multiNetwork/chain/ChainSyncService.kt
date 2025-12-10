@@ -2,7 +2,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.CollectionDiffer
-import io.novafoundation.nova.common.utils.TokenSortingStore
+import io.novafoundation.nova.common.utils.TokenPriorityStore
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainDao
@@ -26,7 +26,7 @@ class ChainSyncService(
     private val chainDao: ChainDao,
     private val chainFetcher: ChainFetcher,
     private val gson: Gson,
-    private val tokenSortingStore: TokenSortingStore
+    private val tokenPriorityStore: TokenPriorityStore
 ) {
 
     suspend fun syncUp() = withContext(Dispatchers.Default) {
@@ -80,7 +80,7 @@ class ChainSyncService(
     }
 
     private fun updateTokenSorting(assetDisplayPriorities: Map<String, Int>) {
-        tokenSortingStore.setTokenSorting(assetDisplayPriorities.mapKeys { TokenSymbol(it.key) })
+        tokenPriorityStore.setTokenSorting(assetDisplayPriorities.mapKeys { TokenSymbol(it.key) })
     }
 
     private fun nodeSelectionPreferencesFor(

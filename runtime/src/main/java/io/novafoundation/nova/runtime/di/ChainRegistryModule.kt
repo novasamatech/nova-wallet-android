@@ -9,7 +9,7 @@ import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
-import io.novafoundation.nova.common.utils.TokenSortingStore
+import io.novafoundation.nova.common.utils.TokenPriorityStore
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
@@ -55,8 +55,8 @@ class ChainRegistryModule {
         dao: ChainDao,
         chainFetcher: ChainFetcher,
         gson: Gson,
-        tokenSortingStore: TokenSortingStore
-    ) = ChainSyncService(dao, chainFetcher, gson, tokenSortingStore)
+        tokenPriorityStore: TokenPriorityStore
+    ) = ChainSyncService(dao, chainFetcher, gson, tokenPriorityStore)
 
     @Provides
     @ApplicationScope
