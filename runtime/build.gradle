@@ -4,12 +4,12 @@ apply plugin: 'kotlin-parcelize'
 android {
 
     defaultConfig {
-        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/feature/chain-assets-display-priorities/chains/v23/chains_dev.json\""
-        buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/assets/evm/v3/assets_dev.json\""
-        buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/chains/v23/preConfigured/chains_dev.json\""
-        buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/chains/v23/preConfigured/detailsDev\""
+        buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/chains/v22/chains_dev.json\""
+        buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v3/assets_dev.json\""
+        buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/chains_dev.json\""
+        buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/detailsDev\""
 
-        buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/tests/chains_for_testBalance.json\""
+        buildConfigField "String", "TEST_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/tests/chains_for_testBalance.json\""
 
         buildConfigField "String", "INFURA_API_KEY", readStringSecret("INFURA_API_KEY")
         buildConfigField "String", "DWELLIR_API_KEY", readStringSecret("DWELLIR_API_KEY")
@@ -24,10 +24,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
-            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/chains/v23/chains.json\""
-            buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/assets/evm/v3/assets.json\""
-            buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/chains/v23/preConfigured/chains.json\""
-            buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feature/chain-assets-display-priorities/chains/v23/preConfigured/details\""
+            buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/chains.json\""
+            buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v3/assets.json\""
+            buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/chains.json\""
+            buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/details\""
         }
     }
     namespace 'io.novafoundation.nova.runtime'
