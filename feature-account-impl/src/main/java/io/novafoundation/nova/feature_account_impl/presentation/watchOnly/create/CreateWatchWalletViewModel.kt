@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -62,11 +63,9 @@ class CreateWatchWalletViewModel(
         }
     }
 
-    private val walletSuggestions = flowOf { interactor.suggestions() }
-        .shareInBackground()
+    private val walletSuggestions = interactor.suggestions()
 
-    val suggestionChipActionModels = walletSuggestions.mapList(::mapWalletSuggestionToChipAction)
-        .shareInBackground()
+    val suggestionChipActionModels = walletSuggestions.map(::mapWalletSuggestionToChipAction)
 
     fun homeButtonClicked() {
         router.back()
@@ -88,7 +87,7 @@ class CreateWatchWalletViewModel(
 
     fun walletSuggestionClicked(index: Int) {
         launch {
-            val suggestion = walletSuggestions.first()[index]
+            val suggestion = walletSuggestions[index]
 
             nameInput.value = suggestion.name
             substrateAddressInput.inputFlow.value = suggestion.substrateAddress
