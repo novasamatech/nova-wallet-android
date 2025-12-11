@@ -35,7 +35,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
-import io.novafoundation.nova.feature_gift_api.domain.AreGiftsSupportedUseCase
+import io.novafoundation.nova.feature_assets.presentation.balance.common.gifts.GiftsRestrictionCheckMixin
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 
 @Module(includes = [ViewModelModule::class])
@@ -102,7 +102,7 @@ class BalanceListModule {
         maskableValueFormatterProvider: MaskableValueFormatterProvider,
         maskingModeUseCase: MaskingModeUseCase,
         fiatFormatter: FiatFormatter,
-        areGiftsSupportedUseCase: AreGiftsSupportedUseCase,
+        giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -124,7 +124,7 @@ class BalanceListModule {
             novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin,
             maskingModeUseCase = maskingModeUseCase,
             fiatFormatter = fiatFormatter,
-            areGiftsSupportedUseCase = areGiftsSupportedUseCase
+            giftsRestrictionCheckMixin = giftsRestrictionCheckMixin
         )
     }
 

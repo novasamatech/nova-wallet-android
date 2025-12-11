@@ -128,7 +128,6 @@ class BalanceListFragment :
         viewModel.shouldShowPlaceholderFlow.observe(emptyAssetsPlaceholder::show)
         viewModel.nftCountFlow.observe(headerAdapter::setNftCountLabel)
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
-        viewModel.giftsButtonEnabled.observe(headerAdapter::setGiftsButtonEnabled)
 
         viewModel.hideRefreshEvent.observeEvent {
             binder.walletContainer.isRefreshing = false

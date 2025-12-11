@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="multisig_gifts_not_supported_title">Gifting is not supported for Multisig wallets</string>
+    <string name="multisig_gifts_not_supported_message">To create or manage gifts, please switch to a different type of wallet.</string>
+
     <string name="account_wallet_name">Wallet name</string>
     <string name="common_name">Name</string>
     <string name="common_invalid_qr_code">Invalid QR code</string>

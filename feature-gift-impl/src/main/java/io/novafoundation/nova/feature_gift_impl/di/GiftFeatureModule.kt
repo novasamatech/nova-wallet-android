@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_gift_api.domain.AreGiftsSupportedUseCase
+import io.novafoundation.nova.feature_gift_api.domain.GiftsAccountSupportedUseCase
 import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_gift_impl.data.GiftSecretsRepository
 import io.novafoundation.nova.feature_gift_impl.data.GiftsRepository
@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_gift_impl.domain.RealGiftsInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.RealCreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.GiftSecretsUseCase
-import io.novafoundation.nova.feature_gift_impl.domain.RealAreGiftsSupportedUseCase
+import io.novafoundation.nova.feature_gift_impl.domain.RealGiftsAccountSupportedUseCase
 import io.novafoundation.nova.feature_gift_impl.domain.RealAvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_gift_impl.domain.RealClaimGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.RealShareGiftInteractor
@@ -174,7 +174,7 @@ class GiftFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAreGiftsSupportedUseCase(selectedAccountUseCase: SelectedAccountUseCase): AreGiftsSupportedUseCase {
-        return RealAreGiftsSupportedUseCase(selectedAccountUseCase)
+    fun provideAreGiftsSupportedUseCase(selectedAccountUseCase: SelectedAccountUseCase): GiftsAccountSupportedUseCase {
+        return RealGiftsAccountSupportedUseCase(selectedAccountUseCase)
     }
 }

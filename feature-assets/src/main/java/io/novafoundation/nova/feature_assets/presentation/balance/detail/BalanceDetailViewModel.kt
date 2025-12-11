@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.sumByBigInteger
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.AlertView
@@ -23,7 +24,6 @@ import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDate
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.balance.detail.BalanceDetailInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
 import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
@@ -32,6 +32,7 @@ import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.gifts.GiftsRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.mapTokenToTokenModel
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
@@ -44,6 +45,7 @@ import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.form
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPriceChangeTextInjector
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPricePriceTextInjector
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
+import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
@@ -98,7 +100,8 @@ class BalanceDetailViewModel(
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val amountFormatter: AmountFormatter,
     private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
-    private val interactor: BalanceDetailInteractor,
+    private val giftsAvailableGiftAssetsUseCase: AvailableGiftAssetsUseCase,
+    private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin
 ) : BaseViewModel(), TransactionHistoryUi by transactionHistoryMixin, Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -166,7 +169,7 @@ class BalanceDetailViewModel(
         .shareInBackground()
 
     val giftsButtonEnabled = chainAssetFlow.map {
-        interactor.areGiftSupportedForAsset(it)
+        !giftsRestrictionCheckMixin.isRestricted() && giftsAvailableGiftAssetsUseCase.isGiftsAvailable(it)
     }
         .onStart { emit(false) }
         .shareInBackground()
@@ -308,8 +311,10 @@ class BalanceDetailViewModel(
         }
     }
 
-    fun giftClicked() {
-        router.openGiftsByAsset(assetPayload)
+    fun giftClicked() = launchUnit {
+        giftsRestrictionCheckMixin.checkRestrictionAndDo {
+            router.openGiftsByAsset(assetPayload)
+        }
     }
 
     fun lockedInfoClicked() = launch {

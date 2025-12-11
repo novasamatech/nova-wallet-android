@@ -81,8 +81,4 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         }
         binder.viewAssetsTotalBalanceMaskingButton.setImageResource(buttonImageRes)
     }
-
-    fun setGiftsButtonEnabled(giftsButtonEnabled: Boolean) {
-        binder.viewAssetsTotalBalanceGift.isEnabled = giftsButtonEnabled
-    }
 }
