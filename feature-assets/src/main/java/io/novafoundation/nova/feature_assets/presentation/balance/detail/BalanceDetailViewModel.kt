@@ -169,7 +169,7 @@ class BalanceDetailViewModel(
         .shareInBackground()
 
     val giftsButtonEnabled = chainAssetFlow.map {
-        !giftsRestrictionCheckMixin.isRestricted() && giftsAvailableGiftAssetsUseCase.isGiftsAvailable(it)
+        giftsAvailableGiftAssetsUseCase.isGiftsAvailable(it)
     }
         .onStart { emit(false) }
         .shareInBackground()
