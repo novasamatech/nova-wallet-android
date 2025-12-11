@@ -113,7 +113,7 @@
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="80dp"
+        android:layout_height="72dp"
         android:layout_marginTop="16dp"
         android:animateLayoutChanges="true"
         app:layout_cardBackgroundColor="@color/block_background"
@@ -130,8 +130,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/wallet_asset_send"
-            app:drawableTopCompat="@drawable/ic_send"
-            tools:drawableTop="@drawable/ic_send" />
+            app:drawableTopCompat="@drawable/ic_send_tokens"
+            tools:drawableTop="@drawable/ic_send_tokens" />
 
         <TextView
             android:id="@+id/viewAssetsTotalBalanceReceive"
@@ -140,8 +140,9 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/wallet_asset_receive"
-            app:drawableTopCompat="@drawable/ic_arrow_down"
-            tools:drawableTop="@drawable/ic_arrow_down" />
+            tools:text="Receive but long text"
+            app:drawableTopCompat="@drawable/ic_receive_tokens"
+            tools:drawableTop="@drawable/ic_receive_tokens" />
 
         <TextView
             android:id="@+id/viewAssetsTotalBalanceSwap"
@@ -160,7 +161,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="@string/wallet_asset_buy_sell"
-            app:drawableTopCompat="@drawable/ic_buy"
+            app:drawableTopCompat="@drawable/ic_buy_tokens"
             tools:drawableTop="@drawable/ic_buy" />
 
         <TextView
