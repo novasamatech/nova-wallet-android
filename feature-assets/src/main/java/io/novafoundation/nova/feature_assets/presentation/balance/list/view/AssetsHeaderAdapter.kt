@@ -46,6 +46,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         fun pendingOperationsClicked()
     }
 
+    private var giftsButtonEnabled: Boolean = false
     private var filterIconRes: Int? = null
     private var walletConnectModel: WalletConnectSessionsModel? = null
     private var maskingEnabled: Boolean? = null
@@ -73,6 +74,12 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         this.nftPreviews = previews
 
         notifyItemChanged(0, Payload.NFT_PREVIEWS)
+    }
+
+    fun setGiftsButtonEnabled(enabled: Boolean) {
+        this.giftsButtonEnabled = enabled
+
+        notifyItemChanged(0, Payload.GIFTS_BUTTON_ENABLED)
     }
 
     fun setMaskingEnabled(maskingEnabled: Boolean) {
@@ -121,6 +128,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                     Payload.WALLET_CONNECT -> holder.bindWalletConnect(walletConnectModel)
                     Payload.PENDING_OPERATIONS_COUNT -> holder.bindPendingOperationsModel(pendingOperationsModel)
+                    Payload.GIFTS_BUTTON_ENABLED -> holder.bindGiftsButtonEnabled(giftsButtonEnabled)
                 }
             }
         }
@@ -134,7 +142,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
             nftCountLabel,
             nftPreviews,
             walletConnectModel,
-            pendingOperationsModel
+            pendingOperationsModel,
+            giftsButtonEnabled
         )
     }
 
@@ -144,7 +153,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, MASKING_ENABLED, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, PENDING_OPERATIONS_COUNT
+    TOTAL_BALANCE, MASKING_ENABLED, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, PENDING_OPERATIONS_COUNT, GIFTS_BUTTON_ENABLED
 }
 
 class AssetsHeaderHolder(
@@ -184,6 +193,7 @@ class AssetsHeaderHolder(
         nftPreviews: MaskableModel<List<NftPreviewUi>>?,
         walletConnect: WalletConnectSessionsModel?,
         pendingOperationsCountModel: PendingOperationsCountModel,
+        giftsButtonEnabled: Boolean
     ) {
         bindTotalBalance(totalBalance)
         bindMaskingEnabled(maskingEnabled)
@@ -192,6 +202,7 @@ class AssetsHeaderHolder(
         bindNftCount(nftCount)
         bindWalletConnect(walletConnect)
         bindPendingOperationsModel(pendingOperationsCountModel)
+        bindGiftsButtonEnabled(giftsButtonEnabled)
     }
 
     fun bindNftPreviews(nftPreviews: MaskableModel<List<NftPreviewUi>>?) = with(viewBinding) {
@@ -228,5 +239,9 @@ class AssetsHeaderHolder(
     fun bindPendingOperationsModel(model: PendingOperationsCountModel) {
         viewBinding.balanceListPendingOperations.setPendingOperationsCount(model)
         viewBinding.balanceTableView.invalidateChildrenVisibility()
+    }
+
+    fun bindGiftsButtonEnabled(giftsButtonEnabled: Boolean) {
+        viewBinding.balanceListTotalBalance.setGiftsButtonEnabled(giftsButtonEnabled)
     }
 }

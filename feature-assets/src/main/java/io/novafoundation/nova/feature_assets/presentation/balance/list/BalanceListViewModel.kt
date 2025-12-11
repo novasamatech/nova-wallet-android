@@ -55,6 +55,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBala
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_gift_api.domain.AreGiftsSupportedUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -70,6 +71,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
@@ -95,7 +97,8 @@ class BalanceListViewModel(
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
     private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
-    private val maskingModeUseCase: MaskingModeUseCase
+    private val maskingModeUseCase: MaskingModeUseCase,
+    private val areGiftsSupportedUseCase: AreGiftsSupportedUseCase,
 ) : BaseViewModel() {
 
     private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
@@ -119,6 +122,10 @@ class BalanceListViewModel(
     )
 
     val buySellSelectorMixin = buySellSelectorMixinFactory.create(BuySellSelectorMixin.SelectorType.AllAssets, viewModelScope)
+
+    val giftsButtonEnabled = areGiftsSupportedUseCase.areGiftsSupportedFlow()
+        .onStart { emit(false) }
+        .shareInBackground()
 
     val assetListMixin = assetListMixinFactory.create(viewModelScope)
 

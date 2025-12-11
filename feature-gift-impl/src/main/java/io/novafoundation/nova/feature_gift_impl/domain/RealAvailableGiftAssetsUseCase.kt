@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.mapNotNullToSet
 import io.novafoundation.nova.common.utils.mapToSet
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency.Asset.Companion.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.fastLookupCustomFeeCapabilityOrDefault
@@ -18,6 +19,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -26,6 +28,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.withContext
 
 class RealAvailableGiftAssetsUseCase(
     private val chainRegistry: ChainRegistry,
@@ -38,6 +41,15 @@ class RealAvailableGiftAssetsUseCase(
     companion object {
 
         private const val GIFT_ASSETS_CACHE = "AssetSearchUseCase.GIFT_ASSETS_CACHE"
+    }
+
+    override suspend fun isGiftsAvailable(chainAsset: Chain.Asset): Boolean {
+        return withContext(Dispatchers.Default) {
+            val canPayFee = feePaymentFacade.canPayFeeInCurrency(chainAsset.toFeePaymentCurrency())
+            val isSelfSufficient = assetSourceRegistry.isSelfSufficientAsset(chainAsset)
+
+            canPayFee && isSelfSufficient
+        }
     }
 
     override fun getAvailableGiftAssets(coroutineScope: CoroutineScope): Flow<Set<FullChainAssetId>> {

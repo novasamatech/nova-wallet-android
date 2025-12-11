@@ -166,7 +166,7 @@ class BalanceDetailViewModel(
         .shareInBackground()
 
     val giftsButtonEnabled = chainAssetFlow.map {
-        interactor.isGiftingEnabled(it)
+        interactor.areGiftSupportedForAsset(it)
     }
         .onStart { emit(false) }
         .shareInBackground()
