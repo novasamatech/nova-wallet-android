@@ -12,8 +12,12 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.callForma
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.tryParseTransfer
+import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toIdWithAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallVisit
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -25,6 +29,7 @@ class TransferMultisigActionFormatter @Inject constructor(
     @LocalIdentity private val identityProvider: IdentityProvider,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val resourceManager: ResourceManager,
+    private val tokenFormatter: TokenFormatter
 ) : MultisigActionFormatterDelegate {
 
     override suspend fun formatPreview(
@@ -38,7 +43,7 @@ class TransferMultisigActionFormatter @Inject constructor(
         return MultisigActionFormatterDelegatePreviewResult(
             title = resourceManager.getString(R.string.transfer_title),
             subtitle = resourceManager.getString(R.string.transfer_history_send_to, destAddress),
-            primaryValue = parsedTransfer.amount.formatPlanks(),
+            primaryValue = parsedTransfer.amount.formatAmount(),
             icon = R.drawable.ic_arrow_up.asIcon()
         )
     }
@@ -62,7 +67,7 @@ class TransferMultisigActionFormatter @Inject constructor(
         val parsedTransfer = tryParseTransfer(visit, chain) ?: return null
 
         val accountName = identityProvider.getNameOrAddress(parsedTransfer.destination, chain)
-        val formattedAmount = parsedTransfer.amount.formatPlanks()
+        val formattedAmount = parsedTransfer.amount.formatAmount(withSign = false)
 
         return resourceManager.getString(
             R.string.multisig_transaction_message_transfer,
@@ -77,6 +82,14 @@ class TransferMultisigActionFormatter @Inject constructor(
     ): TransferParsedFromCall? {
         return assetSourceRegistry.allSources().tryFindNonNull {
             it.transfers.tryParseTransfer(visit.call, chain)
+        }
+    }
+
+    private fun ChainAssetWithAmount.formatAmount(withSign: Boolean = true): CharSequence {
+        return if (withSign) {
+            tokenFormatter.formatToken(amount, chainAsset, config = TokenConfig(tokenAmountSign = AmountSign.NEGATIVE))
+        } else {
+            tokenFormatter.formatToken(amount, chainAsset)
         }
     }
 }
