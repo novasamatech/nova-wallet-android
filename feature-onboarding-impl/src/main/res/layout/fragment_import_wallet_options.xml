@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    tools:background="@color/secondary_screen_background"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:background="@color/secondary_screen_background">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/importOptionsToolbar"
@@ -46,8 +46,8 @@
                 <io.novafoundation.nova.feature_onboarding_impl.presentation.view.ImportOptionView
                     android:id="@+id/importOptionCloud"
                     android:layout_width="0dp"
-                    android:layout_columnWeight="1"
                     android:layout_columnSpan="2"
+                    android:layout_columnWeight="1"
                     android:layout_margin="6dp"
                     android:src="@drawable/ic_import_option_cloud"
                     android:text="@string/import_wallet_options_cloud_backup_subtitle"
@@ -58,6 +58,7 @@
                     android:layout_width="0dp"
                     android:layout_columnSpan="1"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
                     android:layout_margin="6dp"
                     android:src="@drawable/ic_import_option_passphrase"
                     android:text="@string/import_wallet_options_mnemonic_subtitle"
@@ -67,6 +68,7 @@
                     android:id="@+id/importOptionHardware"
                     android:layout_width="0dp"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
                     android:layout_margin="6dp"
                     android:src="@drawable/ic_import_option_hardware"
                     android:text="@string/account_welcome_hardware_wallet_subtitle"
@@ -76,6 +78,7 @@
                     android:id="@+id/importOptionTrustWallet"
                     android:layout_width="0dp"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
                     android:layout_margin="6dp"
                     android:src="@drawable/ic_import_option_trust_wallet"
                     android:text="@string/account_welcome_trust_wallet_subtitle"
@@ -86,6 +89,7 @@
                     android:id="@+id/importOptionWatchOnly"
                     android:layout_width="0dp"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
                     android:layout_margin="6dp"
                     android:src="@drawable/ic_import_option_watch_only"
                     android:text="@string/account_add_watch_only_description"
@@ -96,6 +100,7 @@
                     android:layout_width="0dp"
                     android:layout_height="52dp"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
                     android:layout_margin="6dp"
                     android:elevation="0dp"
                     app:cardBackgroundColor="@color/button_background_secondary"
@@ -122,6 +127,7 @@
                     android:layout_width="0dp"
                     android:layout_height="52dp"
                     android:layout_columnWeight="1"
+                    android:layout_gravity="fill"
                     android:layout_margin="6dp"
                     android:elevation="0dp"
                     app:cardBackgroundColor="@color/button_background_secondary"
