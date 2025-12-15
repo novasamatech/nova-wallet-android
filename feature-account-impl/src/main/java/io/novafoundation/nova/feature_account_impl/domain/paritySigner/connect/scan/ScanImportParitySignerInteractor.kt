@@ -1,15 +1,16 @@
 package io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.scan
 
-import io.novasama.substrate_sdk_android.encrypt.qr.QrFormat
-import io.novasama.substrate_sdk_android.encrypt.qr.formats.SubstrateQrFormat
+import io.novafoundation.nova.feature_account_impl.domain.utils.ScanSecret
 import io.novasama.substrate_sdk_android.runtime.AccountId
-import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class ParitySignerAccount(
-    val accountId: AccountId,
-)
+sealed class ParitySignerAccount(val accountId: AccountId) {
+
+    class Public(accountId: AccountId) : ParitySignerAccount(accountId)
+
+    class Secret(accountId: AccountId, val secret: ScanSecret) : ParitySignerAccount(accountId)
+}
 
 interface ScanImportParitySignerInteractor {
 
@@ -17,14 +18,12 @@ interface ScanImportParitySignerInteractor {
 }
 
 class RealScanImportParitySignerInteractor(
-    private val addressQrFormat: QrFormat = SubstrateQrFormat()
+    private val polkadotVaultScanFormat: PolkadotVaultScanFormat
 ) : ScanImportParitySignerInteractor {
 
-    override suspend fun decodeScanResult(scanResult: String): Result<ParitySignerAccount> = runCatching {
-        withContext(Dispatchers.Default) {
-            val parsed = addressQrFormat.decode(scanResult)
-
-            ParitySignerAccount(parsed.address.toAccountId())
+    override suspend fun decodeScanResult(scanResult: String): Result<ParitySignerAccount> {
+        return withContext(Dispatchers.Default) {
+            polkadotVaultScanFormat.decode(scanResult)
         }
     }
 }

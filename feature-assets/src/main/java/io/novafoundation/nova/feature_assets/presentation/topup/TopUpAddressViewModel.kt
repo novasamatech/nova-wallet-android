@@ -16,9 +16,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
-import io.novafoundation.nova.feature_assets.presentation.send.common.buildAssetTransfer
-import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.autoFixSendValidationPayload
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.buildAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer

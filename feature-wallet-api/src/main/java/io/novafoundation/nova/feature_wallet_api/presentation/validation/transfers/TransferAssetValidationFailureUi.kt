@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_assets.presentation.send
+package io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.TransformedFailure
@@ -8,7 +8,7 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.validation.handleSystemAccountValidationFailure
-import io.novafoundation.nova.feature_assets.R
+import io.novafoundation.nova.feature_wallet_api.R
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferValidationFailure
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleFeeSpikeDetected

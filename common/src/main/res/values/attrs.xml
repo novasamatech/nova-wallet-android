@@ -63,11 +63,16 @@
 
     <declare-styleable name="ActionInputField">
         <attr name="android:hint" format="string" />
+        <attr name="supportScan" format="boolean" />
+        <attr name="supportInsertion" format="boolean" />
+        <attr name="fieldSaveEnabled" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="InputField">
         <attr name="android:inputType" />
         <attr name="android:text" />
+        <attr name="android:maxLines" />
+        <attr name="android:gravity" />
         <attr name="editTextHint" format="string" />
         <attr name="editTextHintColor" format="color" />
         <attr name="android:textAppearance" />

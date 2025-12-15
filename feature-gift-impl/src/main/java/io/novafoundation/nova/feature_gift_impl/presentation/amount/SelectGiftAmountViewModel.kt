@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.orZero
@@ -17,8 +18,6 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.view.ChainChipModel
-import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
-import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_gift_impl.R
 import io.novafoundation.nova.feature_gift_impl.domain.CreateGiftInteractor
 import io.novafoundation.nova.feature_gift_impl.domain.models.CreateGiftModel
@@ -42,6 +41,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.autoFixSendValidationPayload
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chainFlow
 import java.math.BigDecimal
@@ -123,12 +124,12 @@ class SelectGiftAmountViewModel(
     val continueButtonStateFlow = combine(
         validationInProgressFlow,
         amountChooserMixin.fieldError,
-        amountChooserMixin.inputState
+        amountChooserMixin.amountState
     ) { validating, fieldError, amountState ->
         when {
             validating -> DescriptiveButtonState.Loading
             fieldError is FieldValidationResult.Error -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_other_amount))
-            amountState.value.isNotEmpty() -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
+            amountState.value.orZero().isPositive -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
             else -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.gift_enter_amount_disabled_button_state))
         }
     }.onStart { emit(DescriptiveButtonState.Disabled(resourceManager.getString(R.string.gift_enter_amount_disabled_button_state))) }

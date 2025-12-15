@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:drawablePadding="6dp"
+        android:layout_marginBottom="12dp"
         tools:text="@string/account_parity_signer_import_start_select_top"
         android:textColor="@color/text_positive"
         app:drawableStartCompat="@drawable/ic_checkmark_circle_16"
@@ -22,7 +23,6 @@
         android:id="@+id/viewInstructionImage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:adjustViewBounds="true"
         tools:src="@drawable/my_parity_signer" />
 </merge>

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_gift_impl.di
 import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
@@ -17,6 +18,8 @@ import io.novafoundation.nova.common.utils.IntegrityService
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core_db.dao.GiftsDao
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
+import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -108,6 +111,12 @@ interface GiftFeatureDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val accountInteractor: AccountInteractor
+
+    val computationalCache: ComputationalCache
+
+    val feePaymentRegistry: FeePaymentProviderRegistry
+
+    val feePaymentFacade: CustomFeeCapabilityFacade
 
     fun giftsDao(): GiftsDao
 

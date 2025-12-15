@@ -56,6 +56,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.di.ScanSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.di.ShowSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.di.ScanSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.di.StartCreateWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
@@ -158,6 +160,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun manualBackupAdvancedSecrets(): ManualBackupAdvancedSecretsComponent.Factory
 
+    fun scanSeedComponentFactory(): ScanSeedComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -173,6 +177,7 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
             @BindsInstance restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
             @BindsInstance selectSingleWalletCommunicator: SelectSingleWalletCommunicator,
+            @BindsInstance scanSeedCommunicator: ScanSeedCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

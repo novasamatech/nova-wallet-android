@@ -20,7 +20,7 @@ class MnemonicImportView @JvmOverloads constructor(
 
     override val nameInputViews: ImportAccountNameViews
         get() = ImportAccountNameViews(
-            nameInput = binder.importMnemonicUsernameInput,
+            nameInput = binder.importMnemonicUsernameInput.content,
             visibilityDependent = listOf(binder.importMnemnonicUsernameHint)
         )
 

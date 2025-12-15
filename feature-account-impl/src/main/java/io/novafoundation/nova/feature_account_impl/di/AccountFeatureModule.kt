@@ -97,6 +97,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.RealCreateSec
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SubstrateKeypairAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.TrustWalletAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
@@ -512,6 +513,7 @@ class AccountFeatureModule {
         mnemonicAddAccountRepository: MnemonicAddAccountRepository,
         jsonAddAccountRepository: JsonAddAccountRepository,
         seedAddAccountRepository: SeedAddAccountRepository,
+        substrateKeypairAddAccountRepository: SubstrateKeypairAddAccountRepository,
         trustWalletAddAccountRepository: TrustWalletAddAccountRepository,
         accountRepository: AccountRepository,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor
@@ -519,6 +521,7 @@ class AccountFeatureModule {
         mnemonicAddAccountRepository,
         jsonAddAccountRepository,
         seedAddAccountRepository,
+        substrateKeypairAddAccountRepository,
         trustWalletAddAccountRepository,
         accountRepository,
         advancedEncryptionInteractor
