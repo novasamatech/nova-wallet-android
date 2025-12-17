@@ -7,7 +7,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -51,7 +50,6 @@ class SelectMultipleWalletsFragment : BaseFragment<SelectMultipleWalletsViewMode
     private val adapter by lazy(LazyThreadSafetyMode.NONE) { ConcatAdapter(titleAdapter, walletsAdapter) }
 
     override fun initViews() {
-        binder.selectMultipleWalletsToolbar.applyStatusBarInsets()
         binder.selectMultipleWalletsToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
 

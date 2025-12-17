@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDial
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
 import io.novafoundation.nova.common.utils.ViewSpace
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.common.view.recyclerview.adapter.text.TextAdapter
 import io.novafoundation.nova.feature_assets.R
@@ -43,7 +42,6 @@ class TradeProviderListFragment : BaseFragment<TradeProviderListViewModel, Fragm
     }
 
     override fun initViews() {
-        binder.tradeProviderListToolbar.applyStatusBarInsets()
         binder.tradeProviderListToolbar.setHomeButtonListener { viewModel.back() }
         binder.tradeProviderList.adapter = adapter
     }

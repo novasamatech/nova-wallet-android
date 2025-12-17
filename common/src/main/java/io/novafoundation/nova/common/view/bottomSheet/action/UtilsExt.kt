@@ -5,6 +5,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import io.novafoundation.nova.common.databinding.BottomSheetActionBinding
 import io.novafoundation.nova.common.utils.makeGone
+import io.novafoundation.nova.common.utils.makeVisible
+import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.common.view.PrimaryButton
 
 fun BottomSheetActionBinding.setupView(
@@ -17,6 +19,7 @@ fun BottomSheetActionBinding.setupView(
     val subtitleView: TextView = actionBottomSheetSubtitle
     val neutralButton: PrimaryButton = actionBottomSheetNeutralBtn
     val actionButton: PrimaryButton = actionBottomSheetPositiveBtn
+    val alert: AlertView = actionBottomSheetAlert
     val checkBox: CheckBox = actionBottomSheetCheckBox
 
     iconView.setImageResource(payload.imageRes)
@@ -42,6 +45,14 @@ fun BottomSheetActionBinding.setupView(
             }
         }
     } ?: neutralButton.makeGone()
+
+    payload.alertModel?.let {
+        alert.apply {
+            makeVisible()
+            setStyle(it.style)
+            setMessage(it.message)
+        }
+    } ?: alert.makeGone()
 
     payload.checkBoxPreferences?.let { preferences ->
         checkBox.text = preferences.text

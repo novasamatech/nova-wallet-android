@@ -39,7 +39,16 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:textColor="@color/text_secondary"
-        tools:text="Please be sure to remember this password. Store it in a secure location. You will need it to restore your wallets from the backup." />
+        tools:text="Please be sure to remember this password. Store it in a secure location. You will need it to restore your wallets from the" />
+
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/actionBottomSheetAlert"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/actionBottomSheetCheckBox"
@@ -57,10 +66,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:clipToPadding="false"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="10dp"
         android:paddingTop="24dp"
-        android:gravity="center_vertical"
         android:paddingBottom="24dp">
 
         <io.novafoundation.nova.common.view.PrimaryButton

@@ -19,7 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.common.mythos.loadUserStakeState
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -27,7 +28,8 @@ class MythosAlertsComponentFactory(
     private val mythosSharedComputation: MythosSharedComputation,
     private val interactor: MythosStakingAlertsInteractor,
     private val resourceManager: ResourceManager,
-    private val router: MythosStakingRouter
+    private val router: MythosStakingRouter,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -38,7 +40,8 @@ class MythosAlertsComponentFactory(
         interactor = interactor,
         resourceManager = resourceManager,
         hostContext = hostContext,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -47,7 +50,8 @@ private class MythosAlertsComponent(
     private val interactor: MythosStakingAlertsInteractor,
     private val resourceManager: ResourceManager,
     private val hostContext: ComponentHostContext,
-    private val router: MythosStakingRouter
+    private val router: MythosStakingRouter,
+    private val amountFormatter: AmountFormatter
 ) : AlertsComponent,
     ComputationalScope by hostContext.scope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(hostContext.scope) {
@@ -80,7 +84,7 @@ private class MythosAlertsComponent(
             )
 
             is MythosStakingAlert.RedeemTokens -> {
-                val amount = mapAmountToAmountModel(alert.redeemableAmount, asset).token
+                val amount = amountFormatter.formatAmountToAmountModel(alert.redeemableAmount, asset).token
 
                 AlertModel(
                     title = resourceManager.getString(R.string.staking_alert_redeem_title),

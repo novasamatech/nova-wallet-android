@@ -15,8 +15,8 @@ fun KnownNovaPools.isNovaPool(chainId: ChainId, poolId: PoolId) = chainId to poo
 class FixedKnownNovaPools : KnownNovaPools {
 
     override val novaPoolIds: Set<Pair<ChainId, PoolId>> = setOf(
-        key(Chain.Geneses.POLKADOT, 54),
-        key(Chain.Geneses.KUSAMA, 160),
+        key(Chain.Geneses.POLKADOT_ASSET_HUB, 54),
+        key(Chain.Geneses.KUSAMA_ASSET_HUB, 160),
         key(Chain.Geneses.ALEPH_ZERO, 74),
         key(Chain.Geneses.VARA, 65),
         key(Chain.Geneses.AVAIL, 3)

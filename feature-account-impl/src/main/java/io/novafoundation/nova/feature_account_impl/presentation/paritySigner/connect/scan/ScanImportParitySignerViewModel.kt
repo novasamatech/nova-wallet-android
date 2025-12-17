@@ -10,7 +10,7 @@ import io.novafoundation.nova.feature_account_impl.domain.paritySigner.connect.s
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerAccountPayload
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.ParitySignerStartPayload
-import kotlinx.coroutines.delay
+import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.fromDomain
 
 class ScanImportParitySignerViewModel(
     private val router: AccountRouter,
@@ -33,17 +33,25 @@ class ScanImportParitySignerViewModel(
             .onSuccess(::openPreview)
             .onFailure {
                 val message = resourceManager.formatWithPolkadotVaultLabel(R.string.account_parity_signer_import_scan_invalid_qr, payload.variant)
-                showMessage(message)
+                showToast(message)
 
-                // wait a bit until re-enabling scanner otherwise user might experience a lot of error messages shown due to fast scanning
-                delay(1000)
-
-                resetScanning()
+                resetScanningThrottled()
             }
     }
 
     private fun openPreview(signerAccount: ParitySignerAccount) {
-        val payload = ParitySignerAccountPayload(signerAccount.accountId, payload.variant)
+        val payload = when (signerAccount) {
+            is ParitySignerAccount.Public -> ParitySignerAccountPayload.AsPublic(
+                accountId = signerAccount.accountId,
+                variant = payload.variant
+            )
+
+            is ParitySignerAccount.Secret -> ParitySignerAccountPayload.AsSecret(
+                accountId = signerAccount.accountId,
+                variant = payload.variant,
+                secret = signerAccount.secret.fromDomain()
+            )
+        }
 
         router.openPreviewImportParitySigner(payload)
     }

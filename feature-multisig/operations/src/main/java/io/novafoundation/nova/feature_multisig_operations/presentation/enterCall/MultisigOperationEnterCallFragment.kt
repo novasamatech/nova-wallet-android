@@ -1,22 +1,24 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.enterCall
 
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.FragmentPayloadCreator
 import io.novafoundation.nova.common.utils.PayloadCreator
-import io.novafoundation.nova.common.utils.applyImeInsetts
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.payload
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_multisig_operations.databinding.FragmentMultisigOperationEnterCallBinding
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureComponent
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
 
 class MultisigOperationEnterCallFragment : BaseFragment<MultisigOperationEnterCallViewModel, FragmentMultisigOperationEnterCallBinding>() {
 
-    companion object : PayloadCreator<MultisigOperationEnterCallPayload> by FragmentPayloadCreator()
+    companion object : PayloadCreator<MultisigOperationPayload> by FragmentPayloadCreator()
 
     override fun createBinding() = FragmentMultisigOperationEnterCallBinding.inflate(layoutInflater)
 
@@ -30,9 +32,12 @@ class MultisigOperationEnterCallFragment : BaseFragment<MultisigOperationEnterCa
             .inject(this)
     }
 
+    override fun applyInsets(rootView: View) {
+        binder.root.applySystemBarInsets(imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
+    }
+
     override fun initViews() {
-        binder.multisigOperationEnterCallToolbar.applyStatusBarInsets()
-        binder.root.applyImeInsetts()
+        binder.multisigOperationEnterCallToolbar.setHomeButtonListener { viewModel.back() }
 
         binder.multisigOperationEnterCallAction.setOnClickListener { viewModel.approve() }
     }

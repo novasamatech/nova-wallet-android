@@ -42,7 +42,7 @@ class LegacyLedgerWalletDetailsMixin(
                 style = AlertView.Style.fromPreset(AlertView.StylePreset.WARNING),
                 message = resourceManager.getString(R.string.account_ledger_legacy_warning_title),
                 subMessage = resourceManager.getString(R.string.account_ledger_legacy_warning_message),
-                action = AlertModel.ActionModel(
+                linkAction = AlertModel.ActionModel(
                     text = resourceManager.getString(R.string.common_find_out_more),
                     listener = { host.externalActions.showBrowser(appLinksProvider.ledgerMigrationArticle) }
                 )

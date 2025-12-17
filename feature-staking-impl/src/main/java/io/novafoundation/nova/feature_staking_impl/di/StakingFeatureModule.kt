@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -8,6 +9,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
@@ -31,7 +33,6 @@ import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.Pool
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.config.api.StakingGlobalConfigApi
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
@@ -47,14 +48,12 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.ParasReposito
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealParasRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealSessionRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingVersioningRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealVaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
-import io.novafoundation.nova.feature_staking_impl.data.repository.StakingGlobalConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
@@ -66,8 +65,6 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.Ele
 import io.novafoundation.nova.feature_staking_impl.data.repository.consensus.RealElectionsSessionRegistry
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.RealStakingRewardPeriodDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingRewardPeriodDataSource
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSource
-import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.StakingStoriesDataSourceImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.DirectStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.PoolStakingRewardsDataSource
 import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.reward.RealStakingRewardsDataSourceRegistry
@@ -75,12 +72,15 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.datasource.re
 import io.novafoundation.nova.feature_staking_impl.data.validators.NovaValidatorsApi
 import io.novafoundation.nova.feature_staking_impl.data.validators.RemoteValidatorsPreferencesSource
 import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
+import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureModule.BindsModule
 import io.novafoundation.nova.feature_staking_impl.di.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.di.staking.PayoutsBulkRetriever
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
+import io.novafoundation.nova.feature_staking_impl.domain.common.RealStakingHoldsMigrationUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.common.StakingHoldsMigrationUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.era.StakingEraInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.MythosSharedComputation
@@ -92,7 +92,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.recommendations.Valida
 import io.novafoundation.nova.feature_staking_impl.domain.recommendations.settings.RecommendationSettingsProviderFactory
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.setup.ChangeValidatorsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.staking.bond.BondMoreInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.controller.ControllerInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.AddStakingProxyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.delegation.proxy.RealAddStakingProxyInteractor
@@ -112,8 +111,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStak
 import io.novafoundation.nova.feature_staking_impl.presentation.common.hints.StakingHintsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.common.rewardDestination.RewardDestinationProvider
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.RealStakingDashboardPresentationMapper
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.display.RealPoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
@@ -129,6 +127,7 @@ import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.network.updaters.multiChain.DelegateToTimelineChainIdHolder
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
@@ -138,8 +137,19 @@ import javax.inject.Named
 const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
 const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
-@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class])
+@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class, BindsModule::class])
 class StakingFeatureModule {
+
+    @Module
+    interface BindsModule {
+
+        @Binds
+        fun bindHoldsMigrationUseCase(real: RealStakingHoldsMigrationUseCase): StakingHoldsMigrationUseCase
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideTimelineDelegatingHolder(stakingSharedState: StakingSharedState) = DelegateToTimelineChainIdHolder(stakingSharedState)
 
     @Provides
     @FeatureScope
@@ -174,15 +184,10 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingStoriesDataSource(): StakingStoriesDataSource = StakingStoriesDataSourceImpl()
-
-    @Provides
-    @FeatureScope
     fun provideStakingRepository(
         accountStakingDao: AccountStakingDao,
         @Named(LOCAL_STORAGE_SOURCE) localStorageSource: StorageDataSource,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
-        stakingStoriesDataSource: StakingStoriesDataSource,
         walletConstants: WalletConstants,
         chainRegistry: ChainRegistry,
         storageCache: StorageCache,
@@ -191,7 +196,6 @@ class StakingFeatureModule {
         accountStakingDao = accountStakingDao,
         remoteStorage = remoteStorageSource,
         localStorage = localStorageSource,
-        stakingStoriesDataSource = stakingStoriesDataSource,
         walletConstants = walletConstants,
         chainRegistry = chainRegistry,
         storageCache = storageCache,
@@ -507,13 +511,6 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBondMoreInteractor(
-        sharedState: StakingSharedState,
-        extrinsicService: ExtrinsicService,
-    ) = BondMoreInteractor(extrinsicService, sharedState)
-
-    @Provides
-    @FeatureScope
     fun provideRedeemInteractor(
         extrinsicService: ExtrinsicService,
         stakingRepository: StakingRepository,
@@ -608,8 +605,11 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideStakingDashboardPresentationMapper(resourceManager: ResourceManager): StakingDashboardPresentationMapper {
-        return RealStakingDashboardPresentationMapper(resourceManager)
+    fun provideStakingDashboardPresentationMapper(
+        resourceManager: ResourceManager,
+        assetIconProvider: AssetIconProvider
+    ): StakingDashboardPresentationMapperFactory {
+        return StakingDashboardPresentationMapperFactory(resourceManager, assetIconProvider)
     }
 
     @Provides
@@ -693,20 +693,6 @@ class StakingFeatureModule {
         extrinsicService = extrinsicService,
         externalAccountsSyncService = externalAccountsSyncService
     )
-
-    @Provides
-    @FeatureScope
-    fun provideStakingGlobalConfigApi(apiCreator: NetworkApiCreator): StakingGlobalConfigApi {
-        return apiCreator.create(StakingGlobalConfigApi::class.java)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideStakingGlobalConfigRepository(
-        api: StakingGlobalConfigApi
-    ): StakingGlobalConfigRepository {
-        return RealStakingGlobalConfigRepository(api)
-    }
 
     @Provides
     @FeatureScope

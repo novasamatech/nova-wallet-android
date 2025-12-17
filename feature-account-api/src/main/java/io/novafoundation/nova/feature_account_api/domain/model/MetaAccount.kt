@@ -17,6 +17,13 @@ import io.novasama.substrate_sdk_android.extensions.toAccountId
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
+
+class MetaIdWithType(
+    val metaId: Long,
+    val type: LightMetaAccount.Type
+)
 
 class MetaAccountOrdering(
     val id: Long,
@@ -162,6 +169,8 @@ fun MultisigMetaAccount.isThreshold1(): Boolean {
     return threshold == 1
 }
 
+fun MetaAccount.requireMultisigAccount() = this as MultisigMetaAccount
+
 fun MetaAccount.hasChainAccountIn(chainId: ChainId) = chainId in chainAccounts
 
 fun MetaAccount.addressIn(chain: Chain): String? {
@@ -246,7 +255,44 @@ fun LightMetaAccount.Type.requestedAccountPaysFees(): Boolean {
     }
 }
 
-val LightMetaAccount.Type.isProxied: Boolean
-    get() = this == LightMetaAccount.Type.PROXIED
+fun LightMetaAccount.Type.isControllableWallet(): Boolean {
+    return when (this) {
+        LightMetaAccount.Type.SECRETS,
+        LightMetaAccount.Type.PARITY_SIGNER,
+        LightMetaAccount.Type.LEDGER_LEGACY,
+        LightMetaAccount.Type.LEDGER,
+        LightMetaAccount.Type.POLKADOT_VAULT -> true
 
-fun MultisigMetaAccount.allSignatories() = otherSignatories.toSet() + this.signatoryAccountId
+        LightMetaAccount.Type.WATCH_ONLY,
+        LightMetaAccount.Type.PROXIED,
+        LightMetaAccount.Type.MULTISIG -> false
+    }
+}
+
+@OptIn(ExperimentalContracts::class)
+fun LightMetaAccount.isProxied(): Boolean {
+    contract {
+        returns(true) implies (this@isProxied is ProxiedMetaAccount)
+    }
+
+    return this is ProxiedMetaAccount
+}
+
+@OptIn(ExperimentalContracts::class)
+fun LightMetaAccount.isMultisig(): Boolean {
+    contract {
+        returns(true) implies (this@isMultisig is MultisigMetaAccount)
+    }
+
+    return this is MultisigMetaAccount
+}
+
+fun LightMetaAccount.asProxied(): ProxiedMetaAccount = this as ProxiedMetaAccount
+fun LightMetaAccount.asMultisig(): MultisigMetaAccount = this as MultisigMetaAccount
+
+fun MultisigMetaAccount.signatoriesCount() = 1 + otherSignatories.size
+
+fun MultisigMetaAccount.allSignatories() = buildSet {
+    add(signatoryAccountId)
+    addAll(otherSignatories.toSet())
+}

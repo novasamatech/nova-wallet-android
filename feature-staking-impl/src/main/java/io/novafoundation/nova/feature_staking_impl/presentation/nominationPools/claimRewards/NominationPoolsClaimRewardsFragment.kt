@@ -5,7 +5,6 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -19,8 +18,6 @@ class NominationPoolsClaimRewardsFragment : BaseFragment<NominationPoolsClaimRew
     override fun createBinding() = FragmentNominationPoolsClaimRewardsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.nominationPoolsClaimRewardsToolbar.applyStatusBarInsets()
-
         binder.nominationPoolsClaimRewardsExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         binder.nominationPoolsClaimRewardsToolbar.setHomeButtonListener { viewModel.backClicked() }

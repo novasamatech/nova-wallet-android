@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.start
 
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.list.instruction.InstructionItem
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.formatting.spannable.highlightedText
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_ledger_impl.R
@@ -21,7 +21,6 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> :
 
     override fun initViews() {
         binder.startImportLedgerToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.startImportLedgerToolbar.applyStatusBarInsets()
 
         binder.startImportLedgerContinue.setOnClickListener {
             when (binder.startImportLedgerConnectionModePages.currentItem) {
@@ -53,10 +52,10 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> :
         return ConnectionModePageModel(
             modeName = getString(R.string.start_import_ledger_connection_mode_bluetooth),
             guideItems = listOf(
-                LedgerGuideItem(1, networkAppIsInstalledStep()),
-                LedgerGuideItem(2, openingNetworkAppStep()),
-                LedgerGuideItem(3, enableBluetoothStep()),
-                LedgerGuideItem(4, selectAccountStep())
+                InstructionItem.Step(1, networkAppIsInstalledStep()),
+                InstructionItem.Step(2, openingNetworkAppStep()),
+                InstructionItem.Step(3, enableBluetoothStep()),
+                InstructionItem.Step(4, selectAccountStep())
             )
         )
     }
@@ -65,10 +64,10 @@ abstract class StartImportLedgerFragment<VM : StartImportLedgerViewModel> :
         return ConnectionModePageModel(
             modeName = getString(R.string.start_import_ledger_connection_mode_usb),
             guideItems = listOf(
-                LedgerGuideItem(1, networkAppIsInstalledStep()),
-                LedgerGuideItem(2, openingNetworkAppStep()),
-                LedgerGuideItem(3, enableOTGSetting()),
-                LedgerGuideItem(4, selectAccountStep())
+                InstructionItem.Step(1, networkAppIsInstalledStep()),
+                InstructionItem.Step(2, openingNetworkAppStep()),
+                InstructionItem.Step(3, enableOTGSetting()),
+                InstructionItem.Step(4, selectAccountStep())
             )
         )
     }

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.mixin.copy.CopyTextLauncher
 import io.novafoundation.nova.common.mixin.hints.ResourcesHintsMixinFactory
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -36,6 +37,11 @@ import io.novafoundation.nova.feature_deep_linking.presentation.configuring.Link
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.AssetModelFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -54,6 +60,14 @@ import javax.inject.Named
 
 interface GovernanceFeatureDependencies {
 
+    val maskableValueFormatterFactory: MaskableValueFormatterFactory
+
+    val maskableValueFormatterProvider: MaskableValueFormatterProvider
+
+    val amountFormatter: AmountFormatter
+
+    val tokenFormatter: TokenFormatter
+
     val onChainIdentityRepository: OnChainIdentityRepository
 
     val listChooserMixinFactory: ListChooserMixin.Factory
@@ -65,6 +79,8 @@ interface GovernanceFeatureDependencies {
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
     val bannerVisibilityRepository: BannerVisibilityRepository
+
+    val assetModelFormatter: AssetModelFormatter
 
     val chainMultiLocationConverterFactory: ChainMultiLocationConverterFactory
 
@@ -137,6 +153,8 @@ interface GovernanceFeatureDependencies {
     val linkBuilderFactory: LinkBuilderFactory
 
     val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+
+    val copyTextLauncher: CopyTextLauncher.Presentation
 
     @Caching
     fun cachingIconGenerator(): AddressIconGenerator

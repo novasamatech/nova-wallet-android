@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <io.novafoundation.nova.common.presentation.scan.ScanView
+        android:id="@+id/scanSeedScanView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:title="@string/common_scan_qr_code" />
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/scanSeedToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false" />
+</FrameLayout>

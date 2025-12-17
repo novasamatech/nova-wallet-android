@@ -62,6 +62,8 @@ suspend fun <A : AwaitableEvent<P, R>, P, R> MutableLiveData<out Event<in A>>.aw
             onCancel = { continuation.cancel() }
         )
 
-        value = eventCreator(action).event()
+        // Type inference does not work in IR compiler
+        @Suppress("UNCHECKED_CAST")
+        (this as MutableLiveData<Any?>).value = eventCreator(action).event()
     }
 }

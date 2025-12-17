@@ -62,7 +62,7 @@ class BanxaProvider(
         private val address: String
     ) : WebViewIntegrationProvider.Integrator {
 
-        override fun run(using: WebView) {
+        override suspend fun run(using: WebView) {
             using.loadUrl(createLink())
         }
 

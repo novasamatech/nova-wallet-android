@@ -127,6 +127,13 @@ open class TableView @JvmOverloads constructor(
 
     private fun noAttrsInit() {
         setTitle(null)
+
+        childrenPadding.set(
+            PADDING_HORIZONTAL_DP.dp,
+            PADDING_VERTICAL_DP.dp,
+            PADDING_HORIZONTAL_DP.dp,
+            PADDING_VERTICAL_DP.dp,
+        )
     }
 
     private fun applyAttributes(attrs: AttributeSet) = context.useAttributes(attrs, R.styleable.TableView) {

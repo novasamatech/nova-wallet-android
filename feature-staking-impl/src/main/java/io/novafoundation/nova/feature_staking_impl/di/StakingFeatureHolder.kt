@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
@@ -47,6 +48,7 @@ class StakingFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .proxyFeatureApi(getFeature(ProxyFeatureApi::class.java))
             .dAppFeatureApi(getFeature(DAppFeatureApi::class.java))
+            .chainMigrationFeatureApi(getFeature(ChainMigrationFeatureApi::class.java))
             .build()
 
         return DaggerStakingFeatureComponent.factory()

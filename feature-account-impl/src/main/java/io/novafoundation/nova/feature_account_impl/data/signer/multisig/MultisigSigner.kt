@@ -51,8 +51,7 @@ class MultisigSignerFactory @Inject constructor(
 }
 
 // TODO multisig:
-// 3. Create a base class NestedSigner for Multisig and Proxieds
-// Example: 1 click swaps
+// 1. Create a base class NestedSigner for Multisig and Proxieds
 class MultisigSigner(
     private val multisigAccount: MultisigMetaAccount,
     private val accountRepository: AccountRepository,
@@ -96,14 +95,14 @@ class MultisigSigner(
             acknowledgeMultisigOperation()
         }
 
-        val actualCall = getWrappedCall()
-        delegateSigner().setSignerDataForSubmission(context)
-        val delegatedCall = getWrappedCall()
+        val callInsideAsMulti = getWrappedCall()
 
         // We intentionally do validation before wrapping to pass the actual call to the validation
-        validateExtrinsic(context.chain, actualCall = actualCall, delegatedCall = delegatedCall)
+        validateExtrinsic(context.chain, callInsideAsMulti)
 
         wrapCallsInAsMultiForSubmission()
+
+        delegateSigner().setSignerDataForSubmission(context)
     }
 
     context(ExtrinsicBuilder)
@@ -130,36 +129,36 @@ class MultisigSigner(
     context(ExtrinsicBuilder)
     private suspend fun validateExtrinsic(
         chain: Chain,
-        actualCall: GenericCall.Instance,
-        delegatedCall: GenericCall.Instance,
+        callInsideAsMulti: GenericCall.Instance,
     ) {
         val validationPayload = MultisigExtrinsicValidationPayload(
             multisig = multisigAccount,
             signatory = signatoryMetaAccount(),
             chain = chain,
-            signatoryFeePaymentMode = determineSignatoryFeePaymentMode(actualCall),
-            delegatedCall = delegatedCall
+            signatoryFeePaymentMode = determineSignatoryFeePaymentMode(),
+            callInsideAsMulti = callInsideAsMulti
         )
 
         val requestBusPayload = MultisigExtrinsicValidationRequestBus.Request(validationPayload)
-        val validationResponse = multisigExtrinsicValidationEventBus.handle(requestBusPayload)
-
-        val validationStatus = validationResponse.validationResult.getOrNull()
-        if (validationStatus !is ValidationStatus.NotValid) return
-
-        multisigSigningPresenter.presentValidationFailure(validationStatus.reason)
-
-        throw SigningCancelledException()
+        multisigExtrinsicValidationEventBus.handle(requestBusPayload)
+            .validationResult
+            .onSuccess {
+                if (it is ValidationStatus.NotValid) {
+                    multisigSigningPresenter.presentValidationFailure(it.reason)
+                    throw SigningCancelledException()
+                }
+            }
+            .onFailure {
+                throw it
+            }
     }
 
     context(ExtrinsicBuilder)
-    private suspend fun determineSignatoryFeePaymentMode(actualCall: GenericCall.Instance): SignatoryFeePaymentMode {
+    private suspend fun determineSignatoryFeePaymentMode(): SignatoryFeePaymentMode {
         // Our direct signatory only pay fees if it is a LeafSigner
         // Otherwise it is paid by signer's own delegate
         return if (delegateSigner() is LeafSigner) {
-            SignatoryFeePaymentMode.PaysSubmissionFee(
-                actualCall = actualCall
-            )
+            SignatoryFeePaymentMode.PaysSubmissionFee
         } else {
             SignatoryFeePaymentMode.NothingToPay
         }

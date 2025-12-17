@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class SelectSendModule {
@@ -52,6 +53,7 @@ class SelectSendModule {
         accountRepository: AccountRepository,
         selectAddressMixinFactory: SelectAddressMixin.Factory,
         maxActionProviderFactory: MaxActionProviderFactory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SelectSendViewModel(
             chainRegistry = chainRegistry,
@@ -71,7 +73,8 @@ class SelectSendModule {
             amountChooserMixinFactory = amountChooserMixinFactory,
             accountRepository = accountRepository,
             selectAddressMixinFactory = selectAddressMixinFactory,
-            maxActionProviderFactory = maxActionProviderFactory
+            maxActionProviderFactory = maxActionProviderFactory,
+            amountFormatter = amountFormatter
         )
     }
 

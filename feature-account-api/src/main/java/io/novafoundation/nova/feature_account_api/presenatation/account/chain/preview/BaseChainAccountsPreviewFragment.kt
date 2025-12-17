@@ -4,7 +4,6 @@ import androidx.annotation.CallSuper
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.databinding.FragmentChainAccountPreviewBinding
@@ -29,7 +28,6 @@ abstract class BaseChainAccountsPreviewFragment<V : BaseChainAccountsPreviewView
 
     @CallSuper
     override fun initViews() {
-        binder.previewChainAccountToolbar.applyStatusBarInsets()
         binder.previewChainAccountToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }

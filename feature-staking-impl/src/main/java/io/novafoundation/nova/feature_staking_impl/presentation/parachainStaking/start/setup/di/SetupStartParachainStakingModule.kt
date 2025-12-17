@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class, StartParachainStakingModule::class])
 class SetupStartParachainStakingModule {
@@ -64,6 +65,7 @@ class SetupStartParachainStakingModule {
         selectedAssetState: StakingSharedState,
         collatorRecommendatorFactory: CollatorRecommendatorFactory,
         payload: StartParachainStakingPayload,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return StartParachainStakingViewModel(
             router = router,
@@ -84,6 +86,7 @@ class SetupStartParachainStakingModule {
             selectedAssetState = selectedAssetState,
             collatorRecommendatorFactory = collatorRecommendatorFactory,
             payload = payload,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -12,10 +12,12 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapEvent
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.onFailureInstance
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
@@ -25,6 +27,7 @@ import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.CallbackEvent
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.RootDeepLinkHandler
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConnectService
@@ -53,15 +56,22 @@ class RootViewModel(
     private val pushNotificationsInteractor: PushNotificationsInteractor,
     private val externalServiceInitializer: ExternalServiceInitializer,
     private val actionBottomSheetLauncher: ActionBottomSheetLauncher,
-    private val toastMessageManager: ToastMessageManager
+    private val toastMessageManager: ToastMessageManager,
+    private val dialogMessageManager: DialogMessageManager,
+    private val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
+    private val deviceNetworkStateObserver: DeviceNetworkStateObserver
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
 
     val toastMessagesEvents = toastMessageManager.toastMessagesEvents
 
+    val dialogMessageEvents = dialogMessageManager.dialogMessagesEvents
+
     val walletConnectErrorsLiveData = walletConnectService.onPairErrorLiveData
         .mapEvent { it.message }
+
+    val multisigPushNotificationsAlertMixin = multisigPushNotificationsAlertMixinFactory.create(this)
 
     private var willBeClearedForLanguageChange = false
 
@@ -69,9 +79,14 @@ class RootViewModel(
         contributionsInteractor.runUpdate()
             .launchIn(this)
 
-        interactor.runBalancesUpdate()
-            .onEach { handleUpdatesSideEffect(it) }
-            .launchIn(this)
+        launch {
+            // Cache balances before balances sync to detect migration
+            interactor.cacheBalancesForChainMigrationDetection()
+
+            interactor.runBalancesUpdate()
+                .onEach { handleUpdatesSideEffect(it) }
+                .launchIn(viewModelScope)
+        }
 
         backgroundAccessObserver.requestAccessFlow
             .onEach { verifyUserIfNeed() }
@@ -100,10 +115,17 @@ class RootViewModel(
         handlePendingDeepLink()
 
         externalServiceInitializer.initialize()
+
+        multisigPushNotificationsAlertMixin.subscribeToShowAlert()
+
+        deviceNetworkStateObserver.observeIsNetworkAvailable()
+            .onEach { interactor.loadMigrationDetailsConfigs() }
+            .launchIn(this)
     }
 
     private fun observeBusEvents() {
         compoundRequestBusHandler.observe()
+            .launchIn(this)
     }
 
     private fun subscribeDeepLinkCallback() {
@@ -115,7 +137,7 @@ class RootViewModel(
     private fun handleDeepLinkCallbackEvent(event: CallbackEvent) {
         when (event) {
             is CallbackEvent.Message -> {
-                showMessage(event.message)
+                showToast(event.message)
             }
         }
     }

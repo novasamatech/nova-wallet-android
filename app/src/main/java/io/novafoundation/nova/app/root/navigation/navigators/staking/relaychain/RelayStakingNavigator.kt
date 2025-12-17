@@ -26,7 +26,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegati
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.add.confirm.ConfirmAddStakingProxyPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.ConfirmRemoveStakingProxyFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.delegation.proxy.revoke.ConfirmRemoveStakingProxyPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.model.StakingStoryModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.confirm.ConfirmRebondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemFragment
@@ -35,7 +34,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDestination.confirm.parcel.ConfirmRewardDestinationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.story.StoryFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload.FlowType
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.ReviewCustomValidatorsFragment
@@ -148,12 +146,6 @@ class RelayStakingNavigator(
 
     override fun openStartChangeValidators() {
         navigationBuilder().action(R.id.openStartChangeValidatorsFragment)
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun openStory(story: StakingStoryModel) {
-        navigationBuilder().action(R.id.open_staking_story)
-            .setArgs(StoryFragment.getBundle(story))
             .navigateInFirstAttachedContext()
     }
 

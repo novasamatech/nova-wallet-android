@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.repository.filters.PreferencesReferendaFiltersRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.filters.ReferendaFiltersRepository
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RecentVotesTimePointProvider
 import io.novafoundation.nova.feature_governance_impl.domain.filters.RealReferendaFiltersInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.filters.ReferendaFiltersInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
@@ -59,14 +60,16 @@ class ReferendumListModule {
         governanceSourceRegistry: GovernanceSourceRegistry,
         referendaConstructor: ReferendaConstructor,
         referendaSortingProvider: ReferendaSortingProvider,
-        identityRepository: OnChainIdentityRepository
+        identityRepository: OnChainIdentityRepository,
+        recentVotesTimePointProvider: RecentVotesTimePointProvider
     ): ReferendaCommonRepository {
         return RealReferendaCommonRepository(
             chainStateRepository = chainStateRepository,
             governanceSourceRegistry = governanceSourceRegistry,
             referendaConstructor = referendaConstructor,
             referendaSortingProvider = referendaSortingProvider,
-            identityRepository = identityRepository
+            identityRepository = identityRepository,
+            recentVotesTimePointProvider = recentVotesTimePointProvider
         )
     }
 

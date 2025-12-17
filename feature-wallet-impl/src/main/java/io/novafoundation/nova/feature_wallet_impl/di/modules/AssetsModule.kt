@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.TypeBasedAssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.common.orml.OrmlAssetSourceFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.evmErc20.EvmErc20EventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.orml.OrmlAssetEventDetectorFactory
 import io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.assets.events.statemine.StatemineAssetEventDetectorFactory
@@ -30,7 +31,7 @@ class AssetsModule {
     fun provideAssetSourceRegistry(
         @NativeAsset native: Lazy<AssetSource>,
         @StatemineAssets statemine: Lazy<AssetSource>,
-        @OrmlAssets orml: Lazy<AssetSource>,
+        ormlFactory: Lazy<OrmlAssetSourceFactory>,
         @EvmErc20Assets evmErc20: Lazy<AssetSource>,
         @EvmNativeAssets evmNative: Lazy<AssetSource>,
         @EquilibriumAsset equilibrium: Lazy<AssetSource>,
@@ -43,7 +44,7 @@ class AssetsModule {
     ): AssetSourceRegistry = TypeBasedAssetSourceRegistry(
         nativeSource = native,
         statemineSource = statemine,
-        ormlSource = orml,
+        ormlSourceFactory = ormlFactory,
         evmErc20Source = evmErc20,
         evmNativeSource = evmNative,
         equilibriumAssetSource = equilibrium,

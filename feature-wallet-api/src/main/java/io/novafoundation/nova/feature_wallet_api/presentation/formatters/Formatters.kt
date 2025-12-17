@@ -13,14 +13,17 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 
+@Deprecated("Use TokenFormatter instead")
 fun BigInteger.formatPlanks(chainAsset: Chain.Asset, roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return chainAsset.amountFromPlanks(this).formatTokenAmount(chainAsset, roundingMode)
 }
 
+@Deprecated("Use TokenFormatter instead")
 fun ChainAssetWithAmount.formatPlanks(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return amount.formatPlanks(chainAsset, roundingMode)
 }
 
+@Deprecated("Use TokenFormatter instead")
 fun SemiUnboundedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): String {
     val end = endInclusive
     val startFormatted = chainAsset.amountFromPlanks(start).format()
@@ -34,6 +37,7 @@ fun SemiUnboundedRange<Balance>.formatPlanksRange(chainAsset: Chain.Asset): Stri
     }
 }
 
+@Deprecated("Use TokenFormatter instead")
 fun BigDecimal.formatTokenAmount(
     chainAsset: Chain.Asset,
     roundingMode: RoundingMode = RoundingMode.FLOOR
@@ -41,6 +45,7 @@ fun BigDecimal.formatTokenAmount(
     return formatTokenAmount(chainAsset.symbol, roundingMode)
 }
 
+@Deprecated("Use TokenFormatter instead")
 fun BigDecimal.formatTokenAmount(
     tokenSymbol: String,
     roundingMode: RoundingMode = RoundingMode.FLOOR
@@ -51,6 +56,7 @@ fun BigDecimal.formatTokenAmount(
     )
 }
 
+@Deprecated("Use TokenFormatter instead")
 fun BigDecimal.formatTokenChange(chainAsset: Chain.Asset, isIncome: Boolean): String {
     val withoutSign = formatTokenAmount(chainAsset)
     val sign = if (isIncome) '+' else '-'

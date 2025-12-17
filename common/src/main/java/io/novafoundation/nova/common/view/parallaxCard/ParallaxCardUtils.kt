@@ -57,7 +57,7 @@ fun Bitmap.downscale(factor: Float): Bitmap {
     val newBitmap = Bitmap.createBitmap(
         (width * factor).toInt(),
         (height * factor).toInt(),
-        config
+        config!!
     )
     val canvas = Canvas(newBitmap)
     canvas.clipRect(0f, 0f, width * factor, height * factor)

@@ -27,7 +27,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingEvent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingState
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.from
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +44,7 @@ class ParachainUnbondingComponentFactory(
     private val interactor: ParachainStakingUnbondingsInteractor,
     private val router: ParachainStakingRouter,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -55,7 +57,8 @@ class ParachainUnbondingComponentFactory(
         interactor = interactor,
         router = router,
         addressIconGenerator = addressIconGenerator,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 }
 
@@ -64,6 +67,7 @@ private class ParachainUnbondingComponent(
     private val interactor: ParachainStakingUnbondingsInteractor,
     private val addressIconGenerator: AddressIconGenerator,
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
 
     private val stakingOption: StakingOption,
     private val hostContext: ComponentHostContext,
@@ -107,7 +111,7 @@ private class ParachainUnbondingComponent(
         val asset = hostContext.assetFlow.first()
 
         val selectStakeTargetModels = unbondingRequests.map { unbondingWithCollator ->
-            val amountModel = mapAmountToAmountModel(unbondingWithCollator.request.action.amount, asset)
+            val amountModel = amountFormatter.formatAmountToAmountModel(unbondingWithCollator.request.action.amount, asset)
             val subtitle = resourceManager.labeledAmountSubtitle(R.string.wallet_balance_unbonding_v1_9_0, amountModel, selectionActive = true)
 
             SelectStakeTargetModel(
@@ -135,7 +139,7 @@ private class ParachainUnbondingComponent(
             hostContext.assetFlow,
             cancelLoadingFlow
         ) { unbondings, asset, cancelLoading ->
-            UnbondingState.from(unbondings, asset, cancelLoading)
+            UnbondingState.from(unbondings, asset, amountFormatter, cancelLoading)
         }
     }
 }

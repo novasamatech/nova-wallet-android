@@ -15,6 +15,7 @@ import io.novafoundation.nova.core.model.Language
 import io.novafoundation.nova.core.model.Node
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.dao.NodeDao
+import io.novafoundation.nova.core_db.dao.withTransaction
 import io.novafoundation.nova.core_db.model.chain.account.ChainAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountPositionUpdate
@@ -24,10 +25,13 @@ import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountAssetBalance
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccountOrdering
+import io.novafoundation.nova.feature_account_api.domain.model.MetaIdWithType
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountTypeToLocal
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapMetaAccountWithBalanceFromLocal
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.AccountDataMigration
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.model.ChainAccountInsertionData
+import io.novafoundation.nova.feature_account_impl.data.repository.datasource.migration.model.MetaAccountInsertionData
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -146,13 +150,35 @@ class AccountDataSourceImpl(
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
+    override suspend fun getActiveMetaIds(): Set<Long> {
+        return withContext(Dispatchers.IO) { metaAccountDao.getMetaAccountsIdsByStatus(MetaAccountLocal.Status.ACTIVE).toSet() }
+    }
+
     override suspend fun getAllMetaAccounts(): List<MetaAccount> {
         val local = metaAccountDao.getFullMetaAccounts()
         return accountMappers.mapMetaAccountsLocalToMetaAccounts(local)
     }
 
+    override suspend fun getMetaAccountsByIds(metaIds: List<Long>): List<MetaAccount> {
+        val localMetaAccounts = metaAccountDao.getMetaAccountsByIds(metaIds)
+        return accountMappers.mapMetaAccountsLocalToMetaAccounts(localMetaAccounts)
+    }
+
     override fun hasMetaAccountsCountOfTypeFlow(type: LightMetaAccount.Type): Flow<Boolean> {
         return metaAccountDao.hasMetaAccountsCountOfTypeFlow(mapMetaAccountTypeToLocal(type)).distinctUntilChanged()
+    }
+
+    override fun metaAccountsByTypeFlow(type: LightMetaAccount.Type): Flow<List<MetaAccount>> {
+        return metaAccountDao.observeMetaAccountsByTypeFlow(mapMetaAccountTypeToLocal(type))
+            .map { accountMappers.mapMetaAccountsLocalToMetaAccounts(it) }
+    }
+
+    override suspend fun hasMetaAccountsByType(type: LightMetaAccount.Type): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(mapMetaAccountTypeToLocal(type))
+    }
+
+    override suspend fun hasMetaAccountsByType(metaIds: Set<Long>, type: LightMetaAccount.Type): Boolean {
+        return metaAccountDao.hasMetaAccountsByType(metaIds, mapMetaAccountTypeToLocal(type))
     }
 
     override suspend fun getActiveMetaAccountsQuantity(): Int {
@@ -232,12 +258,24 @@ class AccountDataSourceImpl(
         metaAccountDao.updateName(metaId, newName)
     }
 
-    override suspend fun deleteMetaAccount(metaId: Long) {
+    override suspend fun deleteMetaAccount(metaId: Long): List<MetaIdWithType> {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)
 
-        metaAccountDao.delete(metaId)
+        val allAffectedMetaAccounts = metaAccountDao.delete(metaId)
         secretStoreV2.clearMetaAccountSecrets(metaId, chainAccountIds)
+        return allAffectedMetaAccounts.map { MetaIdWithType(it.id, accountMappers.mapMetaAccountTypeFromLocal(it.type)) }
+    }
+
+    override suspend fun insertMetaAccountWithChainAccounts(
+        metaAccount: MetaAccountInsertionData,
+        chainAccounts: List<ChainAccountInsertionData>
+    ) = withContext(Dispatchers.Default) {
+        metaAccountDao.withTransaction {
+            val metaId = insertMetaAccountFromSecrets(metaAccount.name, metaAccount.substrateCryptoType, metaAccount.secrets)
+            chainAccounts.forEach { insertChainAccount(metaId, it.chain, it.cryptoType, it.secrets) }
+            metaId
+        }
     }
 
     override suspend fun insertMetaAccountFromSecrets(

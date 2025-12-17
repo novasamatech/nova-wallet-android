@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quote
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -24,6 +25,7 @@ internal class HydrationConversionFeePayment(
     private val hydrationFeeInjector: HydrationFeeInjector,
     private val hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
     private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
+    private val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
     private val accountRepository: AccountRepository,
     private val coroutineScope: CoroutineScope
 ) : FeePayment {
@@ -60,14 +62,5 @@ internal class HydrationConversionFeePayment(
             submissionOrigin = nativeFee.submissionOrigin,
             asset = paymentAsset
         )
-    }
-
-    override suspend fun canPayFeeInNonUtilityToken(chainAsset: Chain.Asset): Boolean {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
-        val chain = chainRegistry.getChain(paymentAsset.chainId)
-        val accountId = metaAccount.requireAccountIdIn(chain)
-
-        val assetConversion = hydraDxQuoteSharedComputation.getSwapQuoting(chain, accountId, coroutineScope)
-        return assetConversion.canPayFeeInNonUtilityToken(paymentAsset)
     }
 }

@@ -12,6 +12,11 @@ import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 
+class HintModel(
+    val iconRes: Int,
+    val text: CharSequence
+)
+
 class HintsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -24,7 +29,7 @@ class HintsView @JvmOverloads constructor(
         attrs?.let(::applyAttributes)
     }
 
-    fun setHints(hints: List<CharSequence>) {
+    fun setHints(hints: List<HintModel>) {
         removeAllViews()
 
         hints.mapIndexed { index, hint ->
@@ -32,9 +37,9 @@ class HintsView @JvmOverloads constructor(
                 setTextAppearance(R.style.TextAppearance_NovaFoundation_Regular_Caption1)
 
                 setTextColorRes(R.color.text_secondary)
-                setDrawableStart(R.drawable.ic_nova, widthInDp = 16, paddingInDp = 8, tint = R.color.icon_secondary)
+                setDrawableStart(hint.iconRes, widthInDp = 16, paddingInDp = 8, tint = R.color.icon_secondary)
 
-                text = hint
+                text = hint.text
 
                 if (index > 0) {
                     updatePadding(top = 12.dp)
@@ -55,4 +60,13 @@ fun HintsView.setSingleHint(hint: CharSequence) {
 
 fun BaseFragment<*, *>.observeHints(mixin: HintsMixin, view: HintsView) {
     mixin.hintsFlow.observe(view::setHints)
+}
+
+fun HintsView.setHints(hints: List<CharSequence>) {
+    val novaIconHints = hints.map { HintModel(R.drawable.ic_nova, it) }
+    setHints(novaIconHints)
+}
+
+fun HintsView.setHints(vararg hints: HintModel) {
+    setHints(hints.toList())
 }

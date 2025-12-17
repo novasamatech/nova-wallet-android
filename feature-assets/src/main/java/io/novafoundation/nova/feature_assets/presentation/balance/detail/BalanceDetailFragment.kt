@@ -1,13 +1,17 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
 import android.os.Bundle
+import android.view.View
 import androidx.core.view.isGone
 import coil.ImageLoader
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyBarMargin
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.hideKeyboard
+import io.novafoundation.nova.common.utils.insets.applyBarMargin
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.databinding.FragmentBalanceDetailBinding
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
@@ -16,6 +20,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.receive.view.LedgerNotSupportedWarningBottomSheet
+import io.novafoundation.nova.feature_assets.presentation.transaction.history.setBannerModelOrHide
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.showState
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.view.setTotalAmount
@@ -40,10 +45,13 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
     @Inject
     lateinit var imageLoader: ImageLoader
 
+    override fun applyInsets(rootView: View) {
+        binder.root.applyNavigationBarInsets(consume = false)
+        binder.balanceDetailBack.applyBarMargin()
+    }
+
     override fun initViews() {
         hideKeyboard()
-
-        binder.balanceDetailBack.applyBarMargin()
 
         binder.transfersContainer.initializeBehavior(anchorView = binder.balanceDetailContent)
 
@@ -54,6 +62,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         binder.transfersContainer.setTransactionClickListener(viewModel::transactionClicked)
 
         binder.transfersContainer.setFilterClickListener { viewModel.filterClicked() }
+
+        binder.transfersContainer.setBannerClickListener() { viewModel.filterClicked() }
 
         binder.balanceDetailContainer.setOnRefreshListener {
             viewModel.sync()
@@ -73,9 +83,15 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
             viewModel.receiveClicked()
         }
 
+        binder.balanceDetailActions.gift.setOnClickListener {
+            viewModel.giftClicked()
+        }
+
         binder.balanceDetailsBalances.locked.setOnClickListener {
             viewModel.lockedInfoClicked()
         }
+
+        binder.balanceDetailsMigrationAlert.setOnCloseClickListener { viewModel.closeMigrationAlert() }
     }
 
     override fun inject() {
@@ -91,10 +107,15 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
     }
 
     override fun subscribe(viewModel: BalanceDetailViewModel) {
+        observeBrowserEvents(viewModel)
+
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
         setupButSellActionButton(viewModel.buySellSelectorMixin, binder.balanceDetailActions.buySell)
 
         viewModel.state.observe(binder.transfersContainer::showState)
+        viewModel.destinationMigrationBannerFlow.observe {
+            binder.transfersContainer.setBannerModelOrHide(it)
+        }
 
         viewModel.assetDetailsModel.observe { asset ->
             binder.balanceDetailTokenIcon.setTokenIcon(asset.assetIcon, imageLoader)
@@ -136,6 +157,8 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
 
         viewModel.swapButtonEnabled.observe(binder.balanceDetailActions.swap::setEnabled)
 
+        viewModel.giftsButtonEnabled.observe(binder.balanceDetailActions.gift::setEnabled)
+
         viewModel.acknowledgeLedgerWarning.awaitableActionLiveData.observeEvent {
             LedgerNotSupportedWarningBottomSheet(
                 context = requireContext(),
@@ -145,7 +168,11 @@ class BalanceDetailFragment : BaseFragment<BalanceDetailViewModel, FragmentBalan
         }
 
         viewModel.chainUI.observe {
-            binder.balanceDetailsChain.setChain(it)
+            binder.balanceDetailsBalances.setChain(it)
+        }
+
+        viewModel.originMigrationAlertFlow.observe {
+            binder.balanceDetailsMigrationAlert.setModelOrHide(it)
         }
     }
 

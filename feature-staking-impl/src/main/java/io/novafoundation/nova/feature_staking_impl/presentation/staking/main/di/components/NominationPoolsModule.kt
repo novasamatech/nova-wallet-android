@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.nominationPools.NominationPoolsUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.nominationPools.NominationPoolUserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.nominationPools.NominationPoolsYourPoolComponentFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module
 class NominationPoolsModule {
@@ -30,9 +31,11 @@ class NominationPoolsModule {
     fun provideNetworkInfoComponentFactory(
         parachainNetworkInfoInteractor: NominationPoolsNetworkInfoInteractor,
         resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ) = NominationPoolsNetworkInfoComponentFactory(
         resourceManager = resourceManager,
         interactor = parachainNetworkInfoInteractor,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -40,9 +43,11 @@ class NominationPoolsModule {
     fun provideStakeSummaryComponentFactory(
         interactor: NominationPoolStakeSummaryInteractor,
         sharedComputation: NominationPoolSharedComputation,
+        amountFormatter: AmountFormatter
     ) = NominationPoolsStakeSummaryComponentFactory(
         nominationPoolSharedComputation = sharedComputation,
-        interactor = interactor
+        interactor = interactor,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -51,10 +56,12 @@ class NominationPoolsModule {
         interactor: NominationPoolUnbondingsInteractor,
         sharedComputation: NominationPoolSharedComputation,
         router: NominationPoolsRouter,
+        amountFormatter: AmountFormatter
     ) = NominationPoolsUnbondingComponentFactory(
         nominationPoolSharedComputation = sharedComputation,
         interactor = interactor,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -65,12 +72,14 @@ class NominationPoolsModule {
         rewardPeriodsInteractor: StakingRewardPeriodInteractor,
         resourceManager: ResourceManager,
         router: NominationPoolsRouter,
+        amountFormatter: AmountFormatter
     ) = NominationPoolUserRewardsComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
         resourceManager = resourceManager,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -106,10 +115,12 @@ class NominationPoolsModule {
         interactor: NominationPoolsAlertsInteractor,
         resourceManager: ResourceManager,
         router: NominationPoolsRouter,
+        amountFormatter: AmountFormatter
     ) = NominationPoolsAlertsComponentFactory(
         nominationPoolSharedComputation = nominationPoolSharedComputation,
         interactor = interactor,
         resourceManager = resourceManager,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 }

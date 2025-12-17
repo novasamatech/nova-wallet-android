@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_xcm_api.multiLocation
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
+import io.novafoundation.nova.common.utils.HexString
 import io.novafoundation.nova.common.utils.isAscending
 import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -41,7 +42,7 @@ abstract class MultiLocation(
             constructor(id: Int) : this(id.toBigInteger())
         }
 
-        data class GeneralKey(val key: String) : Junction()
+        data class GeneralKey(val key: HexString) : Junction()
 
         data class PalletInstance(val index: BigInteger) : Junction()
 
@@ -51,9 +52,16 @@ abstract class MultiLocation(
 
         data class AccountId32(val accountId: AccountIdKey) : Junction()
 
-        data class GlobalConsensus(val chainId: ChainId) : Junction()
+        data class GlobalConsensus(val networkId: NetworkId) : Junction()
 
         object Unsupported : Junction()
+    }
+
+    sealed class NetworkId {
+
+        data class Substrate(val genesisHash: ChainId) : NetworkId()
+
+        data class Ethereum(val chainId: Int) : NetworkId()
     }
 }
 

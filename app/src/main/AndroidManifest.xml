@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -132,9 +133,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="https" />
-                <data android:host="@string/branch_io_link_host" />
-                <data android:host="@string/branch_io_link_host_alternate" />
+                <data android:scheme="https"/>
+                <data android:host="@string/branch_io_link_host"/>
+                <data android:host="@string/branch_io_link_host_alternate"/>
             </intent-filter>
 
         </activity>
@@ -202,12 +203,14 @@
             android:value="@string/staking_notification_channel_id" />
 
         <meta-data
+            android:name="io.novafoundation.nova.multisigs_notification_channel_id"
+            android:value="@string/multisigs_notification_channel_id" />
+
+        <meta-data
             android:name="io.branch.sdk.BranchKey"
             android:value="key_live_dsxlmUqNhbtOYX6e7cfgrpkbqsjGPYBf" />
 
-        <meta-data
-            android:name="io.branch.sdk.TestMode"
-            android:value="false" />
+        <meta-data android:name="io.branch.sdk.TestMode" android:value="false" />
 
     </application>
 

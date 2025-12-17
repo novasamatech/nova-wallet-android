@@ -14,6 +14,7 @@ import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.secrets.getAccountSecrets
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryption
 import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.AdvancedEncryptionInput
+import io.novafoundation.nova.feature_account_api.domain.account.advancedEncryption.recommended
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.chainAccountFor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.chainIdOrNull
@@ -35,15 +36,8 @@ class AdvancedEncryptionInteractor(
         return accountRepository.getEncryptionTypes()
     }
 
-    suspend fun getRecommendedAdvancedEncryption(): AdvancedEncryption {
-        return AdvancedEncryption(
-            substrateCryptoType = encryptionDefaults.substrateCryptoType,
-            ethereumCryptoType = encryptionDefaults.ethereumCryptoType,
-            derivationPaths = AdvancedEncryption.DerivationPaths(
-                substrate = encryptionDefaults.substrateDerivationPath,
-                ethereum = encryptionDefaults.ethereumDerivationPath
-            )
-        )
+    fun getRecommendedAdvancedEncryption(): AdvancedEncryption {
+        return encryptionDefaults.recommended()
     }
 
     suspend fun getInitialInputState(payload: AdvancedEncryptionModePayload): AdvancedEncryptionInput {

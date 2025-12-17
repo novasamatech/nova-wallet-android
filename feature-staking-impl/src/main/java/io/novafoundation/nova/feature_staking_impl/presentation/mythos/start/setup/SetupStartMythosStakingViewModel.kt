@@ -40,6 +40,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -67,6 +68,7 @@ class SetupStartMythosStakingViewModel(
     mythosCollatorFormatter: MythosCollatorFormatter,
     private val interactor: StartMythosStakingInteractor,
     private val selectCollatorInterScreenRequester: SelectMythosInterScreenRequester,
+    private val amountFormatter: AmountFormatter,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<MythosCollator, SetupStartMythosStakingViewModel.MythosLogic>(
     logicFactory = { scope ->
@@ -90,6 +92,7 @@ class SetupStartMythosStakingViewModel(
     selectedAssetState = selectedAssetState,
     router = router,
     amountChooserMixinFactory = amountChooserMixinFactory,
+    amountFormatter = amountFormatter
 ) {
 
     override val hintsMixin = NoHintsMixin()

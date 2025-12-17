@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.presentation.navigation
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.isDelayed
+import io.novafoundation.nova.feature_account_api.data.signer.selectedAccount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -24,7 +25,8 @@ class RealExtrinsicNavigationWrapper(
             accountUseCase.selectMetaAccount(delayedAccount.id)
 
             if (delayedAccount.type == LightMetaAccount.Type.MULTISIG) {
-                accountRouter.openMainWithFinishMultisigTransaction()
+                val accountWasSwitched = submissionHierarchy.selectedAccount().id != delayedAccount.id
+                accountRouter.openMainWithFinishMultisigTransaction(accountWasSwitched)
             } else {
                 accountRouter.openMain()
             }

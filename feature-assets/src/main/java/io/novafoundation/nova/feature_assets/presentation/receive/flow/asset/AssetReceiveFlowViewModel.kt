@@ -10,11 +10,12 @@ import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInt
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.flow.asset.AssetFlowViewModel
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowPayload
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 
@@ -28,7 +29,8 @@ class AssetReceiveFlowViewModel(
     resourceManager: ResourceManager,
     assetIconProvider: AssetIconProvider,
     assetViewModeInteractor: AssetViewModeInteractor,
-    amountFormatter: AmountFormatter
+    networkAssetMapper: NetworkAssetFormatter,
+    tokenAssetFormatter: TokenAssetFormatter
 ) : AssetFlowViewModel(
     interactorFactory,
     router,
@@ -39,7 +41,8 @@ class AssetReceiveFlowViewModel(
     resourceManager,
     assetIconProvider,
     assetViewModeInteractor,
-    amountFormatter
+    networkAssetMapper,
+    tokenAssetFormatter
 ) {
     override fun searchAssetsFlow(): Flow<AssetsByViewModeResult> {
         return interactor.searchReceiveAssetsFlow(query, externalBalancesFlow)

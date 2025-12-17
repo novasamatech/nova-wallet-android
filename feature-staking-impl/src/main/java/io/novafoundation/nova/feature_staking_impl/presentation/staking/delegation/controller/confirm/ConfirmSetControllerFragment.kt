@@ -5,7 +5,6 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -26,8 +25,6 @@ class ConfirmSetControllerFragment : BaseFragment<ConfirmSetControllerViewModel,
     override fun createBinding() = FragmentConfirmSetControllerBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.confirmSetControllerToolbar.applyStatusBarInsets()
-
         binder.confirmSetControllerToolbar.setHomeButtonListener { viewModel.back() }
 
         binder.confirmSetControllerConfirm.setOnClickListener { viewModel.confirmClicked() }

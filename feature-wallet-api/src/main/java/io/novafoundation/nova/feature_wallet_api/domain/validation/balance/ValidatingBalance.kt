@@ -37,6 +37,10 @@ data class ValidatingBalance(
         }
     }
 
+    fun legacyAdapter(): ValidatingBalance {
+        return copy(assetBalance = assetBalance.legacyAdapter())
+    }
+
     private fun safeDeduct(
         checkResult: BalanceCheckResult,
         unsafeDeduct: (ChainAssetBalance) -> ChainAssetBalance

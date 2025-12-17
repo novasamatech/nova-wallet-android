@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
 import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
 import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureHolder
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
+import io.novafoundation.nova.feature_ahm_impl.di.ChainMigrationFeatureHolder
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureHolder
 import io.novafoundation.nova.feature_banners_api.di.BannersFeatureApi
@@ -36,6 +38,8 @@ import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureHolder
 import io.novafoundation.nova.feature_external_sign_api.di.ExternalSignFeatureApi
 import io.novafoundation.nova.feature_external_sign_impl.di.ExternalSignFeatureHolder
+import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
+import io.novafoundation.nova.feature_gift_impl.di.GiftFeatureHolder
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureHolder
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
@@ -287,4 +291,16 @@ interface ComponentHolderModule {
     @ClassKey(AccountMigrationFeatureApi::class)
     @IntoMap
     fun provideAccountMigrationFeatureHolder(holder: AccountMigrationFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(ChainMigrationFeatureApi::class)
+    @IntoMap
+    fun provideChainMigrationFeatureHolder(holder: ChainMigrationFeatureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(GiftFeatureApi::class)
+    @IntoMap
+    fun provideGiftFeature(giftFeatureHolder: GiftFeatureHolder): FeatureApiHolder
 }

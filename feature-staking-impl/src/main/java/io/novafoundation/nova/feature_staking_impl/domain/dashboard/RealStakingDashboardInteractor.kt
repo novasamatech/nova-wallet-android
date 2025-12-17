@@ -39,7 +39,7 @@ import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.alphabeticalOrder
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.group
-import io.novafoundation.nova.runtime.ext.relaychainsFirstAscendingOrder
+import io.novafoundation.nova.runtime.ext.mainChainsFirstAscendingOrder
 import io.novafoundation.nova.runtime.ext.supportedStakingOptions
 import io.novafoundation.nova.runtime.ext.testnetsLastAscendingOrder
 import io.novafoundation.nova.runtime.ext.utilityAsset
@@ -387,7 +387,7 @@ class RealStakingDashboardInteractor(
         val chainTotalStakeComparator = totalStakeChainComparatorProvider.getTotalStakeComparator()
 
         return sortedWith(
-            compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.relaychainsFirstAscendingOrder }
+            compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.mainChainsFirstAscendingOrder }
                 .thenByDescending { it.token.planksToFiat(it.stakingState.availableBalance()) }
                 .thenByDescending { it.stakingState.availableBalance() }
                 .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))

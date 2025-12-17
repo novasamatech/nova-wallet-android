@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.parachain.ParachainStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.parachain.ParachainUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.parachain.ParachainUserRewardsComponentFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module
 class ParachainModule {
@@ -31,10 +32,12 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         interactor: ParachainStakingStakeSummaryInteractor,
         resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ) = ParachainStakeSummaryComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
-        interactor = interactor
+        interactor = interactor,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -43,10 +46,12 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         parachainNetworkInfoInteractor: ParachainNetworkInfoInteractor,
         resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ) = ParachainNetworkInfoComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
         interactor = parachainNetworkInfoInteractor,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -55,12 +60,14 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         interactor: ParachainStakingUserRewardsInteractor,
         stakingRewardPeriodInteractor: StakingRewardPeriodInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ) = ParachainUserRewardsComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor,
         rewardPeriodsInteractor = stakingRewardPeriodInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -70,13 +77,15 @@ class ParachainModule {
         interactor: ParachainStakingUnbondingsInteractor,
         router: ParachainStakingRouter,
         addressIconGenerator: AddressIconGenerator,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ) = ParachainUnbondingComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         interactor = interactor,
         router = router,
         addressIconGenerator = addressIconGenerator,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -101,11 +110,13 @@ class ParachainModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         resourceManager: ResourceManager,
         router: ParachainStakingRouter,
-        interactor: ParachainStakingAlertsInteractor
+        interactor: ParachainStakingAlertsInteractor,
+        amountFormatter: AmountFormatter
     ) = ParachainAlertsComponentFactory(
         delegatorStateUseCase = delegatorStateUseCase,
         resourceManager = resourceManager,
         router = router,
-        interactor = interactor
+        interactor = interactor,
+        amountFormatter = amountFormatter
     )
 }

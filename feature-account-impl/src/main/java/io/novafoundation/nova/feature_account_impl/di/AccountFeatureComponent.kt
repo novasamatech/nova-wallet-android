@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.chan
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
@@ -22,6 +23,7 @@ import io.novafoundation.nova.feature_account_impl.presentation.account.details.
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.delegationUpdates.di.DelegatedAccountUpdatesComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.di.SelectMultipleWalletsComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.selectAddress.di.SelectAddressComponent
+import io.novafoundation.nova.feature_account_impl.presentation.account.list.singleSelecting.di.SelectSingleWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.list.switching.di.SwitchWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.account.management.di.WalletManagmentComponent
 import io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.changePassword.di.ChangeBackupPasswordComponent
@@ -54,6 +56,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.con
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.scan.di.ScanSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.paritySigner.sign.show.di.ShowSignParitySignerComponent
 import io.novafoundation.nova.feature_account_impl.presentation.pincode.di.PinCodeComponent
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.di.ScanSeedComponent
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.di.StartCreateWalletComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.di.ChangeWatchAccountComponent
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create.di.CreateWatchWalletComponent
@@ -113,6 +117,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun selectMultipleWalletsComponentFactory(): SelectMultipleWalletsComponent.Factory
 
+    fun selectSingleWalletComponentFactory(): SelectSingleWalletComponent.Factory
+
     fun delegatedAccountUpdatesFactory(): DelegatedAccountUpdatesComponent.Factory
 
     fun accountDetailsComponentFactory(): AccountDetailsComponent.Factory
@@ -154,6 +160,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
 
     fun manualBackupAdvancedSecrets(): ManualBackupAdvancedSecretsComponent.Factory
 
+    fun scanSeedComponentFactory(): ScanSeedComponent.Factory
+
     @Component.Factory
     interface Factory {
 
@@ -168,6 +176,8 @@ interface AccountFeatureComponent : AccountFeatureApi {
             @BindsInstance syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
             @BindsInstance changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
             @BindsInstance restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
+            @BindsInstance selectSingleWalletCommunicator: SelectSingleWalletCommunicator,
+            @BindsInstance scanSeedCommunicator: ScanSeedCommunicator,
             deps: AccountFeatureDependencies
         ): AccountFeatureComponent
     }

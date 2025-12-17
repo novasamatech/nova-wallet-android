@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -27,8 +26,6 @@ class NominationPoolsConfirmUnbondFragment : BaseFragment<NominationPoolsConfirm
     override fun createBinding() = FragmentNominationPoolsConfirmUnbondBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.nominationPoolsConfirmUnbondToolbar.applyStatusBarInsets()
-
         binder.nominationPoolsConfirmUnbondExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         binder.nominationPoolsConfirmUnbondToolbar.setHomeButtonListener { viewModel.backClicked() }

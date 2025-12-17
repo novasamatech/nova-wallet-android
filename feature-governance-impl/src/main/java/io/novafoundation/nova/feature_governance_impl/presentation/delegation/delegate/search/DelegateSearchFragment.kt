@@ -9,7 +9,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -36,7 +35,6 @@ class DelegateSearchFragment :
         binder.delegateSearchList.setHasFixedSize(true)
         binder.delegateSearchList.adapter = adapter
 
-        binder.delegateSearchNavigation.applyStatusBarInsets()
         binder.delegateSearchToolbar.setHomeButtonListener {
             viewModel.backClicked()
             hideKeyboard()

@@ -4,7 +4,6 @@ import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -18,8 +17,6 @@ class MythosClaimRewardsFragment : BaseFragment<MythosClaimRewardsViewModel, Fra
     override fun createBinding() = FragmentMythosClaimRewardsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.mythosClaimRewardsToolbar.applyStatusBarInsets()
-
         binder.mythosClaimRewardsExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }
 
         binder.mythosClaimRewardsToolbar.setHomeButtonListener { viewModel.backClicked() }

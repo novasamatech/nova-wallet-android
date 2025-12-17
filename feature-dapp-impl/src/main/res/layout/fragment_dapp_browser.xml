@@ -71,7 +71,7 @@
     <LinearLayout
         android:id="@+id/dappBrowserBottomNavigation"
         android:layout_width="match_parent"
-        android:layout_height="46dp"
+        android:layout_height="wrap_content"
         android:background="@color/dapp_blur_navigation_background"
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -80,7 +80,7 @@
         <ImageView
             android:id="@+id/dappBrowserBack"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="46dp"
             android:layout_weight="1"
             android:scaleType="centerInside"
             android:src="@drawable/ic_chevron_left"
@@ -89,7 +89,7 @@
         <ImageView
             android:id="@+id/dappBrowserForward"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="46dp"
             android:layout_weight="1"
             android:scaleType="centerInside"
             android:src="@drawable/ic_chevron_right"
@@ -133,7 +133,7 @@
         <ImageView
             android:id="@+id/dappBrowserFavorite"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="46dp"
             android:layout_weight="1"
             android:scaleType="centerInside"
             android:src="@drawable/ic_favorite_heart_outline" />
@@ -141,7 +141,7 @@
         <ImageView
             android:id="@+id/dappBrowserMore"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="46dp"
             android:layout_weight="1"
             android:scaleType="centerInside"
             android:src="@drawable/ic_more_horizontal"

@@ -5,11 +5,14 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.XcmTransferDryRunOrigin
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.CrossChainTransferFee
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTransfersConfiguration
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.DynamicCrossChainTransferFeatures
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -33,8 +36,9 @@ interface CrossChainTransfersUseCase {
     suspend fun getConfiguration(): CrossChainTransfersConfiguration
 
     suspend fun requiredRemainingAmountAfterTransfer(
+        originChain: Chain,
         sendingAsset: Chain.Asset,
-        originChain: Chain
+        destinationChain: Chain,
     ): Balance
 
     /**
@@ -59,6 +63,17 @@ interface CrossChainTransfersUseCase {
         assetTransferDirection: AssetTransferDirection,
         computationalScope: CoroutineScope
     ): Duration
+
+    suspend fun dryRunTransferIfPossible(
+        transfer: AssetTransferBase,
+        origin: XcmTransferDryRunOrigin,
+        computationalScope: CoroutineScope
+    ): Result<Unit>
+
+    suspend fun supportsXcmExecute(
+        originChainId: ChainId,
+        features: DynamicCrossChainTransferFeatures
+    ): Boolean
 }
 
 fun CrossChainTransfersUseCase.incomingCrossChainDirectionsAvailable(destination: Flow<Chain.Asset?>): Flow<Boolean> {

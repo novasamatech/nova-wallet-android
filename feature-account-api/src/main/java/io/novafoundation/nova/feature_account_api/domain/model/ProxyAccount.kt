@@ -6,6 +6,5 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 class ProxyAccount(
     val proxyMetaId: Long,
     val chainId: ChainId,
-    val proxiedAccountId: ByteArray,
     val proxyType: ProxyType,
 )

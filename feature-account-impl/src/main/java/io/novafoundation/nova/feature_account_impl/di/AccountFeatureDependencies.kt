@@ -5,6 +5,7 @@ import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
+import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -17,6 +18,7 @@ import io.novafoundation.nova.common.di.modules.Caching
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
@@ -50,6 +52,7 @@ import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyReposito
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
@@ -76,6 +79,8 @@ import java.util.Random
 import javax.inject.Named
 
 interface AccountFeatureDependencies {
+
+    val maskableValueFormatterProvider: MaskableValueFormatterProvider
 
     val hydraDxAssetConversionFactory: HydraDxQuoting.Factory
 
@@ -126,6 +131,8 @@ interface AccountFeatureDependencies {
     val metadataShortenerService: MetadataShortenerService
 
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
+
+    val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher
 
     val blockLimitsRepository: BlockLimitsRepository
 
@@ -222,4 +229,6 @@ interface AccountFeatureDependencies {
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource
+
+    fun globalConfigDataSource(): GlobalConfigDataSource
 }

@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.setupCustomDialogDisplayer
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.progress.observeProgressDialog
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
 import io.novafoundation.nova.common.view.input.selector.setupListSelectorMixin
@@ -19,8 +18,6 @@ class BackupSettingsFragment : BaseFragment<BackupSettingsViewModel, FragmentBac
     override fun createBinding() = FragmentBackupSettingsBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.backupSettingsToolbar.applyStatusBarInsets()
-
         binder.backupSettingsToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.backupStateView.setOnClickListener { viewModel.cloudBackupManageClicked() }
         binder.backupStateView.setProblemClickListener() { viewModel.problemButtonClicked() }

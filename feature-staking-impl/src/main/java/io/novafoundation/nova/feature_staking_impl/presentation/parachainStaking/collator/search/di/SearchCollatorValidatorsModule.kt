@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.search.SearchCollatorViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class SearchCollatorValidatorsModule {
@@ -40,6 +41,7 @@ class SearchCollatorValidatorsModule {
         collatorsUseCase: CollatorsUseCase,
         resourceManager: ResourceManager,
         tokenUseCase: TokenUseCase,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SearchCollatorViewModel(
             router = router,
@@ -50,7 +52,8 @@ class SearchCollatorValidatorsModule {
             collatorRecommendatorFactory = collatorRecommendatorFactory,
             collatorsUseCase = collatorsUseCase,
             resourceManager = resourceManager,
-            tokenUseCase = tokenUseCase
+            tokenUseCase = tokenUseCase,
+            amountFormatter = amountFormatter
         )
     }
 

@@ -7,7 +7,6 @@ import android.widget.TextSwitcher
 import android.widget.TextView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setCurrentText
@@ -29,8 +28,6 @@ class SwapExecutionFragment : BaseFragment<SwapExecutionViewModel, FragmentSwapE
     override fun createBinding() = FragmentSwapExecutionBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.swapExecutionContainer.applyStatusBarInsets()
-
         binder.swapExecutionRate.setOnClickListener { viewModel.rateClicked() }
         binder.swapExecutionPriceDifference.setOnClickListener { viewModel.priceDifferenceClicked() }
         binder.swapExecutionSlippage.setOnClickListener { viewModel.slippageClicked() }

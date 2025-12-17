@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.claimRewa
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class MythosClaimRewardsModule {
@@ -42,7 +43,8 @@ class MythosClaimRewardsModule {
         walletUiUseCase: WalletUiUseCase,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         assetUseCase: AssetUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return MythosClaimRewardsViewModel(
             router = router,
@@ -57,7 +59,8 @@ class MythosClaimRewardsModule {
             walletUiUseCase = walletUiUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             assetUseCase = assetUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

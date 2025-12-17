@@ -8,6 +8,8 @@ import io.novafoundation.nova.common.utils.times
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 
+typealias Weight = BigInteger
+
 data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger) : ToDynamicScaleInstance, Min<WeightV2> {
 
     companion object {
@@ -56,6 +58,18 @@ data class WeightV2(val refTime: BigInteger, val proofSize: BigInteger) : ToDyna
 
 fun WeightV2.fitsIn(limit: WeightV2): Boolean {
     return refTime <= limit.refTime && proofSize <= limit.proofSize
+}
+
+fun bindWeight(decoded: Any?): Weight {
+    return when (decoded) {
+        // weight v1
+        is BalanceOf -> decoded
+
+        // weight v2
+        is Struct.Instance -> bindWeightV2(decoded).refTime
+
+        else -> incompatible()
+    }
 }
 
 fun bindWeightV2(decoded: Any?): WeightV2 {

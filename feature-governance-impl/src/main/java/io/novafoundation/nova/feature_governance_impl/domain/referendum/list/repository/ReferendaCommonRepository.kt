@@ -31,14 +31,13 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Refe
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumProposal
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.Voter
-import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RECENT_VOTES_PERIOD
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RecentVotesTimePointProvider
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.ReferendaConstructor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.list.sorting.ReferendaSortingProvider
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novafoundation.nova.runtime.repository.blockDurationEstimator
-import io.novafoundation.nova.runtime.util.blockInPast
 import io.novasama.substrate_sdk_android.extensions.requireHexPrefix
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import kotlinx.coroutines.async
@@ -65,6 +64,7 @@ class RealReferendaCommonRepository(
     private val referendaConstructor: ReferendaConstructor,
     private val referendaSortingProvider: ReferendaSortingProvider,
     private val identityRepository: OnChainIdentityRepository,
+    private val recentVotesTimePointProvider: RecentVotesTimePointProvider
 ) : ReferendaCommonRepository {
 
     override suspend fun referendaStateFlow(voter: Voter?, governanceOption: SupportedGovernanceOption): Flow<ExtendedLoadingState<ReferendaState>> {
@@ -75,7 +75,7 @@ class RealReferendaCommonRepository(
 
         return combine(
             governanceSource.referendaOffChainInfoFlow(chain),
-            chainStateRepository.currentBlockNumberFlow(chain.id)
+            chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf())
         ) { offChainInfo, currentBlockNumber ->
             coroutineScope {
                 val onChainReferenda = async { governanceSource.referenda.getAllOnChainReferenda(chain.id) }
@@ -114,7 +114,7 @@ class RealReferendaCommonRepository(
 
         return combine(
             governanceSource.referendaOffChainInfoFlow(chain),
-            chainStateRepository.currentBlockNumberFlow(chain.id)
+            chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf())
         ) { offChainInfo, currentBlockNumber ->
             coroutineScope {
                 val onChainReferenda = async { governanceSource.referenda.getAllOnChainReferenda(chain.id) }
@@ -261,14 +261,13 @@ class RealReferendaCommonRepository(
             }
 
             Voter.Type.ACCOUNT -> {
-                val recentVotesBlockThreshold = if (onlyRecentVotes) {
-                    val blockTimeConverter = chainStateRepository.blockDurationEstimator(chain.id)
-                    blockTimeConverter.blockInPast(RECENT_VOTES_PERIOD)
+                val recentVotesTimePointThreshold = if (onlyRecentVotes) {
+                    recentVotesTimePointProvider.getTimePointThresholdForChain(chain)
                 } else {
                     null
                 }
 
-                val historicalVoting = delegationsRepository.directHistoricalVotesOf(voter.accountId, chain, recentVotesBlockThreshold)
+                val historicalVoting = delegationsRepository.directHistoricalVotesOf(voter.accountId, chain, recentVotesTimePointThreshold)
                 val identity = identityRepository.getIdentityFromId(chain.id, voter.accountId)
                     ?.display?.let(::Identity)
 

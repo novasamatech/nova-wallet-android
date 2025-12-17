@@ -8,11 +8,14 @@ import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.sequrity.SafeModeService
+import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
+import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.utils.systemCall.SystemCallExecutor
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
@@ -25,6 +28,10 @@ import io.novafoundation.nova.feature_account_api.domain.account.common.Encrypti
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_migration.di.deeplinks.AccountMigrationDeepLinks
+import io.novafoundation.nova.feature_ahm_api.data.repository.ChainMigrationRepository
+import io.novafoundation.nova.feature_ahm_api.data.repository.MigrationInfoRepository
+import io.novafoundation.nova.feature_ahm_api.di.deeplinks.ChainMigrationDeepLinks
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationDetailsSelectToShowUseCase
 import io.novafoundation.nova.feature_assets.data.network.BalancesUpdateSystem
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.AssetDeepLinks
 import io.novafoundation.nova.feature_buy_api.di.deeplinks.BuyDeepLinks
@@ -37,10 +44,13 @@ import io.novafoundation.nova.feature_dapp_api.di.deeplinks.DAppDeepLinks
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.PendingDeepLinkProvider
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.branchIo.BranchIoLinkConverter
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkingPreferences
+import io.novafoundation.nova.feature_gift_api.di.GiftDeepLinks
 import io.novafoundation.nova.feature_governance_api.data.MutableGovernanceState
 import io.novafoundation.nova.feature_governance_api.di.deeplinks.GovernanceDeepLinks
+import io.novafoundation.nova.feature_multisig_operations.di.deeplink.MultisigDeepLinks
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_push_notifications.presentation.multisigsWarning.MultisigPushNotificationsAlertMixinFactory
 import io.novafoundation.nova.feature_staking_api.di.deeplinks.StakingDeepLinks
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -67,6 +77,10 @@ interface RootDependencies {
     val buyDeepLinks: BuyDeepLinks
 
     val assetDeepLinks: AssetDeepLinks
+
+    val giftDeepLinks: GiftDeepLinks
+
+    val chainMigrationDeepLinks: ChainMigrationDeepLinks
 
     val walletConnectDeepLinks: WalletConnectDeepLinks
 
@@ -104,6 +118,8 @@ interface RootDependencies {
 
     val accountMigrationDeepLinks: AccountMigrationDeepLinks
 
+    val multisigDeepLinks: MultisigDeepLinks
+
     val deepLinkingPreferences: DeepLinkingPreferences
 
     val branchIoLinkConverter: BranchIoLinkConverter
@@ -113,6 +129,14 @@ interface RootDependencies {
     val multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus
 
     val multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
+
+    val actionBottomSheetLauncher: ActionBottomSheetLauncher
+
+    val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory
+
+    val chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase
+
+    val deviceNetworkStateObserver: DeviceNetworkStateObserver
 
     fun updateNotificationsInteractor(): UpdateNotificationsInteractor
 
@@ -159,4 +183,10 @@ interface RootDependencies {
     fun context(): Context
 
     fun toastMessageManager(): ToastMessageManager
+
+    fun dialogMessageManager(): DialogMessageManager
+
+    fun chainMigrationRepository(): ChainMigrationRepository
+
+    fun migrationInfoRepository(): MigrationInfoRepository
 }

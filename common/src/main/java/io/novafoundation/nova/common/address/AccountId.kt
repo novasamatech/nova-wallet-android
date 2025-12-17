@@ -1,7 +1,7 @@
 package io.novafoundation.nova.common.address
 
-import io.novafoundation.nova.common.utils.HexString
 import io.novasama.substrate_sdk_android.extensions.fromHex
+import io.novafoundation.nova.common.utils.HexString
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 

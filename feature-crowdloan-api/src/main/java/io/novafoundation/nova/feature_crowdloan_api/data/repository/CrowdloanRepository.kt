@@ -4,13 +4,11 @@ import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.feature_crowdloan_api.data.network.blockhain.binding.FundInfo
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import kotlinx.coroutines.flow.Flow
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlinx.coroutines.flow.Flow
 
 interface CrowdloanRepository {
-
-    suspend fun isCrowdloansAvailable(chainId: ChainId): Boolean
 
     suspend fun allFundInfos(chainId: ChainId): Map<ParaId, FundInfo>
 

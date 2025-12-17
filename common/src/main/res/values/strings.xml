@@ -1,16 +1,224 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
+
+    <string name="account_wallet_name">Wallet name</string>
+    <string name="common_name">Name</string>
+    <string name="common_invalid_qr_code">Invalid QR code</string>
+
+    <string name="account_polkadot_vault_import_start_step_2">%s you would like to add to Nova Wallet</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">Tap on Derived Key</string>
+
+    <string name="account_pair_public_key">Pair public key</string>
+    <string name="account_import_private_key">Import private key</string>
+
+    <string name="account_polkadot_vault_import_start_step_3_private">Tap the icon in the top-right corner and select %s</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">Export Private Key</string>
+
+    <string name="reclaim_gift_success">You’ve successfully reclaimed your gift</string>
+
+    <string name="reclaim_gift_confirmation_title">Reclaim %s Gift?</string>
+    <string name="reclaim_gift_confirmation_message">If you reclaim this gift, the shared link will be disabled, and tokens will be refunded to your wallet.\nDo you want to continue?</string>
+
+    <string name="share_gift_reclaim">Reclaim</string>
+    <string name="account_secrets">secrets</string>
+
+    <string name="account_chain_not_found">No account on %s</string>
+    <string name="claim_gift_no_account_alert_title">Use another wallet, create a new one, or add a %s account to this wallet in Settings.</string>
+
+    <string name="claim_gift_uncontrollable_wallet_title">You can’t receive a gift with a %s wallet</string>
+    <string name="claim_gift_uncontrollable_wallet_message">Create a new wallet or import an existing one to claim the gift</string>
+
+    <string name="common_manage_wallets">Manage Wallets</string>
+
+    <string name="claim_gift_success_message">You’ve successfully claimed a gift. Tokens will appear in your balance shortly.</string>
+
+    <string name="claim_gift_already_claimed_title">The gift cannot be received</string>
+    <string name="claim_gift_already_claimed_message">Oops, the gift has already been  claimed</string>
+
+    <string name="claim_gift_default_error_title">Oops, something went wrong</string>
+    <string name="claim_gift_default_error_message">There may be a problem with the server. Please, try again later.</string>
+    <string name="claim_gift_button">Claim the gift</string>
+    <string name="claim_gift_title">You’ve got a crypto gift!</string>
+
+    <string name="gift_created_subtitle">Created: %s</string>
+    <string name="gift_claimed_subtitle">Claimed</string>
+    <string name="gift_reclaimed_subtitle">Reclaimed</string>
+    <string name="gifts_claim_fee">Network fee on claim</string>
+
+    <string name="share_gift_text">Hello! You’ve got a %s gift waiting for you!\n\nInstall Nova Wallet app, set up your wallet, and claim it via this special link:\n%s</string>
+
+    <string name="share_gift_title">Gift Has Been Prepared.\nShare It Now!</string>
+    <string name="share_gift_button">Share gift link</string>
+
+    <string name="confirm_create_gift_hint">Confirming will transfer tokens from your account</string>
+    <string name="common_your_gift">Your Gift</string>
+
+    <string name="select_gift_amount_title">Send gift on</string>
+
+    <string name="common_enter_other_amount">Enter another amount</string>
+
+    <string name="gift_min_balance_validation_message">The minimum gift is %s</string>
+
+    <string name="gift_enter_amount_disabled_button_state">Enter amount</string>
+
+    <string name="gifts_assets_flow_title">Select a token to gift</string>
+    <string name="gifts_network_flow_title">Select network for %s gift</string>
+    <string name="assets_gifts_flow_placeholder">You don’t have tokens to gift.\nBuy or Deposit tokens to your account.</string>
+
+    <string name="gifts_create">Create Gift</string>
+    <string name="gifts_placeholder_step_1">Enter your gift amount</string>
+    <string name="gifts_placeholder_step_2">%s as a link and invite anyone to Nova</string>
+    <string name="gifts_placeholder_step_2_highlight">Share the gift directly</string>
+    <string name="gifts_placeholder_step_3">%s, and you can return unclaimed gifts anytime from this device</string>
+    <string name="gifts_placeholder_step_3_highlight">The gift is available instantly</string>
+
+    <string name="gifts_header_title">Share Crypto Gifts with Anyone, Anywhere</string>
+    <string name="gifts_header_subtitle">Send gifts fast, easily, and securely in Nova</string>
+    <string name="gifts_list_title">Gifts you created</string>
+    <string name="common_gift">Gift</string>
+
+    <string name="select_token_to_vote">Select token to vote</string>
+    <string name="common_select_token">Select token</string>
+
+    <string name="staking_rewards">%s rewards</string>
+
+    <string name="chain_migration_details_hint_history">Old transaction history remains on %s</string>
+
+    <string name="chain_migration_details_in_progress_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s. These features might be unavailable for up to 24 hours.</string>
+    <string name="staking_details_migration_alert_title">%1$s staking is live on %2$s starting %3$s</string>
+
+    <string name="common_view">View</string>
+    <string name="transaction_history_migration_source_message">Your previous %s transaction history is still available on %s</string>
+
+    <string name="asset_details_source_asset_alert_title">Your %s tokens now on %s</string>
+    <string name="asset_details_source_asset_alert_message">Starting %1$s, your %2$s balance, Staking, and Governance will be on %3$s — with improved performance and lower costs.</string>
+    <string name="asset_details_source_asset_alert_button">Go to %s</string>
+
+    <string name="chain_migration_details_hint_auto_migration">Migration happens automatically, no action needed</string>
+
+    <string name="chain_migration_details_title">Starting %1$s your %2$s balance, Staking and Governance are on %3$s</string>
+    <string name="chain_migration_details_subtitle">What makes Asset Hub awesome?</string>
+    <string name="chain_migration_details_minimal_balance">%1$sx reduction in minimal balance\n(from %2$s to %3$s)</string>
+    <string name="chain_migration_details_lower_fee">%1$sx lower transaction fees\n(from %2$s to %3$s)</string>
+    <string name="chain_migration_details_tokens">More tokens supported: %s, and other ecosystem tokens</string>
+    <string name="chain_migration_details_unified_access">Unified access to %s, assets, staking, and governance</string>
+    <string name="chain_migration_details_fee_in_any_tokens">Ability to pay fees in any token</string>
+
+    <string name="profile_settings_hide_balances_on_launch_title">Open app with hidden balance</string>
+
+    <string name="mutisigs_push_notifications_warning_enable">Enable in Settings</string>
+
+    <string name="mutisigs_push_notifications_warning_title">Multisig push notifications are here!</string>
+    <string name="mutisigs_push_notifications_warning_message">Get notified about signing requests, new signatures, and completed transactions — so you’re always in control. Manage anytime in Settings.</string>
+
+    <string name="no_ms_accounts_found_dialog_title">No multisig wallets</string>
+    <string name="no_ms_accounts_found_dialog_message">You haven’t added or selected any multisig wallets in Nova. Add and select at least one to receive multisig push notifications.</string>
+
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
+    <string name="account_welcome_trust_wallet_subtitle">Use your Trust Wallet accounts in Nova</string>
+
+    <string name="multisig_push_settings_initial_switcher">Your signature requested</string>
+    <string name="multisig_push_settings_approval_switcher">Signed by signatory</string>
+    <string name="multisig_push_settings_executed_switcher">Multisig transaction executed</string>
+    <string name="multisig_push_settings_rejected_switcher">Multisig transaction rejected</string>
+    <string name="multisig_operation_utility_batch_title">Batch (executes until error)</string>
+    <string name="multisig_operation_utility_batch_all_title">Batch All (reverts on error)</string>
+    <string name="multisig_operation_utility_force_batch_title">Force Batch (ignores errors)</string>
+    <string name="multisig_operation_details_not_found_title">Signing is over</string>
+
+    <string name="multisig_operation_details_not_found_message">Transaction has already been executed or rejected.</string>
+
+    <string name="loading_transaction_details">Loading transaction details…</string>
+
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+
+    <string name="multisig_transaction_executed_dialog_title">Multisig Transaction Executed</string>
+    <string name="multisig_transaction_rejected_dialog_title">Multisig Transaction Rejected</string>
+
+    <string name="multisig_transaction_rejected_dialog_message">%s on %s.\nRejected by: %s.\nNo further actions are required from you.</string>
+    <string name="multisig_transaction_executed_dialog_message">%s on %s.\nNo further actions are required from you.</string>
+
+    <string name="multisig_transaction_dialog_message_unknown_call">Transaction without initial on-chain information (call data) was rejected</string>
+
+    <string name="alert_nova_has_selected_ms_wallet">Nova has automatically switched to your multisig wallet so you can view pending transactions.</string>
+
+    <string name="multisig_notification_on_behalf_of">On behalf of %s.</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ Multisig transaction rejected</string>
+    <string name="multisig_notification_rejected_transaction_message">Rejected by %s.</string>
+
+    <string name="multisig_notification_executed_transaction_title">✅ Multisig transaction executed</string>
+    <string name="multisig_notification_executed_transaction_message">Signed and executed by %s.</string>
+
+    <string name="multisig_notification_new_approval_title_additional_message">%d of %d signatures collected.</string>
+    <string name="multisig_notification_new_approval_title">Signed by %s</string>
+
+    <string name="multisig_notification_init_transaction_title">✍🏻 Your signature requested </string>
+    <string name="multisig_notification_init_transaction_message">%s on %s.</string>
+    <string name="multisig_operation_default_call_format">%s: %s</string>
+    <string name="multisig_notification_initiator_footer">Initiated by %s.</string>
+    <string name="multisig_notification_message_header">Wallet: %s</string>
+
+    <string name="multisigs_notification_channel_name">Multisig Transactions Notification Channel</string>
+    <string name="multisigs_notification_channel_id" translatable="false">multisigs_notification_channel_id</string>
+
+    <string name="push_wallets_title">Select up to %d wallets to be notified when wallet has activity</string>
+
+    <string name="push_settings_multisig_operations">Multisig transactions</string>
+
+    <string name="invalid_call_data_format_message">The call data you provided is invalid or has the wrong format. Please ensure it is correct and try again.</string>
+
+    <string name="multisig_operations_placeholder">No transactions yet.\nSigning requests will show up here</string>
+
+    <string name="proxied_card_not_supported_title">Debit Card is not supported for this Proxied wallet</string>
+    <string name="proxied_card_not_supported_message">To manage your Debit Card, please switch to a different wallet with Polkadot network.</string>
+
+    <string name="common_call_hash">Call hash</string>
+
+    <string name="common_copy_call_data">Copy call data</string>
+    <string name="common_share_call_data">Share call data</string>
+
+    <string name="multisig_approve_transaction_unavailable_title">Cannot perform this transaction</string>
+    <string name="multisig_approve_transaction_unavailable_message">This transaction has already been rejected or executed.</string>
+
+    <string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s.</string>
+    <string name="multisig_transaction_created_subtitle_highlight">Transactions to sign</string>
+
+    <string name="accounts_update_proxieds_title">Delegated to you</string>
+
+    <string name="account_proxieds">Delegated to you (Proxied)</string>
+
+    <string name="multisig_signing_reject_confirmation_subtitle">Transaction will be rejected. Multisig deposit will be returned to %s.</string>
+
+    <string name="common_full_details">Full details</string>
+
+    <string name="multisig_deposit_description">The deposit stays locked on the depositor’s account until the multisig operation is executed or rejected.</string>
+
+    <string name="common_copy_hash">Copy hash</string>
+    <string name="common_share_hash">Share hash</string>
+
+    <string name="common_depositor">Depositor</string>
+    <string name="multisig_deposit">Multisig deposit</string>
+    <string name="common_call_data">Call data</string>
+    <string name="multisig_extrinsic_details_subtitle">Make sure the operation is correct</string>
+
+    <string name="multisig_on_behalf_of">On behalf of</string>
+    <string name="common_signatory">Signatory</string>
+    <string name="common_hide">Hide</string>
+    <string name="common_show">Show</string>
+    <string name="multisig_operation_details_signatories">Signatories (%d of %d)</string>
+
+    <string name="swap_dry_run_failed_inline_message">Simulation of swap step failed</string>
+
+    <string name="common_dry_run_failed_title">Transaction simulation failed</string>
+    <string name="common_dry_run_failed_message">Nova simulates the transaction beforehand to prevent errors. This simulation didn’t succeed. Try again later or with a higher amount. If the issue persists, please contact Nova Wallet Support in Settings.</string>
+
     <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. You need to add %s more to your balance</string>
     <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. You need to add %s more to your balance</string>
     <string name="multisig_signatory_validation_fee">%s doesn’t have enough balance to pay the network fee of %s. You need to add %s more to your balance</string>
-    <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
-<!--    <string name="multisig_signatory_validation_deposit">%s doesn’t have enough balance to place multisig deposit of %s. Available balance: %s</string>-->
-    <!--    <string name="multisig_signatory_validation_deposit_fee">%s doesn’t have enough balance to pay the network fee of %s and place multisig deposit of %s. Available balance: %s</string>-->
 
     <string name="invalid_call_data_title">Invalid call data</string>
     <string name="invalid_call_data_message">This call data for another operation with call hash %s</string>
 
-    <!--<string name="multisig_operation_details_call_data_not_found">Call-data not found</string>-->
     <string name="multisig_operation_details_call_data_not_found">Enter call data to view details</string>
 
     <string name="enter_call_data_title">Enter call data</string>
@@ -19,29 +227,24 @@
     <string name="multisig_wallet_details_info_warning_other_signatories">Other signatories:</string>
     <string name="multisig_wallet_details_info_warning_title">Threshold %d out of %d</string>
 
-    <string name="multisig_card_not_supported_title">Debit Card not supported for Multisig</string>
+    <string name="multisig_card_not_supported_title">Debit Card is not supported for Multisig</string>
     <string name="multisig_card_not_supported_message">To manage your Debit Card, please switch to a different type of wallet.</string>
 
-    <string name="multisig_sell_not_supported_title">Sell not supported for Multisig</string>
+    <string name="multisig_sell_not_supported_title">Sell is not supported for Multisig</string>
     <string name="multisig_sell_not_supported_message">To sell crypto for fiat, please switch to a different type of wallet.</string>
 
 
     <string name="multisig_pending_operations">Transactions to sign</string>
-<!--    <string name="multisig_pending_operations">Pending operations</string>-->
 
     <string name="multisig_operations_progress">Signing (%s of %s)</string>
-<!--    <string name="multisig_operations_progress">%s of %s Signed</string>-->
 
 
     <string name="multisig_operations_created">Created by you</string>
     <string name="multisig_operations_signed">Signed by you</string>
-<!--    <string name="multisig_operations_pending_signature">Pending signature</string>-->
-<!--    <string name="multisig_operations_signed">Signed</string>-->
 
 
     <string name="multisig_pending_operations_on_behalf_of">On behalf of:</string>
 
-<!--    <string name="multisig_operations_unknown_calldata">[Unknown operation] %s</string>-->
     <string name="multisig_operations_unknown_calldata">Unknown operation</string>
 
 
@@ -67,8 +270,6 @@
     <string name="delegation_updates_deactivated_title">No longer valid</string>
 
     <string name="multisig_transaction_created_title">Multisig transaction created</string>
-    <string name="multisig_transaction_created_subtitle">Other signatories can now confirm the transaction.\nYou can track its status in the %s</string>
-    <string name="multisig_transaction_created_subtitle_highlight">Multisig transactions.</string>
     <string name="multisig_transaction_created_view_details">View details</string>
 
     <string name="multisig_operation_details_approve">Approve</string>
@@ -345,9 +546,6 @@
 
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vault will provide you %s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">QR code to scan</string>
-
-    <string name="account_polkadot_vault_import_start_step_2">%s Select your Key set, Network, and then the account you would like to add to Nova Wallet</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Go to “Key Sets” tab.</string>
 
     <string name="account_polkadot_vault_import_start_step_1">%s application on your smartphone</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Open Polkadot Vault</string>
@@ -785,7 +983,6 @@
     <string name="common_clear">Clear</string>
 
     <string name="multiple_wallets_selection_max_message">You cannot select more than %d wallets</string>
-    <string name="push_wallets_title">Select up to 3 wallets to be notified when wallet has activity</string>
 
     <string name="push_settings_staking_rewards">Staking rewards</string>
     <string name="push_settings_others">Others</string>
@@ -874,8 +1071,6 @@
 
     <string name="proxied_wallet_details_info_warning">This account granted access to perform transactions to the following account:</string>
 
-    <string name="common_dont_show_again">Do not show this again</string>
-
     <string name="proxy_signing_warning_title">This is Delegating (Proxied) account</string>
     <string name="proxy_signing_warning_message">Transaction will be initiated by %s as a delegated account. Network fee will be paid by delegated account.</string>
 
@@ -893,8 +1088,6 @@
     <string name="account_proxy_type_cancel_proxy">Cancel Proxy</string>
     <string name="account_proxy_type_auction">Auction</string>
     <string name="account_proxy_type_nomination_pools">Nomination Pools</string>
-
-    <string name="account_proxieds">Delegated to you (Proxieds)</string>
 
     <string name="deep_linking_chain_id_is_not_found">Chain is not found</string>
     <string name="deep_linking_governance_type_is_not_specified">Governance type is not specified</string>
@@ -1611,7 +1804,6 @@
 
     <string name="referendum_dapp_list_title">Use Nova DApp browser</string>
 
-    <string name="referendum_details_full_details">Full details</string>
     <string name="voting_status">Voting status</string>
     <string name="referendum_details_requested_amount">Requested amount</string>
 
@@ -1623,10 +1815,8 @@
     <string name="referendum_full_details_vote_threshold">Vote threshold</string>
     <string name="referendum_full_details_turnout">Turnout</string>
     <string name="referendum_full_details_electorate">Electorate</string>
-    <string name="referendum_full_details_hash">Call hash</string>
     <string name="referendum_full_details_approve_threshold">Approve curve</string>
     <string name="referendum_full_details_support_threshold">Support curve</string>
-    <string name="referendum_full_details_copy_hash">Copy hash</string>
     <string name="referendum_positive_voters_title">Aye votes</string>
     <string name="referendum_negative_voters_title">Nay votes</string>
 
@@ -1889,7 +2079,6 @@
 
     <string name="staking_parachain_collator_own_stake">Collator\'s own stake</string>
     <string name="staking_parachain_collators_number_format">Collators: %s</string>
-    <string name="staking_rewards">Rewards</string>
     <string name="staking_min_stake">Min. stake</string>
 
     <string name="staking_parachain_reward_frequency_hint">Tokens in stake produce rewards each round (%s)</string>
@@ -2544,6 +2733,5 @@
     <string name="wallet_send_phishing_warning_text">Following address: %s is known to be used in phishing activities, thus we are not recommending sending tokens to that address. Would you like to proceed anyway?</string>
     <string name="wallet_send_phishing_warning_title">Scam alert</string>
     <string name="wallet_transfer_details_title">Transfer details</string>
-    <string name="wallet_your_balance">Your balance</string>
     <string name="yesterday">Yesterday</string>
 </resources>

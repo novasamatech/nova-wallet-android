@@ -12,6 +12,7 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_migration.di.AccountMigrationFeatureApi
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_assets.di.AssetsFeatureApi
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
@@ -20,9 +21,11 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
+import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
 import io.novafoundation.nova.feature_ledger_api.di.LedgerFeatureApi
+import io.novafoundation.nova.feature_multisig_operations.di.MultisigOperationsFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -68,6 +71,9 @@ class RootFeatureHolder @Inject constructor(
             .buyFeatureApi(getFeature(BuyFeatureApi::class.java))
             .deepLinkingFeatureApi(getFeature(DeepLinkingFeatureApi::class.java))
             .accountMigrationFeatureApi(getFeature(AccountMigrationFeatureApi::class.java))
+            .multisigOperationsFeatureApi(getFeature(MultisigOperationsFeatureApi::class.java))
+            .chainMigrationFeatureApi(getFeature(ChainMigrationFeatureApi::class.java))
+            .giftFeatureApi(getFeature(GiftFeatureApi::class.java))
             .build()
 
         return DaggerRootComponent.factory()

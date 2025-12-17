@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.model
 
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.utils.images.Icon
 
 data class AssetModel(
@@ -8,5 +9,5 @@ data class AssetModel(
     val icon: Icon,
     val tokenName: String,
     val tokenSymbol: String,
-    val assetBalance: String
+    val assetBalance: MaskableModel<String>
 )

@@ -1,11 +1,12 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.scan
 
 import android.os.Bundle
+import android.view.View
 
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.scan.ScanQrFragment
 import io.novafoundation.nova.common.presentation.scan.ScanView
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentImportParitySignerScanBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
@@ -33,10 +34,13 @@ class ScanImportParitySignerFragment : ScanQrFragment<ScanImportParitySignerView
             .inject(this)
     }
 
+    override fun applyInsets(rootView: View) {
+        binder.scanImportParitySignerScanToolbar.applySystemBarInsets()
+    }
+
     override fun initViews() {
         super.initViews()
 
-        binder.scanImportParitySignerScanToolbar.applyStatusBarInsets()
         binder.scanImportParitySignerScanToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.scanImportParitySignerScan.setTitle(viewModel.title)

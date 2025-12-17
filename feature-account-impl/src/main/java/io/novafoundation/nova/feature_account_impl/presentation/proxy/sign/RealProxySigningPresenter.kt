@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.formatTokenAmount
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.ProxiedMetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.account.proxy.ProxySigningPresenter
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.presentation.common.sign.notSupported.SigningNotSupportedPresentable
@@ -31,7 +32,7 @@ class RealProxySigningPresenter @Inject constructor(
     private val nestedSigningPresenter: NestedSigningPresenter,
 ) : ProxySigningPresenter {
 
-    override suspend fun acknowledgeProxyOperation(proxiedMetaAccount: MetaAccount, proxyMetaAccount: MetaAccount): Boolean {
+    override suspend fun acknowledgeProxyOperation(proxiedMetaAccount: ProxiedMetaAccount, proxyMetaAccount: MetaAccount): Boolean {
         return nestedSigningPresenter.acknowledgeNestedSignOperation(
             warningShowFor = proxiedMetaAccount,
             title = { resourceManager.getString(R.string.proxy_signing_warning_title) },
@@ -64,7 +65,7 @@ class RealProxySigningPresenter @Inject constructor(
     }
 
     override suspend fun notEnoughFee(
-        metaAccount: MetaAccount,
+        proxy: MetaAccount,
         chainAsset: Chain.Asset,
         availableBalance: BigInteger,
         fee: BigInteger
@@ -73,7 +74,7 @@ class RealProxySigningPresenter @Inject constructor(
             title = resourceManager.getString(R.string.error_not_enough_to_pay_fee_title),
             message = resourceManager.getString(
                 R.string.proxy_error_not_enough_to_pay_fee_message,
-                metaAccount.name,
+                proxy.name,
                 fee.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol),
                 availableBalance.amountFromPlanks(chainAsset.precision).formatTokenAmount(chainAsset.symbol)
             )

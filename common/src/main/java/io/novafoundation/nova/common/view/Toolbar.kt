@@ -56,6 +56,9 @@ class Toolbar @JvmOverloads constructor(
             val action = typedArray.getString(R.styleable.Toolbar_textRight)
             action?.let { setTextRight(it) }
 
+            val textRightVisible = typedArray.getBoolean(R.styleable.Toolbar_textRightVisible, true)
+            setRightTextVisible(textRightVisible)
+
             val homeButtonIcon = typedArray.getDrawable(R.styleable.Toolbar_homeButtonIcon)
             homeButtonIcon?.let { setHomeButtonIcon(it) }
 
@@ -77,6 +80,10 @@ class Toolbar @JvmOverloads constructor(
         }
     }
 
+    fun setHomeButtonIcon(@DrawableRes iconRes: Int) {
+        binder.backImg.setImageResource(iconRes)
+    }
+
     fun setHomeButtonIcon(icon: Drawable) {
         binder.backImg.setImageDrawable(icon)
     }
@@ -90,6 +97,10 @@ class Toolbar @JvmOverloads constructor(
 
     fun setRightIconVisible(visible: Boolean) {
         binder.rightImg.setVisible(visible)
+    }
+
+    fun setRightTextVisible(visible: Boolean) {
+        binder.rightText.setVisible(visible)
     }
 
     fun showProgress(visible: Boolean) {

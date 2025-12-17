@@ -7,14 +7,22 @@ import io.novafoundation.nova.feature_account_api.domain.account.advancedEncrypt
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.AddAccountType
 import io.novafoundation.nova.feature_account_api.domain.model.ImportJsonMetaData
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SubstrateKeypairAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.TrustWalletAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
+import io.novafoundation.nova.feature_account_impl.domain.utils.isSubstrateKeypair
+import io.novafoundation.nova.feature_account_impl.domain.utils.isSubstrateSeed
+import io.novasama.substrate_sdk_android.extensions.fromHex
+import java.util.InvalidPropertiesFormatException
 
 class AddAccountInteractor(
     private val mnemonicAddAccountRepository: MnemonicAddAccountRepository,
     private val jsonAddAccountRepository: JsonAddAccountRepository,
     private val seedAddAccountRepository: SeedAddAccountRepository,
+    private val substrateKeypairAddAccountRepository: SubstrateKeypairAddAccountRepository,
+    private val trustWalletAddAccountRepository: TrustWalletAddAccountRepository,
     private val accountRepository: AccountRepository,
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor
 ) {
@@ -49,6 +57,18 @@ class AddAccountInteractor(
         return createAccount(mnemonic, advancedEncryption, addAccountType)
     }
 
+    suspend fun importFromSecret(
+        secret: String,
+        advancedEncryption: AdvancedEncryption,
+        addAccountType: AddAccountType
+    ): Result<Unit> = when {
+        secret.isSubstrateSeed() -> importFromSeed(secret, advancedEncryption, addAccountType)
+
+        secret.isSubstrateKeypair() -> importFromSubstrateKeypair(secret, advancedEncryption, addAccountType)
+
+        else -> Result.failure(InvalidPropertiesFormatException("Invalid secret length: Expected 32 or 64 bytes."))
+    }
+
     suspend fun importFromSeed(
         seed: String,
         advancedEncryption: AdvancedEncryption,
@@ -59,6 +79,22 @@ class AddAccountInteractor(
             seedAddAccountRepository,
             SeedAddAccountRepository.Payload(
                 seed,
+                advancedEncryption,
+                addAccountType
+            )
+        )
+    }
+
+    suspend fun importFromSubstrateKeypair(
+        keypair: String,
+        advancedEncryption: AdvancedEncryption,
+        addAccountType: AddAccountType
+    ): Result<Unit> {
+        return addAccount(
+            addAccountType,
+            substrateKeypairAddAccountRepository,
+            SubstrateKeypairAddAccountRepository.Payload(
+                keypair.fromHex(),
                 advancedEncryption,
                 addAccountType
             )
@@ -78,6 +114,14 @@ class AddAccountInteractor(
                 password = password,
                 addAccountType = addAccountType
             )
+        )
+    }
+
+    suspend fun importFromTrustWallet(mnemonic: String, addAccountType: AddAccountType.MetaAccount): Result<Unit> {
+        return addAccount(
+            addAccountType = addAccountType,
+            addAccountRepository = trustWalletAddAccountRepository,
+            payload = TrustWalletAddAccountRepository.Payload(mnemonic, addAccountType)
         )
     }
 

@@ -5,21 +5,28 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sumByBigInteger
+import io.novafoundation.nova.common.view.AlertModel
+import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
+import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
+import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
+import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
+import io.novafoundation.nova.feature_assets.domain.balance.detail.BalanceDetailInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
-import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
+import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -29,6 +36,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers
 import io.novafoundation.nova.feature_assets.presentation.model.BalanceLocksModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
+import io.novafoundation.nova.feature_assets.presentation.transaction.history.TransactionHistoryBannerModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
 import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartModel
@@ -45,13 +53,17 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.BalanceLock
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.unlabeledReserves
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.balanceId
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -59,11 +71,14 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+
+private const val ORIGIN_MIGRATION_ALERT = "ORIGIN_MIGRATION_ALERT"
 
 class BalanceDetailViewModel(
     private val walletInteractor: WalletInteractor,
@@ -80,9 +95,13 @@ class BalanceDetailViewModel(
     private val swapAvailabilityInteractor: SwapAvailabilityInteractor,
     private val assetIconProvider: AssetIconProvider,
     private val chartsInteractor: ChartsInteractor,
-    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory
-) : BaseViewModel(),
-    TransactionHistoryUi by transactionHistoryMixin {
+    private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
+    private val amountFormatter: AmountFormatter,
+    private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
+    private val interactor: BalanceDetailInteractor,
+) : BaseViewModel(), TransactionHistoryUi by transactionHistoryMixin, Browserable {
+
+    override val openBrowserEvent = MutableLiveData<Event<String>>()
 
     val acknowledgeLedgerWarning = controllableAssetCheck.acknowledgeLedgerWarning
 
@@ -99,6 +118,9 @@ class BalanceDetailViewModel(
         .inBackground()
         .share()
 
+    private val chainAssetFlow = assetFlow.map { it.token.configuration }
+        .distinctUntilChangedBy { it.fullId }
+
     private val balanceLocksFlow = balanceLocksInteractor.balanceLocksFlow(assetPayload.chainId, assetPayload.chainAssetId)
         .shareInBackground()
 
@@ -110,6 +132,9 @@ class BalanceDetailViewModel(
 
     private val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances(assetPayload.fullChainAssetId)
         .onStart { emit(emptyList()) }
+        .shareInBackground()
+
+    private val migrationConfigFlow = chainMigrationInfoUseCase.observeMigrationConfigOrNull(assetPayload.chainId, assetPayload.chainAssetId)
         .shareInBackground()
 
     val assetDetailsModel = combine(assetFlow, externalBalancesFlow) { asset, externalBalances ->
@@ -134,8 +159,14 @@ class BalanceDetailViewModel(
 
     val chainUI = chainFlow.map { mapChainToUi(it) }
 
-    val swapButtonEnabled = assetFlow.flatMapLatest {
-        swapAvailabilityInteractor.swapAvailableFlow(it.token.configuration, viewModelScope)
+    val swapButtonEnabled = chainAssetFlow.flatMapLatest {
+        swapAvailabilityInteractor.swapAvailableFlow(it, viewModelScope)
+    }
+        .onStart { emit(false) }
+        .shareInBackground()
+
+    val giftsButtonEnabled = chainAssetFlow.map {
+        interactor.isGiftingEnabled(it)
     }
         .onStart { emit(false) }
         .shareInBackground()
@@ -159,6 +190,57 @@ class BalanceDetailViewModel(
             RealPricePriceTextInjector(currency, lastCoinRate),
             RealPriceChangeTextInjector(resourceManager, currency),
             RealDateChartTextInjector(resourceManager)
+        )
+    }.shareInBackground()
+
+    private val dateFormatter = getChainMigrationDateFormat()
+
+    val originMigrationAlertFlow = combine(
+        migrationConfigFlow,
+        chainFlow,
+        selectedAccountFlow,
+        chainMigrationInfoUseCase.observeInfoShouldBeHidden(ORIGIN_MIGRATION_ALERT, assetPayload.chainId, assetPayload.chainAssetId)
+    ) { configWithChains, chain, metaAccount, shouldBeHidden ->
+        if (shouldBeHidden) return@combine null
+        if (configWithChains == null) return@combine null
+        if (configWithChains.originAsset.notMatchWithBalanceAsset()) return@combine null
+        if (!metaAccount.hasAccountIn(configWithChains.destinationChain)) return@combine null
+
+        val config = configWithChains.config
+        val sourceAsset = configWithChains.originAsset
+        val destinationChain = configWithChains.destinationChain
+        val formattedDate = dateFormatter.format(config.timeStartAt)
+        AlertModel(
+            style = AlertView.Style.fromPreset(AlertView.StylePreset.INFO),
+            message = resourceManager.getString(R.string.asset_details_source_asset_alert_title, sourceAsset.symbol.value, destinationChain.name),
+            subMessage = resourceManager.getString(
+                R.string.asset_details_source_asset_alert_message,
+                formattedDate,
+                sourceAsset.symbol.value,
+                destinationChain.name
+            ),
+            linkAction = AlertModel.ActionModel(resourceManager.getString(R.string.common_learn_more)) { learnMoreMigrationClicked(config) },
+            buttonAction = AlertModel.ActionModel(
+                resourceManager.getString(R.string.asset_details_source_asset_alert_button, destinationChain.name),
+                { openAssetDetails(chainData = configWithChains.config.destinationData) }
+            )
+        )
+    }.shareInBackground()
+
+    val destinationMigrationBannerFlow = combine(
+        migrationConfigFlow,
+        chainFlow,
+        selectedAccountFlow,
+    ) { configWithChains, chain, metaAccount ->
+        if (configWithChains == null) return@combine null
+        if (configWithChains.destinationAsset.notMatchWithBalanceAsset()) return@combine null
+        if (!metaAccount.hasAccountIn(configWithChains.originChain)) return@combine null
+
+        val sourceAsset = configWithChains.originAsset
+        val sourceChain = configWithChains.originChain
+        TransactionHistoryBannerModel(
+            resourceManager.getString(R.string.transaction_history_migration_source_message, sourceAsset.symbol.value, sourceChain.name),
+            { openAssetDetails(chainData = configWithChains.config.originData) }
         )
     }.shareInBackground()
 
@@ -226,16 +308,17 @@ class BalanceDetailViewModel(
         }
     }
 
-    fun buyClicked() = checkControllableAsset {
-        launch {
-            val chainAsset = assetFlow.first().token.configuration
-            buySellSelectorMixin.openSelector()
-        }
+    fun giftClicked() {
+        router.openGiftsByAsset(assetPayload)
     }
 
     fun lockedInfoClicked() = launch {
         val balanceLocks = lockedBalanceModel.first()
         _showLockedDetailsEvent.value = Event(balanceLocks)
+    }
+
+    fun closeMigrationAlert() {
+        chainMigrationInfoUseCase.markMigrationInfoAsHidden(ORIGIN_MIGRATION_ALERT, assetPayload.chainId, assetPayload.chainAssetId)
     }
 
     private fun checkControllableAsset(action: () -> Unit) {
@@ -252,10 +335,23 @@ class BalanceDetailViewModel(
 
         return AssetDetailsModel(
             token = mapTokenToTokenModel(asset.token),
-            total = mapAmountToAmountModel(asset.total + totalContributed, asset, useAbbreviation = false),
-            transferable = mapAmountToAmountModel(asset.transferable, asset),
-            locked = mapAmountToAmountModel(asset.locked + totalContributed, asset),
+            total = amountFormatter.formatAmountToAmountModel(
+                asset.total + totalContributed,
+                asset,
+                AmountConfig(useTokenAbbreviation = false, fiatAbbreviation = FiatConfig.AbbreviationStyle.NO_ABBREVIATION)
+            ),
+            transferable = amountFormatter.formatAmountToAmountModel(asset.transferable, asset),
+            locked = amountFormatter.formatAmountToAmountModel(asset.locked + totalContributed, asset),
             assetIcon = assetIconProvider.getAssetIconOrFallback(asset.token.configuration)
+        )
+    }
+
+    private fun openAssetDetails(chainData: ChainMigrationConfig.ChainData) {
+        router.openAssetDetails(
+            AssetPayload(
+                chainId = chainData.chainId,
+                chainAssetId = chainData.assetId
+            )
         )
     }
 
@@ -268,14 +364,14 @@ class BalanceDetailViewModel(
         val mappedLocks = balanceLocks.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.id.value),
-                mapAmountToAmountModel(it.amountInPlanks, asset)
+                amountFormatter.formatAmountToAmountModel(it.amountInPlanks, asset)
             )
         }
 
         val mappedHolds = holds.map {
             BalanceLocksModel.Lock(
                 mapBalanceIdToUi(resourceManager, it.identifier),
-                mapAmountToAmountModel(it.amountInPlanks, asset)
+                amountFormatter.formatAmountToAmountModel(it.amountInPlanks, asset)
             )
         }
 
@@ -283,13 +379,13 @@ class BalanceDetailViewModel(
 
         val reservedBalance = BalanceLocksModel.Lock(
             resourceManager.getString(R.string.wallet_balance_reserved),
-            mapAmountToAmountModel(unlabeledReserves, asset)
+            amountFormatter.formatAmountToAmountModel(unlabeledReserves, asset)
         )
 
         val external = externalBalances.map { externalBalance ->
             BalanceLocksModel.Lock(
                 name = mapBalanceIdToUi(resourceManager, externalBalance.type.balanceId),
-                amount = mapAmountToAmountModel(externalBalance.amount, asset)
+                amount = amountFormatter.formatAmountToAmountModel(externalBalance.amount, asset)
             )
         }
 
@@ -345,5 +441,15 @@ class BalanceDetailViewModel(
             PricePeriod.DAY, PricePeriod.WEEK, PricePeriod.MONTH -> true
             PricePeriod.YEAR, PricePeriod.MAX -> false
         }
+    }
+
+    private fun learnMoreMigrationClicked(config: ChainMigrationConfig) {
+        launch {
+            openBrowserEvent.value = Event(config.wikiURL)
+        }
+    }
+
+    private fun Chain.Asset.notMatchWithBalanceAsset(): Boolean {
+        return assetPayload.chainId != chainId || assetPayload.chainAssetId != id
     }
 }

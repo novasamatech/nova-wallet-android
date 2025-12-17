@@ -2,13 +2,14 @@ package io.novafoundation.nova.feature_settings_impl.presentation.settings
 
 import android.content.Intent
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.sendEmailIntent
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
@@ -20,9 +21,11 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
 
     override fun createBinding() = FragmentSettingsBinding.inflate(layoutInflater)
 
-    override fun initViews() {
+    override fun applyInsets(rootView: View) {
         binder.settingsContainer.applyStatusBarInsets()
+    }
 
+    override fun initViews() {
         binder.accountView.setWholeClickListener { viewModel.accountActionsClicked() }
 
         binder.settingsWallets.setOnClickListener { viewModel.walletsClicked() }
@@ -48,6 +51,7 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
         binder.settingsBiometricAuth.setOnClickListener { viewModel.changeBiometricAuth() }
         binder.settingsPinCodeVerification.setOnClickListener { viewModel.changePincodeVerification() }
         binder.settingsSafeMode.setOnClickListener { viewModel.changeSafeMode() }
+        binder.settingsHideBalances.setOnClickListener { viewModel.changeHideBalances() }
         binder.settingsPin.setOnClickListener { viewModel.changePinCodeClicked() }
 
         binder.settingsCloudBackup.setOnClickListener { viewModel.cloudBackupClicked() }
@@ -108,6 +112,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
 
         viewModel.safeModeStatus.observe {
             binder.settingsSafeMode.setChecked(it)
+        }
+
+        viewModel.hideBalancesOnLaunchState.observe {
+            binder.settingsHideBalances.setChecked(it)
         }
 
         viewModel.appVersionFlow.observe(binder.settingsAppVersion::setText)

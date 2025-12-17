@@ -34,7 +34,6 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTimedValue
 
 private val PERCENTAGE_MULTIPLIER = 100.toBigDecimal()
@@ -84,7 +83,6 @@ inline fun <T> Result<T>.mapError(transform: (throwable: Throwable) -> Throwable
 
 fun Result<*>.coerceToUnit(): Result<Unit> = map { }
 
-@OptIn(ExperimentalTime::class)
 inline fun <R> measureExecution(label: String, function: () -> R): R {
     val (value, time) = measureTimedValue(function)
     Log.d("Performance", "$label took $time")
@@ -128,6 +126,12 @@ inline fun <K, V> List<V>.associateByMultiple(keysExtractor: (V) -> Iterable<K>)
 
 fun <T> List<T>.safeSubList(fromIndex: Int, toIndex: Int): List<T> {
     return subList(fromIndex.coerceIn(0, size), toIndex.coerceIn(0, size))
+}
+
+suspend fun <T, R> Iterable<T>.onEachAsync(operation: suspend (T) -> R) {
+    coroutineScope {
+        map { async { operation(it) } }
+    }.awaitAll()
 }
 
 suspend fun <T, R> Iterable<T>.mapAsync(operation: suspend (T) -> R): List<R> {
@@ -240,6 +244,8 @@ fun BigInteger.atLeastZero() = coerceAtLeast(BigInteger.ZERO)
 
 fun BigDecimal.atLeastZero() = coerceAtLeast(BigDecimal.ZERO)
 
+fun Int.atLeastZero() = coerceAtLeast(0)
+
 fun BigDecimal.lessEpsilon(): BigDecimal = when {
     this.isZero -> this
     else -> this.subtract(BigInteger.ONE.toBigDecimal(scale = MathContext.DECIMAL64.precision))
@@ -289,6 +295,24 @@ suspend operator fun <T> Deferred<T>.invoke() = await()
 
 inline fun <T> Iterable<T>.sumByBigDecimal(extractor: (T) -> BigDecimal) = fold(BigDecimal.ZERO) { acc, element ->
     acc + extractor(element)
+}
+
+inline fun <T, K> Iterable<T>.groupByIntoSet(keySelector: (T) -> K): Map<K, Set<T>> {
+    return groupByInto(valueCollectionCreator = { mutableSetOf() }, keySelector = keySelector)
+}
+
+inline fun <T, K, C : MutableCollection<T>> Iterable<T>.groupByInto(
+    valueCollectionCreator: () -> C,
+    keySelector: (T) -> K
+): Map<K, C> {
+    val result = mutableMapOf<K, C>()
+
+    for (element in this) {
+        val key = keySelector(element)
+        val collection = result.getOrPut(key) { valueCollectionCreator() }
+        collection.add(element)
+    }
+    return result
 }
 
 inline fun <reified T> Any?.castOrNull(): T? {
@@ -572,6 +596,17 @@ inline fun <T, R> Iterable<T>.foldToSet(mapper: (T) -> Iterable<R>): Set<R> = fo
     acc
 }
 
+inline fun <T, K> Iterable<T>.groupByToSet(keySelector: (T) -> K): MultiMap<K, T> {
+    val destination = mutableMultiMapOf<K, T>()
+
+    for (element in this) {
+        val key = keySelector(element)
+        destination.put(key, element)
+    }
+
+    return destination
+}
+
 inline fun <T, R : Any> Iterable<T>.mapNotNullToSet(mapper: (T) -> R?): Set<R> = mapNotNullTo(mutableSetOf(), mapper)
 
 fun <T> Collection<T>.indexOfFirstOrNull(predicate: (T) -> Boolean) = indexOfFirst(predicate).takeIf { it >= 0 }
@@ -610,7 +645,7 @@ fun ByteArray.compareTo(other: ByteArray, unsigned: Boolean): Int {
         return size - other.size
     }
 
-    for (i in 0 until size) {
+    for (i in indices) {
         val result = if (unsigned) {
             this[i].toUByte().compareTo(other[i].toUByte())
         } else {
@@ -722,6 +757,26 @@ fun Int.collectionIndexOrNull(): Int? {
 
 fun <T> Set<T>.hasIntersectionWith(other: Set<T>): Boolean {
     return this.any { it in other }
+}
+
+@Suppress("UNCHECKED_CAST")
+fun <T1, T2, T3, T4, T5, T6, R> combine(
+    flow: Flow<T1>,
+    flow2: Flow<T2>,
+    flow3: Flow<T3>,
+    flow4: Flow<T4>,
+    flow5: Flow<T5>,
+    flow6: Flow<T6>,
+    transform: suspend (T1, T2, T3, T4, T5, T6) -> R
+): Flow<R> = kotlinx.coroutines.flow.combine(flow, flow2, flow3, flow4, flow5, flow6) { args: Array<*> ->
+    transform(
+        args[0] as T1,
+        args[1] as T2,
+        args[2] as T3,
+        args[3] as T4,
+        args[4] as T5,
+        args[5] as T6
+    )
 }
 
 typealias LazyGet<T> = () -> T

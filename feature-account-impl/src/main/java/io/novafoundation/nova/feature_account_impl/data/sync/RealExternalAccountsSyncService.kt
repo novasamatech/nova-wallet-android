@@ -3,33 +3,35 @@ package io.novafoundation.nova.feature_account_impl.data.sync
 import android.util.Log
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.associateMutableBy
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.filterToSet
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.mapToSet
-import io.novafoundation.nova.common.utils.mutableMultiListMapOf
 import io.novafoundation.nova.common.utils.put
+import io.novafoundation.nova.common.utils.toMutableMultiMapList
 import io.novafoundation.nova.core_db.dao.MetaAccountDao
 import io.novafoundation.nova.core_db.model.chain.account.MetaAccountLocal
 import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChangesEventBus
 import io.novafoundation.nova.feature_account_api.data.events.checkIncludes
 import io.novafoundation.nova.feature_account_api.data.events.combineBusEvents
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
+import io.novafoundation.nova.feature_account_api.data.model.AccountIdKeyMap
+import io.novafoundation.nova.feature_account_api.data.model.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.AddAccountResult
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.toAccountBusEvent
 import io.novafoundation.nova.feature_account_api.domain.account.identity.Identity
-import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
-import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.accountIdKeyIn
 import io.novafoundation.nova.feature_account_api.domain.model.isUniversal
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.enabledChains
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -42,7 +44,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
     private val accountDao: MetaAccountDao,
     private val eventBus: MetaAccountChangesEventBus,
     private val metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-    @OnChainIdentity private val identityProvider: IdentityProvider,
+    private val identityRepository: OnChainIdentityRepository,
     private val rootScope: RootScope,
     private val chainRegistry: ChainRegistry,
 ) : ExternalAccountsSyncService {
@@ -77,30 +79,16 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
     override fun sync() = rootScope.launchUnit(Dispatchers.IO) {
         syncMutex.withLock {
-            val nonReachableUniversalPerChain = chainRegistry.enabledChains().mapNotNull { chain ->
-                syncInternal(chain).getOrDefault(null)
-            }
-
-            updateAccountStatusForUniversal(nonReachableUniversalPerChain)
+            syncInternal()
         }
     }
 
-    override fun sync(chain: Chain) = rootScope.launchUnit(Dispatchers.IO) {
-        syncMutex.withLock {
-            syncInternal(chain)
-        }
-    }
+    private suspend fun syncInternal() {
+        val dataSource = dataSourceFactories
+            .map { it.create() }
+            .aggregate()
 
-    private suspend fun syncInternal(chain: Chain): Result<NonReachableUniversalIds?> {
-        val dataSources = dataSourceFactories.mapNotNull { it.create(chain) }
-        if (dataSources.isNotEmpty()) {
-            Log.d("ExternalAccountsDiscovery", "Created data sources for ${chain.name}: ${dataSources.map { it::class.simpleName }}")
-
-            val aggregateSource = dataSources.aggregate()
-            return sync(chain, aggregateSource)
-        }
-
-        return Result.success(null)
+        sync(dataSource)
     }
 
     /**
@@ -122,7 +110,7 @@ internal class RealExternalAccountsSyncService @Inject constructor(
      *
      * 2. Once we fetched all accessible [ExternalControllableAccount] we start comparing already added meta accounts with the fetched list. The goal is to only add those accounts
      * that has not been added yet
-     * For each external account, [addNewExternalAccounts] achieve this by doing the following:
+     * For each external account, [updateLocalExternalAccounts] achieve this by doing the following:
      *   a. It first checks whether this pair of controller + controlled can actually be used.
      *   In particular, a controller, via [ExternalSourceCreatedAccount], checks that it can actually control the controlled account. This is usefully for Proxies
      *   since only Any/NonTransfer proxy account can dispatch proxy.proxy / multisig.as_multi calls, and thus, be able to control such accounts despite the permission being granted
@@ -133,37 +121,31 @@ internal class RealExternalAccountsSyncService @Inject constructor(
      *   For example, it is not enough for a Proxy to just check for controlled and controller account ids match
      *   as there might be multiple connection between same pairs of accounts via multiple proxy types.
      */
-    private suspend fun sync(chain: Chain, dataSource: ExternalAccountsSyncDataSource): Result<NonReachableUniversalIds?> = runCatching {
-        Log.d("ExternalAccountsDiscovery", "Started syncing external accounts on ${chain.name}")
+    private suspend fun sync(dataSource: ExternalAccountsSyncDataSource): Result<Unit> = runCatching {
+        Log.d("ExternalAccountsDiscovery", "Started syncing external accounts")
 
-        val allAccounts = accountRepository.getAllMetaAccounts().filter {
-            it.isAllowedToSyncExternalAccounts() && it.hasAccountIn(chain)
-        }
-        val directlyControlledAccounts = allAccounts.filter { !dataSource.isCreatedFromDataSource(it) }
-        if (directlyControlledAccounts.isEmpty()) return@runCatching null
+        val directlyControlledAccounts = accountRepository.getAllMetaAccounts()
+            .filter { it.isAllowedToSyncExternalAccounts() && !dataSource.isCreatedFromDataSource(it) }
+        if (directlyControlledAccounts.isEmpty()) return@runCatching
 
-        val (externalAccounts, allVisitedCandidates) = findReachableExternalAccounts(directlyControlledAccounts, dataSource, chain)
+        val supportedChains = dataSource.supportedChains()
 
-        val identities = identityProvider.identitiesFor(allVisitedCandidates.map { it.value }, chain.id)
+        val (externalAccounts, allVisitedCandidates) = findReachableExternalAccounts(directlyControlledAccounts, dataSource, supportedChains)
 
-        val (added, reachableExistingMetaIds) = addNewExternalAccounts(allAccounts, directlyControlledAccounts, externalAccounts, identities, dataSource, chain)
+        val identities = identityRepository.getMultiChainIdentities(allVisitedCandidates)
 
-        val reachabilityReport = constructReachabilityReport(allAccounts, reachableExistingMetaIds)
-
-        updateAccountStatusesForSingleChain(reachabilityReport, chain)
-        notifyAboutAddedAccounts(added)
-
-        reachabilityReport.universalNonReachable
+        updateLocalExternalAccounts(directlyControlledAccounts, externalAccounts, identities, dataSource, supportedChains)
     }
-        .onFailure { Log.d("ExternalAccountsDiscovery", "Failed to sync external accounts for chain ${chain.name}", it) }
-        .onSuccess { Log.d("ExternalAccountsDiscovery", "Finished syncing external accounts for chain ${chain.name}") }
+        .onFailure { Log.d("ExternalAccountsDiscovery", "Failed to sync external accounts", it) }
+        .onSuccess { Log.d("ExternalAccountsDiscovery", "Finished syncing external accounts ") }
 
-    private suspend fun notifyAboutAddedAccounts(added: List<AddAccountResult.AccountAdded>) {
+    private suspend fun notifyAboutAddedAccounts(added: List<AddAccountResult.AccountAdded>, deactivatedMetaIds: Set<Long>) {
         added.map { it.toAccountBusEvent() }
             .combineBusEvents()
             ?.let { eventBus.notify(it, source = ACCOUNTS_CHANGED_SOURCE) }
 
-        metaAccountsUpdatesRegistry.addMetaIds(added.map { it.metaId })
+        val updatedAccountsIds = deactivatedMetaIds.toList() + added.map { it.metaId }
+        metaAccountsUpdatesRegistry.addMetaIds(updatedAccountsIds)
     }
 
     private fun constructReachabilityReport(
@@ -204,35 +186,71 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
         // Find universal account that every chain reported as non-reachable
         val notReachable = notReachableUniversalPerChain.reduce { a, b -> a.intersect(b) }
+            .toList()
 
         if (notReachable.isNotEmpty()) {
             Log.d("ExternalAccountsDiscovery", "Disabling ${notReachable.size} non-reachable universal accounts: $notReachable")
-            accountDao.changeAccountsStatus(notReachable.toList(), MetaAccountLocal.Status.DEACTIVATED)
+            accountDao.changeAccountsStatus(notReachable, MetaAccountLocal.Status.DEACTIVATED)
+            metaAccountsUpdatesRegistry.addMetaIds(notReachable)
         } else {
             Log.d("ExternalAccountsDiscovery", "No universal accounts to disable found")
         }
+    }
+
+    private suspend fun updateLocalExternalAccounts(
+        directlyControlledAccounts: List<MetaAccount>,
+        externalAccounts: List<ExternalControllableAccount>,
+        identities: AccountIdKeyMap<OnChainIdentity?>,
+        dataSource: ExternalAccountsSyncDataSource,
+        supportedChains: Collection<Chain>,
+    ) {
+        val universalNonReachable = supportedChains.mapNotNull { chain ->
+            runCatching {
+                val allAccounts = accountRepository.getAllMetaAccounts().filter { it.isAllowedToSyncExternalAccounts() }
+
+                val allAccountsAvailableOnChain = allAccounts.filter { it.hasAccountIn(chain) }
+                val directAccountsAvailableOnChain = directlyControlledAccounts.filter { it.hasAccountIn(chain) }
+
+                val externalAccountsAvailableOnChain = externalAccounts.filter { it.isAvailableOn(chain) }
+
+                val (added, reachableExistingMetaIds) = addNewExternalAccounts(
+                    allAccounts = allAccountsAvailableOnChain,
+                    directlyControlledAccounts = directAccountsAvailableOnChain,
+                    foundExternalAccounts = externalAccountsAvailableOnChain,
+                    identities = identities,
+                    dataSource = dataSource,
+                    chain = chain
+                )
+
+                val reachabilityReport = constructReachabilityReport(allAccountsAvailableOnChain, reachableExistingMetaIds)
+
+                updateAccountStatusesForSingleChain(reachabilityReport, chain)
+                notifyAboutAddedAccounts(added, deactivatedMetaIds = reachabilityReport.singleChainNonReachable)
+
+                reachabilityReport.universalNonReachable
+            }
+                .onFailure { Log.d("ExternalAccountsDiscovery", "Failed to add new external accounts for chain ${chain.name}", it) }
+                .onSuccess { Log.d("ExternalAccountsDiscovery", "Finished adding new external accounts for chain ${chain.name}") }
+                .getOrNull()
+        }
+
+        updateAccountStatusForUniversal(universalNonReachable)
     }
 
     private suspend fun addNewExternalAccounts(
         allAccounts: List<MetaAccount>,
         directlyControlledAccounts: List<MetaAccount>,
         foundExternalAccounts: List<ExternalControllableAccount>,
-        identities: Map<AccountIdKey, Identity?>,
+        identities: AccountIdKeyMap<OnChainIdentity?>,
         dataSource: ExternalAccountsSyncDataSource,
         chain: Chain
     ): AddReachableAccountResult {
         val existingAccountsByAccountId = allAccounts.groupBy { it.requireAccountIdKeyIn(chain) }
         val existingAccountsByParentId = allAccounts.groupBy { it.parentMetaId }
 
-        val controllersByAccountId = mutableMultiListMapOf<AccountIdKey, MetaAccount>()
-        existingAccountsByAccountId.onEach { (accountId, metaAccounts) ->
-            controllersByAccountId.put(accountId, metaAccounts)
-        }
-
-        val controllersById = mutableMapOf<Long, MetaAccount>()
-        allAccounts.onEach { metaAccount ->
-            controllersById[metaAccount.id] = metaAccount
-        }
+        val controllersByParentId = existingAccountsByParentId.toMutableMultiMapList()
+        val controllersByAccountId = existingAccountsByAccountId.toMutableMultiMapList()
+        val controllersById = allAccounts.associateMutableBy { it.id }
 
         fun signingPath(metaAccount: MetaAccount): List<AccountIdKey> {
             val path = mutableListOf(metaAccount.requireAccountIdKeyIn(chain))
@@ -253,6 +271,8 @@ internal class RealExternalAccountsSyncService @Inject constructor(
 
         var position = accountDao.nextAccountPosition()
 
+        Log.d("ExternalAccountsDiscovery", "Checking ${foundExternalAccounts.size} found external accounts against local state in ${chain.name}")
+
         foundExternalAccounts.onEach { externalAccount ->
             val controllers = controllersByAccountId[externalAccount.controllerAccountId].orEmpty()
 
@@ -261,8 +281,8 @@ internal class RealExternalAccountsSyncService @Inject constructor(
                 if (externalAccount.accountId in signingPath) {
                     Log.v(
                         "ExternalAccountsDiscovery",
-                        "Loop detected: ${externalAccount.address()} already present " +
-                            "in the signing path of ${externalAccount.controllerAddress()}"
+                        "Loop detected: ${externalAccount.address(chain)} already present " +
+                            "in the signing path of ${externalAccount.controllerAddress(chain)}"
                     )
                     return@controllersLoop
                 }
@@ -273,12 +293,12 @@ internal class RealExternalAccountsSyncService @Inject constructor(
                 if (!canControl) {
                     Log.v(
                         "ExternalAccountsDiscovery",
-                        "Discovered account ${externalAccount.address()} cannot be controlled by ${externalAccount.controllerAddress()}"
+                        "Discovered account ${externalAccount.address(chain)} cannot be controlled by ${externalAccount.controllerAddress(chain)}"
                     )
                     return@controllersLoop
                 }
 
-                val existingControlledAccounts = existingAccountsByParentId[controller.id].orEmpty()
+                val existingControlledAccounts = controllersByParentId[controller.id].orEmpty()
 
                 val existingAccountRepresentedByExternal = existingControlledAccounts.find { existingAccount ->
                     val existingAccountId = existingAccount.requireAccountIdKeyIn(chain)
@@ -288,19 +308,22 @@ internal class RealExternalAccountsSyncService @Inject constructor(
                 if (existingAccountRepresentedByExternal != null) {
                     reachableExistingMetaIds.add(existingAccountRepresentedByExternal.id)
                 } else {
-                    val addResult = externalAccount.addControlledAccount(controller, identities[externalAccount.accountId], position)
+                    val identity = identities[externalAccount.accountId]?.let(::Identity)
+                    val addResult = externalAccount.addControlledAccount(controller, identity, position, chain)
 
                     val newMetaAccount = accountRepository.getMetaAccount(addResult.metaId)
 
                     position++
                     controllersByAccountId.put(externalAccount.accountId, newMetaAccount)
+                    controllersByParentId.put(controller.id, newMetaAccount)
+
                     controllersById[newMetaAccount.id] = newMetaAccount
                     added.add(addResult)
                 }
             }
         }
 
-        Log.d("ExternalAccountsDiscovery", "Added ${added.size} new accounts on ${chain.name}")
+        Log.d("ExternalAccountsDiscovery", "Added ${added.size} new accounts on ${chain.name}: ${added.map { it.type }}")
 
         return AddReachableAccountResult(added, reachableExistingMetaIds)
     }
@@ -308,9 +331,9 @@ internal class RealExternalAccountsSyncService @Inject constructor(
     private suspend fun findReachableExternalAccounts(
         directlyControlledAccounts: List<MetaAccount>,
         dataSource: ExternalAccountsSyncDataSource,
-        chain: Chain,
+        supportedChains: Collection<Chain>
     ): ReachableExternalAccounts {
-        var nextSearchCandidates = directlyControlledAccounts.mapToSet { it.requireAccountIdKeyIn(chain) }
+        var nextSearchCandidates = getAccountIds(directlyControlledAccounts, supportedChains)
         val foundExternalAccounts = mutableListOf<ExternalControllableAccount>()
         val allVisitedCandidates = mutableSetOf<AccountIdKey>()
 
@@ -331,6 +354,21 @@ internal class RealExternalAccountsSyncService @Inject constructor(
         }
 
         return ReachableExternalAccounts(foundExternalAccounts, allVisitedCandidates)
+    }
+
+    private fun getAccountIds(metaAccounts: List<MetaAccount>, chains: Collection<Chain>): Set<AccountIdKey> {
+        return buildSet {
+            metaAccounts.onEach {
+                addAccountIds(it, chains)
+            }
+        }
+    }
+
+    context(MutableSet<AccountIdKey>)
+    private fun addAccountIds(metaAccount: MetaAccount, chains: Collection<Chain>) {
+        chains.forEach { chain ->
+            metaAccount.accountIdKeyIn(chain)?.let { add(it) }
+        }
     }
 
     private data class ChainReachabilityReport(

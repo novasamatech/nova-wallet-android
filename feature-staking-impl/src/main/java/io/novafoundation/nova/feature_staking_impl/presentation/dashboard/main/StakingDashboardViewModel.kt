@@ -2,12 +2,13 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.throttleLast
-import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
@@ -24,18 +25,29 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+
+private class DashboardFormatters(
+    val maskableValueFormatter: MaskableValueFormatter,
+    val presentationMapper: StakingDashboardPresentationMapper
+)
 
 class StakingDashboardViewModel(
     private val interactor: StakingDashboardInteractor,
@@ -46,9 +58,16 @@ class StakingDashboardViewModel(
     private val router: StakingRouter,
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingSharedState: StakingSharedState,
-    private val presentationMapper: StakingDashboardPresentationMapper,
-    private val dashboardUpdatePeriod: Duration = 200.milliseconds
+    private val presentationMapperFactory: StakingDashboardPresentationMapperFactory,
+    private val dashboardUpdatePeriod: Duration = 200.milliseconds,
+    private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
+    private val amountFormatter: AmountFormatter,
+    private val assetIconProvider: AssetIconProvider
 ) : BaseViewModel() {
+
+    private val dashboardFormattersFlow = maskableValueFormatterProvider.provideFormatter()
+        .map { DashboardFormatters(it, presentationMapperFactory.create(it)) }
+        .shareInBackground()
 
     val scrollToTopEvent = dashboardRouter.scrollToDashboardTopEvent
 
@@ -60,7 +79,7 @@ class StakingDashboardViewModel(
 
     val stakingDashboardUiFlow = stakingDashboardFlow
         .throttleLast(dashboardUpdatePeriod)
-        .map { dashboardLoading -> dashboardLoading.map(::mapDashboardToUi) }
+        .combine(dashboardFormattersFlow) { dashboardLoading, valueFormatter -> dashboardLoading.map { mapDashboardToUi(it, valueFormatter) } }
         .shareInBackground()
 
     init {
@@ -106,32 +125,42 @@ class StakingDashboardViewModel(
         router.openSwitchWallet()
     }
 
-    private fun mapDashboardToUi(dashboard: StakingDashboard): StakingDashboardModel {
+    private fun mapDashboardToUi(dashboard: StakingDashboard, formatters: DashboardFormatters): StakingDashboardModel {
         return StakingDashboardModel(
-            hasStakeItems = dashboard.hasStake.map(::mapHasStakeItemToUi),
-            noStakeItems = dashboard.withoutStake.map(presentationMapper::mapWithoutStakeItemToUi),
+            hasStakeItems = dashboard.hasStake.map { mapHasStakeItemToUi(it, formatters) },
+            noStakeItems = dashboard.withoutStake.map(formatters.presentationMapper::mapWithoutStakeItemToUi),
         )
     }
 
-    private fun mapHasStakeItemToUi(hasStake: AggregatedStakingDashboardOption<HasStake>): StakingDashboardModel.HasStakeItem {
+    private fun mapHasStakeItemToUi(
+        hasStake: AggregatedStakingDashboardOption<HasStake>,
+        formatters: DashboardFormatters
+    ): StakingDashboardModel.HasStakeItem {
         val stats = hasStake.stakingState.stats
         val isSyncingPrimary = hasStake.syncingStage.isSyncingPrimary()
         val isSyncingSecondary = hasStake.syncingStage.isSyncingSecondary()
 
         val stakingTypBadge = if (hasStake.stakingState.showStakingType) {
-            presentationMapper.mapStakingTypeToUi(hasStake.stakingState.stakingType)
+            formatters.presentationMapper.mapStakingTypeToUi(hasStake.stakingState.stakingType)
         } else {
             null
         }
 
         return StakingDashboardModel.HasStakeItem(
-            chainUi = mapChainToUi(hasStake.chain).syncingIf(isSyncingPrimary),
-            assetId = hasStake.token.configuration.id,
-            rewards = stats.map { mapAmountToAmountModel(it.rewards, hasStake.token).syncingIf(isSyncingSecondary) },
-            stake = mapAmountToAmountModel(hasStake.stakingState.stake, hasStake.token).syncingIf(isSyncingPrimary),
+            assetLabel = resourceManager.getString(R.string.staking_rewards, hasStake.token.configuration.name).syncingIf(isSyncingPrimary),
+            assetId = hasStake.token.configuration.fullId,
+            rewards = stats.map {
+                formatters.maskableValueFormatter.format {
+                    amountFormatter.formatAmountToAmountModel(it.rewards, hasStake.token)
+                }.syncingIf(isSyncingSecondary)
+            },
+            stake = formatters.maskableValueFormatter.format {
+                amountFormatter.formatAmountToAmountModel(hasStake.stakingState.stake, hasStake.token)
+            }.syncingIf(isSyncingSecondary),
             status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
             earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
-            stakingTypeBadge = stakingTypBadge
+            stakingTypeBadge = stakingTypBadge,
+            assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary)
         )
     }
 

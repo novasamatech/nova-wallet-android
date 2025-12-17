@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_multisig_operations.presentation.callForm
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.utils.images.Icon
 
-class MultisigCallPreviewModel(
+data class MultisigCallPreviewModel(
     val title: String,
     val subtitle: String?,
     val primaryValue: String?,

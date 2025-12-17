@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypePayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.SetupStakingTypeViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -45,11 +46,13 @@ class SetupStakingTypeModule {
     @Provides
     fun provideEditableStakingTypeItemFormatter(
         resourceManager: ResourceManager,
-        multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter
+        multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter,
+        amountFormatter: AmountFormatter
     ): EditableStakingTypeItemFormatter {
         return EditableStakingTypeItemFormatter(
             resourceManager,
-            multiStakingTargetSelectionFormatter
+            multiStakingTargetSelectionFormatter,
+            amountFormatter = amountFormatter
         )
     }
 
@@ -70,6 +73,7 @@ class SetupStakingTypeModule {
         setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
         chainRegistry: ChainRegistry,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return SetupStakingTypeViewModel(
             stakingRouter,

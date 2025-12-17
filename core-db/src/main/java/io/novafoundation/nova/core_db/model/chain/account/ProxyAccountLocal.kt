@@ -35,6 +35,7 @@ data class ProxyAccountLocal(
     val proxiedMetaId: Long,
     val proxyMetaId: Long,
     val chainId: String,
+    @Deprecated("Unused")
     val proxiedAccountId: ByteArray,
     val proxyType: String
 ) : Identifiable {

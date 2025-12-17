@@ -4,26 +4,10 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorBottomSheet
-import io.novafoundation.nova.feature_wallet_api.presentation.view.AssetSelectorView
 
 interface WithAssetSelector {
 
     val assetSelectorMixin: AssetSelectorMixin
-}
-
-fun <V> BaseFragment<V, *>.setupAssetSelector(
-    view: AssetSelectorView,
-    selectorMixin: AssetSelectorMixin,
-    imageLoader: ImageLoader
-) where V : BaseViewModel {
-    view.onClick {
-        selectorMixin.assetSelectorClicked()
-    }
-
-    subscribeOnAssetChange(selectorMixin) {
-        view.setState(imageLoader, it)
-    }
-    subscribeOnAssetClick(selectorMixin, imageLoader)
 }
 
 fun <V> BaseFragment<V, *>.subscribeOnAssetChange(
@@ -36,11 +20,13 @@ fun <V> BaseFragment<V, *>.subscribeOnAssetChange(
 }
 
 fun <V> BaseFragment<V, *>.subscribeOnAssetClick(
+    title: String,
     selectorMixin: AssetSelectorMixin,
     imageLoader: ImageLoader
 ) where V : BaseViewModel {
     selectorMixin.showAssetChooser.observeEvent {
         AssetSelectorBottomSheet(
+            title = title,
             imageLoader = imageLoader,
             context = requireContext(),
             payload = it,

@@ -13,7 +13,6 @@ import com.yuyakaido.android.cardstackview.StackFrom
 import com.yuyakaido.android.cardstackview.SwipeAnimationSetting
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
@@ -36,7 +35,6 @@ class TinderGovCardsFragment :
     private val adapter = TinderGovCardsAdapter(lifecycleOwner = this, handler = this)
 
     override fun initViews() {
-        binder.tinderGovCardsStatusBarInsetsContainer.applyStatusBarInsets()
         binder.tinderGovCardsBack.setOnClickListener { viewModel.back() }
         binder.tinderGovCardsSettings.setOnClickListener { viewModel.editVotingPowerClicked() }
 

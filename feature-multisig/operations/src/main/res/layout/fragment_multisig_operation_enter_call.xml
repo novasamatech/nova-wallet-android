@@ -17,16 +17,18 @@
 
     <io.novafoundation.nova.common.view.InputField
         android:id="@+id/multisigOperationEnterCallInput"
-        style="@style/Widget.Nova.Input.Primary.External"
+        style="@style/Widget.Nova.Input.Primary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="16dp"
-        android:hint="@string/account_import_seed_hint"
+        android:gravity="top"
         android:inputType="textMultiLine"
+        android:maxLines="2"
+        app:editTextHint="@string/account_import_seed_hint"
+        app:editTextMinHeight="64dp"
         app:endIconDrawable="@drawable/ic_x_clear_filled"
-        app:endIconMode="clear_text"
-        app:hintAnimationEnabled="false" />
+        app:endIconMode="clear_text" />
 
     <Space
         android:layout_width="match_parent"

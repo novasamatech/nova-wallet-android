@@ -38,7 +38,10 @@ import io.novafoundation.nova.splash.SplashRouter
         CloudBackupNavigationModule::class,
         AssetNavigationModule::class,
         AccountMigrationNavigationModule::class,
-        MultisigNavigationModule::class
+        MultisigNavigationModule::class,
+        ChainMigrationNavigationModule::class,
+        WalletNavigationModule::class,
+        GiftNavigationModule::class
     ]
 )
 class NavigationModule {

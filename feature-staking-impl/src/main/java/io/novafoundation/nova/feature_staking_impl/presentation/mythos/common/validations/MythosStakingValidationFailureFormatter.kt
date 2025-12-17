@@ -14,7 +14,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.unbond.validati
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
 import io.novafoundation.nova.feature_wallet_api.domain.validation.handleNotEnoughFeeError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.zeroAmount
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import javax.inject.Inject
 
 interface MythosStakingValidationFailureFormatter {
@@ -31,6 +32,7 @@ interface MythosStakingValidationFailureFormatter {
 @FeatureScope
 class RealMythosStakingValidationFailureFormatter @Inject constructor(
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) : MythosStakingValidationFailureFormatter {
 
     override fun formatStartStaking(failure: ValidationStatus.NotValid<StartMythosStakingValidationFailure>): TransformedFailure {
@@ -42,7 +44,7 @@ class RealMythosStakingValidationFailureFormatter @Inject constructor(
             StartMythosStakingValidationFailure.NotPositiveAmount -> resourceManager.zeroAmount().asDefault()
 
             is StartMythosStakingValidationFailure.TooLowStakeAmount -> {
-                val formattedMinStake = mapAmountToAmountModel(reason.minimumStake, reason.asset).token
+                val formattedMinStake = amountFormatter.formatAmountToAmountModel(reason.minimumStake, reason.asset).token
 
                 val content = resourceManager.getString(R.string.common_amount_low) to
                     resourceManager.getString(R.string.staking_setup_amount_too_low, formattedMinStake)

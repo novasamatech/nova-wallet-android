@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
@@ -36,6 +37,7 @@ class SetupTinderGovVoteViewModel(
     private val tinderGovInteractor: TinderGovInteractor,
     private val tinderGovVoteResponder: TinderGovVoteResponder,
     private val accountRepository: AccountRepository,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     assetUseCase: AssetUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -60,6 +62,7 @@ class SetupTinderGovVoteViewModel(
     convictionValuesProvider,
     locksFormatter,
     maxActionProviderFactory,
+    amountFormatter,
     feeLoaderMixinFactory
 ) {
     override val title: Flow<String> = flowOf {

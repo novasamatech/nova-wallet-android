@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_api.domain.api
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
@@ -7,7 +8,6 @@ import io.novafoundation.nova.feature_staking_api.domain.model.InflationPredicti
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
-import io.novafoundation.nova.feature_staking_api.domain.model.StakingStory
 import io.novafoundation.nova.feature_staking_api.domain.model.ValidatorPrefs
 import io.novafoundation.nova.feature_staking_api.domain.model.relaychain.StakingState
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -20,9 +20,9 @@ typealias ExposuresWithEraIndex = Pair<AccountIdMap<Exposure>, EraIndex>
 
 interface StakingRepository {
 
-    suspend fun eraStartSessionIndex(chainId: ChainId, currentEra: BigInteger): EraIndex
+    suspend fun eraStartSessionIndex(chainId: ChainId, era: EraIndex): EraIndex
 
-    suspend fun eraLength(chainId: ChainId): BigInteger
+    suspend fun eraLength(chain: Chain): BigInteger
 
     suspend fun getActiveEraIndex(chainId: ChainId): EraIndex
 
@@ -36,7 +36,7 @@ interface StakingRepository {
 
     suspend fun getValidatorPrefs(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<ValidatorPrefs?>
 
-    suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): AccountIdMap<Boolean>
+    suspend fun getSlashes(chainId: ChainId, accountIdsHex: Collection<String>): Set<AccountIdKey>
 
     suspend fun getSlashingSpan(chainId: ChainId, accountId: AccountId): SlashingSpans?
 
@@ -45,8 +45,6 @@ interface StakingRepository {
         chainAsset: Chain.Asset,
         accountId: AccountId
     ): Flow<StakingState>
-
-    fun stakingStoriesFlow(): Flow<List<StakingStory>>
 
     fun ledgerFlow(stakingState: StakingState.Stash): Flow<StakingLedger>
 

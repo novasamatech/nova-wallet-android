@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.calls
 
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.composeCall
-import io.novafoundation.nova.feature_xcm_api.dryRun.model.OriginCaller
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.model.OriginCaller
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 

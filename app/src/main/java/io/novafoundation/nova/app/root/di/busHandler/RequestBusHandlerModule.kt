@@ -3,7 +3,6 @@ package io.novafoundation.nova.app.root.di.busHandler
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
-import io.novafoundation.nova.app.root.di.RootActionBottomSheetLauncher
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CloudBackupSyncRequestBusHandler
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
@@ -13,7 +12,6 @@ import io.novafoundation.nova.app.root.presentation.requestBusHandler.PushSettin
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.RequestBusHandler
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.data.proxy.validation.ProxyExtrinsicValidationRequestBus
@@ -32,12 +30,10 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun providePushSettingsSyncRequestBusHandler(
-        scope: RootScope,
         metaAccountChangesEventBus: MetaAccountChangesEventBus,
         pushNotificationsInteractor: PushNotificationsInteractor
     ): RequestBusHandler {
         return PushSettingsSyncRequestBusHandler(
-            scope,
             metaAccountChangesEventBus,
             pushNotificationsInteractor
         )
@@ -47,12 +43,10 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun provideProxyExtrinsicValidationRequestBusHandler(
-        scope: RootScope,
         proxyProxyExtrinsicValidationRequestBus: ProxyExtrinsicValidationRequestBus,
         proxyHaveEnoughFeeValidationFactory: ProxyHaveEnoughFeeValidationFactory
     ): RequestBusHandler {
         return ProxyExtrinsicValidationRequestBusHandler(
-            scope,
             proxyProxyExtrinsicValidationRequestBus,
             proxyHaveEnoughFeeValidationFactory
         )
@@ -62,12 +56,10 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun provideMultisigExtrinsicValidationRequestBusHandler(
-        scope: RootScope,
         multisigExtrinsicValidationRequestBus: MultisigExtrinsicValidationRequestBus,
         multisigExtrinsicValidationFactory: MultisigExtrinsicValidationFactory
     ): RequestBusHandler {
         return MultisigExtrinsicValidationRequestBusHandler(
-            scope,
             multisigExtrinsicValidationRequestBus,
             multisigExtrinsicValidationFactory
         )
@@ -77,18 +69,16 @@ class RequestBusHandlerModule {
     @FeatureScope
     @IntoSet
     fun provideCloudBackupSyncRequestBusHandler(
-        scope: RootScope,
         rootRouter: RootRouter,
         resourceManager: ResourceManager,
         metaAccountChangesEventBus: MetaAccountChangesEventBus,
         applyLocalSnapshotToCloudBackupUseCase: ApplyLocalSnapshotToCloudBackupUseCase,
         accountRepository: AccountRepository,
-        @RootActionBottomSheetLauncher actionBottomSheetLauncher: ActionBottomSheetLauncher,
+        actionBottomSheetLauncher: ActionBottomSheetLauncher,
         automaticInteractionGate: AutomaticInteractionGate
     ): RequestBusHandler {
         return CloudBackupSyncRequestBusHandler(
             rootRouter,
-            scope,
             resourceManager,
             metaAccountChangesEventBus,
             applyLocalSnapshotToCloudBackupUseCase,

@@ -18,7 +18,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StakingPeriod
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeActions.StakeActionsEvent
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,6 +31,7 @@ import java.math.RoundingMode
 
 abstract class BaseNetworkInfoComponent(
     private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter,
     coroutineScope: CoroutineScope,
     @StringRes titleRes: Int,
 ) : NetworkInfoComponent,
@@ -59,8 +62,12 @@ abstract class BaseNetworkInfoComponent(
         }
 
         return createNetworkInfoItems(
-            totalStaked = mapAmountToAmountModel(networkInfo.totalStake, asset).asLoaded(),
-            minimumStake = mapAmountToAmountModel(networkInfo.minimumStake, asset, roundingMode = RoundingMode.CEILING).asLoaded(),
+            totalStaked = amountFormatter.formatAmountToAmountModel(networkInfo.totalStake, asset).asLoaded(),
+            minimumStake = amountFormatter.formatAmountToAmountModel(
+                networkInfo.minimumStake,
+                asset,
+                AmountConfig(roundingMode = RoundingMode.CEILING)
+            ).asLoaded(),
             activeNominators = networkInfo.nominatorsCount?.format()?.asLoaded(),
             unstakingPeriod = unstakingPeriod.asLoaded(),
             stakingPeriod = stakingPeriod.asLoaded(),

@@ -7,13 +7,15 @@ import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_swap_core_api.di.SwapCoreApi
+import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
 
 @ApplicationScope
 class WalletFeatureHolder @Inject constructor(
-    featureContainer: FeatureContainer,
+    private val walletRouter: WalletRouter,
+    featureContainer: FeatureContainer
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -27,6 +29,6 @@ class WalletFeatureHolder @Inject constructor(
             .xcmFeatureApi(getFeature(XcmFeatureApi::class.java))
             .build()
         return DaggerWalletFeatureComponent.factory()
-            .create(dependencies)
+            .create(walletRouter, dependencies)
     }
 }

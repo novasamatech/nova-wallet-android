@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.validations.reedeem.Re
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.redeem.RedeemViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class RedeemModule {
@@ -40,7 +41,8 @@ class RedeemModule {
         feeLoaderMixin: FeeLoaderMixin.Presentation,
         singleAssetSharedState: StakingSharedState,
         walletUiUseCase: WalletUiUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return RedeemViewModel(
             router = router,
@@ -54,7 +56,8 @@ class RedeemModule {
             externalActions = externalActions,
             selectedAssetState = singleAssetSharedState,
             walletUiUseCase = walletUiUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

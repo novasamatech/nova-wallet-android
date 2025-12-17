@@ -42,7 +42,7 @@ interface TradeTokenRegistry {
 
     interface Integrator<T> {
 
-        fun run(using: T)
+        suspend fun run(using: T)
     }
 
     enum class TradeType {

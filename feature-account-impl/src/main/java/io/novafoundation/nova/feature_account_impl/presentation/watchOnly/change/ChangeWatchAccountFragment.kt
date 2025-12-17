@@ -4,7 +4,6 @@ import android.os.Bundle
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -27,7 +26,6 @@ class ChangeWatchAccountFragment : BaseFragment<ChangeWatchAccountViewModel, Fra
     override fun createBinding() = FragmentChangeWatchWalletBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.changeWatchAccountToolbar.applyStatusBarInsets()
         binder.changeWatchAccountToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.changeWatchAccountContinue.setOnClickListener { viewModel.nextClicked() }

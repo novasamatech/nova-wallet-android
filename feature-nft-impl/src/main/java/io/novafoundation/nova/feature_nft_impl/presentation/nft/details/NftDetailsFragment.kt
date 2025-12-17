@@ -8,7 +8,6 @@ import coil.ImageLoader
 import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -52,7 +51,6 @@ class NftDetailsFragment : BaseFragment<NftDetailsViewModel, FragmentNftDetailsB
     }
 
     override fun initViews() {
-        binder.nftDetailsToolbar.applyStatusBarInsets()
         binder.nftDetailsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.nftDetailsOnwer.setOnClickListener { viewModel.ownerClicked() }

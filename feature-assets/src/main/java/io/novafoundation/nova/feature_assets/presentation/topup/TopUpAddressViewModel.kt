@@ -16,9 +16,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInp
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
-import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
-import io.novafoundation.nova.feature_assets.presentation.send.common.buildAssetTransfer
-import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.autoFixSendValidationPayload
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.buildAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -47,6 +48,7 @@ class TopUpAddressViewModel(
     private val validationExecutor: ValidationExecutor,
     private val resourceManager: ResourceManager,
     private val responder: TopUpAddressResponder,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
     amountChooserMixinFactory: AmountChooserMixin.Factory,

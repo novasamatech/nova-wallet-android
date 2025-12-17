@@ -43,6 +43,7 @@ import io.novafoundation.nova.feature_governance_api.domain.referendum.details.R
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.PreparingReason
 import io.novafoundation.nova.feature_governance_api.domain.referendum.list.ReferendumStatus
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -179,7 +180,7 @@ class RealReferendaConstructor(
         val chain = selectedGovernanceOption.assetWithChain.chain
         val governanceSource = governanceSourceRegistry.sourceFor(selectedGovernanceOption)
 
-        val blockTime = chainStateRepository.predictedBlockTime(chain.id)
+        val blockTime = chainStateRepository.predictedBlockTime(chain.timelineChainIdOrSelf())
         val blockDurationEstimator = BlockDurationEstimator(currentBlock = currentBlockNumber, blockTimeMillis = blockTime)
 
         val undecidingTimeout = governanceSource.referenda.undecidingTimeout(chain.id)
@@ -229,7 +230,7 @@ class RealReferendaConstructor(
         calculatedStatus: ReferendumStatus,
         currentBlockNumber: BlockNumber,
     ): List<ReferendumTimeline.Entry> {
-        val blockTime = chainStateRepository.predictedBlockTime(chain.id)
+        val blockTime = chainStateRepository.predictedBlockTime(chain.timelineChainIdOrSelf())
         val blockDurationEstimator = BlockDurationEstimator(currentBlock = currentBlockNumber, blockTimeMillis = blockTime)
 
         fun MutableList<ReferendumTimeline.Entry>.add(state: State, at: BlockNumber?) {

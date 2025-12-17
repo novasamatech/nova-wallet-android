@@ -3,13 +3,16 @@ package io.novafoundation.nova.feature_assets.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
+import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -30,25 +33,31 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
-import io.novafoundation.nova.feature_assets.domain.novaCard.RealNovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeAssetSearchInteractorFactory
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
+import io.novafoundation.nova.feature_assets.domain.novaCard.RealNovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.MultisigRestrictionCheckMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatterFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
+import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatterFactory
+import io.novafoundation.nova.feature_assets.presentation.novacard.common.NovaCardRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.InitialSwapFlowExecutor
 import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlowExecutorFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegistry
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
@@ -58,11 +67,11 @@ import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsSt
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
-import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.model.RealAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -90,7 +99,12 @@ class AssetsFeatureModule {
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
         swapService: SwapService
-    ) = AssetSearchUseCase(walletRepository, accountRepository, chainRegistry, swapService)
+    ) = AssetSearchUseCase(
+        walletRepository = walletRepository,
+        accountRepository = accountRepository,
+        chainRegistry = chainRegistry,
+        swapService = swapService
+    )
 
     @Provides
     @FeatureScope
@@ -98,16 +112,24 @@ class AssetsFeatureModule {
         assetViewModeRepository: AssetsViewModeRepository,
         assetSearchUseCase: AssetSearchUseCase,
         chainRegistry: ChainRegistry,
-        tradeTokenRegistry: TradeTokenRegistry
-    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(assetViewModeRepository, assetSearchUseCase, chainRegistry, tradeTokenRegistry)
+        tradeTokenRegistry: TradeTokenRegistry,
+        availableGiftAssetsUseCase: AvailableGiftAssetsUseCase
+    ): AssetSearchInteractorFactory = AssetViewModeAssetSearchInteractorFactory(
+        assetViewModeRepository,
+        assetSearchUseCase,
+        chainRegistry,
+        tradeTokenRegistry,
+        availableGiftAssetsUseCase
+    )
 
     @Provides
     @FeatureScope
     fun provideAssetNetworksInteractor(
         chainRegistry: ChainRegistry,
         assetSearchUseCase: AssetSearchUseCase,
-        tradeTokenRegistry: TradeTokenRegistry
-    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry)
+        tradeTokenRegistry: TradeTokenRegistry,
+        giftAssetsUseCase: AvailableGiftAssetsUseCase
+    ) = AssetNetworksInteractor(chainRegistry, assetSearchUseCase, tradeTokenRegistry, giftAssetsUseCase)
 
     @Provides
     @FeatureScope
@@ -225,8 +247,38 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAmountFormatter(resourceManager: ResourceManager): AmountFormatter {
-        return RealAmountFormatter(resourceManager)
+    fun provideNetworkAssetMapperFactory(
+        fiatFormatter: FiatFormatter,
+        amountFormatter: AmountFormatter
+    ): NetworkAssetFormatterFactory {
+        return NetworkAssetFormatterFactory(
+            fiatFormatter,
+            amountFormatter
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideTokenAssetMapperFactory(amountFormatter: AmountFormatter): TokenAssetFormatterFactory {
+        return TokenAssetFormatterFactory(amountFormatter)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNotMaskingNetworkAssetMapper(
+        networkAssetFormatterFactory: NetworkAssetFormatterFactory,
+        maskableValueFormatterFactory: MaskableValueFormatterFactory
+    ): NetworkAssetFormatter {
+        return networkAssetFormatterFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNotMaskingTokenAssetMapper(
+        tokenAssetFormatterFactory: TokenAssetFormatterFactory,
+        maskableValueFormatterFactory: MaskableValueFormatterFactory
+    ): TokenAssetFormatter {
+        return tokenAssetFormatterFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
     }
 
     @Provides
@@ -235,13 +287,17 @@ class AssetsFeatureModule {
         assetIconProvider: AssetIconProvider,
         currencyInteractor: CurrencyInteractor,
         assetsViewModeRepository: AssetsViewModeRepository,
-        amountFormatter: AmountFormatter
+        amountFormatterProvider: MaskableValueFormatterProvider,
+        networkAssetFormatterFactory: NetworkAssetFormatterFactory,
+        tokenAssetFormatterFactory: TokenAssetFormatterFactory,
     ): ExpandableAssetsMixinFactory {
         return ExpandableAssetsMixinFactory(
             assetIconProvider,
             currencyInteractor,
             assetsViewModeRepository,
-            amountFormatter
+            amountFormatterProvider,
+            networkAssetFormatterFactory,
+            tokenAssetFormatterFactory
         )
     }
 
@@ -256,15 +312,31 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideMultisigCheckMixinFactory(
+    fun provideBuySellRestrictionCheckMixin(
         accountUseCase: SelectedAccountUseCase,
-        actionLauncherFactory: ActionBottomSheetLauncherFactory,
+        actionLauncher: ActionBottomSheetLauncher,
         resourceManager: ResourceManager
-    ): MultisigRestrictionCheckMixinFactory {
-        return MultisigRestrictionCheckMixinFactory(
+    ): BuySellRestrictionCheckMixin {
+        return BuySellRestrictionCheckMixin(
             accountUseCase,
-            actionLauncherFactory,
-            resourceManager
+            resourceManager,
+            actionLauncher
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideNovaCardRestrictionCheckMixin(
+        accountUseCase: SelectedAccountUseCase,
+        actionLauncher: ActionBottomSheetLauncher,
+        resourceManager: ResourceManager,
+        chainRegistry: ChainRegistry
+    ): NovaCardRestrictionCheckMixin {
+        return NovaCardRestrictionCheckMixin(
+            accountUseCase,
+            resourceManager,
+            actionLauncher,
+            chainRegistry
         )
     }
 
@@ -275,14 +347,14 @@ class AssetsFeatureModule {
         tradeTokenRegistry: TradeTokenRegistry,
         chainRegistry: ChainRegistry,
         resourceManager: ResourceManager,
-        multisigRestrictionCheckMixinFactory: MultisigRestrictionCheckMixinFactory
+        buySellRestrictionCheckMixin: BuySellRestrictionCheckMixin
     ): BuySellSelectorMixinFactory {
         return BuySellSelectorMixinFactory(
             router,
             tradeTokenRegistry,
             chainRegistry,
             resourceManager,
-            multisigRestrictionCheckMixinFactory
+            buySellRestrictionCheckMixin
         )
     }
 }

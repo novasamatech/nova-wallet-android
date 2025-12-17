@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_nft_impl.domain.nft.list.NftListInteractor
 import io.novafoundation.nova.feature_nft_impl.domain.nft.list.PricedNft
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatIssuance
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.formatNftPrice
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -25,6 +26,7 @@ class NftListViewModel(
     private val router: NftRouter,
     private val resourceManager: ResourceManager,
     private val interactor: NftListInteractor,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel() {
 
     private val nftsFlow = interactor.userNftsFlow()
@@ -69,7 +71,7 @@ class NftListViewModel(
             is Nft.Details.Loaded -> {
                 val issuanceFormatted = resourceManager.formatIssuance(details.issuance)
 
-                val price = resourceManager.formatNftPrice(details.price, pricedNft.nftPriceToken)
+                val price = resourceManager.formatNftPrice(amountFormatter, details.price, pricedNft.nftPriceToken)
 
                 LoadingState.Loaded(
                     NftListItem.Content(

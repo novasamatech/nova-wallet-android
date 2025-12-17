@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_ledger_impl.presentation.account.common.s
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import io.novafoundation.nova.common.list.instruction.InstructionAdapter
+import io.novafoundation.nova.common.list.instruction.InstructionItem
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.view.AlertModel
 import io.novafoundation.nova.common.view.setModelOrHide
@@ -10,7 +12,7 @@ import io.novafoundation.nova.feature_ledger_impl.databinding.ItemImportLedgerSt
 
 class ConnectionModePageModel(
     val modeName: String,
-    val guideItems: List<LedgerGuideItem>
+    val guideItems: List<InstructionItem>
 )
 
 class StartImportLedgerPagerAdapter(
@@ -52,7 +54,7 @@ class StartImportLedgerPageViewHolder(
     private val handler: StartImportLedgerPagerAdapter.Handler
 ) : ViewHolder(binder.root) {
 
-    private val adapter = StartImportLedgerInstructionAdapter()
+    private val adapter = InstructionAdapter()
 
     init {
         binder.startImportLedgerInstructions.adapter = adapter

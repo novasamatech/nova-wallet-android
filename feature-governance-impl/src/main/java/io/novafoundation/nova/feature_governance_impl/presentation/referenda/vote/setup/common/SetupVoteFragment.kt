@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentSetupVoteBinding
 import io.novafoundation.nova.feature_governance_impl.presentation.common.locks.AmountChipModel
@@ -40,8 +39,6 @@ abstract class SetupVoteFragment<T : SetupVoteViewModel> : BaseFragment<T, Fragm
     }
 
     override fun initViews() {
-        binder.setupReferendumVoteContainer.applyStatusBarInsets()
-
         binder.setupReferendumVoteToolbar.setHomeButtonListener { viewModel.backClicked() }
         onBackPressed { viewModel.backClicked() }
     }

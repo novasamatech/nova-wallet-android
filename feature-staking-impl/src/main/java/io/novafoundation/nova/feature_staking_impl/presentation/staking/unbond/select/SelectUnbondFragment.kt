@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSelectUnbondBinding
@@ -18,8 +17,6 @@ class SelectUnbondFragment : BaseFragment<SelectUnbondViewModel, FragmentSelectU
     override fun createBinding() = FragmentSelectUnbondBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.unbondContainer.applyStatusBarInsets()
-
         binder.unbondToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.unbondContinue.prepareForProgress(viewLifecycleOwner)
         binder.unbondContinue.setOnClickListener { viewModel.nextClicked() }

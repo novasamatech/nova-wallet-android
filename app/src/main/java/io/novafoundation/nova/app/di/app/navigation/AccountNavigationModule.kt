@@ -5,8 +5,10 @@ import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
 import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.app.root.navigation.navigators.account.PolkadotVaultVariantSignCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.account.ScanSeedCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.account.SelectAddressCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.account.SelectMultipleWalletsCommunicatorImpl
+import io.novafoundation.nova.app.root.navigation.navigators.account.SelectSingleWalletCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.account.SelectWalletCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.cloudBackup.ChangeBackupPasswordCommunicatorImpl
 import io.novafoundation.nova.app.root.navigation.navigators.cloudBackup.RestoreBackupPasswordCommunicatorImpl
@@ -22,6 +24,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWall
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletCommunicator
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedCommunicator
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 
 @Module
@@ -51,6 +55,19 @@ class AccountNavigationModule {
         router: AssetsRouter,
         navigationHoldersRegistry: NavigationHoldersRegistry
     ): SelectAddressCommunicator = SelectAddressCommunicatorImpl(router, navigationHoldersRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideScanSeedCommunicator(
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): ScanSeedCommunicator = ScanSeedCommunicatorImpl(navigationHoldersRegistry)
+
+    @Provides
+    @ApplicationScope
+    fun provideSelectSingleWalletCommunicator(
+        router: AssetsRouter,
+        navigationHoldersRegistry: NavigationHoldersRegistry
+    ): SelectSingleWalletCommunicator = SelectSingleWalletCommunicatorImpl(router)
 
     @Provides
     @ApplicationScope

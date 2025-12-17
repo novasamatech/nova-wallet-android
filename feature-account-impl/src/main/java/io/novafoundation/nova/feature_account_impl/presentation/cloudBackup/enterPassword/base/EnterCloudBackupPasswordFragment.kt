@@ -4,7 +4,6 @@ import androidx.lifecycle.lifecycleScope
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.switchPasswordInputType
 import io.novafoundation.nova.common.view.bottomSheet.action.observeActionBottomSheet
@@ -20,7 +19,6 @@ abstract class EnterCloudBackupPasswordFragment<T : EnterCloudBackupPasswordView
     abstract val subtitleRes: Int
 
     override fun initViews() {
-        binder.restoreCloudBackupToolbar.applyStatusBarInsets()
         binder.restoreCloudBackupToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.enterBackupPasswordTitle.setText(titleRes)

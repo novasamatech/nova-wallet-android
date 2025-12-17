@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@drawable/drawable_background_image">
+    android:background="@drawable/drawable_background_image"
+    android:orientation="vertical">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/multisigPendingOperationsToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:contentBackground="@android:color/transparent"
         android:background="@color/blur_navigation_background"
+        app:contentBackground="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -27,6 +27,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <io.novafoundation.nova.common.view.PlaceholderView
+        android:id="@+id/multisigPendingOperationsPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/multisig_operations_placeholder"
+        android:visibility="gone"
+        app:image="@drawable/ic_placeholder"
+        app:imageTint="@color/icon_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/multisigPendingOperationsToolbar"
+        app:placeholderBackgroundStyle="no_background"
+        app:showButton="false" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/multisigPendingOperationsList"

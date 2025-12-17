@@ -1,13 +1,15 @@
 package io.novafoundation.nova.feature_assets.presentation.tokens.manage
 
+import android.view.View
 import androidx.lifecycle.lifecycleScope
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
+import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
@@ -32,14 +34,12 @@ class ManageTokensFragment :
         ManageTokensAdapter(imageLoader, this)
     }
 
-    override fun initViews() {
-        binder.manageTokensToolbar.applyStatusBarInsets()
-        binder.manageTokensContainer.applyInsetter {
-            type(ime = true) {
-                padding()
-            }
-        }
+    override fun applyInsets(rootView: View) {
+        binder.manageTokensToolbarContainer.applyStatusBarInsets()
+        binder.manageTokensList.applyNavigationBarInsets(consume = false, imeInsets = ImeInsetsState.ENABLE_IF_SUPPORTED)
+    }
 
+    override fun initViews() {
         binder.manageTokensList.setHasFixedSize(true)
         binder.manageTokensList.adapter = tokensAdapter
 

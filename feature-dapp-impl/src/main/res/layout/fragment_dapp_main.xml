@@ -8,6 +8,6 @@
     android:background="@drawable/drawable_background_image"
     android:clipToPadding="false"
     android:overScrollMode="never"
-    android:paddingBottom="84dp"
+    android:paddingBottom="16dp"
     android:scrollbars="none"
     app:layoutManager="io.novafoundation.nova.common.view.recyclerview.LinearLayoutManagerFixed" />

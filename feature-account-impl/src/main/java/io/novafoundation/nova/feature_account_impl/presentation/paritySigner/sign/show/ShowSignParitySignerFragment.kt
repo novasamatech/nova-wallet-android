@@ -4,7 +4,6 @@ import android.os.Bundle
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setSequence
@@ -36,7 +35,6 @@ class ShowSignParitySignerFragment : BaseFragment<ShowSignParitySignerViewModel,
 
         onBackPressed { viewModel.backClicked() }
 
-        binder.signParitySignerShowToolbar.applyStatusBarInsets()
         binder.signParitySignerShowToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.signParitySignerShowQr.background = requireContext().getRoundedCornerDrawable(fillColorRes = R.color.qr_code_background)

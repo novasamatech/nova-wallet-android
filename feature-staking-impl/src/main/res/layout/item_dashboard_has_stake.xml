@@ -8,12 +8,11 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
 
     <com.facebook.shimmer.ShimmerFrameLayout
-        android:id="@+id/itemDashboardHasStakeChainContainer"
+        android:id="@+id/itemDashboardHasStakeAssetContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="8dp"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@+id/itemDashboardHasStakeStakingType"
         app:layout_constraintHorizontal_bias="0"
@@ -21,10 +20,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <io.novafoundation.nova.feature_account_api.view.ChainChipView
-            android:id="@+id/itemDashboardHasStakeChain"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <ImageView
+            android:id="@+id/itemDashboardHasStakeAssetIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            tools:src="@drawable/ic_nova"/>
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -34,20 +34,24 @@
         tools:text="@string/nomination_pools_direct"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dp"
+        android:layout_marginStart="8dp"
         style="@style/Widget.Nova.StakingTypeBadge.Medium"
-        app:layout_constraintBottom_toBottomOf="@+id/itemDashboardHasStakeChainContainer"
+        app:layout_constraintBottom_toBottomOf="@+id/itemDashboardHasStakeAssetContainer"
         app:layout_constraintEnd_toStartOf="@+id/itemDashboardHasStakeRightSection"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/itemDashboardHasStakeChainContainer"
-        app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeChainContainer" />
+        app:layout_constraintStart_toEndOf="@+id/itemDashboardHasStakeAssetContainer"
+        app:layout_constraintTop_toTopOf="@+id/itemDashboardHasStakeAssetContainer" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/itemDashboardHasStakeRewardsLabelContainer"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeChainContainer"
-        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeChainContainer">
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="6dp"
+        app:layout_constraintEnd_toStartOf="@+id/itemDashboardHasStakeRightSection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeAssetContainer">
 
         <TextView
             android:id="@+id/itemDashboardHasStakeRewardsLabel"
@@ -55,13 +59,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/staking_rewards" />
-
-        <View
-            android:id="@+id/itemDashboardHasStakeRewardsLabelShimmer"
-            android:layout_width="49dp"
-            android:layout_height="10dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/bg_shimmering" />
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
@@ -182,14 +179,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="12dp"
         android:layout_marginEnd="10dp"
         android:ellipsize="end"
+        android:layout_marginTop="12dp"
         android:lines="1"
         android:text="@string/staking_your_stake"
         app:layout_constraintEnd_toEndOf="@+id/itemDashboardHasStakeRightSection"
         app:layout_constraintStart_toStartOf="@+id/itemDashboardHasStakeRightSection"
-        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeChainContainer" />
+        app:layout_constraintTop_toBottomOf="@+id/itemDashboardHasStakeStatusContainer" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
         android:id="@+id/itemDashboardHasStakeStakeAmountContainer"

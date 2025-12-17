@@ -7,7 +7,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.address.format.AddressScheme
 import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.addressActions.setupAddressActions
 import io.novafoundation.nova.feature_ledger_impl.databinding.FragmentImportLedgerSelectAddressBinding
@@ -46,7 +45,6 @@ abstract class SelectAddressLedgerFragment<V : SelectAddressLedgerViewModel> :
     protected fun payload(): SelectLedgerAddressPayload = argument(PAYLOAD_KEY)
 
     override fun initViews() {
-        binder.ledgerSelectAddressToolbar.applyStatusBarInsets()
         binder.ledgerSelectAddressToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }

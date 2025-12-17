@@ -53,6 +53,8 @@ import io.novafoundation.nova.feature_account_impl.presentation.startCreateWalle
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload
 import io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet.StartCreateWalletPayload.FlowType
 import io.novafoundation.nova.feature_account_impl.presentation.watchOnly.change.ChangeWatchAccountFragment
+import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsFragment
+import io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsPayload
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailFragment
 import io.novafoundation.nova.feature_assets.presentation.flow.network.NetworkFlowFragment
@@ -93,11 +95,17 @@ import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.cus
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.custom.moonbeam.terms.MoonbeamCrowdloanTermsFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.CrowdloanContributeFragment
 import io.novafoundation.nova.feature_crowdloan_impl.presentation.contribute.select.parcel.ContributePayload
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.amount.SelectGiftAmountPayload
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsFragment
+import io.novafoundation.nova.feature_gift_impl.presentation.gifts.GiftsPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerFragment
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.generic.selectLedger.AddEvmAccountSelectGenericLedgerPayload
-import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerFragment
+import io.novafoundation.nova.feature_ledger_impl.presentation.account.addChain.legacy.selectLedger.AddChainAccountSelectLedgerPayload
 import io.novafoundation.nova.feature_ledger_impl.presentation.account.common.selectLedger.SelectLedgerPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedBottomSheet
+import io.novafoundation.nova.feature_multisig_operations.presentation.created.MultisigCreatedPayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.WelcomeFragment
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -355,6 +363,12 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openSelectSingleWallet(arguments: Bundle) {
+        navigationBuilder().action(R.id.action_open_select_single_wallet)
+            .setArgs(arguments)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openSelectMultipleWallets(arguments: Bundle) {
         navigationBuilder().action(R.id.action_open_select_multiple_wallets)
             .setArgs(arguments)
@@ -414,6 +428,12 @@ class Navigator(
 
     override fun openSellFlow() {
         navigationBuilder().action(R.id.action_mainFragment_to_sellFlow)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSelectGiftAmount(assetPayload: AssetPayload) {
+        navigationBuilder().action(R.id.action_selectGiftAmount)
+            .setArgs(SelectGiftAmountFragment.createPayload(SelectGiftAmountPayload(assetPayload)))
             .navigateInFirstAttachedContext()
     }
 
@@ -488,6 +508,12 @@ class Navigator(
 
     override fun openSellNetworks(payload: NetworkFlowPayload) {
         navigationBuilder().action(R.id.action_sellFlow_to_sellFlowNetwork)
+            .setArgs(NetworkFlowFragment.createPayload(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openGiftsNetworks(payload: NetworkFlowPayload) {
+        navigationBuilder().action(R.id.action_giftsFlow_to_giftsFlowNetwork)
             .setArgs(NetworkFlowFragment.createPayload(payload))
             .navigateInFirstAttachedContext()
     }
@@ -616,6 +642,12 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openChainMigrationDetails(chainId: String) {
+        navigationBuilder().action(R.id.action_open_chain_migration_details)
+            .setArgs(ChainMigrationDetailsFragment.createPayload(ChainMigrationDetailsPayload(chainId)))
+            .navigateInRoot()
+    }
+
     override fun returnToWallet() {
         // to achieve smooth animation
         postToUiThread {
@@ -628,6 +660,12 @@ class Navigator(
         val extras = WalletDetailsFragment.getBundle(metaId)
         navigationBuilder().action(R.id.action_open_account_details)
             .setArgs(extras)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openClaimContribution() {
+        navigationBuilder()
+            .action(R.id.action_userContributionsFragment_to_claimContributionFragment)
             .navigateInFirstAttachedContext()
     }
 
@@ -646,12 +684,25 @@ class Navigator(
             .addCase(R.id.assetSearchFragment, R.id.action_assetSearchFragment_to_balanceDetailFragment)
             .addCase(R.id.confirmTransferFragment, R.id.action_confirmTransferFragment_to_balanceDetailFragment)
             .addCase(R.id.tradeWebFragment, R.id.action_tradeWebFragment_to_balanceDetailFragment)
+            .addCase(R.id.balanceDetailFragment, R.id.action_balanceDetailFragment_to_balanceDetailFragment)
             .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }
 
     override fun openAssetDetailsFromDeepLink(payload: AssetPayload) {
         openSplitScreenWithInstantAction(R.id.action_mainFragment_to_balanceDetailFragment, BalanceDetailFragment.getBundle(payload))
+    }
+
+    override fun openGifts() {
+        navigationBuilder().action(R.id.action_open_gifts)
+            .setArgs(GiftsFragment.createPayload(GiftsPayload.AllAssets))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openGiftsByAsset(assetPayload: AssetPayload) {
+        navigationBuilder().action(R.id.action_open_gifts)
+            .setArgs(GiftsFragment.createPayload(GiftsPayload.ByAsset(assetPayload)))
+            .navigateInFirstAttachedContext()
     }
 
     override fun finishTradeOperation() {
@@ -679,7 +730,7 @@ class Navigator(
     }
 
     override fun openUserContributions() {
-        navigationBuilder().action(R.id.action_mainFragment_to_userContributionsFragment)
+        navigationBuilder().action(R.id.action_mainFragment_to_userContributionsGraph)
             .navigateInFirstAttachedContext()
     }
 
@@ -915,7 +966,8 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openMainWithFinishMultisigTransaction() {
-        openSplitScreenWithInstantAction(R.id.action_open_multisigCreatedDialog, nestedActionExtras = null)
+    override fun openMainWithFinishMultisigTransaction(accountWasSwitched: Boolean) {
+        val payload = MultisigCreatedBottomSheet.createPayload(MultisigCreatedPayload(accountWasSwitched))
+        openSplitScreenWithInstantAction(R.id.action_open_multisigCreatedDialog, nestedActionExtras = payload)
     }
 }

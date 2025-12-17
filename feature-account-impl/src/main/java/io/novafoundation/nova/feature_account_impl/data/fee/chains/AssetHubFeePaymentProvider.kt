@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.data.fee.chains
 
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import io.novafoundation.nova.feature_account_api.data.fee.FeePayment
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
 import io.novafoundation.nova.feature_account_api.data.fee.chains.CustomOrNativeFeePaymentProvider
@@ -12,40 +15,24 @@ import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 
-class AssetHubFeePaymentProviderFactory(
-    private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
-    private val multiLocationConverterFactory: MultiLocationConverterFactory,
-    private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
-    private val chainRegistry: ChainRegistry,
-    private val xcmVersionDetector: XcmVersionDetector
-) {
-
-    suspend fun create(chainId: ChainId): AssetHubFeePaymentProvider {
-        val chain = chainRegistry.getChain(chainId)
-        return AssetHubFeePaymentProvider(
-            chain = chain,
-            multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
-            multiLocationConverterFactory = multiLocationConverterFactory,
-            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher,
-            xcmVersionDetector = xcmVersionDetector
-        )
-    }
-}
-
-class AssetHubFeePaymentProvider(
-    private val chain: Chain,
+class AssetHubFeePaymentProvider @AssistedInject constructor(
+    @Assisted override val chain: Chain,
     private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
     private val multiLocationConverterFactory: MultiLocationConverterFactory,
     private val assetHubFeePaymentAssetsFetcher: AssetHubFeePaymentAssetsFetcherFactory,
     private val xcmVersionDetector: XcmVersionDetector
 ) : CustomOrNativeFeePaymentProvider() {
+
+    @AssistedFactory
+    interface Factory {
+
+        fun create(chain: Chain): AssetHubFeePaymentProvider
+    }
 
     override suspend fun feePaymentFor(customFeeAsset: Chain.Asset, coroutineScope: CoroutineScope?): FeePayment {
         val multiLocationConverter = multiLocationConverterFactory.defaultSync(chain)
@@ -54,9 +41,14 @@ class AssetHubFeePaymentProvider(
             paymentAsset = customFeeAsset,
             multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
             multiLocationConverter = multiLocationConverter,
-            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher.create(chain, multiLocationConverter),
             xcmVersionDetector = xcmVersionDetector
         )
+    }
+
+    override suspend fun canPayFeeInNonUtilityToken(customFeeAsset: Chain.Asset): Result<Boolean> {
+        // Asset hub does not support per-asset optimized query
+        return fastLookupCustomFeeCapability()
+            .map { it.canPayFeeInNonUtilityToken(customFeeAsset.id) }
     }
 
     override suspend fun detectFeePaymentFromExtrinsic(extrinsic: SendableExtrinsic): FeePayment {
@@ -67,7 +59,6 @@ class AssetHubFeePaymentProvider(
             paymentAsset = feePaymentAsset,
             multiChainRuntimeCallsApi = multiChainRuntimeCallsApi,
             multiLocationConverter = multiLocationConverter,
-            assetHubFeePaymentAssetsFetcher = assetHubFeePaymentAssetsFetcher.create(chain, multiLocationConverter),
             xcmVersionDetector = xcmVersionDetector
         )
     }

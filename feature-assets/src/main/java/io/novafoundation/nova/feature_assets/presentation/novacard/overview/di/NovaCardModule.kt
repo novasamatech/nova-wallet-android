@@ -57,7 +57,7 @@ class NovaCardModule {
     fun provideNovaCardWebViewControllerFactory(
         appLinksProvider: AppLinksProvider,
         interceptingWebViewClientFactory: InterceptingWebViewClientFactory,
-        novaCardWebChromeClientFactory: BaseWebChromeClientFactory,
+        novaCardWebChromeClientFactory: BaseWebChromeClientFactory
     ): NovaCardWebViewControllerFactory {
         return NovaCardWebViewControllerFactory(
             interceptingWebViewClientFactory,

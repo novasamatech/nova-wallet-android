@@ -104,6 +104,7 @@ fun BigDecimal.format(roundingMode: RoundingMode = RoundingMode.FLOOR): String {
     return defaultNumberFormatter.format(this, roundingMode)
 }
 
+@Deprecated("Use TokenFormatter instead")
 fun BigDecimal.formatWithFullAmount(): String {
     return fullAmountAbbreviationFormatter.format(this)
 }

@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.le
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.ledger.RealLegacyLedgerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.paritySigner.ParitySignerAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SubstrateKeypairAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.RealMnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.watchOnly.WatchOnlyAddAccountRepository
@@ -22,7 +23,7 @@ import io.novafoundation.nova.feature_account_impl.data.repository.datasource.Ac
 import io.novafoundation.nova.feature_account_impl.data.secrets.AccountSecretsFactory
 import io.novafoundation.nova.feature_account_impl.di.AddAccountsModule.BindsModule
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
 
 @Module(includes = [BindsModule::class])
 class AddAccountsModule {
@@ -61,13 +62,27 @@ class AddAccountsModule {
     fun provideJsonAddAccountRepository(
         accountDataSource: AccountDataSource,
         accountSecretsFactory: AccountSecretsFactory,
-        jsonSeedDecoder: JsonSeedDecoder,
+        JsonDecoder: JsonDecoder,
         chainRegistry: ChainRegistry,
         metaAccountChangesEventBus: MetaAccountChangesEventBus
     ) = JsonAddAccountRepository(
         accountDataSource,
         accountSecretsFactory,
-        jsonSeedDecoder,
+        JsonDecoder,
+        chainRegistry,
+        metaAccountChangesEventBus
+    )
+
+    @Provides
+    @FeatureScope
+    fun provideRawKeyAddAccountRepository(
+        accountDataSource: AccountDataSource,
+        accountSecretsFactory: AccountSecretsFactory,
+        chainRegistry: ChainRegistry,
+        metaAccountChangesEventBus: MetaAccountChangesEventBus
+    ) = SubstrateKeypairAddAccountRepository(
+        accountDataSource,
+        accountSecretsFactory,
         chainRegistry,
         metaAccountChangesEventBus
     )

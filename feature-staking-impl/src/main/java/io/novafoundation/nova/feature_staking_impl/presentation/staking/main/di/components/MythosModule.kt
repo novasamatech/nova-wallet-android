@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.stakeSummary.mythos.MythosStakeSummaryComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.mythos.MythosUnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.mythos.MythosUserRewardsComponentFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module
 class MythosModule {
@@ -25,9 +26,11 @@ class MythosModule {
     fun provideStakeSummaryComponentFactory(
         mythosSharedComputation: MythosSharedComputation,
         interactor: MythosStakeSummaryInteractor,
+        amountFormatter: AmountFormatter
     ) = MythosStakeSummaryComponentFactory(
         mythosSharedComputation = mythosSharedComputation,
-        interactor = interactor
+        interactor = interactor,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -48,10 +51,12 @@ class MythosModule {
         mythosSharedComputation: MythosSharedComputation,
         interactor: MythosUnbondingInteractor,
         router: MythosStakingRouter,
+        amountFormatter: AmountFormatter
     ) = MythosUnbondingComponentFactory(
         mythosSharedComputation = mythosSharedComputation,
         interactor = interactor,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -62,12 +67,14 @@ class MythosModule {
         interactor: MythosUserRewardsInteractor,
         rewardPeriodsInteractor: StakingRewardPeriodInteractor,
         resourceManager: ResourceManager,
+        amountFormatter: AmountFormatter
     ) = MythosUserRewardsComponentFactory(
         router = router,
         mythosSharedComputation = mythosSharedComputation,
         interactor = interactor,
         rewardPeriodsInteractor = rewardPeriodsInteractor,
-        resourceManager = resourceManager
+        resourceManager = resourceManager,
+        amountFormatter = amountFormatter
     )
 
     @Provides
@@ -77,10 +84,12 @@ class MythosModule {
         interactor: MythosStakingAlertsInteractor,
         resourceManager: ResourceManager,
         router: MythosStakingRouter,
+        amountFormatter: AmountFormatter
     ) = MythosAlertsComponentFactory(
         mythosSharedComputation = mythosSharedComputation,
         interactor = interactor,
         resourceManager = resourceManager,
-        router = router
+        router = router,
+        amountFormatter = amountFormatter
     )
 }

@@ -26,6 +26,10 @@ class ExpandableView @JvmOverloads constructor(
     defStyle: Int = 0,
 ) : ConstraintLayout(context, attrs, defStyle) {
 
+    fun interface Callback {
+        fun onStateChanged(state: ExpandableViewState)
+    }
+
     private var supportAnimation: Boolean = true
     private var collapsedByDefault: Boolean = false
     private var chevronResId: Int? = null
@@ -37,6 +41,8 @@ class ExpandableView @JvmOverloads constructor(
     private val expandablePart: View? by lazy { findViewByIdOrNull(expandablePartResId) }
 
     private var isExpandable: Boolean = true
+
+    private var callback: Callback? = null
 
     init {
         applyAttributes(attrs)
@@ -69,6 +75,17 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
+    fun currentState(): ExpandableViewState {
+        return when (isExpanded()) {
+            true -> ExpandableViewState.EXPANDED
+            false -> ExpandableViewState.COLLAPSED
+        }
+    }
+
+    fun setCallback(callback: Callback) {
+        this.callback = callback
+    }
+
     fun setState(state: ExpandableViewState) {
         when (state) {
             ExpandableViewState.COLLAPSED -> collapse()
@@ -77,11 +94,13 @@ class ExpandableView @JvmOverloads constructor(
     }
 
     fun collapseImmediate() {
+        callback?.onStateChanged(ExpandableViewState.COLLAPSED)
         expandablePart?.makeGone()
         chevron?.rotation = -180f
     }
 
     fun expandImmediate() {
+        callback?.onStateChanged(ExpandableViewState.EXPANDED)
         expandablePart?.makeVisible()
         chevron?.rotation = 0f
     }
@@ -105,10 +124,12 @@ class ExpandableView @JvmOverloads constructor(
         }
     }
 
+    private fun isExpanded() = expandablePart?.isVisible == true
+
     private fun toggle() {
         if (!isExpandable) return
 
-        if (expandablePart?.isVisible == true) {
+        if (isExpanded()) {
             collapse()
         } else {
             expand()
@@ -117,6 +138,7 @@ class ExpandableView @JvmOverloads constructor(
 
     private fun collapse() {
         if (supportAnimation) {
+            callback?.onStateChanged(ExpandableViewState.COLLAPSED)
             expandCollapseAnimator.removeAllListeners()
             expandCollapseAnimator.setFloatValues(0f, -1f)
             expandCollapseAnimator.doOnEnd { expandablePart?.makeGone() }
@@ -128,6 +150,7 @@ class ExpandableView @JvmOverloads constructor(
 
     private fun expand() {
         if (supportAnimation) {
+            callback?.onStateChanged(ExpandableViewState.EXPANDED)
             expandCollapseAnimator.removeAllListeners()
             expandCollapseAnimator.setFloatValues(-1f, 0f)
             expandCollapseAnimator.doOnStart { expandablePart?.makeVisible() }

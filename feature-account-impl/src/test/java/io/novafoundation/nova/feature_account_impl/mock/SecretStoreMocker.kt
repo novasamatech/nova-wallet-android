@@ -127,7 +127,7 @@ class MetaAccountSecretsMockBuilder(
             MetaAccountSecrets(
                 substrateKeyPair = it,
                 entropy = _entropy,
-                seed = _seed,
+                substrateSeed = _seed,
                 substrateDerivationPath = _substrateDerivationPath,
                 ethereumKeypair = _ethereumKeypair,
                 ethereumDerivationPath = _ethereumDerivationPath

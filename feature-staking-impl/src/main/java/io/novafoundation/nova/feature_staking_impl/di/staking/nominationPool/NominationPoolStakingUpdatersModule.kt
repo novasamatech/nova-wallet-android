@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ParachainsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
+import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.BondedErasUpdaterUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentEpochIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSessionIndexUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.session.CurrentSlotUpdater
@@ -159,6 +160,7 @@ class NominationPoolStakingUpdatersModule {
         genesisSlotUpdater: GenesisSlotUpdater,
         currentSessionIndexUpdater: CurrentSessionIndexUpdater,
         eraStartSessionIndexUpdater: EraStartSessionIndexUpdater,
+        bondedErasUpdaterUpdater: BondedErasUpdaterUpdater,
         parachainsUpdater: ParachainsUpdater,
         delegatedStakeUpdater: DelegatedStakeUpdater,
     ) = StakingUpdaters.Group(
@@ -178,6 +180,7 @@ class NominationPoolStakingUpdatersModule {
         currentSessionIndexUpdater,
         eraStartSessionIndexUpdater,
         parachainsUpdater,
-        delegatedStakeUpdater
+        delegatedStakeUpdater,
+        bondedErasUpdaterUpdater
     )
 }

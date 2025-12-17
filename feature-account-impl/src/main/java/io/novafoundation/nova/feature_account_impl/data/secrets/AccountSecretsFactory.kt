@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_account_impl.data.secrets
 
 import io.novafoundation.nova.common.data.mappers.mapCryptoTypeToEncryption
 import io.novafoundation.nova.common.data.mappers.mapEncryptionToCryptoType
+import io.novafoundation.nova.common.data.network.runtime.binding.cast
 import io.novafoundation.nova.common.data.secrets.v2.ChainAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.MetaAccountSecrets
 import io.novafoundation.nova.common.data.secrets.v2.mapKeypairStructToKeypair
@@ -9,14 +10,17 @@ import io.novafoundation.nova.common.utils.castOrNull
 import io.novafoundation.nova.common.utils.deriveSeed32
 import io.novafoundation.nova.core.model.CryptoType
 import io.novafoundation.nova.feature_account_api.data.derivationPath.DerivationPathDecoder
+import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
 import io.novasama.substrate_sdk_android.encrypt.junction.JunctionDecoder
-import io.novasama.substrate_sdk_android.encrypt.keypair.ethereum.EthereumKeypairFactory
+import io.novasama.substrate_sdk_android.encrypt.keypair.bip32.Bip32EcdsaKeypairFactory
+import io.novasama.substrate_sdk_android.encrypt.keypair.generate
+import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.Sr25519SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.encrypt.mnemonic.MnemonicCreator
 import io.novasama.substrate_sdk_android.encrypt.seed.SeedFactory
-import io.novasama.substrate_sdk_android.encrypt.seed.ethereum.EthereumSeedFactory
+import io.novasama.substrate_sdk_android.encrypt.seed.bip39.Bip39SeedFactory
 import io.novasama.substrate_sdk_android.encrypt.seed.substrate.SubstrateSeedFactory
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.scale.EncodableStruct
@@ -25,15 +29,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class AccountSecretsFactory(
-    private val jsonSeedDecoder: JsonSeedDecoder
+    private val JsonDecoder: JsonDecoder
 ) {
 
     sealed class AccountSource {
+
         class Mnemonic(val cryptoType: CryptoType, val mnemonic: String) : AccountSource()
 
         class Seed(val cryptoType: CryptoType, val seed: String) : AccountSource()
 
         class Json(val json: String, val password: String) : AccountSource()
+
+        class EncodedSr25519Keypair(val key: ByteArray) : AccountSource()
     }
 
     sealed class SecretsError : Exception() {
@@ -55,7 +62,7 @@ class AccountSecretsFactory(
         val decodedDerivationPath = decodeDerivationPath(derivationPath, ethereum = isEthereum)
 
         val decodedJson = accountSource.castOrNull<AccountSource.Json>()?.let { jsonSource ->
-            jsonSeedDecoder.decode(jsonSource.json, jsonSource.password).also {
+            JsonDecoder.decode(jsonSource.json, jsonSource.password).also {
                 // only allow Ethereum JSONs for ethereum chains
                 if (isEthereum && it.multiChainEncryption != MultiChainEncryption.Ethereum) {
                     throw SecretsError.NotValidEthereumCryptoType()
@@ -72,24 +79,35 @@ class AccountSecretsFactory(
             is AccountSource.Mnemonic -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Seed -> mapCryptoTypeToEncryption(accountSource.cryptoType)
             is AccountSource.Json -> decodedJson!!.multiChainEncryption.encryptionType
+            is AccountSource.EncodedSr25519Keypair -> EncryptionType.SR25519
         }
 
         val seed = when (accountSource) {
             is AccountSource.Mnemonic -> deriveSeed(accountSource.mnemonic, decodedDerivationPath?.password, ethereum = isEthereum).seed
             is AccountSource.Seed -> accountSource.seed.fromHex()
-            is AccountSource.Json -> decodedJson!!.seed
+            is AccountSource.Json -> null
+            is AccountSource.EncodedSr25519Keypair -> null
         }
 
-        val keypair = if (seed != null) {
-            val junctions = decodedDerivationPath?.junctions.orEmpty()
+        val keypair = when {
+            seed != null -> {
+                val junctions = decodedDerivationPath?.junctions.orEmpty()
 
-            if (isEthereum) {
-                EthereumKeypairFactory.generate(seed, junctions)
-            } else {
-                SubstrateKeypairFactory.generate(encryptionType, seed, junctions)
+                if (isEthereum) {
+                    Bip32EcdsaKeypairFactory.generate(seed, junctions)
+                } else {
+                    SubstrateKeypairFactory.generate(encryptionType, seed, junctions)
+                }
             }
-        } else { // seed is null for some cases when importing with JSON
-            decodedJson!!.keypair
+
+            decodedJson != null -> {
+                decodedJson.keypair
+            }
+
+            else -> {
+                val encodedSr25519Keypair = accountSource.cast<AccountSource.EncodedSr25519Keypair>()
+                Sr25519SubstrateKeypairFactory.createKeypairFromSecret(encodedSr25519Keypair.key)
+            }
         }
 
         val secrets = ChainAccountSecrets(
@@ -118,12 +136,12 @@ class AccountSecretsFactory(
 
             val seed = deriveSeed(it.mnemonic, password = decodedEthereumDerivationPath?.password, ethereum = true).seed
 
-            EthereumKeypairFactory.generate(seed = seed, junctions = decodedEthereumDerivationPath?.junctions.orEmpty())
+            Bip32EcdsaKeypairFactory.generate(seed = seed, junctions = decodedEthereumDerivationPath?.junctions.orEmpty())
         }
 
         val secrets = MetaAccountSecrets(
             entropy = substrateSecrets[ChainAccountSecrets.Entropy],
-            seed = substrateSecrets[ChainAccountSecrets.Seed],
+            substrateSeed = substrateSecrets[ChainAccountSecrets.Seed],
             substrateKeyPair = mapKeypairStructToKeypair(substrateSecrets[ChainAccountSecrets.Keypair]),
             substrateDerivationPath = substrateDerivationPath,
             ethereumKeypair = ethereumKeypair,
@@ -135,7 +153,7 @@ class AccountSecretsFactory(
 
     private fun deriveSeed(mnemonic: String, password: String?, ethereum: Boolean): SeedFactory.Result {
         return if (ethereum) {
-            EthereumSeedFactory.deriveSeed(mnemonic, password)
+            Bip39SeedFactory.deriveSeed(mnemonic, password)
         } else {
             SubstrateSeedFactory.deriveSeed32(mnemonic, password)
         }

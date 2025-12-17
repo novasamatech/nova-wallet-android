@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.useAttributes
 import io.novafoundation.nova.feature_governance_impl.R
@@ -45,12 +46,12 @@ class GovernanceLocksView @JvmOverloads constructor(
     fun setModel(model: GovernanceLocksModel) {
         binder.governanceLockedTitle.text = model.title
         binder.governanceLockAmount.setTextOrHide(model.amount)
-        binder.governanceUnlockBadge.isVisible = model.hasUnlockableLocks
+        binder.governanceUnlockBadge.isVisible = model.showUnlockableLocks
     }
 }
 
 class GovernanceLocksModel(
-    val amount: CharSequence?,
+    val amount: MaskableModel<CharSequence>?,
     val title: String,
-    val hasUnlockableLocks: Boolean
+    val showUnlockableLocks: Boolean
 )

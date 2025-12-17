@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSubmis
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.OriginFee
@@ -100,7 +101,7 @@ fun AssetTransferBase(
     }
 }
 
-class BaseAssetTransfer(
+data class BaseAssetTransfer(
     override val sender: MetaAccount,
     override val recipient: String,
     override val originChain: Chain,
@@ -146,6 +147,9 @@ fun AssetTransfer.recipientOrNull(): AccountId? {
     return destinationChain.accountIdOrNull(recipient)
 }
 
+val AssetTransfer.senderAccountId: AccountIdKey
+    get() = sender.requireAccountIdKeyIn(originChain)
+
 interface AssetTransfers {
 
     fun getValidationSystem(coroutineScope: CoroutineScope): AssetTransfersValidationSystem
@@ -153,6 +157,8 @@ interface AssetTransfers {
     suspend fun calculateFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): Fee
 
     suspend fun performTransfer(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<ExtrinsicSubmission>
+
+    suspend fun performTransferAndAwaitExecution(transfer: WeightedAssetTransfer, coroutineScope: CoroutineScope): Result<TransactionExecution>
 
     suspend fun totalCanDropBelowMinimumBalance(chainAsset: Chain.Asset): Boolean {
         return true
@@ -177,3 +183,5 @@ suspend fun AssetTransfers.tryParseTransfer(call: GenericCall.Instance, chain: C
         .onFailure { Log.e(LOG_TAG, "Failed to parse call: $call", it) }
         .getOrNull()
 }
+
+fun AssetTransfer.asWeighted(fee: OriginFee) = WeightedAssetTransfer(this, fee)

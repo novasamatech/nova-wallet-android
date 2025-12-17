@@ -61,7 +61,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.la
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.SetupAmountMultiStakingPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -100,7 +101,8 @@ class StartStakingLandingViewModel(
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val chainRegistry: ChainRegistry,
-    private val contextManager: ContextManager
+    private val contextManager: ContextManager,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
@@ -133,7 +135,7 @@ class StartStakingLandingViewModel(
             StartStakingInfoModel(
                 title = createTitle(it.asset.token.configuration, it.maxEarningRate, themeColor),
                 conditions = createConditions(it, themeColor),
-                moreInfo = createMoreInfoText(it.chain),
+                moreInfo = createMoreInfoText(it.chain, it.asset.token.configuration),
                 buttonColor = themeColor
             )
         }
@@ -145,7 +147,7 @@ class StartStakingLandingViewModel(
     }.shareInBackground()
 
     val availableBalanceTextFlow = availableBalance.map { availableBalance ->
-        val amountModel = mapAmountToAmountModel(availableBalance.availableBalance, availableBalance.asset.token)
+        val amountModel = amountFormatter.formatAmountToAmountModel(availableBalance.availableBalance, availableBalance.asset.token)
         resourceManager.getString(R.string.start_staking_fragment_available_balance, amountModel.token, amountModel.fiat!!)
     }.shareInBackground()
 
@@ -250,7 +252,7 @@ class StartStakingLandingViewModel(
         )
     }
 
-    private fun createMoreInfoText(chain: Chain): CharSequence {
+    private fun createMoreInfoText(chain: Chain, asset: Chain.Asset): CharSequence {
         val iconColor = resourceManager.getColor(R.color.chip_icon)
         val clickableTextColor = resourceManager.getColor(R.color.link_text)
         val chevronSize = resourceManager.measureInPx(20)
@@ -266,7 +268,7 @@ class StartStakingLandingViewModel(
 
         return SpannableFormatter.format(
             resourceManager.getString(R.string.start_staking_fragment_more_info),
-            chain.name,
+            asset.name,
             clickablePart
         )
     }

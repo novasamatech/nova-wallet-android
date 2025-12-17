@@ -5,7 +5,6 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -27,8 +26,6 @@ class ConfirmRewardDestinationFragment : BaseFragment<ConfirmRewardDestinationVi
     override fun createBinding() = FragmentConfirmRewardDestinationBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.confirmRewardDestinationContainer.applyStatusBarInsets()
-
         binder.confirmRewardDestinationToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.confirmRewardDestinationExtrinsicInformation.setOnAccountClickedListener { viewModel.originAccountClicked() }

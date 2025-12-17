@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_versions_impl.data
 
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.resources.AppVersionProvider
 import io.novafoundation.nova.test_shared.any
 import io.novafoundation.nova.test_shared.whenever
 import junit.framework.Assert.assertEquals
@@ -112,7 +113,7 @@ internal class RealVersionRepositoryTest {
         }
 
         val appVersionProvider = Mockito.mock(AppVersionProvider::class.java).also {
-            whenever(it.getCurrentVersionName()).thenReturn(appVersion)
+            whenever(it.versionName).thenReturn(appVersion)
         }
 
         val repository = RealVersionRepository(appVersionProvider, preferences, fetcher)

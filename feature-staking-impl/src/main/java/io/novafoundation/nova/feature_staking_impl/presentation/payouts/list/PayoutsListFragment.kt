@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.payouts.list
 
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -19,12 +18,6 @@ class PayoutsListFragment : BaseFragment<PayoutsListViewModel, FragmentPayoutsLi
     lateinit var adapter: PayoutAdapter
 
     override fun initViews() {
-        binder.payoutsListContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
-
         adapter = PayoutAdapter(this)
         binder.payoutsList.adapter = adapter
 

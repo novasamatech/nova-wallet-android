@@ -64,6 +64,10 @@ interface AssetReadOnlyCache {
     suspend fun getAsset(metaId: Long, chainId: String, assetId: Int): AssetLocal?
 
     suspend fun getAssetsInChain(metaId: Long, chainId: String): List<AssetLocal>
+
+    suspend fun getAllAssets(): List<AssetLocal>
+
+    suspend fun getAssetsById(id: Int): List<AssetLocal>
 }
 
 @Dao
@@ -95,6 +99,12 @@ abstract class AssetDao : AssetReadOnlyCache {
 
     @Query("SELECT * FROM assets WHERE metaId = :metaId AND chainId = :chainId")
     abstract override suspend fun getAssetsInChain(metaId: Long, chainId: String): List<AssetLocal>
+
+    @Query("SELECT * FROM assets")
+    abstract override suspend fun getAllAssets(): List<AssetLocal>
+
+    @Query("SELECT * FROM assets WHERE assetId IS :id")
+    abstract override suspend fun getAssetsById(id: Int): List<AssetLocal>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertAsset(asset: AssetLocal)

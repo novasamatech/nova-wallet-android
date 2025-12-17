@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.feature_banners_api.presentation.view.BannerPagerView
 
 context(BaseFragment<T, *>)
@@ -25,5 +26,17 @@ fun <T : BaseViewModel> PromotionBannersMixin.bindWithAdapter(
         adapter.show(it is ExtendedLoadingState.Loaded && it.data.isNotEmpty())
         adapter.setBanners(it.dataOrNull.orEmpty())
         onSubmitList()
+    }
+}
+
+context(BaseFragment<T, *>)
+fun <T : BaseViewModel> PromotionBannersMixin.bind(
+    view: BannerPagerView
+) {
+    view.setClosable(false)
+
+    bannersFlow.observe {
+        view.setLoadingState(it.isLoading)
+        view.setBanners(it.dataOrNull.orEmpty())
     }
 }

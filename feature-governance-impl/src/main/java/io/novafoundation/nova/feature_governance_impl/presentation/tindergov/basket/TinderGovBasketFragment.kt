@@ -4,7 +4,6 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.dialog.infoDialog
 import io.novafoundation.nova.common.view.dialog.warningDialog
 import io.novafoundation.nova.common.view.setState
@@ -22,7 +21,6 @@ class TinderGovBasketFragment : BaseFragment<TinderGovBasketViewModel, FragmentT
     private val adapter = TinderGovBasketAdapter(this)
 
     override fun initViews() {
-        binder.tinderGovBasketToolbar.applyStatusBarInsets()
         binder.tinderGovBasketToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.tinderGovBasketToolbar.setRightActionClickListener { viewModel.toggleEditMode() }
 

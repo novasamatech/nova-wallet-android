@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_settings_impl.presentation.networkManagem
 import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
@@ -26,7 +25,6 @@ class AddNetworkMainFragment : BaseFragment<AddNetworkMainViewModel, FragmentAdd
     override fun createBinding() = FragmentAddNetworkMainBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.addNetworkMainToolbar.applyStatusBarInsets()
         binder.addNetworkMainToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         val payload: AddNetworkPayload? = argumentOrNull(KEY_PAYLOAD)

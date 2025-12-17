@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentRebondCustomBinding
@@ -18,8 +17,6 @@ class CustomRebondFragment : BaseFragment<CustomRebondViewModel, FragmentRebondC
     override fun createBinding() = FragmentRebondCustomBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.rebondToolbar.applyStatusBarInsets()
-
         binder.rebondToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.rebondContinue.prepareForProgress(viewLifecycleOwner)
         binder.rebondContinue.setOnClickListener { viewModel.confirmClicked() }

@@ -142,7 +142,6 @@ fun mapProxyAccountFromLocal(proxyAccountLocal: ProxyAccountLocal): ProxyAccount
         ProxyAccount(
             proxyMetaId = proxyMetaId,
             chainId = chainId,
-            proxiedAccountId = proxiedAccountId,
             proxyType = ProxyType.fromString(proxyType)
         )
     }

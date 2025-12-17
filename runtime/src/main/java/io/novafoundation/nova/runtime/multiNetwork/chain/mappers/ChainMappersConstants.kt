@@ -3,6 +3,7 @@ package io.novafoundation.nova.runtime.multiNetwork.chain.mappers
 const val ASSET_NATIVE = "native"
 const val ASSET_STATEMINE = "statemine"
 const val ASSET_ORML = "orml"
+const val ASSET_ORML_HYDRATION_EVM = "orml-hydration-evm"
 const val ASSET_UNSUPPORTED = "unsupported"
 
 const val ASSET_EVM_ERC20 = "evm"

@@ -17,3 +17,10 @@ fun ChainStateRepository.blockDurationEstimatorFlow(chainId: ChainId): Flow<Bloc
         BlockDurationEstimator(currentBlock, blockTime)
     }
 }
+
+suspend fun ChainStateRepository.blockDurationEstimatorFromRemote(chainId: ChainId): BlockDurationEstimator {
+    return BlockDurationEstimator(
+        currentBlock = currentRemoteBlock(chainId),
+        blockTimeMillis = predictedBlockTime(chainId),
+    )
+}

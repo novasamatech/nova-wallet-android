@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.mixin.actionAwaitable.setupConfirmationDialog
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.WithContextExtensions
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
@@ -49,8 +48,6 @@ class ReferendumDetailsFragment : BaseFragment<ReferendumDetailsViewModel, Fragm
         get() = requireContext()
 
     override fun initViews() {
-        binder.referendumDetailsContainer.applyStatusBarInsets()
-
         binder.referendumDetailsToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }

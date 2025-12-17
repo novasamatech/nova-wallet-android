@@ -2,12 +2,15 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.holder
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_account_api.presenatation.chain.setTokenIcon
 import io.novafoundation.nova.feature_assets.databinding.ItemNetworkAssetBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.NetworkAssetUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableFiat
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableToken
 
 class NetworkAssetViewHolder(
     private val binder: ItemNetworkAssetBinding,
@@ -30,8 +33,8 @@ class NetworkAssetViewHolder(
     }
 
     fun bindTotal(asset: AssetModel) {
-        binder.itemAssetBalance.text = asset.amount.token
-        binder.itemAssetPriceAmount.text = asset.amount.fiat
+        binder.itemAssetBalance.setMaskableText(asset.amount.maskableToken())
+        binder.itemAssetPriceAmount.setMaskableText(asset.amount.maskableFiat())
     }
 
     fun bindRecentChange(asset: AssetModel) = with(containerView) {

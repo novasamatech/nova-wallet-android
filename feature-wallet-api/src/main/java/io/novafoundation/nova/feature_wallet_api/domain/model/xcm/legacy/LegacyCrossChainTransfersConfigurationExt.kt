@@ -16,6 +16,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import java.math.BigInteger
+import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.dynamic.reserve.XcmTransferType as XcmReserveTransferType
 
 fun LegacyCrossChainTransfersConfiguration.XcmFee.Mode.Proportional.weightToFee(weight: Weight): BigInteger {
     val pico = BigInteger.TEN.pow(12)
@@ -28,7 +29,7 @@ fun LegacyCrossChainTransfersConfiguration.availableOutDestinations(origin: Chai
     val assetTransfers = outComingAssetTransfers(origin) ?: return emptyList()
 
     return assetTransfers.xcmTransfers
-        .filter { it.type != XcmTransferType.UNKNOWN }
+        .filter { it.type != LegacyXcmTransferMethod.UNKNOWN }
         .map { it.destination.fullDestinationAssetId }
 }
 
@@ -38,7 +39,7 @@ fun LegacyCrossChainTransfersConfiguration.availableInDestinations(destination: 
     return chains.flatMap { (originChainId, chainTransfers) ->
         chainTransfers.mapNotNull { originAssetTransfers ->
             val hasDestination = originAssetTransfers.xcmTransfers
-                .any { it.type != XcmTransferType.UNKNOWN && it.destination.fullDestinationAssetId == requiredDestinationId }
+                .any { it.type != LegacyXcmTransferMethod.UNKNOWN && it.destination.fullDestinationAssetId == requiredDestinationId }
 
             FullChainAssetId(originChainId, originAssetTransfers.assetId).takeIf { hasDestination }
         }
@@ -49,7 +50,7 @@ fun LegacyCrossChainTransfersConfiguration.availableInDestinations(): List<Edge<
     return chains.flatMap { (originChainId, chainTransfers) ->
         chainTransfers.flatMap { originAssetTransfers ->
             originAssetTransfers.xcmTransfers.mapNotNull {
-                if (it.type == XcmTransferType.UNKNOWN) return@mapNotNull null
+                if (it.type == LegacyXcmTransferMethod.UNKNOWN) return@mapNotNull null
 
                 val from = FullChainAssetId(originChainId, originAssetTransfers.assetId)
                 val to = FullChainAssetId(it.destination.chainId, it.destination.assetId)
@@ -60,7 +61,7 @@ fun LegacyCrossChainTransfersConfiguration.availableInDestinations(): List<Edge<
     }
 }
 
-fun LegacyCrossChainTransfersConfiguration.transferConfiguration(
+suspend fun LegacyCrossChainTransfersConfiguration.transferConfiguration(
     originXcmChain: XcmChain,
     originAsset: Chain.Asset,
     destinationXcmChain: XcmChain,
@@ -87,13 +88,21 @@ fun LegacyCrossChainTransfersConfiguration.transferConfiguration(
     )
 
     return LegacyCrossChainTransferConfiguration(
-        originChainId = originChain.id,
+        originChain = originXcmChain,
+        destinationChain = destinationXcmChain,
+        transferType = XcmReserveTransferType.determineTransferType(
+            usesTeleports = XcmReserveTransferType.isSystemTeleport(originXcmChain, destinationXcmChain),
+            originChain = originXcmChain,
+            destinationChain = destinationXcmChain,
+            reserve = reserveRegistry.getReserve(originAsset)
+        ),
         assetLocation = originAssetLocationOf(assetTransfers),
         reserveChainLocation = reserveAssetLocation.multiLocation,
         destinationChainLocation = destinationLocation(originChain, destinationXcmChain.parachainId),
         destinationFee = destinationFee,
         reserveFee = reserveFee,
-        transferType = destination.type
+        originChainAsset = originAsset,
+        transferMethod = destination.type
     )
 }
 

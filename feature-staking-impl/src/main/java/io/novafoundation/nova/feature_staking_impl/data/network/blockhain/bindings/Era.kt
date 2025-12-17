@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.data.network.runtime.binding.getTyped
 import io.novafoundation.nova.common.data.network.runtime.binding.storageReturnType
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
+import io.novafoundation.nova.feature_staking_api.domain.model.SessionIndex
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.fromHexOrNull
 import java.math.BigInteger
@@ -58,7 +59,7 @@ fun bindCurrentEra(
 fun bindEraIndex(dynamicInstance: Any?): EraIndex = bindNumber(dynamicInstance)
 
 @HelperBinding
-fun bindSessionIndex(dynamicInstance: Any?): BigInteger = bindNumber(dynamicInstance)
+fun bindSessionIndex(dynamicInstance: Any?): SessionIndex = bindNumber(dynamicInstance)
 
 @HelperBinding
 fun bindSlot(dynamicInstance: Any?): BigInteger = bindNumber(dynamicInstance)

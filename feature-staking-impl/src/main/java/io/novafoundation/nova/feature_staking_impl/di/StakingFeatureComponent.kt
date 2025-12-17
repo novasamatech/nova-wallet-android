@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_proxy_api.di.ProxyFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -87,7 +88,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.di.SelectUnbondComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.story.di.StoryComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.nominations.di.ConfirmNominationsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.review.di.ReviewCustomValidatorsComponent
@@ -162,8 +162,6 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun confirmNominationsComponentFactory(): ConfirmNominationsComponent.Factory
 
     fun validatorDetailsComponentFactory(): ValidatorDetailsComponent.Factory
-
-    fun storyComponentFactory(): StoryComponent.Factory
 
     fun payoutsListFactory(): PayoutsListComponent.Factory
 
@@ -299,7 +297,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
             AccountFeatureApi::class,
             ProxyFeatureApi::class,
             WalletFeatureApi::class,
-            DAppFeatureApi::class
+            DAppFeatureApi::class,
+            ChainMigrationFeatureApi::class
         ]
     )
     interface StakingFeatureDependenciesComponent : StakingFeatureDependencies

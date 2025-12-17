@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.validators
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.fromHex
 import io.novafoundation.nova.common.utils.foldToSet
 import io.novafoundation.nova.common.utils.toHexAccountId
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
@@ -14,8 +16,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedCo
 import io.novafoundation.nova.feature_staking_impl.domain.common.electedExposuresInActiveEra
 import io.novafoundation.nova.feature_staking_impl.domain.rewards.RewardCalculatorFactory
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
-import io.novasama.substrate_sdk_android.extensions.fromHex
 import kotlinx.coroutines.CoroutineScope
 
 sealed class ValidatorSource {
@@ -53,12 +55,14 @@ class ValidatorProvider(
 
         val validatorPrefs = stakingRepository.getValidatorPrefs(chainId, validatorIdsToQueryPrefs)
         val identities = identityRepository.getIdentitiesFromIdsHex(chainId, requestedValidatorIds)
-        val slashes = stakingRepository.getSlashes(chainId, requestedValidatorIds)
+        val slashes = stakingRepository.getSlashes(chain.id, requestedValidatorIds)
 
         val rewardCalculator = rewardCalculatorFactory.create(stakingOption, electedValidatorExposures, validatorPrefs, scope)
         val maxNominators = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
         return requestedValidatorIds.map { accountIdHex ->
+            val accountId = AccountIdKey.fromHex(accountIdHex).getOrThrow()
+
             val electedInfo = electedValidatorExposures[accountIdHex]?.let {
                 Validator.ElectedInfo(
                     totalStake = it.total,
@@ -70,37 +74,40 @@ class ValidatorProvider(
             }
 
             Validator(
-                slashed = slashes.getOrDefault(accountIdHex, false),
+                slashed = accountId in slashes,
                 accountIdHex = accountIdHex,
                 electedInfo = electedInfo,
                 prefs = validatorPrefs[accountIdHex],
                 identity = identities[accountIdHex],
-                address = chain.addressOf(accountIdHex.fromHex()),
+                address = chain.addressOf(accountId.value),
                 isNovaValidator = accountIdHex in novaValidatorIds
             )
         }
     }
 
-    suspend fun getValidatorWithoutElectedInfo(chainId: ChainId, address: String): Validator {
-        val accountId = address.toHexAccountId()
+    suspend fun getValidatorWithoutElectedInfo(chain: Chain, address: String): Validator {
+        val chainId = chain.id
 
-        val accountIdBridged = listOf(accountId)
+        val accountIdHex = address.toHexAccountId()
+        val accountId = AccountIdKey.fromHex(accountIdHex).getOrThrow()
 
-        val prefs = stakingRepository.getValidatorPrefs(chainId, accountIdBridged)[accountId]
-        val identity = identityRepository.getIdentitiesFromIdsHex(chainId, accountIdBridged)[accountId]
+        val accountIdHexBridged = listOf(accountIdHex)
 
-        val slashes = stakingRepository.getSlashes(chainId, accountIdBridged)
+        val prefs = stakingRepository.getValidatorPrefs(chainId, accountIdHexBridged)[accountIdHex]
+        val identity = identityRepository.getIdentitiesFromIdsHex(chainId, accountIdHexBridged)[accountIdHex]
+
+        val slashes = stakingRepository.getSlashes(chain.id, accountIdHexBridged)
 
         val novaValidatorIds = validatorsPreferencesSource.getRecommendedValidatorIds(chainId)
 
         return Validator(
-            slashed = slashes.getOrDefault(accountId, false),
-            accountIdHex = accountId,
+            slashed = accountId in slashes,
+            accountIdHex = accountIdHex,
             address = address,
             prefs = prefs,
             identity = identity,
             electedInfo = null,
-            isNovaValidator = accountId in novaValidatorIds
+            isNovaValidator = accountIdHex in novaValidatorIds
         )
     }
 

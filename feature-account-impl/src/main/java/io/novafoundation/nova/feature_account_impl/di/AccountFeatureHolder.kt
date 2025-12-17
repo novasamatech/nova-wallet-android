@@ -10,10 +10,12 @@ import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.chan
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.changePassword.RestoreBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.cloudBackup.createPassword.SyncWalletsBackupPasswordCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.sign.LedgerSignCommunicator
 import io.novafoundation.nova.feature_account_impl.data.signer.paritySigner.PolkadotVaultVariantSignCommunicator
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
+import io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedCommunicator
 import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
@@ -37,7 +39,9 @@ class AccountFeatureHolder @Inject constructor(
     private val pinCodeTwoFactorVerificationCommunicator: PinCodeTwoFactorVerificationCommunicator,
     private val syncWalletsBackupPasswordCommunicator: SyncWalletsBackupPasswordCommunicator,
     private val changeBackupPasswordCommunicator: ChangeBackupPasswordCommunicator,
-    private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator
+    private val restoreBackupPasswordCommunicator: RestoreBackupPasswordCommunicator,
+    private val selectSingleWalletCommunicator: SelectSingleWalletCommunicator,
+    private val scanSeedCommunicator: ScanSeedCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
@@ -67,6 +71,8 @@ class AccountFeatureHolder @Inject constructor(
                 syncWalletsBackupPasswordCommunicator = syncWalletsBackupPasswordCommunicator,
                 changeBackupPasswordCommunicator = changeBackupPasswordCommunicator,
                 restoreBackupPasswordCommunicator = restoreBackupPasswordCommunicator,
+                selectSingleWalletCommunicator = selectSingleWalletCommunicator,
+                scanSeedCommunicator = scanSeedCommunicator,
                 deps = accountFeatureDependencies
             )
     }

@@ -26,7 +26,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.det
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.accountIdKeyOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
@@ -45,6 +46,7 @@ class MythosCurrentCollatorsViewModel(
     private val stakingSharedState: AnySelectedAssetOptionSharedState,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     tokenUseCase: TokenUseCase,
+    private val amountFormatter: AmountFormatter
 ) : CurrentStakeTargetsViewModel() {
 
     private val groupedCurrentCollatorsFlow = currentCollatorsInteractor.currentCollatorsFlow()
@@ -117,7 +119,7 @@ class MythosCurrentCollatorsViewModel(
 
         return SelectedStakeTargetModel(
             addressModel = iconGenerator.collatorAddressModel(collator, chain),
-            nominated = mapAmountToAmountModel(currentCollator.userStake, token),
+            nominated = amountFormatter.formatAmountToAmountModel(currentCollator.userStake, token),
             isOversubscribed = false,
             isSlashed = false,
             apy = formatStakeTargetRewardsOrNull(collator.apr)

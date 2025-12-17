@@ -7,11 +7,14 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
+import io.novafoundation.nova.feature_ahm_api.di.ChainMigrationFeatureApi
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.di.BalanceDetailComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.di.BalanceListComponent
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.GoToNftsView
 import io.novafoundation.nova.feature_assets.presentation.balance.search.di.AssetSearchComponent
+import io.novafoundation.nova.feature_assets.presentation.gifts.assets.di.AssetGiftsFlowComponent
+import io.novafoundation.nova.feature_assets.presentation.gifts.networks.di.NetworkGiftsFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.overview.di.NovaCardComponent
 import io.novafoundation.nova.feature_assets.presentation.topup.di.TopUpAddressComponent
 import io.novafoundation.nova.feature_assets.presentation.novacard.waiting.di.WaitingNovaCardTopUpComponent
@@ -46,6 +49,7 @@ import io.novafoundation.nova.feature_buy_api.di.BuyFeatureApi
 import io.novafoundation.nova.feature_crowdloan_api.di.CrowdloanFeatureApi
 import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_deep_linking.di.DeepLinkingFeatureApi
+import io.novafoundation.nova.feature_gift_api.di.GiftFeatureApi
 import io.novafoundation.nova.feature_nft_api.NftFeatureApi
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_swap_api.di.SwapFeatureApi
@@ -107,6 +111,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
 
     fun sellFlowComponent(): AssetSellFlowComponent.Factory
 
+    fun giftsFlowComponent(): AssetGiftsFlowComponent.Factory
+
     fun tradeProviderListComponent(): TradeProviderListComponent.Factory
 
     fun tradeWebComponent(): TradeWebComponent.Factory
@@ -122,6 +128,8 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun networkSwapFlowComponent(): NetworkSwapFlowComponent.Factory
 
     fun topUpCardComponentFactory(): TopUpAddressComponent.Factory
+
+    fun networkGiftsFlowComponent(): NetworkGiftsFlowComponent.Factory
 
     fun novaCardComponentFactory(): NovaCardComponent.Factory
 
@@ -156,7 +164,9 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
             SwapFeatureApi::class,
             BuyFeatureApi::class,
             BannersFeatureApi::class,
-            DeepLinkingFeatureApi::class
+            DeepLinkingFeatureApi::class,
+            ChainMigrationFeatureApi::class,
+            GiftFeatureApi::class
         ]
     )
     interface AssetsFeatureDependenciesComponent : AssetsFeatureDependencies

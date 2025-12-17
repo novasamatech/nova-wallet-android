@@ -5,7 +5,6 @@ import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.condition.setupConditions
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
 import io.novafoundation.nova.common.utils.toSpannable
@@ -30,7 +29,6 @@ class ManualBackupWarningFragment : BaseFragment<ManualBackupWarningViewModel, F
     }
 
     override fun initViews() {
-        binder.manualBackupWarningToolbar.applyStatusBarInsets()
         binder.manualBackupWarningToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.manualBackupWarningButtonContinue.setOnClickListener { viewModel.continueClicked() }

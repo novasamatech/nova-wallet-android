@@ -19,7 +19,7 @@ class MultisigNoPendingCallHashValidation(
 
     override suspend fun validate(value: MultisigExtrinsicValidationPayload): ValidationStatus<MultisigExtrinsicValidationFailure> {
         val runtime = chainRegistry.getRuntime(value.chain.id)
-        val callHash = value.delegatedCall.callHash(runtime).intoKey()
+        val callHash = value.callInsideAsMulti.callHash(runtime).intoKey()
 
         val hasPendingCallHash = multisigValidationsRepository.hasPendingCallHash(value.chain.id, value.multisigAccountId(), callHash)
 

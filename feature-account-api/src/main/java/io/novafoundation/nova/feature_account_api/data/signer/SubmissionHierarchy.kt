@@ -30,3 +30,5 @@ class SubmissionHierarchy(
 }
 
 fun SubmissionHierarchy.isDelayed() = path.any { it.callExecutionType == CallExecutionType.DELAYED }
+
+fun SubmissionHierarchy.selectedAccount() = path.last().account

@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vot
 import io.novafoundation.nova.feature_governance_impl.presentation.tindergov.cards.TinderGovCardsViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class TinderGovCardsModule {
@@ -48,7 +49,8 @@ class TinderGovCardsModule {
         referendaSummaryInteractor: ReferendaSummaryInteractor,
         tokenUseCase: TokenUseCase,
         basketInteractor: TinderGovBasketInteractor,
-        markwon: Markwon
+        markwon: Markwon,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return TinderGovCardsViewModel(
             router = router,
@@ -60,7 +62,8 @@ class TinderGovCardsModule {
             resourceManager = resourceManager,
             referendaSummaryInteractor = referendaSummaryInteractor,
             tokenUseCase = tokenUseCase,
-            cardsMarkdown = markwon
+            cardsMarkdown = markwon,
+            amountFormatter = amountFormatter
         )
     }
 

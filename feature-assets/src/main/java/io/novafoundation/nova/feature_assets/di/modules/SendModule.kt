@@ -8,8 +8,9 @@ import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransactor
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainTransfersRepository
+import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainValidationSystemProvider
+import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
 
 @Module
@@ -18,20 +19,22 @@ class SendModule {
     @Provides
     @FeatureScope
     fun provideSendInteractor(
-        walletRepository: WalletRepository,
         assetSourceRegistry: AssetSourceRegistry,
         crossChainTransfersRepository: CrossChainTransfersRepository,
         crossChainTransactor: CrossChainTransactor,
         parachainInfoRepository: ParachainInfoRepository,
         extrinsicService: ExtrinsicService,
-        crossChainTransfersUseCase: CrossChainTransfersUseCase
+        sendUseCase: SendUseCase,
+        crossChainTransfersUseCase: CrossChainTransfersUseCase,
+        crossChainValidationProvider: CrossChainValidationSystemProvider
     ) = SendInteractor(
-        walletRepository,
         assetSourceRegistry,
         crossChainTransactor,
         crossChainTransfersRepository,
         parachainInfoRepository,
         crossChainTransfersUseCase,
         extrinsicService,
+        sendUseCase,
+        crossChainValidationProvider
     )
 }

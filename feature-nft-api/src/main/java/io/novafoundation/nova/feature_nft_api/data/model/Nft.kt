@@ -48,7 +48,7 @@ class Nft(
     sealed class Type(val key: Key) {
 
         enum class Key {
-            UNIQUES, RMRKV1, RMRKV2, PDC20, KODADOT
+            UNIQUES, RMRKV1, RMRKV2, PDC20, KODADOT, UNIQUE_NETWORK
         }
 
         object Uniques : Type(Key.UNIQUES)
@@ -60,6 +60,8 @@ class Nft(
         object Pdc20 : Type(Key.PDC20)
 
         object Kodadot : Type(Key.KODADOT)
+
+        object UniqueNetwork : Type(Key.UNIQUE_NETWORK)
     }
 }
 

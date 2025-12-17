@@ -44,6 +44,7 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.common.c
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.details.call.ReferendumPreImageParser
 import io.novafoundation.nova.feature_governance_impl.domain.track.mapTrackInfoToTrack
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -118,7 +119,7 @@ class RealReferendumDetailsInteractor(
 
         return combineTransform(
             referendumFlow(governanceSource, selectedGovernanceOption, referendumId, coroutineScope),
-            chainStateRepository.currentBlockNumberFlow(chain.id)
+            chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf())
         ) { referendumWithVotingDetails, currentBlockNumber ->
             // If null it means that referendum with given id doesn't exist
             if (referendumWithVotingDetails == null) {

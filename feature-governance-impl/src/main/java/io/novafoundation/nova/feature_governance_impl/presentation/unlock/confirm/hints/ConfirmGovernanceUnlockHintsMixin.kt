@@ -8,14 +8,16 @@ import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.unlock.GovernanceUnlockAffects.RemainsLockedInfo
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBalanceIdToUi
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class ConfirmGovernanceUnlockHintsMixinFactory(
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val amountFormatter: AmountFormatter
 ) {
 
     fun create(
@@ -23,7 +25,7 @@ class ConfirmGovernanceUnlockHintsMixinFactory(
         assetFlow: Flow<Asset>,
         remainsLockedInfoFlow: Flow<RemainsLockedInfo?>
     ): HintsMixin {
-        return ConfirmGovernanceUnlockHintsMixin(resourceManager, scope, assetFlow, remainsLockedInfoFlow)
+        return ConfirmGovernanceUnlockHintsMixin(resourceManager, scope, assetFlow, remainsLockedInfoFlow, amountFormatter)
     }
 }
 
@@ -31,7 +33,8 @@ private class ConfirmGovernanceUnlockHintsMixin(
     private val resourceManager: ResourceManager,
     scope: CoroutineScope,
     assetFlow: Flow<Asset>,
-    remainsLockedInfoFlow: Flow<RemainsLockedInfo?>
+    remainsLockedInfoFlow: Flow<RemainsLockedInfo?>,
+    private val amountFormatter: AmountFormatter
 ) : HintsMixin, WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(scope) {
 
     override val hintsFlow: Flow<List<CharSequence>> = remainsLockedInfoFlow.map { remainsLockedInfo ->
@@ -46,7 +49,7 @@ private class ConfirmGovernanceUnlockHintsMixin(
         asset: Asset,
         remainsLockedInfo: RemainsLockedInfo
     ): CharSequence {
-        val amountPart = mapAmountToAmountModel(remainsLockedInfo.amount, asset).token
+        val amountPart = amountFormatter.formatAmountToAmountModel(remainsLockedInfo.amount, asset).token
         val lockedIdsPart = remainsLockedInfo.lockedInIds.joinToString { lockId ->
             mapBalanceIdToUi(resourceManager, lockId.value)
         }

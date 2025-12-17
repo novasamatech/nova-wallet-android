@@ -31,7 +31,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.ma
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.awaitFee
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.filterIsInstance
@@ -54,6 +55,7 @@ class ConfirmPayoutViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     walletUiUseCase: WalletUiUseCase,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions.Presentation by externalActions,
     FeeLoaderMixin by feeLoaderMixin,
@@ -73,7 +75,7 @@ class ConfirmPayoutViewModel(
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
     val totalRewardFlow = assetFlow.map {
-        mapAmountToAmountModel(payload.totalRewardInPlanks, it)
+        amountFormatter.formatAmountToAmountModel(payload.totalRewardInPlanks, it)
     }
         .shareInBackground()
 
@@ -136,7 +138,7 @@ class ConfirmPayoutViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
-                showMessage(resourceManager.getString(R.string.make_payout_transaction_sent))
+                showToast(resourceManager.getString(R.string.make_payout_transaction_sent))
 
                 startNavigation(it.submissionHierarchy()) { router.returnToStakingMain() }
             },

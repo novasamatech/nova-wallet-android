@@ -38,6 +38,19 @@ interface NovaSigner : Signer {
      *
      * This should only be called after all other extrinsic information has been set, including all non-signer related extensions and calls
      * So, this should be the final operation that modifies the extrinsic, followed just by [ExtrinsicBuilder.buildExtrinsic]
+     *
+     * Note for nested signers:
+     *
+     * Since signers delegation work in top-down approach(root signer is the executing account),
+     * but the wrapping should be done in the bottom-up way (the actual call is the inner-most one),
+     * nested signers should perform call wrapping themselves, and only after that perform nested [setSignerDataForSubmission] call.
+     *
+     * For example:
+     *
+     * With Secrets Wallet -> Proxy -> Multisig setup, the signing sequence will be MultisigSigner -> ProxiedSigner -> SecretsSigner.
+     * The final call should be proxy(as_multi(actual)) from Secrets origin.
+     * So, the wrapping should be done in the following sequence: actual -> wrap in as_multi -> wrap in proxy.
+     * So, the top-most signer (MultisigSigner) should first wrap the actual call into as_multi and only then delegate to ProxiedSigner.
      */
     context(ExtrinsicBuilder)
     suspend fun setSignerDataForSubmission(context: SigningContext)
@@ -49,6 +62,8 @@ interface NovaSigner : Signer {
      *
      * This should only be called after all other extrinsic information has been set, including all non-signer related extensions and calls
      * So, this should be the final operation that modifies the extrinsic, followed just by [ExtrinsicBuilder.buildExtrinsic]
+     *
+     * You can find notes about nested signers in [setSignerDataForSubmission]
      */
     context(ExtrinsicBuilder)
     suspend fun setSignerDataForFee(context: SigningContext)

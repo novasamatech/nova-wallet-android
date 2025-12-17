@@ -16,7 +16,7 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
-import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAddressAccountFilter
+import io.novafoundation.nova.feature_account_api.domain.filter.selectAddress.SelectAccountFilter
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -34,11 +34,11 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDirection
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.CrossChainDestinationModel
 import io.novafoundation.nova.feature_assets.presentation.send.amount.view.SelectCrossChainDestinationBottomSheet
-import io.novafoundation.nova.feature_assets.presentation.send.autoFixSendValidationPayload
-import io.novafoundation.nova.feature_assets.presentation.send.common.buildAssetTransfer
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.autoFixSendValidationPayload
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.buildAssetTransfer
 import io.novafoundation.nova.feature_assets.presentation.send.common.fee.TransferFeeDisplayFormatter
 import io.novafoundation.nova.feature_assets.presentation.send.common.fee.createForTransfer
-import io.novafoundation.nova.feature_assets.presentation.send.mapAssetTransferValidationFailureToUI
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.mapAssetTransferValidationFailureToUI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.WeightedAssetTransfer
@@ -53,7 +53,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.formatter.DefaultFeeFormatter
 import io.novafoundation.nova.runtime.ext.isEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
@@ -92,6 +94,7 @@ class SelectSendViewModel(
     addressInputMixinFactory: AddressInputMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     selectAddressMixinFactory: SelectAddressMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions {
@@ -165,7 +168,7 @@ class SelectSendViewModel(
     private val originAssetFlow = originChainAsset.flatMapLatest(interactor::assetFlow)
         .shareInBackground()
 
-    private val feeFormatter = TransferFeeDisplayFormatter()
+    private val feeFormatter = TransferFeeDisplayFormatter(componentDelegate = DefaultFeeFormatter(amountFormatter))
     val feeMixin = feeLoaderMixinFactory.createForTransfer(originChainAsset, feeFormatter)
 
     private val maxActionProvider = maxActionProviderFactory.create(
@@ -478,7 +481,7 @@ class SelectSendViewModel(
             CrossChainDestinationModel(
                 chainWithAsset = it.chainWithAsset,
                 chainUi = mapChainToUi(it.chainWithAsset.chain),
-                balance = it.balances?.let { asset -> mapAmountToAmountModel(asset.transferable, asset) }
+                balance = it.balances?.let { asset -> amountFormatter.formatAmountToAmountModel(asset.transferable, asset) }
             )
         }
 
@@ -534,18 +537,18 @@ class SelectSendViewModel(
         }
     }
 
-    private suspend fun getMetaAccountsFilter(origin: Chain, desination: Chain): SelectAddressAccountFilter {
-        val isCrossChain = origin.id != desination.id
+    private suspend fun getMetaAccountsFilter(origin: Chain, destination: Chain): SelectAccountFilter {
+        val isCrossChain = origin.id != destination.id
 
         return if (isCrossChain) {
-            SelectAddressAccountFilter.Everything()
+            SelectAccountFilter.Everything()
         } else {
-            val destinationAccountId = selectedAccount.first().requireAccountIdIn(desination)
+            val destinationAccountId = selectedAccount.first().requireAccountIdIn(destination)
             val notOriginMetaAccounts = accountRepository.getActiveMetaAccounts()
                 .filter { it.accountIdIn(origin)?.intoKey() == destinationAccountId.intoKey() }
                 .map { it.id }
 
-            SelectAddressAccountFilter.ExcludeMetaAccounts(
+            SelectAccountFilter.ExcludeMetaAccounts(
                 notOriginMetaAccounts
             )
         }

@@ -2,18 +2,22 @@ package io.novafoundation.nova.feature_multisig_operations.domain.details
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.WeightV2
+import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.callHash
+import io.novafoundation.nova.common.utils.toHex
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigAsMulti
 import io.novafoundation.nova.feature_account_api.data.multisig.composeMultisigCancelAsMulti
 import io.novafoundation.nova.feature_account_api.data.multisig.model.MultisigAction
 import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperation
+import io.novafoundation.nova.feature_account_api.data.multisig.model.PendingMultisigOperationId
 import io.novafoundation.nova.feature_account_api.data.multisig.model.userAction
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
@@ -21,12 +25,18 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.MultisigMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.SavedMultisigOperationCall
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
+import io.novafoundation.nova.feature_account_api.domain.multisig.intoCallHash
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.model.ChainAssetBalance
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.queryAccountBalanceCatching
 import io.novafoundation.nova.runtime.di.ExtrinsicSerialization
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +48,8 @@ interface MultisigOperationDetailsInteractor {
 
     fun callDetails(call: GenericCall.Instance): String
 
+    suspend fun callHash(call: GenericCall.Instance, chainId: ChainId): String
+
     suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee?
 
     suspend fun performAction(operation: PendingMultisigOperation): Result<ExtrinsicExecutionResult>
@@ -47,7 +59,17 @@ interface MultisigOperationDetailsInteractor {
     suspend fun getSignatoryBalance(signatory: MetaAccount, chain: Chain): Result<ChainAssetBalance>
 
     fun isCallValid(operation: PendingMultisigOperation, enteredCall: String): Boolean
+
+    fun setSkipRejectConfirmation(value: Boolean)
+
+    fun getSkipRejectConfirmation(): Boolean
+
+    suspend fun callDataAsString(call: GenericCall.Instance, chainId: ChainId): String
+
+    suspend fun isOperationAvailable(operationId: PendingMultisigOperationId): Boolean
 }
+
+private const val SKIP_REJECT_CONFIRMATION_KEY = "SKIP_REJECT_CONFIRMATION_KEY"
 
 @FeatureScope
 class RealMultisigOperationDetailsInteractor @Inject constructor(
@@ -58,6 +80,9 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
     private val multisigOperationLocalCallRepository: MultisigOperationLocalCallRepository,
     @ExtrinsicSerialization
     private val extrinsicGson: Gson,
+    private val chainRegistry: ChainRegistry,
+    private val toggleFeatureRepository: ToggleFeatureRepository,
+    private val multisigDetailsRepository: MultisigDetailsRepository
 ) : MultisigOperationDetailsInteractor {
 
     override suspend fun setCall(operation: PendingMultisigOperation, call: String) {
@@ -74,6 +99,23 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
     override fun callDetails(call: GenericCall.Instance): String {
         return extrinsicGson.toJson(call)
+    }
+
+    override suspend fun callHash(call: GenericCall.Instance, chainId: ChainId): String {
+        val runtime = chainRegistry.getRuntime(chainId)
+        return call.callHash(runtime).toHexString(withPrefix = true)
+    }
+
+    override suspend fun callDataAsString(call: GenericCall.Instance, chainId: ChainId): String {
+        val runtime = chainRegistry.getRuntime(chainId)
+        return call.toHex(runtime)
+    }
+
+    override suspend fun isOperationAvailable(operationId: PendingMultisigOperationId): Boolean {
+        val chain = chainRegistry.getChain(operationId.chainId)
+        val metaAccount = accountRepository.getMetaAccount(operationId.metaId)
+        val callHash = operationId.callHash.intoCallHash()
+        return multisigDetailsRepository.hasMultisigOperation(chain, metaAccount.requireAccountIdKeyIn(chain), callHash)
     }
 
     override suspend fun estimateActionFee(operation: PendingMultisigOperation): Fee? {
@@ -110,6 +152,14 @@ class RealMultisigOperationDetailsInteractor @Inject constructor(
 
         operationHash.contentEquals(enteredHash)
     }.getOrDefault(false)
+
+    override fun getSkipRejectConfirmation(): Boolean {
+        return toggleFeatureRepository.get(SKIP_REJECT_CONFIRMATION_KEY, false)
+    }
+
+    override fun setSkipRejectConfirmation(value: Boolean) {
+        toggleFeatureRepository.set(SKIP_REJECT_CONFIRMATION_KEY, value)
+    }
 
     private suspend fun estimateApproveFee(operation: PendingMultisigOperation): Fee? {
         if (operation.call == null) return null

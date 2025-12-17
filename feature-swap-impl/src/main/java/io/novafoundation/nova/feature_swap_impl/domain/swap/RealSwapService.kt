@@ -14,9 +14,11 @@ import io.novafoundation.nova.common.utils.forEachAsync
 import io.novafoundation.nova.common.utils.graph.EdgeVisitFilter
 import io.novafoundation.nova.common.utils.graph.Graph
 import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.allEdges
 import io.novafoundation.nova.common.utils.graph.create
 import io.novafoundation.nova.common.utils.graph.findAllPossibleDestinations
 import io.novafoundation.nova.common.utils.graph.hasOutcomingDirections
+import io.novafoundation.nova.common.utils.graph.numberOfEdges
 import io.novafoundation.nova.common.utils.graph.vertices
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.lazyAsync
@@ -27,10 +29,11 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.withFlowScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency.Asset.Companion.toFeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProvider
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.FastLookupCustomFeeCapability
-import io.novafoundation.nova.feature_account_api.data.fee.toFeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.fee.fastLookupCustomFeeCapabilityOrDefault
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
@@ -65,6 +68,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.PathRoughFeeEstimation
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.QuotedPath
+import io.novafoundation.nova.feature_swap_core_api.data.paths.model.WeightBreakdown
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuote
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.firstSegmentQuotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.lastSegmentQuote
@@ -112,6 +116,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.runningFold
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
@@ -480,7 +485,27 @@ internal class RealSwapService(
                 .accumulateLists()
                 .filter { it.isNotEmpty() }
                 .map { Graph.create(it) }
+                .onEach { printGraphStats(it) }
         }
+    }
+
+    private fun printGraphStats(graph: SwapGraph) {
+        if (!BuildConfig.DEBUG) return
+
+        val allEdges = graph.numberOfEdges()
+        val edgesByType = graph.allEdges().groupBy { it::class.simpleName }
+        val edgesByTypeStats = edgesByType.entries.joinToString { (type, typeEdges) ->
+            "$type: ${typeEdges.size}"
+        }
+
+        val message = """
+            === Swap Graph Stats ===
+            All swap directions: $allEdges
+            $edgesByTypeStats
+            === Swap Graph Stats ===
+        """.trimIndent()
+
+        Log.d("SwapService", message)
     }
 
     private suspend fun exchangeRegistry(computationScope: CoroutineScope): ExchangeRegistry {
@@ -736,7 +761,9 @@ internal class RealSwapService(
 
     private suspend fun formatTrade(trade: QuotedTrade): String {
         return buildString {
-            trade.path.onEachIndexed { index, quotedSwapEdge ->
+            val weightBreakdown = WeightBreakdown.fromQuotedPath(trade)
+
+            trade.path.zip(weightBreakdown.individualWeights).onEachIndexed { index, (quotedSwapEdge, weight) ->
                 val amountIn: Balance
                 val amountOut: Balance
 
@@ -765,7 +792,7 @@ internal class RealSwapService(
                     }
                 }
 
-                append(" --- " + quotedSwapEdge.edge.debugLabel() + " ---> ")
+                append(" --- ${quotedSwapEdge.edge.debugLabel()} (w: $weight)---> ")
 
                 val assetOut = chainRegistry.asset(quotedSwapEdge.edge.to)
                 val outAmount = amountOut.formatPlanks(assetOut)
@@ -777,7 +804,7 @@ internal class RealSwapService(
                         val roughFeesInAssetOut = trade.roughFeeEstimation.inAssetOut
                         val roughFeesInAssetOutAmount = roughFeesInAssetOut.formatPlanks(assetOut)
 
-                        append(" (-$roughFeesInAssetOutAmount fees)")
+                        append(" (-$roughFeesInAssetOutAmount fees, w: ${weightBreakdown.total})")
                     }
                 }
             }
@@ -834,7 +861,7 @@ internal class RealSwapService(
         val selectedAccount: MetaAccount,
     ) : EdgeVisitFilter<SwapGraphEdge> {
 
-        private val feePaymentCapabilityCache: MutableMap<ChainId, Any> = mutableMapOf()
+        private val feePaymentCapabilityCache: MutableMap<ChainId, FastLookupCustomFeeCapability> = mutableMapOf()
         private val callExecutionType = lazyAsync {
             signerProvider.rootSignerFor(selectedAccount)
                 .callExecutionType()
@@ -853,8 +880,8 @@ internal class RealSwapService(
             // First path segments don't have any extra restrictions
             if (pathPredecessor == null) return true
 
-            //
-            if (callExecutionType.get() == CallExecutionType.DELAYED) return false
+            // Second and subsequent edges are subject to checking whether we can execute them one by one immediately
+            if (!canExecuteIntermediateEdgeSequentially(edge, pathPredecessor)) return false
 
             // We don't (yet) handle edges that doesn't allow to transfer whole account balance out
             if (!edge.canTransferOutWholeAccountBalance()) return false
@@ -880,24 +907,29 @@ internal class RealSwapService(
                 edge.canPayNonNativeFeesInIntermediatePosition()
         }
 
+        private suspend fun canExecuteIntermediateEdgeSequentially(edge: SwapGraphEdge, predecessor: SwapGraphEdge): Boolean {
+            // If account can execute operations immediately - we can execute anything sequentially
+            if (callExecutionType.get() == CallExecutionType.IMMEDIATE) return true
+
+            // Otherwise it is only possible to do when the edges is merged with predecessor. If it does not - it will require a separate operation
+            // And doing a separate operation is not possible since execution type is DELAYED
+            return edge.canAppendToPredecessor(predecessor)
+        }
+
         private fun isSufficient(chainAndAsset: ChainWithAsset): Boolean {
             val balance = assetSourceRegistry.sourceFor(chainAndAsset.asset).balance
             return balance.isSelfSufficient(chainAndAsset.asset)
         }
 
-        private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability? {
-            val fromCache = feePaymentCapabilityCache.getOrPut(chainId) {
-                createFastLookupFeeCapability(chainId, computationScope).boxNullable()
+        private suspend fun getFeeCustomFeeCapability(chainId: ChainId): FastLookupCustomFeeCapability {
+            return feePaymentCapabilityCache.getOrPut(chainId) {
+                createFastLookupFeeCapability(chainId, computationScope)
             }
-
-            return fromCache.unboxNullable()
         }
 
-        private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability? {
+        private suspend fun createFastLookupFeeCapability(chainId: ChainId, computationScope: CoroutineScope): FastLookupCustomFeeCapability {
             val feePaymentRegistry = exchangeRegistry(computationScope).getFeePaymentRegistry()
-            return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapability()
-                .onFailure { Log.e("Swap", "Failed to construct fast custom fee lookup for chain $chainId", it) }
-                .getOrNull()
+            return feePaymentRegistry.providerFor(chainId).fastLookupCustomFeeCapabilityOrDefault()
         }
     }
 
@@ -913,13 +945,6 @@ internal class RealSwapService(
             return blockNumberCache.getOrCompute(chainId)
         }
     }
-
-    private object NULL
-
-    fun <T> T.boxNullable(): Any = this ?: NULL
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T> Any.unboxNullable(): T? = if (this == NULL) null else this as T
 }
 
 private typealias QuotedTrade = QuotedPath<SwapGraphEdge>

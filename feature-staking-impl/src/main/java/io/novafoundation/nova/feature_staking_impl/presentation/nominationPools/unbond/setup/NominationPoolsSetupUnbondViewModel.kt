@@ -26,7 +26,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.await
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -46,6 +47,7 @@ class NominationPoolsSetupUnbondViewModel(
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -73,7 +75,7 @@ class NominationPoolsSetupUnbondViewModel(
     private val stakedBalance = poolMemberStateFlow.map { it.stakedBalance }
 
     val transferableBalance = selectedAsset.map {
-        mapAmountToAmountModel(it.transferable, it)
+        amountFormatter.formatAmountToAmountModel(it.transferable, it)
     }.shareInBackground()
 
     private val maxActionProvider = maxActionProviderFactory.createCustom(viewModelScope) {

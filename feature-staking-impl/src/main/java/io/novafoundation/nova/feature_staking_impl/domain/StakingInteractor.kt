@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain
 
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.utils.combineToPair
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
@@ -327,16 +329,20 @@ class StakingInteractor(
     }
 
     private suspend fun activeNominators(chainId: ChainId, exposures: Collection<Exposure>): Int {
+        val active = mutableSetOf<AccountIdKey>()
         val activeNominatorsPerValidator = stakingConstantsRepository.maxRewardedNominatorPerValidator(chainId)
 
-        return exposures.fold(0) { acc, exposure ->
-            val othersSize = exposure.others.size
-            acc + if (activeNominatorsPerValidator != null) {
-                othersSize.coerceAtMost(activeNominatorsPerValidator)
+        exposures.forEach { exposure ->
+            val activeNominatorsOfValidator = if (activeNominatorsPerValidator != null) {
+                exposure.others.take(activeNominatorsPerValidator)
             } else {
-                othersSize
+                exposure.others
             }
+
+            active.addAll(activeNominatorsOfValidator.map { it.who.intoKey() })
         }
+
+        return active.size
     }
 
     private fun totalStake(exposures: Collection<Exposure>): BigInteger {

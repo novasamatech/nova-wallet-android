@@ -2,10 +2,9 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.authorizedDApps
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.warningDialog
-import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.showWallet
+import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentAuthorizedDappsBinding
@@ -25,7 +24,6 @@ class AuthorizedDAppsFragment : BaseFragment<AuthorizedDAppsViewModel, FragmentA
     }
 
     override fun initViews() {
-        binder.authorizedDAppsToolbar.applyStatusBarInsets()
         binder.authorizedDAppsToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.authorizedDAppsList.setHasFixedSize(true)

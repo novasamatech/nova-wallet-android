@@ -80,7 +80,8 @@ import io.novafoundation.nova.feature_governance_impl.presentation.view.VotersMo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.chainAndAsset
@@ -114,7 +115,8 @@ class ReferendumDetailsViewModel(
     private val validationExecutor: ValidationExecutor,
     private val updateSystem: UpdateSystem,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    val shareReferendumMixin: ShareReferendumMixin
+    val shareReferendumMixin: ShareReferendumMixin,
+    private val amountFormatter: AmountFormatter
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor {
@@ -470,7 +472,7 @@ class ReferendumDetailsViewModel(
                 val token = tokenUseCase.getToken(referendumCall.chainAsset.fullId)
 
                 ReferendumCallModel.GovernanceRequest(
-                    amount = mapAmountToAmountModel(referendumCall.amount, token)
+                    amount = amountFormatter.formatAmountToAmountModel(referendumCall.amount, token)
                 )
             }
         }

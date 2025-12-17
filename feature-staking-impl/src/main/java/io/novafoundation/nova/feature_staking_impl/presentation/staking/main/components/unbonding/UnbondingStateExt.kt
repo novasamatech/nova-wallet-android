@@ -6,11 +6,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondi
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings.RebondState.CAN_REBOND
 import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.Unbondings.RebondState.REBOND_NOT_POSSIBLE
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 
 fun UnbondingState.Companion.from(
     unbondings: Unbondings,
     asset: Asset,
+    amountFormatter: AmountFormatter,
     cancelLoading: Boolean = false
 ): UnbondingState {
     return when {
@@ -25,17 +27,17 @@ fun UnbondingState.Companion.from(
                     else -> ButtonState.DISABLED
                 },
                 unbondings = unbondings.unbondings.map { unbonding ->
-                    mapUnbondingToUnbondingModel(unbonding, asset)
+                    mapUnbondingToUnbondingModel(unbonding, asset, amountFormatter)
                 }
             )
         }
     }
 }
 
-private fun mapUnbondingToUnbondingModel(unbonding: Unbonding, asset: Asset): UnbondingModel {
+private fun mapUnbondingToUnbondingModel(unbonding: Unbonding, asset: Asset, amountFormatter: AmountFormatter): UnbondingModel {
     return UnbondingModel(
         id = unbonding.id,
         status = unbonding.status,
-        amountModel = mapAmountToAmountModel(unbonding.amount, asset)
+        amountModel = amountFormatter.formatAmountToAmountModel(unbonding.amount, asset)
     )
 }

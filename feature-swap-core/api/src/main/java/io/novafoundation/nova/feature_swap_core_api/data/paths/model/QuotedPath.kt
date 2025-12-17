@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_core_api.data.paths.model
 
 import io.novafoundation.nova.common.utils.graph.Path
+import io.novafoundation.nova.common.utils.graph.WeightedEdge
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import java.math.BigInteger
 
@@ -19,6 +20,31 @@ class QuotedPath<E>(
             SwapDirection.SPECIFIED_IN -> (amountOutAfterFees - other.amountOutAfterFees).signum()
             // When we want to buy a token, the smaller the quote - the better
             SwapDirection.SPECIFIED_OUT -> (other.amountInAfterFees - amountInAfterFees).signum()
+        }
+    }
+}
+
+class WeightBreakdown private constructor(
+    val individualWeights: List<Int>,
+    val total: Int
+) {
+
+    companion object {
+
+        fun <N, E : WeightedEdge<N>> fromQuotedPath(path: QuotedPath<E>): WeightBreakdown {
+            val weightedPath = mutableListOf<E>()
+            val individualWeights = mutableListOf<Int>()
+            var weight = 0
+
+            path.path.forEach { quotedEdge ->
+                val edgeWeight = quotedEdge.edge.weightForAppendingTo(weightedPath)
+
+                weight += edgeWeight
+                weightedPath += quotedEdge.edge
+                individualWeights += edgeWeight
+            }
+
+            return WeightBreakdown(individualWeights, weight)
         }
     }
 }

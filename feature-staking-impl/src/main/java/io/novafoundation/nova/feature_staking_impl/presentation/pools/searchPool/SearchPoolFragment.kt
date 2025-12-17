@@ -9,7 +9,6 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
@@ -46,8 +45,6 @@ class SearchPoolFragment : BaseFragment<SearchPoolViewModel, FragmentSearchPoolB
     }
 
     override fun initViews() {
-        binder.searchPoolToolbar.applyStatusBarInsets()
-
         binder.searchPoolToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.searchPoolList.adapter = adapter

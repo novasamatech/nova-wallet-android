@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
+import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.interfaces.FileProvider
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -43,8 +44,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_xcm_api.dryRun.DryRunApi
+import io.novafoundation.nova.feature_xcm_api.builder.XcmBuilder
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.dryRun.DryRunApi
+import io.novafoundation.nova.feature_xcm_api.runtimeApi.xcmPayment.XcmPaymentApi
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
+import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
@@ -61,6 +65,8 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 interface WalletFeatureDependencies {
+
+    val maskingModeUseCase: MaskingModeUseCase
 
     val fileCache: FileCache
 
@@ -100,7 +106,13 @@ interface WalletFeatureDependencies {
 
     val dryRunApi: DryRunApi
 
+    val xcmPaymentApi: XcmPaymentApi
+
+    val xcmBuilderFactory: XcmBuilder.Factory
+
     val multisigValidationsRepository: MultisigValidationsRepository
+
+    val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
 
     fun preferences(): Preferences
 

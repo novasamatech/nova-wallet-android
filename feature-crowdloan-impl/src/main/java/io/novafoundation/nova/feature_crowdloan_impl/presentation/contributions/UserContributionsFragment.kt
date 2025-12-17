@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_crowdloan_impl.presentation.contributions
 import androidx.recyclerview.widget.ConcatAdapter
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -32,16 +31,11 @@ class UserContributionsFragment : BaseFragment<UserContributionsViewModel, Fragm
     }
 
     override fun initViews() {
-        binder.myContributionsContainer.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
-
         binder.myContributionsList.adapter = adapter
         binder.myContributionsList.setHasFixedSize(true)
 
         binder.myContributionsToolbar.setHomeButtonListener { viewModel.backClicked() }
+        binder.myContributionsClaim.setOnClickListener { viewModel.claimClicked() }
     }
 
     override fun inject() {
@@ -68,5 +62,7 @@ class UserContributionsFragment : BaseFragment<UserContributionsViewModel, Fragm
                 listAdapter.submitList(loadingState.data)
             }
         }
+
+        viewModel.claimContributionsVisible.observe(binder.myContributionsClaim::setVisible)
     }
 }

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.common.holder
 
 import coil.ImageLoader
 import io.novafoundation.nova.common.list.GroupedListHolder
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableChildViewHolder
 import io.novafoundation.nova.common.utils.recyclerView.expandable.items.ExpandableChildItem
 import io.novafoundation.nova.feature_account_api.presenatation.chain.loadChainIcon
@@ -10,6 +11,8 @@ import io.novafoundation.nova.feature_assets.databinding.ItemTokenAssetBinding
 import io.novafoundation.nova.feature_assets.presentation.balance.common.BalanceListAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenAssetUi
 import io.novafoundation.nova.feature_assets.presentation.model.AssetModel
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableFiat
+import io.novafoundation.nova.feature_wallet_api.presentation.model.maskableToken
 
 class TokenAssetViewHolder(
     private val binder: ItemTokenAssetBinding,
@@ -34,7 +37,7 @@ class TokenAssetViewHolder(
     }
 
     fun bindTotal(asset: AssetModel) {
-        binder.itemTokenAssetBalance.text = asset.amount.token
-        binder.itemTokenAssetPriceAmount.text = asset.amount.fiat
+        binder.itemTokenAssetBalance.setMaskableText(asset.amount.maskableToken())
+        binder.itemTokenAssetPriceAmount.setMaskableText(asset.amount.maskableFiat())
     }
 }

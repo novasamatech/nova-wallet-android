@@ -10,9 +10,9 @@ import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.ApiType
 import io.novafoundation.nova.core_db.model.chain.ChainExternalApiLocal.SourceType
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
+import io.novafoundation.nova.core_db.model.chain.ChainLocal.AutoBalanceStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.Companion.EMPTY_CHAIN_ICON
 import io.novafoundation.nova.core_db.model.chain.ChainLocal.ConnectionStateLocal
-import io.novafoundation.nova.core_db.model.chain.ChainLocal.AutoBalanceStrategyLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -23,6 +23,8 @@ private const val ETHEREUM_OPTION = "ethereumBased"
 private const val CROWDLOAN_OPTION = "crowdloans"
 private const val TESTNET_OPTION = "testnet"
 private const val PROXY_OPTION = "proxy"
+
+private const val MULTISIG_SUPPORT = "multisig"
 private const val SWAP_HUB = "swap-hub"
 private const val HYDRA_DX_SWAPS = "hydradx-swaps"
 private const val NO_SUBSTRATE_RUNTIME = "noSubstrateRuntime"
@@ -42,6 +44,8 @@ private const val SUPPORT_GENERIC_LEDGER_APP = "supportsGenericLedgerApp"
 private const val IDENTITY_CHAIN = "identityChain"
 private const val DISABLED_CHECK_METADATA_HASH = "disabledCheckMetadataHash"
 private const val SESSION_LENGTH = "sessionLength"
+private const val SESSIONS_PER_ERA = "sessionsPerEra"
+private const val TIMELINE_CHAIN = "timelineChain"
 
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
@@ -68,7 +72,9 @@ fun mapRemoteChainToLocal(
             supportLedgerGenericApp = it[SUPPORT_GENERIC_LEDGER_APP] as? Boolean,
             identityChain = it[IDENTITY_CHAIN] as? ChainId,
             disabledCheckMetadataHash = it[DISABLED_CHECK_METADATA_HASH] as? Boolean,
-            sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull()
+            sessionLength = it[SESSION_LENGTH].asGsonParsedIntOrNull(),
+            sessionsPerEra = it[SESSIONS_PER_ERA].asGsonParsedIntOrNull(),
+            timelineChain = it[TIMELINE_CHAIN] as? ChainId
         )
     }
 
@@ -87,6 +93,7 @@ fun mapRemoteChainToLocal(
             isTestNet = TESTNET_OPTION in optionsOrEmpty,
             hasCrowdloans = CROWDLOAN_OPTION in optionsOrEmpty,
             supportProxy = PROXY_OPTION in optionsOrEmpty,
+            multisigSupport = MULTISIG_SUPPORT in optionsOrEmpty,
             hasSubstrateRuntime = NO_SUBSTRATE_RUNTIME !in optionsOrEmpty,
             pushSupport = PUSH_SUPPORT in optionsOrEmpty,
             governance = mapGovernanceRemoteOptionsToLocal(optionsOrEmpty),
@@ -211,11 +218,11 @@ fun mapExternalApisToLocal(chainRemote: ChainRemote): List<ChainExternalApiLocal
 private fun mapApiTypeRemoteToLocal(apiType: String): ApiType = when (apiType) {
     "history" -> ApiType.TRANSFERS
     "staking" -> ApiType.STAKING
+    "staking-rewards" -> ApiType.STAKING_REWARDS
     "crowdloans" -> ApiType.CROWDLOANS
     "governance" -> ApiType.GOVERNANCE_REFERENDA
     "governance-delegations" -> ApiType.GOVERNANCE_DELEGATIONS
     "referendum-summary" -> ApiType.REFERENDUM_SUMMARY
-    "multisig" -> ApiType.MULTISIG
     else -> ApiType.UNKNOWN
 }
 

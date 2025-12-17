@@ -1,21 +1,15 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.minSdkVersion
-        targetSdkVersion rootProject.targetSdkVersion
 
         buildConfigField "String", "NOTIFICATIONS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-wallet-android-releases/master/updates/v1/entrypoint_dev.json\""
         buildConfigField "String", "NOTIFICATION_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-wallet-android-releases/master/updates/changelogs/dev/\""
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
 
     buildTypes {
@@ -26,16 +20,6 @@ android {
             buildConfigField "String", "NOTIFICATIONS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-wallet-android-releases/master/updates/v1/entrypoint_release.json\""
             buildConfigField "String", "NOTIFICATION_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-wallet-android-releases/master/updates/changelogs/release/\""
         }
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-        freeCompilerArgs = ["-Xcontext-receivers"]
-    }
-
-    compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
     }
     namespace 'io.novafoundation.nova.feature_versions_impl'
 
@@ -63,12 +47,12 @@ dependencies {
     implementation markwonDep
 
     implementation daggerDep
-    kapt daggerKapt
+    ksp daggerCompiler
 
     implementation retrofitDep
 
     implementation lifecycleDep
-    kapt lifecycleKapt
+    ksp lifecycleCompiler
 
     testImplementation project(":test-shared")
 }

@@ -3,17 +3,18 @@ package io.novafoundation.nova.feature_account_impl.data.signer
 import android.util.Log
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
+import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdKeyIn
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
-import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.encrypt.EncryptionType
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.encrypt.keypair.Keypair
-import io.novasama.substrate_sdk_android.encrypt.keypair.ethereum.EthereumKeypairFactory
+import io.novasama.substrate_sdk_android.encrypt.keypair.bip32.Bip32EcdsaKeypairFactory
+import io.novasama.substrate_sdk_android.encrypt.keypair.generate
 import io.novasama.substrate_sdk_android.encrypt.keypair.substrate.SubstrateKeypairFactory
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -88,7 +89,7 @@ abstract class LeafSigner(
         return if (chain.isEthereumBased) {
             val emptySeed = ByteArray(64) { 1 }
 
-            EthereumKeypairFactory.generate(emptySeed, junctions = emptyList())
+            Bip32EcdsaKeypairFactory.generate(emptySeed, junctions = emptyList())
         } else {
             val emptySeed = ByteArray(32) { 1 }
 

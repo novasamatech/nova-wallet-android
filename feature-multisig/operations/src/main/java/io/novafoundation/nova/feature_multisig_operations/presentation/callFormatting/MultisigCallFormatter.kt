@@ -6,9 +6,34 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 
 interface MultisigCallFormatter {
 
-    suspend fun formatMultisigCall(
+    suspend fun formatPreview(
         call: GenericCall.Instance?,
         initialOrigin: AccountIdKey,
         chain: Chain,
     ): MultisigCallPreviewModel
+
+    suspend fun formatDetails(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): MultisigCallDetailsModel
+
+    suspend fun formatPushNotificationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): MultisigCallPushNotificationModel
+
+    suspend fun formatExecutedOperationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        chain: Chain
+    ): String
+
+    suspend fun formatRejectedOperationMessage(
+        call: GenericCall.Instance?,
+        initialOrigin: AccountIdKey,
+        rejectedAccountName: String,
+        chain: Chain
+    ): String
 }

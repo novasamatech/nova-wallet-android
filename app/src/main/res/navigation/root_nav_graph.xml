@@ -23,6 +23,8 @@
 
     <include app:graph="@navigation/sign_parity_signer_graph" />
 
+    <include app:graph="@navigation/multisig_operation_details_graph" />
+
     <action
         android:id="@+id/action_open_externalSignGraph"
         app:destination="@id/external_sign_graph"
@@ -145,6 +147,30 @@
         android:id="@+id/action_openUnifiedAddressDialog"
         app:destination="@id/chainAddressesFragment" />
 
+    <action
+        android:id="@+id/action_multisigOperationDetailsFragment"
+        app:destination="@id/multisig_operation_details_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_chain_migration_details"
+        app:destination="@id/chainMigrationDetails"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_scan_seed"
+        app:destination="@id/scanSeedFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
     <fragment
         android:id="@+id/splashFragment"
         android:name="io.novafoundation.nova.splash.presentation.SplashFragment"
@@ -177,6 +203,12 @@
             app:popUpToInclusive="true" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/chainMigrationDetails"
+        android:name="io.novafoundation.nova.feature_ahm_impl.presentation.migrationDetails.ChainMigrationDetailsFragment"
+        android:label="fragment_chain_migration_details"
+        tools:layout="@layout/fragment_chain_migration_details" />
 
     <fragment
         android:id="@+id/pincodeFragment"
@@ -257,5 +289,10 @@
             app:popUpToInclusive="true" />
 
     </fragment>
+
+    <fragment
+        android:id="@+id/scanSeedFragment"
+        android:name="io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedFragment"
+        android:label="ScanSeedFragment" />
 
 </navigation>

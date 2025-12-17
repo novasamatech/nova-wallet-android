@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_governance_api.data.source.SupportedGovern
 import io.novafoundation.nova.feature_governance_api.domain.delegation.delegate.list.model.DelegatePreview
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.mapDelegateStatsToPreviews
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
+import io.novafoundation.nova.runtime.ext.timelineChainIdOrSelf
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -32,7 +33,7 @@ class DelegatesSharedComputation(
             val delegatesStatsDeferred = scope.async { delegateCommonRepository.getDelegatesStats(governanceOption) }
             val tracksDeferred = scope.async { delegateCommonRepository.getTracks(governanceOption) }
 
-            chainStateRepository.currentBlockNumberFlow(chain.id).map {
+            chainStateRepository.currentBlockNumberFlow(chain.timelineChainIdOrSelf()).map {
                 val userDelegates = delegateCommonRepository.getUserDelegationsOrEmpty(governanceOption, tracksDeferred.await())
                 val userDelegateIds = userDelegates.keys.map { it.value }
 

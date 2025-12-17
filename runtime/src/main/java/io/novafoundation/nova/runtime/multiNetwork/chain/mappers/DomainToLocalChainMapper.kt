@@ -125,6 +125,7 @@ fun mapChainToLocal(chain: Chain, gson: Gson): ChainLocal {
         hasSubstrateRuntime = chain.hasSubstrateRuntime,
         pushSupport = chain.pushSupport,
         hasCrowdloans = chain.hasCrowdloans,
+        multisigSupport = chain.multisigSupport,
         supportProxy = chain.supportProxy,
         swap = mapSwapListToLocal(chain.swap),
         customFee = mapCustomFeeToLocal(chain.customFee),
@@ -193,8 +194,8 @@ fun mapChainExternalApiToLocal(gson: Gson, chainId: String, api: ExternalApi): C
         is ExternalApi.GovernanceDelegations -> mapExternalApiGovernanceDelegations(chainId, api)
         is ExternalApi.GovernanceReferenda -> mapExternalApiGovernanceReferenda(gson, chainId, api)
         is ExternalApi.Staking -> mapExternalApiStaking(chainId, api)
+        is ExternalApi.StakingRewards -> mapExternalApiStakingRewards(chainId, api)
         is ExternalApi.ReferendumSummary -> mapExternalApiReferendumSummary(chainId, api)
-        is ExternalApi.Multisig -> mapExternalApiMultisig(chainId, api)
     }
 }
 
@@ -265,21 +266,21 @@ private fun mapExternalApiStaking(chainId: String, api: ExternalApi.Staking): Ch
     )
 }
 
-private fun mapExternalApiReferendumSummary(chainId: String, api: ExternalApi.ReferendumSummary): ChainExternalApiLocal {
+fun mapExternalApiStakingRewards(chainId: String, api: ExternalApi.StakingRewards): ChainExternalApiLocal {
     return ChainExternalApiLocal(
         chainId = chainId,
-        sourceType = SourceType.UNKNOWN,
-        apiType = ChainExternalApiLocal.ApiType.REFERENDUM_SUMMARY,
+        sourceType = SourceType.SUBQUERY,
+        apiType = ChainExternalApiLocal.ApiType.STAKING_REWARDS,
         parameters = null,
         url = api.url
     )
 }
 
-private fun mapExternalApiMultisig(chainId: String, api: ExternalApi.Multisig): ChainExternalApiLocal {
+private fun mapExternalApiReferendumSummary(chainId: String, api: ExternalApi.ReferendumSummary): ChainExternalApiLocal {
     return ChainExternalApiLocal(
         chainId = chainId,
-        sourceType = SourceType.SUBSQUARE,
-        apiType = ChainExternalApiLocal.ApiType.MULTISIG,
+        sourceType = SourceType.UNKNOWN,
+        apiType = ChainExternalApiLocal.ApiType.REFERENDUM_SUMMARY,
         parameters = null,
         url = api.url
     )

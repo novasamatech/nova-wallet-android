@@ -6,7 +6,8 @@ import io.novafoundation.nova.feature_nft_api.data.model.Nft
 import io.novafoundation.nova.feature_nft_impl.R
 import io.novafoundation.nova.feature_nft_impl.presentation.nft.common.model.NftPriceModel
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
-import io.novafoundation.nova.feature_wallet_api.presentation.model.mapAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 
 fun ResourceManager.formatIssuance(issuance: Nft.Issuance): String {
     return when (issuance) {
@@ -30,13 +31,13 @@ fun ResourceManager.formatIssuance(issuance: Nft.Issuance): String {
     }
 }
 
-fun ResourceManager.formatNftPrice(price: Nft.Price?, priceToken: Token?): NftPriceModel? {
+fun ResourceManager.formatNftPrice(amountFormatter: AmountFormatter, price: Nft.Price?, priceToken: Token?): NftPriceModel? {
     if (price == null || priceToken == null) return null
 
     return when (price) {
         is Nft.Price.Fungible -> {
             val units = price.units.format()
-            val amountModel = mapAmountToAmountModel(price.totalPrice, priceToken)
+            val amountModel = amountFormatter.formatAmountToAmountModel(price.totalPrice, priceToken)
 
             NftPriceModel(
                 amountInfo = getString(R.string.nft_fungile_price, units, amountModel.token),
@@ -44,7 +45,7 @@ fun ResourceManager.formatNftPrice(price: Nft.Price?, priceToken: Token?): NftPr
             )
         }
         is Nft.Price.NonFungible -> {
-            val amountModel = mapAmountToAmountModel(price.nftPrice, priceToken)
+            val amountModel = amountFormatter.formatAmountToAmountModel(price.nftPrice, priceToken)
 
             NftPriceModel(
                 amountInfo = amountModel.token,

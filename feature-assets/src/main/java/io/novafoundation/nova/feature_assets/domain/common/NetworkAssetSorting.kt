@@ -73,7 +73,7 @@ fun Asset.totalWithOffChain(externalBalances: Map<FullChainAssetId, Balance>): A
     val overallFiat = token.amountToFiat(overallTotal)
 
     return AssetBalance(
-        PricedAmount(overallTotal, overallFiat),
-        PricedAmount(transferable, token.amountToFiat(transferable))
+        AssetBalance.Amount(overallTotal, overallFiat),
+        AssetBalance.Amount(transferable, token.amountToFiat(transferable))
     )
 }

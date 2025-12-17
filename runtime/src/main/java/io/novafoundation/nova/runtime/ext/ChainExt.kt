@@ -26,6 +26,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ExplorerTemplateExtractor
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -96,6 +97,10 @@ val Chain.isEnabled
 
 val Chain.isDisabled
     get() = !isEnabled
+
+fun Chain.getAssetOrThrow(assetId: ChainAssetId): Chain.Asset {
+    return assetsById.getValue(assetId)
+}
 
 fun Chain.Asset.supportedStakingOptions(): List<Chain.Asset.StakingType> {
     if (staking.isEmpty()) return emptyList()
@@ -189,6 +194,10 @@ fun Chain.Asset.StakingType.isDirectStaking(): Boolean {
 
 fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
     return group() == StakingTypeGroup.NOMINATION_POOL
+}
+
+inline fun <reified T : Chain.ExternalApi> Chain.allExternalApis(): List<T> {
+    return externalApis.filterIsInstance<T>()
 }
 
 inline fun <reified T : Chain.ExternalApi> Chain.externalApi(): T? {
@@ -286,6 +295,14 @@ fun Chain.accountIdOf(address: String): ByteArray {
     } else {
         address.toAccountId()
     }
+}
+
+fun String.toAccountId(chain: Chain): ByteArray {
+    return chain.accountIdOf(this)
+}
+
+fun String.toAccountIdKey(chain: Chain): AccountIdKey {
+    return chain.accountIdKeyOf(this)
 }
 
 fun Chain.accountIdKeyOf(address: String): AccountIdKey {
@@ -443,6 +460,11 @@ object ChainGeneses {
     const val VARA = "fe1b4c55fd4d668101126434206571a7838a8b6b93a6d1b95d607e78e6c53763"
 
     const val POLKADOT_ASSET_HUB = "68d56f15f85d3136970ec16946040bc1752654e906147f7e43e9d539d7c3de2f"
+
+    const val UNIQUE_NETWORK = "84322d9cddbf35088f1e54e9a85c967a41a56a4f43445768125e61af166c7d31"
+
+    const val POLKADOT_PEOPLE = "67fa177a097bfa18f77ea95ab56e9bcdfeb0e5b8a40e46298bb93e16b6fc5008"
+    const val KUSAMA_PEOPLE = "c1af4cb4eb3918e5db15086c0cc5ec17fb334f728b7c65dd44bfe1e174ff8b3f"
 }
 
 object ChainIds {
@@ -588,6 +610,18 @@ fun Chain.hasReferendaSummaryApi(): Boolean {
 
 fun Chain.summaryApiOrNull(): Chain.ExternalApi.ReferendumSummary? {
     return externalApi<Chain.ExternalApi.ReferendumSummary>()
+}
+
+fun Chain.timelineChainId(): ChainId? {
+    return additional?.timelineChain
+}
+
+fun Chain.timelineChainIdOrSelf(): ChainId {
+    return timelineChainId() ?: id
+}
+
+fun Chain.hasTimelineChain(): Boolean {
+    return additional?.timelineChain != null
 }
 
 fun FullChainAssetId.Companion.utilityAssetOf(chainId: ChainId) = FullChainAssetId(chainId, UTILITY_ASSET_ID)

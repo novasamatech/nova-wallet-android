@@ -67,10 +67,10 @@
         android:gravity="end|center_vertical"
         android:maxLines="1"
         android:textColor="@color/text_secondary"
-        app:layout_constraintBaseline_toBaselineOf="@id/itemAssetRateChange"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@+id/itemAssetRateChange"
+        app:layout_constraintTop_toBottomOf="@+id/itemAssetBalance"
         tools:text="$1,000.05" />
 
     <TextView
@@ -83,10 +83,11 @@
         android:gravity="end|center_vertical"
         android:maxLines="1"
         android:textColor="@color/text_primary"
-        app:layout_constraintBaseline_toBaselineOf="@id/itemAssetToken"
+        app:layout_constraintBottom_toTopOf="@+id/itemAssetPriceAmount"
         app:layout_constraintEnd_toEndOf="@+id/itemAssetPriceAmount"
-        app:layout_constraintHorizontal_bias="1"
         app:layout_constraintStart_toEndOf="@+id/itemAssetToken"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
         tools:text="120.0849" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

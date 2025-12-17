@@ -21,6 +21,7 @@
     <string name="account_backup_mnemonic_title">パスフレーズを書き留めてください</string>
     <string name="account_backup_secret_caption">フレーズが正確かつ判読可能に書かれていることを確認してください。</string>
     <string name="account_chain_address_format">%s アドレス</string>
+    <string name="account_chain_not_found">アカウントが%sにありません</string>
     <string name="account_confirm_mnemonic">ニーモニックを確認</string>
     <string name="account_confirm_mnemonic_title">ダブルチェックしましょう</string>
     <string name="account_confirmation_details">正しい順序で言葉を選んでください</string>
@@ -60,6 +61,7 @@
     <string name="account_import_mnemonic_subtitle">単語はスペースで区切り、カンマやその他の記号は使わないでください</string>
     <string name="account_import_mnemonic_title">単語を正しい順序で入力</string>
     <string name="account_import_password_placeholder">パスワード</string>
+    <string name="account_import_private_key">秘密鍵をインポート</string>
     <string name="account_import_seed_hint">0xAB</string>
     <string name="account_import_seed_title">生のSeedを入力</string>
     <string name="account_import_wallet_subtitle">Novaは全てのアプリに対応しています</string>
@@ -77,6 +79,7 @@
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
     <string name="account_ledger_import_fill_title">ウォレットにアカウントを追加</string>
+    <string name="account_ledger_import_start_guide">Ledger接続ガイド</string>
     <string name="account_ledger_import_start_step_1">Ledger Liveアプリを使ってLedgerデバイスに%sを確実にしてください</string>
     <string name="account_ledger_import_start_step_1_highlighted">ネットワークアプリがインストールされている</string>
     <string name="account_ledger_import_start_step_2">あなたのLedgerデバイス上の%s</string>
@@ -87,12 +90,14 @@
     <string name="account_ledger_import_start_step_4_highlighted">アカウントを選択</string>
     <string name="account_ledger_import_start_step_otg">%s を電話の設定で</string>
     <string name="account_ledger_import_start_step_otg_highlighted">OTGを有効にする</string>
+    <string name="account_ledger_import_start_title">Ledgerを接続</string>
     <string name="account_ledger_legacy_warning_message">操作にサインしてアカウントを新しいGeneric Ledgerアプリに移行するには、Migrationアプリをインストールして開いてください。Legacy OldおよびMigration Ledgerアプリは将来サポートされなくなります。</string>
     <string name="account_ledger_legacy_warning_title">新しいLedgerアプリがリリースされました</string>
     <string name="account_ledger_migration_app">Polkadot Migration</string>
     <string name="account_ledger_migration_deprecation_message">Migrationアプリは近い将来使用できなくなります。新しいLedgerアプリにアカウントを移行して資金を失わないようにしてください。</string>
     <string name="account_ledger_migration_generic">Polkadot</string>
     <string name="account_ledger_nano_x">Ledger Nano X</string>
+    <string name="account_ledger_nano_x_legacy">レジャー・レガシー</string>
     <string name="account_ledger_select_device_all_description">LedgerをBluetoothで使用する場合は、両方のデバイスでBluetoothを有効にし、NovaにBluetoothおよび位置情報の権限を付与してください。USBの場合は、電話の設定でOTGを有効にしてください。</string>
     <string name="account_ledger_select_device_description">電話の設定とLedgerデバイスでBluetoothを有効にしてください。Ledgerデバイスを解除し、%sアプリを開いてください。</string>
     <string name="account_ledger_select_device_title">Ledgerデバイスを選択</string>
@@ -105,6 +110,7 @@
     <string name="account_needed_message">このネットワークにはアカウントがありません。アカウントを作成するか、インポートすることができます。</string>
     <string name="account_needed_title">アカウントが必要です</string>
     <string name="account_no_chain_projection">アカウントが見つかりません</string>
+    <string name="account_pair_public_key">公開鍵をペアリング</string>
     <string name="account_parity_signer">Parity Signer</string>
     <string name="account_parity_signer_chain_not_supported" formatted="false">%sが%sをサポートしていません</string>
     <string name="account_parity_signer_import_preview_description">次のアカウントが%sから正常に読み取られました</string>
@@ -133,13 +139,15 @@
     <string name="account_polkadot_vault_import_start_empty_derivation_hint">派生パス名が空であることに注意してください</string>
     <string name="account_polkadot_vault_import_start_step_1">スマートフォンの%sアプリケーション</string>
     <string name="account_polkadot_vault_import_start_step_1_highlighted">Polkadot Vault を開く</string>
-    <string name="account_polkadot_vault_import_start_step_2">%s キーセット、ネットワーク、Nova Walletに追加するアカウントを選択します</string>
-    <string name="account_polkadot_vault_import_start_step_2_highlighted">Key Sets タブに行く。</string>
+    <string name="account_polkadot_vault_import_start_step_2">%s をNova Walletに追加しますか</string>
+    <string name="account_polkadot_vault_import_start_step_2_highlighted">派生キーをタップ</string>
     <string name="account_polkadot_vault_import_start_step_3">Polkadot Vaultが%s</string>
     <string name="account_polkadot_vault_import_start_step_3_highlighted">スキャン用のQRコード</string>
+    <string name="account_polkadot_vault_import_start_step_3_private">右上のアイコンをタップして%sを選択</string>
+    <string name="account_polkadot_vault_import_start_step_3_private_highlighted">秘密鍵をエクスポート</string>
     <string name="account_private_key">プライベートキー</string>
     <string name="account_proxied">プロキシ</string>
-    <string name="account_proxieds">あなたに委任された（プロキシ）</string>
+    <string name="account_proxieds">委任された（プロキシ）</string>
     <string name="account_proxy_type_any">任意の操作</string>
     <string name="account_proxy_type_auction">オークション</string>
     <string name="account_proxy_type_cancel_proxy">プロキシのキャンセル</string>
@@ -149,6 +157,7 @@
     <string name="account_proxy_type_non_transfer">非転送</string>
     <string name="account_proxy_type_staking">Stake</string>
     <string name="account_restore_account">すでにアカウントを持っています</string>
+    <string name="account_secrets">シークレット</string>
     <string name="account_seed_hex_symbols">64の16進数記号</string>
     <string name="account_select_hardware_wallet">ハードウェアウォレットを選択</string>
     <string name="account_select_secret_source">秘密のタイプを選択</string>
@@ -157,6 +166,7 @@
     <string name="account_substrate_accounts">Substrateアカウント</string>
     <string name="account_substrate_crypto_type">Substrateキーの暗号タイプ</string>
     <string name="account_substrate_derivation_path">Substrate秘密の導出パス</string>
+    <string name="account_wallet_name">ウォレット名</string>
     <string name="account_wallet_nickname">ウォレットのニックネーム</string>
     <string name="account_watch_add_evm_address_description">Moonbeam、Moonriverおよびその他のネットワーク</string>
     <string name="account_watch_add_evm_address_optional">EVMアドレス（任意）</string>
@@ -168,11 +178,14 @@
     <string name="account_watch_only">閲覧専用</string>
     <string name="account_welcome_hardware_wallet_subtitle">Polkadot Vault、Parity SignerまたはLedgerを使用</string>
     <string name="account_welcome_hardware_wallet_title">ハードウェアウォレット</string>
+    <string name="account_welcome_trust_wallet_subtitle">NovaでTrust Walletアカウントを使用する</string>
+    <string name="account_welcome_trust_wallet_title">Trust Wallet</string>
     <string name="accounts_add_chain_account">%s アカウントを追加</string>
     <string name="accounts_add_wallet">ウォレットを追加</string>
     <string name="accounts_change_chain_account">%s アカウントを変更</string>
     <string name="accounts_change_chain_secrets">アカウントを変更</string>
     <string name="accounts_ledger_legacy">Ledger（Legacy）</string>
+    <string name="accounts_update_proxieds_title">あなたに委任されています</string>
     <string name="active_multisig_title">共有コントロール</string>
     <string name="add_custom_node">カスタムノードを追加</string>
     <string name="add_delegation_missing_account_message">委任するためにはウォレットに%sアカウントを追加する必要があります</string>
@@ -186,6 +199,7 @@
     <string name="add_proxy_maximum_reached_error_title">プロキシの最大数に達しました</string>
     <string name="added_networks_empty_placeholder">追加されたカスタムネットワーク\nここに表示されます</string>
     <string name="additional_payment_methods">+%d</string>
+    <string name="alert_nova_has_selected_ms_wallet">ノヴァは自動的にあなたのマルチシグウォレットに切り替え、保留中のトランザクションを確認できるようにしました。</string>
     <string name="appearance_colored_icon_title">カラー</string>
     <string name="appearance_title">外観</string>
     <string name="appearance_token_assets_title">トークンアイコン</string>
@@ -202,6 +216,9 @@
     <string name="asset_add_token_enter_contract_address">コントラクトアドレスを入力</string>
     <string name="asset_add_token_enter_decimals">小数を入力</string>
     <string name="asset_add_token_enter_symbol">シンボルを入力</string>
+    <string name="asset_details_source_asset_alert_button">%sに移動</string>
+    <string name="asset_details_source_asset_alert_message">%1$sより、あなたの%2$s の残高、Staking、およびガバナンスは%3$sで利用可能になります — 性能向上とコスト削減を実現します。</string>
+    <string name="asset_details_source_asset_alert_title" formatted="false">あなたの%s トークンが%sで利用可能です</string>
     <string name="asset_view_networks">ネットワーク</string>
     <string name="asset_view_tokens">トークン</string>
     <string name="assets_add_token">トークンを追加</string>
@@ -220,6 +237,7 @@
     <string name="assets_crowdloan_unlock_banner_description">クラウドローンからDOTを受け取りましたか？ DOTを今日からステークして最大限の報酬を得ましょう！</string>
     <string name="assets_crowdloan_unlock_banner_title">DOTをブースト 🚀</string>
     <string name="assets_filter_title">トークンをフィルター</string>
+    <string name="assets_gifts_flow_placeholder">贈り物にできるトークンがありません。\nアカウントにトークンを購入または入金してください。</string>
     <string name="assets_manage_tokens_all_networks">すべてのネットワーク</string>
     <string name="assets_manage_tokens_title">トークンを管理</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">%sをLedgerで管理されたアカウントに送信しないでください。Ledgerは%sの送信をサポートしていないため、資産がこのアカウントで凍結される可能性があります。</string>
@@ -261,6 +279,16 @@
     <string name="buy_order_completed_message">購入が開始されました！60分までお待ちください。ステータスはメールで確認できます。</string>
     <string name="buy_token_not_supported_message">現在、弊社のプロバイダーはこのトークンの購入をサポートしていません。別のトークン、異なるネットワークを選択するか、後ほど再確認してください。</string>
     <string name="buy_token_not_supported_title">このトークンは購入機能でサポートされていません</string>
+    <string name="chain_migration_details_fee_in_any_tokens">任意のトークンで手数料を支払う機能</string>
+    <string name="chain_migration_details_hint_auto_migration">移行は自動で行われ、アクションは不要です</string>
+    <string name="chain_migration_details_hint_history">古い取引履歴は%sに残ります</string>
+    <string name="chain_migration_details_in_progress_title">%1$s を使ってあなたの %2$s 残高に基づき、ステーキングとガバナンスは %3$s にあります。これらの機能は最長24時間ご利用いただけない場合があります。</string>
+    <string name="chain_migration_details_lower_fee">取引手数料が%1$sx低下\n（%2$sから%3$sへ）</string>
+    <string name="chain_migration_details_minimal_balance">最小残高が%1$sx低減\n（%2$sから%3$sへ）</string>
+    <string name="chain_migration_details_subtitle">Asset Hubが素晴らしい理由は？</string>
+    <string name="chain_migration_details_title">%1$s の開始時点の残高、%2$s の残高、ステーキングとガバナンスは %3$s 上にあります</string>
+    <string name="chain_migration_details_tokens">より多くのトークンがサポートされます：%sと他のエコシステムトークン</string>
+    <string name="chain_migration_details_unified_access">％s、アセット、Staking、およびガバナンスへの統合アクセス</string>
     <string name="chain_network_management_auto_balance">自動バランスノード</string>
     <string name="chain_network_management_enabling">接続を有効にする</string>
     <string name="change_cloud_backup_password_subtitle">クラウドバックアップからウォレットを復元するために使用するパスワードを入力してください。このパスワードは将来的に復元できないため、必ず覚えておいてください！</string>
@@ -273,6 +301,16 @@
     <string name="choose_amount_fee">転送手数料</string>
     <string name="choose_amount_network_error">ネットワークが応答していません</string>
     <string name="choose_amount_to">宛先</string>
+    <string name="claim_gift_already_claimed_message">おっと、贈り物はすでに受け取られています</string>
+    <string name="claim_gift_already_claimed_title">贈り物を受け取れません</string>
+    <string name="claim_gift_button">贈り物を受け取る</string>
+    <string name="claim_gift_default_error_message">サーバーに問題があるかもしれません。後でもう一度お試しください。</string>
+    <string name="claim_gift_default_error_title">おっと、何かが間違っています</string>
+    <string name="claim_gift_no_account_alert_title">別のウォレットを使用するか、新しいアカウントを作成するか、または設定でこのウォレットに%sアカウントを追加してください。</string>
+    <string name="claim_gift_success_message">贈り物を正常に受け取りました。トークンは間もなくあなたの残高に表示されます。</string>
+    <string name="claim_gift_title">暗号通貨の贈り物を受け取りました！</string>
+    <string name="claim_gift_uncontrollable_wallet_message">贈り物を受け取るために、新しいウォレットを作成するか既存のウォレットをインポートしてください</string>
+    <string name="claim_gift_uncontrollable_wallet_title">%sウォレットでは贈り物を受け取ることができません</string>
     <string name="close_dapp_tabs_message">DAppブラウザーで開いているすべてのタブが閉じられます。</string>
     <string name="close_dapp_tabs_title">すべてのDAppを閉じますか？</string>
     <string name="cloud_backup_delete_action_subtitle">%s と、いつでも復元できるように必ずオフラインで保持してください。バックアップ設定でこれを行うことができます。</string>
@@ -339,6 +377,8 @@
     <string name="common_balance">残高</string>
     <string name="common_bonus">ボーナス</string>
     <string name="common_call">呼び出し</string>
+    <string name="common_call_data">コールデータ</string>
+    <string name="common_call_hash">コールハッシュ</string>
     <string name="common_cancel">キャンセル</string>
     <string name="common_cancel_operation_warning">この操作をキャンセルしてもよろしいですか？</string>
     <string name="common_cannot_find_app">申し訳ありませんが、このリクエストを処理するための適切なアプリがありません</string>
@@ -366,17 +406,21 @@
     <string name="common_continue">続行</string>
     <string name="common_copied">クリップボードにコピーされました</string>
     <string name="common_copy_address">アドレスをコピー</string>
+    <string name="common_copy_call_data">コールデータをコピー</string>
+    <string name="common_copy_hash">ハッシュをコピー</string>
     <string name="common_copy_id">IDをコピー</string>
     <string name="common_crypto_type">キーペア暗号タイプ</string>
     <string name="common_date">日付</string>
     <string name="common_days_and_hours_format_with_delimeter" formatted="false">%s と %s</string>
     <string name="common_delete">削除</string>
+    <string name="common_depositor">預金者</string>
     <string name="common_details">詳細</string>
     <string name="common_disabled">無効</string>
     <string name="common_disconnect">切断する</string>
     <string name="common_do_not_close_app">アプリを閉じないでください！</string>
     <string name="common_done">完了</string>
-    <string name="common_dont_show_again">これを再表示しない</string>
+    <string name="common_dry_run_failed_message">Novaはエラーを防ぐためにトランザクションを事前にシミュレートします。このシミュレーションは成功しませんでした。後でもう一度試すか、より高い額で試してください。問題が続く場合は、設定でNovaウォレットのサポートに連絡してください。</string>
+    <string name="common_dry_run_failed_title">トランザクションシミュレーション失敗</string>
     <string name="common_edit">編集</string>
     <string name="common_element_and_more_format" formatted="false">%s (さらに %s)</string>
     <string name="common_email_chooser_title">メールアプリを選択</string>
@@ -384,6 +428,7 @@
     <string name="common_enter_address">アドレスを入力…</string>
     <string name="common_enter_amount">金額を入力...</string>
     <string name="common_enter_details">詳細を入力してください</string>
+    <string name="common_enter_other_amount">別の金額を入力</string>
     <string name="common_enter_password">パスワードを入力</string>
     <string name="common_error_general_title">エラー</string>
     <string name="common_error_not_enough_tokens">トークンが足りません</string>
@@ -407,10 +452,13 @@
     </plurals>
     <string name="common_frequency_days_daily">毎日</string>
     <string name="common_frequency_days_everyday">毎日</string>
+    <string name="common_full_details">詳細</string>
     <string name="common_get_token_format">%sを取得</string>
+    <string name="common_gift">贈り物</string>
     <string name="common_got_it">了解しました</string>
     <string name="common_governance">ガバナンス</string>
     <string name="common_hexadecimal_string">16進文字列</string>
+    <string name="common_hide">非表示</string>
     <plurals name="common_hours_format">
         <item quantity="other">%d時間</item>
     </plurals>
@@ -418,10 +466,12 @@
     <string name="common_i_understand">了解しました</string>
     <string name="common_info">情報</string>
     <string name="common_invalid_qr">QRコードが無効です</string>
+    <string name="common_invalid_qr_code">無効なQRコード</string>
     <string name="common_learn_more">さらに詳しく</string>
     <string name="common_learn_more_v2_2_0">についてもっと知る</string>
     <string name="common_ledger">Ledger</string>
     <string name="common_left">残り%s</string>
+    <string name="common_manage_wallets">ウォレットを管理</string>
     <string name="common_maximum">最大</string>
     <string name="common_maximum_format">%s最大</string>
     <plurals name="common_minutes_format">
@@ -430,6 +480,7 @@
     <string name="common_missing_account_title">%sアカウントがありません</string>
     <string name="common_modify">修正</string>
     <string name="common_module">モジュール</string>
+    <string name="common_name">名前</string>
     <string name="common_network">ネットワーク</string>
     <string name="common_network_ethereum">Ethereum</string>
     <string name="common_network_not_supported">%sはサポートされていません</string>
@@ -494,10 +545,15 @@
     </plurals>
     <string name="common_secret_derivation_path">シークレット導出パス</string>
     <string name="common_see_all">すべて見る</string>
+    <string name="common_select_token">トークンを選択</string>
     <string name="common_settings">設定</string>
     <string name="common_share">共有</string>
+    <string name="common_share_call_data">コールデータを共有</string>
+    <string name="common_share_hash">ハッシュを共有</string>
+    <string name="common_show">表示</string>
     <string name="common_sign_in">サインイン</string>
     <string name="common_sign_request">署名のリクエスト</string>
+    <string name="common_signatory">署名者</string>
     <string name="common_signature_invalid">署名が無効です</string>
     <string name="common_skip">スキップ</string>
     <string name="common_skip_process">プロセスをスキップ</string>
@@ -532,13 +588,16 @@
     <string name="common_use_max">最大を使用</string>
     <string name="common_validation_invalid_address_message">受信者は有効な %s アドレスである必要があります</string>
     <string name="common_validation_invalid_address_title">無効な受信者</string>
+    <string name="common_view">表示</string>
     <string name="common_waiting">待機中</string>
     <string name="common_wallet">ウォレット</string>
     <string name="common_warning">警告</string>
     <string name="common_yes">はい</string>
+    <string name="common_your_gift">あなたの贈り物</string>
     <string name="common_zero_amount_error">金額は正の数である必要があります</string>
     <string name="confirm_cloud_backup_password_subtitle">バックアッププロセス中に作成したパスワードを入力してください</string>
     <string name="confirm_cloud_backup_password_title">現在のバックアップパスワードを入力してください</string>
+    <string name="confirm_create_gift_hint">確認すると、トークンがあなたのアカウントから転送されます</string>
     <string name="confirm_mnemonic_disabled_button_state">単語を選択してください...</string>
     <string name="confirm_mnemonic_not_matching_error_message">無効なパスフレーズです。単語の順序をもう一度確認してください。</string>
     <string name="confirm_referendum_vote_referendum">国民投票</string>
@@ -745,6 +804,7 @@
     <string name="ed25519_selection_subtitle">ed25519 (代替)</string>
     <string name="ed25519_selection_title">Edwards</string>
     <string name="enter_backup_password_hint">バックアップパスワード</string>
+    <string name="enter_call_data_title">コールデータを入力</string>
     <string name="error_not_enough_to_pay_fee_title">手数料を支払うのに十分なトークンがありません</string>
     <string name="ethereum_contract">契約</string>
     <string name="ethereum_contract_call">契約呼び出し</string>
@@ -772,6 +832,23 @@
     <string name="fragment_top_up_card_title">カードに%sをチャージ</string>
     <string name="fragment_waiting_top_up_time_out_error_message">support@novawallet.ioに連絡してください。カードを発行するために使用したメールアドレスを添えてください。</string>
     <string name="fragment_waiting_top_up_time_out_error_title">サポートに連絡</string>
+    <string name="gift_claimed_subtitle">請求済み</string>
+    <string name="gift_created_subtitle">作成済み: %s</string>
+    <string name="gift_enter_amount_disabled_button_state">金額を入力</string>
+    <string name="gift_min_balance_validation_message">最小贈り物は%sです</string>
+    <string name="gift_reclaimed_subtitle">回収済み</string>
+    <string name="gifts_assets_flow_title">贈るトークンを選択</string>
+    <string name="gifts_claim_fee">請求時のネットワーク料金</string>
+    <string name="gifts_create">贈り物を作成</string>
+    <string name="gifts_header_subtitle">Novaで迅速、簡単、安全に贈り物を送る</string>
+    <string name="gifts_header_title">誰にでも、どこにでもクリプトギフトを共有</string>
+    <string name="gifts_list_title">あなたが作成した贈り物</string>
+    <string name="gifts_network_flow_title">%sの贈り物のネットワークを選択</string>
+    <string name="gifts_placeholder_step_1">贈り物の金額を入力</string>
+    <string name="gifts_placeholder_step_2">%sをリンクとして共有し、誰でもNovaに招待</string>
+    <string name="gifts_placeholder_step_2_highlight">贈り物を直接共有</string>
+    <string name="gifts_placeholder_step_3">%s、そして、このデバイスからいつでも請求されていないギフトを回収できます</string>
+    <string name="gifts_placeholder_step_3_highlight">贈り物は瞬時に利用可能</string>
     <string name="governance_notification_channel_name">ガバナンス通知チャンネル</string>
     <plurals name="governance_select_tracks_min_tracks_error">
         <item quantity="other">少なくとも %d トラックを選択する必要があります</item>
@@ -806,6 +883,9 @@
     <string name="integrate_networks_banner_description">あなたが構築しているネットワークのすべての機能をNova Walletに統合し、誰でもアクセスできるようにします。</string>
     <string name="integrate_networks_banner_link">ネットワークを統合する</string>
     <string name="integrate_networks_banner_title">Polkadot用に構築していますか？</string>
+    <string name="invalid_call_data_format_message">あなたが提供したコールデータは無効か、形式が間違っています。それが正しいことを確認し、もう一度お試しください。</string>
+    <string name="invalid_call_data_message">このコールデータは別の操作用のもので、コールハッシュ%sによります</string>
+    <string name="invalid_call_data_title">無効なコールデータ</string>
     <string name="invalid_proxy_address_message">プロキシアドレスは有効な%sアドレスである必要があります</string>
     <string name="invalid_proxy_address_title">無効なプロキシアドレス</string>
     <string name="invalid_token_symbol_message">入力された通貨記号（%1$s）はネットワーク（%2$s）と一致しません。正しい通貨記号を使用しますか？</string>
@@ -851,6 +931,7 @@
     <string name="ledger_wallet_details_description">このウォレットはLedgerとペアリングされています。Novaは望む操作を形成する手助けをし、Ledgerを使用してそれらを署名するよう求められます</string>
     <string name="ledher_import_select_address_title">ウォレットに追加するアカウントを選択</string>
     <string name="loading_network_info">ネットワーク情報を読み込み中...</string>
+    <string name="loading_transaction_details">トランザクションの詳細を読み込んでいます…</string>
     <string name="loocking_backup_progress">バックアップを探しています...</string>
     <string name="make_payout_transaction_sent">支払いトランザクションが送信されました</string>
     <string name="manage_assets_add_token">トークンを追加</string>
@@ -886,29 +967,77 @@
     <plurals name="multiple_wallets_selection_min_button_text">
         <item quantity="other">%dウォレットを少なくとも選択してください</item>
     </plurals>
+    <string name="multisig_approve_transaction_unavailable_message">このトランザクションはすでに拒否または実行されています。</string>
+    <string name="multisig_approve_transaction_unavailable_title">このトランザクションを実行できません</string>
     <string name="multisig_callhash_exists_message">%sは同じ操作をすでに開始しており、現在他の署名者による署名を待っています。</string>
     <string name="multisig_callhash_exists_title">操作は既に存在します</string>
+    <string name="multisig_card_not_supported_message">デビットカードを管理するには、異なるタイプのウォレットに切り替えてください。</string>
+    <string name="multisig_card_not_supported_title">マルチシグにはデビットカードはサポートされていません</string>
+    <string name="multisig_deposit">マルチシグ預金</string>
+    <string name="multisig_deposit_description">この預金は、マルチシグ操作が実行または拒否されるまで預金者のアカウントにロックされます。</string>
+    <string name="multisig_extrinsic_details_subtitle">操作が正しいことを確認してください</string>
+    <string name="multisig_notification_executed_transaction_message">%s により署名され、実行されました。</string>
+    <string name="multisig_notification_executed_transaction_title">✅ マルチシグトランザクションが実行されました</string>
+    <string name="multisig_notification_init_transaction_message" formatted="false">%s が %s で。</string>
+    <string name="multisig_notification_init_transaction_title">✍🏻 あなたの署名が要求されています</string>
+    <string name="multisig_notification_initiator_footer">%s により開始されました。</string>
+    <string name="multisig_notification_message_header">ウォレット: %s</string>
+    <string name="multisig_notification_new_approval_title">%s により署名されました</string>
+    <string name="multisig_notification_new_approval_title_additional_message" formatted="false">%d のうち %d の署名が集まりました。</string>
+    <string name="multisig_notification_on_behalf_of">%s を代表しています。</string>
+    <string name="multisig_notification_rejected_transaction_message">%s により拒否されました。</string>
+    <string name="multisig_notification_rejected_transaction_title">❌ マルチシグトランザクションが拒否されました</string>
+    <string name="multisig_on_behalf_of">代表して</string>
+    <string name="multisig_operation_default_call_format" formatted="false">%s: %s</string>
     <string name="multisig_operation_details_approve">承認</string>
     <string name="multisig_operation_details_approve_and_execute">承認と実行</string>
-    <string name="multisig_operation_details_call_data_not_found">コールデータが見つかりません</string>
+    <string name="multisig_operation_details_call_data_not_found">詳細を表示するにはコールデータを入力してください</string>
+    <string name="multisig_operation_details_not_found_message">トランザクションは既に実行されたか拒否されました。</string>
+    <string name="multisig_operation_details_not_found_title">署名は終了しました</string>
     <string name="multisig_operation_details_reject">拒否</string>
-    <string name="multisig_operations_pending_signature">署名待ち</string>
-    <string name="multisig_operations_progress" formatted="false">%s / %s 署名済み</string>
-    <string name="multisig_operations_signed">署名済み</string>
-    <string name="multisig_operations_unknown_calldata">[不明な操作] (%s)</string>
-    <string name="multisig_pending_operations">保留中の操作</string>
+    <string name="multisig_operation_details_signatories" formatted="false">署名者 (%d/%d)</string>
+    <string name="multisig_operation_utility_batch_all_title">バッチオール (エラー時にリバート)</string>
+    <string name="multisig_operation_utility_batch_title">バッチ (エラーまで実行)</string>
+    <string name="multisig_operation_utility_force_batch_title">強制バッチ (エラーを無視)</string>
+    <string name="multisig_operations_created">あなたによって作成された</string>
+    <string name="multisig_operations_placeholder">まだトランザクションはありません。\n署名リクエストがここに表示されます</string>
+    <string name="multisig_operations_progress" formatted="false">署名中 (%s/%s)</string>
+    <string name="multisig_operations_signed">あなたによって署名された</string>
+    <string name="multisig_operations_unknown_calldata">不明な操作</string>
+    <string name="multisig_pending_operations">署名すべきトランザクション</string>
+    <string name="multisig_pending_operations_on_behalf_of">代表として:</string>
+    <string name="multisig_push_settings_approval_switcher">署名者による署名</string>
+    <string name="multisig_push_settings_executed_switcher">マルチシグトランザクションが実行されました</string>
+    <string name="multisig_push_settings_initial_switcher">あなたの署名が要求されています</string>
+    <string name="multisig_push_settings_rejected_switcher">マルチシグトランザクションが拒否されました</string>
+    <string name="multisig_sell_not_supported_message">仮想通貨をフィアットに売却するには、異なるタイプのウォレットに切り替えてください。</string>
+    <string name="multisig_sell_not_supported_title">マルチシグには売却はサポートされていません</string>
     <string name="multisig_signatory">署名者：</string>
-    <string name="multisig_signatory_validation_deposit" formatted="false">%sはマルチシグのデポジット%sを配置するのに十分な残高がありません。利用可能な残高: %s</string>
-    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%sはネットワーク手数料%sを払い、マルチシグのデポジット%sを配置するのに十分な残高がありません。利用可能な残高: %s</string>
+    <string name="multisig_signatory_validation_deposit" formatted="false">%sは%sのマルチシグ預金をするのに十分な残高がありません。残高にさらに%sを追加する必要があります。</string>
+    <string name="multisig_signatory_validation_deposit_fee" formatted="false">%sは%sのネットワーク手数料を支払い、%sのマルチシグ預金をするのに十分な残高がありません。残高にさらに%sを追加する必要があります。</string>
     <string name="multisig_signatory_validation_ed" formatted="false">%sはこの取引手数料を支払い、最低ネットワーク残高を超えるために少なくとも%sが必要です。現在の残高は: %s</string>
+    <string name="multisig_signatory_validation_fee" formatted="false">%sは%sのネットワーク手数料を支払うのに十分な残高がありません。残高にさらに%sを追加する必要があります。</string>
     <string name="multisig_signing_is_not_supported_message">マルチシグウォレットは任意のメッセージの署名をサポートしていません — トランザクションのみ</string>
+    <string name="multisig_signing_reject_confirmation_subtitle">トランザクションは拒否されます。マルチシグのデポジットは%sに返されます。</string>
     <string name="multisig_signing_warning_message">マルチシグトランザクションは%sによって開始されます。開始者はネットワーク手数料を支払い、マルチシグデポジットを予約します。このデポジットはトランザクションが実行されるとアンリザーブされます。</string>
     <string name="multisig_signing_warning_title">マルチシグトランザクション</string>
-    <string name="multisig_transaction_created_subtitle">他の署名者がトランザクションを確認できます。 \nそのステータスを %s で追跡できます</string>
-    <string name="multisig_transaction_created_subtitle_highlight">マルチシグトランザクション。</string>
+    <string name="multisig_transaction_created_subtitle">他の署名者はトランザクションを確認できます。\n%sでそのステータスを追跡できます。</string>
+    <string name="multisig_transaction_created_subtitle_highlight">署名するトランザクション</string>
     <string name="multisig_transaction_created_title">マルチシグトランザクションが作成されました</string>
     <string name="multisig_transaction_created_view_details">詳細を表示</string>
+    <string name="multisig_transaction_dialog_message_unknown_call">初期のオンチェーン情報 (コールデータ) のないトランザクションが拒否されました</string>
+    <string name="multisig_transaction_executed_dialog_message" formatted="false">%s が %s で。\nこれ以上の操作は必要ありません。</string>
+    <string name="multisig_transaction_executed_dialog_title">マルチシグトランザクションが実行されました</string>
+    <string name="multisig_transaction_message_transfer">%1$s → %2$s</string>
+    <string name="multisig_transaction_rejected_dialog_message" formatted="false">%s が %s で。\n%s により拒否されました。\nこれ以上の操作は必要ありません。</string>
+    <string name="multisig_transaction_rejected_dialog_title">マルチシグトランザクションが拒否されました</string>
     <string name="multisig_wallet_details_info_warning">このウォレットからのトランザクションには、複数の署名者の承認が必要です。あなたのアカウントはその署名者の一つです：</string>
+    <string name="multisig_wallet_details_info_warning_other_signatories">他の署名者:</string>
+    <string name="multisig_wallet_details_info_warning_title" formatted="false">%d分の%dの閾値</string>
+    <string name="multisigs_notification_channel_name">マルチシグトランザクション通知チャンネル</string>
+    <string name="mutisigs_push_notifications_warning_enable">設定で有効にする</string>
+    <string name="mutisigs_push_notifications_warning_message">署名リクエスト、新しい署名、完了したトランザクションについて通知を受け取り、常に管理を維持しましょう。設定でいつでも管理できます。</string>
+    <string name="mutisigs_push_notifications_warning_title">マルチシグプッシュ通知が到着しました！</string>
     <string name="network_already_exist_failure_title">このノードはすでに存在します</string>
     <string name="network_fee">ネットワーク手数料</string>
     <string name="network_info_address">ノードアドレス</string>
@@ -927,6 +1056,8 @@
     <string name="nft_owned_by">所有者</string>
     <string name="nft_price_not_listed">リストされていません</string>
     <string name="nft_your_nfts">あなたのNFT</string>
+    <string name="no_ms_accounts_found_dialog_message">ノヴァにマルチシグウォレットを追加または選択していません。マルチシグプッシュ通知を受け取るために少なくとも1つ追加し、選択してください。</string>
+    <string name="no_ms_accounts_found_dialog_title">マルチシグウォレットがありません</string>
     <string name="node_already_exist_failure_message">入力されたURLは「%s」ノードとしてすでに存在します。</string>
     <string name="node_already_exist_failure_title">このノードはすでに存在します</string>
     <string name="node_not_alive_message">入力されたノードURLが応答していないか、フォーマットが不正です。URLのフォーマットは「wss://」から始まる必要があります。</string>
@@ -1001,9 +1132,12 @@
     <string name="profile_accounts_title_2_0">ウォレット</string>
     <string name="profile_language_title">言語</string>
     <string name="profile_pincode_change_title">PINコードを変更</string>
+    <string name="profile_settings_hide_balances_on_launch_title">残高を非表示にしてアプリを開く</string>
     <string name="profile_settings_pin_code_verification_title">PINで承認</string>
     <string name="profile_settings_safe_mode_title">セーフモード</string>
     <string name="profile_settings_title">設定</string>
+    <string name="proxied_card_not_supported_message">デビットカードを管理するには、Polkadotネットワークに切り替えて別のウォレットを使用してください。</string>
+    <string name="proxied_card_not_supported_title">このプロクシウォレットではデビットカードはサポートされていません</string>
     <string name="proxied_wallet_details_info_warning">このアカウントは以下のアカウントに取引を行うアクセスを許可しています:</string>
     <string name="proxy_access_type_staking_operations">Stakingオペレーション</string>
     <string name="proxy_error_not_enough_to_pay_fee_message" formatted="false">委任されたアカウント%sは、ネットワーク手数料%sを支払うのに十分な残高がありません。手数料支払いに利用可能な残高: %s</string>
@@ -1031,6 +1165,7 @@
     <string name="push_settings_announcements">Novaのお知らせ</string>
     <string name="push_settings_balances">残高</string>
     <string name="push_settings_enable">通知を有効にする</string>
+    <string name="push_settings_multisig_operations">マルチシグトランザクション</string>
     <string name="push_settings_no_selected_wallets">ウォレットを選択していないため、ウォレット活動（残高、ステーキング）についての通知を受け取ることができません。</string>
     <string name="push_settings_others">その他</string>
     <string name="push_settings_received_tokens">受け取ったトークン</string>
@@ -1048,7 +1183,7 @@
     <string name="push_token_sent_message" formatted="false">%s を %s に %s で送信しました</string>
     <string name="push_token_sent_no_account_name_title">💸 送信されました</string>
     <string name="push_token_sent_title">💸 送信されました %s</string>
-    <string name="push_wallets_title">ウォレット活動があるときに通知するために最大3つのウォレットを選択してください</string>
+    <string name="push_wallets_title">ウォレットにアクティビティがあると通知されるように最大 %d つのウォレットを選択</string>
     <string name="push_welcome_enable_button">プッシュ通知を有効にする</string>
     <string name="push_welcome_message">ウォレット操作、ガバナンスの更新、ステーキング活動、そしてセキュリティについての通知を受け取ることで、常に最新の情報を得られます</string>
     <string name="push_welcome_terms_and_conditions" formatted="false">プッシュ通知を有効にすることで、%sと%sに同意したことになります</string>
@@ -1056,6 +1191,9 @@
     <string name="push_welcome_title">お見逃しなく！</string>
     <string name="receive_network_flow_title">受信するネットワークを選択 %s</string>
     <string name="receive_screen_copy_address">住所をコピー</string>
+    <string name="reclaim_gift_confirmation_message">この贈り物を回収すると、共有リンクが無効になり、トークンがウォレットに返金されます。\n続行しますか？</string>
+    <string name="reclaim_gift_confirmation_title">%sギフトを回収しますか？</string>
+    <string name="reclaim_gift_success">ギフトを正常に再取得しました</string>
     <string name="recover_json_hint">jsonを貼り付けるかファイルをアップロード...</string>
     <string name="recover_json_upload">ファイルをアップロード</string>
     <string name="recovery_json">JSONを復元</string>
@@ -1080,16 +1218,13 @@
     <string name="referendum_aye_format">賛成: %s</string>
     <string name="referendum_dapp_list_title">Nova DAppブラウザを使用</string>
     <string name="referendum_description_fallback">提案者のみがこの説明とタイトルを編集できます。提案者のアカウントをお持ちの場合は、Polkassembly にアクセスして提案に関する情報を入力してください</string>
-    <string name="referendum_details_full_details">詳細</string>
     <string name="referendum_details_requested_amount">要求された金額</string>
     <string name="referendum_details_timeline">タイムライン</string>
     <string name="referendum_details_your_vote">あなたの投票:</string>
     <string name="referendum_full_details_approve_threshold">承認曲線</string>
     <string name="referendum_full_details_beneficiary">受益者</string>
-    <string name="referendum_full_details_copy_hash">ハッシュをコピー</string>
     <string name="referendum_full_details_deposit">デポジット</string>
     <string name="referendum_full_details_electorate">有権者</string>
-    <string name="referendum_full_details_hash">コールハッシュ</string>
     <string name="referendum_full_details_long_for_preview">プレビューには長すぎます</string>
     <string name="referendum_full_details_parameters_json">パラメータ JSON</string>
     <string name="referendum_full_details_proposer">提案者</string>
@@ -1207,10 +1342,12 @@
     <string name="select_delegation_tracks_edit_title">デリゲーションを編集するトラックを選択</string>
     <string name="select_delegation_tracks_revoke_title">デリゲーションを取り消すトラックを選択</string>
     <string name="select_delegation_tracks_unavailable_tracks">利用不可のトラック</string>
+    <string name="select_gift_amount_title">贈り物を送る</string>
     <string name="select_ledger_grant_permissions">Bluetoothを有効にして権限を付与</string>
     <string name="select_ledger_location_enable_request_message">Novaは、Ledgerデバイスを見つけるためにBluetoothスキャンを実行するために位置情報の有効化が必要です</string>
     <string name="select_ledger_location_enable_request_title">デバイス設定で位置情報を有効にしてください</string>
     <string name="select_network_title">ネットワークを選択</string>
+    <string name="select_token_to_vote">投票するトークンを選択</string>
     <string name="select_tracks_for">トラックを選択</string>
     <string name="selected_tracks_quantity" formatted="false">%d / %d</string>
     <string name="sell_network_flow_title">%s を売るためのネットワークを選択</string>
@@ -1255,6 +1392,10 @@
     <string name="setup_staking_type_pool_staking">プールステーキング</string>
     <string name="setup_staking_type_staking_amount_is_less_than_min_amount_title">ステークが報酬を得るための最低額を下回っています</string>
     <string name="setup_staking_type_unsupported_staking_type_used_fallback_message">サポートされていないステーキングタイプ</string>
+    <string name="share_gift_button">贈り物リンクを共有</string>
+    <string name="share_gift_reclaim">回収</string>
+    <string name="share_gift_text" formatted="false">こんにちは！あなたには%sの贈り物が待っています！\n\nNovaウォレットアプリをインストールし、ウォレットを設定して、この特別リンクで請求してください：\n%s</string>
+    <string name="share_gift_title">贈り物が準備できました。\n今すぐ共有しましょう！</string>
     <string name="sr25519_selection_subtitle">sr25519 (推奨)</string>
     <string name="sr25519_selection_title">Schnorrkel</string>
     <string name="staking_account_is_used_as_controller">選択されたアカウントはすでにコントローラーとして使用されています</string>
@@ -1302,6 +1443,7 @@
     <string name="staking_dashboard_browser_stake_header">Nova DApp ブラウザを通じてのStaking</string>
     <string name="staking_dashboard_more_options">追加のStakingオプション</string>
     <string name="staking_dashboard_no_stake_header">Stakeして報酬を稼ぐ</string>
+    <string name="staking_details_migration_alert_title">%1$s Stakingは%2$sでライブ開始 %3$s</string>
     <string name="staking_earnings_per_year">推定報酬</string>
     <string name="staking_era_title">エラ #%s</string>
     <string name="staking_estimate_earning_title_v1.9.0">推定収益</string>
@@ -1443,7 +1585,7 @@
     <string name="staking_reward_payouts_payout_all">すべて支払う (%s)</string>
     <string name="staking_reward_payouts_title">保留中の報酬</string>
     <string name="staking_reward_payouts_title_v2_2_0">未払いの報酬</string>
-    <string name="staking_rewards">報酬</string>
+    <string name="staking_rewards">%s 報酬</string>
     <string name="staking_rewards_about">報酬について</string>
     <string name="staking_rewards_apy">報酬 (APY)</string>
     <string name="staking_rewards_destination_title_v2_0_0">報酬の宛先</string>
@@ -1600,6 +1742,7 @@
     <string name="state_removed">削除済み</string>
     <string name="swap_custom_fee_selector_description">ネットワーク手数料を支払うトークン</string>
     <string name="swap_custom_fee_selector_footer">入力された金額の上にネットワーク手数料が追加されます</string>
+    <string name="swap_dry_run_failed_inline_message">スワップステップのシミュレーションが失敗しました</string>
     <string name="swap_error_pair_not_supported">このペアはサポートされていません</string>
     <string name="swap_execution_failure" formatted="false">操作 #%s (%s) が失敗しました</string>
     <string name="swap_execution_failure_swap_label" formatted="false">%sから%sへのスワップ on %s</string>
@@ -1709,6 +1852,7 @@
     <string name="transaction_details_view_polkascan">Polkascanで表示</string>
     <string name="transaction_details_view_subscan">Subscanで表示</string>
     <string name="transaction_history_fiat_with_time" formatted="false">%s（%sで）</string>
+    <string name="transaction_history_migration_source_message" formatted="false">以前の%s トランザクション履歴は%sで引き続き利用可能です</string>
     <string name="transaction_status_completed">完了</string>
     <string name="transaction_status_failed">失敗</string>
     <string name="transaction_status_pending">保留中</string>
@@ -1845,7 +1989,6 @@
     <string name="wallet_tokens">トークン</string>
     <string name="wallet_transfer_details_send_back">この連絡先に送信</string>
     <string name="wallet_transfer_details_title">転送の詳細</string>
-    <string name="wallet_your_balance">あなたのバランス</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s のアドレス %s</string>
     <string name="web3names_integrity_check_failed_message">Nova は %1$s アドレスの情報の整合性に問題を検出しました。整合性の問題を解決するために %1$s の所有者にご連絡ください。</string>

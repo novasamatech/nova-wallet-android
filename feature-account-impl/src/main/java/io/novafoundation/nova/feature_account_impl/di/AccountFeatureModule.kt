@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.secrets.v2.SecretStoreV2
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.ClipboardManager
 import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.resources.LanguagesHolder
@@ -34,21 +35,30 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
+import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
 import io.novafoundation.nova.feature_account_api.data.multisig.repository.MultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_api.data.proxy.MetaAccountsUpdatesRegistry
+import io.novafoundation.nova.feature_account_api.data.repository.CreateSecretsRepository
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.data.repository.addAccount.secrets.MnemonicAddAccountRepository
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
 import io.novafoundation.nova.feature_account_api.domain.account.common.EncryptionDefaults
+import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
+import io.novafoundation.nova.feature_account_api.domain.account.identity.OnChainIdentity
 import io.novafoundation.nova.feature_account_api.domain.cloudBackup.ApplyLocalSnapshotToCloudBackupUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountUIUseCase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.CreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.MetaAccountGroupingInteractor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.RealAccountUIUseCase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.MetaAccountTypePresentationMapper
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.account.copyAddress.CopyAddressMixin
 import io.novafoundation.nova.feature_account_api.presenatation.account.polkadotVault.config.PolkadotVaultVariantConfigProvider
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -62,6 +72,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.importType.ImportTypeChooserProvider
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectAddress.SelectAddressMixin
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletCommunicator
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectSingleWallet.SelectSingleWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletCommunicator
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.selectWallet.SelectWalletMixin
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
@@ -75,14 +87,18 @@ import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicS
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
+import io.novafoundation.nova.feature_account_impl.data.multisig.RealMultisigDetailsRepository
 import io.novafoundation.nova.feature_account_impl.data.multisig.repository.RealMultisigOperationLocalCallRepository
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSource
 import io.novafoundation.nova.feature_account_impl.data.network.blockchain.AccountSubstrateSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.proxy.RealMetaAccountsUpdatesRegistry
 import io.novafoundation.nova.feature_account_impl.data.repository.AccountRepositoryImpl
+import io.novafoundation.nova.feature_account_impl.data.repository.RealCreateSecretsRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.RealOnChainIdentityRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.JsonAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SeedAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.SubstrateKeypairAddAccountRepository
+import io.novafoundation.nova.feature_account_impl.data.repository.addAccount.secrets.TrustWalletAddAccountRepository
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSource
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.AccountDataSourceImpl
 import io.novafoundation.nova.feature_account_impl.data.repository.datasource.RealSecretsMetaAccountLocalFactory
@@ -104,6 +120,7 @@ import io.novafoundation.nova.feature_account_impl.di.modules.signers.SignersMod
 import io.novafoundation.nova.feature_account_impl.domain.AccountInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.MetaAccountGroupingInteractorImpl
 import io.novafoundation.nova.feature_account_impl.domain.NodeHostValidator
+import io.novafoundation.nova.feature_account_impl.domain.RealCreateGiftMetaAccountUseCase
 import io.novafoundation.nova.feature_account_impl.domain.account.add.AddAccountInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
 import io.novafoundation.nova.feature_account_impl.domain.account.cloudBackup.RealApplyLocalSnapshotToCloudBackupUseCase
@@ -122,12 +139,14 @@ import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.Real
 import io.novafoundation.nova.feature_account_impl.domain.startCreateWallet.StartCreateWalletInteractor
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import io.novafoundation.nova.feature_account_impl.presentation.account.addressActions.AddressActionsMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountValidForTransactionListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.MetaAccountWithBalanceListingMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.RealMetaAccountTypePresentationMapper
 import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.DelegatedMetaAccountUpdatesListingMixinFactory
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealMultisigFormatter
+import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.RealProxyFormatter
 import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectAddressMixinFactory
+import io.novafoundation.nova.feature_account_impl.presentation.account.mixin.SelectSingleWalletMixinFactory
 import io.novafoundation.nova.feature_account_impl.presentation.account.wallet.WalletUiUseCaseImpl
 import io.novafoundation.nova.feature_account_impl.presentation.common.RealSelectedAccountUseCase
 import io.novafoundation.nova.feature_account_impl.presentation.common.address.RealCopyAddressMixin
@@ -158,8 +177,8 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.web3names.domain.networking.Web3NamesInteractor
 import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedDecoder
-import io.novasama.substrate_sdk_android.encrypt.json.JsonSeedEncoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
+import io.novasama.substrate_sdk_android.encrypt.json.JsonEncoder
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
 import javax.inject.Named
 
@@ -195,6 +214,15 @@ class AccountFeatureModule {
 
         @Binds
         fun bindNestedSigningPresenter(real: RealNestedSigningPresenter): NestedSigningPresenter
+
+        @Binds
+        fun bindProxyFormatter(real: RealProxyFormatter): ProxyFormatter
+
+        @Binds
+        fun bindMultisigFormatter(real: RealMultisigFormatter): MultisigFormatter
+
+        @Binds
+        fun bindMultisigApprovalsRepository(real: RealMultisigDetailsRepository): MultisigDetailsRepository
     }
 
     @Provides
@@ -263,13 +291,13 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideJsonDecoder(jsonMapper: Gson) = JsonSeedDecoder(jsonMapper)
+    fun provideJsonDecoder(jsonMapper: Gson) = JsonDecoder(jsonMapper)
 
     @Provides
     @FeatureScope
     fun provideJsonEncoder(
         jsonMapper: Gson,
-    ) = JsonSeedEncoder(jsonMapper)
+    ) = JsonEncoder(jsonMapper)
 
     @Provides
     @FeatureScope
@@ -287,7 +315,7 @@ class AccountFeatureModule {
         accountDataSource: AccountDataSource,
         accountDao: AccountDao,
         nodeDao: NodeDao,
-        jsonSeedEncoder: JsonSeedEncoder,
+        JsonEncoder: JsonEncoder,
         accountSubstrateSource: AccountSubstrateSource,
         languagesHolder: LanguagesHolder,
         secretStoreV2: SecretStoreV2,
@@ -297,7 +325,7 @@ class AccountFeatureModule {
             accountDataSource,
             accountDao,
             nodeDao,
-            jsonSeedEncoder,
+            JsonEncoder,
             languagesHolder,
             accountSubstrateSource,
             secretStoreV2,
@@ -441,13 +469,17 @@ class AccountFeatureModule {
         addressIconGenerator: AddressIconGenerator,
         walletUiUseCase: WalletUiUseCase,
         metaAccountsUpdatesRegistry: MetaAccountsUpdatesRegistry,
-        presentationMapper: MetaAccountTypePresentationMapper
+        presentationMapper: MetaAccountTypePresentationMapper,
+        maskableValueFormatterProvider: MaskableValueFormatterProvider,
+        resourceManager: ResourceManager
     ): SelectedAccountUseCase = RealSelectedAccountUseCase(
         accountRepository = accountRepository,
         walletUiUseCase = walletUiUseCase,
         addressIconGenerator = addressIconGenerator,
         metaAccountsUpdatesRegistry = metaAccountsUpdatesRegistry,
-        accountTypePresentationMapper = presentationMapper
+        accountTypePresentationMapper = presentationMapper,
+        maskableValueFormatterProvider = maskableValueFormatterProvider,
+        resourceManager = resourceManager
     )
 
     @Provides
@@ -472,8 +504,8 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideAccountSecretsFactory(
-        jsonSeedDecoder: JsonSeedDecoder
-    ) = AccountSecretsFactory(jsonSeedDecoder)
+        JsonDecoder: JsonDecoder
+    ) = AccountSecretsFactory(JsonDecoder)
 
     @Provides
     @FeatureScope
@@ -481,12 +513,16 @@ class AccountFeatureModule {
         mnemonicAddAccountRepository: MnemonicAddAccountRepository,
         jsonAddAccountRepository: JsonAddAccountRepository,
         seedAddAccountRepository: SeedAddAccountRepository,
+        substrateKeypairAddAccountRepository: SubstrateKeypairAddAccountRepository,
+        trustWalletAddAccountRepository: TrustWalletAddAccountRepository,
         accountRepository: AccountRepository,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor
     ) = AddAccountInteractor(
         mnemonicAddAccountRepository,
         jsonAddAccountRepository,
         seedAddAccountRepository,
+        substrateKeypairAddAccountRepository,
+        trustWalletAddAccountRepository,
         accountRepository,
         advancedEncryptionInteractor
     )
@@ -566,7 +602,7 @@ class AccountFeatureModule {
     fun provideProxyFormatter(
         walletUseCase: WalletUiUseCase,
         resourceManager: ResourceManager
-    ) = ProxyFormatter(walletUseCase, resourceManager)
+    ) = RealProxyFormatter(walletUseCase, resourceManager)
 
     @Provides
     @FeatureScope
@@ -749,8 +785,9 @@ class AccountFeatureModule {
     @Provides
     @FeatureScope
     fun provideCustomFeeCapabilityFacade(
-        accountRepository: AccountRepository
-    ): CustomFeeCapabilityFacade = RealCustomCustomFeeCapabilityFacade(accountRepository)
+        accountRepository: AccountRepository,
+        feePaymentProviderRegistry: FeePaymentProviderRegistry,
+    ): CustomFeeCapabilityFacade = RealCustomCustomFeeCapabilityFacade(accountRepository, feePaymentProviderRegistry)
 
     @Provides
     @FeatureScope
@@ -780,5 +817,65 @@ class AccountFeatureModule {
     @FeatureScope
     fun provideMultisigOperationLocalCallRepository(multisigOperationsDao: MultisigOperationsDao): MultisigOperationLocalCallRepository {
         return RealMultisigOperationLocalCallRepository(multisigOperationsDao)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAccountUIUseCase(
+        accountRepository: AccountRepository,
+        walletUiUseCase: WalletUiUseCase,
+        addressIconGenerator: AddressIconGenerator,
+        @OnChainIdentity identityProvider: IdentityProvider
+    ): AccountUIUseCase {
+        return RealAccountUIUseCase(
+            accountRepository,
+            walletUiUseCase,
+            addressIconGenerator,
+            identityProvider
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCreateSecretsRepository(accountSecretsFactory: AccountSecretsFactory): CreateSecretsRepository {
+        return RealCreateSecretsRepository(
+            accountSecretsFactory
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideCreateGiftMetaAccountUseCase(encryptionDefaults: EncryptionDefaults): CreateGiftMetaAccountUseCase {
+        return RealCreateGiftMetaAccountUseCase(encryptionDefaults)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideAccountListingMixinValidForTransactionsFactory(
+        walletUiUseCase: WalletUiUseCase,
+        resourceManager: ResourceManager,
+        chainRegistry: ChainRegistry,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+        accountTypePresentationMapper: MetaAccountTypePresentationMapper,
+    ): MetaAccountValidForTransactionListingMixinFactory {
+        return MetaAccountValidForTransactionListingMixinFactory(
+            walletUiUseCase = walletUiUseCase,
+            resourceManager = resourceManager,
+            chainRegistry = chainRegistry,
+            metaAccountGroupingInteractor = metaAccountGroupingInteractor,
+            accountTypePresentationMapper = accountTypePresentationMapper
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSelectSingleWalletMixinFactory(
+        selectSingleWalletRequester: SelectSingleWalletCommunicator,
+        metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+    ): SelectSingleWalletMixin.Factory {
+        return SelectSingleWalletMixinFactory(
+            selectSingleWalletRequester,
+            metaAccountGroupingInteractor
+        )
     }
 }

@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeRetries
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.formatting.applyTermsAndPrivacyPolicy
 import io.novafoundation.nova.common.utils.permissions.setupPermissionAsker
 import io.novafoundation.nova.feature_push_notifications.R
@@ -17,7 +16,6 @@ class PushWelcomeFragment : BaseFragment<PushWelcomeViewModel, FragmentPushWelco
     override fun createBinding() = FragmentPushWelcomeBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.pushWelcomeToolbar.applyStatusBarInsets()
         binder.pushWelcomeEnableButton.prepareForProgress(this)
         binder.pushWelcomeCancelButton.prepareForProgress(this)
         binder.pushWelcomeToolbar.setHomeButtonListener { viewModel.backClicked() }

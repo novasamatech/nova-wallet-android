@@ -35,7 +35,6 @@ import io.novafoundation.nova.common.validation.isErrorWithTag
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
-import io.novafoundation.nova.feature_account_api.domain.model.addressIn
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
@@ -52,14 +51,11 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
-import io.novafoundation.nova.feature_swap_impl.domain.model.GetAssetInOption
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapFieldValidator
-import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.EnoughAmountToSwapValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.LiquidityFieldValidatorFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fieldValidation.SwapReceiveAmountAboveEDFieldValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
@@ -72,13 +68,14 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.state.swapSe
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixin
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapAmountInputMixinFactory
 import io.novafoundation.nova.feature_swap_impl.presentation.main.input.SwapInputMixinPriceImpactFiatFormatterFactory
-import io.novafoundation.nova.feature_swap_impl.presentation.main.view.GetAssetInBottomSheet
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountFieldValidator
+import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.invokeMaxClick
@@ -91,6 +88,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2.Configuration
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.fullChainAssetId
@@ -119,7 +117,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -137,7 +134,7 @@ class SwapMainSettingsViewModel(
     private val validationExecutor: ValidationExecutor,
     private val liquidityFieldValidatorFactory: LiquidityFieldValidatorFactory,
     private val swapReceiveAmountAboveEDFieldValidatorFactory: SwapReceiveAmountAboveEDFieldValidatorFactory,
-    private val enoughAmountToSwapValidatorFactory: EnoughAmountToSwapValidatorFactory,
+    private val enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
     private val swapInputMixinPriceImpactFiatFormatterFactory: SwapInputMixinPriceImpactFiatFormatterFactory,
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
@@ -146,6 +143,7 @@ class SwapMainSettingsViewModel(
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val swapStateStoreProvider: SwapStateStoreProvider,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
+    private val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -259,28 +257,12 @@ class SwapMainSettingsViewModel(
 
     val swapDirectionFlipped: MutableLiveData<Event<SwapDirection>> = MutableLiveData()
 
-    private val getAssetInOptions = swapInteractor.availableGetAssetInOptionsFlow(chainAssetIn)
-        .shareInBackground()
-
-    val getAssetInOptionsButtonState = combine(
-        chainAssetIn.filterNotNull(),
-        getAssetInOptions,
-        amountInInput.fieldError
-    ) { assetIn, getAssetInOptions, fieldError ->
-        val hasBalanceFieldError = fieldError.isErrorWithTag(EnoughAmountToSwapFieldValidator.ERROR_TAG)
-
-        if (hasBalanceFieldError && getAssetInOptions.isNotEmpty()) {
-            val symbol = assetIn.symbol
-            DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_get_token_format, symbol))
-        } else {
-            DescriptiveButtonState.Gone
-        }
-    }
-        .onStart { emit(DescriptiveButtonState.Gone) }
-        .distinctUntilChanged()
-        .shareInBackground()
-
-    val selectGetAssetInOption = actionAwaitableFactory.create<GetAssetInBottomSheet.Payload, GetAssetInOption>()
+    private val notEnoughAmountErrorFlow = amountInInput.fieldError.map { it.isErrorWithTag(EnoughAmountFieldValidator.ERROR_TAG) }
+    val getAssetOptionsMixin = getAssetOptionsMixinFactory.create(
+        assetFlow = chainAssetIn,
+        additionalButtonFilter = notEnoughAmountErrorFlow,
+        scope = viewModelScope,
+    )
 
     private val amountInputFormatter = CompoundNumberFormatter(
         abbreviations = listOf(
@@ -378,19 +360,6 @@ class SwapMainSettingsViewModel(
         applyFlipToUi(previousSettings, newSettings)
     }
 
-    fun getAssetInClicked() = launch {
-        val assetIn = chainAssetIn.first() ?: return@launch
-        val availableOptions = getAssetInOptions.first()
-
-        val payload = GetAssetInBottomSheet.Payload(
-            chainAsset = assetIn,
-            availableOptions = availableOptions
-        )
-
-        val selectedOption = selectGetAssetInOption.awaitAction(payload)
-        onGetAssetInOptionSelected(selectedOption)
-    }
-
     fun openOptions() {
         swapRouter.openSwapOptions()
     }
@@ -446,33 +415,6 @@ class SwapMainSettingsViewModel(
             assetInFlow = assetInFlow.filterNotNull(),
             feeLoaderMixin = feeMixin,
         )
-    }
-
-    private fun onGetAssetInOptionSelected(option: GetAssetInOption) {
-        when (option) {
-            GetAssetInOption.RECEIVE -> receiveSelected()
-            GetAssetInOption.CROSS_CHAIN -> onCrossChainTransferSelected()
-            GetAssetInOption.BUY -> buySelected()
-        }
-    }
-
-    private fun onCrossChainTransferSelected() = launch {
-        val chainAssetIn = chainAssetIn.first() ?: return@launch
-        val assetInChain = originChainFlow.first()
-
-        val currentAddress = selectedAccountUseCase.getSelectedMetaAccount().addressIn(assetInChain)
-
-        swapRouter.openSendCrossChain(AssetPayload(chainAssetIn.chainId, chainAssetIn.id), currentAddress)
-    }
-
-    private fun buySelected() = launch {
-        val chainAssetIn = chainAssetIn.first() ?: return@launch
-        swapRouter.openBuyToken(chainAssetIn.chainId, chainAssetIn.id)
-    }
-
-    private fun receiveSelected() = launch {
-        val chainAssetIn = chainAssetIn.first() ?: return@launch
-        swapRouter.openReceive(AssetPayload(chainAssetIn.chainId, chainAssetIn.id))
     }
 
     private fun initPayload() {
@@ -750,7 +692,7 @@ class SwapMainSettingsViewModel(
 
     private fun getAmountInFieldValidator(): FieldValidator {
         return CompoundFieldValidator(
-            enoughAmountToSwapValidatorFactory.create(maxAssetInProvider),
+            enoughAmountValidatorFactory.create(maxAssetInProvider, errorMessageRes = R.string.swap_field_validation_not_enough_amount_to_swap),
             liquidityFieldValidatorFactory.create(quotingState)
         )
     }

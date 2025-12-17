@@ -12,27 +12,22 @@ class FindMultisigsRequest(
 
     val query = """
         query {
-         accounts(
+          accountMultisigs(
             filter: {
-              signatories: {
-                some: {
-                  signatory: {
-                    ${"id" presentIn accountIdsHex}
-                  }
-                }
+              signatory: {
+                ${"id" presentIn accountIdsHex}
               }
-              ${"isMultisig" equalTo true}
             }
           ) {
             nodes {
-              id
-              threshold
-              signatories {
-                nodes {
-                  signatory {
-                    id
+              multisig {
+                threshold
+                signatories {
+                  nodes {
+                    signatoryId
                   }
                 }
+                accountId
               }
             }
           }

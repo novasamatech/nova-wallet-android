@@ -8,7 +8,6 @@ import io.novafoundation.nova.common.mixin.hints.observeHints
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.presentation.showLoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
@@ -30,8 +29,6 @@ class ParachainStakingRebondFragment : BaseFragment<ParachainStakingRebondViewMo
     override fun createBinding() = FragmentParachainStakingRebondBinding.inflate(layoutInflater)
 
     override fun initViews() {
-        binder.parachainStakingRebondContainer.applyStatusBarInsets()
-
         binder.parachainStakingRebondToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.parachainStakingRebondExtrinsicInfo.setOnAccountClickedListener { viewModel.originAccountClicked() }

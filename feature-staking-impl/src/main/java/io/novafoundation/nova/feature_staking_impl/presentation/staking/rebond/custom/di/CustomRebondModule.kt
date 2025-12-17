@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rebond.c
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class CustomRebondModule {
@@ -37,6 +38,7 @@ class CustomRebondModule {
         validationSystem: RebondValidationSystem,
         amountChooserMixin: AmountChooserMixin.Factory,
         hintsMixinFactory: ResourcesHintsMixinFactory,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return CustomRebondViewModel(
             router = router,
@@ -48,7 +50,8 @@ class CustomRebondModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             maxActionProviderFactory = maxActionProviderFactory,
             amountChooserMixinFactory = amountChooserMixin,
-            hintsMixinFactory = hintsMixinFactory
+            hintsMixinFactory = hintsMixinFactory,
+            amountFormatter = amountFormatter
         )
     }
 

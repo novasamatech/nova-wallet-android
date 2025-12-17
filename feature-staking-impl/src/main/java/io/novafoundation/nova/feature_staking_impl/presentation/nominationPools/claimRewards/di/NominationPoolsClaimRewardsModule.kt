@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 
 @Module(includes = [ViewModelModule::class])
 class NominationPoolsClaimRewardsModule {
@@ -75,7 +76,8 @@ class NominationPoolsClaimRewardsModule {
         walletUiUseCase: WalletUiUseCase,
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         assetUseCase: AssetUseCase,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NominationPoolsClaimRewardsViewModel(
             router = router,
@@ -89,7 +91,8 @@ class NominationPoolsClaimRewardsModule {
             walletUiUseCase = walletUiUseCase,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             assetUseCase = assetUseCase,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            amountFormatter = amountFormatter
         )
     }
 

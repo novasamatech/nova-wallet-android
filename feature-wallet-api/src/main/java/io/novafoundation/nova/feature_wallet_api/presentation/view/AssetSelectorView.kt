@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
+import io.novafoundation.nova.common.presentation.masking.setMaskableText
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.getEnum
 import io.novafoundation.nova.common.utils.inflater
@@ -67,7 +68,7 @@ class AssetSelectorView @JvmOverloads constructor(
         assetSelectorModel: AssetSelectorModel
     ) {
         with(assetSelectorModel) {
-            binder.assetSelectorBalance.text = assetModel.assetBalance
+            binder.assetSelectorBalance.setMaskableText(assetModel.assetBalance)
             binder.assetSelectorTokenName.text = title
             binder.assetSelectorIcon.setIcon(assetModel.icon, imageLoader)
         }

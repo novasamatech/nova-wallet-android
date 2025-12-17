@@ -70,6 +70,13 @@ interface StorageDataSource {
     ): Flow<R>
 }
 
+suspend fun <R> StorageDataSource.queryCatching(
+    chainId: String,
+    at: BlockHash? = null,
+    applyStorageDefault: Boolean = false,
+    query: suspend StorageQueryContext.() -> R,
+): Result<R> = runCatching { query(chainId = chainId, at = at, applyStorageDefault = applyStorageDefault, query = query) }
+
 suspend inline fun <T> StorageDataSource.queryNonNull(
     chainId: String,
     noinline keyBuilder: (RuntimeSnapshot) -> String,

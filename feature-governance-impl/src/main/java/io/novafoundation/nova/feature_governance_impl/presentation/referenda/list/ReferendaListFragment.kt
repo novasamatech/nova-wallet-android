@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
+import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.databinding.FragmentReferendaListBinding
 import io.novafoundation.nova.feature_governance_impl.di.GovernanceFeatureComponent
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.list.BaseReferendaListFragment
@@ -40,7 +41,7 @@ class ReferendaListFragment : BaseReferendaListFragment<ReferendaListViewModel, 
     }
 
     override fun subscribe(viewModel: ReferendaListViewModel) {
-        subscribeOnAssetClick(viewModel.assetSelectorMixin, imageLoader)
+        subscribeOnAssetClick(getString(R.string.select_token_to_vote), viewModel.assetSelectorMixin, imageLoader)
         observeValidations(viewModel)
 
         subscribeOnAssetChange(viewModel.assetSelectorMixin) {

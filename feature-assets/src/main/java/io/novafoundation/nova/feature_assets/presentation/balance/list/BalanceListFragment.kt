@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.list
 
+import android.view.View
 import androidx.recyclerview.widget.ConcatAdapter
 
 import coil.ImageLoader
-import dev.chrisbanes.insetter.applyInsetter
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.EditablePlaceholderAdapter
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
 import io.novafoundation.nova.common.utils.recyclerView.expandable.animator.ExpandableAnimator
@@ -25,7 +26,6 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Balance
 import io.novafoundation.nova.feature_assets.presentation.balance.common.baseDecoration.applyDefaultTo
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.setupBuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.createForAssets
-import io.novafoundation.nova.feature_assets.presentation.balance.common.multisig.observeMultisigCheck
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderHolder
@@ -77,13 +77,11 @@ class BalanceListFragment :
         ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter)
     }
 
-    override fun initViews() {
-        binder.balanceListAssets.applyInsetter {
-            type(statusBars = true) {
-                padding()
-            }
-        }
+    override fun applyInsets(rootView: View) {
+        binder.balanceListAssets.applyStatusBarInsets()
+    }
 
+    override fun initViews() {
         hideKeyboard()
 
         setupRecyclerView()
@@ -112,7 +110,6 @@ class BalanceListFragment :
     }
 
     override fun subscribe(viewModel: BalanceListViewModel) {
-        observeMultisigCheck(viewModel.multisigRestrictionCheckMixin)
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
 
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
@@ -125,6 +122,7 @@ class BalanceListFragment :
             }
         }
 
+        viewModel.maskingModeEnableFlow.observe(headerAdapter::setMaskingEnabled)
         viewModel.totalBalanceFlow.observe(headerAdapter::setTotalBalance)
         viewModel.selectedWalletModelFlow.observe(headerAdapter::setSelectedWallet)
         viewModel.shouldShowPlaceholderFlow.observe(emptyAssetsPlaceholder::show)
@@ -200,6 +198,10 @@ class BalanceListFragment :
         viewModel.walletConnectClicked()
     }
 
+    override fun maskClicked() {
+        viewModel.toggleMasking()
+    }
+
     override fun sendClicked() {
         viewModel.sendClicked()
     }
@@ -226,6 +228,10 @@ class BalanceListFragment :
 
     override fun swapClicked() {
         viewModel.swapClicked()
+    }
+
+    override fun giftClicked() {
+        viewModel.giftClicked()
     }
 
     private fun setupRecyclerViewSpacing() {

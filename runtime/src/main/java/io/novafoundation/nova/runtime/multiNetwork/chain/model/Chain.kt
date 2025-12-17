@@ -41,6 +41,7 @@ data class Chain(
     val governance: List<Governance>,
     val swap: List<Swap>,
     val customFee: List<CustomFee>,
+    val multisigSupport: Boolean,
     val connectionState: ConnectionState,
     val parentId: String?,
     val additional: Additional?
@@ -61,7 +62,9 @@ data class Chain(
         val supportLedgerGenericApp: Boolean?,
         val identityChain: ChainId?,
         val disabledCheckMetadataHash: Boolean?,
-        val sessionLength: Int?
+        val sessionLength: Int?,
+        val sessionsPerEra: Int?,
+        val timelineChain: ChainId?
     )
 
     data class Types(
@@ -103,7 +106,13 @@ data class Chain(
                 val currencyIdType: String,
                 val existentialDeposit: BigInteger,
                 val transfersEnabled: Boolean,
-            ) : Type()
+                val subType: SubType
+            ) : Type() {
+
+                enum class SubType {
+                    DEFAULT, HYDRATION_EVM
+                }
+            }
 
             data class EvmErc20(
                 val contractAddress: String
@@ -194,6 +203,8 @@ data class Chain(
 
         data class Staking(override val url: String) : ExternalApi()
 
+        data class StakingRewards(override val url: String) : ExternalApi()
+
         data class GovernanceReferenda(override val url: String, val source: Source) : ExternalApi() {
 
             sealed class Source {
@@ -207,8 +218,6 @@ data class Chain(
         data class GovernanceDelegations(override val url: String) : ExternalApi()
 
         data class ReferendumSummary(override val url: String) : ExternalApi()
-
-        data class Multisig(override val url: String) : ExternalApi()
     }
 
     enum class Governance {

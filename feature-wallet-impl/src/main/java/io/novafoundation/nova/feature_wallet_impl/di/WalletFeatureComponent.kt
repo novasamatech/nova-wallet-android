@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_impl.di
 
+import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -12,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_impl.di.modules.AssetsModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.BalanceLocksModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.ValidationsModule
 import io.novafoundation.nova.feature_wallet_impl.di.modules.WalletBindsModule
+import io.novafoundation.nova.feature_wallet_impl.presentation.WalletRouter
 import io.novafoundation.nova.feature_xcm_api.di.XcmFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -34,6 +36,7 @@ interface WalletFeatureComponent : WalletFeatureApi {
     interface Factory {
 
         fun create(
+            @BindsInstance walletRouter: WalletRouter,
             deps: WalletFeatureDependencies
         ): WalletFeatureComponent
     }

@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_governance_api.domain.delegation.delegatio
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
 import io.novafoundation.nova.feature_governance_impl.data.repository.RealRemoveVotesSuggestionRepository
 import io.novafoundation.nova.feature_governance_impl.data.repository.RemoveVotesSuggestionRepository
+import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.RecentVotesTimePointProvider
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.DelegateCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.common.repository.RealDelegateCommonRepository
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegate.delegators.RealDelegateDelegatorsInteractor
@@ -32,7 +33,6 @@ import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegati
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.ChooseDelegationAmountValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseAmount.validation.chooseDelegationAmount
 import io.novafoundation.nova.feature_governance_impl.domain.delegation.delegation.create.chooseTrack.RealChooseTrackInteractor
-import io.novafoundation.nova.feature_governance_impl.domain.track.TracksUseCase
 import io.novafoundation.nova.feature_governance_impl.domain.track.category.TrackCategorizer
 import io.novafoundation.nova.feature_governance_impl.presentation.common.voters.VotersFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.delegation.delegate.common.DelegateMappers
@@ -48,14 +48,22 @@ class DelegateModule {
 
     @Provides
     @FeatureScope
+    fun provideRecentVotesTimePointProvider(
+        chainStateRepository: ChainStateRepository
+    ): RecentVotesTimePointProvider {
+        return RecentVotesTimePointProvider(chainStateRepository)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideDelegateCommonRepository(
         governanceSourceRegistry: GovernanceSourceRegistry,
-        chainStateRepository: ChainStateRepository,
-        accountRepository: AccountRepository
+        accountRepository: AccountRepository,
+        recentVotesTimePointProvider: RecentVotesTimePointProvider
     ): DelegateCommonRepository = RealDelegateCommonRepository(
         governanceSourceRegistry = governanceSourceRegistry,
-        chainStateRepository = chainStateRepository,
-        accountRepository = accountRepository
+        accountRepository = accountRepository,
+        recentVotesTimePointProvider = recentVotesTimePointProvider
     )
 
     @Provides
@@ -76,14 +84,14 @@ class DelegateModule {
         identityRepository: OnChainIdentityRepository,
         governanceSharedState: GovernanceSharedState,
         accountRepository: AccountRepository,
-        tracksUseCase: TracksUseCase,
+        recentVotesTimePointProvider: RecentVotesTimePointProvider
     ): DelegateDetailsInteractor = RealDelegateDetailsInteractor(
         governanceSourceRegistry = governanceSourceRegistry,
         chainStateRepository = chainStateRepository,
         identityRepository = identityRepository,
         governanceSharedState = governanceSharedState,
         accountRepository = accountRepository,
-        tracksUseCase = tracksUseCase
+        recentVotesTimePointProvider = recentVotesTimePointProvider
     )
 
     @Provides

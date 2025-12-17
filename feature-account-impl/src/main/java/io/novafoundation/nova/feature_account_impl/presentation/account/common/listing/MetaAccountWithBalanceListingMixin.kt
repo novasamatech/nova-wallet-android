@@ -12,8 +12,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.common.l
 import io.novafoundation.nova.feature_account_api.presenatation.account.listing.items.AccountUi
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.chain.iconOrFallback
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.MultisigFormatter
-import io.novafoundation.nova.feature_account_impl.presentation.account.common.listing.delegated.ProxyFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.MultisigFormatter
+import io.novafoundation.nova.feature_account_api.presenatation.account.common.listing.delegeted.ProxyFormatter
 import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

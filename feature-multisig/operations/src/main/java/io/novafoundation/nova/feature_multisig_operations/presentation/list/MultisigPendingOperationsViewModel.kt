@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_multisig_operations.presentation.list
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.list.toListWithHeaders
 import io.novafoundation.nova.common.presentation.ColoredDrawable
 import io.novafoundation.nova.common.presentation.ColoredText
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -17,7 +18,10 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdK
 import io.novafoundation.nova.feature_multisig_operations.R
 import io.novafoundation.nova.feature_multisig_operations.presentation.MultisigOperationsRouter
 import io.novafoundation.nova.feature_multisig_operations.presentation.callFormatting.MultisigCallFormatter
-import io.novafoundation.nova.feature_multisig_operations.presentation.details.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.MultisigOperationPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.common.fromOperationId
+import io.novafoundation.nova.feature_multisig_operations.presentation.details.general.MultisigOperationDetailsPayload
+import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationHeaderModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel
 import io.novafoundation.nova.feature_multisig_operations.presentation.list.model.PendingMultisigOperationModel.SigningAction
 import kotlinx.coroutines.flow.first
@@ -36,7 +40,15 @@ class MultisigPendingOperationsViewModel(
     val pendingOperationsFlow = discoveryService.pendingOperations()
         .map { operations ->
             val account = account.first()
-            operations.map { it.toUi(account) }
+
+            operations
+                .sortedByDescending { it.timestamp }
+                .groupBy { it.timestamp.inWholeDays }
+                .toSortedMap(Comparator.reverseOrder())
+                .toListWithHeaders(
+                    keyMapper = { day, _ -> PendingMultisigOperationHeaderModel(day) },
+                    valueMapper = { operation -> operation.toUi(account) }
+                )
         }
         .withSafeLoading()
         .shareInBackground()
@@ -46,21 +58,21 @@ class MultisigPendingOperationsViewModel(
     }
 
     fun operationClicked(model: PendingMultisigOperationModel) {
-        val payload = MultisigOperationDetailsPayload(model.id)
-        router.openMultisigOperationDetails(payload)
+        val operationPayload = MultisigOperationPayload.fromOperationId(model.id)
+        router.openMultisigOperationDetails(MultisigOperationDetailsPayload(operationPayload))
     }
 
     private suspend fun PendingMultisigOperation.toUi(selectedAccount: MetaAccount): PendingMultisigOperationModel {
         val initialOrigin = selectedAccount.requireAccountIdKeyIn(chain)
-        val formattedCall = multisigCallFormatter.formatMultisigCall(call, initialOrigin, chain)
+        val formattedCall = multisigCallFormatter.formatPreview(call, initialOrigin, chain)
 
         return PendingMultisigOperationModel(
-            id = identifier,
+            id = operationId,
             chain = mapChainToUi(chain),
             action = formatAction(),
             call = formattedCall,
             progress = formatProgress(),
-            time = null // TODO multisig api has some bugs that prevents us from properly fetching the time
+            time = resourceManager.formatTime(timestamp.inWholeMilliseconds)
         )
     }
 

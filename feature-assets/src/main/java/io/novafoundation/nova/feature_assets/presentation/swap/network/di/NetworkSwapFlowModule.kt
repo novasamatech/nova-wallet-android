@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_assets.presentation.swap.executor.SwapFlow
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowViewModel
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -41,7 +42,8 @@ class NetworkSwapFlowModule {
         executorFactory: SwapFlowExecutorFactory,
         payload: NetworkSwapFlowPayload,
         chainRegistry: ChainRegistry,
-        swapFlowScopeAggregator: SwapFlowScopeAggregator
+        swapFlowScopeAggregator: SwapFlowScopeAggregator,
+        amountFormatter: AmountFormatter
     ): ViewModel {
         return NetworkSwapFlowViewModel(
             interactor = interactor,
@@ -54,7 +56,8 @@ class NetworkSwapFlowModule {
             swapFlowPayload = payload.swapFlowPayload,
             chainRegistry = chainRegistry,
             swapFlowExecutor = executorFactory.create(payload.swapFlowPayload),
-            swapFlowScopeAggregator = swapFlowScopeAggregator
+            swapFlowScopeAggregator = swapFlowScopeAggregator,
+            amountFormatter = amountFormatter
         )
     }
 }

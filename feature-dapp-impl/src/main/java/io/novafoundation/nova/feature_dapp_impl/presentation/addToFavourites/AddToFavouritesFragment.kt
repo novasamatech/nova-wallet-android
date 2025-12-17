@@ -6,7 +6,6 @@ import androidx.lifecycle.lifecycleScope
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
@@ -35,7 +34,6 @@ class AddToFavouritesFragment : BaseFragment<AddToFavouritesViewModel, FragmentA
     lateinit var imageLoader: ImageLoader
 
     override fun initViews() {
-        binder.addToFavouritesToolbar.applyStatusBarInsets()
         binder.addToFavouritesToolbar.setHomeButtonListener {
             viewModel.backClicked()
         }

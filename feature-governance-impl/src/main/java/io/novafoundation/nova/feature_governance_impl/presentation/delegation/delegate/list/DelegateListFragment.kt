@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.utils.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.submitListPreservingViewPoint
 import io.novafoundation.nova.common.view.input.chooser.setupListChooserMixinBottomSheet
 import io.novafoundation.nova.feature_governance_api.di.GovernanceFeatureApi
@@ -40,7 +39,6 @@ class DelegateListFragment :
         binder.delegateListList.setHasFixedSize(true)
         binder.delegateListList.adapter = adapter
 
-        binder.delegateListToolbar.applyStatusBarInsets()
         binder.delegateListToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.delegateListToolbar.setRightActionClickListener { viewModel.openSearch() }
     }

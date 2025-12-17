@@ -1,5 +1,8 @@
 package io.novafoundation.nova.test_shared
 
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import org.junit.Assert.assertEquals
+
 fun <T> assertListEquals(expected: List<T>, actual: List<T>, compare: (T, T) -> Boolean = { a, b -> a == b }) {
     if (expected.size != actual.size) {
         throw AssertionError("Lists are not equal. Expected: $expected, actual: $actual")
@@ -9,6 +12,10 @@ fun <T> assertListEquals(expected: List<T>, actual: List<T>, compare: (T, T) -> 
             throw AssertionError("Lists are not equal. Expected: $expected, actual: $actual")
         }
     }
+}
+
+fun assertHexEquals(expected: ByteArray, actual: ByteArray) {
+    assertEquals(expected.toHexString(), actual.toHexString())
 }
 
 fun <T> assertSetEquals(expected: Set<T>, actual: Set<T>) {

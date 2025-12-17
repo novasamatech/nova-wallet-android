@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.mixin.api.of
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.flowOf
@@ -58,7 +59,6 @@ import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.milliseconds
 
 private const val DEBOUNCE_DURATION_MILLIS = 500
 
@@ -99,7 +99,7 @@ class CrowdloanContributeViewModel(
         .share()
 
     val assetModelFlow = assetFlow
-        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager, it.transferableInPlanks) }
+        .map { mapAssetToAssetModel(assetIconProvider, it, resourceManager, MaskableModel.Unmasked(it.transferableInPlanks)) }
         .inBackground()
         .share()
 

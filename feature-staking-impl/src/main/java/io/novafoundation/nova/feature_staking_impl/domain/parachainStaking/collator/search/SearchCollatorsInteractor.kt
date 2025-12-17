@@ -7,11 +7,11 @@ class SearchCollatorsInteractor {
 
     @SuppressLint("DefaultLocale")
     fun searchValidator(query: String, localValidators: Collection<Collator>): List<Collator> {
-        val queryLower = query.toLowerCase()
+        val queryLower = query.lowercase()
 
         return localValidators.filter {
-            val foundInIdentity = it.identity?.display?.toLowerCase()?.contains(queryLower) ?: false
-            val foundInAddress = it.address.toLowerCase().startsWith(queryLower)
+            val foundInIdentity = it.identity?.display?.lowercase()?.contains(queryLower) ?: false
+            val foundInAddress = it.address.lowercase().startsWith(queryLower)
 
             foundInIdentity || foundInAddress
         }

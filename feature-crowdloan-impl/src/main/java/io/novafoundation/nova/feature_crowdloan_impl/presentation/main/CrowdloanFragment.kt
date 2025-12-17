@@ -52,7 +52,7 @@ class CrowdloanFragment : BaseFragment<CrowdloanViewModel, FragmentCrowdloansBin
     }
 
     override fun subscribe(viewModel: CrowdloanViewModel) {
-        subscribeOnAssetClick(viewModel.assetSelectorMixin, imageLoader)
+        subscribeOnAssetClick(getString(R.string.common_select_token), viewModel.assetSelectorMixin, imageLoader)
         subscribeOnAssetChange(viewModel.assetSelectorMixin) {
             headerAdapter.setAsset(it)
         }
