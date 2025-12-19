@@ -17,7 +17,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.AddressD
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
-import io.novafoundation.nova.feature_assets.domain.balance.detail.BalanceDetailInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
 import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
@@ -25,12 +24,14 @@ import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.gifts.GiftsRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.detail.BalanceDetailViewModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.HistoryFiltersProviderFactory
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryProvider
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
@@ -108,7 +109,8 @@ class BalanceDetailModule {
         buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
         amountFormatter: AmountFormatter,
         chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
-        interactor: BalanceDetailInteractor,
+        giftsAvailableGiftAssetsUseCase: AvailableGiftAssetsUseCase,
+        giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -128,7 +130,8 @@ class BalanceDetailModule {
             buySellSelectorMixinFactory = buySellSelectorMixinFactory,
             amountFormatter = amountFormatter,
             chainMigrationInfoUseCase = chainMigrationInfoUseCase,
-            interactor = interactor
+            giftsRestrictionCheckMixin = giftsRestrictionCheckMixin,
+            giftsAvailableGiftAssetsUseCase = giftsAvailableGiftAssetsUseCase
         )
     }
 

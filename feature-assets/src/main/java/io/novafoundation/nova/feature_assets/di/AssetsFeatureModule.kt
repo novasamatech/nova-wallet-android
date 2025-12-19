@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.Control
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
+import io.novafoundation.nova.feature_assets.presentation.balance.common.gifts.GiftsRestrictionCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.NetworkAssetFormatterFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.mappers.TokenAssetFormatter
@@ -58,6 +59,7 @@ import io.novafoundation.nova.feature_buy_api.presentation.trade.TradeTokenRegis
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
+import io.novafoundation.nova.feature_gift_api.domain.GiftsAccountSupportedUseCase
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
@@ -355,6 +357,20 @@ class AssetsFeatureModule {
             chainRegistry,
             resourceManager,
             buySellRestrictionCheckMixin
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideGiftsRestrictionCheckMixin(
+        accountSupportedUseCase: GiftsAccountSupportedUseCase,
+        resourceManager: ResourceManager,
+        actionLauncher: ActionBottomSheetLauncher,
+    ): GiftsRestrictionCheckMixin {
+        return GiftsRestrictionCheckMixin(
+            accountSupportedUseCase,
+            resourceManager,
+            actionLauncher
         )
     }
 }

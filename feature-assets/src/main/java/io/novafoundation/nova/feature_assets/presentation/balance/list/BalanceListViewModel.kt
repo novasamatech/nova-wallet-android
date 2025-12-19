@@ -55,6 +55,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBala
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_assets.presentation.balance.common.gifts.GiftsRestrictionCheckMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -95,7 +96,8 @@ class BalanceListViewModel(
     private val buySellSelectorMixinFactory: BuySellSelectorMixinFactory,
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
     private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
-    private val maskingModeUseCase: MaskingModeUseCase
+    private val maskingModeUseCase: MaskingModeUseCase,
+    private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin
 ) : BaseViewModel() {
 
     private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
@@ -373,8 +375,10 @@ class BalanceListViewModel(
         router.openSwapFlow()
     }
 
-    fun giftClicked() {
-        router.openGifts()
+    fun giftClicked() = launchUnit {
+        giftsRestrictionCheckMixin.checkRestrictionAndDo {
+            router.openGifts()
+        }
     }
 
     fun novaCardClicked() = launchUnit {
