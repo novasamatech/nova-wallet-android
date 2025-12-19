@@ -119,7 +119,8 @@ class SelectRewardDestinationViewModel(
         val payload = RewardDestinationValidationPayload(
             availableControllerBalance = controllerAssetFlow.first().transferable,
             fee = feeLoaderMixin.awaitFee(),
-            stashState = stashStateFlow.first()
+            stashState = stashStateFlow.first(),
+            asset = controllerAssetFlow.first()
         )
 
         val rewardDestination = rewardDestinationModelFlow.first()

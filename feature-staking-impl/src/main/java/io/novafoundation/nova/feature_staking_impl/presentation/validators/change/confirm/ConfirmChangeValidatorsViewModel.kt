@@ -145,7 +145,8 @@ class ConfirmChangeValidatorsViewModel(
 
         val payload = SetupStakingPayload(
             maxFee = feeLoaderMixin.awaitFee(),
-            controllerAsset = controllerAssetFlow.first()
+            controllerAsset = controllerAssetFlow.first(),
+            chain = stashFlow.first().chain
         )
 
         validationExecutor.requireValid(
