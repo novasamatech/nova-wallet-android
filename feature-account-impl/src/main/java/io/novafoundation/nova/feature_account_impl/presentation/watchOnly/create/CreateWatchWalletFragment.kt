@@ -58,6 +58,6 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
 
         viewModel.buttonState.observe(binder.createWatchWalletContinue::setState)
 
-        viewModel.suggestionChipActionModels.observe(suggestionsAdapter::submitList)
+        suggestionsAdapter.submitList(viewModel.suggestionChipActionModels)
     }
 }

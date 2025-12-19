@@ -4,8 +4,6 @@ import androidx.annotation.StringRes
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.mapList
 import io.novafoundation.nova.common.view.ChipActionsModel
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
@@ -17,7 +15,6 @@ import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -62,11 +59,9 @@ class CreateWatchWalletViewModel(
         }
     }
 
-    private val walletSuggestions = flowOf { interactor.suggestions() }
-        .shareInBackground()
+    private val walletSuggestions = interactor.suggestions()
 
-    val suggestionChipActionModels = walletSuggestions.mapList(::mapWalletSuggestionToChipAction)
-        .shareInBackground()
+    val suggestionChipActionModels = walletSuggestions.map(::mapWalletSuggestionToChipAction)
 
     fun homeButtonClicked() {
         router.back()
@@ -88,7 +83,7 @@ class CreateWatchWalletViewModel(
 
     fun walletSuggestionClicked(index: Int) {
         launch {
-            val suggestion = walletSuggestions.first()[index]
+            val suggestion = walletSuggestions[index]
 
             nameInput.value = suggestion.name
             substrateAddressInput.inputFlow.value = suggestion.substrateAddress
