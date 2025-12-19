@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_dapp_impl.web3.webview
 
+import android.webkit.ConsoleMessage
 import android.webkit.WebView
 import android.widget.ProgressBar
 import io.novafoundation.nova.common.utils.browser.fileChoosing.WebViewFileChooser
@@ -21,5 +22,9 @@ class Web3ChromeClient(
         progressBar.progress = newProgress
 
         progressBar.setVisible(newProgress < MAX_PROGRESS)
+    }
+
+    override fun onConsoleMessage(consoleMessage: ConsoleMessage): Boolean {
+        return true
     }
 }
