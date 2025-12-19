@@ -65,7 +65,7 @@ class RealAddNetworkInteractor(
         prefilledChain: Chain?,
         coroutineScope: CoroutineScope
     ) = runCatching {
-        val chain = customChainFactory.createSubstrateChain(payload, prefilledChain, coroutineScope)
+        val chain = customChainFactory.createSubstrateChain(payload, prefilledChain, displayPriority = null, coroutineScope)
 
         chainRepository.addChain(chain)
     }
@@ -74,7 +74,7 @@ class RealAddNetworkInteractor(
         payload: CustomNetworkPayload,
         prefilledChain: Chain?
     ) = runCatching {
-        val chain = customChainFactory.createEvmChain(payload, prefilledChain)
+        val chain = customChainFactory.createEvmChain(payload, prefilledChain, displayPriority = null)
 
         chainRepository.addChain(chain)
     }

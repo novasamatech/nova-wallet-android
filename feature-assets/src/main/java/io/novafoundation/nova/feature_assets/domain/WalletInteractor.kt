@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
@@ -63,11 +64,13 @@ interface WalletInteractor {
 
     suspend fun groupAssetsByNetwork(
         assets: List<Asset>,
-        externalBalances: List<ExternalBalance>
+        externalBalances: List<ExternalBalance>,
+        tokenDisplayPriority: Map<TokenSymbol, Int>
     ): Map<NetworkAssetGroup, List<AssetWithOffChainBalance>>
 
     suspend fun groupAssetsByToken(
         assets: List<Asset>,
-        externalBalances: List<ExternalBalance>
+        externalBalances: List<ExternalBalance>,
+        tokenDisplayPriority: Map<TokenSymbol, Int>
     ): Map<TokenAssetGroup, List<AssetWithNetwork>>
 }

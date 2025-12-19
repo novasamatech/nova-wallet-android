@@ -6,6 +6,7 @@ import dagger.Provides
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.common.utils.TokenPriorityStore
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.StorageDao
@@ -14,6 +15,7 @@ import io.novafoundation.nova.runtime.call.RealMultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.gas.GasPriceProviderFactory
 import io.novafoundation.nova.runtime.ethereum.gas.RealGasPriceProviderFactory
+import io.novafoundation.nova.runtime.ext.TokenSortingProvider
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicSerializers
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicValidityUseCase
@@ -279,5 +281,11 @@ class RuntimeModule {
             chainDao,
             gson
         )
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideTokenSortingProvider(tokenSortStorage: TokenPriorityStore): TokenSortingProvider {
+        return TokenSortingProvider(tokenSortStorage)
     }
 }

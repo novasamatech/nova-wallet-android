@@ -19,11 +19,11 @@ import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainsFlow
+import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

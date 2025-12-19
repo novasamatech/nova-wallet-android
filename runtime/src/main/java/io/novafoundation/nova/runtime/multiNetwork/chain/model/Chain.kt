@@ -44,7 +44,8 @@ data class Chain(
     val multisigSupport: Boolean,
     val connectionState: ConnectionState,
     val parentId: String?,
-    val additional: Additional?
+    val additional: Additional?,
+    val displayPriority: Int?
 ) : Identifiable, Serializable {
 
     companion object // extensions

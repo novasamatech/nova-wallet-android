@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.interfaces.FileProvider
+import io.novafoundation.nova.common.utils.TokenPriorityStore
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
@@ -52,10 +53,10 @@ class ChainRegistryModule {
     @ApplicationScope
     fun provideChainSyncService(
         dao: ChainDao,
-        chainAssetDao: ChainAssetDao,
         chainFetcher: ChainFetcher,
-        gson: Gson
-    ) = ChainSyncService(dao, chainFetcher, gson)
+        gson: Gson,
+        tokenPriorityStore: TokenPriorityStore
+    ) = ChainSyncService(dao, chainFetcher, gson, tokenPriorityStore)
 
     @Provides
     @ApplicationScope

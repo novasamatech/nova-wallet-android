@@ -3,11 +3,7 @@ package io.novafoundation.nova.runtime.ext
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 val Chain.mainChainsFirstAscendingOrder
-    get() = when (genesisHash) {
-        Chain.Geneses.POLKADOT_ASSET_HUB -> 0
-        Chain.Geneses.KUSAMA_ASSET_HUB -> 1
-        else -> 2
-    }
+    get() = this.displayPriority ?: Int.MAX_VALUE
 
 val Chain.testnetsLastAscendingOrder
     get() = if (isTestNet) {

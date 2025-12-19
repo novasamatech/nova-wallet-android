@@ -2,6 +2,8 @@ package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.CollectionDiffer
+import io.novafoundation.nova.common.utils.TokenPriorityStore
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.FullAssetIdLocal
@@ -23,7 +25,8 @@ import kotlinx.coroutines.withContext
 class ChainSyncService(
     private val chainDao: ChainDao,
     private val chainFetcher: ChainFetcher,
-    private val gson: Gson
+    private val gson: Gson,
+    private val tokenPriorityStore: TokenPriorityStore
 ) {
 
     suspend fun syncUp() = withContext(Dispatchers.Default) {
@@ -38,9 +41,13 @@ class ChainSyncService(
         val oldChainsById = oldChains.associateBy { it.id }
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
 
-        val remoteChains = retryUntilDone { chainFetcher.getChains() }
+        val chainConfigRemote = retryUntilDone { chainFetcher.getChains() }
+        val remoteChains = chainConfigRemote.chains
 
-        val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], source = ChainLocal.Source.DEFAULT, gson) }
+        val newChains = remoteChains.map {
+            val chainDisplayPriority = chainConfigRemote.chainDisplayPriorities[it.chainId]
+            mapRemoteChainToLocal(it, oldChainsById[it.chainId], source = ChainLocal.Source.DEFAULT, chainDisplayPriority, gson)
+        }
         val newAssets = remoteChains.flatMap { chain ->
             chain.assets.map {
                 val fullAssetId = FullAssetIdLocal(chain.chainId, it.assetId)
@@ -60,6 +67,8 @@ class ChainSyncService(
         val externalApisDiff = CollectionDiffer.findDiff(newExternalApis, oldExternalApis, forceUseNewItems = false)
         val nodeSelectionPreferencesDiff = CollectionDiffer.findDiff(newNodeSelectionPreferences, oldNodeSelectionPreferences, forceUseNewItems = false)
 
+        updateTokenSorting(chainConfigRemote.assetDisplayPriorities)
+
         chainDao.applyDiff(
             chainDiff = chainsDiff,
             assetsDiff = assetDiff,
@@ -68,6 +77,10 @@ class ChainSyncService(
             externalApisDiff = externalApisDiff,
             nodeSelectionPreferencesDiff = nodeSelectionPreferencesDiff
         )
+    }
+
+    private fun updateTokenSorting(assetDisplayPriorities: Map<String, Int>) {
+        tokenPriorityStore.setTokenSorting(assetDisplayPriorities.mapKeys { TokenSymbol(it.key) })
     }
 
     private fun nodeSelectionPreferencesFor(

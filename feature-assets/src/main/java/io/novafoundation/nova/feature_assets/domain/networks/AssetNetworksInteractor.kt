@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.aggregatedBalanceByAsset
+import io.novafoundation.nova.runtime.ext.TokenSortingProvider
 import io.novafoundation.nova.runtime.ext.normalize
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -30,7 +31,8 @@ class AssetNetworksInteractor(
     private val chainRegistry: ChainRegistry,
     private val assetSearchUseCase: AssetSearchUseCase,
     private val tradeTokenRegistry: TradeTokenRegistry,
-    private val giftAssetsUseCase: AvailableGiftAssetsUseCase
+    private val giftAssetsUseCase: AvailableGiftAssetsUseCase,
+    private val tokenSortingProvider: TokenSortingProvider
 ) {
 
     fun tradeAssetFlow(
@@ -102,10 +104,14 @@ class AssetNetworksInteractor(
 
         val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
 
-        return combine(assetsFlow, aggregatedExternalBalances) { assets, externalBalances ->
+        return combine(
+            assetsFlow,
+            tokenSortingProvider.tokenDisplayPriorityFlow(),
+            aggregatedExternalBalances
+        ) { assets, tokenDisplayPriorities, externalBalances ->
             val chainsById = chainRegistry.enabledChainById()
 
-            groupAndSortAssetsByToken(assets, externalBalances, chainsById, assetGroupComparator, assetsComparator)
+            groupAndSortAssetsByToken(assets, externalBalances, chainsById, tokenDisplayPriorities, assetGroupComparator, assetsComparator)
                 .flatMap { it.value }
         }
     }

@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_assets.domain.common
 
+import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.utils.sumByBigDecimal
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
+import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.ext.defaultComparatorFrom
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
@@ -22,17 +24,19 @@ class NetworkAssetGroup(
 class AssetWithOffChainBalance(
     val asset: Asset,
     val balanceWithOffchain: AssetBalance,
+    val displayPriority: Int?
 )
 
 fun groupAndSortAssetsByNetwork(
     assets: List<Asset>,
     externalBalances: Map<FullChainAssetId, Balance>,
     chainsById: Map<String, Chain>,
+    tokenDisplayPriorities: Map<TokenSymbol, Int>,
     assetGroupComparator: Comparator<NetworkAssetGroup> = getAssetGroupBaseComparator(),
     assetComparator: Comparator<AssetWithOffChainBalance> = getAssetBaseComparator()
 ): Map<NetworkAssetGroup, List<AssetWithOffChainBalance>> {
     return assets
-        .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances)) }
+        .map { asset -> AssetWithOffChainBalance(asset, asset.totalWithOffChain(externalBalances), tokenDisplayPriorities[asset.token.configuration.symbol]) }
         .filter { chainsById.containsKey(it.asset.token.configuration.chainId) }
         .groupBy { chainsById.getValue(it.asset.token.configuration.chainId) }
         .mapValues { (_, assets) -> assets.sortedWith(assetComparator) }
@@ -52,7 +56,7 @@ fun getAssetBaseComparator(
     return compareByDescending(comparing)
         .thenByDescending { it.balanceWithOffchain.total.amount }
         .thenByDescending { it.asset.token.configuration.isUtilityAsset } // utility assets first
-        .thenBy { it.asset.token.configuration.symbol.value }
+        .then(TokenSymbol.defaultComparator(displayPriority = { it.displayPriority }, symbolExtractor = { it.asset.token.configuration.symbol }))
 }
 
 fun getAssetGroupBaseComparator(

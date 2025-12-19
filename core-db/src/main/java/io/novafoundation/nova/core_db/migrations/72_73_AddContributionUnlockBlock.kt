@@ -3,7 +3,7 @@ package io.novafoundation.nova.core_db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-val AddFieldsToContributions = object : Migration(72, 73) {
+val AddFieldsToContributions_72_73 = object : Migration(72, 73) {
 
     override fun migrate(db: SupportSQLiteDatabase) {
         db.execSQL("DROP TABLE contributions")

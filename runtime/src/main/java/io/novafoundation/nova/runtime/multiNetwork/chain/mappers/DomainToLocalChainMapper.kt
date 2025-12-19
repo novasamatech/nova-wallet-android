@@ -133,7 +133,8 @@ fun mapChainToLocal(chain: Chain, gson: Gson): ChainLocal {
         additional = chain.additional?.let { gson.toJson(it) },
         connectionState = mapConnectionStateToLocal(chain.connectionState),
         nodeSelectionStrategy = mapNodeSelectionStrategyToLocal(chain),
-        source = mapChainSourceToLocal(chain.source)
+        source = mapChainSourceToLocal(chain.source),
+        displayPriority = chain.displayPriority
     )
 }
 

@@ -84,7 +84,9 @@ import io.novafoundation.nova.common.utils.QrCodeGenerator
 import io.novafoundation.nova.common.utils.RealCopyValueMixin
 import io.novafoundation.nova.common.utils.RealDialogMessageManager
 import io.novafoundation.nova.common.utils.RealToastMessageManager
+import io.novafoundation.nova.common.utils.RealTokenPriorityStore
 import io.novafoundation.nova.common.utils.ToastMessageManager
+import io.novafoundation.nova.common.utils.TokenPriorityStore
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.ip.PublicIpAddressReceiver
@@ -505,5 +507,11 @@ class CommonModule {
     @ApplicationScope
     fun provideDeviceIdProvider(context: Context): DeviceIdProvider {
         return AndroidDeviceIdProvider(context)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideTokenSortingStore(preferences: Preferences): TokenPriorityStore {
+        return RealTokenPriorityStore(preferences)
     }
 }

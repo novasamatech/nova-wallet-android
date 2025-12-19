@@ -29,7 +29,7 @@ class RealPreConfiguredChainsRepository(
     override suspend fun getPreconfiguredChainById(id: ChainId): Result<Chain> {
         return runCatching {
             val chain = chainFetcher.getPreConfiguredChainById(id)
-            chainMapperFacade.mapRemoteChainToDomain(chain, Chain.Source.CUSTOM)
+            chainMapperFacade.mapRemoteChainToDomain(chain, Chain.Source.CUSTOM, displayPriority = null)
         }
     }
 }
