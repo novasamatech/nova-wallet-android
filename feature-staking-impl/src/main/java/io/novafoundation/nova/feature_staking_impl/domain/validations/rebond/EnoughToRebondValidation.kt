@@ -7,7 +7,7 @@ class EnoughToRebondValidation : RebondValidation {
 
     override suspend fun validate(value: RebondValidationPayload): ValidationStatus<RebondValidationFailure> {
         return validOrError(value.rebondAmount <= value.controllerAsset.unbonding) {
-            RebondValidationFailure.NOT_ENOUGH_UNBONDINGS
+            RebondValidationFailure.NotEnoughUnbondings
         }
     }
 }
