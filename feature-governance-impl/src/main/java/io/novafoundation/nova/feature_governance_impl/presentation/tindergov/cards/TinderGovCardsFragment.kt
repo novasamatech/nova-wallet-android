@@ -13,6 +13,8 @@ import com.yuyakaido.android.cardstackview.StackFrom
 import com.yuyakaido.android.cardstackview.SwipeAnimationSetting
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
+import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.common.utils.setVisible
@@ -33,6 +35,11 @@ class TinderGovCardsFragment :
     override fun createBinding() = FragmentTinderGovCardsBinding.inflate(layoutInflater)
 
     private val adapter = TinderGovCardsAdapter(lifecycleOwner = this, handler = this)
+
+    override fun applyInsets(rootView: View) {
+        binder.tinderGovCardsStatusBarInsetsContainer.applyStatusBarInsets()
+        rootView.applyNavigationBarInsets(consume = false)
+    }
 
     override fun initViews() {
         binder.tinderGovCardsBack.setOnClickListener { viewModel.back() }
