@@ -241,7 +241,7 @@ class RealMultisigCallFormatter @Inject constructor(
 
     private fun formatDetails(call: GenericCall.Instance): MultisigCallDetailsModel {
         return MultisigCallDetailsModel(
-            title = "${call.module.name}.${call.function.name}",
+            title = call.function.name.splitAndCapitalizeWords(),
             primaryAmount = null,
             tableEntries = emptyList(),
             onBehalfOf = null
