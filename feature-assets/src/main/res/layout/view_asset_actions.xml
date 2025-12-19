@@ -15,8 +15,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:text="@string/wallet_asset_send"
-        app:drawableTopCompat="@drawable/ic_send"
-        tools:drawableTop="@drawable/ic_send" />
+        app:drawableTopCompat="@drawable/ic_send_tokens"
+        tools:drawableTop="@drawable/ic_send_tokens" />
 
     <TextView
         android:id="@+id/assetActionsReceive"
@@ -25,8 +25,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:text="@string/wallet_asset_receive"
-        app:drawableTopCompat="@drawable/ic_arrow_down"
-        tools:drawableTop="@drawable/ic_arrow_down" />
+        app:drawableTopCompat="@drawable/ic_receive_tokens"
+        tools:drawableTop="@drawable/ic_receive_tokens" />
 
     <TextView
         android:id="@+id/assetActionsSwap"
@@ -45,8 +45,8 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:text="@string/wallet_asset_buy_sell"
-        app:drawableTopCompat="@drawable/ic_buy"
-        tools:drawableTop="@drawable/ic_buy" />
+        app:drawableTopCompat="@drawable/ic_buy_tokens"
+        tools:drawableTop="@drawable/ic_buy_tokens" />
 
     <TextView
         android:id="@+id/assetActionsGift"
