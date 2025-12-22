@@ -62,10 +62,10 @@ class RealTokenFormatter(
     }
 }
 
-fun TokenFormatter.formatToken(amountInPlanks: BigInteger, asset: Asset): CharSequence {
-    return formatToken(asset.token.amountFromPlanks(amountInPlanks), asset.token.configuration.symbol)
+fun TokenFormatter.formatToken(amountInPlanks: BigInteger, asset: Asset, config: TokenConfig = TokenConfig()): CharSequence {
+    return formatToken(asset.token.amountFromPlanks(amountInPlanks), asset.token.configuration.symbol, config)
 }
 
-fun TokenFormatter.formatToken(amountInPlanks: BigInteger, chainAsset: Chain.Asset): CharSequence {
-    return formatToken(chainAsset.amountFromPlanks(amountInPlanks), chainAsset.symbol)
+fun TokenFormatter.formatToken(amountInPlanks: BigInteger, chainAsset: Chain.Asset, config: TokenConfig = TokenConfig()): CharSequence {
+    return formatToken(chainAsset.amountFromPlanks(amountInPlanks), chainAsset.symbol, config)
 }

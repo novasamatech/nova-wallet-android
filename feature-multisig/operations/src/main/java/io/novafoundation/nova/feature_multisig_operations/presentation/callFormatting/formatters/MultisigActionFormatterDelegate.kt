@@ -18,7 +18,7 @@ interface MultisigActionFormatterDelegate {
 class MultisigActionFormatterDelegatePreviewResult(
     val title: String,
     val subtitle: String?,
-    val primaryValue: String?,
+    val primaryValue: CharSequence?,
     val icon: Icon,
 )
 
