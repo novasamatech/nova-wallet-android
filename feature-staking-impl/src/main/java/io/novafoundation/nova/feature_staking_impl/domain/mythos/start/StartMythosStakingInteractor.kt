@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.mythos.start
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.model.st
 import io.novafoundation.nova.feature_staking_impl.domain.mythos.common.rewards.MythosClaimPendingRewardsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.state.chain
@@ -38,7 +40,7 @@ interface StartMythosStakingInteractor {
 
     suspend fun estimateFee(
         currentState: MythosDelegatorState,
-        candidate: AccountIdKey,
+        candidate: AccountIdKey?,
         amount: Balance
     ): Fee
 
@@ -70,15 +72,17 @@ class RealStartMythosStakingInteractor @Inject constructor(
 
     override suspend fun estimateFee(
         currentState: MythosDelegatorState,
-        candidate: AccountIdKey,
+        candidate: AccountIdKey?,
         amount: Balance
     ): Fee {
         val chain = stakingSharedState.chain()
 
+        val candidateOrEmpty = candidate ?: chain.emptyAccountId().intoKey()
+
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
             claimPendingRewardsUseCase.claimPendingRewards(chain)
 
-            stakeMore(chain, currentState, candidate, amount)
+            stakeMore(chain, currentState, candidateOrEmpty, amount)
         }
     }
 

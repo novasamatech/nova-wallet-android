@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.common.singleSe
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.WithAccountId
-import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -43,8 +42,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefault
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
-import io.novafoundation.nova.runtime.ext.emptyAccountId
-import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import io.novafoundation.nova.runtime.state.selectedOption
 import kotlinx.coroutines.Dispatchers
@@ -198,8 +195,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
             inputSource1 = amountChooserMixin.backPressuredPlanks,
             inputSource2 = selectedTargetIdFlow,
             feeConstructor = { _, amount, selectedTargetId ->
-                val chain = selectedAssetState.chain()
-                val stakeTargetId = selectedTargetId ?: chain.emptyAccountId().intoKey()
+                val stakeTargetId = selectedTargetId
 
                 logic.estimateFee(amount, stakeTargetId)
             },
@@ -311,7 +307,7 @@ abstract class StartSingleSelectStakingViewModel<T, L : StartSingleSelectStaking
 
         suspend fun minimumStakeToGetRewards(selectedStakeTarget: T?): Balance
 
-        suspend fun estimateFee(amount: Balance, targetId: AccountIdKey): Fee
+        suspend fun estimateFee(amount: Balance, targetId: AccountIdKey?): Fee
     }
 }
 

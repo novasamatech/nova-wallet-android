@@ -15,7 +15,9 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.DelegatorStateRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.ParachainStakingConstantsRepository
+import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -25,7 +27,7 @@ import java.math.BigInteger
 
 interface StartParachainStakingInteractor {
 
-    suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee
+    suspend fun estimateFee(amount: BigInteger, collatorId: AccountId?): Fee
 
     suspend fun delegate(amount: BigInteger, collator: AccountId): Result<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>>
 
@@ -41,25 +43,28 @@ class RealStartParachainStakingInteractor(
     private val candidatesRepository: CandidatesRepository,
 ) : StartParachainStakingInteractor {
 
-    override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId): Fee {
+    override suspend fun estimateFee(amount: BigInteger, collatorId: AccountId?): Fee {
         val (chain, chainAsset) = singleAssetSharedState.chainAndAsset()
+        val collatorIdOrEmpty = collatorId ?: chain.emptyAccountId()
         val metaAccount = accountRepository.getSelectedMetaAccount()
         val accountId = metaAccount.accountIdIn(chain)!!
 
         val currentDelegationState = delegatorStateRepository.getDelegationState(chain, chainAsset, accountId)
 
         return extrinsicService.estimateFee(chain, TransactionOrigin.SelectedWallet) {
-            if (currentDelegationState.hasDelegation(collatorId)) {
+            if (currentDelegationState.hasDelegation(collatorIdOrEmpty)) {
                 delegatorBondMore(
-                    candidate = collatorId,
+                    candidate = collatorIdOrEmpty,
                     amount = amount
                 )
             } else {
+                val delegationCount = getDelegationCountOrFake(collatorId, chain)
+
                 delegate(
-                    candidate = collatorId,
+                    candidate = collatorIdOrEmpty,
                     amount = amount,
-                    candidateDelegationCount = fakeDelegationCount(),
-                    delegationCount = fakeDelegationCount()
+                    candidateDelegationCount = delegationCount,
+                    delegationCount = currentDelegationState.delegationsCount.toBigInteger()
                 )
             }
         }
@@ -102,6 +107,16 @@ class RealStartParachainStakingInteractor(
         } else {
             DelegationsLimit.Reached(maxDelegations)
         }
+    }
+
+    private suspend fun getDelegationCountOrFake(
+        collatorId: AccountId?,
+        chain: Chain
+    ): BigInteger = if (collatorId == null) {
+        fakeDelegationCount()
+    } else {
+        candidatesRepository.getCandidateMetadata(chain.id, collatorId)
+            .delegationCount
     }
 
     private fun fakeDelegationCount() = BigInteger.TEN
