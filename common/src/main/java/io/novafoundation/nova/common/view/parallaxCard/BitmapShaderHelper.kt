@@ -26,4 +26,12 @@ class BitmapShaderHelper(val bitmap: Bitmap) {
     fun setAlpha(alpha: Float) {
         paint.alpha = (alpha * 255).toInt()
     }
+
+    fun withHighlighting(withHighlighting: Boolean) {
+        paint.shader = if (withHighlighting) {
+            shader
+        } else {
+            null
+        }
+    }
 }
