@@ -95,3 +95,11 @@ fun <T> T.doIf(isTrue: Boolean, block: T.() -> Unit): T {
     if (isTrue) block()
     return this
 }
+
+fun <T> T.mapIf(isTrue: Boolean, block: T.() -> T): T {
+    return if (isTrue) {
+        block()
+    } else {
+        this
+    }
+}

@@ -1,11 +1,13 @@
 package io.novafoundation.nova.app.root.presentation.main
 
+import android.content.res.ColorStateList
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.databinding.FragmentMainBinding
@@ -51,6 +53,7 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
         binder.bottomNavigationView.setupWithNavController(navController!!)
         binder.bottomNavigationView.itemIconTintList = null
+        binder.bottomNavigationView.setupNewYearItemColors(navController!!)
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
@@ -70,4 +73,34 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
     private fun isAtHomeTab(destination: NavDestination) =
         destination.id == navController!!.graph.startDestination
+}
+
+private fun BottomNavigationView.setupNewYearItemColors(navController: NavController) {
+    val destinationIdToColor = mapOf(
+        R.id.walletFragment to context.getColor(R.color.new_year_assets),
+        R.id.voteFragment to context.getColor(R.color.new_year_vote),
+        R.id.dAppsFragment to context.getColor(R.color.new_year_dapps),
+        R.id.stakingDashboardFragment to context.getColor(R.color.new_year_staking),
+        R.id.moreStakingOptionsFragment to context.getColor(R.color.new_year_staking),
+        R.id.profileFragment to context.getColor(R.color.new_year_settings)
+    )
+
+    val inactiveColor = context.getColor(R.color.nav_bar_icon_inactive)
+
+    val states = arrayOf(
+        intArrayOf(android.R.attr.state_checked),
+        intArrayOf()
+    )
+
+    navController.addOnDestinationChangedListener { _, destination, _ ->
+        val colors = intArrayOf(
+            destinationIdToColor[destination.id] ?: inactiveColor,
+            inactiveColor
+        )
+
+        val dynamicColorList = ColorStateList(states, colors)
+
+        itemTextColor = dynamicColorList
+        itemIconTintList = dynamicColorList
+    }
 }
