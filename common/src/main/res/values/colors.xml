@@ -168,5 +168,6 @@
     <color name="new_year_dapps">#CAC8FF</color>
     <color name="new_year_staking">#FF5E61</color>
     <color name="new_year_settings">#9BE9FF</color>
+    <color name="new_year_chip">#1F498E</color>
 
 </resources>
