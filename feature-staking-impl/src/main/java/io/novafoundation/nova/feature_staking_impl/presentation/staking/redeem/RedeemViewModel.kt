@@ -112,7 +112,8 @@ class RedeemViewModel(
 
         val validationPayload = RedeemValidationPayload(
             fee = feeLoaderMixin.awaitFee(),
-            asset = asset
+            asset = asset,
+            chain = accountStakingFlow.first().chain
         )
 
         validationExecutor.requireValid(

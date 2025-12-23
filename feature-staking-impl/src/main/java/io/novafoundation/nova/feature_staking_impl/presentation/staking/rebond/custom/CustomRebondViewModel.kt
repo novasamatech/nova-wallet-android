@@ -113,7 +113,8 @@ class CustomRebondViewModel(
         val payload = RebondValidationPayload(
             fee = originFeeMixin.awaitFee(),
             rebondAmount = amountChooserMixin.amount.first(),
-            controllerAsset = assetFlow.first()
+            controllerAsset = assetFlow.first(),
+            chain = accountStakingFlow.first().chain
         )
 
         validationExecutor.requireValid(
