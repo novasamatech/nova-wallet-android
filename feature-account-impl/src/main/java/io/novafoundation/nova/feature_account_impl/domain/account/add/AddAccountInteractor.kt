@@ -61,12 +61,14 @@ class AddAccountInteractor(
         secret: String,
         advancedEncryption: AdvancedEncryption,
         addAccountType: AddAccountType
-    ): Result<Unit> = when {
-        secret.isSubstrateSeed() -> importFromSeed(secret, advancedEncryption, addAccountType)
+    ): Result<Unit> = runCatching {
+        when {
+            secret.isSubstrateSeed() -> importFromSeed(secret, advancedEncryption, addAccountType).getOrThrow()
 
-        secret.isSubstrateKeypair() -> importFromSubstrateKeypair(secret, advancedEncryption, addAccountType)
+            secret.isSubstrateKeypair() -> importFromSubstrateKeypair(secret, advancedEncryption, addAccountType).getOrThrow()
 
-        else -> Result.failure(InvalidPropertiesFormatException("Invalid secret length: Expected 32 or 64 bytes."))
+            else -> throw InvalidPropertiesFormatException("Invalid secret length: Expected 32 or 64 bytes.")
+        }
     }
 
     suspend fun importFromSeed(
