@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/balanceListActions"
     android:layout_width="match_parent"
-    android:layout_height="80dp"
+    android:layout_height="wrap_content"
+    android:minHeight="80dp"
     android:orientation="horizontal"
     tools:background="@color/secondary_screen_background"
     tools:parentTag="android.widget.LinearLayout">
@@ -14,6 +15,9 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:breakStrategy="high_quality"
+        android:hyphenationFrequency="full"
+        android:paddingBottom="8dp"
         android:text="@string/wallet_asset_send"
         app:drawableTopCompat="@drawable/ic_send_tokens"
         tools:drawableTop="@drawable/ic_send_tokens" />
@@ -24,6 +28,9 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:breakStrategy="high_quality"
+        android:hyphenationFrequency="full"
+        android:paddingBottom="8dp"
         android:text="@string/wallet_asset_receive"
         app:drawableTopCompat="@drawable/ic_receive_tokens"
         tools:drawableTop="@drawable/ic_receive_tokens" />
@@ -34,6 +41,9 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:breakStrategy="high_quality"
+        android:hyphenationFrequency="full"
+        android:paddingBottom="8dp"
         android:text="@string/wallet_asset_swap"
         app:drawableTopCompat="@drawable/ic_swap"
         tools:drawableTop="@drawable/ic_swap" />
@@ -44,6 +54,9 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:breakStrategy="high_quality"
+        android:hyphenationFrequency="full"
+        android:paddingBottom="8dp"
         android:text="@string/wallet_asset_buy_sell"
         app:drawableTopCompat="@drawable/ic_buy_tokens"
         tools:drawableTop="@drawable/ic_buy_tokens" />
@@ -54,6 +67,9 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:breakStrategy="high_quality"
+        android:hyphenationFrequency="full"
+        android:paddingBottom="8dp"
         android:text="@string/common_gift"
         app:drawableTopCompat="@drawable/ic_gift_card"
         tools:drawableTop="@drawable/ic_gift_card" />
