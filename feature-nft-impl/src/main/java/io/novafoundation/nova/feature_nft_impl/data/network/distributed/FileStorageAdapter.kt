@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_nft_impl.data.network.distributed
 
 enum class FileStorage(val prefix: String, val additionalPaths: List<String>, val defaultHttpsGateway: String?) {
-    IPFS("ipfs://", listOf("ipfs/"), "https://image.w.kodadot.xyz/ipfs/"),
+    IPFS("ipfs://", listOf("ipfs/"), "https://bucket.chaotic.art/ipfs/"),
     HTTPS("https://", emptyList(), null),
     HTTP("http://", emptyList(), null);
 
