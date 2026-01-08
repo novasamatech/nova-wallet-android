@@ -111,6 +111,7 @@ class ConfirmBondMoreViewModel(
             fee = decimalFee,
             amount = payload.amount,
             stashAsset = stashAssetFlow.first(),
+            chain = selectedAssetState.chain(),
             stakeable = stakeableAmountFlow.first()
         )
 

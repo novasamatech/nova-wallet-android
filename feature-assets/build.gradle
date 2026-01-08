@@ -75,6 +75,8 @@ dependencies {
     implementation lifecycleDep
     ksp lifecycleCompiler
 
+    implementation androidxWebKit
+
     implementation bouncyCastleDep
 
     testImplementation jUnitDep

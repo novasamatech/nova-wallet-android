@@ -5,35 +5,35 @@
     <item
         android:id="@+id/walletFragment"
         android:enabled="true"
-        android:icon="@drawable/bottom_assets"
+        android:icon="@drawable/ic_new_year_assets"
         android:title="@string/wallet_assets"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/voteFragment"
         android:enabled="true"
-        android:icon="@drawable/bottom_vote"
+        android:icon="@drawable/ic_new_year_vote"
         android:title="@string/vote_vote"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/dAppsFragment"
         android:enabled="true"
-        android:icon="@drawable/bottom_dapps"
+        android:icon="@drawable/ic_new_year_dapp"
         android:title="@string/dapp_dapps"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/staking_dashboard_graph"
         android:enabled="true"
-        android:icon="@drawable/bottom_staking"
+        android:icon="@drawable/ic_new_year_staking"
         android:title="@string/tabbar_staking_title"
         app:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/profileFragment"
         android:enabled="true"
-        android:icon="@drawable/bottom_settings"
+        android:icon="@drawable/ic_new_year_settings"
         android:title="@string/profile_settings_title"
         app:showAsAction="ifRoom" />
 </menu>

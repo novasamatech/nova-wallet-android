@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_dapp_impl.web3.metamask.model
 
 import android.os.Parcelable
 import io.novafoundation.nova.common.utils.removeHexPrefix
+import io.novafoundation.nova.runtime.BuildConfig
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -20,7 +21,7 @@ data class MetamaskChain(
             chainId = "0x1",
             chainName = "Ethereum Mainnet",
             nativeCurrency = NativeCurrency(name = "Ether", symbol = "ETH", decimals = 18),
-            rpcUrls = listOf("https://mainnet.infura.io/v3/6b7733290b9a4156bf62a4ba105b76ec"),
+            rpcUrls = listOf("https://mainnet.infura.io/v3/${BuildConfig.INFURA_API_KEY}"),
             blockExplorerUrls = null,
             iconUrls = null
         )

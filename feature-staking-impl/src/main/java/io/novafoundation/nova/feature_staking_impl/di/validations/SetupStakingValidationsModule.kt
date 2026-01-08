@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.changeValidators
+import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 
 @Module
 class SetupStakingValidationsModule {
@@ -17,7 +18,8 @@ class SetupStakingValidationsModule {
     fun provideSetupStakingValidationSystem(
         stakingRepository: StakingRepository,
         stakingSharedComputation: StakingSharedComputation,
+        enoughTotalToStayAboveEDValidationFactory: EnoughTotalToStayAboveEDValidationFactory
     ): SetupStakingValidationSystem {
-        return ValidationSystem.changeValidators(stakingRepository, stakingSharedComputation)
+        return ValidationSystem.changeValidators(stakingRepository, stakingSharedComputation, enoughTotalToStayAboveEDValidationFactory)
     }
 }
