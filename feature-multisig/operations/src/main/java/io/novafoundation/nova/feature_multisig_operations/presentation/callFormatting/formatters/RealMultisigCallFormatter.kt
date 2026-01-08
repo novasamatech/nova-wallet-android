@@ -20,6 +20,9 @@ import io.novafoundation.nova.feature_multisig_operations.presentation.callForma
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.AmountConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountSign
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallTraversal
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.CallVisit
 import io.novafoundation.nova.runtime.extrinsic.visitor.call.api.collect
@@ -167,7 +170,13 @@ class RealMultisigCallFormatter @Inject constructor(
             title = delegateResult.title,
             primaryAmount = delegateResult.primaryAmount?.let {
                 val token = tokenUseCase.getToken(it.chainAssetId)
-                amountFormatter.formatAmountToAmountModel(it.amount, token)
+                amountFormatter.formatAmountToAmountModel(
+                    it.amount,
+                    token,
+                    config = AmountConfig(
+                        tokenConfig = TokenConfig(tokenAmountSign = AmountSign.NEGATIVE)
+                    )
+                )
             },
             tableEntries = delegateResult.tableEntries.map { it.toUi() },
             onBehalfOf = onBehalfOf
@@ -241,7 +250,7 @@ class RealMultisigCallFormatter @Inject constructor(
 
     private fun formatDetails(call: GenericCall.Instance): MultisigCallDetailsModel {
         return MultisigCallDetailsModel(
-            title = "${call.module.name}.${call.function.name}",
+            title = call.function.name.splitAndCapitalizeWords(),
             primaryAmount = null,
             tableEntries = emptyList(),
             onBehalfOf = null

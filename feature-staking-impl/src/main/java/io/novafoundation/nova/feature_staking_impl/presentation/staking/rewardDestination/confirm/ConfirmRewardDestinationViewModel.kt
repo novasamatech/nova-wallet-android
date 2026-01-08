@@ -138,7 +138,8 @@ class ConfirmRewardDestinationViewModel(
         val payload = RewardDestinationValidationPayload(
             availableControllerBalance = controllerAsset.transferable,
             fee = decimalFee,
-            stashState = stashState
+            stashState = stashState,
+            asset = controllerAssetFlow.first()
         )
 
         validationExecutor.requireValid(

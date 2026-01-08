@@ -122,6 +122,7 @@ class SelectBondMoreViewModel(
             fee = originFeeMixin.awaitFee(),
             amount = amountChooserMixin.amount.first(),
             stashAsset = assetFlow.first(),
+            chain = accountStakingFlow.first().chain,
             stakeable = stakeableBalance.first().decimalAmount
         )
 

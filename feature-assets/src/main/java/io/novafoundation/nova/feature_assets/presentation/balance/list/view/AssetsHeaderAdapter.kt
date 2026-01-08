@@ -183,7 +183,7 @@ class AssetsHeaderHolder(
         nftCount: MaskableModel<String>?,
         nftPreviews: MaskableModel<List<NftPreviewUi>>?,
         walletConnect: WalletConnectSessionsModel?,
-        pendingOperationsCountModel: PendingOperationsCountModel,
+        pendingOperationsCountModel: PendingOperationsCountModel
     ) {
         bindTotalBalance(totalBalance)
         bindMaskingEnabled(maskingEnabled)

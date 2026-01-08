@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_nft_impl.data.source.providers.kodadot.ne
 class KodadotNftsRequest(userAddress: String) {
 
     val query = """
-        {
-           nftEntities(where: {currentOwner_eq: "$userAddress"}) {
+        query nftListByOwner(${'$'}id: String!) {
+           nftEntities(where: {currentOwner_eq: ${'$'}id, burned_eq: false}) {
                id
                image
                metadata
@@ -19,4 +19,6 @@ class KodadotNftsRequest(userAddress: String) {
             }
         }
     """.trimIndent()
+
+    val variables = mapOf("id" to userAddress)
 }

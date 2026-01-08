@@ -374,13 +374,12 @@
         <item name="android:layout_height">32dp</item>
     </style>
 
-    <style name="Widget.Nova.ActionButton" parent="TextAppearance.AppCompat.Body2">
+    <style name="Widget.Nova.ActionButton" parent="TextAppearance.NovaFoundation.Regular.Caption2">
         <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">12dp</item>
-        <item name="android:gravity">center</item>
+        <item name="android:gravity">top|center_horizontal</item>
         <item name="android:drawableTint">@color/actions_color</item>
         <item name="android:textColor">@color/actions_color</item>
-        <item name="android:drawablePadding">4dp</item>
+        <item name="android:drawablePadding">8dp</item>
     </style>
 
     <style name="Widget.Nova.Checkbox" parent="">

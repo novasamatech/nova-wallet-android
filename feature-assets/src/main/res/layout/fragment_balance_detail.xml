@@ -127,10 +127,11 @@
                         <io.novafoundation.nova.feature_assets.presentation.balance.assetActions.AssetActionsView
                             android:id="@+id/balanceDetailActions"
                             android:layout_width="0dp"
-                            android:layout_height="@dimen/asset_height"
+                            android:layout_height="wrap_content"
                             android:layout_marginStart="16dp"
                             android:layout_marginTop="8dp"
                             android:layout_marginEnd="16dp"
+                            android:minHeight="@dimen/asset_height"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toBottomOf="@+id/balanceDetailsBalances" />

@@ -218,8 +218,8 @@ class StartParachainStakingViewModel(
             return selectedStakeTarget?.minimumStakeToGetRewards ?: collatorsUseCase.defaultMinimumStake()
         }
 
-        override suspend fun estimateFee(amount: Balance, targetId: AccountIdKey): Fee {
-            return interactor.estimateFee(amount, targetId.value)
+        override suspend fun estimateFee(amount: Balance, targetId: AccountIdKey?): Fee {
+            return interactor.estimateFee(amount, targetId?.value)
         }
     }
 }

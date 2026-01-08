@@ -200,7 +200,7 @@ class SetupStartMythosStakingViewModel(
             return interactor.minStake()
         }
 
-        override suspend fun estimateFee(amount: Balance, targetId: AccountIdKey): Fee {
+        override suspend fun estimateFee(amount: Balance, targetId: AccountIdKey?): Fee {
             return interactor.estimateFee(currentDelegatorStateFlow.first(), targetId, amount)
         }
     }

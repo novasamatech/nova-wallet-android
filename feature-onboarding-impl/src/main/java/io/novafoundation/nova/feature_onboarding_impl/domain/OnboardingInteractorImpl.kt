@@ -1,10 +1,12 @@
 package io.novafoundation.nova.feature_onboarding_impl.domain
 
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_onboarding_api.domain.OnboardingInteractor
 
 class OnboardingInteractorImpl(
-    private val cloudBackupService: CloudBackupService
+    private val cloudBackupService: CloudBackupService,
+    private val accountRepository: AccountRepository
 ) : OnboardingInteractor {
 
     override suspend fun checkCloudBackupIsExist(): Result<Boolean> {
@@ -12,7 +14,8 @@ class OnboardingInteractorImpl(
     }
 
     override suspend fun isCloudBackupAvailableForImport(): Boolean {
-        return !cloudBackupService.session.isSyncWithCloudEnabled()
+        return !cloudBackupService.session.isSyncWithCloudEnabled() &&
+            !accountRepository.hasActiveMetaAccounts()
     }
 
     override suspend fun signInToCloud(): Result<Unit> {

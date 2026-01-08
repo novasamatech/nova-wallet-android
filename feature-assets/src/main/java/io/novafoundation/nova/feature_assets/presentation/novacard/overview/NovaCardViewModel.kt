@@ -104,7 +104,7 @@ class NovaCardViewModel(
     }
 
     private suspend fun getTopUpChain(): Chain {
-        return chainRegistry.getChain(ChainGeneses.POLKADOT)
+        return chainRegistry.getChain(ChainGeneses.POLKADOT_ASSET_HUB)
     }
 
     private fun ensureCardCreationIsBlocking() {

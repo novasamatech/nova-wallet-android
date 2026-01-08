@@ -10,14 +10,14 @@ class WatchWalletSuggestion(
 
 interface WatchOnlyRepository {
 
-    suspend fun watchWalletSuggestions(): List<WatchWalletSuggestion>
+    fun watchWalletSuggestions(): List<WatchWalletSuggestion>
 }
 
 class RealWatchOnlyRepository(
     private val accountDao: MetaAccountDao
 ) : WatchOnlyRepository {
 
-    override suspend fun watchWalletSuggestions(): List<WatchWalletSuggestion> {
+    override fun watchWalletSuggestions(): List<WatchWalletSuggestion> {
         return listOf(
             WatchWalletSuggestion(
                 name = "\uD83C\uDF0C NOVA",

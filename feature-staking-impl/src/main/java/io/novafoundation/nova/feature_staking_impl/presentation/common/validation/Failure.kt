@@ -5,12 +5,14 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.preliminary.ParachainStakingUnbondPreliminaryValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure
-import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure.AmountLessThanMinimum
+import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure.NotEnoughStakeable
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure.CannotPayFee
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure.MaxNominatorsReached
-import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure.NotEnoughStakeable
+import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure.AmountLessThanMinimum
+import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.SetupStakingValidationFailure.NotEnoughFundToStayAboveED
 import io.novafoundation.nova.feature_staking_impl.domain.validations.setup.handleStakingMinimumBondError
 import io.novafoundation.nova.feature_wallet_api.domain.validation.amountIsTooBig
+import io.novafoundation.nova.feature_wallet_api.presentation.validation.handleInsufficientBalanceCommission
 
 fun stakingValidationFailure(
     reason: SetupStakingValidationFailure,
@@ -25,6 +27,11 @@ fun stakingValidationFailure(
             }
 
             is AmountLessThanMinimum -> handleStakingMinimumBondError(resourceManager, reason)
+
+            is NotEnoughFundToStayAboveED -> handleInsufficientBalanceCommission(
+                reason,
+                resourceManager
+            )
         }
     }
 
