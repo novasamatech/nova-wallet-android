@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.ScheduledDelegationRequestsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters.TotalDelegatedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.CurrentRoundRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.scheduledRequests.DelegationScheduledRequestFactory
 import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -124,12 +125,14 @@ class ParachainStakingUpdatersModule {
         stakingSharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource,
+        delegationScheduledRequestFactory: DelegationScheduledRequestFactory
     ) = ScheduledDelegationRequestsUpdater(
         scope = scope,
         storageCache = storageCache,
         stakingSharedState = stakingSharedState,
         chainRegistry = chainRegistry,
-        remoteStorageDataSource = storageDataSource
+        remoteStorageDataSource = storageDataSource,
+        delegationScheduledRequestFactory = delegationScheduledRequestFactory
     )
 
     @Provides

@@ -12,11 +12,11 @@ import io.novafoundation.nova.feature_staking_api.domain.model.parachain.Delegat
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindDelegatorState
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.scheduledRequests.DelegationScheduledRequestFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.chainAndAsset
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novafoundation.nova.runtime.storage.source.query.wrapSingleArgumentKeys
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +29,7 @@ class ScheduledDelegationRequestsUpdater(
     private val stakingSharedState: StakingSharedState,
     private val remoteStorageDataSource: StorageDataSource,
     private val chainRegistry: ChainRegistry,
+    private val delegationScheduledRequestFactory: DelegationScheduledRequestFactory
 ) : SharedStateBasedUpdater<MetaAccount> {
 
     override suspend fun listenForUpdates(
@@ -60,12 +61,12 @@ class ScheduledDelegationRequestsUpdater(
         blockHash: String
     ): Map<String, String?>? = when (delegatorState) {
         is DelegatorState.Delegator -> {
-            val delegatorIdsArgs = delegatorState.delegations.map { it.owner }.wrapSingleArgumentKeys()
-
             remoteStorageDataSource.query(chainId = delegatorState.chain.id, at = blockHash) {
-                runtime.metadata.parachainStaking().storage("DelegationScheduledRequests").entriesRaw(delegatorIdsArgs)
+                delegationScheduledRequestFactory.create()
+                    .entriesRaw(delegatorState)
             }
         }
+
         is DelegatorState.None -> null
     }
 }
