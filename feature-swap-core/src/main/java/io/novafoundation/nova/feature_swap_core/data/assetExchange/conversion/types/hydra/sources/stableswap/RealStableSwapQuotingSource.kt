@@ -276,8 +276,7 @@ private class RealStableSwapQuotingSource(
         tradabilities: Map<HydraDxAssetId, Tradeability>
     ): Map<HydraDxAssetId, StableSwapPoolInfo> {
         return this.filter { (poolId, _) ->
-            val tradability = tradabilities[poolId]
-            if (tradability == null) return@filter true
+            val tradability = tradabilities[poolId] ?: return@filter true
 
             tradability.canBuy() && tradability.canSell()
         }
