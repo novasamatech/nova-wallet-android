@@ -59,7 +59,7 @@ class NewDelegationScheduledRequestExecutor : DelegationScheduledRequestExecutor
                     delegatorId = key.delegatorId.fromHex()
                 )
             }
-        ).mapNotNull { it.values.firstOrNull() }
+        ).mapNotNull { it.values.flatMap { it.orEmpty() } }
     }
 
     context(StorageQueryContext)
