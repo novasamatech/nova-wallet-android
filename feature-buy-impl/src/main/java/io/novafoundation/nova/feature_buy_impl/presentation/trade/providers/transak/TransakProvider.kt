@@ -11,7 +11,7 @@ const val TRANSAK_NETWORK_KEY = "network"
 
 class TransakProvider(
     private val host: String,
-    private val apiKey: String,
+    private val referrerDomain: String,
     private val environment: String
 ) : WebViewIntegrationProvider {
 
@@ -59,7 +59,7 @@ class TransakProvider(
         return TransakIntegrator(
             payload = TransakIntegrator.Payload(
                 host = host,
-                apiKey = apiKey,
+                referrerDomain = referrerDomain,
                 environment = environment,
                 network = network,
                 tokenSymbol = chainAsset.symbol,

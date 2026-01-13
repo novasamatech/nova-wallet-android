@@ -22,8 +22,8 @@ class TransakIntegrator(
 
     class Payload(
         val host: String,
-        val apiKey: String,
         val network: String?,
+        val referrerDomain: String,
         val environment: String,
         val tokenSymbol: TokenSymbol,
         val address: String,
@@ -42,9 +42,9 @@ class TransakIntegrator(
             .scheme("https")
             .authority(payload.host)
             .appendQueryParameter("productsAvailed", payload.tradeFlow.getType())
-            .appendQueryParameter("apiKey", payload.apiKey)
             .appendQueryParameter("environment", payload.environment)
             .appendQueryParameter("cryptoCurrencyCode", payload.tokenSymbol.value)
+            .appendQueryParameter("referrerDomain", payload.referrerDomain)
             .appendNullableQueryParameter(TRANSAK_NETWORK_KEY, payload.network)
 
         if (payload.tradeFlow == TradeTokenRegistry.TradeType.BUY) {
