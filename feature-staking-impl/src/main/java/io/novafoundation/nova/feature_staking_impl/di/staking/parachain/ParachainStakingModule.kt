@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RuntimeParachainStakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.scheduledRequests.DelegationScheduledRequestFactory
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.turing.repository.TuringStakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.validators.ValidatorsPreferencesSource
@@ -54,10 +55,19 @@ class ParachainStakingModule {
 
     @Provides
     @FeatureScope
+    fun provideDelegationScheduledRequestFactory() = DelegationScheduledRequestFactory()
+
+    @Provides
+    @FeatureScope
     fun provideDelegatorStateRepository(
         @Named(LOCAL_STORAGE_SOURCE) localDataSource: StorageDataSource,
         @Named(REMOTE_STORAGE_SOURCE) remoteDataSource: StorageDataSource,
-    ): DelegatorStateRepository = RealDelegatorStateRepository(localStorage = localDataSource, remoteStorage = remoteDataSource)
+        delegationScheduledRequestFactory: DelegationScheduledRequestFactory
+    ): DelegatorStateRepository = RealDelegatorStateRepository(
+        localStorage = localDataSource,
+        remoteStorage = remoteDataSource,
+        delegationScheduledRequestFactory
+    )
 
     @Provides
     @FeatureScope
