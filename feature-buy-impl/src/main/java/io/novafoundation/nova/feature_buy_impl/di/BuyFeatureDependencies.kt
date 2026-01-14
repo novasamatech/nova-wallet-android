@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_buy_impl.di
 
+import android.content.Context
 import com.google.gson.Gson
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -11,6 +12,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
 interface BuyFeatureDependencies {
+
+    val context: Context
 
     val amountFormatter: AmountFormatter
 

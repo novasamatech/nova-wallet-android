@@ -984,6 +984,8 @@
     <string name="multisig_deposit">Multisig letét</string>
     <string name="multisig_deposit_description">A letét zárolva marad a letétbe helyező számláján, amíg a multisig művelet végrehajtásra nem kerül, vagy el nem utasítják.</string>
     <string name="multisig_extrinsic_details_subtitle">Győződjön meg róla, hogy a művelet helyes</string>
+    <string name="multisig_gifts_not_supported_message">Ajándékok létrehozásához vagy kezeléséhez kérjük váltson egy másik típusú tárcára.</string>
+    <string name="multisig_gifts_not_supported_title">Ajándékozás nem támogatott többaláírásos tárcákhoz</string>
     <string name="multisig_notification_executed_transaction_message">Által aláírva és végrehajtva: %s.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Multiszignós tranzakció végrehajtva</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s a %s-on.</string>

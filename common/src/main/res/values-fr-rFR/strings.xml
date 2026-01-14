@@ -984,6 +984,8 @@
     <string name="multisig_deposit">Dépôt multisig</string>
     <string name="multisig_deposit_description">Le dépôt reste bloqué sur le compte du déposant jusqu\'à ce que l\'opération multisig soit exécutée ou rejetée.</string>
     <string name="multisig_extrinsic_details_subtitle">Assurez-vous que l\'opération est correcte</string>
+    <string name="multisig_gifts_not_supported_message">Pour créer ou gérer des cadeaux, veuillez passer à un autre type de portefeuille.</string>
+    <string name="multisig_gifts_not_supported_title">Les cadeaux ne sont pas pris en charge pour les portefeuilles Multisig</string>
     <string name="multisig_notification_executed_transaction_message">Signée et exécutée par %s.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Transaction multisig exécutée</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s sur %s.</string>

@@ -74,6 +74,7 @@ class SelectHardwareWalletBottomSheet(
             iconRes = config.common.iconRes,
             titleRes = config.common.nameRes,
             showArrow = true,
+            applyIconTint = false,
             onClick = { onSuccess(HardwareWalletModel.PolkadotVault(variant)) }
         )
     }

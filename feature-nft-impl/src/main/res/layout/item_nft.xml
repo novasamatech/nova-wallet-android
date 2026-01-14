@@ -22,11 +22,10 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-
     <LinearLayout
         android:id="@+id/itemNftContent"
         android:layout_width="match_parent"
-        android:layout_height="262dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
         <ImageView

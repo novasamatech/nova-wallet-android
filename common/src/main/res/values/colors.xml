@@ -162,12 +162,4 @@
     <color name="neutral_price_chart_line">#454968</color>
     <color name="positive_price_chart_line">#2FC864</color>
     <color name="negative_price_chart_line">#E53450</color>
-
-    <color name="new_year_assets">#37C66B</color>
-    <color name="new_year_vote">#FFE188</color>
-    <color name="new_year_dapps">#CAC8FF</color>
-    <color name="new_year_staking">#FF5E61</color>
-    <color name="new_year_settings">#9BE9FF</color>
-    <color name="new_year_chip">#1F498E</color>
-
 </resources>

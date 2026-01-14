@@ -984,6 +984,8 @@
     <string name="multisig_deposit">Çoklu imza depozitosu</string>
     <string name="multisig_deposit_description">Depozito, çoklu imza işlemi gerçekleşene veya reddedilene kadar yatıranın hesabında kilitli kalır.</string>
     <string name="multisig_extrinsic_details_subtitle">İşlemin doğru olduğundan emin olun</string>
+    <string name="multisig_gifts_not_supported_message">Hediyeler oluşturmak veya yönetmek için lütfen farklı bir cüzdan türüne geçin.</string>
+    <string name="multisig_gifts_not_supported_title">Çoklu imza cüzdanları için hediye gönderme desteklenmiyor</string>
     <string name="multisig_notification_executed_transaction_message">%s tarafından imzalandı ve yürütüldü.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Multisig işlemi gerçekleştirildi</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s üzerinde %s.</string>

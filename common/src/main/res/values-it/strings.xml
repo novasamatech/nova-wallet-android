@@ -984,6 +984,8 @@
     <string name="multisig_deposit">Deposito multisig</string>
     <string name="multisig_deposit_description">Il deposito rimane bloccato sul conto del depositante fino a quando l\'operazione multisig non è eseguita o rifiutata.</string>
     <string name="multisig_extrinsic_details_subtitle">Assicurati che l\'operazione sia corretta</string>
+    <string name="multisig_gifts_not_supported_message">Per creare o gestire regali, per favore cambia tipo di portafoglio.</string>
+    <string name="multisig_gifts_not_supported_title">I regali non sono supportati per i wallet Multisig</string>
     <string name="multisig_notification_executed_transaction_message">Firmato ed eseguito da %s.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Transazione multisig eseguita</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s su %s.</string>

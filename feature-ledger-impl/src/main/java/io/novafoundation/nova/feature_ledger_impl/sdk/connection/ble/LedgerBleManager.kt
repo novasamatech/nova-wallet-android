@@ -21,9 +21,10 @@ class LedgerBleManager(
 ) : BleManager(contextManager.getApplicationContext()), DataReceivedCallback {
 
     companion object {
-        fun getSupportedLedgerDevicesInfo(): List<BleDevice.Supported> {
-            return LedgerDeviceType.values()
+        fun getSupportedLedgerDevicesInfo(): List<BleDevice.Supported.Spec> {
+            return LedgerDeviceType.entries
                 .mapNotNull { it.bleDevice as? BleDevice.Supported }
+                .flatMap { it.specs.toList() }
         }
     }
 

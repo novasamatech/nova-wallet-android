@@ -2,6 +2,6 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
 
     <corners android:radius="8dp" />
-    <solid android:color="@color/new_year_chip" />
+    <solid android:color="@color/chip_on_card_background" />
 
 </shape>

@@ -16,7 +16,6 @@ import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -59,7 +58,7 @@ class NewDelegationScheduledRequestExecutor : DelegationScheduledRequestExecutor
                     delegatorId = key.delegatorId.fromHex()
                 )
             }
-        ).mapNotNull { it.values.firstOrNull() }
+        ).mapNotNull { instances -> instances.values.flatMap { it.orEmpty() } }
     }
 
     context(StorageQueryContext)

@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.t
 
 import io.novafoundation.nova.common.utils.stableSwap
 import io.novafoundation.nova.common.utils.stableSwapOrNull
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.Tradeability
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.bindTradeability
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StableSwapPoolInfo
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StalbeSwapPoolPegInfo
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.bindPoolPegInfo
@@ -37,4 +39,13 @@ val StableSwapApi.poolPegs: QueryableStorageEntry1<HydraDxAssetId, StalbeSwapPoo
     get() = storage1(
         name = "PoolPegs",
         binding = { decoded, _ -> bindPoolPegInfo(decoded) },
+    )
+
+context(StorageQueryContext)
+val StableSwapApi.assetTradability: QueryableStorageEntry1<HydraDxAssetId, Tradeability>
+    get() = storage1(
+        name = "AssetTradability",
+        binding = { decoded, _ ->
+            bindTradeability(decoded)
+        },
     )

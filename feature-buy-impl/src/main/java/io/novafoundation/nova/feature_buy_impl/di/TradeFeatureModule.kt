@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_buy_impl.di
 
+import android.content.Context
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -88,12 +89,12 @@ class BuyFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideTransakProvider(): TransakProvider {
+    fun provideTransakProvider(context: Context): TransakProvider {
         val environment = if (BuildConfig.DEBUG) "STAGING" else "PRODUCTION"
 
         return TransakProvider(
             host = BuildConfig.TRANSAK_HOST,
-            apiKey = BuildConfig.TRANSAK_TOKEN,
+            referrerDomain = context.packageName,
             environment = environment
         )
     }

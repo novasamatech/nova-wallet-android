@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.withSave
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.getColorOrNull
 import io.novafoundation.nova.common.view.parallaxCard.gyroscope.CardGyroscopeListener
@@ -81,20 +82,28 @@ open class ParallaxCardView @JvmOverloads constructor(
 
         parallaxLayers = listOf(
             ParallaxLayer(
-                id = "paralax_1",
-                bitmapId = R.drawable.ic_frost_bg,
-                alpha = 1f,
-                withHighlighting = false,
-                blurRadius = 0,
-                travelVector = TravelVector(0f, 0f)
-            ),
-            ParallaxLayer(
-                id = "paralax_2",
-                bitmapId = R.drawable.ic_frost_parallax_bg,
+                id = "parallax_1",
+                bitmapId = R.drawable.ic_big_star,
                 alpha = 1f,
                 withHighlighting = true,
                 blurRadius = 0,
-                travelVector = TravelVector(0f, 0f)
+                travelVector = TravelVector((-7).dpF(context), (-3).dpF(context))
+            ),
+            ParallaxLayer(
+                id = "parallax_2",
+                bitmapId = R.drawable.ic_middle_star,
+                alpha = 1f,
+                withHighlighting = true,
+                blurRadius = 2.dp(context),
+                travelVector = TravelVector((15).dpF(context), (8).dpF(context))
+            ),
+            ParallaxLayer(
+                id = "parallax_3",
+                bitmapId = R.drawable.ic_small_star,
+                alpha = 1f,
+                withHighlighting = true,
+                blurRadius = 3.dp(context),
+                travelVector = TravelVector((25).dpF(context), (19).dpF(context))
             )
         )
 

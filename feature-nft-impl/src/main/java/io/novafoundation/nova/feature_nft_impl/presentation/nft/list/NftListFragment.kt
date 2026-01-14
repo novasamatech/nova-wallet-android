@@ -30,7 +30,6 @@ class NftListFragment : BaseFragment<NftListViewModel, FragmentNftListBinding>()
     override fun initViews() {
         binder.nftListBack.setOnClickListener { viewModel.backClicked() }
 
-        binder.nftListNfts.setHasFixedSize(true)
         binder.nftListNfts.adapter = adapter
         binder.nftListNfts.itemAnimator = null
 

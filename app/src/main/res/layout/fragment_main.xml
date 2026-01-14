@@ -23,6 +23,7 @@
         app:elevation="0dp"
         app:itemTextAppearanceActive="@style/BottomNavigationView"
         app:itemTextAppearanceInactive="@style/BottomNavigationView"
+        app:itemTextColor="@drawable/bottom_navigation_tint_color_selector"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigations" />
