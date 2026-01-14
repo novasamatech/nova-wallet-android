@@ -976,6 +976,8 @@
     <string name="multisig_deposit">Đặt cọc đa chữ ký</string>
     <string name="multisig_deposit_description">Khoản đặt cọc sẽ bị khóa trên tài khoản của người gửi tiền cho đến khi thao tác đa chữ ký được thực hiện hoặc bị từ chối.</string>
     <string name="multisig_extrinsic_details_subtitle">Hãy chắc chắn rằng thao tác là đúng</string>
+    <string name="multisig_gifts_not_supported_message">Để tạo hoặc quản lý quà tặng, vui lòng chuyển sang loại ví khác.</string>
+    <string name="multisig_gifts_not_supported_title">Tính năng tặng quà không được hỗ trợ cho ví Multisig</string>
     <string name="multisig_notification_executed_transaction_message">Đã ký và thực hiện bởi %s.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Giao dịch multisig đã thực hiện</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s trên %s.</string>

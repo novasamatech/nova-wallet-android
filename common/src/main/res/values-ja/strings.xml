@@ -976,6 +976,8 @@
     <string name="multisig_deposit">マルチシグ預金</string>
     <string name="multisig_deposit_description">この預金は、マルチシグ操作が実行または拒否されるまで預金者のアカウントにロックされます。</string>
     <string name="multisig_extrinsic_details_subtitle">操作が正しいことを確認してください</string>
+    <string name="multisig_gifts_not_supported_message">ギフトを作成または管理するには、別の種類のウォレットに切り替えてください。</string>
+    <string name="multisig_gifts_not_supported_title">マルチシグウォレットではギフト機能はサポートされていません</string>
     <string name="multisig_notification_executed_transaction_message">%s により署名され、実行されました。</string>
     <string name="multisig_notification_executed_transaction_title">✅ マルチシグトランザクションが実行されました</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s が %s で。</string>
