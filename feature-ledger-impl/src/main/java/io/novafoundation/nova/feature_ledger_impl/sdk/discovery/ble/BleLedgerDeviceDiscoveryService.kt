@@ -7,7 +7,6 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.os.ParcelUuid
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
-import io.novafoundation.nova.feature_ledger_api.sdk.device.BleDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
 import io.novafoundation.nova.feature_ledger_api.sdk.device.supportedBleSpecs
