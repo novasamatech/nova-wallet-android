@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.feature_ledger_api.sdk.device.BleDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDeviceType
+import io.novafoundation.nova.feature_ledger_api.sdk.device.supportedBleSpecs
 import io.novafoundation.nova.feature_ledger_api.sdk.discovery.DiscoveryMethods
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.BleConnection
 import io.novafoundation.nova.feature_ledger_impl.sdk.connection.ble.LedgerBleManager
@@ -79,16 +80,12 @@ class BleLedgerDeviceDiscoveryService(
             val searchingServiceUUIDs = this.scanRecord?.serviceUuids
                 .orEmpty()
                 .map { it.uuid }
+                .toSet()
 
-            for (ledgerDeviceType in LedgerDeviceType.values()) {
-                val bleInfo = ledgerDeviceType.bleDevice as? BleDevice.Supported ?: continue
-
-                if (bleInfo.serviceUuid in searchingServiceUUIDs) {
-                    return ledgerDeviceType
-                }
+            return LedgerDeviceType.entries.find {
+                val supportedServicesIds = it.supportedBleSpecs().map { it.serviceUuid }.toSet()
+                supportedServicesIds.intersect(searchingServiceUUIDs).isNotEmpty()
             }
-
-            return null
         }
     }
 }
