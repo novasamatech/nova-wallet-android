@@ -976,6 +976,8 @@
     <string name="multisig_deposit">다중 서명 예치금</string>
     <string name="multisig_deposit_description">예치금은 다중 서명 작업이 실행되거나 거부될 때까지 입금자 계정에 잠겨 있습니다.</string>
     <string name="multisig_extrinsic_details_subtitle">작업이 올바른지 확인하십시오</string>
+    <string name="multisig_gifts_not_supported_message">선물을 생성하거나 관리하려면 다른 유형의 지갑으로 전환하세요.</string>
+    <string name="multisig_gifts_not_supported_title">멀티시그 지갑에서는 선물하기가 지원되지 않습니다</string>
     <string name="multisig_notification_executed_transaction_message">%s에 의해 서명 및 실행되었습니다.</string>
     <string name="multisig_notification_executed_transaction_title">✅ 멀티시그 거래 실행 완료</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s에서 %s.</string>
