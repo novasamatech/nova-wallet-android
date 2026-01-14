@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <!--<string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>-->
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
+
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
+
     <string name="multisig_gifts_not_supported_title">Gifting is not supported for Multisig wallets</string>
     <string name="multisig_gifts_not_supported_message">To create or manage gifts, please switch to a different type of wallet.</string>
 
@@ -380,7 +385,6 @@
 
     <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot app)</string>
 
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
     <string name="account_parity_signer_show_mode_legacy">Legacy</string>
     <string name="account_parity_signer_show_mode_new">New (Vault v7+)</string>
 
