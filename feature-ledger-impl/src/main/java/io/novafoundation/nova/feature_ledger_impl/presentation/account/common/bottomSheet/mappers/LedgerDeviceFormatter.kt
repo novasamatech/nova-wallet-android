@@ -16,6 +16,7 @@ class LedgerDeviceFormatter(private val resourceManager: ResourceManager) {
             LedgerDeviceType.NANO_X -> LedgerNanoXUIMapperDelegate(resourceManager, device)
             LedgerDeviceType.NANO_S_PLUS -> LedgerNanoSPlusMapperDelegate(resourceManager, device)
             LedgerDeviceType.NANO_S -> LedgerNanoSMapperDelegate(resourceManager, device)
+            LedgerDeviceType.NANO_GEN5 -> LedgerNanoGen5UIMapperDelegate(resourceManager, device)
         }
     }
 }

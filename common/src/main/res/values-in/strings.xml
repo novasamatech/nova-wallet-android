@@ -976,6 +976,8 @@
     <string name="multisig_deposit">Deposit multisig</string>
     <string name="multisig_deposit_description">Deposit tetap terkunci di akun penyetor hingga operasi multisig dieksekusi atau ditolak.</string>
     <string name="multisig_extrinsic_details_subtitle">Pastikan operasi ini benar</string>
+    <string name="multisig_gifts_not_supported_message">Untuk membuat atau mengelola hadiah, silakan beralih ke jenis dompet yang berbeda.</string>
+    <string name="multisig_gifts_not_supported_title">Pemberian hadiah tidak didukung untuk dompet Multisig</string>
     <string name="multisig_notification_executed_transaction_message">Ditandatangani dan dieksekusi oleh %s.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Transaksi multisig dieksekusi</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s pada %s.</string>

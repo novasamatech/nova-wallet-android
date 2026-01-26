@@ -1000,6 +1000,8 @@
     <string name="multisig_deposit">Depozyt multisig</string>
     <string name="multisig_deposit_description">Depozyt pozostaje zablokowany na koncie depozytariusza do momentu wykonania lub odrzucenia operacji multisig.</string>
     <string name="multisig_extrinsic_details_subtitle">Upewnij się, że operacja jest poprawna</string>
+    <string name="multisig_gifts_not_supported_message">Aby utworzyć lub zarządzać prezentami, proszę przełączyć się na inny typ portfela.</string>
+    <string name="multisig_gifts_not_supported_title">Obdarowywanie nie jest obsługiwane dla portfeli Multisig</string>
     <string name="multisig_notification_executed_transaction_message">Podpisano i wykonano przez %s.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Transakcja multisig wykonana</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s na %s.</string>

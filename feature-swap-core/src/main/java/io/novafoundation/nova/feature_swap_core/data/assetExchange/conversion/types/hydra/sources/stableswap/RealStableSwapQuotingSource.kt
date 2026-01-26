@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.RemoteAndLocalIdOptional
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.Tradeability
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.flatten
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.omniPoolAccountId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.model.StablePool
@@ -265,7 +266,19 @@ private class RealStableSwapQuotingSource(
 
     private suspend fun getPools(): Map<HydraDxAssetId, StableSwapPoolInfo> {
         return remoteStorageSource.query(chain.id) {
+            val tradabilities = runtime.metadata.stableSwapOrNull?.assetTradability?.entries().orEmpty()
             runtime.metadata.stableSwapOrNull?.pools?.entries().orEmpty()
+                .filterByTradability(tradabilities)
+        }
+    }
+
+    private fun Map<HydraDxAssetId, StableSwapPoolInfo>.filterByTradability(
+        tradabilities: Map<HydraDxAssetId, Tradeability>
+    ): Map<HydraDxAssetId, StableSwapPoolInfo> {
+        return this.filter { (poolId, _) ->
+            val tradability = tradabilities[poolId] ?: return@filter true
+
+            tradability.canBuy() && tradability.canSell()
         }
     }
 

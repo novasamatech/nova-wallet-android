@@ -37,7 +37,7 @@ class ParallaxCardResourceManager(
     val cardHighlightBitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_card_background_highlight)
     val cardBorderHighlightBitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_card_border_highlight)
     val nestedViewBorderHighlightBitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_frosted_glass_highlight)
-    val parallaxHighlightBitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_card_highlight)
+    val parallaxHighlightBitmap: Bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.ic_pattern_highlight)
 
     // Shaders
     var cardHighlightShader: BitmapShaderHelper = cardHighlightBitmap.toBitmapShaderHelper()

@@ -984,6 +984,8 @@
     <string name="multisig_deposit">Depósito multisig</string>
     <string name="multisig_deposit_description">O depósito permanece bloqueado na conta do depositante até que a operação multisig seja executada ou rejeitada.</string>
     <string name="multisig_extrinsic_details_subtitle">Certifique-se de que a operação está correta</string>
+    <string name="multisig_gifts_not_supported_message">Para criar ou gerenciar presentes, mude para um tipo diferente de carteira.</string>
+    <string name="multisig_gifts_not_supported_title">Presentear não é suportado para carteiras Multisig</string>
     <string name="multisig_notification_executed_transaction_message">Assinado e executado por %s.</string>
     <string name="multisig_notification_executed_transaction_title">✅ Transação multisig executada</string>
     <string name="multisig_notification_init_transaction_message" formatted="false">%s em %s.</string>
