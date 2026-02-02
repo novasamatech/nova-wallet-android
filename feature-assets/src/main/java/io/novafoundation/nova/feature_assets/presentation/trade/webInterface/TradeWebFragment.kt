@@ -27,6 +27,7 @@ class TradeWebFragment : BaseFragment<TradeWebViewModel, FragmentTradeWebInterfa
             allowContentAccess = true
             useWideViewPort = true
             displayZoomControls = false
+            mediaPlaybackRequiresUserGesture = false
 
             javaScriptCanOpenWindowsAutomatically = true
             setSupportMultipleWindows(true)
