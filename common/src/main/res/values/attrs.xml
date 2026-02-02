@@ -355,6 +355,8 @@
         <attr name="android:icon" />
         <attr name="iconTint" />
         <attr name="android:text" />
+        <attr name="android:textAppearance" />
+        <attr name="android:textColor" />
     </declare-styleable>
 
     <declare-styleable name="TapToViewContainer">

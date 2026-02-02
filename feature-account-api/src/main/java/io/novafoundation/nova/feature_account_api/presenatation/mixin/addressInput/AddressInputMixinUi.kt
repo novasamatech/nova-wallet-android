@@ -1,17 +1,20 @@
 package io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput
 
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.utils.SingletonDialogHolder
 import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.keyboard.isKeyboardVisible
 import io.novafoundation.nova.common.utils.keyboard.setKeyboardVisibilityListener
+import io.novafoundation.nova.common.utils.observe
 import io.novafoundation.nova.common.view.bottomSheet.list.dynamic.DynamicListBottomSheet
 import io.novafoundation.nova.feature_account_api.R
 import io.novafoundation.nova.feature_account_api.presenatation.account.external.ExternalAccountsBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ErrorEvent
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ShowBottomSheetEvent
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
+import kotlinx.coroutines.CoroutineScope
 
 fun BaseFragment<*, *>.setupAddressInput(
     mixin: AddressInputMixin,
@@ -26,6 +29,22 @@ fun BaseFragment<*, *>.setupAddressInput(
 
     mixin.state.observe(::setState)
 }
+
+fun setupAddressInput(
+    scope: LifecycleCoroutineScope,
+    mixin: AddressInputMixin,
+    inputField: AddressInputField
+) = with(inputField) {
+    content.bindTo(mixin.inputFlow, scope)
+
+    onScanClicked { mixin.scanClicked() }
+    onPasteClicked { mixin.pasteClicked() }
+    onClearClicked { mixin.clearClicked() }
+    onMyselfClicked { mixin.myselfClicked() }
+
+    mixin.state.observe(scope, ::setState)
+}
+
 
 /**
  * Make sure that the insets are not consumed by the layer above for this method to work correctly
@@ -130,6 +149,7 @@ private fun BaseFragment<*, *>.handleError(event: ErrorEvent) {
                 exception.chainName
             )
         }
+
         is Web3NamesException.UnsupportedAsset -> {
             getString(R.string.web3names_unsupported_asset_title, exception.chainAsset.symbol) to getString(
                 R.string.web3names_unsupported_asset_message,

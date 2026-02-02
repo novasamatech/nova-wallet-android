@@ -21,7 +21,5 @@ class WatchOnlyModule {
 
     @Provides
     @FeatureScope
-    fun provideWatchOnlyRepository(
-        accountDao: MetaAccountDao
-    ): WatchOnlyRepository = RealWatchOnlyRepository(accountDao)
+    fun provideWatchOnlyRepository(): WatchOnlyRepository = RealWatchOnlyRepository()
 }

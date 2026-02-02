@@ -6,6 +6,7 @@ import com.google.android.material.tabs.TabLayout
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.utils.createTab
 import io.novafoundation.nova.common.utils.setTabSelectedListener
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -52,12 +53,5 @@ class DelegatedAccountUpdatesBottomSheet : BaseBottomSheetFragment<DelegatedAcco
         observeBrowserEvents(viewModel)
         viewModel.filtersAvailableFlow.observe { binder.delegatedAccountUpdatesMode.isVisible = it }
         viewModel.accounts.observe { adapter.submitList(it) }
-    }
-
-    private fun TabLayout.createTab(textResId: Int) {
-        val tab = newTab()
-        tab.setText(textResId)
-
-        addTab(tab)
     }
 }

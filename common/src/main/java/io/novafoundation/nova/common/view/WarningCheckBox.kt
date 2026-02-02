@@ -35,6 +35,14 @@ class WarningCheckBox @JvmOverloads constructor(
         binder.warningCheckBoxCheckBox.text = text
     }
 
+    fun setTextColor(color: Int) {
+        binder.warningCheckBoxCheckBox.setTextColor(color)
+    }
+
+    fun setTextAppearance(appearanceRes: Int?) {
+        appearanceRes?.let { binder.warningCheckBoxCheckBox.setTextAppearance(appearanceRes) }
+    }
+
     fun setIconTintColor(color: Int) {
         binder.warningCheckBoxIcon.setImageTint(color)
     }
@@ -51,10 +59,14 @@ class WarningCheckBox @JvmOverloads constructor(
         val iconRes = it.getResourceIdOrNull(R.styleable.WarningCheckBox_android_icon)
         val iconTint = it.getColorOrNull(R.styleable.WarningCheckBox_iconTint)
         val text = it.getString(R.styleable.WarningCheckBox_android_text)
+        val textAppearance = it.getResourceIdOrNull(R.styleable.WarningCheckBox_android_textAppearance)
+        val textColor = it.getColorOrNull(R.styleable.WarningCheckBox_android_textColor)
 
         setIcon(iconRes)
         iconTint?.let(::setIconTintColor)
         setText(text)
+        setTextAppearance(textAppearance)
+        textColor?.let { setTextColor(textColor) }
     }
 
     override fun setChecked(checked: Boolean) {
