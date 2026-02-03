@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.insets.ImeInsetsState
+import io.novafoundation.nova.common.utils.sendEmailIntent
 import io.novafoundation.nova.common.utils.setTabSelectedListener
 import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.common.utils.toSpannable
@@ -61,6 +62,12 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
 
     override fun subscribe(viewModel: CreateWatchWalletViewModel) {
         viewModel.buttonState.observe(binder.createWatchWalletContinue::setState)
+
+        viewModel.scamWarningEvent.observeEvent {
+            runWarning(it)
+        }
+
+        viewModel.openEmailEvent.observeEvent { requireContext().sendEmailIntent(it) }
     }
 
     private fun getTermsText() = buildSpannedString {
@@ -69,5 +76,16 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
         val highlightColor = requireContext().getColor(R.color.text_negative)
         val highlightedPart = getString(R.string.create_wo_wallet_terms_highlighted).toSpannable(colorSpan(highlightColor))
         append(highlightedPart)
+    }
+
+    private fun runWarning(payload: ScamRiskWarningBottomSheet.Payload) {
+        val bottomSheet = ScamRiskWarningBottomSheet(
+            requireContext(),
+            payload,
+            viewModel::onWarningConfirmed,
+            viewModel::onMailClicked
+        )
+
+        bottomSheet.show()
     }
 }

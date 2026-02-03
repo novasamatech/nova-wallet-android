@@ -383,4 +383,9 @@
             <enum name="end" value="2" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="DelayedMaterialButton">
+        <attr name="delayDuration" format="integer" />
+        <attr name="progressColor" format="color" />
+    </declare-styleable>
 </resources>

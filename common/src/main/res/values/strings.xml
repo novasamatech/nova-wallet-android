@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="watch_only_scam_risk_warning_title">Scam Risk Warning!</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nThis is a scam. No one can share, grant access to, or unlock a watch-only wallet for you.\n\nIf someone asked you to add a wallet,\ncontact us %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">NEVER send money to anyone promising to unlock funds in a watch-only wallet.</string>
 
     <string name="watch_only_accept_terms">Accept terms</string>
 

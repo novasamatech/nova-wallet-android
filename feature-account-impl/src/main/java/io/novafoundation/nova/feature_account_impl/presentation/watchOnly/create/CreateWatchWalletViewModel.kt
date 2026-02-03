@@ -1,9 +1,14 @@
 package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isAddressValid
@@ -33,7 +38,8 @@ class CreateWatchWalletViewModel(
     private val addressInputMixinFactory: AddressInputMixinFactory,
     private val interactor: CreateWatchWalletInteractor,
     private val accountInteractor: AccountInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val appLinksProvider: AppLinksProvider
 ) : BaseViewModel() {
 
     private val customPage = createCustomPage()
@@ -73,6 +79,12 @@ class CreateWatchWalletViewModel(
         }
     }.shareInBackground()
 
+    private val _scamWarningEvent = MutableLiveData<Event<ScamRiskWarningBottomSheet.Payload>>()
+    val scamWarningEvent: LiveData<Event<ScamRiskWarningBottomSheet.Payload>> = _scamWarningEvent
+
+    private val _openEmailEvent = MutableLiveData<Event<String>>()
+    val openEmailEvent: LiveData<Event<String>> = _openEmailEvent
+
     fun homeButtonClicked() {
         router.back()
     }
@@ -85,7 +97,15 @@ class CreateWatchWalletViewModel(
         selectedMode.value = WatchOnlyAccountType.DEMO
     }
 
-    fun nextClicked() = launch {
+    fun nextClicked() {
+        _scamWarningEvent.value = Event(ScamRiskWarningBottomSheet.Payload(appLinksProvider.email))
+    }
+
+    fun onMailClicked() {
+        _openEmailEvent.value = appLinksProvider.email.event()
+    }
+
+    fun onWarningConfirmed() = launch {
         val result = withContext(Dispatchers.Default) {
             interactor.createWallet(
                 name = nameFlow.first(),

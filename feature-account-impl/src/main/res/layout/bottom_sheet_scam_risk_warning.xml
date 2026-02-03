@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <View
+        style="@style/Widget.Nova.Puller"
+        android:layout_marginTop="6dp" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/scamWarningBottomSheetImage"
+        android:layout_width="88dp"
+        android:layout_height="88dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_icon_big"
+        android:padding="12dp"
+        android:src="@drawable/ic_warning_filled" />
+
+    <TextView
+        android:id="@+id/scamWarningBottomSheetTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp"
+        android:gravity="center"
+        android:text="@string/watch_only_scam_risk_warning_title"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        android:id="@+id/scamWarningBottomSheetSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/text_secondary"
+        tools:text="Message" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="false"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp">
+
+        <io.novafoundation.nova.common.view.PrimaryButtonV2
+            android:id="@+id/scamWarningBottomSheetCancel"
+            style="@style/Widget.Nova.MaterialButton.Secondary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_weight="1"
+            app:appearance="secondary"
+            android:text="@string/common_cancel" />
+
+        <io.novafoundation.nova.common.view.DelayedButton
+            android:id="@+id/scamWarningBottomSheetConfirm"
+            style="@style/Widget.Nova.MaterialButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/selector_button_text"
+            android:text="@string/common_i_understand"
+            app:backgroundTint="@color/selector_button_background_on_gradient_negative"
+            app:delayDuration="7000"
+            app:progressColor="@color/block_background" />
+
+    </LinearLayout>
+
+</LinearLayout>
