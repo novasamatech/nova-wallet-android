@@ -11,7 +11,6 @@ fun Result<Drawable>.toIdenticonState(): AddressInputState.IdenticonState {
     )
 }
 
-
 fun AddressInputMixin.mixinWithInputFlow(): Flow<MixinWithInput> {
     return inputFlow.map { MixinWithInput(this, it) }
 }

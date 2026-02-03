@@ -4,21 +4,11 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.RectF
-import android.graphics.drawable.Drawable
 import android.os.CountDownTimer
 import android.util.AttributeSet
-import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import com.github.razir.progressbutton.DrawableButton
-import com.github.razir.progressbutton.bindProgressButton
-import com.github.razir.progressbutton.hideProgress
-import com.github.razir.progressbutton.isProgressActive
-import com.github.razir.progressbutton.showProgress
 import com.google.android.material.button.MaterialButton
 import io.novafoundation.nova.common.R
-import io.novafoundation.nova.common.presentation.DescriptiveButtonState
-import io.novafoundation.nova.common.presentation.textOrNull
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.withClip
 

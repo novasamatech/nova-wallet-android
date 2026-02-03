@@ -15,9 +15,9 @@ class RealWatchOnlyRepository() : WatchOnlyRepository {
 
     override fun watchOnlyDemoAccount(): WatchWalletSuggestion {
         return WatchWalletSuggestion(
-                name = "NOVA DEMO WALLET",
-                substrateAddress = "1ChFWeNRLarAPRCTM3bfJmncJbSAbSS9yqjueWz7jX7iTVZ",
-                evmAddress = "0x7Aa98AEb3AfAcf10021539d5412c7ac6AfE0fb00"
-            )
+            name = "NOVA DEMO WALLET",
+            substrateAddress = "1ChFWeNRLarAPRCTM3bfJmncJbSAbSS9yqjueWz7jX7iTVZ",
+            evmAddress = "0x7Aa98AEb3AfAcf10021539d5412c7ac6AfE0fb00"
+        )
     }
 }

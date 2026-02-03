@@ -21,7 +21,6 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.setTextOrHide
-import io.novafoundation.nova.common.utils.updatePadding
 import io.novafoundation.nova.common.utils.useAttributes
 
 typealias SimpleAlertModel = String

@@ -14,7 +14,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.external
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ErrorEvent
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.externalAccount.AccountIdentifierProvider.Event.ShowBottomSheetEvent
 import io.novafoundation.nova.web3names.domain.exceptions.Web3NamesException
-import kotlinx.coroutines.CoroutineScope
 
 fun BaseFragment<*, *>.setupAddressInput(
     mixin: AddressInputMixin,
@@ -44,7 +43,6 @@ fun setupAddressInput(
 
     mixin.state.observe(scope, ::setState)
 }
-
 
 /**
  * Make sure that the insets are not consumed by the layer above for this method to work correctly

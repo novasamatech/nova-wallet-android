@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isAddressValid
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isInputValid
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isNotEmpty
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.mixinWithInputFlow

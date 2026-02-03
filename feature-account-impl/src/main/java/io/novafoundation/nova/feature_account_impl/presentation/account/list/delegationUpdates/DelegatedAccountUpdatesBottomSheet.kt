@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.list.de
 
 import androidx.core.view.isVisible
 import coil.ImageLoader
-import com.google.android.material.tabs.TabLayout
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents

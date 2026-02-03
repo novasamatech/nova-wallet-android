@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create
 
-import android.text.style.ImageSpan
 import android.view.View
 import androidx.core.text.buildSpannedString
 import androidx.core.text.color
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.buildSpannable
 import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.insets.ImeInsetsState
