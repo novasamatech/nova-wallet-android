@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+
+    <string name="watch_only_accept_terms">Accept terms</string>
+
     <string name="watch_only_wallet_evm_field_hint">0x...</string>
     <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="watch_only_wallet_name_field_hint">Watch-only wallet</string>
     <string name="watch_only_custom_title">Custom</string>
     <string name="watch_only_demo_title">Demo</string>
 
-    <string name="create_wo_wallet_terms">I understand that I will not be able to access or manage the funds from this wallet</string>
+    <string name="create_wo_wallet_terms">I understand I cannot access funds from a watch-only wallet.</string>
+    <string name="create_wo_wallet_terms_highlighted">Anyone asking for payment to unlock the funds is a scammer.</string>
 
     <!--<string name="account_watch_add_presets">Preset wallets</string>-->
-    <!--<string name="wallet_nickname_create_caption_v2_2_0">Name examples: Main account, My validator, Dotsama crowdloans, etc.</string>-->
     <!--<string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT and 50+ networks</string>-->
     <!--<string name="account_watch_add_evm_address_description">Moonbeam, Moonriver and other networks</string>-->
 
@@ -26,6 +29,8 @@
     <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
 
     <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
+
+    <string name="wallet_nickname_create_caption_v2_2_0">Name examples: Main account, My validator, Dotsama crowdloans, etc.</string>
 
     <string name="multisig_gifts_not_supported_title">Gifting is not supported for Multisig wallets</string>
     <string name="multisig_gifts_not_supported_message">To create or manage gifts, please switch to a different type of wallet.</string>

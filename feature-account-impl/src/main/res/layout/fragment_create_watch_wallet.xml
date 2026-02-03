@@ -19,6 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
+        android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingBottom="16dp">
 
@@ -59,7 +60,7 @@
                 android:id="@+id/createWatchWalletViewPager"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:overScrollMode="never"/>
+                android:overScrollMode="never" />
 
         </LinearLayout>
 
@@ -70,9 +71,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:text="@string/create_wo_wallet_terms"
         android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-        android:textColor="@color/text_primary" />
+        android:textColor="@color/text_primary"
+        tools:text="@string/create_wo_wallet_terms" />
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/createWatchWalletContinue"

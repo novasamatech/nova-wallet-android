@@ -1,13 +1,19 @@
 package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create
 
+import android.text.style.ImageSpan
 import android.view.View
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
 import androidx.lifecycle.lifecycleScope
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.buildSpannable
+import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
 import io.novafoundation.nova.common.utils.insets.ImeInsetsState
 import io.novafoundation.nova.common.utils.setTabSelectedListener
 import io.novafoundation.nova.common.utils.setupWithViewPager2
+import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.R
@@ -42,6 +48,8 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
         binder.createWatchWalletTerms.setOnCheckedChangeListener { _, isChecked -> viewModel.onTermsChecked(isChecked) }
 
         binder.createWatchWalletContinue.setOnClickListener { viewModel.nextClicked() }
+
+        binder.createWatchWalletTerms.setText(getTermsText())
     }
 
     override fun inject() {
@@ -53,5 +61,13 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
 
     override fun subscribe(viewModel: CreateWatchWalletViewModel) {
         viewModel.buttonState.observe(binder.createWatchWalletContinue::setState)
+    }
+
+    private fun getTermsText() = buildSpannedString {
+        append(getString(R.string.create_wo_wallet_terms))
+        appendLine()
+        val highlightColor = requireContext().getColor(R.color.text_negative)
+        val highlightedPart = getString(R.string.create_wo_wallet_terms_highlighted).toSpannable(colorSpan(highlightColor))
+        append(highlightedPart)
     }
 }

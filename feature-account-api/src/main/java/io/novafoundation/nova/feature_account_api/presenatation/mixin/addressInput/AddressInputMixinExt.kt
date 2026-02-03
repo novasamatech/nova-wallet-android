@@ -22,3 +22,5 @@ class MixinWithInput(
 )
 
 suspend fun MixinWithInput.isInputValid() = mixin.isAddressValid(input)
+
+suspend fun MixinWithInput.isNotEmpty() = input.isNotEmpty()

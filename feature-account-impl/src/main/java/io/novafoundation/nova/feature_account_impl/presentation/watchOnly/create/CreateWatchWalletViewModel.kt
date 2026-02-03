@@ -6,7 +6,9 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputMixinFactory
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isAddressValid
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isInputValid
+import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.isNotEmpty
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.mixinWithInputFlow
 import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setAddress
 import io.novafoundation.nova.feature_account_impl.R
@@ -20,6 +22,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.text.isNotEmpty
 
 enum class WatchOnlyAccountType {
     CUSTOM, DEMO
@@ -63,8 +66,9 @@ class CreateWatchWalletViewModel(
     ) { name, substrateAddress, evmAddress, termsChecked ->
         when {
             name.isEmpty() -> disabledStateFrom(R.string.account_enter_wallet_nickname)
-            !substrateAddress.isInputValid() && !evmAddress.isInputValid() -> disabledStateFrom(R.string.accoount_enter_substrate_address)
-            !termsChecked -> disabledStateFrom(R.string.common_continue)
+            !substrateAddress.isInputValid() -> disabledStateFrom(R.string.accoount_enter_substrate_address)
+            evmAddress.isNotEmpty() && !evmAddress.isInputValid() -> disabledStateFrom(R.string.accoount_enter_evm_address)
+            !termsChecked -> disabledStateFrom(R.string.watch_only_accept_terms)
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
     }.shareInBackground()
