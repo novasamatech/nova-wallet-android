@@ -42,15 +42,31 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <io.novafoundation.nova.common.view.AlertView
+        android:id="@+id/balanceListWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:visibility="gone"
+        app:styleBackgroundColor="@color/block_background"
+        app:styleIconTint="@color/icon_primary"
+        android:text="@string/assets_list_watch_only_warning"
+        app:AlertView_action="@string/common_learn_more"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/balanceListTotalTitle"
+        tools:visibility="visible" />
+
     <io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsTotalBalanceView
         android:id="@+id/balanceListTotalBalance"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="12dp"
         android:elevation="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/balanceListTotalTitle"
+        app:layout_constraintTop_toBottomOf="@id/balanceListWarning"
+        app:layout_goneMarginTop="24dp"
         tools:layout_height="200dp" />
 
     <androidx.legacy.widget.Space

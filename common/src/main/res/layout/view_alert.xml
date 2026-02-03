@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingBottom="10dp"
     tools:background="@color/block_background"
     tools:orientation="horizontal"
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout">
@@ -49,24 +48,12 @@
         android:layout_marginTop="10dp"
         android:includeFontPadding="false"
         android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toTopOf="@+id/alertSubMessageContainer"
         app:layout_constraintEnd_toStartOf="@+id/alertCloseButton"
         app:layout_constraintStart_toEndOf="@+id/alertIconContainer"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginBottom="10dp"
         tools:text="@tools:sample/lorem[20]" />
-
-    <TextView
-        android:id="@+id/alertActionContent"
-        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawablePadding="5dp"
-        android:includeFontPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:textColor="@color/button_text_accent"
-        app:layout_constraintStart_toStartOf="@+id/alertMessage"
-        app:layout_constraintTop_toBottomOf="@+id/alertSubMessageContainer"
-        tools:text="@string/common_how_it_works" />
 
     <LinearLayout
         android:id="@+id/alertSubMessageContainer"
@@ -75,9 +62,28 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="16dp"
         android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/alertActionContent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/alertIconContainer"
-        app:layout_constraintTop_toBottomOf="@id/alertMessage" />
+        app:layout_constraintTop_toBottomOf="@id/alertMessage"
+        app:layout_goneMarginBottom="10dp" />
+
+    <TextView
+        android:id="@+id/alertActionContent"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:drawablePadding="5dp"
+        android:includeFontPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/button_text_accent"
+        app:layout_constraintBottom_toTopOf="@+id/alertButton"
+        app:layout_constraintStart_toStartOf="@+id/alertMessage"
+        app:layout_constraintTop_toBottomOf="@+id/alertSubMessageContainer"
+        app:layout_goneMarginBottom="4dp"
+        tools:text="@string/common_how_it_works" />
 
     <ImageView
         android:id="@+id/alertActionArrow"
@@ -103,11 +109,10 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="2dp"
+        android:layout_marginBottom="12dp"
         android:visibility="gone"
         app:appearance="accentSecondaryTransparent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alertActionContent"
         app:size="small"
         tools:text="Do Something"
         tools:visibility="visible" />

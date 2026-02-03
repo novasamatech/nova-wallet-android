@@ -70,7 +70,8 @@ class NetworkModule {
             novaCardWidgetUrl = BuildConfig.NOVA_CARD_WIDGET_URL,
             unifiedAddressArticle = BuildConfig.UNIFIED_ADDRESS_ARTICLE,
             multisigsWikiUrl = BuildConfig.MULTISIGS_WIKI_URL,
-            giftsWikiUrl = BuildConfig.GIFTS_WIKI_URL
+            giftsWikiUrl = BuildConfig.GIFTS_WIKI_URL,
+            watchOnlyScamWikiUrl = BuildConfig.WATCH_ONLY_SCAM_WIKI
         )
     }
 

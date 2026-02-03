@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -103,6 +104,7 @@ class BalanceListModule {
         maskingModeUseCase: MaskingModeUseCase,
         fiatFormatter: FiatFormatter,
         giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
+        appLinksProvider: AppLinksProvider
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -124,7 +126,8 @@ class BalanceListModule {
             novaCardRestrictionCheckMixin = novaCardRestrictionCheckMixin,
             maskingModeUseCase = maskingModeUseCase,
             fiatFormatter = fiatFormatter,
-            giftsRestrictionCheckMixin = giftsRestrictionCheckMixin
+            giftsRestrictionCheckMixin = giftsRestrictionCheckMixin,
+            appLinksProvider = appLinksProvider
         )
     }
 

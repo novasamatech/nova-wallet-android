@@ -75,8 +75,6 @@ class AlertView @JvmOverloads constructor(
     private val binder = ViewAlertBinding.inflate(inflater(), this)
 
     init {
-        updatePadding(bottom = 10.dp)
-
         attrs?.let(::applyAttrs)
     }
 

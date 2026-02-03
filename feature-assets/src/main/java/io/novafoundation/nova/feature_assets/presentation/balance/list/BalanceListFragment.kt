@@ -7,6 +7,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.list.EditablePlaceholderAdapter
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.hideKeyboard
 import io.novafoundation.nova.common.utils.recyclerView.expandable.ExpandableAnimationSettings
@@ -111,6 +112,7 @@ class BalanceListFragment :
 
     override fun subscribe(viewModel: BalanceListViewModel) {
         setupBuySellSelectorMixin(viewModel.buySellSelectorMixin)
+        observeBrowserEvents(viewModel)
 
         viewModel.bannersMixin.bindWithAdapter(bannerAdapter) {
             binder.balanceListAssets.invalidateItemDecorations()
@@ -128,6 +130,7 @@ class BalanceListFragment :
         viewModel.shouldShowPlaceholderFlow.observe(emptyAssetsPlaceholder::show)
         viewModel.nftCountFlow.observe(headerAdapter::setNftCountLabel)
         viewModel.nftPreviewsUi.observe(headerAdapter::setNftPreviews)
+        viewModel.showWatchOnlyWarning.observe(headerAdapter::showWatchOnlyWarning)
 
         viewModel.hideRefreshEvent.observeEvent {
             binder.walletContainer.isRefreshing = false
@@ -220,6 +223,10 @@ class BalanceListFragment :
 
     override fun pendingOperationsClicked() {
         viewModel.pendingOperationsClicked()
+    }
+
+    override fun watchOnlyLearnMore() {
+        viewModel.watchOnlyLearnMore()
     }
 
     override fun assetViewModeClicked() {
