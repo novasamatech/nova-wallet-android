@@ -230,6 +230,14 @@ class BalanceListViewModel(
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
+    val balanceTitleFlow = selectedMetaAccount.map {
+        if (it.type == LightMetaAccount.Type.WATCH_ONLY) {
+            resourceManager.getString(R.string.wallet_balance_details_total_watch_only)
+        } else {
+            resourceManager.getString(R.string.wallet_balance_details_total)
+        }
+    }.shareInBackground()
+
     init {
         selectedCurrency
             .onEach { fullSync() }

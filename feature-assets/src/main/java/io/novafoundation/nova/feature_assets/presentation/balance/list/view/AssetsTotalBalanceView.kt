@@ -35,6 +35,10 @@ class AssetsTotalBalanceView @JvmOverloads constructor(
         binder.viewAssetsTotalBalanceMaskingButton.isHapticFeedbackEnabled = true
     }
 
+    fun setTitle(title: String?) {
+        binder.viewAssetsTotalBalanceTitle.text = title
+    }
+
     fun showTotalBalance(totalBalance: TotalBalanceModel) {
         binder.viewAssetsTotalBalanceShimmer.setShimmerVisible(false)
         binder.viewAssetsTotalBalanceTotal.setVisible(true)
