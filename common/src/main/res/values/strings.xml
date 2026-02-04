@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="TypographyEllipsis">
 
+    <string name="wallet_balance_details_total_watch_only">Watch-only balance</string>
     <string name="assets_list_watch_only_warning">Beware of scammers. No one can unlock a watch-only wallet or its funds</string>
 
     <string name="watch_only_scam_risk_warning_title">Scam Risk Warning!</string>
