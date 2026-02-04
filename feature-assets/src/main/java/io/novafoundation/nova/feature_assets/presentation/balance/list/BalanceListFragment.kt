@@ -156,6 +156,7 @@ class BalanceListFragment :
             balanceBreakdownBottomSheet?.show()
         }
 
+        viewModel.balanceTitleFlow.observe(headerAdapter::setTitleForTotalBalance)
         viewModel.walletConnectAccountSessionsUI.observe(headerAdapter::setWalletConnectModel)
         viewModel.pendingOperationsCountModel.observe(headerAdapter::setPendingOperationsCountModel)
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
