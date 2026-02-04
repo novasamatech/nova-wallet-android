@@ -9,6 +9,8 @@
 
     <string name="watch_only_accept_terms">Accept terms</string>
 
+    <string name="watch_only_add_any_address">Enter at least one address...</string>
+
     <string name="watch_only_wallet_evm_field_hint">0x...</string>
     <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="watch_only_wallet_name_field_hint">Watch-only wallet</string>

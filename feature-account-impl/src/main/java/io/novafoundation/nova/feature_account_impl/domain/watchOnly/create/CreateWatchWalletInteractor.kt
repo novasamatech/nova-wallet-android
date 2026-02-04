@@ -26,7 +26,7 @@ class RealCreateWatchWalletInteractor(
 ) : CreateWatchWalletInteractor {
 
     override suspend fun createWallet(name: String, substrateAddress: String, evmAddress: String) = runCatching {
-        val substrateAccountId = substrateAddress.toAccountId()
+        val substrateAccountId = substrateAddress.takeIf { it.isNotEmpty() }?.toAccountId()
         val evmAccountId = evmAddress.takeIf { it.isNotEmpty() }?.ethereumAddressToAccountId()
 
         val addAccountResult = watchOnlyAddAccountRepository.addAccountWithSingleChange(

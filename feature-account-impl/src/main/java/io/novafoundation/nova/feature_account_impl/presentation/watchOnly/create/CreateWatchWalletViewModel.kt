@@ -71,8 +71,7 @@ class CreateWatchWalletViewModel(
     ) { name, substrateAddress, evmAddress, termsChecked ->
         when {
             name.isEmpty() -> disabledStateFrom(R.string.account_enter_wallet_nickname)
-            !substrateAddress.isInputValid() -> disabledStateFrom(R.string.accoount_enter_substrate_address)
-            evmAddress.isNotEmpty() && !evmAddress.isInputValid() -> disabledStateFrom(R.string.accoount_enter_evm_address)
+            !substrateAddress.isInputValid() && !evmAddress.isInputValid() -> disabledStateFrom(R.string.watch_only_add_any_address)
             !termsChecked -> disabledStateFrom(R.string.watch_only_accept_terms)
             else -> DescriptiveButtonState.Enabled(resourceManager.getString(R.string.common_continue))
         }
