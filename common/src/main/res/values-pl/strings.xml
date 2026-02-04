@@ -1954,6 +1954,7 @@
     <string name="wallet_balance_details_title">Szczegóły bilansu</string>
     <string name="wallet_balance_details_total">Łączny bilans</string>
     <string name="wallet_balance_details_total_after">Łączny po transferze</string>
+    <string name="wallet_balance_details_total_watch_only">Saldo tylko do obserwacji</string>
     <string name="wallet_balance_frozen">Zamrożone</string>
     <string name="wallet_balance_locked">Zablokowane</string>
     <string name="wallet_balance_redeemable">Do odebrania</string>
@@ -2036,6 +2037,7 @@
     <string name="wallet_transfer_details_send_back">Wyślij do tego kontaktu</string>
     <string name="wallet_transfer_details_title">Szczegóły transferu</string>
     <string name="watch_only_accept_terms">Akceptuj warunki</string>
+    <string name="watch_only_add_any_address">Wprowadź co najmniej jeden adres...</string>
     <string name="watch_only_custom_title">Niestandardowy</string>
     <string name="watch_only_demo_title">Demo</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nTo jest oszustwo. Nikt nie może udostępnić, dać dostępu ani odblokować portfela tylko do obserwacji dla Ciebie.\n\nJeśli ktoś poprosił Cię o dodanie portfela,\nskontaktuj się z nami %2$s</string>

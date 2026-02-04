@@ -1918,6 +1918,7 @@
     <string name="wallet_balance_details_title">余额详情</string>
     <string name="wallet_balance_details_total">总余额</string>
     <string name="wallet_balance_details_total_after">转账后总计</string>
+    <string name="wallet_balance_details_total_watch_only">仅观察余额</string>
     <string name="wallet_balance_frozen">已冻结</string>
     <string name="wallet_balance_locked">已锁定</string>
     <string name="wallet_balance_redeemable">可赎回</string>
@@ -1994,6 +1995,7 @@
     <string name="wallet_transfer_details_send_back">发送给此联系人</string>
     <string name="wallet_transfer_details_title">转账详情</string>
     <string name="watch_only_accept_terms">接受条款</string>
+    <string name="watch_only_add_any_address">请输入至少一个地址...</string>
     <string name="watch_only_custom_title">自定义</string>
     <string name="watch_only_demo_title">演示</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\n这是一个骗局。没有人可以为您分享、授予访问权限或解锁仅观察钱包。\n\n如果有人要求您添加钱包，\n请联系我们 %2$s</string>

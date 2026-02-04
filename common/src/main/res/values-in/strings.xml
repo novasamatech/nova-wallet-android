@@ -1918,6 +1918,7 @@
     <string name="wallet_balance_details_title">Detail saldo</string>
     <string name="wallet_balance_details_total">Total saldo</string>
     <string name="wallet_balance_details_total_after">Total setelah transfer</string>
+    <string name="wallet_balance_details_total_watch_only">Saldo untuk dilihat saja</string>
     <string name="wallet_balance_frozen">Terbekukan</string>
     <string name="wallet_balance_locked">Terkunci</string>
     <string name="wallet_balance_redeemable">Dapat ditukarkan</string>
@@ -1994,6 +1995,7 @@
     <string name="wallet_transfer_details_send_back">Kirim ke kontak ini</string>
     <string name="wallet_transfer_details_title">Rincian Transfer</string>
     <string name="watch_only_accept_terms">Terima syarat</string>
+    <string name="watch_only_add_any_address">Masukkan setidaknya satu alamat...</string>
     <string name="watch_only_custom_title">Kustom</string>
     <string name="watch_only_demo_title">Demo</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nIni adalah penipuan. Tidak ada yang dapat membagikan, memberikan akses ke, atau membuka dompet hanya-baca untuk Anda.\n\nJika seseorang meminta Anda untuk menambahkan dompet,\nhubungi kami %2$s</string>

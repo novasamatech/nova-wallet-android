@@ -1930,6 +1930,7 @@
     <string name="wallet_balance_details_title">Detalles del saldo</string>
     <string name="wallet_balance_details_total">Saldo total</string>
     <string name="wallet_balance_details_total_after">Total después de la transferencia</string>
+    <string name="wallet_balance_details_total_watch_only">Saldo solo de visualización</string>
     <string name="wallet_balance_frozen">Congelado</string>
     <string name="wallet_balance_locked">Bloqueado</string>
     <string name="wallet_balance_redeemable">Redimible</string>
@@ -2008,6 +2009,7 @@
     <string name="wallet_transfer_details_send_back">Enviar a este contacto</string>
     <string name="wallet_transfer_details_title">Detalles de la transferencia</string>
     <string name="watch_only_accept_terms">Aceptar términos</string>
+    <string name="watch_only_add_any_address">Introduce al menos una dirección...</string>
     <string name="watch_only_custom_title">Personalizado</string>
     <string name="watch_only_demo_title">Demostración</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nEsto es una estafa. Nadie puede compartir, conceder acceso o desbloquear una cartera solo de visualización para ti.\n\nSi alguien te pidió añadir una cartera,\ncontáctanos %2$s</string>

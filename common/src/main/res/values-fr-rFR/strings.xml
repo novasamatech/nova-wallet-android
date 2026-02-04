@@ -1930,6 +1930,7 @@
     <string name="wallet_balance_details_title">Détails du solde</string>
     <string name="wallet_balance_details_total">Solde total</string>
     <string name="wallet_balance_details_total_after">Total après transfert</string>
+    <string name="wallet_balance_details_total_watch_only">Solde en consultation seulement</string>
     <string name="wallet_balance_frozen">Gelé</string>
     <string name="wallet_balance_locked">Verrouillé</string>
     <string name="wallet_balance_redeemable">Remboursable</string>
@@ -2008,6 +2009,7 @@
     <string name="wallet_transfer_details_send_back">Envoyer à ce contact</string>
     <string name="wallet_transfer_details_title">Détails du transfert</string>
     <string name="watch_only_accept_terms">Accepter les conditions</string>
+    <string name="watch_only_add_any_address">Entrez au moins une adresse...</string>
     <string name="watch_only_custom_title">Personnalisé</string>
     <string name="watch_only_demo_title">Démonstration</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nC\'est une arnaque. Personne ne peut partager, accorder l\'accès à, ou déverrouiller un portefeuille en consultation seulement pour vous.\n\nSi quelqu\'un vous a demandé d\'ajouter un portefeuille,\ncontactez-nous %2$s</string>

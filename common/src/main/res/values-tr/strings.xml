@@ -1930,6 +1930,7 @@
     <string name="wallet_balance_details_title">Bakiye detayları</string>
     <string name="wallet_balance_details_total">Toplam bakiye</string>
     <string name="wallet_balance_details_total_after">Transfer sonrası toplam</string>
+    <string name="wallet_balance_details_total_watch_only">Sadece-izleme bakiyesi</string>
     <string name="wallet_balance_frozen">Dondurulmuş</string>
     <string name="wallet_balance_locked">Kilitli</string>
     <string name="wallet_balance_redeemable">Talep edilebilir</string>
@@ -2008,6 +2009,7 @@
     <string name="wallet_transfer_details_send_back">Bu kişiye gönder</string>
     <string name="wallet_transfer_details_title">Transfer detayları</string>
     <string name="watch_only_accept_terms">Koşulları kabul edin</string>
+    <string name="watch_only_add_any_address">En az bir adres girin...</string>
     <string name="watch_only_custom_title">Özel</string>
     <string name="watch_only_demo_title">Demo</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nBu bir dolandırıcılıktır. Hiç kimse sizin için bir sadece-izleme cüzdanını paylaşamaz, erişim veremez veya açamaz.\n\nBirisi sizden cüzdan eklemenizi istediyse, bizimle iletişime geçin %2$s</string>

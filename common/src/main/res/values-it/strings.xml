@@ -1930,6 +1930,7 @@
     <string name="wallet_balance_details_title">Dettagli del saldo</string>
     <string name="wallet_balance_details_total">Saldo totale</string>
     <string name="wallet_balance_details_total_after">Totale dopo il trasferimento</string>
+    <string name="wallet_balance_details_total_watch_only">Saldo solo visualizzazione</string>
     <string name="wallet_balance_frozen">Congelato</string>
     <string name="wallet_balance_locked">Bloccato</string>
     <string name="wallet_balance_redeemable">Riscattabile</string>
@@ -2008,6 +2009,7 @@
     <string name="wallet_transfer_details_send_back">Invia a questo contatto</string>
     <string name="wallet_transfer_details_title">Dettagli del trasferimento</string>
     <string name="watch_only_accept_terms">Accetta i termini</string>
+    <string name="watch_only_add_any_address">Inserisci almeno un indirizzo...</string>
     <string name="watch_only_custom_title">Personalizzato</string>
     <string name="watch_only_demo_title">Demo</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nQuesta è una truffa. Nessuno può condividere, concederti l’accesso o sbloccare per te un portafoglio di sola visualizzazione.\n\nSe qualcuno ti ha chiesto di aggiungere un portafoglio,\ncontattaci %2$s</string>

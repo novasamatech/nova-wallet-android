@@ -1918,6 +1918,7 @@
     <string name="wallet_balance_details_title">Chi tiết số dư</string>
     <string name="wallet_balance_details_total">Tổng số dư</string>
     <string name="wallet_balance_details_total_after">Tổng số sau khi chuyển</string>
+    <string name="wallet_balance_details_total_watch_only">Số dư chỉ theo dõi</string>
     <string name="wallet_balance_frozen">Đóng băng</string>
     <string name="wallet_balance_locked">Đã khóa</string>
     <string name="wallet_balance_redeemable">Có thể thu hồi</string>
@@ -1994,6 +1995,7 @@
     <string name="wallet_transfer_details_send_back">Gửi đến liên hệ này</string>
     <string name="wallet_transfer_details_title">Chi tiết chuyển khoản</string>
     <string name="watch_only_accept_terms">Chấp nhận điều khoản</string>
+    <string name="watch_only_add_any_address">Nhập ít nhất một địa chỉ...</string>
     <string name="watch_only_custom_title">Tuỳ chỉnh</string>
     <string name="watch_only_demo_title">Demonstration</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nĐây là lừa đảo. Không ai có thể chia sẻ, cấp quyền truy cập hoặc mở khóa một ví chỉ theo dõi cho bạn.\n\nNếu ai đó yêu cầu bạn thêm một ví,\nliên hệ với chúng tôi %2$s</string>

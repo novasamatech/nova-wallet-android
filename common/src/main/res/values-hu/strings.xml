@@ -1930,6 +1930,7 @@
     <string name="wallet_balance_details_title">Egyenleg részletei</string>
     <string name="wallet_balance_details_total">Teljes egyenleg</string>
     <string name="wallet_balance_details_total_after">Összesen az átutalás után</string>
+    <string name="wallet_balance_details_total_watch_only">Csak-figyelési egyenleg</string>
     <string name="wallet_balance_frozen">Lefagyasztott</string>
     <string name="wallet_balance_locked">Zárolt</string>
     <string name="wallet_balance_redeemable">Kiváltható</string>
@@ -2008,6 +2009,7 @@
     <string name="wallet_transfer_details_send_back">Küldés ennek a kapcsolatnak</string>
     <string name="wallet_transfer_details_title">Átutalás részletei</string>
     <string name="watch_only_accept_terms">Feltételek elfogadása</string>
+    <string name="watch_only_add_any_address">Adjon meg legalább egy címet...</string>
     <string name="watch_only_custom_title">Egyéni</string>
     <string name="watch_only_demo_title">Bemutató</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nEz egy csalás. Senki sem tud megosztani, hozzáférést biztosítani vagy egy csak-figyelési pénztárcát feloldani az Ön számára.\n\nHa valaki arra kérte, hogy adjon hozzá egy pénztárcát,\nlépjen kapcsolatba velünk %2$s</string>

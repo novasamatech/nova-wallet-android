@@ -1918,6 +1918,7 @@
     <string name="wallet_balance_details_title">잔액 세부 정보</string>
     <string name="wallet_balance_details_total">총 잔액</string>
     <string name="wallet_balance_details_total_after">전송 후 총액</string>
+    <string name="wallet_balance_details_total_watch_only">보기 전용 잔액</string>
     <string name="wallet_balance_frozen">동결됨</string>
     <string name="wallet_balance_locked">잠겨 있음</string>
     <string name="wallet_balance_redeemable">회수 가능</string>
@@ -1994,6 +1995,7 @@
     <string name="wallet_transfer_details_send_back">이 연락처로 전송</string>
     <string name="wallet_transfer_details_title">전송 세부 사항</string>
     <string name="watch_only_accept_terms">약관에 동의</string>
+    <string name="watch_only_add_any_address">최소 하나의 주소를 입력하세요...</string>
     <string name="watch_only_custom_title">사용자 지정</string>
     <string name="watch_only_demo_title">데모</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\n이것은 사기입니다. 누구도 보기 전용 지갑에 대한 접근 권한을 공유하거나 부여할 수 없습니다.\n\n누군가 지갑 추가를 요청했다면,\n%2$s 연락 주세요</string>

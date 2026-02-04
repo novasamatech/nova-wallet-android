@@ -1930,6 +1930,7 @@
     <string name="wallet_balance_details_title">Detalhes do saldo</string>
     <string name="wallet_balance_details_total">Saldo total</string>
     <string name="wallet_balance_details_total_after">Total após a transferência</string>
+    <string name="wallet_balance_details_total_watch_only">Saldo somente de visualização</string>
     <string name="wallet_balance_frozen">Congelado</string>
     <string name="wallet_balance_locked">Bloqueado</string>
     <string name="wallet_balance_redeemable">Resgatável</string>
@@ -2008,6 +2009,7 @@
     <string name="wallet_transfer_details_send_back">Enviar para este contato</string>
     <string name="wallet_transfer_details_title">Detalhes da transferência</string>
     <string name="watch_only_accept_terms">Aceitar termos</string>
+    <string name="watch_only_add_any_address">Insira pelo menos um endereço...</string>
     <string name="watch_only_custom_title">Personalizado</string>
     <string name="watch_only_demo_title">Demonstração</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nIsso é um golpe. Ninguém pode compartilhar, conceder acesso ou desbloquear uma carteira somente de visualização para você.\n\nSe alguém pediu para você adicionar uma carteira,\nentre em contato conosco %2$s</string>

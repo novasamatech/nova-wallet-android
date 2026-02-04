@@ -1918,6 +1918,7 @@
     <string name="wallet_balance_details_title">残高の詳細</string>
     <string name="wallet_balance_details_total">総残高</string>
     <string name="wallet_balance_details_total_after">転送後の総残高</string>
+    <string name="wallet_balance_details_total_watch_only">ウォッチオンリーバランス</string>
     <string name="wallet_balance_frozen">凍結</string>
     <string name="wallet_balance_locked">ロック済み</string>
     <string name="wallet_balance_redeemable">引き換え可能</string>
@@ -1994,6 +1995,7 @@
     <string name="wallet_transfer_details_send_back">この連絡先に送信</string>
     <string name="wallet_transfer_details_title">転送の詳細</string>
     <string name="watch_only_accept_terms">規約を受け入れる</string>
+    <string name="watch_only_add_any_address">少なくとも1つのアドレスを入力してください...</string>
     <string name="watch_only_custom_title">カスタム</string>
     <string name="watch_only_demo_title">デモ</string>
     <string name="watch_only_scam_risk_warning_subtitle">%1$s\nこれは詐欺です。ウォッチオンリーウォレットを共有、アクセス許可、解除することはできません。\n\n誰かがウォレットを追加するよう求めた場合、\n私たちに連絡してください %2$s</string>
