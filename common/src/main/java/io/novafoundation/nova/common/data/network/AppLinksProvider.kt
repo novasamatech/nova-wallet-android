@@ -32,6 +32,7 @@ class AppLinksProvider(
     val multisigsWikiUrl: String,
 
     val giftsWikiUrl: String,
+    val watchOnlyScamWikiUrl: String
 ) {
 
     fun getTwitterAccountUrl(

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.list.view
 
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.utils.inflater
@@ -44,6 +45,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         fun novaCardClick()
 
         fun pendingOperationsClicked()
+
+        fun watchOnlyLearnMore()
     }
 
     private var filterIconRes: Int? = null
@@ -54,6 +57,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
     private var nftCountLabel: MaskableModel<String>? = null
     private var nftPreviews: MaskableModel<List<NftPreviewUi>>? = null
     private var pendingOperationsModel: PendingOperationsCountModel = PendingOperationsCountModel.Gone
+    private var showWatchOnlyWarning: Boolean = false
 
     override fun getItemViewType(position: Int): Int {
         return AssetsHeaderHolder.viewType
@@ -104,6 +108,11 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         notifyItemChanged(0, Payload.PENDING_OPERATIONS_COUNT)
     }
 
+    fun showWatchOnlyWarning(showWatchOnlyWarning: Boolean) {
+        this.showWatchOnlyWarning = showWatchOnlyWarning
+        notifyItemChanged(0, Payload.WATCH_ONLY_WARNING)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AssetsHeaderHolder {
         return AssetsHeaderHolder(ItemAssetHeaderBinding.inflate(parent.inflater(), parent, false), handler)
     }
@@ -121,6 +130,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                     Payload.WALLET_CONNECT -> holder.bindWalletConnect(walletConnectModel)
                     Payload.PENDING_OPERATIONS_COUNT -> holder.bindPendingOperationsModel(pendingOperationsModel)
+                    Payload.WATCH_ONLY_WARNING -> holder.bindPendingOperationsModel(pendingOperationsModel)
                 }
             }
         }
@@ -134,7 +144,8 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
             nftCountLabel,
             nftPreviews,
             walletConnectModel,
-            pendingOperationsModel
+            pendingOperationsModel,
+            showWatchOnlyWarning
         )
     }
 
@@ -144,7 +155,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 }
 
 private enum class Payload {
-    TOTAL_BALANCE, MASKING_ENABLED, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, PENDING_OPERATIONS_COUNT
+    TOTAL_BALANCE, MASKING_ENABLED, ADDRESS, NFT_COUNT, NFT_PREVIEWS, WALLET_CONNECT, PENDING_OPERATIONS_COUNT, WATCH_ONLY_WARNING
 }
 
 class AssetsHeaderHolder(
@@ -173,6 +184,7 @@ class AssetsHeaderHolder(
             balanceListPendingOperations.setOnClickListener { handler.pendingOperationsClicked() }
 
             balanceListTotalBalance.onSwapClick { handler.swapClicked() }
+            balanceListWarning.setOnLinkClickedListener { handler.watchOnlyLearnMore() }
         }
     }
 
@@ -183,7 +195,8 @@ class AssetsHeaderHolder(
         nftCount: MaskableModel<String>?,
         nftPreviews: MaskableModel<List<NftPreviewUi>>?,
         walletConnect: WalletConnectSessionsModel?,
-        pendingOperationsCountModel: PendingOperationsCountModel
+        pendingOperationsCountModel: PendingOperationsCountModel,
+        showWatchOnlyWarning: Boolean
     ) {
         bindTotalBalance(totalBalance)
         bindMaskingEnabled(maskingEnabled)
@@ -192,6 +205,7 @@ class AssetsHeaderHolder(
         bindNftCount(nftCount)
         bindWalletConnect(walletConnect)
         bindPendingOperationsModel(pendingOperationsCountModel)
+        bindWatchOnlyWarning(showWatchOnlyWarning)
     }
 
     fun bindNftPreviews(nftPreviews: MaskableModel<List<NftPreviewUi>>?) = with(viewBinding) {
@@ -228,5 +242,9 @@ class AssetsHeaderHolder(
     fun bindPendingOperationsModel(model: PendingOperationsCountModel) {
         viewBinding.balanceListPendingOperations.setPendingOperationsCount(model)
         viewBinding.balanceTableView.invalidateChildrenVisibility()
+    }
+
+    fun bindWatchOnlyWarning(showWatchOnlyWarning: Boolean) {
+        viewBinding.balanceListWarning.isVisible = showWatchOnlyWarning
     }
 }

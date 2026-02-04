@@ -1,26 +1,28 @@
 package io.novafoundation.nova.feature_account_impl.presentation.watchOnly.create
 
 import android.view.View
+import androidx.core.text.buildSpannedString
+import androidx.core.text.color
 import androidx.lifecycle.lifecycleScope
-
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.colorSpan
 import io.novafoundation.nova.common.utils.insets.applySystemBarInsets
-import io.novafoundation.nova.common.utils.bindTo
 import io.novafoundation.nova.common.utils.insets.ImeInsetsState
-import io.novafoundation.nova.common.utils.scrollOnFocusTo
-import io.novafoundation.nova.common.view.ChipActionsAdapter
+import io.novafoundation.nova.common.utils.sendEmailIntent
+import io.novafoundation.nova.common.utils.setTabSelectedListener
+import io.novafoundation.nova.common.utils.setupWithViewPager2
+import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
-import io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.setupAddressInput
+import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.databinding.FragmentCreateWatchWalletBinding
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureComponent
 
-class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, FragmentCreateWatchWalletBinding>() {
+private const val CUSTOM_ACCOUNT_INDEX = 0
+private const val DEMO_ACCOUNT_INDEX = 1
 
-    private val suggestionsAdapter by lazy(LazyThreadSafetyMode.NONE) {
-        ChipActionsAdapter(viewModel::walletSuggestionClicked)
-    }
+class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, FragmentCreateWatchWalletBinding>() {
 
     override fun createBinding() = FragmentCreateWatchWalletBinding.inflate(layoutInflater)
 
@@ -31,16 +33,22 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
     override fun initViews() {
         binder.createWatchWalletToolbar.setHomeButtonListener { viewModel.homeButtonClicked() }
 
-        binder.createWatchWalletPresets.adapter = suggestionsAdapter
-        binder.createWatchWalletPresets.setHasFixedSize(true)
+        val adapter = CreateWatchWalletPagerAdapter(viewModel.pages, viewLifecycleOwner.lifecycleScope)
+        binder.createWatchWalletViewPager.adapter = adapter
+        binder.createWatchWalletMode.setupWithViewPager2(binder.createWatchWalletViewPager, adapter::getPageTitle)
+
+        binder.createWatchWalletMode.setTabSelectedListener {
+            when (it.position) {
+                CUSTOM_ACCOUNT_INDEX -> viewModel.customAccountSelected()
+                DEMO_ACCOUNT_INDEX -> viewModel.demoAccountSelected()
+            }
+        }
+
+        binder.createWatchWalletTerms.setOnCheckedChangeListener { _, isChecked -> viewModel.onTermsChecked(isChecked) }
 
         binder.createWatchWalletContinue.setOnClickListener { viewModel.nextClicked() }
 
-        binder.createWatchWalletScrollArea.scrollOnFocusTo(
-            binder.createWatchWalletName,
-            binder.createWatchWalletEvmAddress,
-            binder.createWatchWalletSubstrateAddress
-        )
+        binder.createWatchWalletTerms.setText(getTermsText())
     }
 
     override fun inject() {
@@ -51,13 +59,31 @@ class CreateWatchWalletFragment : BaseFragment<CreateWatchWalletViewModel, Fragm
     }
 
     override fun subscribe(viewModel: CreateWatchWalletViewModel) {
-        setupAddressInput(viewModel.substrateAddressInput, binder.createWatchWalletSubstrateAddress)
-        setupAddressInput(viewModel.evmAddressInput, binder.createWatchWalletEvmAddress)
-
-        binder.createWatchWalletName.bindTo(viewModel.nameInput, viewLifecycleOwner.lifecycleScope)
-
         viewModel.buttonState.observe(binder.createWatchWalletContinue::setState)
 
-        suggestionsAdapter.submitList(viewModel.suggestionChipActionModels)
+        viewModel.scamWarningEvent.observeEvent {
+            runWarning(it)
+        }
+
+        viewModel.openEmailEvent.observeEvent { requireContext().sendEmailIntent(it) }
+    }
+
+    private fun getTermsText() = buildSpannedString {
+        append(getString(R.string.create_wo_wallet_terms))
+        appendLine()
+        val highlightColor = requireContext().getColor(R.color.text_negative)
+        val highlightedPart = getString(R.string.create_wo_wallet_terms_highlighted).toSpannable(colorSpan(highlightColor))
+        append(highlightedPart)
+    }
+
+    private fun runWarning(payload: ScamRiskWarningBottomSheet.Payload) {
+        val bottomSheet = ScamRiskWarningBottomSheet(
+            requireContext(),
+            payload,
+            viewModel::onWarningConfirmed,
+            viewModel::onMailClicked
+        )
+
+        bottomSheet.show()
     }
 }

@@ -16,7 +16,7 @@ interface CreateWatchWalletInteractor {
         evmAddress: String
     ): Result<*>
 
-    fun suggestions(): List<WatchWalletSuggestion>
+    fun demoAccount(): WatchWalletSuggestion
 }
 
 class RealCreateWatchWalletInteractor(
@@ -40,7 +40,7 @@ class RealCreateWatchWalletInteractor(
         accountRepository.selectMetaAccount(addAccountResult.metaId)
     }
 
-    override fun suggestions(): List<WatchWalletSuggestion> {
-        return repository.watchWalletSuggestions()
+    override fun demoAccount(): WatchWalletSuggestion {
+        return repository.watchOnlyDemoAccount()
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -39,9 +40,10 @@ class CreateWatchWalletModule {
         addressInputMixinFactory: AddressInputMixinFactory,
         interactor: CreateWatchWalletInteractor,
         accountInteractor: AccountInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        appLinksProvider: AppLinksProvider
     ): ViewModel {
-        return CreateWatchWalletViewModel(router, addressInputMixinFactory, interactor, accountInteractor, resourceManager)
+        return CreateWatchWalletViewModel(router, addressInputMixinFactory, interactor, accountInteractor, resourceManager, appLinksProvider)
     }
 
     @Provides
