@@ -18,19 +18,13 @@
     <string name="create_wo_wallet_terms">I understand I cannot access funds from a watch-only wallet.</string>
     <string name="create_wo_wallet_terms_highlighted">Anyone asking for payment to unlock the funds is a scammer.</string>
 
-    <!--<string name="account_watch_add_presets">Preset wallets</string>-->
-    <!--<string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT and 50+ networks</string>-->
-    <!--<string name="account_watch_add_evm_address_description">Moonbeam, Moonriver and other networks</string>-->
 
-    <!--<string name="account_watch_add_subtitle">Track the activity of any wallet without injecting your private key to Nova Wallet</string>-->
     <string name="account_watch_add_subtitle">Track wallet activity without a private key.\nYou won’t be able to perform any transactions.</string>
 
-    <!--<string name="account_watch_add_evm_address_optional">EVM address (Optional)</string>-->
     <string name="account_watch_add_evm_address_optional">Ethereum or any other EVM-compatible address</string>
 
     <string name="account_watch_add_substrate_address_optional">Polkadot or any other Substrate-based address</string>
 
-    <!--<string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>-->
     <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
 
     <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>

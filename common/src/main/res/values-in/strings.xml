@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Aplikasi Polkadot sudah terinstal</string>
     <string name="account_ledger_generic_import_start_step_2">%s di perangkat Ledger Anda</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Buka aplikasi Polkadot</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (Aplikasi Polkadot Generik)</string>
     <string name="account_ledger_import_fill_description">Pastikan aplikasi Jaringan terinstal di perangkat Ledger Anda menggunakan aplikasi Ledger Live. Buka aplikasi jaringan di perangkat Ledger Anda.</string>
     <string name="account_ledger_import_fill_disabled_hint">Tambahkan setidaknya satu akun</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Jalur pemutusan rahasia Substrate</string>
     <string name="account_wallet_name">Nama dompet</string>
     <string name="account_wallet_nickname">Nama panggilan dompet</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver dan jaringan lainnya</string>
-    <string name="account_watch_add_evm_address_optional">Alamat EVM (Opsional)</string>
-    <string name="account_watch_add_presets">Dompet preset</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT dan 50+ jaringan</string>
-    <string name="account_watch_add_subtitle">Lacak aktivitas dompet apa pun tanpa menyuntikkan kunci pribadi Anda ke Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">Alamat Ethereum atau alamat lain yang kompatibel dengan EVM</string>
+    <string name="account_watch_add_substrate_address_optional">Alamat Polkadot atau alamat lain berbasis Substrate</string>
+    <string name="account_watch_add_subtitle">Lacak aktivitas dompet tanpa kunci privat.\nAnda tidak akan dapat melakukan transaksi apapun.</string>
     <string name="account_watch_key_missing_description">Dompet Anda hanya dapat dilihat, artinya Anda tidak dapat melakukan operasi apa pun dengannya</string>
     <string name="account_watch_key_missing_title">Ups! Kunci hilang</string>
     <string name="account_watch_only">hanya untuk ditonton</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Tingkatkan DOT Anda 🚀</string>
     <string name="assets_filter_title">Filter token</string>
     <string name="assets_gifts_flow_placeholder">Anda tidak memiliki token untuk diberikan.\nBeli atau Setor token ke akun Anda.</string>
+    <string name="assets_list_watch_only_warning">Waspadalah terhadap penipuan. Tidak ada yang dapat membuka dompet hanya-baca atau dananya</string>
     <string name="assets_manage_tokens_all_networks">Semua jaringan</string>
     <string name="assets_manage_tokens_title">Kelola token</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Jangan transfer %s ke akun yang dikendalikan Ledger karena Ledger tidak mendukung pengiriman %s, sehingga aset akan terjebak di akun ini</string>
@@ -630,6 +629,8 @@
     <string name="create_cloud_backup_password_title">Buat kata sandi cadangan Anda</string>
     <string name="create_network_invalid_chain_id_message">Chain ID yang dimasukkan tidak cocok dengan jaringan di URL RPC.</string>
     <string name="create_network_invalid_chain_id_title">Chain ID tidak valid</string>
+    <string name="create_wo_wallet_terms">Saya mengerti saya tidak dapat mengakses dana dari dompet hanya-baca.</string>
+    <string name="create_wo_wallet_terms_highlighted">Siapa pun yang meminta pembayaran untuk membuka dana adalah penipu.</string>
     <string name="crodloan_private_crowdloan_message">Crowdloans pribadi belum didukung.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan pribadi</string>
     <string name="crowdloan_about">Tentang crowdloans</string>
@@ -897,6 +898,7 @@
     <string name="language_title">Bahasa</string>
     <string name="ledger_chain_not_supported">Ledger tidak mendukung %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -1991,6 +1993,15 @@
     <string name="wallet_tokens">Token</string>
     <string name="wallet_transfer_details_send_back">Kirim ke kontak ini</string>
     <string name="wallet_transfer_details_title">Rincian Transfer</string>
+    <string name="watch_only_accept_terms">Terima syarat</string>
+    <string name="watch_only_custom_title">Kustom</string>
+    <string name="watch_only_demo_title">Demo</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nIni adalah penipuan. Tidak ada yang dapat membagikan, memberikan akses ke, atau membuka dompet hanya-baca untuk Anda.\n\nJika seseorang meminta Anda untuk menambahkan dompet,\nhubungi kami %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">JANGAN pernah kirim uang kepada siapa pun yang menjanjikan untuk membuka dana dalam dompet hanya-baca.</string>
+    <string name="watch_only_scam_risk_warning_title">Peringatan Risiko Penipuan!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Dompet hanya-baca</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s alamat untuk %s</string>
     <string name="web3names_integrity_check_failed_message">Nova mendeteksi masalah dengan integritas informasi tentang alamat %1$s. Harap hubungi pemilik %1$s untuk menyelesaikan masalah integritas.</string>

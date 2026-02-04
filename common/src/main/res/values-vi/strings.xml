@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Ứng dụng Polkadot đã được cài đặt</string>
     <string name="account_ledger_generic_import_start_step_2">%s trên thiết bị Ledger của bạn</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Mở ứng dụng Polkadot</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (Ứng dụng Polkadot chung)</string>
     <string name="account_ledger_import_fill_description">Đảm bảo ứng dụng mạng được cài đặt vào thiết bị Ledger của bạn bằng ứng dụng Ledger Live. Mở ứng dụng mạng trên thiết bị Ledger của bạn.</string>
     <string name="account_ledger_import_fill_disabled_hint">Thêm ít nhất một tài khoản</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Đường dẫn dẫn xuất bí mật Substrate</string>
     <string name="account_wallet_name">Tên ví</string>
     <string name="account_wallet_nickname">Biệt danh ví</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver và các mạng khác</string>
-    <string name="account_watch_add_evm_address_optional">Địa chỉ EVM (Không bắt buộc)</string>
-    <string name="account_watch_add_presets">Ví cài sẵn</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT và hơn 50 mạng khác</string>
-    <string name="account_watch_add_subtitle">Theo dõi hoạt động của bất kỳ ví nào mà không cần nhập khoá riêng tư của bạn vào Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">Địa chỉ Ethereum hoặc bất kỳ địa chỉ tương thích EVM nào khác</string>
+    <string name="account_watch_add_substrate_address_optional">Địa chỉ Polkadot hoặc bất kỳ địa chỉ dựa trên Substrate nào khác</string>
+    <string name="account_watch_add_subtitle">Theo dõi hoạt động ví mà không cần khóa riêng.\nBạn sẽ không thể thực hiện bất kỳ giao dịch nào.</string>
     <string name="account_watch_key_missing_description">Ví của bạn chỉ có thể xem, có nghĩa là bạn không thể thực hiện bất kỳ thao tác nào với nó</string>
     <string name="account_watch_key_missing_title">Ôi! Thiếu khoá</string>
     <string name="account_watch_only">chỉ xem</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Tăng cường DOT của bạn 🚀</string>
     <string name="assets_filter_title">Lọc token</string>
     <string name="assets_gifts_flow_placeholder">Bạn không có token để tặng.\nMua hoặc Nạp token vào tài khoản của bạn.</string>
+    <string name="assets_list_watch_only_warning">Cảnh giác với kẻ lừa đảo. Không ai có thể mở khóa một ví chỉ theo dõi hoặc số tiền của nó</string>
     <string name="assets_manage_tokens_all_networks">Tất cả mạng</string>
     <string name="assets_manage_tokens_title">Quản lý token</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Không chuyển %s vào tài khoản Ledger kiểm soát vì Ledger không hỗ trợ việc gửi %s, do đó tài sản sẽ bị kẹt trên tài khoản này</string>
@@ -630,6 +629,8 @@
     <string name="create_cloud_backup_password_title">Tạo mật khẩu sao lưu của bạn</string>
     <string name="create_network_invalid_chain_id_message">Chain ID đã nhập không khớp với mạng trong URL RPC.</string>
     <string name="create_network_invalid_chain_id_title">Chain ID không hợp lệ</string>
+    <string name="create_wo_wallet_terms">Tôi hiểu tôi không thể truy cập quỹ từ một ví chỉ theo dõi.</string>
+    <string name="create_wo_wallet_terms_highlighted">Bất cứ ai yêu cầu thanh toán để mở khóa số tiền đều là kẻ lừa đảo.</string>
     <string name="crodloan_private_crowdloan_message">Crowdloan riêng tư chưa được hỗ trợ.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan riêng tư</string>
     <string name="crowdloan_about">Về crowdloans</string>
@@ -897,6 +898,7 @@
     <string name="language_title">Ngôn ngữ</string>
     <string name="ledger_chain_not_supported">Ledger không hỗ trợ %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -1991,6 +1993,15 @@
     <string name="wallet_tokens">Token</string>
     <string name="wallet_transfer_details_send_back">Gửi đến liên hệ này</string>
     <string name="wallet_transfer_details_title">Chi tiết chuyển khoản</string>
+    <string name="watch_only_accept_terms">Chấp nhận điều khoản</string>
+    <string name="watch_only_custom_title">Tuỳ chỉnh</string>
+    <string name="watch_only_demo_title">Demonstration</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nĐây là lừa đảo. Không ai có thể chia sẻ, cấp quyền truy cập hoặc mở khóa một ví chỉ theo dõi cho bạn.\n\nNếu ai đó yêu cầu bạn thêm một ví,\nliên hệ với chúng tôi %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">KHÔNG BAO GIỜ gửi tiền cho bất kỳ ai hứa mở khóa quỹ trong ví chỉ theo dõi.</string>
+    <string name="watch_only_scam_risk_warning_title">Cảnh báo Rủi ro Lừa đảo!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Ví chỉ theo dõi</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">Địa chỉ %s cho %s</string>
     <string name="web3names_integrity_check_failed_message">Nova phát hiện các vấn đề liên quan đến tính toàn vẹn của thông tin về địa chỉ %1$s. Vui lòng liên hệ với chủ sở hữu %1$s để giải quyết các vấn đề liên quan đến tính toàn vẹn.</string>

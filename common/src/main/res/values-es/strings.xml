@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot app esté instalada</string>
     <string name="account_ledger_generic_import_start_step_2">%s en tu dispositivo Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Abre la aplicación Polkadot</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (Aplicación Genérica Polkadot)</string>
     <string name="account_ledger_import_fill_description">Asegúrate de que la aplicación de Red está instalada en tu dispositivo Ledger usando la aplicación Ledger Live. Abre la aplicación de red en tu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Agrega al menos una cuenta</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Ruta de derivación del secreto Substrate</string>
     <string name="account_wallet_name">Nombre de la billetera</string>
     <string name="account_wallet_nickname">Apodo del monedero</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver y otras redes</string>
-    <string name="account_watch_add_evm_address_optional">Dirección EVM (Opcional)</string>
-    <string name="account_watch_add_presets">Monederos preestablecidos</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT y más de 50 redes</string>
-    <string name="account_watch_add_subtitle">Rastrea la actividad de cualquier monedero sin introducir tu clave privada en Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">Ethereum o cualquier otra dirección compatible con EVM</string>
+    <string name="account_watch_add_substrate_address_optional">Polkadot o cualquier otra dirección basada en Substrate</string>
+    <string name="account_watch_add_subtitle">Sigue la actividad de la cartera sin una clave privada.\nNo podrás realizar ninguna transacción.</string>
     <string name="account_watch_key_missing_description">Tu monedero es solo para ver, lo que significa que no puedes realizar ninguna operación con él</string>
     <string name="account_watch_key_missing_title">¡Ups! Falta la clave</string>
     <string name="account_watch_only">solo visualización</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Potencie su DOT 🚀</string>
     <string name="assets_filter_title">Filtrar tokens</string>
     <string name="assets_gifts_flow_placeholder">No tienes tokens para regalar.\nCompra o deposita tokens en tu cuenta.</string>
+    <string name="assets_list_watch_only_warning">Cuidado con los estafadores. Nadie puede desbloquear una cartera solo de visualización ni sus fondos</string>
     <string name="assets_manage_tokens_all_networks">Todas las redes</string>
     <string name="assets_manage_tokens_title">Gestionar tokens</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">No transfiera %s a la cuenta controlada por Ledger ya que Ledger no admite el envío de %s, por lo que los activos quedarán bloqueados en esta cuenta</string>
@@ -636,6 +635,8 @@
     <string name="create_cloud_backup_password_title">Crea tu contraseña de respaldo</string>
     <string name="create_network_invalid_chain_id_message">El ID de cadena ingresado no coincide con la red en la URL de RPC.</string>
     <string name="create_network_invalid_chain_id_title">ID de cadena inválido</string>
+    <string name="create_wo_wallet_terms">Entiendo que no puedo acceder a los fondos desde una cartera solo de visualización.</string>
+    <string name="create_wo_wallet_terms_highlighted">Cualquiera que pida un pago para desbloquear los fondos es un estafador.</string>
     <string name="crodloan_private_crowdloan_message">Los crowdloans privados aún no están soportados.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan privado</string>
     <string name="crowdloan_about">Acerca de los crowdloans</string>
@@ -904,6 +905,7 @@
     <string name="language_title">Idioma</string>
     <string name="ledger_chain_not_supported">Ledger no soporta %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -2005,6 +2007,15 @@
     <string name="wallet_tokens">Tokens</string>
     <string name="wallet_transfer_details_send_back">Enviar a este contacto</string>
     <string name="wallet_transfer_details_title">Detalles de la transferencia</string>
+    <string name="watch_only_accept_terms">Aceptar términos</string>
+    <string name="watch_only_custom_title">Personalizado</string>
+    <string name="watch_only_demo_title">Demostración</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nEsto es una estafa. Nadie puede compartir, conceder acceso o desbloquear una cartera solo de visualización para ti.\n\nSi alguien te pidió añadir una cartera,\ncontáctanos %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">NUNCA envíes dinero a alguien prometiendo desbloquear fondos en una cartera solo de visualización.</string>
+    <string name="watch_only_scam_risk_warning_title">¡Advertencia de Riesgo de Estafa!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Cartera solo de visualización</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">Direcciones %s para %s</string>
     <string name="web3names_integrity_check_failed_message">Nova detectó problemas con la integridad de la información sobre direcciones %1$s. Por favor, contacta al propietario de %1$s para resolver los problemas de integridad.</string>

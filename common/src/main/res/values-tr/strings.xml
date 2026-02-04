@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot uygulamanın yüklü</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger cihazınızda %s açın</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Polkadot uygulamasını açın</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (Genel Polkadot uygulaması)</string>
     <string name="account_ledger_import_fill_description">Ledger cihazınızda Ledger Live uygulaması kullanılarak Ağ uygulamasının kurulduğundan emin olun. Ledger cihazınızda ağ uygulamasını açın.</string>
     <string name="account_ledger_import_fill_disabled_hint">En az bir hesap ekleyin</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Substrate sır türetme yolu</string>
     <string name="account_wallet_name">Cüzdan adı</string>
     <string name="account_wallet_nickname">Cüzdan adı</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver ve diğer ağlar</string>
-    <string name="account_watch_add_evm_address_optional">EVM Adresi (İsteğe bağlı)</string>
-    <string name="account_watch_add_presets">Önceden ayarlanmış cüzdanlar</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT ve 50+ ağlar</string>
-    <string name="account_watch_add_subtitle">Nova Wallet\'ta özel anahtarınızı sağlamadan herhangi bir cüzdanın etkinliğini takip edin</string>
+    <string name="account_watch_add_evm_address_optional">Ethereum veya herhangi başka bir EVM-uyumlu adres</string>
+    <string name="account_watch_add_substrate_address_optional">Polkadot veya herhangi başka bir Substrate-tabanlı adres</string>
+    <string name="account_watch_add_subtitle">Cüzdan aktivitesini özel anahtar olmadan izleyin.\nHerhangi bir işlem gerçekleştiremezsiniz.</string>
     <string name="account_watch_key_missing_description">Cüzdanınız yalnızca gözlem amacıyla kullanılabilir, yani herhangi bir işlem yapamazsınız</string>
     <string name="account_watch_key_missing_title">Hata! Anahtar eksik</string>
     <string name="account_watch_only">yalnızca-izle</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">DOT\'unuzu Artırın 🚀</string>
     <string name="assets_filter_title">Token\'ları Filtrele</string>
     <string name="assets_gifts_flow_placeholder">Hediye etmek için token\'iniz yok.\nHesabınıza token alın veya yatırın.</string>
+    <string name="assets_list_watch_only_warning">Dolandırıcılara dikkat edin. Hiç kimse sadece-izleme cüzdanını veya fonlarını açamaz</string>
     <string name="assets_manage_tokens_all_networks">Tüm Ağlar</string>
     <string name="assets_manage_tokens_title">Token\'ları Yönet</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">%s\'yi Ledger kontrolü altındaki hesaba aktarmayın çünkü Ledger %s gönderimini desteklemiyor, bu nedenle varlıklar bu hesapta takılı kalacak</string>
@@ -636,6 +635,8 @@
     <string name="create_cloud_backup_password_title">Yedekleme Parolanızı Oluşturun</string>
     <string name="create_network_invalid_chain_id_message">Girilen Zincir ID\'si RPC URL\'sindeki ağ ile eşleşmiyor.</string>
     <string name="create_network_invalid_chain_id_title">Geçersiz Zincir ID\'si</string>
+    <string name="create_wo_wallet_terms">Sadece-izleme cüzdanından fonlara erişemeyeceğimi anlıyorum.</string>
+    <string name="create_wo_wallet_terms_highlighted">Fonları açmak için ödeme isteyen herkes bir dolandırıcıdır.</string>
     <string name="crodloan_private_crowdloan_message">Özel kitle fonlamaları henüz desteklenmiyor.</string>
     <string name="crodloan_private_crowdloan_title">Özel kitle fonlaması</string>
     <string name="crowdloan_about">Kitle fonlamaları hakkında</string>
@@ -904,6 +905,7 @@
     <string name="language_title">Dil</string>
     <string name="ledger_chain_not_supported">Ledger %s desteklemiyor</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -2005,6 +2007,15 @@
     <string name="wallet_tokens">Tokenler</string>
     <string name="wallet_transfer_details_send_back">Bu kişiye gönder</string>
     <string name="wallet_transfer_details_title">Transfer detayları</string>
+    <string name="watch_only_accept_terms">Koşulları kabul edin</string>
+    <string name="watch_only_custom_title">Özel</string>
+    <string name="watch_only_demo_title">Demo</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nBu bir dolandırıcılıktır. Hiç kimse sizin için bir sadece-izleme cüzdanını paylaşamaz, erişim veremez veya açamaz.\n\nBirisi sizden cüzdan eklemenizi istediyse, bizimle iletişime geçin %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">Bir sadece-izleme cüzdanındaki fonları açma vaatleriyle kimseye asla para göndermeyin.</string>
+    <string name="watch_only_scam_risk_warning_title">Dolandırıcılık Riski Uyarısı!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Sadece-izleme cüzdanı</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s adresleri %s için</string>
     <string name="web3names_integrity_check_failed_message">Nova, %1$s adreslerinin bilgi bütünlüğüyle ilgili sorunları tespit etti. Lütfen bütünlük sorunlarını çözmek için %1$s sahibiyle iletişime geçin.</string>

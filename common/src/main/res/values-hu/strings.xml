@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot alkalmazás telepítve van</string>
     <string name="account_ledger_generic_import_start_step_2">%s az Ön Ledger eszközén</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Nyissa meg a Polkadot alkalmazást</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (Általános Polkadot alkalmazás)</string>
     <string name="account_ledger_import_fill_description">Győzödj meg róla, hogy a hálózati alkalmazás telepítve van azon a Ledger eszközödön, amelyik a Ledger Live-ot használja. Nyisd meg a hálózati alkalmazást a Ledger eszközödön.</string>
     <string name="account_ledger_import_fill_disabled_hint">Legalább egy fiókot hozzá kell adni</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Substrate titkos származtatási útvonal</string>
     <string name="account_wallet_name">Tárca neve</string>
     <string name="account_wallet_nickname">Tárca beceneve</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver és egyéb hálózatok</string>
-    <string name="account_watch_add_evm_address_optional">EVM-cím (opcionális)</string>
-    <string name="account_watch_add_presets">Előre beállított tárcák</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT és még 50+ hálózat</string>
-    <string name="account_watch_add_subtitle">Kövess nyomon bármilyen tárcát anélkül, hogy a megadnád a privát kulcsodat Nova Wallet-be</string>
+    <string name="account_watch_add_evm_address_optional">Ethereum vagy bármely egyéb EVM-kompatibilis cím</string>
+    <string name="account_watch_add_substrate_address_optional">Polkadot vagy bármely más Substrate-alapú cím</string>
+    <string name="account_watch_add_subtitle">Pénztárca aktivitás nyomon követése privát kulcs nélkül.\nNem lesz képes tranzakciók végrehajtására.</string>
     <string name="account_watch_key_missing_description">A tárcád csak egy nézhető tárca, ami azt jelenti, hogy nem kezdeményezhetsz rajta semmilyen műveletet</string>
     <string name="account_watch_key_missing_title">Hoppá! Hiányzik a kulcs</string>
     <string name="account_watch_only">csak nézhető</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Maximalizálja DOT jutalmait 🚀</string>
     <string name="assets_filter_title">Tokenek szűrése</string>
     <string name="assets_gifts_flow_placeholder">Nincsenek tokenjeid ajándékozni.\nVásárolj vagy helyezz el tokeneket a számládon.</string>
+    <string name="assets_list_watch_only_warning">Óvakodj a csalóktól. Senki sem tud egy csak-figyelési pénztárcát vagy annak alapjait feloldani</string>
     <string name="assets_manage_tokens_all_networks">Minden hálózat</string>
     <string name="assets_manage_tokens_title">Tokenek kezelése</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Ne küldj %s-ot a Ledger által vezérelt fiókra, mivel az nem támogatja a(z) %s küldését. emiatt ezen a fiókon fognak ragadni</string>
@@ -636,6 +635,8 @@
     <string name="create_cloud_backup_password_title">Hozza létre a biztonsági mentés jelszavát</string>
     <string name="create_network_invalid_chain_id_message">A bevitt láncazonosító nem egyezik az RPC URL hálózatával.</string>
     <string name="create_network_invalid_chain_id_title">Érvénytelen Láncazonosító</string>
+    <string name="create_wo_wallet_terms">Megértem, hogy nem férhetek hozzá az alapokhoz egy csak-figyelési pénztárcából.</string>
+    <string name="create_wo_wallet_terms_highlighted">Bárki, aki fizetést kér a pénzek feloldásához, csaló.</string>
     <string name="crodloan_private_crowdloan_message">A privát közösségi hitelek még nem támogatottak.</string>
     <string name="crodloan_private_crowdloan_title">Privát közösségi hitel</string>
     <string name="crowdloan_about">A közösségi hitelekről</string>
@@ -904,6 +905,7 @@
     <string name="language_title">Nyelv</string>
     <string name="ledger_chain_not_supported">A Ledger nem támogatja a következőt: %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -2005,6 +2007,15 @@
     <string name="wallet_tokens">Tokenek</string>
     <string name="wallet_transfer_details_send_back">Küldés ennek a kapcsolatnak</string>
     <string name="wallet_transfer_details_title">Átutalás részletei</string>
+    <string name="watch_only_accept_terms">Feltételek elfogadása</string>
+    <string name="watch_only_custom_title">Egyéni</string>
+    <string name="watch_only_demo_title">Bemutató</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nEz egy csalás. Senki sem tud megosztani, hozzáférést biztosítani vagy egy csak-figyelési pénztárcát feloldani az Ön számára.\n\nHa valaki arra kérte, hogy adjon hozzá egy pénztárcát,\nlépjen kapcsolatba velünk %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">SOHA ne küldjön pénzt senkinek, aki a csak-figyelési pénztárca alapjainak feloldását ígéri.</string>
+    <string name="watch_only_scam_risk_warning_title">Csalásveszély figyelmeztetés!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Csak-figyelési pénztárca</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s címek a következőhöz: %s</string>
     <string name="web3names_integrity_check_failed_message">A Nova problémákat észlet bizonyos %1$s címek integritásával kapcsolatban. Kérlek, vedd fel a kapcsolat a(z) %1$s tulajdonosával az integritási problémák kiküszöbölése érdekében.</string>

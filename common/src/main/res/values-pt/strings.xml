@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">o aplicativo Polkadot está instalado</string>
     <string name="account_ledger_generic_import_start_step_2">%s no seu dispositivo Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Abra o aplicativo Polkadot</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (App Genérico Polkadot)</string>
     <string name="account_ledger_import_fill_description">Certifique-se de que o aplicativo da Rede está instalado no seu dispositivo Ledger usando o aplicativo Ledger Live. Abra o aplicativo da rede no seu dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Adicione pelo menos uma conta</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Caminho de derivação secreta Substrate</string>
     <string name="account_wallet_name">Nome da carteira</string>
     <string name="account_wallet_nickname">Apelido da carteira</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver e outras redes</string>
-    <string name="account_watch_add_evm_address_optional">Endereço EVM (Opcional)</string>
-    <string name="account_watch_add_presets">Carteiras predefinidas</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT e mais de 50 redes</string>
-    <string name="account_watch_add_subtitle">Acompanhe a atividade de qualquer carteira sem injetar sua chave privada na Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">Endereço Ethereum ou de qualquer outra EVM-compatível</string>
+    <string name="account_watch_add_substrate_address_optional">Endereço Polkadot ou de qualquer outra baseada em Substrate</string>
+    <string name="account_watch_add_subtitle">Acompanhe a atividade da carteira sem uma chave privada.\nVocê não poderá realizar transações.</string>
     <string name="account_watch_key_missing_description">Sua carteira é apenas para visualização, o que significa que você não pode realizar nenhuma operação com ela</string>
     <string name="account_watch_key_missing_title">Ops! A chave está faltando</string>
     <string name="account_watch_only">somente visualização</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Impulsione seus DOTs 🚀</string>
     <string name="assets_filter_title">Filtrar tokens</string>
     <string name="assets_gifts_flow_placeholder">Você não tem tokens para presentear.\nCompre ou Deposite tokens na sua conta.</string>
+    <string name="assets_list_watch_only_warning">Cuidado com golpistas. Ninguém pode desbloquear uma carteira somente de visualização ou seus fundos</string>
     <string name="assets_manage_tokens_all_networks">Todas as redes</string>
     <string name="assets_manage_tokens_title">Gerenciar tokens</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Não transfira %s para a conta controlada por Ledger já que Ledger não suporta o envio de %s, assim os ativos ficarão presos nesta conta</string>
@@ -636,6 +635,8 @@
     <string name="create_cloud_backup_password_title">Crie sua senha de backup</string>
     <string name="create_network_invalid_chain_id_message">O ID da Cadeia inserido não corresponde à rede no URL RPC.</string>
     <string name="create_network_invalid_chain_id_title">ID da Cadeia inválido</string>
+    <string name="create_wo_wallet_terms">Entendo que não posso acessar fundos de uma carteira somente de visualização.</string>
+    <string name="create_wo_wallet_terms_highlighted">Qualquer um que solicite pagamento para desbloquear fundos é um golpista.</string>
     <string name="crodloan_private_crowdloan_message">Crowdloans privados ainda não são suportados.</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan privado</string>
     <string name="crowdloan_about">Sobre crowdloans</string>
@@ -904,6 +905,7 @@
     <string name="language_title">Idioma</string>
     <string name="ledger_chain_not_supported">Ledger não suporta %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -2005,6 +2007,15 @@
     <string name="wallet_tokens">Tokens</string>
     <string name="wallet_transfer_details_send_back">Enviar para este contato</string>
     <string name="wallet_transfer_details_title">Detalhes da transferência</string>
+    <string name="watch_only_accept_terms">Aceitar termos</string>
+    <string name="watch_only_custom_title">Personalizado</string>
+    <string name="watch_only_demo_title">Demonstração</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nIsso é um golpe. Ninguém pode compartilhar, conceder acesso ou desbloquear uma carteira somente de visualização para você.\n\nSe alguém pediu para você adicionar uma carteira,\nentre em contato conosco %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">NUNCA envie dinheiro a alguém prometendo desbloquear fundos em uma carteira somente de visualização.</string>
+    <string name="watch_only_scam_risk_warning_title">Aviso de Risco de Golpe!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Carteira somente de visualização</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">Endereços %s para %s</string>
     <string name="web3names_integrity_check_failed_message">Nova detectou problemas com a integridade das informações sobre os endereços %1$s. Entre em contato com o proprietário de %1$s para resolver os problemas de integridade.</string>

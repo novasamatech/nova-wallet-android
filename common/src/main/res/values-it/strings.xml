@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">l\'app Polkadot sia installata</string>
     <string name="account_ledger_generic_import_start_step_2">%s sul tuo dispositivo Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Apri l\'app Polkadot</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (App Polkadot Generico)</string>
     <string name="account_ledger_import_fill_description">Assicurati che l\'app di rete sia installata sul tuo dispositivo Ledger utilizzando l\'app Ledger Live. Apri l\'app di rete sul tuo dispositivo Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Aggiungi almeno un account</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Percorso di derivazione segreto Substrate</string>
     <string name="account_wallet_name">Nome del portafoglio</string>
     <string name="account_wallet_nickname">Soprannome del portafoglio</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver e altre reti</string>
-    <string name="account_watch_add_evm_address_optional">Indirizzo EVM (Opzionale)</string>
-    <string name="account_watch_add_presets">Portafogli predefiniti</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT e altre 50 reti</string>
-    <string name="account_watch_add_subtitle">Traccia l\'attività di qualsiasi portafoglio senza inserire la tua chiave privata in Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">Indirizzo Ethereum o di qualsiasi altra rete compatibile con EVM</string>
+    <string name="account_watch_add_substrate_address_optional">Polkadot o qualsiasi altro indirizzo basato su Substrate</string>
+    <string name="account_watch_add_subtitle">Tieni traccia dell’attività del portafoglio senza una chiave privata.\nNon potrai eseguire alcuna transazione.</string>
     <string name="account_watch_key_missing_description">Il tuo portafoglio è solo per la visualizzazione, il che significa che non puoi eseguire alcuna operazione con esso</string>
     <string name="account_watch_key_missing_title">Ops! La chiave manca</string>
     <string name="account_watch_only">solo per la visualizzazione</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Potenzia i tuoi DOT \ndei DOT 🚀</string>
     <string name="assets_filter_title">Filtra i token</string>
     <string name="assets_gifts_flow_placeholder">Non hai token da regalare.\nAcquista o Deposita token nel tuo account.</string>
+    <string name="assets_list_watch_only_warning">Attenzione ai truffatori. Nessuno può sbloccare un wallet di sola visualizzazione o i suoi fondi</string>
     <string name="assets_manage_tokens_all_networks">Tutte le reti</string>
     <string name="assets_manage_tokens_title">Gestisci i token</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Non trasferire %s sul conto controllato da Ledger poiché Ledger non supporta l\'invio di %s, quindi gli asset rimarranno bloccati su questo conto</string>
@@ -636,6 +635,8 @@
     <string name="create_cloud_backup_password_title">Crea la tua password di backup</string>
     <string name="create_network_invalid_chain_id_message">L\'ID della catena inserito non corrisponde alla rete nell\'URL RPC.</string>
     <string name="create_network_invalid_chain_id_title">ID Catena non valido</string>
+    <string name="create_wo_wallet_terms">Capisco che non posso accedere ai fondi da un wallet di sola visualizzazione.</string>
+    <string name="create_wo_wallet_terms_highlighted">Chiunque chieda un pagamento per sbloccare i fondi è un truffatore.</string>
     <string name="crodloan_private_crowdloan_message">Le crowdloan private non sono ancora supportate</string>
     <string name="crodloan_private_crowdloan_title">Crowdloan privata</string>
     <string name="crowdloan_about">Informazioni sulle crowdloan</string>
@@ -904,6 +905,7 @@
     <string name="language_title">Lingua</string>
     <string name="ledger_chain_not_supported">Ledger non supporta %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -2005,6 +2007,15 @@
     <string name="wallet_tokens">Token</string>
     <string name="wallet_transfer_details_send_back">Invia a questo contatto</string>
     <string name="wallet_transfer_details_title">Dettagli del trasferimento</string>
+    <string name="watch_only_accept_terms">Accetta i termini</string>
+    <string name="watch_only_custom_title">Personalizzato</string>
+    <string name="watch_only_demo_title">Demo</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nQuesta è una truffa. Nessuno può condividere, concederti l’accesso o sbloccare per te un portafoglio di sola visualizzazione.\n\nSe qualcuno ti ha chiesto di aggiungere un portafoglio,\ncontattaci %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">NON inviare mai denaro a chiunque prometta di sbloccare fondi in un portafoglio di sola visualizzazione.</string>
+    <string name="watch_only_scam_risk_warning_title">Avviso di rischio truffa!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Wallet di sola visualizzazione</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s indirizzi per %s</string>
     <string name="web3names_integrity_check_failed_message">Nova ha rilevato problemi con l\'integrità delle informazioni sugli indirizzi %1$s. Si prega di contattare il proprietario di %1$s per risolvere i problemi di integrità.</string>
