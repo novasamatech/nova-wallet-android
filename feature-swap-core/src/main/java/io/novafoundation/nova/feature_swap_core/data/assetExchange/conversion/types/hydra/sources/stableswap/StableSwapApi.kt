@@ -12,9 +12,12 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableModule
 import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry1
+import io.novafoundation.nova.runtime.storage.source.query.api.QueryableStorageEntry2
 import io.novafoundation.nova.runtime.storage.source.query.api.storage1
+import io.novafoundation.nova.runtime.storage.source.query.api.storage2
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import java.math.BigInteger
 
 @JvmInline
 value class StableSwapApi(override val module: Module) : QueryableModule
@@ -42,10 +45,10 @@ val StableSwapApi.poolPegs: QueryableStorageEntry1<HydraDxAssetId, StalbeSwapPoo
     )
 
 context(StorageQueryContext)
-val StableSwapApi.assetTradability: QueryableStorageEntry1<HydraDxAssetId, Tradeability>
-    get() = storage1(
+val StableSwapApi.assetTradability: QueryableStorageEntry2<HydraDxAssetId, HydraDxAssetId, Tradeability>
+    get() = storage2(
         name = "AssetTradability",
-        binding = { decoded, _ ->
-            bindTradeability(decoded)
+        binding = { tradability, _, _ ->
+            bindTradeability(tradability)
         },
     )

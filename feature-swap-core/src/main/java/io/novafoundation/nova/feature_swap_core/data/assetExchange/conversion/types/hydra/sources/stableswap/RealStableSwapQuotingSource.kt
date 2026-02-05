@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap
 
+import android.util.Log
 import com.google.gson.Gson
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
@@ -93,15 +94,19 @@ private class RealStableSwapQuotingSource(
 
     override val identifier: String = StableSwapQuotingSourceFactory.ID
 
-    private val initialPoolsInfo: MutableSharedFlow<Collection<PoolInitialInfo>> = singleReplaySharedFlow()
+    private val initialPoolsInfo: MutableSharedFlow<StableSwapContext> = singleReplaySharedFlow()
 
     private val stablePools: MutableSharedFlow<List<StablePool>> = singleReplaySharedFlow()
 
     override suspend fun sync() {
-        val pools = getPools()
+        val poolInitialInfo = getPools().matchIdsWithLocal()
+        val assetsTradability = getAssetsTradability()
 
-        val poolInitialInfo = pools.matchIdsWithLocal()
-        initialPoolsInfo.emit(poolInitialInfo)
+        val stableswapContext = StableSwapContext(
+            assetsTradability = assetsTradability,
+            pools = poolInitialInfo
+        )
+        initialPoolsInfo.emit(stableswapContext)
     }
 
     override suspend fun availableSwapDirections(): Collection<StableSwapQuotingSource.Edge> {
@@ -117,7 +122,7 @@ private class RealStableSwapQuotingSource(
     ): Flow<Unit> = coroutineScope {
         stablePools.resetReplayCache()
 
-        val initialPoolsInfo = initialPoolsInfo.first()
+        val initialPoolsInfo = initialPoolsInfo.first().pools
 
         val poolInfoSubscriptions = initialPoolsInfo.map { poolInfo ->
             remoteStorageSource.subscribe(chain.id, subscriptionBuilder) {
@@ -266,9 +271,15 @@ private class RealStableSwapQuotingSource(
 
     private suspend fun getPools(): Map<HydraDxAssetId, StableSwapPoolInfo> {
         return remoteStorageSource.query(chain.id) {
-            val tradabilities = runtime.metadata.stableSwapOrNull?.assetTradability?.entries().orEmpty()
             runtime.metadata.stableSwapOrNull?.pools?.entries().orEmpty()
-                .filterByTradability(tradabilities)
+        }
+    }
+
+    private suspend fun getAssetsTradability(): Map<Pair<HydraDxAssetId, HydraDxAssetId>, Tradeability> {
+        return remoteStorageSource.query(chain.id) {
+            val storageEntry = runtime.metadata.stableSwapOrNull?.assetTradability ?: return@query emptyMap()
+            val keys = storageEntry.keys().toList()
+            storageEntry.entries(keys)
         }
     }
 
@@ -301,8 +312,9 @@ private class RealStableSwapQuotingSource(
         }
     }
 
-    private fun Collection<PoolInitialInfo>.allPossibleDirections(): Collection<RealStableSwapQuotingEdge> {
-        return flatMap { (poolAssetId, poolAssets) ->
+    private fun StableSwapContext.allPossibleDirections(): Collection<RealStableSwapQuotingEdge> {
+        return pools.flatMap { (poolAssetId, poolAssets) ->
+            val poolId = poolAssetId.first
             val allPoolAssetIds = buildList {
                 addAll(poolAssets.mapNotNull { it.flatten() })
 
@@ -313,14 +325,31 @@ private class RealStableSwapQuotingSource(
                 }
             }
 
-            allPoolAssetIds.flatMap { assetId ->
-                allPoolAssetIds.mapNotNull { otherAssetId ->
-                    otherAssetId.takeIf { assetId != otherAssetId }
-                        ?.let { RealStableSwapQuotingEdge(assetId, otherAssetId, poolAssetId.first) }
+            allPoolAssetIds.flatMap { sourceAssetId ->
+                val sourceTradability = assetsTradability[poolId to sourceAssetId.first]
+                val isSellAllowed = sourceTradability?.canSell() ?: true
+                if (!isSellAllowed) return@flatMap emptyList()
+
+                allPoolAssetIds.mapNotNull { targetAssetId ->
+                    if (sourceAssetId == targetAssetId) return@mapNotNull null
+
+                    val targetTradability = assetsTradability[poolId to targetAssetId.first]
+                    val isBuyAllowed = targetTradability?.canBuy() ?: true
+
+                    if (isBuyAllowed) {
+                        RealStableSwapQuotingEdge(sourceAssetId, targetAssetId, poolId)
+                    } else {
+                        null
+                    }
                 }
             }
         }
     }
+
+    private data class StableSwapContext(
+        val assetsTradability: Map<Pair<HydraDxAssetId, HydraDxAssetId>, Tradeability>,
+        val pools: Collection<PoolInitialInfo>
+    )
 
     private data class PoolInitialInfo(
         val sharedAsset: RemoteAndLocalIdOptional,
