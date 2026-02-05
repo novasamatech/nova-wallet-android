@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot приложение установлено</string>
     <string name="account_ledger_generic_import_start_step_2">%s на своем устройстве Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Откройте Polkadot приложение</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (Generic Polkadot app)</string>
     <string name="account_ledger_import_fill_description">Убедитесь, что приложение сети установлено на вашем Ledger устройстве через приложение Ledger Live. Откройте приложение сети на вашем Ledger устройстве.</string>
     <string name="account_ledger_import_fill_disabled_hint">Добавьте аккаунт</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Последовательность для вывода секрета Substrate</string>
     <string name="account_wallet_name">Имя кошелька</string>
     <string name="account_wallet_nickname">Имя кошелька</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver и другие сети</string>
-    <string name="account_watch_add_evm_address_optional">EVM Адрес (необязательно)</string>
-    <string name="account_watch_add_presets">Предустановленные кошельки</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT и 50+ сетей</string>
-    <string name="account_watch_add_subtitle">Отслеживайте активность любого кошелька, не вводя свой приватный ключ в Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">Адрес Ethereum или любого другого совместимого с EVM</string>
+    <string name="account_watch_add_substrate_address_optional">Адрес Polkadot или любого другого построенного на Substrate</string>
+    <string name="account_watch_add_subtitle">Отслеживание активности кошелька без приватного ключа.\nВы не сможете выполнить никакие транзакции.</string>
     <string name="account_watch_key_missing_description">Ваш кошелек доступен только для просмотра, то есть вы не можете выполнять с ним никаких операций</string>
     <string name="account_watch_key_missing_title">Упс! Ключ отсутствует</string>
     <string name="account_watch_only">watch-only</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Максимизируйте награды от DOT 🚀</string>
     <string name="assets_filter_title">Фильтр токенов</string>
     <string name="assets_gifts_flow_placeholder">У вас нет токенов для подарка.\nКупите или внесите токены на свой счет.</string>
+    <string name="assets_list_watch_only_warning">Остерегайтесь мошенников. Никто не может разблокировать кошелек только для просмотра или его средства</string>
     <string name="assets_manage_tokens_all_networks">Все сети</string>
     <string name="assets_manage_tokens_title">Управление токенами</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Не переводите %s на Ledger аккаунт так как Ledger не поддерживает переводы %s, таким образом ассет будет недоступен для перевода на этом аккаунте</string>
@@ -648,6 +647,8 @@
     <string name="create_cloud_backup_password_title">Создание пароля для бэкапа</string>
     <string name="create_network_invalid_chain_id_message">Введенный Chain ID не совпадает с сетью в RPC URL.</string>
     <string name="create_network_invalid_chain_id_title">Неверный Chain ID</string>
+    <string name="create_wo_wallet_terms">Я понимаю, что не могу получить доступ к средствам из кошелька только для просмотра.</string>
+    <string name="create_wo_wallet_terms_highlighted">Любой, кто просит оплату для разблокировки средств, является мошенником.</string>
     <string name="crodloan_private_crowdloan_message">Приватные краудлоуны пока не поддерживаются</string>
     <string name="crodloan_private_crowdloan_title">Приватный краудлоун</string>
     <string name="crowdloan_about">О краудлоунах</string>
@@ -918,6 +919,7 @@
     <string name="language_title">Язык</string>
     <string name="ledger_chain_not_supported">Ledger не поддерживает %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -1952,6 +1954,7 @@
     <string name="wallet_balance_details_title">Детали баланса</string>
     <string name="wallet_balance_details_total">Общий баланс</string>
     <string name="wallet_balance_details_total_after">Общий после перевода</string>
+    <string name="wallet_balance_details_total_watch_only">Только просмотр баланса</string>
     <string name="wallet_balance_frozen">Заморожено</string>
     <string name="wallet_balance_locked">Заблокировано</string>
     <string name="wallet_balance_redeemable">Можно забрать</string>
@@ -2033,6 +2036,16 @@
     <string name="wallet_tokens">Токены</string>
     <string name="wallet_transfer_details_send_back">Отправить этому контакту</string>
     <string name="wallet_transfer_details_title">Детали перевода</string>
+    <string name="watch_only_accept_terms">Принять условия</string>
+    <string name="watch_only_add_any_address">Введите хотя бы один адрес...</string>
+    <string name="watch_only_custom_title">Пользовательский</string>
+    <string name="watch_only_demo_title">Демо</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nЭто мошенничество. Никто не может поделиться, предоставить доступ или разблокировать для вас кошелек только для просмотра.\n\nЕсли кто-то попросил вас добавить кошелек,\nсвяжитесь с нами %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">НИКОГДА не отправляйте деньги никому, кто обещает разблокировать средства в кошельке только для просмотра.</string>
+    <string name="watch_only_scam_risk_warning_title">Предупреждение о риске мошенничества!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Кошелек только для просмотра</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s адреса для %s</string>
     <string name="web3names_integrity_check_failed_message">Nova обнаружила проблемы с целостностью информации об адресах %1$s. Пожалуйста, свяжитесь с владельцем %1$s для решения проблем с целостностью.</string>

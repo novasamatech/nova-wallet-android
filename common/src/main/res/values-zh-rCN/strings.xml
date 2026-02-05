@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadot 应用程序</string>
     <string name="account_ledger_generic_import_start_step_2">在 Ledger 设备上%s</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">打开 Polkadot 应用程序</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger（通用 Polkadot 应用）</string>
     <string name="account_ledger_import_fill_description">确保通过Ledger Live应用把网络应用安装到您的Ledger设备上。在您的Ledger设备上打开网络应用。</string>
     <string name="account_ledger_import_fill_disabled_hint">至少添加一个账户</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Substrate 秘密衍生路径</string>
     <string name="account_wallet_name">钱包名称</string>
     <string name="account_wallet_nickname">钱包昵称</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam、Moonriver 以及其他网络</string>
-    <string name="account_watch_add_evm_address_optional">EVM 地址（可选）</string>
-    <string name="account_watch_add_presets">预设钱包</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot、Kusama、Karura、KILT 以及 50+ 网络</string>
-    <string name="account_watch_add_subtitle">跟踪任何钱包的活动，无需将您的私钥输入到Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">以太坊或其他 EVM 兼容的地址</string>
+    <string name="account_watch_add_substrate_address_optional">Polkadot 或其他基于 Substrate 的地址</string>
+    <string name="account_watch_add_subtitle">在没有私钥的情况下跟踪钱包活动。\n您将无法执行任何交易。</string>
     <string name="account_watch_key_missing_description">您的钱包是仅查看的，这意味着您不能对其进行任何操作</string>
     <string name="account_watch_key_missing_title">哎呀！缺少密钥</string>
     <string name="account_watch_only">仅查看</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">提升你的 DOT 🚀</string>
     <string name="assets_filter_title">筛选代币</string>
     <string name="assets_gifts_flow_placeholder">您没有可赠送的代币。\n购买或存入代币到您的账户。</string>
+    <string name="assets_list_watch_only_warning">警惕骗子。没有人可以解锁仅观察钱包或其资金</string>
     <string name="assets_manage_tokens_all_networks">所有网络</string>
     <string name="assets_manage_tokens_title">代币管理</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">不要将 %s 转账至 Ledger 控制的账户，因为 Ledger 不支持 %s 的发送，所以资产将被卡在这个账户上</string>
@@ -630,6 +629,8 @@
     <string name="create_cloud_backup_password_title">创建备份密码</string>
     <string name="create_network_invalid_chain_id_message">输入的链 ID 与 RPC URL 中的网络不匹配。</string>
     <string name="create_network_invalid_chain_id_title">无效的链 ID</string>
+    <string name="create_wo_wallet_terms">我理解我无法从仅观察钱包访问资金。</string>
+    <string name="create_wo_wallet_terms_highlighted">任何要求支付以解锁资金的人都是骗子。</string>
     <string name="crodloan_private_crowdloan_message">私有众贷暂不支持。</string>
     <string name="crodloan_private_crowdloan_title">私有众筹</string>
     <string name="crowdloan_about">关于众贷</string>
@@ -897,6 +898,7 @@
     <string name="language_title">语言</string>
     <string name="ledger_chain_not_supported">Ledger不支持%s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -1916,6 +1918,7 @@
     <string name="wallet_balance_details_title">余额详情</string>
     <string name="wallet_balance_details_total">总余额</string>
     <string name="wallet_balance_details_total_after">转账后总计</string>
+    <string name="wallet_balance_details_total_watch_only">仅观察余额</string>
     <string name="wallet_balance_frozen">已冻结</string>
     <string name="wallet_balance_locked">已锁定</string>
     <string name="wallet_balance_redeemable">可赎回</string>
@@ -1991,6 +1994,16 @@
     <string name="wallet_tokens">代币</string>
     <string name="wallet_transfer_details_send_back">发送给此联系人</string>
     <string name="wallet_transfer_details_title">转账详情</string>
+    <string name="watch_only_accept_terms">接受条款</string>
+    <string name="watch_only_add_any_address">请输入至少一个地址...</string>
+    <string name="watch_only_custom_title">自定义</string>
+    <string name="watch_only_demo_title">演示</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\n这是一个骗局。没有人可以为您分享、授予访问权限或解锁仅观察钱包。\n\n如果有人要求您添加钱包，\n请联系我们 %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">绝不将资金转给承诺解锁仅观察钱包的人。</string>
+    <string name="watch_only_scam_risk_warning_title">诈骗风险警告!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">仅观察钱包</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s地址为%s</string>
     <string name="web3names_integrity_check_failed_message">Nova检测到关于%1$s地址信息完整性的问题。请联系%1$s的所有者解决完整性问题。</string>
