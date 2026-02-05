@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.data.network.subquery.SubQueryResponse
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
 import io.novafoundation.nova.feature_staking_impl.data.model.stakingExternalApi
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingNominatorEraInfosRequest
-import io.novafoundation.nova.feature_staking_impl.data.network.subquery.request.StakingValidatorEraInfosRequest
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import java.math.BigInteger
@@ -30,23 +29,6 @@ class SubQueryValidatorSetFetcher(
                     eraFrom = eraRange.first(),
                     eraTo = eraRange.last(),
                     nominatorStashAddress = stashAccountAddress
-                )
-            )
-        }
-    }
-
-    suspend fun findValidatorPayoutTargets(
-        chain: Chain,
-        stashAccountAddress: String,
-        eraRange: List<EraIndex>,
-    ): List<PayoutTarget> {
-        return findPayoutTargets(chain) { apiUrl ->
-            stakingApi.getValidatorEraInfos(
-                apiUrl,
-                StakingValidatorEraInfosRequest(
-                    eraFrom = eraRange.first(),
-                    eraTo = eraRange.last(),
-                    validatorStashAddress = stashAccountAddress
                 )
             )
         }
