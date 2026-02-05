@@ -17,7 +17,6 @@ import io.novafoundation.nova.runtime.storage.source.query.api.storage1
 import io.novafoundation.nova.runtime.storage.source.query.api.storage2
 import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
-import java.math.BigInteger
 
 @JvmInline
 value class StableSwapApi(override val module: Module) : QueryableModule
