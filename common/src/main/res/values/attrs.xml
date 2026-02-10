@@ -355,6 +355,8 @@
         <attr name="android:icon" />
         <attr name="iconTint" />
         <attr name="android:text" />
+        <attr name="android:textAppearance" />
+        <attr name="android:textColor" />
     </declare-styleable>
 
     <declare-styleable name="TapToViewContainer">
@@ -380,5 +382,10 @@
             <enum name="center" value="1" />
             <enum name="end" value="2" />
         </attr>
+    </declare-styleable>
+
+    <declare-styleable name="DelayedMaterialButton">
+        <attr name="delayDuration" format="integer" />
+        <attr name="progressColor" format="color" />
     </declare-styleable>
 </resources>

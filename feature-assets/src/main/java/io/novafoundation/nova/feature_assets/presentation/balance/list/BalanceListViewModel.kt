@@ -7,9 +7,11 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.data.model.MaskingMode
+import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -55,6 +57,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.mapBala
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_assets.presentation.balance.common.gifts.GiftsRestrictionCheckMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.FiatConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.model.FractionPartStyling
@@ -97,8 +101,9 @@ class BalanceListViewModel(
     private val multisigPendingOperationsService: MultisigPendingOperationsService,
     private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
     private val maskingModeUseCase: MaskingModeUseCase,
-    private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin
-) : BaseViewModel() {
+    private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
+    private val appLinksProvider: AppLinksProvider
+) : BaseViewModel(), Browserable {
 
     private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
         .shareInBackground()
@@ -152,6 +157,11 @@ class BalanceListViewModel(
 
     val nftPreviewsUi = nftsPreviews
         .combine(maskableAmountFormatterFlow, ::mapNftPreviewToUi)
+        .inBackground()
+        .share()
+
+    val showWatchOnlyWarning = selectedMetaAccount
+        .map { it.type == LightMetaAccount.Type.WATCH_ONLY }
         .inBackground()
         .share()
 
@@ -217,6 +227,16 @@ class BalanceListViewModel(
         .withSafeLoading()
         .combine(maskableAmountFormatterFlow, ::formatPendingOperationsCount)
         .shareInBackground()
+
+    override val openBrowserEvent = MutableLiveData<Event<String>>()
+
+    val balanceTitleFlow = selectedMetaAccount.map {
+        if (it.type == LightMetaAccount.Type.WATCH_ONLY) {
+            resourceManager.getString(R.string.wallet_balance_details_total_watch_only)
+        } else {
+            resourceManager.getString(R.string.wallet_balance_details_total)
+        }
+    }.shareInBackground()
 
     init {
         selectedCurrency
@@ -403,5 +423,9 @@ class BalanceListViewModel(
 
     fun toggleMasking() {
         maskingModeUseCase.toggleMaskingMode()
+    }
+
+    fun watchOnlyLearnMore() {
+        openBrowserEvent.value = appLinksProvider.watchOnlyScamWikiUrl.event()
     }
 }

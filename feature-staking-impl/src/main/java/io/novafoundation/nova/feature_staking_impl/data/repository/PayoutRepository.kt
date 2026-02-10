@@ -73,13 +73,15 @@ class PayoutRepository(
                     calculateNominatorReward(stakingState.stashId, it)
                 }
             )
+
             is StakingState.Stash.Validator -> calculateUnpaidPayouts(
                 chain = stakingState.chain,
                 retrievePayoutTargets = { historicalRange ->
-                    validatorSetFetcher.findValidatorPayoutTargets(stakingState.chain, stakingState.stashAddress, historicalRange)
+                    historicalRange.map { PayoutTarget(stakingState.stashId.intoKey(), it) }
                 },
                 calculatePayout = ::calculateValidatorReward
             )
+
             else -> throw IllegalStateException("Cannot calculate payouts for ${stakingState::class.simpleName} state")
         }
     }

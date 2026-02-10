@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Polkadotアプリがインストールされています</string>
     <string name="account_ledger_generic_import_start_step_2">Ledger デバイスで%s</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">ポルカドットアプリを開く</string>
-    <string name="account_ledger_generic_item_subtitle">フレックス、スタックス、ナノ X、ナノ S プラス</string>
+    <string name="account_ledger_generic_item_subtitle">フレックス、スタックス、ナノ</string>
     <string name="account_ledger_generic_item_title">Ledger (一般的な Polkadot アプリ)</string>
     <string name="account_ledger_import_fill_description">Ledger Liveアプリを使用してネットワークアプリをLedgerデバイスにインストールしてください。Ledgerデバイスでネットワークアプリを開いてください。</string>
     <string name="account_ledger_import_fill_disabled_hint">少なくとも1つのアカウントを追加してください</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Substrate秘密の導出パス</string>
     <string name="account_wallet_name">ウォレット名</string>
     <string name="account_wallet_nickname">ウォレットのニックネーム</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam、Moonriverおよびその他のネットワーク</string>
-    <string name="account_watch_add_evm_address_optional">EVMアドレス（任意）</string>
-    <string name="account_watch_add_presets">プリセットウォレット</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot、Kusama、Karura、KILTおよび50+のネットワーク</string>
-    <string name="account_watch_add_subtitle">👀 プライベートキーをNova Walletに入力せずに任意のウォレットの活動を追跡</string>
+    <string name="account_watch_add_evm_address_optional">イーサリアムまたはその他のEVM互換アドレス</string>
+    <string name="account_watch_add_substrate_address_optional">Polkadotまたはその他のSubstrateベースのアドレス</string>
+    <string name="account_watch_add_subtitle">秘密鍵を使わずにウォレットのアクティビティを追跡することができます。\nトランザクションを実行することはできません。</string>
     <string name="account_watch_key_missing_description">あなたのウォレットは閲覧専用であり、操作を行うことはできません</string>
     <string name="account_watch_key_missing_title">おっと！ キーが見つかりません</string>
     <string name="account_watch_only">閲覧専用</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">DOTをブースト 🚀</string>
     <string name="assets_filter_title">トークンをフィルター</string>
     <string name="assets_gifts_flow_placeholder">贈り物にできるトークンがありません。\nアカウントにトークンを購入または入金してください。</string>
+    <string name="assets_list_watch_only_warning">詐欺師に注意してください。ウォッチオンリーポケットやその資金を解除できる人はいません。</string>
     <string name="assets_manage_tokens_all_networks">すべてのネットワーク</string>
     <string name="assets_manage_tokens_title">トークンを管理</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">%sをLedgerで管理されたアカウントに送信しないでください。Ledgerは%sの送信をサポートしていないため、資産がこのアカウントで凍結される可能性があります。</string>
@@ -630,6 +629,8 @@
     <string name="create_cloud_backup_password_title">バックアップパスワードを作成する</string>
     <string name="create_network_invalid_chain_id_message">入力されたチェーンIDはRPC URLのネットワークと一致しません。</string>
     <string name="create_network_invalid_chain_id_title">無効なチェーンID</string>
+    <string name="create_wo_wallet_terms">ウォッチオンリーウォレットから資金にアクセスできないことを理解しました。</string>
+    <string name="create_wo_wallet_terms_highlighted">資金のアンロックのために支払いを求める者は詐欺師です。</string>
     <string name="crodloan_private_crowdloan_message">プライベートクラウドローンはまだサポートされていません。</string>
     <string name="crodloan_private_crowdloan_title">プライベートクラウドローン</string>
     <string name="crowdloan_about">クラウドローンについて</string>
@@ -897,6 +898,7 @@
     <string name="language_title">言語</string>
     <string name="ledger_chain_not_supported">Ledgerは〜をサポートしていません</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">ナノ X</string>
@@ -1916,6 +1918,7 @@
     <string name="wallet_balance_details_title">残高の詳細</string>
     <string name="wallet_balance_details_total">総残高</string>
     <string name="wallet_balance_details_total_after">転送後の総残高</string>
+    <string name="wallet_balance_details_total_watch_only">ウォッチオンリーバランス</string>
     <string name="wallet_balance_frozen">凍結</string>
     <string name="wallet_balance_locked">ロック済み</string>
     <string name="wallet_balance_redeemable">引き換え可能</string>
@@ -1991,6 +1994,16 @@
     <string name="wallet_tokens">トークン</string>
     <string name="wallet_transfer_details_send_back">この連絡先に送信</string>
     <string name="wallet_transfer_details_title">転送の詳細</string>
+    <string name="watch_only_accept_terms">規約を受け入れる</string>
+    <string name="watch_only_add_any_address">少なくとも1つのアドレスを入力してください...</string>
+    <string name="watch_only_custom_title">カスタム</string>
+    <string name="watch_only_demo_title">デモ</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nこれは詐欺です。ウォッチオンリーウォレットを共有、アクセス許可、解除することはできません。\n\n誰かがウォレットを追加するよう求めた場合、\n私たちに連絡してください %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">ウォッチオンリーウォレットの資金をアンロックすることを約束する人にお金を送ってはいけません。</string>
+    <string name="watch_only_scam_risk_warning_title">詐欺リスク警告！</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">ウォッチオンリーポケット</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s のアドレス %s</string>
     <string name="web3names_integrity_check_failed_message">Nova は %1$s アドレスの情報の整合性に問題を検出しました。整合性の問題を解決するために %1$s の所有者にご連絡ください。</string>

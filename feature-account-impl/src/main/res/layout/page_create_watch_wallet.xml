@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/createWatchWalletContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/account_wallet_nickname"
+        android:textColor="@color/text_secondary" />
+
+    <io.novafoundation.nova.common.view.input.TextInputView
+        android:id="@+id/createWatchWalletName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/watch_only_wallet_name_field_hint" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/account_watch_add_substrate_address_optional"
+        android:textColor="@color/text_secondary" />
+
+    <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
+        android:id="@+id/createWatchWalletSubstrateAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/watch_only_wallet_evm_field_hint" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/account_watch_add_evm_address_optional"
+        android:textColor="@color/text_secondary" />
+
+    <io.novafoundation.nova.feature_account_api.presenatation.mixin.addressInput.AddressInputField
+        android:id="@+id/createWatchWalletEvmAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:hint="@string/watch_only_wallet_substrate_field_hint" />
+
+</LinearLayout>

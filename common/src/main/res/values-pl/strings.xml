@@ -74,7 +74,7 @@
     <string name="account_ledger_generic_import_start_step_1_highlighted">Aplikacja Polkadot jest zainstalowana</string>
     <string name="account_ledger_generic_import_start_step_2">%s na swoim urządzeniu Ledger</string>
     <string name="account_ledger_generic_import_start_step_2_highlighted">Otwórz aplikację Polkadot</string>
-    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano X, Nano S Plus</string>
+    <string name="account_ledger_generic_item_subtitle">Flex, Stax, Nano</string>
     <string name="account_ledger_generic_item_title">Ledger (Aplikacja Polkadot Ogólna)</string>
     <string name="account_ledger_import_fill_description">Upewnij się, że aplikacja sieciowa jest zainstalowana na Twoim urządzeniu Ledger przy użyciu aplikacji Ledger Live. Otwórz aplikację sieciową na swoim urządzeniu Ledger.</string>
     <string name="account_ledger_import_fill_disabled_hint">Dodaj przynajmniej jedno konto</string>
@@ -168,11 +168,9 @@
     <string name="account_substrate_derivation_path">Ścieżka wyprowadzenia sekretu Substrate</string>
     <string name="account_wallet_name">Nazwa portfela</string>
     <string name="account_wallet_nickname">Pseudonim portfela</string>
-    <string name="account_watch_add_evm_address_description">Moonbeam, Moonriver i inne sieci</string>
-    <string name="account_watch_add_evm_address_optional">Adres EVM (opcjonalnie)</string>
-    <string name="account_watch_add_presets">Portfele predefiniowane</string>
-    <string name="account_watch_add_substrate_address_description">Polkadot, Kusama, Karura, KILT i 50+ sieci</string>
-    <string name="account_watch_add_subtitle">Śledź aktywność dowolnego portfela bez wprowadzania swojego klucza prywatnego do Nova Wallet</string>
+    <string name="account_watch_add_evm_address_optional">Ethereum lub dowolny inny adres kompatybilny z EVM</string>
+    <string name="account_watch_add_substrate_address_optional">Polkadot lub dowolny inny adres oparty na Substrate</string>
+    <string name="account_watch_add_subtitle">Śledź aktywność portfela bez klucza prywatnego.\nNie będziesz w stanie przeprowadzać żadnych transakcji.</string>
     <string name="account_watch_key_missing_description">Twój portfel jest tylko do przeglądania, co oznacza, że nie możesz wykonywać na nim żadnych operacji</string>
     <string name="account_watch_key_missing_title">Ups! Brak klucza</string>
     <string name="account_watch_only">tylko do przeglądania</string>
@@ -238,6 +236,7 @@
     <string name="assets_crowdloan_unlock_banner_title">Zwiększ swoje DOT 🚀</string>
     <string name="assets_filter_title">Filtruj tokeny</string>
     <string name="assets_gifts_flow_placeholder">Nie masz tokenów do podarowania.\nKup lub zdeponuj tokeny na swoje konto.</string>
+    <string name="assets_list_watch_only_warning">Uważaj na oszustów. Nikt nie może odblokować portfela tylko do obserwacji ani jego środków</string>
     <string name="assets_manage_tokens_all_networks">Wszystkie sieci</string>
     <string name="assets_manage_tokens_title">Zarządzaj tokenami</string>
     <string name="assets_receive_ledger_not_supported_message" formatted="false">Nie przenoś %s na konto zarządzane przez Ledger, ponieważ Ledger nie obsługuje wysyłania %s. W ten sposób aktywa będą zablokowane na tym koncie.</string>
@@ -648,6 +647,8 @@
     <string name="create_cloud_backup_password_title">Utwórz swoje hasło kopii zapasowej</string>
     <string name="create_network_invalid_chain_id_message">Wprowadzony Chain ID nie pasuje do sieci w adresie URL RPC.</string>
     <string name="create_network_invalid_chain_id_title">Nieprawidłowy Chain ID</string>
+    <string name="create_wo_wallet_terms">Rozumiem, że nie mogę uzyskać dostępu do środków z portfela tylko do obserwacji.</string>
+    <string name="create_wo_wallet_terms_highlighted">Każdy, kto prosi o płatność za odblokowanie środków, jest oszustem.</string>
     <string name="crodloan_private_crowdloan_message">Prywatne crowdloany nie są jeszcze obsługiwane.</string>
     <string name="crodloan_private_crowdloan_title">Prywatny crowdloan</string>
     <string name="crowdloan_about">O crowdloanach</string>
@@ -918,6 +919,7 @@
     <string name="language_title">Język</string>
     <string name="ledger_chain_not_supported">Ledger nie obsługuje %s</string>
     <string name="ledger_device_flex">Ledger Flex</string>
+    <string name="ledger_device_nano_gen5">Ledger Nano Gen5</string>
     <string name="ledger_device_nano_s">Nano S</string>
     <string name="ledger_device_nano_s_plus">Nano S Plus</string>
     <string name="ledger_device_nano_x">Nano X</string>
@@ -1952,6 +1954,7 @@
     <string name="wallet_balance_details_title">Szczegóły bilansu</string>
     <string name="wallet_balance_details_total">Łączny bilans</string>
     <string name="wallet_balance_details_total_after">Łączny po transferze</string>
+    <string name="wallet_balance_details_total_watch_only">Saldo tylko do obserwacji</string>
     <string name="wallet_balance_frozen">Zamrożone</string>
     <string name="wallet_balance_locked">Zablokowane</string>
     <string name="wallet_balance_redeemable">Do odebrania</string>
@@ -2033,6 +2036,16 @@
     <string name="wallet_tokens">Tokeny</string>
     <string name="wallet_transfer_details_send_back">Wyślij do tego kontaktu</string>
     <string name="wallet_transfer_details_title">Szczegóły transferu</string>
+    <string name="watch_only_accept_terms">Akceptuj warunki</string>
+    <string name="watch_only_add_any_address">Wprowadź co najmniej jeden adres...</string>
+    <string name="watch_only_custom_title">Niestandardowy</string>
+    <string name="watch_only_demo_title">Demo</string>
+    <string name="watch_only_scam_risk_warning_subtitle">%1$s\nTo jest oszustwo. Nikt nie może udostępnić, dać dostępu ani odblokować portfela tylko do obserwacji dla Ciebie.\n\nJeśli ktoś poprosił Cię o dodanie portfela,\nskontaktuj się z nami %2$s</string>
+    <string name="watch_only_scam_risk_warning_subtitle_highlighted">NIGDY nie wysyłaj pieniędzy nikomu, kto obiecuje odblokowanie środków w portfelu tylko do obserwacji.</string>
+    <string name="watch_only_scam_risk_warning_title">Ostrzeżenie o ryzyku oszustwa!</string>
+    <string name="watch_only_wallet_evm_field_hint">0x...</string>
+    <string name="watch_only_wallet_name_field_hint">Portfel tylko do obserwacji</string>
+    <string name="watch_only_wallet_substrate_field_hint">1...</string>
     <string name="web3names_address_with_description" formatted="false">%s (%s)</string>
     <string name="web3names_identifiers_sheet_title" formatted="false">%s adresy dla %s</string>
     <string name="web3names_integrity_check_failed_message">Nova wykryła problemy z integralnością informacji o adresach %1$s. Proszę skontaktować się z właścicielem %1$s, aby rozwiązać problemy z integralnością.</string>

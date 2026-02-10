@@ -18,7 +18,7 @@ class WatchOnlyAddAccountRepository(
     sealed interface Payload {
         class MetaAccount(
             val name: String,
-            val substrateAccountId: AccountId,
+            val substrateAccountId: AccountId?,
             val ethereumAccountId: AccountId?
         ) : Payload
 
