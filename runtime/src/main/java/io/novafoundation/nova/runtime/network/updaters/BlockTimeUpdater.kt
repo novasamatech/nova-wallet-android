@@ -76,6 +76,10 @@ class BlockTimeUpdater(
             }.noSideAffects()
     }
 
+    // TODO: ASSET HUB WARNING: We don't use Block Time Updater directly for Asset Hub chains but have to change this method if we start using it.
+    //  Description:
+    //  Asset Hub chains may emmit multiple blocks with 0 delta time. Because of this SampledBlockTimeStorage may save averageBlockTime = 0 and sampleSize > 0
+    //  This state may potentially lead us to crashes in MortalityConstructor.
     private suspend fun updateSampledBlockTime(chainId: ChainId, newSampledTime: BigInteger) {
         val current = sampledBlockTimeStorage.get(chainId)
 
@@ -86,7 +90,7 @@ class BlockTimeUpdater(
             averageBlockTime = adjustedAverage
         )
 
-        Log.d(LOG_TAG, "New block time update: $newSampledTime, adjustedAverage: $adjustedSampledBlockTime")
+        Log.d(LOG_TAG, "New block time update on chain $chainId: $newSampledTime, adjustedAverage: $adjustedSampledBlockTime")
 
         sampledBlockTimeStorage.put(chainId, adjustedSampledBlockTime)
     }
