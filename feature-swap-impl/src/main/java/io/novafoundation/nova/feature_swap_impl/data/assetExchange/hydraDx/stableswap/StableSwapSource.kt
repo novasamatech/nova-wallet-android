@@ -5,7 +5,6 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.StableSwapQuotingSource
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.stableswap.StableSwapQuotingSourceFactory
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
-import io.novafoundation.nova.feature_swap_core_api.data.network.toChainAssetOrThrow
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
@@ -56,8 +55,9 @@ private class StableSwapSource(
         override val standaloneSwap = null
 
         override suspend fun debugLabel(): String {
-            val poolAsset = hydraDxAssetIdConverter.toChainAssetOrThrow(chain, delegate.poolId)
-            return "StableSwap.${poolAsset.symbol}"
+            val poolLabel = hydraDxAssetIdConverter.toChainAssetOrNull(chain, delegate.poolId)?.symbol
+                ?: delegate.poolId
+            return "StableSwap.${poolLabel}"
         }
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
