@@ -903,8 +903,8 @@ internal class RealSwapService(
 
             val feeCapability = getFeeCustomFeeCapability(edge.from.chainId)
 
-            return feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId)
-                && edge.canPayNonNativeFeesInIntermediatePosition()
+            return feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId) &&
+                edge.canPayNonNativeFeesInIntermediatePosition()
         }
 
         private suspend fun canExecuteIntermediateEdgeSequentially(edge: SwapGraphEdge, predecessor: SwapGraphEdge): Boolean {

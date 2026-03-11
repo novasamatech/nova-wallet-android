@@ -53,7 +53,7 @@ value class Fraction private constructor(private val value: Double) : Comparable
     }
 
     override fun toString(): String {
-        return "${inPercents}%"
+        return "$inPercents%"
     }
 }
 

@@ -57,7 +57,7 @@ private class StableSwapSource(
         override suspend fun debugLabel(): String {
             val poolLabel = hydraDxAssetIdConverter.toChainAssetOrNull(chain, delegate.poolId)?.symbol
                 ?: delegate.poolId
-            return "StableSwap.${poolLabel}"
+            return "StableSwap.$poolLabel"
         }
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
