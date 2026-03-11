@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.data.network.runtime.binding
 
 import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.Fraction.Companion.percents
+import io.novafoundation.nova.common.utils.Fraction.Companion.permills
 import java.math.BigDecimal
 import java.math.BigInteger
 import io.novafoundation.nova.common.utils.Perbill as PerbillTyped
@@ -40,6 +41,10 @@ fun bindPerbillTyped(dynamic: Any?, mantissa: Int = PERBILL_MANTISSA_SIZE): Perb
 
 fun bindPermill(dynamic: Any?): PerbillTyped {
     return bindPerbillTyped(dynamic, mantissa = PERMILL_MANTISSA_SIZE)
+}
+
+fun bindPermillFraction(dynamic: Any?): Fraction {
+    return bindNumber(dynamic).permills
 }
 
 fun BigInteger.asPerQuintill(): PerbillTyped {
