@@ -34,6 +34,9 @@ value class Fraction private constructor(private val value: Double) : Comparable
 
         val Int.percents: Fraction
             get() = toDouble().toFraction(FractionUnit.PERCENT)
+
+        val BigInteger.permills: Fraction
+            get() = toDouble().toFraction(FractionUnit.PERMILL)
     }
 
     val inPercents: Double
@@ -48,19 +51,28 @@ value class Fraction private constructor(private val value: Double) : Comparable
     override fun compareTo(other: Fraction): Int {
         return value.compareTo(other.value)
     }
+
+    override fun toString(): String {
+        return "$inPercents%"
+    }
 }
 
 enum class FractionUnit {
 
     /**
-     * Default range: 0..1
+     * Parts per one (1 = 100%)
      */
     FRACTION,
 
     /**
-     * Default range: 0..100
+     * Parts per hundred (100 = 100%)
      */
-    PERCENT
+    PERCENT,
+
+    /**
+     * Parts per million (1_000_000 = 100%)
+     */
+    PERMILL
 }
 
 fun Fraction?.orZero(): Fraction = this ?: Fraction.ZERO
@@ -72,6 +84,7 @@ private fun FractionUnit.convertToFraction(value: Double): Double {
     return when (this) {
         FractionUnit.FRACTION -> value
         FractionUnit.PERCENT -> value / 100
+        FractionUnit.PERMILL -> value / 1_000_000
     }
 }
 
@@ -79,6 +92,7 @@ private fun FractionUnit.convertFromFraction(value: Double): Double {
     return when (this) {
         FractionUnit.FRACTION -> value
         FractionUnit.PERCENT -> value * 100
+        FractionUnit.PERMILL -> value * 1_000_000
     }
 }
 

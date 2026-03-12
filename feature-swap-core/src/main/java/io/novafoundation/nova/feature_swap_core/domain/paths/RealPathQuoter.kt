@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import java.math.BigInteger
 
-private const val PATHS_LIMIT = 4
+private const val PATHS_LIMIT = 10
 private const val QUOTES_CACHE = "RealSwapService.QuotesCache"
 
 class RealPathQuoterFactory(

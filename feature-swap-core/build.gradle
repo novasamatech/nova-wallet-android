@@ -19,4 +19,8 @@ dependencies {
     implementation androidDep
 
     api project(':core-api')
+
+    androidTestImplementation androidTestRunnerDep
+    androidTestImplementation androidTestRulesDep
+    androidTestImplementation androidJunitDep
 }

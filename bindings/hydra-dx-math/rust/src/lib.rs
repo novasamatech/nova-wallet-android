@@ -730,3 +730,426 @@ fn calculate_pool_trade_fee(amount: String, fee_nominator: String, fee_denominat
         error()
     }
 }
+
+/* ---------------- OMNIPOOL ---------------------- */
+
+use hydra_dx_math::omnipool::types::{AssetReserveState, BalanceUpdate, TradeSlipFees, SignedBalance};
+
+fn build_asset_reserve_state(reserve: u128, hub_reserve: u128, shares: u128) -> AssetReserveState<u128> {
+    AssetReserveState {
+        reserve,
+        hub_reserve,
+        shares,
+        protocol_shares: 0,
+    }
+}
+
+fn build_slip_fees(
+    asset_in_hub_reserve: u128,
+    asset_out_hub_reserve: u128,
+    max_slip_fee: Permill,
+) -> Option<TradeSlipFees> {
+    if max_slip_fee == Permill::zero() {
+        None
+    } else {
+        Some(TradeSlipFees {
+            asset_in_hub_reserve,
+            asset_in_delta: SignedBalance::Positive(0),
+            asset_out_hub_reserve,
+            asset_out_delta: SignedBalance::Positive(0),
+            max_slip_fee,
+        })
+    }
+}
+
+#[no_mangle]
+pub fn Java_io_novafoundation_nova_hydra_1dx_1math_omnipool_OmniPoolMathBridge_calculate_1out_1given_1in<'a>(
+    jni_env: JNIEnv<'a>,
+    _: JClass,
+    asset_in_reserve: JString,
+    asset_in_hub_reserve: JString,
+    asset_in_shares: JString,
+    asset_out_reserve: JString,
+    asset_out_hub_reserve: JString,
+    asset_out_shares: JString,
+    amount_in: JString,
+    asset_fee: JString,
+    protocol_fee: JString,
+    max_slip_fee: JString,
+) -> JString<'a> {
+    let asset_in_reserve = get_str(&jni_env, asset_in_reserve);
+    let asset_in_hub_reserve = get_str(&jni_env, asset_in_hub_reserve);
+    let asset_in_shares = get_str(&jni_env, asset_in_shares);
+    let asset_out_reserve = get_str(&jni_env, asset_out_reserve);
+    let asset_out_hub_reserve = get_str(&jni_env, asset_out_hub_reserve);
+    let asset_out_shares = get_str(&jni_env, asset_out_shares);
+    let amount_in = get_str(&jni_env, amount_in);
+    let asset_fee = get_str(&jni_env, asset_fee);
+    let protocol_fee = get_str(&jni_env, protocol_fee);
+    let max_slip_fee = get_str(&jni_env, max_slip_fee);
+
+    let out = omnipool_calculate_out_given_in(
+        asset_in_reserve, asset_in_hub_reserve, asset_in_shares,
+        asset_out_reserve, asset_out_hub_reserve, asset_out_shares,
+        amount_in, asset_fee, protocol_fee, max_slip_fee,
+    );
+
+    jni_env.new_string(out).unwrap()
+}
+
+fn omnipool_calculate_out_given_in(
+    asset_in_reserve: String,
+    asset_in_hub_reserve: String,
+    asset_in_shares: String,
+    asset_out_reserve: String,
+    asset_out_hub_reserve: String,
+    asset_out_shares: String,
+    amount_in: String,
+    asset_fee: String,
+    protocol_fee: String,
+    max_slip_fee: String,
+) -> String {
+    let asset_in_reserve = parse_into!(u128, asset_in_reserve);
+    let asset_in_hub_reserve = parse_into!(u128, asset_in_hub_reserve);
+    let asset_in_shares = parse_into!(u128, asset_in_shares);
+    let asset_out_reserve = parse_into!(u128, asset_out_reserve);
+    let asset_out_hub_reserve = parse_into!(u128, asset_out_hub_reserve);
+    let asset_out_shares = parse_into!(u128, asset_out_shares);
+    let amount = parse_into!(u128, amount_in);
+    let asset_fee = Permill::from_float(parse_into!(f64, asset_fee));
+    let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee));
+    let max_slip_fee = Permill::from_float(parse_into!(f64, max_slip_fee));
+
+    let asset_in = build_asset_reserve_state(asset_in_reserve, asset_in_hub_reserve, asset_in_shares);
+    let asset_out = build_asset_reserve_state(asset_out_reserve, asset_out_hub_reserve, asset_out_shares);
+    let slip = build_slip_fees(asset_in_hub_reserve, asset_out_hub_reserve, max_slip_fee);
+
+    let result = hydra_dx_math::omnipool::calculate_sell_state_changes(
+        &asset_in,
+        &asset_out,
+        amount,
+        asset_fee,
+        protocol_fee,
+        Permill::zero(),
+        slip.as_ref(),
+    );
+
+    match result {
+        Some(state) => {
+            match state.asset_out.delta_reserve {
+                BalanceUpdate::Increase(v) => v.to_string(),
+                BalanceUpdate::Decrease(v) => v.to_string(),
+            }
+        }
+        None => error(),
+    }
+}
+
+#[no_mangle]
+pub fn Java_io_novafoundation_nova_hydra_1dx_1math_omnipool_OmniPoolMathBridge_calculate_1in_1given_1out<'a>(
+    jni_env: JNIEnv<'a>,
+    _: JClass,
+    asset_in_reserve: JString,
+    asset_in_hub_reserve: JString,
+    asset_in_shares: JString,
+    asset_out_reserve: JString,
+    asset_out_hub_reserve: JString,
+    asset_out_shares: JString,
+    amount_out: JString,
+    asset_fee: JString,
+    protocol_fee: JString,
+    max_slip_fee: JString,
+) -> JString<'a> {
+    let asset_in_reserve = get_str(&jni_env, asset_in_reserve);
+    let asset_in_hub_reserve = get_str(&jni_env, asset_in_hub_reserve);
+    let asset_in_shares = get_str(&jni_env, asset_in_shares);
+    let asset_out_reserve = get_str(&jni_env, asset_out_reserve);
+    let asset_out_hub_reserve = get_str(&jni_env, asset_out_hub_reserve);
+    let asset_out_shares = get_str(&jni_env, asset_out_shares);
+    let amount_out = get_str(&jni_env, amount_out);
+    let asset_fee = get_str(&jni_env, asset_fee);
+    let protocol_fee = get_str(&jni_env, protocol_fee);
+    let max_slip_fee = get_str(&jni_env, max_slip_fee);
+
+    let out = omnipool_calculate_in_given_out(
+        asset_in_reserve, asset_in_hub_reserve, asset_in_shares,
+        asset_out_reserve, asset_out_hub_reserve, asset_out_shares,
+        amount_out, asset_fee, protocol_fee, max_slip_fee,
+    );
+
+    jni_env.new_string(out).unwrap()
+}
+
+fn omnipool_calculate_in_given_out(
+    asset_in_reserve: String,
+    asset_in_hub_reserve: String,
+    asset_in_shares: String,
+    asset_out_reserve: String,
+    asset_out_hub_reserve: String,
+    asset_out_shares: String,
+    amount_out: String,
+    asset_fee: String,
+    protocol_fee: String,
+    max_slip_fee: String,
+) -> String {
+    let asset_in_reserve = parse_into!(u128, asset_in_reserve);
+    let asset_in_hub_reserve = parse_into!(u128, asset_in_hub_reserve);
+    let asset_in_shares = parse_into!(u128, asset_in_shares);
+    let asset_out_reserve = parse_into!(u128, asset_out_reserve);
+    let asset_out_hub_reserve = parse_into!(u128, asset_out_hub_reserve);
+    let asset_out_shares = parse_into!(u128, asset_out_shares);
+    let amount = parse_into!(u128, amount_out);
+    let asset_fee = Permill::from_float(parse_into!(f64, asset_fee));
+    let protocol_fee = Permill::from_float(parse_into!(f64, protocol_fee));
+    let max_slip_fee = Permill::from_float(parse_into!(f64, max_slip_fee));
+
+    let asset_in = build_asset_reserve_state(asset_in_reserve, asset_in_hub_reserve, asset_in_shares);
+    let asset_out = build_asset_reserve_state(asset_out_reserve, asset_out_hub_reserve, asset_out_shares);
+    let slip = build_slip_fees(asset_in_hub_reserve, asset_out_hub_reserve, max_slip_fee);
+
+    let result = hydra_dx_math::omnipool::calculate_buy_state_changes(
+        &asset_in,
+        &asset_out,
+        amount,
+        asset_fee,
+        protocol_fee,
+        Permill::zero(),
+        slip.as_ref(),
+    );
+
+    match result {
+        Some(state) => {
+            match state.asset_in.delta_reserve {
+                BalanceUpdate::Increase(v) => v.to_string(),
+                BalanceUpdate::Decrease(v) => v.to_string(),
+            }
+        }
+        None => error(),
+    }
+}
+
+#[cfg(test)]
+mod omnipool_tests {
+    use super::*;
+
+    const UNIT: u128 = 1_000_000_000_000;
+
+    fn to_unit(amount: u128) -> String {
+        (amount * UNIT).to_string()
+    }
+
+    #[test]
+    fn sell_should_work_with_no_fees() {
+        let result = omnipool_calculate_out_given_in(
+            to_unit(10_000_000),  // assetInReserve
+            to_unit(20_000_000),  // assetInHubReserve
+            to_unit(10_000_000),  // assetInShares
+            to_unit(5_000_000),   // assetOutReserve
+            to_unit(5_000_000),   // assetOutHubReserve
+            to_unit(20_000_000),  // assetOutShares
+            to_unit(4_000_000),   // amountIn
+            "0".to_string(),      // assetFee
+            "0".to_string(),      // protocolFee
+            "0".to_string(),      // maxSlipFee
+        );
+
+        assert_ne!(result, "-1", "Should not return error");
+        let amount_out: u128 = result.parse().expect("Should be valid number");
+        assert!(amount_out > 0, "Amount out should be positive");
+    }
+
+    #[test]
+    fn sell_with_fees_should_reduce_output() {
+        let no_fee = omnipool_calculate_out_given_in(
+            to_unit(10_000_000),
+            to_unit(20_000_000),
+            to_unit(10_000_000),
+            to_unit(5_000_000),
+            to_unit(5_000_000),
+            to_unit(20_000_000),
+            to_unit(4_000_000),
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        ).parse::<u128>().unwrap();
+
+        let with_fee = omnipool_calculate_out_given_in(
+            to_unit(10_000_000),
+            to_unit(20_000_000),
+            to_unit(10_000_000),
+            to_unit(5_000_000),
+            to_unit(5_000_000),
+            to_unit(20_000_000),
+            to_unit(4_000_000),
+            "0.01".to_string(),   // 1% asset fee
+            "0".to_string(),
+            "0".to_string(),
+        ).parse::<u128>().unwrap();
+
+        assert!(with_fee < no_fee, "With fee ({}) should be less than no fee ({})", with_fee, no_fee);
+    }
+
+    #[test]
+    fn sell_with_slip_fee_should_reduce_output() {
+        let no_slip = omnipool_calculate_out_given_in(
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(500_000),
+            to_unit(5_000_000),
+            to_unit(500_000),
+            to_unit(100_000),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(),      // no slip fee
+        );
+
+        let with_slip = omnipool_calculate_out_given_in(
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(500_000),
+            to_unit(5_000_000),
+            to_unit(500_000),
+            to_unit(100_000),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.05".to_string(),   // 5% max slip fee
+        );
+
+        assert_ne!(no_slip, "-1");
+        assert_ne!(with_slip, "-1");
+
+        let no_slip_out: u128 = no_slip.parse().unwrap();
+        let with_slip_out: u128 = with_slip.parse().unwrap();
+
+        assert!(with_slip_out < no_slip_out,
+            "Slip fee should reduce output: {} < {}", with_slip_out, no_slip_out);
+    }
+
+    #[test]
+    fn buy_should_work_with_no_fees() {
+        let result = omnipool_calculate_in_given_out(
+            to_unit(10_000_000),
+            to_unit(20_000_000),
+            to_unit(10_000_000),
+            to_unit(5_000_000),
+            to_unit(5_000_000),
+            to_unit(20_000_000),
+            to_unit(1_000_000),
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        );
+
+        assert_ne!(result, "-1", "Should not return error");
+        let amount_in: u128 = result.parse().expect("Should be valid number");
+        assert!(amount_in > 0, "Amount in should be positive");
+    }
+
+    #[test]
+    fn buy_with_slip_fee_should_increase_cost() {
+        let no_slip = omnipool_calculate_in_given_out(
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(500_000),
+            to_unit(5_000_000),
+            to_unit(500_000),
+            to_unit(1_000),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(),
+        );
+
+        let with_slip = omnipool_calculate_in_given_out(
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(500_000),
+            to_unit(5_000_000),
+            to_unit(500_000),
+            to_unit(1_000),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0.05".to_string(),
+        );
+
+        assert_ne!(no_slip, "-1");
+        assert_ne!(with_slip, "-1");
+
+        let no_slip_in: u128 = no_slip.parse().unwrap();
+        let with_slip_in: u128 = with_slip.parse().unwrap();
+
+        assert!(with_slip_in > no_slip_in,
+            "Slip fee should increase cost: {} > {}", with_slip_in, no_slip_in);
+    }
+
+    #[test]
+    fn sell_returns_error_on_invalid_input() {
+        let result = omnipool_calculate_out_given_in(
+            "invalid".to_string(),
+            to_unit(20_000_000),
+            to_unit(10_000_000),
+            to_unit(5_000_000),
+            to_unit(5_000_000),
+            to_unit(20_000_000),
+            to_unit(4_000_000),
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        );
+
+        assert_eq!(result, "-1", "Should return error for invalid input");
+    }
+
+    #[test]
+    fn buy_returns_error_on_invalid_input() {
+        let result = omnipool_calculate_in_given_out(
+            to_unit(10_000_000),
+            to_unit(20_000_000),
+            to_unit(10_000_000),
+            to_unit(5_000_000),
+            to_unit(5_000_000),
+            to_unit(20_000_000),
+            "invalid".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+            "0".to_string(),
+        );
+
+        assert_eq!(result, "-1", "Should return error for invalid input");
+    }
+
+    #[test]
+    fn sell_with_zero_slip_fee_should_match_no_slip() {
+        let no_slip = omnipool_calculate_out_given_in(
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(500_000),
+            to_unit(5_000_000),
+            to_unit(500_000),
+            to_unit(100_000),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(),
+        );
+
+        let explicit_zero = omnipool_calculate_out_given_in(
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(10_000_000),
+            to_unit(500_000),
+            to_unit(5_000_000),
+            to_unit(500_000),
+            to_unit(100_000),
+            "0.0025".to_string(),
+            "0.0005".to_string(),
+            "0".to_string(),
+        );
+
+        assert_eq!(no_slip, explicit_zero, "Zero slip and no slip should match");
+    }
+
+}
