@@ -13,9 +13,11 @@ import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBro
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
+import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 
 class DAppNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
+    private val stakingDashboardNavigator: StakingDashboardNavigator,
 ) : BaseNavigator(navigationHoldersRegistry), DAppRouter {
 
     override fun openChangeAccount() {
@@ -74,6 +76,13 @@ class DAppNavigator(
     override fun openDAppFavorites() {
         navigationBuilder().action(R.id.action_open_dapp_favorites)
             .navigateInFirstAttachedContext()
+    }
+
+    override fun navigateToStaking() {
+        // DApp browser/search lives in the root nav graph, so we pop the root back stack
+        // to return to the split screen, then switch to the staking tab via bottom navigation.
+        back()
+        stakingDashboardNavigator.openStakingDashboard()
     }
 
     private fun NavigationBuilder.setDappAnimations(): NavigationBuilder {

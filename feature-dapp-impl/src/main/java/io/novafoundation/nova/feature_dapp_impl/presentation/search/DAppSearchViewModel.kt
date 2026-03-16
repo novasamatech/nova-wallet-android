@@ -20,12 +20,15 @@ import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.search.StakingKeywordMatcher
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.StakingCompetitorDomains
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -66,6 +69,11 @@ class DAppSearchViewModel(
             .mapValues { (_, groupItems) -> groupItems.map(::mapSearchResultToSearchModel) }
             .toListWithHeaders()
     }
+        .inBackground()
+        .share()
+
+    val showStakingBanner = query.map { StakingKeywordMatcher.isStakingQuery(it) }
+        .distinctUntilChanged()
         .inBackground()
         .share()
 
@@ -128,7 +136,11 @@ class DAppSearchViewModel(
                 is DappSearchResult.Url -> searchResult.url
             }
 
-            if (!searchResult.isTrustedByNova) {
+            // Always show the unknown DApp warning for staking competitor domains,
+            // even if the DApp is present in the catalogue.
+            val isStakingCompetitor = StakingCompetitorDomains.isStakingCompetitor(newUrl)
+
+            if (!searchResult.isTrustedByNova || isStakingCompetitor) {
                 dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
             }
 
@@ -147,6 +159,10 @@ class DAppSearchViewModel(
         SearchPayload.Request.GO_TO_URL -> true
 
         SearchPayload.Request.OPEN_NEW_URL -> false
+    }
+
+    fun goToStakingClicked() {
+        router.navigateToStaking()
     }
 
     fun onCategoryClicked(id: String) {
