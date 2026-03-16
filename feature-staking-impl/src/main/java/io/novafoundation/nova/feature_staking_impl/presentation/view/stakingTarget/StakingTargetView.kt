@@ -46,6 +46,14 @@ class StakingTargetView @JvmOverloads constructor(
         makeGoneViews(binder.stakingTargetTitle, binder.stakingTargetSubtitle, binder.stakingTargetQuantity, binder.stakingTargetIcon)
     }
 
+    fun setChevronVisible(visible: Boolean) {
+        if (visible) {
+            binder.stakingTargetChevron.makeVisible()
+        } else {
+            binder.stakingTargetChevron.makeGone()
+        }
+    }
+
     fun setModel(stakingTargetModel: StakingTargetModel) {
         binder.stakingTargetTitle.text = stakingTargetModel.title
         binder.stakingTargetTitle.makeVisible()
