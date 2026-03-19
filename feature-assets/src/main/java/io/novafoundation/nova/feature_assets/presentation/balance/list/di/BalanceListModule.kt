@@ -16,6 +16,8 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigPendingOperationsService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_assets.data.repository.defaultTokens.DefaultTokensRepository
+import io.novafoundation.nova.feature_assets.data.repository.defaultTokens.LoadMoreTokensPreferences
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.list.AssetsListInteractor
@@ -70,13 +72,17 @@ class BalanceListModule {
         walletInteractor: WalletInteractor,
         assetsListInteractor: AssetsListInteractor,
         externalBalancesInteractor: ExternalBalancesInteractor,
-        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory
+        expandableAssetsMixinFactory: ExpandableAssetsMixinFactory,
+        defaultTokensRepository: DefaultTokensRepository,
+        loadMoreTokensPreferences: LoadMoreTokensPreferences
     ): AssetListMixinFactory {
         return AssetListMixinFactory(
             walletInteractor,
             assetsListInteractor,
             externalBalancesInteractor,
-            expandableAssetsMixinFactory
+            expandableAssetsMixinFactory,
+            defaultTokensRepository,
+            loadMoreTokensPreferences
         )
     }
 
@@ -104,7 +110,8 @@ class BalanceListModule {
         maskingModeUseCase: MaskingModeUseCase,
         fiatFormatter: FiatFormatter,
         giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
-        appLinksProvider: AppLinksProvider
+        appLinksProvider: AppLinksProvider,
+        loadMoreTokensPreferences: LoadMoreTokensPreferences
     ): ViewModel {
         return BalanceListViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -127,7 +134,8 @@ class BalanceListModule {
             maskingModeUseCase = maskingModeUseCase,
             fiatFormatter = fiatFormatter,
             giftsRestrictionCheckMixin = giftsRestrictionCheckMixin,
-            appLinksProvider = appLinksProvider
+            appLinksProvider = appLinksProvider,
+            loadMoreTokensPreferences = loadMoreTokensPreferences
         )
     }
 

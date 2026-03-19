@@ -1228,6 +1228,9 @@
 
     <string name="assets_buy_tokens_placeholder_button">Buy tokens</string>
 
+    <string name="assets_load_more_tokens">Manage Tokens</string>
+    <string name="assets_load_more_networks">Manage Networks</string>
+
     <string name="assets_send_flow_placeholder">You don’t have tokens to send.\nBuy or Deposit tokens to your account.</string>
     <string name="common_days_and_hours_format_with_delimeter">%s and %s</string>
     <string name="common_frequency_days_daily">daily</string>
@@ -1740,6 +1743,16 @@
 
     <string name="assets_manage_tokens_title">Manage tokens</string>
     <string name="assets_manage_tokens_all_networks">All networks</string>
+    <string name="manage_tokens_tab_tokens">Tokens</string>
+    <string name="manage_tokens_tab_networks">Networks</string>
+    <string name="manage_tokens_select_all">Select All</string>
+    <string name="manage_tokens_deselect_all">Deselect All</string>
+    <string name="manage_tokens_select_visible">Select Visible</string>
+    <string name="manage_tokens_deselect_visible">Deselect Visible</string>
+    <string name="manage_tokens_enabled_count">%1$d / %2$d</string>
+    <string name="manage_tokens_at_least_one">At least one token must remain enabled</string>
+    <string name="manage_tokens_deselect_all_confirmation_title">Deselect all tokens?</string>
+    <string name="manage_tokens_deselect_all_confirmation_message">This will disable all tokens except the minimum required. You can re-enable them at any time.</string>
 
     <string name="common_no_app_to_handle_import_intent">File import application not found on device. Please install it and try again</string>
 
@@ -2225,6 +2238,12 @@
 
     <string name="wallet_assets_empty">Your assets will appear here.\nMake sure the "Hide zero balances" filter is turned off</string>
     <string name="wallet_filter_hide_zero_balance">Hide assets with zero balances</string>
+    <string name="wallet_filter_hide_dust">Hide small balances</string>
+    <string name="wallet_filter_dust_threshold_1">&lt; $1</string>
+    <string name="wallet_filter_dust_threshold_5">&lt; $5</string>
+    <string name="wallet_filter_dust_threshold_10">&lt; $10</string>
+    <string name="wallet_filter_dust_threshold_50">&lt; $50</string>
+    <string name="wallet_filter_hidden_by_dust">Hidden by dust filter (%d tokens)</string>
 
     <string name="wallet_send_existential_warnining_transfer_dust">Your account will be removed from blockchain after transfer cause it makes total balance lower than minimal. Remaining balance will be transferred to recipient as well.</string>
     <string name="wallet_send_dead_recipient_commission_asset_title">Recipient is not able to accept transfer</string>

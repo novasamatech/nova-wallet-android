@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.common.createF
 import io.novafoundation.nova.feature_assets.presentation.balance.list.model.items.TokenGroupUi
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderHolder
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.LoadMoreAssetsAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.ManageAssetsAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.ManageAssetsHolder
 import io.novafoundation.nova.feature_banners_api.presentation.BannerHolder
@@ -42,7 +43,8 @@ class BalanceListFragment :
     BaseFragment<BalanceListViewModel, FragmentBalanceListBinding>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler,
-    ManageAssetsAdapter.Handler {
+    ManageAssetsAdapter.Handler,
+    LoadMoreAssetsAdapter.Handler {
 
     override fun createBinding() = FragmentBalanceListBinding.inflate(layoutInflater)
 
@@ -74,8 +76,12 @@ class BalanceListFragment :
         BalanceListAdapter(imageLoader, this)
     }
 
+    private val loadMoreAssetsAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        LoadMoreAssetsAdapter(this)
+    }
+
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter)
+        ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter, loadMoreAssetsAdapter)
     }
 
     override fun applyInsets(rootView: View) {
@@ -93,7 +99,7 @@ class BalanceListFragment :
     }
 
     private fun setupRecyclerView() {
-        binder.balanceListAssets.setHasFixedSize(true)
+        binder.balanceListAssets.setHasFixedSize(false)
         binder.balanceListAssets.adapter = adapter
 
         setupAssetsDecorationForRecyclerView()
@@ -161,6 +167,9 @@ class BalanceListFragment :
         viewModel.pendingOperationsCountModel.observe(headerAdapter::setPendingOperationsCountModel)
         viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
         viewModel.assetViewModeModelFlow.observe { manageAssetsAdapter.setAssetViewModeModel(it) }
+
+        viewModel.showLoadMoreFlow.observe(loadMoreAssetsAdapter::show)
+        viewModel.loadMoreButtonTextRes.observe(loadMoreAssetsAdapter::setButtonText)
     }
 
     override fun assetClicked(asset: Chain.Asset) {
@@ -240,6 +249,10 @@ class BalanceListFragment :
 
     override fun giftClicked() {
         viewModel.giftClicked()
+    }
+
+    override fun loadMoreClicked() {
+        viewModel.loadMoreClicked()
     }
 
     private fun setupRecyclerViewSpacing() {

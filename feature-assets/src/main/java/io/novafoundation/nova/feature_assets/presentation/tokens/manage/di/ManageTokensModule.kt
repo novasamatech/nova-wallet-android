@@ -9,12 +9,17 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
+import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
+import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
+import io.novafoundation.nova.feature_assets.data.repository.assetFilters.DustFilterPreferences
+import io.novafoundation.nova.feature_assets.data.repository.defaultTokens.DefaultTokensRepository
+import io.novafoundation.nova.feature_assets.data.repository.defaultTokens.LoadMoreTokensPreferences
 import io.novafoundation.nova.feature_assets.domain.assets.filters.AssetFiltersInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.manage.ManageTokenInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.ManageTokensViewModel
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.model.MultiChainTokenMapper
 
 @Module(includes = [ViewModelModule::class])
 class ManageTokensModule {
@@ -36,14 +41,24 @@ class ManageTokensModule {
     fun provideViewModel(
         router: AssetsRouter,
         interactor: ManageTokenInteractor,
-        commonUiMapper: MultiChainTokenMapper,
-        assetFiltersInteractor: AssetFiltersInteractor
+        assetFiltersInteractor: AssetFiltersInteractor,
+        assetIconProvider: AssetIconProvider,
+        loadMoreTokensPreferences: LoadMoreTokensPreferences,
+        dustFilterPreferences: DustFilterPreferences,
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        resourceManager: ResourceManager,
+        defaultTokensRepository: DefaultTokensRepository,
     ): ViewModel {
         return ManageTokensViewModel(
             router = router,
             interactor = interactor,
-            commonUiMapper = commonUiMapper,
-            assetFiltersInteractor = assetFiltersInteractor
+            assetFiltersInteractor = assetFiltersInteractor,
+            assetIconProvider = assetIconProvider,
+            loadMoreTokensPreferences = loadMoreTokensPreferences,
+            dustFilterPreferences = dustFilterPreferences,
+            actionAwaitableMixinFactory = actionAwaitableMixinFactory,
+            resourceManager = resourceManager,
+            defaultTokensRepository = defaultTokensRepository,
         )
     }
 }
