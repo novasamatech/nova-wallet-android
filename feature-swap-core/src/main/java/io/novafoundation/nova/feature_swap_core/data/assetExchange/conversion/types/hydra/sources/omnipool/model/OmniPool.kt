@@ -1,18 +1,20 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model
 
-import io.novafoundation.nova.common.utils.Perbill
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetId
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
+import io.novafoundation.nova.hydra_dx_math.HydraDxMathConversions.fromBridgeResultToBalance
+import io.novafoundation.nova.hydra_dx_math.omnipool.OmniPoolMathBridge
 import java.math.BigInteger
-import kotlin.math.floor
 
 class OmniPool(
     val tokens: Map<HydraDxAssetId, OmniPoolToken>,
+    val maxSlipFee: Fraction
 )
 
 class OmniPoolFees(
-    val protocolFee: Perbill,
-    val assetFee: Perbill
+    val protocolFee: Fraction,
+    val assetFee: Fraction
 )
 
 class OmniPoolToken(
@@ -40,31 +42,22 @@ fun OmniPool.calculateOutGivenIn(
     assetIdIn: HydraDxAssetId,
     assetIdOut: HydraDxAssetId,
     amountIn: BigInteger
-): BigInteger {
+): BigInteger? {
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 
-    val protocolFee = tokenInState.fees.protocolFee
-    val assetFee = tokenOutState.fees.assetFee
-
-    val inHubReserve = tokenInState.hubReserve.toDouble()
-    val inReserve = tokenInState.balance.toDouble()
-
-    val inAmount = amountIn.toDouble()
-
-    val deltaHubReserveIn = inAmount * inHubReserve / (inReserve + inAmount)
-
-    val protocolFeeAmount = floor(protocolFee.value * deltaHubReserveIn)
-
-    val deltaHubReserveOut = deltaHubReserveIn - protocolFeeAmount
-
-    val outReserveHp = tokenOutState.balance.toDouble()
-    val outHubReserveHp = tokenOutState.hubReserve.toDouble()
-
-    val deltaReserveOut = outReserveHp * deltaHubReserveOut / (outHubReserveHp + deltaHubReserveOut)
-    val amountOut = deltaReserveOut.deductFraction(assetFee)
-
-    return amountOut.toBigDecimal().toBigInteger()
+    return OmniPoolMathBridge.calculate_out_given_in(
+        tokenInState.balance.toString(),
+        tokenInState.hubReserve.toString(),
+        tokenInState.shares.toString(),
+        tokenOutState.balance.toString(),
+        tokenOutState.hubReserve.toString(),
+        tokenOutState.shares.toString(),
+        amountIn.toString(),
+        tokenOutState.fees.assetFee.inFraction.toBigDecimal().toPlainString(),
+        tokenInState.fees.protocolFee.inFraction.toBigDecimal().toPlainString(),
+        maxSlipFee.inFraction.toBigDecimal().toPlainString()
+    ).fromBridgeResultToBalance()
 }
 
 fun OmniPool.calculateInGivenOut(
@@ -75,31 +68,16 @@ fun OmniPool.calculateInGivenOut(
     val tokenInState = tokens.getValue(assetIdIn)
     val tokenOutState = tokens.getValue(assetIdOut)
 
-    val protocolFee = tokenInState.fees.protocolFee
-    val assetFee = tokenOutState.fees.assetFee
-
-    val outHubReserve = tokenOutState.hubReserve.toDouble()
-    val outReserve = tokenOutState.balance.toDouble()
-
-    val outAmount = amountOut.toDouble()
-
-    val outReserveNoFee = outReserve.deductFraction(assetFee)
-
-    val deltaHubReserveOut = outHubReserve * outAmount / (outReserveNoFee - outAmount) + 1
-
-    val deltaHubReserveIn = deltaHubReserveOut / (1.0 - protocolFee.value)
-
-    val inHubReserveHp = tokenInState.hubReserve.toDouble()
-
-    if (deltaHubReserveIn >= inHubReserveHp) {
-        return null
-    }
-
-    val inReserveHp = tokenInState.balance.toDouble()
-
-    val deltaReserveIn = inReserveHp * deltaHubReserveIn / (inHubReserveHp - deltaHubReserveIn) + 1
-
-    return deltaReserveIn.takeIf { it >= 0 }?.toBigDecimal()?.toBigInteger()
+    return OmniPoolMathBridge.calculate_in_given_out(
+        tokenInState.balance.toString(),
+        tokenInState.hubReserve.toString(),
+        tokenInState.shares.toString(),
+        tokenOutState.balance.toString(),
+        tokenOutState.hubReserve.toString(),
+        tokenOutState.shares.toString(),
+        amountOut.toString(),
+        tokenOutState.fees.assetFee.inFraction.toBigDecimal().toPlainString(),
+        tokenInState.fees.protocolFee.inFraction.toBigDecimal().toPlainString(),
+        maxSlipFee.inFraction.toBigDecimal().toPlainString()
+    ).fromBridgeResultToBalance()
 }
-
-private fun Double.deductFraction(perbill: Perbill): Double = this - this * perbill.value

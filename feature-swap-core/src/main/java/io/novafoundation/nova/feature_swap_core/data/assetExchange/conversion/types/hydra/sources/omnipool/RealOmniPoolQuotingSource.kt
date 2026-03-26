@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool
 
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.common.utils.Fraction
 import io.novafoundation.nova.common.utils.dynamicFees
 import io.novafoundation.nova.common.utils.graph.Path
 import io.novafoundation.nova.common.utils.graph.WeightedEdge
@@ -12,11 +13,11 @@ import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.common.utils.toMultiSubscription
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationAssetType
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcher
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.HydrationBalanceFetcherFactory
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.common.fromAsset
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights.Hydra.weightAppendingToPath
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.DynamicFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.OmniPool
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.omnipool.model.OmniPoolFees
@@ -150,9 +151,10 @@ private class RealOmniPoolQuotingSource(
         }.toMultiSubscription(pooledAssets.size)
 
         val defaultFees = getDefaultFees()
+        val maxSlipFee = getMaxSlipFee()
 
         return combine(omniPoolStateFlow, omniPoolBalancesFlow, feesFlow) { poolState, poolBalances, fees ->
-            createOmniPool(poolState, poolBalances, fees, defaultFees)
+            createOmniPool(poolState, poolBalances, fees, defaultFees, maxSlipFee)
         }
             .onEach(omniPoolFlow::emit)
             .map { }
@@ -183,6 +185,7 @@ private class RealOmniPoolQuotingSource(
         poolBalances: Map<HydraDxAssetId, BigInteger>,
         fees: Map<HydraDxAssetId, DynamicFee?>,
         defaultFees: OmniPoolFees,
+        maxSlipFee: Fraction,
     ): OmniPool {
         val tokensState = poolAssetStates.mapValues { (tokenId, poolAssetState) ->
             val assetBalance = poolBalances[tokenId].orZero()
@@ -198,7 +201,7 @@ private class RealOmniPoolQuotingSource(
             )
         }
 
-        return OmniPool(tokensState)
+        return OmniPool(tokensState, maxSlipFee)
     }
 
     private suspend fun getDefaultFees(): OmniPoolFees {
@@ -211,6 +214,12 @@ private class RealOmniPoolQuotingSource(
             protocolFee = protocolFeeParams.minFee,
             assetFee = assetFeeParams.minFee
         )
+    }
+
+    private suspend fun getMaxSlipFee(): Fraction {
+        return remoteStorageSource.query(chain.id) {
+            metadata.omnipoolOrNull?.slipFee?.query()?.maxSlipFee.orZero()
+        }
     }
 
     private inner class RealOmniPoolQuotingEdge(

@@ -903,7 +903,7 @@ internal class RealSwapService(
 
             val feeCapability = getFeeCustomFeeCapability(edge.from.chainId)
 
-            return feeCapability != null && feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId) &&
+            return feeCapability.canPayFeeInNonUtilityToken(edge.from.assetId) &&
                 edge.canPayNonNativeFeesInIntermediatePosition()
         }
 
