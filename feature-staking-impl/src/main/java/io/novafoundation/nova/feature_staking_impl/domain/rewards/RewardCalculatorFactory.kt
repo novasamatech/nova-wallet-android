@@ -100,7 +100,7 @@ class RewardCalculatorFactory(
     ): RewardCalculator? {
         return when (chain.id) {
             Chain.Geneses.VARA -> Vara(chain.id, validators, totalIssuance)
-            Chain.Geneses.POLKADOT -> PolkadotInflationPrediction(validators, totalIssuance, scope)
+            Chain.Geneses.POLKADOT_ASSET_HUB -> PolkadotInflationPrediction(validators, totalIssuance, scope)
             else -> null
         }
     }
