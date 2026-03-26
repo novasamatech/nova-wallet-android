@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -28,7 +29,8 @@ class CreateWalletBackupPasswordModule {
         interactor: CreateCloudBackupPasswordInteractor,
         actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         payload: CreateBackupPasswordPayload,
-        accountInteractor: AccountInteractor
+        accountInteractor: AccountInteractor,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return CreateWalletBackupPasswordViewModel(
             router,
@@ -36,7 +38,8 @@ class CreateWalletBackupPasswordModule {
             interactor,
             actionBottomSheetLauncherFactory,
             payload,
-            accountInteractor
+            accountInteractor,
+            analyticsService
         )
     }
 

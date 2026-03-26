@@ -43,7 +43,7 @@ class DAppDeepLinkHandler(
         if (browserTabService.hasSelectedTab()) {
             browserTabService.createAndSelectTab(normalizedUrl)
         } else {
-            router.openDAppBrowser(DAppBrowserPayload.Address(url))
+            router.openDAppBrowser(DAppBrowserPayload.Address(url, source = "deep_link"))
         }
     }
 

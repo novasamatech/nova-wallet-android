@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.di
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
@@ -170,4 +171,6 @@ interface SwapFeatureDependencies {
     val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher
 
     fun maxActionProviderFactory(): MaxActionProviderFactory
+
+    val analyticsService: AnalyticsService
 }

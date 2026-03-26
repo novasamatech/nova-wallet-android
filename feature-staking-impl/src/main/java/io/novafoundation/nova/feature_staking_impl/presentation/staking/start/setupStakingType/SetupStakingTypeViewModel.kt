@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
@@ -48,7 +50,8 @@ class SetupStakingTypeViewModel(
     private val setupStakingTypeFlowExecutorFactory: SetupStakingTypeFlowExecutorFactory,
     private val setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    chainRegistry: ChainRegistry
+    chainRegistry: ChainRegistry,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(), Validatable by validationExecutor {
 
     val closeConfirmationAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -156,12 +159,14 @@ class SetupStakingTypeViewModel(
             val compoundStakingTypeDetailsProvider = compoundStakingTypeDetailsProviderFlow.first()
             val validationSystem = compoundStakingTypeDetailsProvider.getValidationSystem(stakingType)
             val payload = compoundStakingTypeDetailsProvider.getValidationPayload(stakingType) ?: return@launch
+            val network = chainWithAssetFlow.first().chain.name
 
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
                 validationFailureTransformer = { handleSetupStakingTypeValidationFailure(chainAsset, it, resourceManager) },
             ) {
+                analyticsService.track(AnalyticsEvent.StakingTypeSelected(stakingType.name.lowercase(), network))
                 setRecommendedSelection(enteredAmount, stakingType)
             }
         }

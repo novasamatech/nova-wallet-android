@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -67,6 +68,7 @@ class ImportAccountModule {
         accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
         importSourceFactory: ImportSourceFactory,
         payload: ImportAccountPayload,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return ImportAccountViewModel(
             interactor,
@@ -74,7 +76,8 @@ class ImportAccountModule {
             resourceManager,
             accountNameChooserFactory,
             payload,
-            importSourceFactory
+            importSourceFactory,
+            analyticsService
         )
     }
 

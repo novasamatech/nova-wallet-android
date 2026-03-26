@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confir
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.added
@@ -30,7 +33,8 @@ class ConfirmMnemonicViewModel(
     private val deviceVibrator: DeviceVibrator,
     private val resourceManager: ResourceManager,
     private val config: ConfirmMnemonicConfig,
-    private val payload: ConfirmMnemonicPayload
+    private val payload: ConfirmMnemonicPayload,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel() {
 
     private val originMnemonic = payload.mnemonic
@@ -143,7 +147,10 @@ class ConfirmMnemonicViewModel(
                 val advancedEncryption = advancedEncryptionModel.toAdvancedEncryption()
 
                 addAccountInteractor.createAccount(mnemonicString, advancedEncryption, addAccountType)
-                    .onSuccess { continueBasedOnCodeStatus() }
+                    .onSuccess {
+                        analyticsService.track(AnalyticsEvent.WalletCreationCompleted(WalletCreationMethod.CREATE))
+                        continueBasedOnCodeStatus()
+                    }
                     .onFailure(::showAccountCreationError)
             }
         }

@@ -40,7 +40,7 @@ class DAppFavoritesViewModel(
     }
 
     fun openDApp(dapp: DappModel) {
-        router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url))
+        router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url, source = "favorites"))
     }
 
     fun onFavoriteClicked(dapp: DappModel) = launch {

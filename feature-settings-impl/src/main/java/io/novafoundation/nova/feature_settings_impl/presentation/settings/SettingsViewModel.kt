@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.presentation.settings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -55,7 +56,8 @@ class SettingsViewModel(
     private val twoFactorVerificationService: TwoFactorVerificationService,
     private val biometricService: BiometricService,
     private val pushNotificationsInteractor: PushNotificationsInteractor,
-    private val maskingModeUseCase: MaskingModeUseCase
+    private val maskingModeUseCase: MaskingModeUseCase,
+    private val analyticsOptOutManager: AnalyticsOptOutManager
 ) : BaseViewModel(), Browserable {
 
     val confirmationAwaitableAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
@@ -91,6 +93,8 @@ class SettingsViewModel(
     val safeModeStatus = safeModeService.safeModeStatusFlow()
 
     val hideBalancesOnLaunchState = maskingModeUseCase.observeHideBalancesOnLaunchEnabled()
+
+    val analyticsEnabledState = analyticsOptOutManager.observeAnalyticsEnabled()
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
@@ -204,6 +208,10 @@ class SettingsViewModel(
 
     fun changeHideBalances() {
         maskingModeUseCase.toggleHideBalancesOnLaunch()
+    }
+
+    fun changeAnalytics() {
+        analyticsOptOutManager.toggleAnalytics()
     }
 
     fun changePinCodeClicked() {

@@ -241,7 +241,7 @@ class GovernanceNavigator(
     }
 
     override fun openDAppBrowser(url: String) {
-        dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url))
+        dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url, source = "governance"))
     }
 
     override fun openReferendumDescription(payload: DescriptionPayload) {

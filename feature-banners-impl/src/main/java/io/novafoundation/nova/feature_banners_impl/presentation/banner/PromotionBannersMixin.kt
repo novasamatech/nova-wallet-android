@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import coil.ImageLoader
 import coil.request.ImageRequest
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.utils.launchDeepLink
 import io.novafoundation.nova.feature_banners_api.domain.PromotionBanner
 import io.novafoundation.nova.common.utils.scopeAsync
@@ -21,7 +23,8 @@ import kotlinx.coroutines.flow.map
 class RealPromotionBannersMixinFactory(
     private val imageLoader: ImageLoader,
     private val context: Context,
-    private val promotionBannersInteractor: PromotionBannersInteractor
+    private val promotionBannersInteractor: PromotionBannersInteractor,
+    private val analyticsService: AnalyticsService
 ) : PromotionBannersMixinFactory {
 
     override fun create(source: BannersSource, coroutineScope: CoroutineScope): PromotionBannersMixin {
@@ -30,7 +33,8 @@ class RealPromotionBannersMixinFactory(
             imageLoader,
             context,
             source,
-            coroutineScope
+            coroutineScope,
+            analyticsService
         )
     }
 }
@@ -40,7 +44,8 @@ class RealPromotionBannersMixin(
     private val imageLoader: ImageLoader,
     private val context: Context,
     private val bannersSource: BannersSource,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    private val analyticsService: AnalyticsService
 ) : PromotionBannersMixin, CoroutineScope by coroutineScope {
 
     override val bannersFlow = bannersSource.observeBanners()
@@ -55,6 +60,14 @@ class RealPromotionBannersMixin(
     }
 
     override fun startBannerAction(page: BannerPageModel) {
+        analyticsService.track(
+            AnalyticsEvent.BannerClicked(
+                bannerId = page.id,
+                bannerTitle = page.title,
+                screen = bannersSource.screenName
+            )
+        )
+
         val url = page.actionUrl ?: return
 
         context.launchDeepLink(url)

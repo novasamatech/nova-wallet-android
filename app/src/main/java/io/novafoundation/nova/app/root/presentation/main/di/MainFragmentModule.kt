@@ -8,6 +8,9 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsOptOutManager
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
@@ -30,14 +33,20 @@ class MainFragmentModule {
         automaticInteractionGate: AutomaticInteractionGate,
         welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor,
         chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase,
-        rootRouter: RootRouter
+        rootRouter: RootRouter,
+        analyticsOptOutManager: AnalyticsOptOutManager,
+        analyticsService: AnalyticsService,
+        preferences: Preferences
     ): ViewModel {
         return MainViewModel(
             updateNotificationsInteractor,
             automaticInteractionGate,
             welcomePushNotificationsInteractor,
             rootRouter,
-            chainMigrationDetailsSelectToShowUseCase
+            chainMigrationDetailsSelectToShowUseCase,
+            analyticsOptOutManager,
+            analyticsService,
+            preferences
         )
     }
 

@@ -2,6 +2,10 @@ package io.novafoundation.nova.feature_account_impl.presentation.account.managem
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.OnboardingSource
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitAction
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingOrDenyingAction
@@ -28,6 +32,7 @@ class WalletManagmentViewModel(
     private val accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
     cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
     listSelectorMixinFactory: ListSelectorMixin.Factory,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel() {
 
     val cloudBackupChangingWarningMixin = cloudBackupChangingWarningMixinFactory.create(viewModelScope)
@@ -106,10 +111,13 @@ class WalletManagmentViewModel(
     }
 
     private fun onImportWalletClicked() {
+        analyticsService.track(AnalyticsEvent.OnboardingStarted(OnboardingSource.ADD_WALLET))
         accountRouter.openImportOptionsScreen()
     }
 
     private fun onCreateNewWalletClicked() {
+        analyticsService.track(AnalyticsEvent.OnboardingStarted(OnboardingSource.ADD_WALLET))
+        analyticsService.track(AnalyticsEvent.WalletCreationMethodSelected(WalletCreationMethod.CREATE))
         cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
             accountRouter.openCreateWallet(StartCreateWalletPayload(FlowType.SECOND_WALLET))
         }

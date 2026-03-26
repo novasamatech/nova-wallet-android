@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -44,7 +45,8 @@ class ConfirmUnbondModule {
         unbondHintsMixinFactory: UnbondHintsMixinFactory,
         walletUiUseCase: WalletUiUseCase,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return ConfirmUnbondViewModel(
             router = router,
@@ -60,7 +62,8 @@ class ConfirmUnbondModule {
             unbondHintsMixinFactory = unbondHintsMixinFactory,
             walletUiUseCase = walletUiUseCase,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

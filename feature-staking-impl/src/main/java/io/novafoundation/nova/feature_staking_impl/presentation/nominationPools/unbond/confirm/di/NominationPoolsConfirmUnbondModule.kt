@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -45,7 +46,8 @@ class NominationPoolsConfirmUnbondModule {
         assetUseCase: AssetUseCase,
         hintsFactory: NominationPoolsUnbondHintsFactory,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return NominationPoolsConfirmUnbondViewModel(
             router = router,
@@ -61,7 +63,8 @@ class NominationPoolsConfirmUnbondModule {
             assetUseCase = assetUseCase,
             hintsFactory = hintsFactory,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

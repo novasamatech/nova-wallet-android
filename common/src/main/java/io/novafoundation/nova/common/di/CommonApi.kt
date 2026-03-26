@@ -8,6 +8,8 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
+import io.novafoundation.nova.common.data.analytics.AnalyticsOptOutManager
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -143,6 +145,10 @@ interface CommonApi {
     val deviceNetworkStateObserver: DeviceNetworkStateObserver
 
     val deviceIdProvider: DeviceIdProvider
+
+    val analyticsService: AnalyticsService
+
+    val analyticsOptOutManager: AnalyticsOptOutManager
 
     fun copyTextMixin(): CopyTextLauncher.Presentation
 

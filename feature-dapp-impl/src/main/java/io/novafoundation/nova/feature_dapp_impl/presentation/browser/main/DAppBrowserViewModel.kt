@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
 import io.novafoundation.nova.common.utils.Event
@@ -78,7 +80,8 @@ class DAppBrowserViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val chainRegistry: ChainRegistry,
-    private val browserTabService: BrowserTabService
+    private val browserTabService: BrowserTabService,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -181,6 +184,29 @@ class DAppBrowserViewModel(
 
     fun onPageChanged(url: String?, title: String?) {
         updateCurrentPage(url ?: "", title, synchronizedWithBrowser = true)
+
+        if (url != null) {
+            trackDappOpened(url)
+        }
+    }
+
+    private var lastTrackedDappHost: String? = null
+
+    private fun trackDappOpened(url: String) = launch {
+        try {
+            val host = Urls.hostOf(url)
+            if (host == lastTrackedDappHost) return@launch
+            lastTrackedDappHost = host
+            val source = when (payload) {
+                is DAppBrowserPayload.Tab -> "tab"
+                is DAppBrowserPayload.Address -> payload.source
+                else -> "unknown"
+            }
+            val isKnown = dAppInteractor.getDAppInfo(url).metadata != null || source.startsWith("catalog_")
+            analyticsService.track(AnalyticsEvent.DappOpened(dappHost = host, source = source, isKnownDapp = isKnown))
+        } catch (_: Exception) {
+            // Skip tracking for malformed URLs
+        }
     }
 
     fun closeClicked() = launch {

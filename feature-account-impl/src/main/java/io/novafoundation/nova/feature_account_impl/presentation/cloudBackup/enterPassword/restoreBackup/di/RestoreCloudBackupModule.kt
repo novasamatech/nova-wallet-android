@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -28,7 +29,8 @@ class RestoreCloudBackupModule {
         interactor: EnterCloudBackupInteractor,
         accountInteractor: AccountInteractor,
         actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
-        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
+        actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return RestoreCloudBackupViewModel(
             accountInteractor,
@@ -36,7 +38,8 @@ class RestoreCloudBackupModule {
             resourceManager,
             interactor,
             actionBottomSheetLauncherFactory,
-            actionAwaitableMixinFactory
+            actionAwaitableMixinFactory,
+            analyticsService
         )
     }
 

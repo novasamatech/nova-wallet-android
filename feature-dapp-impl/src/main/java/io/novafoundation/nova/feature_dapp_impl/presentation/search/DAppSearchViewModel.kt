@@ -138,7 +138,13 @@ class DAppSearchViewModel(
                     router.finishDappSearch()
                 }
 
-                SearchPayload.Request.OPEN_NEW_URL -> router.openDAppBrowser(DAppBrowserPayload.Address(newUrl))
+                SearchPayload.Request.OPEN_NEW_URL -> {
+                    val source = when (searchResult) {
+                        is DappSearchResult.Dapp -> "search"
+                        else -> "address_bar"
+                    }
+                    router.openDAppBrowser(DAppBrowserPayload.Address(newUrl, source = source))
+                }
             }
         }
     }

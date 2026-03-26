@@ -3,6 +3,10 @@ package io.novafoundation.nova.feature_assets.presentation.send.confirm
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AmountBucket
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.AssetCategoryClassifier
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -15,6 +19,7 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
 import io.novafoundation.nova.feature_account_api.presenatation.account.AddressDisplayUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.icon.createAddressModel
@@ -83,7 +88,8 @@ class ConfirmSendViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val transferDraft: TransferDraft,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -202,7 +208,7 @@ class ConfirmSendViewModel(
                 )
             },
         ) { validPayload ->
-            performTransfer(validPayload.transfer, validPayload.originFee, validPayload.crossChainFee)
+            trackSendInitiatedAndPerformTransfer(validPayload.transfer, validPayload.originFee, validPayload.crossChainFee)
         }
     }
 
@@ -246,17 +252,63 @@ class ConfirmSendViewModel(
         addressDisplayUseCase = addressDisplayUseCase.takeIf { resolveName }
     )
 
-    private fun performTransfer(
+    private fun trackSendInitiatedAndPerformTransfer(
         transfer: WeightedAssetTransfer,
         originFee: OriginFee,
         crossChainFee: FeeBase?
     ) = launch {
+        val assetName = transfer.originChainAsset.symbol.value
+        val networkName = transfer.originChain.name
+        val asset = assetFlow.first()
+        val usdAmount = asset.token.amountToFiat(transfer.amount)
+        val amountBucket = AmountBucket.from(usdAmount)
+
+        // Track SendInitiated here - after validation passes but before transfer
+        val destNetworkName = if (isCrossChain) destinationChain().name else null
+        analyticsService.track(
+            AnalyticsEvent.SendInitiated(
+                asset = assetName,
+                network = networkName,
+                destinationNetwork = destNetworkName,
+                assetCategory = AssetCategoryClassifier.classify(assetName),
+                amountBucket = amountBucket,
+                isCrossChain = isCrossChain
+            )
+        )
+
+        performTransfer(transfer, originFee, crossChainFee, assetName, networkName, amountBucket, destNetworkName)
+    }
+
+    private suspend fun performTransfer(
+        transfer: WeightedAssetTransfer,
+        originFee: OriginFee,
+        crossChainFee: FeeBase?,
+        assetName: String,
+        networkName: String,
+        amountBucket: AmountBucket,
+        destNetworkName: String? = null
+    ) {
+        val isWatchOnly = currentAccount.first().type == LightMetaAccount.Type.WATCH_ONLY
+
         sendInteractor.performTransfer(transfer, originFee, crossChainFee, viewModelScope)
             .onSuccess {
+                analyticsService.track(AnalyticsEvent.SendCompleted(assetName, networkName, amountBucket, destNetworkName))
+
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { finishSendFlow() }
-            }.onFailure(::showError)
+            }.onFailure {
+                val reason = when {
+                    isWatchOnly -> "signing_unavailable"
+                    it is io.novafoundation.nova.common.base.errors.SigningCancelledException -> "user_cancelled"
+                    it is java.io.IOException -> "network_error"
+                    it.message?.contains("signing") == true -> "signing_unavailable"
+                    else -> "unknown"
+                }
+                analyticsService.track(AnalyticsEvent.SendFailed(assetName, networkName, reason, destNetworkName))
+
+                showError(it)
+            }
 
         _transferSubmittingLiveData.value = false
     }

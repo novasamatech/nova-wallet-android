@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -103,7 +104,8 @@ class DAppBrowserModule {
         dAppInteractor: DappInteractor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         chainRegistry: ChainRegistry,
-        browserTabService: BrowserTabService
+        browserTabService: BrowserTabService,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
@@ -116,7 +118,8 @@ class DAppBrowserModule {
             extensionStoreFactory = extensionStoreFactory,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             chainRegistry = chainRegistry,
-            browserTabService = browserTabService
+            browserTabService = browserTabService,
+            analyticsService = analyticsService
         )
     }
 }

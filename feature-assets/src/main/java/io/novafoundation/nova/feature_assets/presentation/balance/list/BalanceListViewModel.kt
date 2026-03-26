@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -102,7 +104,8 @@ class BalanceListViewModel(
     private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
     private val maskingModeUseCase: MaskingModeUseCase,
     private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
-    private val appLinksProvider: AppLinksProvider
+    private val appLinksProvider: AppLinksProvider,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(), Browserable {
 
     private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
@@ -288,6 +291,10 @@ class BalanceListViewModel(
     }
 
     fun goToNftsClicked() {
+        launch {
+            val nftCount = nftsPreviews.first().totalNftsCount
+            analyticsService.track(AnalyticsEvent.NftSectionOpened(nftCount = nftCount))
+        }
         router.openNfts()
     }
 
@@ -403,6 +410,7 @@ class BalanceListViewModel(
 
     fun novaCardClicked() = launchUnit {
         novaCardRestrictionCheckMixin.checkRestrictionAndDo {
+            analyticsService.track(AnalyticsEvent.NovaCardOpened)
             router.openNovaCard()
         }
     }

@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing
 import android.content.Intent
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.withFlagSet
@@ -10,6 +13,7 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -32,6 +36,7 @@ class ImportAccountViewModel(
     accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
     private val payload: ImportAccountPayload,
     private val importSourceFactory: ImportSourceFactory,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     WithAccountNameChooserMixin {
 
@@ -74,7 +79,15 @@ class ImportAccountViewModel(
             val addAccountType = mapAddAccountPayloadToAddAccountType(payload.addAccountPayload, nameState)
 
             importSource.performImport(addAccountType)
-                .onSuccess { continueBasedOnCodeStatus() }
+                .onSuccess {
+                    val method = when (payload.importType) {
+                        is ImportType.Mnemonic -> WalletCreationMethod.IMPORT_MNEMONIC
+                        ImportType.Seed -> WalletCreationMethod.IMPORT_SEED
+                        ImportType.Json -> WalletCreationMethod.IMPORT_JSON
+                    }
+                    analyticsService.track(AnalyticsEvent.WalletCreationCompleted(method))
+                    continueBasedOnCodeStatus()
+                }
                 .onFailure(::handleCreateAccountError)
         }
     }
