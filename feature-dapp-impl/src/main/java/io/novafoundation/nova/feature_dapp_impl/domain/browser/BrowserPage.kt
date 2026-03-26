@@ -16,7 +16,7 @@ class BrowserPageAnalyzed(
 ) {
 
     enum class Security {
-        SECURE, DANGEROUS, UNKNOWN
+        SECURE, DANGEROUS, STAKING_COMPETITOR, UNKNOWN
     }
 }
 

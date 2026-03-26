@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.StakingCompetitorDomains
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
@@ -58,6 +59,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Collections
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -103,6 +105,18 @@ class DAppBrowserViewModel(
     private val _openBrowserOptionsEvent = MutableLiveData<Event<DAppOptionsPayload>>()
     val openBrowserOptionsEvent: LiveData<Event<DAppOptionsPayload>> = _openBrowserOptionsEvent
 
+    private val _showStakingWarning = MutableLiveData(false)
+    val showStakingWarning: LiveData<Boolean> = _showStakingWarning
+
+    // URL that was blocked by staking competitor interception, pending user decision
+    private var pendingStakingCompetitorUrl: String? = null
+
+    // True when the initial URL was intercepted before a tab was created
+    private var initialLoadIntercepted: Boolean = false
+
+    // Set of domains the user has explicitly chosen to continue to (bypass future warnings)
+    private val bypassedStakingCompetitorDomains = Collections.synchronizedSet(mutableSetOf<String>())
+
     val extensionsStore = extensionStoreFactory.create(hostApi = this, coroutineScope = this)
 
     private val isDesktopModeEnabledFlow = MutableStateFlow(false)
@@ -135,12 +149,21 @@ class DAppBrowserViewModel(
             .launchIn(this)
 
         watchDangerousWebsites()
+        watchStakingCompetitorInitialLoad()
 
         launch {
             when (payload) {
                 is DAppBrowserPayload.Tab -> browserTabService.selectTab(payload.id)
 
-                is DAppBrowserPayload.Address -> browserTabService.createAndSelectTab(payload.address)
+                is DAppBrowserPayload.Address -> {
+                    if (StakingCompetitorDomains.isStakingCompetitor(payload.address)) {
+                        initialLoadIntercepted = true
+                        pendingStakingCompetitorUrl = payload.address
+                        _showStakingWarning.postValue(true)
+                    } else {
+                        browserTabService.createAndSelectTab(payload.address)
+                    }
+                }
             }
         }
     }
@@ -255,7 +278,72 @@ class DAppBrowserViewModel(
             .launchIn(this)
     }
 
+    /**
+     * Watches for staking competitor pages on initial load (when the URL is opened directly,
+     * bypassing shouldOverrideUrlLoading). Shows the full-screen warning overlay.
+     * Skips domains the user has already explicitly chosen to continue to.
+     */
+    private fun watchStakingCompetitorInitialLoad() {
+        currentPageAnalyzed
+            .filter { it.synchronizedWithBrowser && it.security == BrowserPageAnalyzed.Security.STAKING_COMPETITOR }
+            .filter { runCatching { Urls.hostOf(it.url) }.getOrNull() !in bypassedStakingCompetitorDomains }
+            .onEach { onStakingCompetitorIntercepted(it.url) }
+            .launchIn(this)
+    }
+
+    /**
+     * Called from the Fragment when shouldOverrideUrlLoading detects a staking competitor URL.
+     * Shows the full-screen warning overlay, blocking the page from loading.
+     * Skips domains the user has already explicitly chosen to continue to.
+     */
+    fun onStakingCompetitorIntercepted(url: String): Boolean {
+        val host = runCatching { Urls.hostOf(url) }.getOrNull() ?: return false
+        if (host in bypassedStakingCompetitorDomains) return false
+
+        pendingStakingCompetitorUrl = url
+        _showStakingWarning.postValue(true)
+        return true
+    }
+
+    /**
+     * User chose "Continue to site" on the staking competitor warning.
+     * Hides the overlay, marks the domain as bypassed, and loads the blocked URL.
+     * If the warning was shown before a tab was created (initial load interception),
+     * creates the tab now which will load the URL. Otherwise loads via BrowserCommand.
+     */
+    fun onStakingWarningContinue() {
+        val url = pendingStakingCompetitorUrl ?: return
+        pendingStakingCompetitorUrl = null
+        runCatching { Urls.hostOf(url) }.getOrNull()?.let { bypassedStakingCompetitorDomains.add(it) }
+
+        if (initialLoadIntercepted) {
+            initialLoadIntercepted = false
+            launch {
+                browserTabService.createAndSelectTab(url)
+                _showStakingWarning.postValue(false)
+            }
+        } else {
+            _showStakingWarning.value = false
+            _browserCommandEvent.value = BrowserCommand.OpenUrl(url).event()
+        }
+    }
+
+    /**
+     * User chose "Go to Stake" on the staking competitor warning.
+     * Navigates to the staking tab.
+     */
+    fun navigateToStaking() {
+        _showStakingWarning.value = false
+        pendingStakingCompetitorUrl = null
+        initialLoadIntercepted = false
+        router.navigateToStaking()
+    }
+
     private fun forceLoad(url: String) {
+        if (StakingCompetitorDomains.isStakingCompetitor(url) && onStakingCompetitorIntercepted(url)) {
+            return
+        }
+
         _browserCommandEvent.value = BrowserCommand.OpenUrl(url).event()
 
         updateCurrentPage(url, title = null, synchronizedWithBrowser = false)

@@ -52,6 +52,36 @@
         android:layout_height="1dp"
         android:background="@color/navigation_divider"/>
 
+    <LinearLayout
+        android:id="@+id/searchDappStakingBanner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@color/blur_navigation_background"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="12dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/searchDappStakingBannerText"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            android:textColor="@color/text_secondary"
+            android:text="@string/dapp_search_staking_banner_text" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/searchDappStakingBannerButton"
+            style="@style/Widget.Nova.Button.Primary.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="@string/dapp_search_staking_banner_button" />
+
+    </LinearLayout>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/searchDappList"
         android:layout_width="match_parent"

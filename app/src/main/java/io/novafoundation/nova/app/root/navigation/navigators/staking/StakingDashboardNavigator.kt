@@ -2,6 +2,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking
 
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
@@ -14,7 +15,9 @@ class StakingDashboardNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), StakingDashboardRouter {
 
     private var stakingTabNavController: NavController? = null
+    private var bottomNavigationView: BottomNavigationView? = null
     private var pendingAction: Int? = null
+    private var pendingSelectedItemId: Int? = null
 
     override val scrollToDashboardTopEvent = MutableLiveData<Event<Unit>>()
 
@@ -27,8 +30,21 @@ class StakingDashboardNavigator(
         }
     }
 
+    fun setBottomNavigationView(view: BottomNavigationView) {
+        bottomNavigationView = view
+
+        if (pendingSelectedItemId != null) {
+            // Post the tab switch so it runs after setupWithNavController restores
+            // the previously-selected tab from saved state.
+            val targetId = pendingSelectedItemId!!
+            pendingSelectedItemId = null
+            view.post { view.selectedItemId = targetId }
+        }
+    }
+
     fun clearStakingTabNavController() {
         stakingTabNavController = null
+        bottomNavigationView = null
     }
 
     override fun openMoreStakingOptions() {
@@ -48,7 +64,12 @@ class StakingDashboardNavigator(
         scrollToDashboardTopEvent.value = Unit.event()
     }
     override fun openStakingDashboard() {
-        stakingTabNavController.performNavigationOrDelay(R.id.action_open_staking)
+        val view = bottomNavigationView
+        if (view != null) {
+            view.selectedItemId = R.id.staking_dashboard_graph
+        } else {
+            pendingSelectedItemId = R.id.staking_dashboard_graph
+        }
     }
 
     private fun returnToStakingTabRoot() {
