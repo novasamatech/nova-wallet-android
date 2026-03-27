@@ -15,6 +15,7 @@ class MultiChainToken(
     class ChainTokenInstance(
         val chain: Chain,
         val chainAssetId: ChainAssetId,
+        val originalSymbol: String,
         val isEnabled: Boolean,
         val isSwitchable: Boolean
     )

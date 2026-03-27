@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_assets.di
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.network.NetworkApiCreator
+import io.novafoundation.nova.feature_assets.BuildConfig
 import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
@@ -23,8 +25,12 @@ import io.novafoundation.nova.feature_assets.data.repository.NovaCardStateReposi
 import io.novafoundation.nova.feature_assets.data.repository.RealNovaCardStateRepository
 import io.novafoundation.nova.feature_assets.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
+import io.novafoundation.nova.feature_assets.data.network.defaultTokens.DefaultAssetsApi
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
+import io.novafoundation.nova.feature_assets.data.repository.assetFilters.DustFilterPreferences
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.PreferencesAssetFiltersRepository
+import io.novafoundation.nova.feature_assets.data.repository.defaultTokens.DefaultTokensRepository
+import io.novafoundation.nova.feature_assets.data.repository.defaultTokens.LoadMoreTokensPreferences
 import io.novafoundation.nova.feature_assets.di.modules.AddTokenModule
 import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
@@ -141,6 +147,39 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideDefaultAssetsApi(
+        apiCreator: NetworkApiCreator
+    ): DefaultAssetsApi = apiCreator.create(DefaultAssetsApi::class.java)
+
+    @Provides
+    @FeatureScope
+    fun provideDefaultTokensRepository(
+        defaultAssetsApi: DefaultAssetsApi
+    ): DefaultTokensRepository {
+        return DefaultTokensRepository(
+            defaultAssetsApi = defaultAssetsApi,
+            remoteUrl = BuildConfig.DEFAULT_ASSETS_URL
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideLoadMoreTokensPreferences(
+        preferences: Preferences
+    ): LoadMoreTokensPreferences {
+        return LoadMoreTokensPreferences(preferences)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideDustFilterPreferences(
+        preferences: Preferences
+    ): DustFilterPreferences {
+        return DustFilterPreferences(preferences)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideWalletInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
@@ -148,7 +187,8 @@ class AssetsFeatureModule {
         chainRegistry: ChainRegistry,
         nftRepository: NftRepository,
         transactionHistoryRepository: TransactionHistoryRepository,
-        currencyRepository: CurrencyRepository
+        currencyRepository: CurrencyRepository,
+        dustFilterPreferences: DustFilterPreferences
     ): WalletInteractor = WalletInteractorImpl(
         walletRepository = walletRepository,
         accountRepository = accountRepository,
@@ -156,7 +196,8 @@ class AssetsFeatureModule {
         chainRegistry = chainRegistry,
         nftRepository = nftRepository,
         transactionHistoryRepository = transactionHistoryRepository,
-        currencyRepository = currencyRepository
+        currencyRepository = currencyRepository,
+        dustFilterPreferences = dustFilterPreferences
     )
 
     @Provides

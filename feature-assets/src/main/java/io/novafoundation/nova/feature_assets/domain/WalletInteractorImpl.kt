@@ -2,12 +2,16 @@ package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
+import io.novafoundation.nova.common.utils.applyFilter
 import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
+import io.novafoundation.nova.feature_assets.data.repository.assetFilters.DustFilterPreferences
+import io.novafoundation.nova.feature_assets.domain.assets.filters.DustBalanceFilter
+import io.novafoundation.nova.feature_assets.domain.assets.filters.NonZeroBalanceFilter
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -29,6 +33,7 @@ import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainByIdFlow
 import io.novafoundation.nova.runtime.multiNetwork.enabledChains
@@ -48,7 +53,8 @@ class WalletInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
     private val transactionHistoryRepository: TransactionHistoryRepository,
-    private val currencyRepository: CurrencyRepository
+    private val currencyRepository: CurrencyRepository,
+    private val dustFilterPreferences: DustFilterPreferences
 ) : WalletInteractor {
 
     override fun isFiltersEnabledFlow(): Flow<Boolean> {
@@ -57,9 +63,30 @@ class WalletInteractorImpl(
     }
 
     override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
-        return combine(assetsFlow, assetFiltersRepository.assetFiltersFlow()) { assets, filters ->
-            assets.applyFilters(filters)
+        return combine(
+            assetsFlow,
+            assetFiltersRepository.assetFiltersFlow(),
+            dustFilterPreferences.dustFilterSettingsFlow()
+        ) { assets, filters, dustSettings ->
+            val filtered = assets.applyFilters(filters)
+            val zeroBalanceFilterActive = filters.any { it is NonZeroBalanceFilter }
+            if (zeroBalanceFilterActive && dustSettings.enabled) {
+                val exemptIds = dustSettings.exemptTokenIds.mapNotNull { encoded ->
+                    parseFullChainAssetId(encoded)
+                }.toSet()
+                val dustFilter = DustBalanceFilter(dustSettings.threshold, exemptIds)
+                filtered.applyFilter(dustFilter)
+            } else {
+                filtered
+            }
         }
+    }
+
+    private fun parseFullChainAssetId(encoded: String): FullChainAssetId? {
+        val parts = encoded.split(":")
+        if (parts.size != 2) return null
+        val assetId = parts[1].toIntOrNull() ?: return null
+        return FullChainAssetId(parts[0], assetId)
     }
 
     override fun assetsFlow(): Flow<List<Asset>> {
@@ -69,7 +96,10 @@ class WalletInteractorImpl(
         val enabledChains = chainRegistry.enabledChainByIdFlow()
 
         return combine(assetsFlow, enabledChains) { assets, chainsById ->
-            assets.filter { chainsById.containsKey(it.token.configuration.chainId) }
+            assets.filter { asset ->
+                chainsById.containsKey(asset.token.configuration.chainId) &&
+                    asset.token.configuration.enabled
+            }
         }
     }
 

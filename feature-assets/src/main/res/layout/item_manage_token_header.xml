@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_primary_list_item"
+    android:paddingVertical="12dp"
+    tools:background="@color/secondary_screen_background">
+
+    <ImageView
+        android:id="@+id/manageTokenHeaderIcon"
+        style="@style/Widget.Nova.AssetIcon.OnColor"
+        android:layout_marginStart="12dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@drawable/ic_token_dot_colored" />
+
+    <TextView
+        android:id="@+id/manageTokenHeaderTitle"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="8dp"
+        android:singleLine="true"
+        android:textColor="@color/text_primary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/manageTokenHeaderCount"
+        app:layout_constraintStart_toEndOf="@+id/manageTokenHeaderIcon"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="DOT" />
+
+    <TextView
+        android:id="@+id/manageTokenHeaderCount"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/text_secondary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/manageTokenHeaderChevron"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="3 / 5" />
+
+    <ImageView
+        android:id="@+id/manageTokenHeaderChevron"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="16dp"
+        android:src="@drawable/ic_chevron_down"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/icon_secondary" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
