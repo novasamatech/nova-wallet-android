@@ -37,6 +37,7 @@ class SetupStakingTypeAdapter(
                 EditableStakingTypeRVItem::conditions -> holder.setConditions(item)
                 EditableStakingTypeRVItem::isSelected -> holder.select(item)
                 EditableStakingTypeRVItem::isSelectable -> holder.setSelectable(item)
+                EditableStakingTypeRVItem::isEditable -> holder.setEditable(item)
                 EditableStakingTypeRVItem::stakingTarget -> holder.setStakingTarget(item)
                 EditableStakingTypeRVItem::imageRes -> holder.setImage(item)
             }
@@ -69,6 +70,7 @@ class EditableStakingTypeViewHolder(
         setConditions(item)
         select(item)
         setSelectable(item)
+        setEditable(item)
         setStakingTarget(item)
         setImage(item)
 
@@ -97,6 +99,10 @@ class EditableStakingTypeViewHolder(
         binder.editableStakingType.setSelectable(item.isSelectable)
     }
 
+    fun setEditable(item: EditableStakingTypeRVItem) {
+        binder.editableStakingType.setStakingTargetEditable(item.isEditable)
+    }
+
     fun setStakingTarget(item: EditableStakingTypeRVItem) {
         binder.editableStakingType.setStakingTarget(item.stakingTarget)
     }
@@ -111,6 +117,7 @@ private object SetupStakingTypePayloadGenerator : PayloadGenerator<EditableStaki
     EditableStakingTypeRVItem::conditions,
     EditableStakingTypeRVItem::isSelected,
     EditableStakingTypeRVItem::isSelectable,
+    EditableStakingTypeRVItem::isEditable,
     EditableStakingTypeRVItem::stakingTarget,
     EditableStakingTypeRVItem::imageRes
 )

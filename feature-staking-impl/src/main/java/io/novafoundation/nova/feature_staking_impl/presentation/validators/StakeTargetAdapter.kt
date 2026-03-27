@@ -103,12 +103,19 @@ class StakingTargetViewHolder<V>(private val binder: ItemValidatorBinding) : Rec
         StakeTargetModel: StakeTargetModel<V>,
         handler: StakeTargetAdapter.ItemHandler<V>
     ) = with(binder) {
+        root.isEnabled = true
+        root.isClickable = true
+
         when {
             mode == StakeTargetAdapter.Mode.EDIT -> {
-                itemStakingTargetActionIcon.makeVisible()
                 itemStakingTargetCheck.makeGone()
 
-                itemStakingTargetActionIcon.setOnClickListener { handler.removeClicked(StakeTargetModel) }
+                if (StakeTargetModel.isLocked) {
+                    itemStakingTargetActionIcon.makeGone()
+                } else {
+                    itemStakingTargetActionIcon.makeVisible()
+                    itemStakingTargetActionIcon.setOnClickListener { handler.removeClicked(StakeTargetModel) }
+                }
             }
 
             StakeTargetModel.isChecked == null -> {
@@ -121,6 +128,10 @@ class StakingTargetViewHolder<V>(private val binder: ItemValidatorBinding) : Rec
                 itemStakingTargetCheck.makeVisible()
 
                 itemStakingTargetCheck.isChecked = StakeTargetModel.isChecked
+                itemStakingTargetCheck.isEnabled = !StakeTargetModel.isLocked
+                itemStakingTargetCheck.alpha = if (StakeTargetModel.isLocked) 0.3f else 1.0f
+                root.isEnabled = !StakeTargetModel.isLocked
+                root.isClickable = !StakeTargetModel.isLocked
             }
         }
     }
@@ -172,7 +183,7 @@ class StakingTargetDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>(
     }
 
     override fun areContentsTheSame(oldItem: StakeTargetModel<V>, newItem: StakeTargetModel<V>): Boolean {
-        return oldItem.scoring == newItem.scoring && oldItem.isChecked == newItem.isChecked && oldItem.subtitle == newItem.subtitle
+        return oldItem.scoring == newItem.scoring && oldItem.isChecked == newItem.isChecked && oldItem.subtitle == newItem.subtitle && oldItem.isLocked == newItem.isLocked
     }
 
     override fun getChangePayload(oldItem: StakeTargetModel<V>, newItem: StakeTargetModel<V>): Any? {
@@ -183,5 +194,6 @@ class StakingTargetDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>(
 private object StakingTargetPayloadGenerator : PayloadGenerator<StakeTargetModel<*>>(
     StakeTargetModel<*>::isChecked,
     StakeTargetModel<*>::scoring,
-    StakeTargetModel<*>::subtitle
+    StakeTargetModel<*>::subtitle,
+    StakeTargetModel<*>::isLocked
 )

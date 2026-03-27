@@ -12,8 +12,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.FORCED_NOVA_POOL_CHAIN_IDS
 import io.novafoundation.nova.runtime.ext.isDirectStaking
 import io.novafoundation.nova.runtime.ext.isPoolStaking
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class EditableStakingTypeItemFormatter(
     private val resourceManager: ResourceManager,
@@ -24,7 +26,8 @@ class EditableStakingTypeItemFormatter(
     suspend fun format(
         asset: Asset,
         validatedStakingType: ValidatedStakingTypeDetails,
-        selection: RecommendableMultiStakingSelection
+        selection: RecommendableMultiStakingSelection,
+        chainId: ChainId
     ): EditableStakingTypeRVItem? {
         val stakingTarget = multiStakingTargetSelectionFormatter.formatForStakingType(selection)
         val selectedStakingType = selection.selection.stakingOption.stakingType
@@ -37,14 +40,17 @@ class EditableStakingTypeItemFormatter(
         }
 
         val isSelected = selectedStakingType == stakingType
+        val isPoolForced = stakingType.isPoolStaking() && chainId in FORCED_NOVA_POOL_CHAIN_IDS
+        val isEditable = !isPoolForced
 
         return EditableStakingTypeRVItem(
             isSelected = isSelected,
             isSelectable = validatedStakingType.isAvailable || isSelected,
+            isEditable = isEditable,
             title = resourceManager.getString(titleRes),
             imageRes = imageRes,
             conditions = mapConditions(asset, validatedStakingType.stakingTypeDetails),
-            stakingTarget = stakingTarget.takeIf { selectedStakingType == stakingType }
+            stakingTarget = if (isPoolForced) null else stakingTarget.takeIf { selectedStakingType == stakingType }
         )
     }
 

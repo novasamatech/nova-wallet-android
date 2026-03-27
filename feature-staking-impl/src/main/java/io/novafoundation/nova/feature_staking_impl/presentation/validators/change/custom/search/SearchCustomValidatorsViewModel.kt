@@ -90,6 +90,8 @@ class SearchCustomValidatorsViewModel(
     }
 
     override fun itemClicked(item: ValidatorStakeTargetModel) {
+        if (item.isLocked) return
+
         if (item.stakeTarget.prefs!!.blocked) {
             showError(resourceManager.getString(R.string.staking_custom_blocked_warning))
             return

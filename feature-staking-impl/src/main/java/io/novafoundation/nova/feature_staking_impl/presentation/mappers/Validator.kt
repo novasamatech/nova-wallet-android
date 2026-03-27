@@ -85,6 +85,7 @@ suspend fun mapValidatorToValidatorModel(
             addressModel = addressModel,
             scoring = scoring,
             isChecked = isChecked,
+            isLocked = isNovaValidator,
             stakeTarget = validator,
             subtitle = null // TODO relaychain subtitles
         )

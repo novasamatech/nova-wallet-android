@@ -13,6 +13,7 @@ data class StakeTargetModel<V>(
     val subtitle: Subtitle?,
     val addressModel: AddressModel,
     val isChecked: Boolean?,
+    val isLocked: Boolean = false,
     val stakeTarget: V,
 ) {
 

@@ -172,6 +172,7 @@ class SetupStakingTypeViewModel(
             val stakingType = stakingTypesDataFlow.first()[position]
                 .stakingTypeDetails
                 .stakingType
+
             val setupStakingTypeFlowExecutor = setupStakingTypeFlowExecutorFactory.create(
                 payload.availableStakingOptions.chainId,
                 payload.availableStakingOptions.assetId,
@@ -194,8 +195,9 @@ class SetupStakingTypeViewModel(
         stakingTypesDetails: List<ValidatedStakingTypeDetails>,
         selection: RecommendableMultiStakingSelection
     ): List<EditableStakingTypeRVItem> {
+        val chainId = payload.availableStakingOptions.chainId
         return stakingTypesDetails.mapNotNull {
-            editableStakingTypeItemFormatter.format(asset, it, selection)
+            editableStakingTypeItemFormatter.format(asset, it, selection, chainId)
         }
     }
 

@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.MultiStakingSelectionStoreProviderKey
 import io.novafoundation.nova.feature_staking_impl.di.staking.startMultiStaking.StakingTypeEditingStoreProviderKey
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.SetupStakingTypeSelectionMixinFactory
@@ -34,12 +35,14 @@ class SetupStakingTypeModule {
     fun provideSetupStakingTypeFlowExecutorFactory(
         stakingRouter: StakingRouter,
         setupStakingSharedState: SetupStakingSharedState,
-        @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider
+        @StakingTypeEditingStoreProviderKey editableSelectionStoreProvider: StartMultiStakingSelectionStoreProvider,
+        knownNovaPools: KnownNovaPools,
     ): SetupStakingTypeFlowExecutorFactory {
         return SetupStakingTypeFlowExecutorFactory(
             stakingRouter,
             setupStakingSharedState,
-            editableSelectionStoreProvider
+            editableSelectionStoreProvider,
+            knownNovaPools
         )
     }
 
