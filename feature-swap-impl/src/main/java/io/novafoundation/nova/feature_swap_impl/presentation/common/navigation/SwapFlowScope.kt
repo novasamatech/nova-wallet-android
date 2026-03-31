@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.common.navigation
 
-import android.util.Log
 import io.novafoundation.nova.common.utils.invokeOnCompletion
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import kotlinx.coroutines.CoroutineScope
@@ -21,8 +20,6 @@ class RealSwapFlowScopeAggregator : SwapFlowScopeAggregator {
             }
 
             scopes.add(screenScope)
-
-            Log.d("Swaps", "Registering new swap screen scope, total count: ${scopes.size}")
         }
 
         screenScope.invokeOnCompletion {
@@ -30,12 +27,8 @@ class RealSwapFlowScopeAggregator : SwapFlowScopeAggregator {
                 scopes -= screenScope
 
                 if (scopes.isEmpty()) {
-                    Log.d("Swaps", "Last swap screen scope was cancelled, cancelling flow scope")
-
                     aggregatedScope!!.cancel()
                     aggregatedScope = null
-                } else {
-                    Log.d("Swaps", "Swap screen scope was cancelled, remaining count: ${scopes.size}")
                 }
             }
         }

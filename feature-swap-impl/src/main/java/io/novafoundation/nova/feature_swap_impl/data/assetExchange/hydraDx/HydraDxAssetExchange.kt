@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.BundleExtraActions
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -367,8 +368,11 @@ private class HydraDxAssetExchange(
             )
         }
 
-        override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
-            return submitInternal(args)
+        override suspend fun execute(
+            args: AtomicSwapOperationSubmissionArgs,
+            bundleExtraActions: BundleExtraActions?
+        ): Result<SwapExecutionCorrection> {
+            return submitInternal(args, bundleExtraActions)
                 .mapCatching {
                     SwapExecutionCorrection(
                         actualReceivedAmount = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
@@ -376,12 +380,18 @@ private class HydraDxAssetExchange(
                 }
         }
 
-        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
-            return submitInternal(args)
+        override suspend fun submit(
+            args: AtomicSwapOperationSubmissionArgs,
+            bundleExtraActions: BundleExtraActions?
+        ): Result<SwapSubmissionResult> {
+            return submitInternal(args, bundleExtraActions)
                 .map { SwapSubmissionResult(it.submissionHierarchy) }
         }
 
-        private suspend fun submitInternal(args: AtomicSwapOperationSubmissionArgs): Result<ExtrinsicExecutionResult> {
+        private suspend fun submitInternal(
+            args: AtomicSwapOperationSubmissionArgs,
+            bundleExtraActions: BundleExtraActions? = null
+        ): Result<ExtrinsicExecutionResult> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
@@ -391,6 +401,7 @@ private class HydraDxAssetExchange(
                 )
             ) {
                 executeSwap(args.actualSwapLimit)
+                bundleExtraActions?.invoke(this)
             }.requireOk()
         }
 

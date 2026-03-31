@@ -11,7 +11,8 @@ import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 class DescriptionBottomSheet(
     context: Context,
     val titleRes: Int,
-    val descriptionRes: Int
+    val descriptionRes: Int,
+    val descriptionText: String? = null
 ) : BaseBottomSheet<BottomSheetDescriptionBinding>(context, R.style.BottomSheetDialog), WithContextExtensions by WithContextExtensions(context) {
 
     override val binder: BottomSheetDescriptionBinding = BottomSheetDescriptionBinding.inflate(LayoutInflater.from(context))
@@ -19,6 +20,11 @@ class DescriptionBottomSheet(
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binder.sheetDescriptionTitle.setText(titleRes)
-        binder.sheetDescriptionDetails.setText(descriptionRes)
+
+        if (descriptionText != null) {
+            binder.sheetDescriptionDetails.text = descriptionText
+        } else {
+            binder.sheetDescriptionDetails.setText(descriptionRes)
+        }
     }
 }

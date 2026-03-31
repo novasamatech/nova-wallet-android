@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
-import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
+import io.novafoundation.nova.feature_swap_impl.domain.swap.displaySwapRate
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
@@ -22,6 +22,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -47,12 +48,15 @@ class RealSwapConfirmationDetailsFormatter(
         val chainIn = chainRegistry.getChain(assetIn.chainId)
         val chainOut = chainRegistry.getChain(assetOut.chainId)
 
+        val chainsById = chainRegistry.chainsById()
+        val displayRate = quote.displaySwapRate(chainsById)
+
         return SwapConfirmationDetailsModel(
             assets = SwapAssetsView.Model(
                 assetIn = formatAssetDetails(chainIn, assetIn, quote.planksIn),
                 assetOut = formatAssetDetails(chainOut, assetOut, quote.planksOut)
             ),
-            rate = formatRate(quote.swapRate(), assetIn, assetOut),
+            rate = formatRate(displayRate, assetIn, assetOut),
             priceDifference = formatPriceDifference(quote.priceImpact),
             slippage = slippage.formatPercents(),
             swapRouteModel = swapRouteFormatter.formatSwapRoute(quote),

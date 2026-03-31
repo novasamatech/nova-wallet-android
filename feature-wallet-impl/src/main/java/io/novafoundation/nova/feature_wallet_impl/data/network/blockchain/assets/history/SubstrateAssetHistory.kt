@@ -147,6 +147,11 @@ abstract class SubstrateAssetHistory(
 
         val assetsBySubQueryId = chain.assetsBySubQueryId()
 
+        // TODO: Filter out commission transfers to the Nova fee account (NovaSwapCommission.FEE_ACCOUNT_HEX)
+        //  so they don't appear as separate transfer entries in the user's transaction history.
+        //  The fee account address varies by chain encoding, so the filter should compare account IDs
+        //  rather than formatted addresses. This requires making the fee account ID accessible from
+        //  a shared module (e.g. feature-wallet-api) to avoid circular dependencies with feature-swap-impl.
         val operations = subqueryResponse.historyElements.nodes.mapNotNull { node ->
             val coinRate = priceHistory.findNearestCoinRate(node.timestamp)
             mapNodeToOperation(node, coinRate, chainAsset, assetsBySubQueryId)

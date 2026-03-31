@@ -1793,6 +1793,9 @@
     <string name="swap_price_difference_title">Perbedaan harga</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">Kurs pertukaran antara dua cryptocurrency yang berbeda. Ini menggambarkan seberapa banyak cryptocurrency itu yang bisa Anda dapatkan dalam pertukaran dengan sejumlah tertentu cryptocurrency lain.</string>
+    <string name="swap_rate_includes_fee_description">Kurs terbaik yang ditemukan, termasuk biaya Nova Wallet %s%%.</string>
+    <string name="swap_network_fees_label">Biaya jaringan</string>
+    <string name="swap_nova_fee_disclaimer">Termasuk biaya Nova %s%%.</string>
     <string name="swap_rate_title">Kurs</string>
     <string name="swap_rate_was_updated_failure_message">Kurs lama: %1$s ≈ %2$s.\nKurs baru: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Kurs pertukaran telah diperbarui</string>

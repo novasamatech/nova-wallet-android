@@ -1805,6 +1805,9 @@
     <string name="swap_price_difference_title">Árkülönbség</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">Az árfolyam két különböző kriptovaluta között azt jelenti, hogy egy kriptovalutából mennyit kaphatsz cserébe egy bizonyos mennyiségű másik kriptovalutáért.</string>
+    <string name="swap_rate_includes_fee_description">A legjobb megtalált árfolyam, beleértve a %s%%-os Nova Wallet díjat.</string>
+    <string name="swap_network_fees_label">Hálózati díjak</string>
+    <string name="swap_nova_fee_disclaimer">%s%%-os Nova díjat tartalmaz.</string>
     <string name="swap_rate_title">Mérték</string>
     <string name="swap_rate_was_updated_failure_message">Régi árfolyam: %1$s ≈ %2$s.\nÚj árfolyam: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Frissült a csere árfolyam</string>

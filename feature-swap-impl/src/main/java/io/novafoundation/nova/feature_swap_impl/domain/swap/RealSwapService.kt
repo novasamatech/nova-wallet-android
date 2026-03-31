@@ -44,6 +44,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.BundleExtraActions
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
@@ -53,6 +54,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
+import io.novafoundation.nova.feature_swap_api.domain.model.amountOutMin
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -82,6 +84,8 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.SharedSwapSub
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
+import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.firstExistingCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -94,8 +98,11 @@ import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.ext.isUtility
+import io.novafoundation.nova.runtime.ext.isUtilityAsset
+import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAssetOf
+import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
@@ -108,6 +115,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -166,8 +174,6 @@ internal class RealSwapService(
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
-        Log.d("Swaps", "Syncing swap service")
-
         exchangeRegistry(coroutineScope)
             .allExchanges()
             .forEachAsync { it.sync() }
@@ -228,6 +234,9 @@ internal class RealSwapService(
 
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
 
+        // Pre-determine the last Hydra segment index - commission should only apply there
+        val lastHydraSegmentIndex = findLastHydraSegmentIndex(segments)
+
         return flow {
             segments.withIndex().fold(initialCorrection) { prevStepCorrection, (index, segment) ->
                 val (segmentFee, operation) = segment
@@ -250,9 +259,17 @@ internal class RealSwapService(
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
                     val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
 
-                    Log.d("SwapSubmission", "$displayData with $actualSwapLimit")
+                    // Only apply commission on the last Hydra segment
+                    val isCommissionSegment = index == lastHydraSegmentIndex
+                    val commissionActions = if (isCommissionSegment) buildCommissionActions(operation, actualSwapLimit) else null
+                    val commissionAmount = if (isCommissionSegment) getCommissionAmount(operation, actualSwapLimit) else BigInteger.ZERO
 
-                    operation.execute(segmentSubmissionArgs).onFailure {
+                    operation.execute(segmentSubmissionArgs, commissionActions).map { executionCorrection ->
+                        // Subtract commission from actualReceivedAmount so subsequent segments see the true available balance
+                        SwapExecutionCorrection(
+                            actualReceivedAmount = executionCorrection.actualReceivedAmount - commissionAmount
+                        )
+                    }.onFailure {
                         Log.e("SwapSubmission", "Swap failed on stage '$displayData'", it)
 
                         emit(SwapProgress.Failure(it, attemptedStep = step))
@@ -264,6 +281,22 @@ internal class RealSwapService(
         }
     }
 
+    /**
+     * Finds the index of the last segment whose output chain supports HydraDx swaps.
+     * Returns -1 if no segment runs on a Hydra chain.
+     */
+    private suspend fun findLastHydraSegmentIndex(segments: List<SwapFee.SwapSegment>): Int {
+        var lastIndex = -1
+        segments.forEachIndexed { index, (_, operation) ->
+            val chainId = operation.assetOut.chainId
+            val chain = chainRegistry.getChain(chainId)
+            if (chain.swap.hydraDxSupported()) {
+                lastIndex = index
+            }
+        }
+        return lastIndex
+    }
+
     override suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult> {
         val (_, operation) = calculatedFee.segments.firstOrNull() ?: return Result.failure(IllegalStateException("No segments"))
 
@@ -272,13 +305,97 @@ internal class RealSwapService(
 
         val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
 
-        return operation.submit(segmentSubmissionArgs)
+        val commissionActions = buildCommissionActions(operation, actualSwapLimit)
+
+        return operation.submit(segmentSubmissionArgs, commissionActions)
     }
 
     private fun SwapLimit.estimatedAmountIn(): Balance {
         return when (this) {
             is SwapLimit.SpecifiedIn -> amountIn
             is SwapLimit.SpecifiedOut -> amountInQuote
+        }
+    }
+
+    /**
+     * Returns the commission amount for this operation, or [BigInteger.ZERO] if not applicable.
+     */
+    private suspend fun getCommissionAmount(
+        operation: AtomicSwapOperation,
+        actualSwapLimit: SwapLimit
+    ): Balance {
+        val chainId = operation.assetOut.chainId
+        val chain = chainRegistry.getChain(chainId)
+
+        if (!chain.swap.hydraDxSupported()) return BigInteger.ZERO
+
+        val commissionAmount = NovaSwapCommission.feeAmount(actualSwapLimit.amountOutMin)
+        return if (commissionAmount > BigInteger.ZERO) commissionAmount else BigInteger.ZERO
+    }
+
+    /**
+     * Builds commission transfer actions to bundle with the swap extrinsic on Hydration.
+     * Returns null if the operation is not on a Hydration chain.
+     *
+     * The commission is [NovaSwapCommission.FEE_PERCENT_DISPLAY]% of the swap output,
+     * calculated from [SwapLimit.amountOutMin] (the post-slippage minimum) for safety.
+     */
+    private suspend fun buildCommissionActions(
+        operation: AtomicSwapOperation,
+        actualSwapLimit: SwapLimit
+    ): BundleExtraActions? {
+        val chainId = operation.assetOut.chainId
+        val chain = chainRegistry.getChain(chainId)
+
+        if (!chain.swap.hydraDxSupported()) return null
+
+        val assetOut = chain.assetsById[operation.assetOut.assetId] ?: return null
+        val commissionAmount = NovaSwapCommission.feeAmount(actualSwapLimit.amountOutMin)
+
+        if (commissionAmount <= BigInteger.ZERO) return null
+
+        return buildCommissionTransferCall(assetOut, commissionAmount)
+    }
+
+    /**
+     * Creates a [BundleExtraActions] lambda that adds a transfer call for the commission.
+     * Uses Balances.transfer_keep_alive for native assets.
+     * For ORML tokens, dynamically resolves between Currencies and Tokens modules
+     * using [firstExistingCall], matching the approach in [OrmlAssetTransfers].
+     */
+    private fun buildCommissionTransferCall(
+        assetOut: Chain.Asset,
+        commissionAmount: Balance
+    ): BundleExtraActions {
+        return {
+            if (assetOut.isUtilityAsset) {
+                // Native asset: use Balances.transfer_keep_alive
+                call(
+                    moduleName = Modules.BALANCES,
+                    callName = "transfer_keep_alive",
+                    arguments = mapOf(
+                        "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, NovaSwapCommission.feeAccountId),
+                        "value" to commissionAmount
+                    )
+                )
+            } else {
+                // ORML token: dynamically resolve between Currencies.transfer and Tokens.transfer
+                val ormlTransferCandidates = listOf(
+                    Modules.CURRENCIES to "transfer",
+                    Modules.TOKENS to "transfer"
+                )
+                val (moduleIndex, callIndex) = runtime.metadata.firstExistingCall(ormlTransferCandidates).index
+
+                call(
+                    moduleIndex = moduleIndex,
+                    callIndex = callIndex,
+                    arguments = mapOf(
+                        "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, NovaSwapCommission.feeAccountId),
+                        "currency_id" to assetOut.ormlCurrencyId(runtime),
+                        "amount" to commissionAmount
+                    )
+                )
+            }
         }
     }
 
@@ -734,6 +851,8 @@ internal class RealSwapService(
     }
 
     private fun logFee(fee: SwapFee) {
+        if (!debug) return
+
         val route = fee.segments.joinToString(separator = "\n") { segment ->
             val allFees = buildList {
                 add(segment.fee.submissionFee)

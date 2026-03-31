@@ -96,5 +96,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
         }
 
         viewModel.validationProgress.observe(binder.swapMainSettingsContinue::setProgressState)
+
+        binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
+        viewModel.showNovaFeeDisclaimer.observe { binder.swapNovaFeeDisclaimer.setVisible(it) }
     }
 }

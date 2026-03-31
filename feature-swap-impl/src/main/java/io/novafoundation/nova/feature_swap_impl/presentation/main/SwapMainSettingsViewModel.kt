@@ -38,8 +38,10 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
+import io.novafoundation.nova.feature_swap_impl.domain.swap.NovaSwapCommission
+import io.novafoundation.nova.feature_swap_impl.domain.swap.displaySwapRate
+import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -96,6 +98,7 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -239,6 +242,25 @@ class SwapMainSettingsViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
+    val showNovaFeeDisclaimer: Flow<Boolean> = quotingState.mapNotNull {
+        when (it) {
+            is QuotingState.Loaded -> {
+                val chainsById = chainRegistry.chainsById()
+                it.quote.involvesHydraSwap(chainsById)
+            }
+            is QuotingState.Default,
+            is QuotingState.Error -> false
+            else -> null
+        }
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val novaFeeDisclaimerText: String = resourceManager.getString(
+        R.string.swap_nova_fee_disclaimer,
+        NovaSwapCommission.FEE_PERCENT_DISPLAY
+    )
+
     private val _validationProgress = MutableStateFlow(false)
 
     val validationProgress = _validationProgress
@@ -350,7 +372,12 @@ class SwapMainSettingsViewModel(
     }
 
     fun rateDetailsClicked() {
-        launchSwapRateDescription()
+        launch {
+            val chainsById = chainRegistry.chainsById()
+            val includesFee = (quotingState.value as? QuotingState.Loaded)
+                ?.quote?.involvesHydraSwap(chainsById) ?: false
+            launchSwapRateDescription(resourceManager, includesFee, NovaSwapCommission.FEE_PERCENT_DISPLAY)
+        }
     }
 
     fun flipAssets() = launch {
@@ -516,8 +543,10 @@ class SwapMainSettingsViewModel(
         swapDirectionFlipped.value = newSettings.swapDirection!!.event()
     }
 
-    private fun formatRate(swapQuote: SwapQuote): String {
-        return swapRateFormatter.format(swapQuote.swapRate(), swapQuote.assetIn, swapQuote.assetOut)
+    private suspend fun formatRate(swapQuote: SwapQuote): String {
+        val chainsById = chainRegistry.chainsById()
+        val rate = swapQuote.displaySwapRate(chainsById)
+        return swapRateFormatter.format(rate, swapQuote.assetIn, swapQuote.assetOut)
     }
 
     private fun formatButtonStates(
@@ -570,8 +599,6 @@ class SwapMainSettingsViewModel(
             swapInteractor.runSubscriptions(selectedAccountUseCase.getSelectedMetaAccount())
                 .catch { Log.e(this@SwapMainSettingsViewModel.LOG_TAG, "Failure during subscriptions run", it) }
         }.onEach {
-            Log.d("Swap", "ReQuote triggered from subscription")
-
             val currentSwapSettings = swapSettings.first()
 
             performQuote(currentSwapSettings, shouldShowLoading = false)

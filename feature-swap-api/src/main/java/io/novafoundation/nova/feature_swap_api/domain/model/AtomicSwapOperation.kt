@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 
 interface AtomicSwapOperation {
 
@@ -35,10 +36,22 @@ interface AtomicSwapOperation {
      */
     suspend fun additionalMaxAmountDeduction(): SwapMaxAdditionalAmountDeduction
 
-    suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection>
+    suspend fun execute(
+        args: AtomicSwapOperationSubmissionArgs,
+        bundleExtraActions: BundleExtraActions? = null
+    ): Result<SwapExecutionCorrection>
 
-    suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult>
+    suspend fun submit(
+        args: AtomicSwapOperationSubmissionArgs,
+        bundleExtraActions: BundleExtraActions? = null
+    ): Result<SwapSubmissionResult>
 }
+
+/**
+ * A lambda that appends extra calls to the extrinsic builder.
+ * Used by SwapService to bundle commission transfer calls alongside swap calls.
+ */
+typealias BundleExtraActions = suspend ExtrinsicBuilder.() -> Unit
 
 class AtomicSwapOperationSubmissionArgs(
     val actualSwapLimit: SwapLimit,
