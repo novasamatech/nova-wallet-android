@@ -2067,4 +2067,7 @@
     <string name="yield_boost_stake_increase_time">Частота увеличения стейка</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost будет автоматически стейкать %s все мои переводные токены выше %s</string>
     <string name="yiled_boost_yield_boosted">С Yield Boost</string>
+    <string name="favourites_section_header">★ Избранное</string>
+    <string name="wallets_section_header">Кошельки</string>
+    <string name="search_wallets_placeholder">Поиск кошельков…</string>
 </resources>

@@ -619,12 +619,18 @@ class AccountFeatureModule {
     fun provideAccountListingMixinFactory(
         walletUseCase: WalletUiUseCase,
         metaAccountGroupingInteractor: MetaAccountGroupingInteractor,
+        accountInteractor: AccountInteractor,
+        chainRegistry: io.novafoundation.nova.runtime.multiNetwork.ChainRegistry,
+        resourceManager: io.novafoundation.nova.common.resources.ResourceManager,
         proxyFormatter: ProxyFormatter,
         multisigFormatter: MultisigFormatter,
         accountTypePresentationMapper: MetaAccountTypePresentationMapper,
     ) = MetaAccountWithBalanceListingMixinFactory(
         walletUseCase,
         metaAccountGroupingInteractor,
+        accountInteractor,
+        chainRegistry,
+        resourceManager,
         accountTypePresentationMapper,
         multisigFormatter,
         proxyFormatter

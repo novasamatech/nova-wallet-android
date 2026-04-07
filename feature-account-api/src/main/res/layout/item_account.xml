@@ -20,14 +20,27 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
+        android:id="@+id/itemAccountFavourite"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginStart="8dp"
+        android:padding="4dp"
+        android:src="@android:drawable/btn_star_big_off"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/itemAccountDelete"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="visible" />
+
+    <ImageView
         android:id="@+id/itemAccountIcon"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/itemAccountDelete"
+        app:layout_constraintStart_toEndOf="@+id/itemAccountFavourite"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginStart="16dp"
         tools:src="@color/icon_primary" />

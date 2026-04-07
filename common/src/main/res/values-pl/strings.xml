@@ -2067,4 +2067,7 @@
     <string name="yield_boost_stake_increase_time">Czas zwiększenia Stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost automatycznie Stake %s wszystkie moje przenośne tokeny powyżej %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="favourites_section_header">★ Ulubione</string>
+    <string name="wallets_section_header">Portfele</string>
+    <string name="search_wallets_placeholder">Szukaj portfeli…</string>
 </resources>

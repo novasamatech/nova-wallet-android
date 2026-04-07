@@ -258,6 +258,14 @@ class AccountDataSourceImpl(
         metaAccountDao.updateName(metaId, newName)
     }
 
+    override suspend fun setFavourite(metaId: Long, isFavourite: Boolean) {
+        metaAccountDao.setFavourite(metaId, isFavourite)
+    }
+
+    override fun observeFavouriteMetaIds(): Flow<List<Long>> {
+        return metaAccountDao.observeFavouriteIds()
+    }
+
     override suspend fun deleteMetaAccount(metaId: Long): List<MetaIdWithType> {
         val joinedMetaAccountInfo = metaAccountDao.getJoinedMetaAccountInfo(metaId)
         val chainAccountIds = joinedMetaAccountInfo.chainAccounts.map(ChainAccountLocal::accountId)

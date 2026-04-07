@@ -2039,4 +2039,7 @@
     <string name="yield_boost_stake_increase_time">Tempo di aumento dello stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost stakerà automaticamente %s tutti i miei token trasferibili oltre %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="favourites_section_header">★ Preferiti</string>
+    <string name="wallets_section_header">Portafogli</string>
+    <string name="search_wallets_placeholder">Cerca portafogli…</string>
 </resources>

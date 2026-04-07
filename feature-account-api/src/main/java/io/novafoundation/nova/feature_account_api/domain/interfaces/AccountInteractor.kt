@@ -36,6 +36,10 @@ interface AccountInteractor {
 
     suspend fun deleteAccount(metaId: Long): Boolean
 
+    suspend fun setFavourite(metaId: Long, isFavourite: Boolean)
+
+    fun observeFavouriteMetaIds(): Flow<List<Long>>
+
     suspend fun updateMetaAccountPositions(idsInNewOrder: List<Long>)
 
     fun chainFlow(chainId: ChainId): Flow<Chain>

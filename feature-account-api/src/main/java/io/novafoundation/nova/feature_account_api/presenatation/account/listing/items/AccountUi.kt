@@ -14,5 +14,9 @@ class AccountUi(
     val chainIcon: Icon?,
     val updateIndicator: Boolean,
     val subtitleIconRes: Int?,
-    val chainIconOpacity: Float = 1f
+    val chainIconOpacity: Float = 1f,
+    val isFavourite: Boolean = false,
+    val showFavouriteToggle: Boolean = false,
+    val typeBadge: String? = null,
+    val groupTag: String = ""
 )

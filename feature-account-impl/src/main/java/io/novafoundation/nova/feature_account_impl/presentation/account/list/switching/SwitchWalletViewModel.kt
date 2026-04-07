@@ -19,7 +19,10 @@ class SwitchWalletViewModel(
     accountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
 ) : WalletListViewModel() {
 
-    override val walletsListingMixin = accountListingMixinFactory.create(this)
+    override val walletsListingMixin = accountListingMixinFactory.create(
+        coroutineScope = this,
+        searchQueryFlow = searchQueryFlow
+    )
 
     override val mode: AccountHolder.Mode = AccountHolder.Mode.SWITCH
 

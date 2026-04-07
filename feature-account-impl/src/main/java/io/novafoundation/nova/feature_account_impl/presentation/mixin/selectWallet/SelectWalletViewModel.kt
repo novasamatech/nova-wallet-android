@@ -24,6 +24,7 @@ class SelectWalletViewModel(
 
     override val walletsListingMixin = accountListingMixinFactory.create(
         coroutineScope = this,
+        searchQueryFlow = searchQueryFlow,
         metaAccountSelectedFlow = currentSelectedIdFlow
     )
 

@@ -6,5 +6,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.listing.
 object MetaAccountPayloadGenerator : PayloadGenerator<AccountUi>(
     AccountUi::title,
     AccountUi::subtitle,
-    AccountUi::isSelected
+    AccountUi::isSelected,
+    AccountUi::isFavourite
 )

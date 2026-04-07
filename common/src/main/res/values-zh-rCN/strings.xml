@@ -2025,4 +2025,7 @@
     <string name="yield_boost_stake_increase_time">加注时间</string>
     <string name="yield_boost_terms" formatted="false">收益增强将自动加注我所有可转让代币中超过%s的%s</string>
     <string name="yiled_boost_yield_boosted">已增强收益</string>
+    <string name="favourites_section_header">★ 收藏</string>
+    <string name="wallets_section_header">钱包</string>
+    <string name="search_wallets_placeholder">搜索钱包…</string>
 </resources>

@@ -2025,4 +2025,7 @@
     <string name="yield_boost_stake_increase_time">Waktu peningkatan staking</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost akan secara otomatis melakukan staking %s semua token yang dapat ditransfer di atas %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="favourites_section_header">★ Favorit</string>
+    <string name="wallets_section_header">Dompet</string>
+    <string name="search_wallets_placeholder">Cari dompet…</string>
 </resources>
