@@ -33,10 +33,9 @@ runs:
         file: ${{ inputs.upload-file }}
 
     - name: Sleep for 60 seconds
-      uses: whatnick/wait-action@master
       if: steps.upload.outcome=='failure'
-      with:
-        time: '60s'
+      run: sleep 60
+      shell: bash
 
     - name: Retry upload artifacts
       if: steps.upload.outcome=='failure'

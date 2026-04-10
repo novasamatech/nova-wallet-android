@@ -1,0 +1,164 @@
+name: Reusable workflow for build Android
+
+on:
+  workflow_call:
+    inputs:
+      gradlew-command:
+        required: false
+        type: string
+        default: "false"
+      run-tests:
+        required: false
+        type: boolean
+        default: true
+      keystore-source:
+        required: false
+        type: string
+        default: "false"
+      upload-name:
+        required: false
+        type: string
+        default: "apk"
+      ci-build-id:
+        required: false
+        type: string
+        default: ""
+      build-output-type:
+        required: false
+        type: string
+        default: "apk"
+      build-debug-tests:
+        required: false
+        type: boolean
+        default: false
+
+env:
+  # API tokens (remain as GitHub Secrets)
+  CI_BUILD_ID: ${{ inputs.ci-build-id }}
+  ACALA_PROD_AUTH_TOKEN: ${{ secrets.ACALA_PROD_AUTH_TOKEN }}
+  ACALA_TEST_AUTH_TOKEN: ${{ secrets.ACALA_TEST_AUTH_TOKEN }}
+  MOONBEAM_PROD_AUTH_TOKEN: ${{ secrets.MOONBEAM_PROD_AUTH_TOKEN }}
+  MOONBEAM_TEST_AUTH_TOKEN: ${{ secrets.MOONBEAM_TEST_AUTH_TOKEN }}
+  MOONPAY_PRODUCTION_SECRET: ${{ secrets.MOONPAY_PRODUCTION_SECRET }}
+  MOONPAY_TEST_SECRET: ${{ secrets.MOONPAY_TEST_SECRET }}
+  MERCURYO_PRODUCTION_SECRET: ${{ secrets.MERCURYO_PRODUCTION_SECRET }}
+  MERCURYO_TEST_SECRET: ${{ secrets.MERCURYO_TEST_SECRET }}
+  EHTERSCAN_API_KEY_MOONBEAM: ${{ secrets.EHTERSCAN_API_KEY_MOONBEAM }}
+  EHTERSCAN_API_KEY_MOONRIVER: ${{ secrets.EHTERSCAN_API_KEY_MOONRIVER }}
+  EHTERSCAN_API_KEY_ETHEREUM: ${{ secrets.EHTERSCAN_API_KEY_ETHEREUM }}
+  INFURA_API_KEY: ${{ secrets.INFURA_API_KEY }}
+  DWELLIR_API_KEY: ${{ secrets.DWELLIR_API_KEY }}
+  WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
+  DEBUG_GOOGLE_OAUTH_ID: ${{ secrets.DEBUG_GOOGLE_OAUTH_ID }}
+  RELEASE_GOOGLE_OAUTH_ID: ${{ secrets.RELEASE_GOOGLE_OAUTH_ID }}
+  POLKASSEMBLY_SUMMARY_API_KEY: ${{ secrets.POLKASSEMBLY_SUMMARY_API_KEY }}
+
+jobs:
+  run-tests:
+    name: Run unit tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: ${{ inputs.run-tests }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Install dependencies + fetch secrets
+        uses: ./.github/actions/install
+        with:
+          scw_access_key: ${{ secrets.SCW_ACCESS_KEY }}
+          scw_secret_key: ${{ secrets.SCW_SECRET_KEY }}
+          scw_default_project_id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          scw_default_organization_id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+
+      - name: 📂 Setup Google Services
+        uses: ./.github/actions/setup-google-services
+        with:
+          dev-google-services-base64: ${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}
+          prod-google-services-base64: ${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}
+
+      - name: 🧪 Run tests
+        run: ./gradlew runTest
+
+  build-app:
+    name: Build app
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: ${{ inputs.gradlew-command != 'false' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Install dependencies + fetch secrets
+        uses: ./.github/actions/install
+        with:
+          scw_access_key: ${{ secrets.SCW_ACCESS_KEY }}
+          scw_secret_key: ${{ secrets.SCW_SECRET_KEY }}
+          scw_default_project_id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          scw_default_organization_id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+
+      - name: 📂 Setup Google Services
+        uses: ./.github/actions/setup-google-services
+        with:
+          dev-google-services-base64: ${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}
+          prod-google-services-base64: ${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}
+
+      - name: 🔐 Setup signing key
+        id: signing_key
+        if: ${{ inputs.keystore-source != 'false' }}
+        uses: ./.github/actions/setup-signing-key
+        with:
+          keystore-source: ${{ inputs.keystore-source }}
+
+      - name: 🏗 Build app
+        run: ./gradlew ${{ inputs.gradlew-command }}
+
+      - name: 🧹 Delete key after building
+        if: ${{ inputs.keystore-source != 'false' }}
+        run: rm -f ./app/${{ steps.signing_key.outputs.keystore-file-name }}
+
+      - name: ➡️ Upload app artifacts
+        if: ${{ inputs.build-output-type == 'apk' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.upload-name }}
+          path: app/build/outputs/apk/
+
+      - name: ➡️ Upload bundle artifacts
+        if: ${{ inputs.build-output-type == 'bundle' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.upload-name }}
+          path: app/build/outputs/bundle/
+
+  build-debug-tests:
+    name: Build debug tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    if: ${{ inputs.build-debug-tests }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Install dependencies + fetch secrets
+        uses: ./.github/actions/install
+        with:
+          scw_access_key: ${{ secrets.SCW_ACCESS_KEY }}
+          scw_secret_key: ${{ secrets.SCW_SECRET_KEY }}
+          scw_default_project_id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          scw_default_organization_id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+
+      - name: 📂 Setup Google Services
+        uses: ./.github/actions/setup-google-services
+        with:
+          dev-google-services-base64: ${{ env.CI_DEVELOP_GOOGLE_SERVICES_FILE }}
+          prod-google-services-base64: ${{ env.CI_PRODUCTION_GOOGLE_SERVICES_FILE }}
+
+      - name: 🏗 Build debug tests
+        run: ./gradlew assembleDebugAndroidTest
+
+      - name: ➡️ Upload debug test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.upload-name }}-androidTest
+          path: app/build/outputs/apk/androidTest/

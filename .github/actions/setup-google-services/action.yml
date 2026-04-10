@@ -1,0 +1,25 @@
+name: Setup Google Services
+description: Decode base64 google-services.json for DEV and PROD source sets
+
+inputs:
+  dev-google-services-base64:
+    description: 'Base64-encoded DEV google-services.json'
+    required: true
+  prod-google-services-base64:
+    description: 'Base64-encoded PROD google-services.json'
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: 📂 Set up DEV Google Services
+      shell: bash
+      run: |
+        mkdir -p ./app
+        printf '%s' '${{ inputs.dev-google-services-base64 }}' | base64 --decode > ./app/google-services.json
+
+    - name: 📂 Set up PROD Google Services
+      shell: bash
+      run: |
+        mkdir -p ./app/src/release
+        printf '%s' '${{ inputs.prod-google-services-base64 }}' | base64 --decode > ./app/src/release/google-services.json
