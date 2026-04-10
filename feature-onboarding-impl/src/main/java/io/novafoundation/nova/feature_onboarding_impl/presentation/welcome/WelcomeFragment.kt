@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 import android.graphics.Color
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.text.style.UnderlineSpan
 import android.view.View
 
 import io.novafoundation.nova.common.base.BaseFragment
@@ -52,12 +53,16 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
 
     override fun initViews() {
         configureTermsAndPrivacy(
-            getString(R.string.onboarding_terms_and_conditions_1_v2_2_1),
-            getString(R.string.onboarding_terms_and_conditions_2),
-            getString(R.string.onboarding_privacy_policy)
+            getString(R.string.consent_banner_text_template),
+            getString(R.string.consent_banner_terms_of_service),
+            getString(R.string.consent_banner_privacy_notice)
         )
         binder.welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
         binder.welcomeTerms.highlightColor = Color.TRANSPARENT
+
+        binder.welcomeConsentCheckbox.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.consentToggled(isChecked)
+        }
 
         binder.welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
         binder.welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
@@ -68,10 +73,17 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
     private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
         val clickableColor = requireContext().getColor(R.color.text_primary)
 
+        // Underline the link substrings — Aurum mandates that consent banner
+        // hyperlinks be underlined and/or distinctly coloured. We do both for
+        // maximum discoverability.
         binder.welcomeTerms.text = SpannableFormatter.format(
             sourceText,
-            terms.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::termsClicked)),
-            privacy.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::privacyClicked)),
+            terms.toSpannable(colorSpan(clickableColor))
+                .setFullSpan(clickableSpan(viewModel::termsClicked))
+                .setFullSpan(UnderlineSpan()),
+            privacy.toSpannable(colorSpan(clickableColor))
+                .setFullSpan(clickableSpan(viewModel::privacyClicked))
+                .setFullSpan(UnderlineSpan()),
         )
     }
 
@@ -90,5 +102,14 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
         observeBrowserEvents(viewModel)
 
         viewModel.shouldShowBackLiveData.observe(binder.welcomeBackButton::setVisible)
+
+        viewModel.consentAccepted.observe { accepted ->
+            // Sync the checkbox UI state without re-firing the toggle handler.
+            if (binder.welcomeConsentCheckbox.isChecked != accepted) {
+                binder.welcomeConsentCheckbox.isChecked = accepted
+            }
+            binder.welcomeCreateWalletButton.isEnabled = accepted
+            binder.welcomeRestoreWalletButton.isEnabled = accepted
+        }
     }
 }

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_onboarding_impl.di
 
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -21,6 +22,8 @@ interface OnboardingFeatureDependencies {
     fun resourceManager(): ResourceManager
 
     fun appLinksProvider(): AppLinksProvider
+
+    fun consentRepository(): ConsentRepository
 
     fun importTypeChooserMixin(): ImportTypeChooserMixin.Presentation
 

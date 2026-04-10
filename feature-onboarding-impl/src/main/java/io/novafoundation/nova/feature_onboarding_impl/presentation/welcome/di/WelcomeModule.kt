@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -23,18 +23,18 @@ class WelcomeModule {
     @ViewModelKey(WelcomeViewModel::class)
     fun provideViewModel(
         router: OnboardingRouter,
-        appLinksProvider: AppLinksProvider,
         shouldShowBack: Boolean,
         addAccountPayload: AddAccountPayload,
         updateNotificationsInteractor: UpdateNotificationsInteractor,
         ledgerMigrationTracker: LedgerMigrationTracker,
+        consentRepository: ConsentRepository
     ): ViewModel {
         return WelcomeViewModel(
             shouldShowBack,
             router,
-            appLinksProvider,
             addAccountPayload,
-            updateNotificationsInteractor
+            updateNotificationsInteractor,
+            consentRepository
         )
     }
 

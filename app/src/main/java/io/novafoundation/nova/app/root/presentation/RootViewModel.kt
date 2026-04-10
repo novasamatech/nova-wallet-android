@@ -6,7 +6,10 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
@@ -19,6 +22,8 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapEvent
 import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.onFailureInstance
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core.updater.Updater
@@ -59,7 +64,9 @@ class RootViewModel(
     private val toastMessageManager: ToastMessageManager,
     private val dialogMessageManager: DialogMessageManager,
     private val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
-    private val deviceNetworkStateObserver: DeviceNetworkStateObserver
+    private val deviceNetworkStateObserver: DeviceNetworkStateObserver,
+    private val consentRepository: ConsentRepository,
+    private val automaticInteractionGate: AutomaticInteractionGate
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -67,6 +74,9 @@ class RootViewModel(
     val toastMessagesEvents = toastMessageManager.toastMessagesEvents
 
     val dialogMessageEvents = dialogMessageManager.dialogMessagesEvents
+
+    private val _showConsentBannerUpgradeEvent = MutableLiveData<io.novafoundation.nova.common.utils.Event<Unit>>()
+    val showConsentBannerUpgradeEvent: LiveData<io.novafoundation.nova.common.utils.Event<Unit>> = _showConsentBannerUpgradeEvent
 
     val walletConnectErrorsLiveData = walletConnectService.onPairErrorLiveData
         .mapEvent { it.message }
@@ -121,6 +131,36 @@ class RootViewModel(
         deviceNetworkStateObserver.observeIsNetworkAvailable()
             .onEach { interactor.loadMigrationDetailsConfigs() }
             .launchIn(this)
+
+        checkForConsentBannerUpgrade()
+    }
+
+    /**
+     * On launch, if the user already has a wallet (so they would land on the
+     * main UI rather than the welcome screen) AND they have not yet accepted
+     * the current ToS / Privacy Notice version, fire the event to show the
+     * blocking upgrade modal. New users are gated by the welcome-screen
+     * checkbox instead — they never see this dialog.
+     */
+    private fun checkForConsentBannerUpgrade() {
+        launch {
+            if (!interactor.isAccountSelected()) return@launch
+            if (consentRepository.hasAcceptedCurrentVersion()) return@launch
+
+            // Wait until the user has passed PIN authentication so the dialog
+            // doesn't overlay the PIN entry screen. Mirrors iOS's
+            // securedLayer.scheduleExecutionIfAuthorized gate.
+            // FALLBACK: if this causes issues, removing this single line
+            // restores the previous behaviour (dialog appears immediately on
+            // launch, overlaying the PIN screen but still functional).
+            automaticInteractionGate.awaitInteractionAllowed()
+
+            _showConsentBannerUpgradeEvent.value = io.novafoundation.nova.common.utils.Event(Unit)
+        }
+    }
+
+    fun consentBannerUpgradeAccepted() {
+        consentRepository.acceptCurrentConsent()
     }
 
     private fun observeBusEvents() {

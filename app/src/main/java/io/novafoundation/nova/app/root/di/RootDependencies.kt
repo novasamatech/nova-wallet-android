@@ -3,6 +3,7 @@ package io.novafoundation.nova.app.root.di
 import android.content.Context
 import coil.ImageLoader
 import io.novafoundation.nova.common.data.network.AppLinksProvider
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.resources.ContextManager
@@ -189,4 +190,6 @@ interface RootDependencies {
     fun chainMigrationRepository(): ChainMigrationRepository
 
     fun migrationInfoRepository(): MigrationInfoRepository
+
+    fun consentRepository(): ConsentRepository
 }
