@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
@@ -12,7 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.se
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.FORCED_NOVA_POOL_CHAIN_IDS
 import io.novafoundation.nova.runtime.ext.isDirectStaking
 import io.novafoundation.nova.runtime.ext.isPoolStaking
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -20,7 +20,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 class EditableStakingTypeItemFormatter(
     private val resourceManager: ResourceManager,
     private val multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val knownNovaPools: KnownNovaPools,
 ) {
 
     suspend fun format(
@@ -40,7 +41,7 @@ class EditableStakingTypeItemFormatter(
         }
 
         val isSelected = selectedStakingType == stakingType
-        val isPoolForced = stakingType.isPoolStaking() && chainId in FORCED_NOVA_POOL_CHAIN_IDS
+        val isPoolForced = stakingType.isPoolStaking() && chainId in knownNovaPools.forcedPoolChainIds
         val isEditable = !isPoolForced
 
         return EditableStakingTypeRVItem(

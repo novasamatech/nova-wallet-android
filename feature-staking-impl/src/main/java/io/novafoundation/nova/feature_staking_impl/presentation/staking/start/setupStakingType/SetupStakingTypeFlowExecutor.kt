@@ -9,7 +9,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingProcess
 import io.novafoundation.nova.feature_staking_impl.presentation.common.SetupStakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
-import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.FORCED_NOVA_POOL_CHAIN_IDS
 import io.novafoundation.nova.runtime.ext.isDirectStaking
 import io.novafoundation.nova.runtime.ext.isPoolStaking
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -84,7 +83,7 @@ class SetupPoolStakingFlowExecutor(
         // Do nothing here to preserve the Automatic selection source, which keeps
         // the "Recommended" label on the amount screen instead of switching to a Manual selection
         // that would display the specific pool name.
-        if (chainId in FORCED_NOVA_POOL_CHAIN_IDS && novaPoolId != null) {
+        if (chainId in knownNovaPools.forcedPoolChainIds && novaPoolId != null) {
             return
         }
 
