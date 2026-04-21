@@ -5,10 +5,24 @@ on:
     branches: [develop]
 
 jobs:
+  resolve-version-code:
+    name: Resolve versionCode
+    runs-on: ubuntu-latest
+    outputs:
+      ci_build_id: ${{ steps.version_code.outputs.ci_build_id }}
+    steps:
+      - name: Calculate CI build id
+        id: version_code
+        run: |
+          echo "ci_build_id=$((1000 + GITHUB_RUN_NUMBER))" >> "$GITHUB_OUTPUT"
+          echo "Using CI_BUILD_ID=$((1000 + GITHUB_RUN_NUMBER))"
+
   build:
+    needs: resolve-version-code
     uses: ./.github/workflows/reusable_android_build.yml
     with:
       gradlew-command: assembleDevelop
+      ci-build-id: ${{ needs.resolve-version-code.outputs.ci_build_id }}
     secrets: inherit
 
   upload-to-firebase:
