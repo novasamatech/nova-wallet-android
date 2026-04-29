@@ -39,7 +39,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:orientation="horizontal">
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp">
 
         <CheckBox
             android:id="@+id/consentUpgradeCheckbox"
@@ -53,10 +55,12 @@
         <TextView
             android:id="@+id/consentUpgradeText"
             style="@style/TextAppearance.NovaFoundation.Body1"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_weight="1"
             android:gravity="start"
+            android:lineSpacingExtra="2dp"
             android:textColor="@color/text_secondary"
             android:textColorLink="@color/text_primary"
             tools:text="@string/consent_banner_text_template" />

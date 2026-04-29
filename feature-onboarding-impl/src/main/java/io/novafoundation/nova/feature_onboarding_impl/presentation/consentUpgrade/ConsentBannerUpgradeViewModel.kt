@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.consentUpgrade
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -9,13 +10,11 @@ import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 
 class ConsentBannerUpgradeViewModel(
-    private val router: OnboardingRouter,
     private val consentRepository: ConsentRepository,
     private val resourceManager: ResourceManager,
 ) : BaseViewModel(),
@@ -35,13 +34,24 @@ class ConsentBannerUpgradeViewModel(
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
+    private val _dismissEvent = MutableLiveData<Event<Unit>>()
+    val dismissEvent: LiveData<Event<Unit>> = _dismissEvent
+
     fun consentToggled(checked: Boolean) {
         _consentAccepted.value = checked
     }
 
     fun acceptClicked() {
         consentRepository.acceptCurrentConsent()
-        router.back()
+        // Dismiss via Fragment.dismiss() rather than router.back(): the host
+        // BaseNavigator.back() resolves to firstAttachedHolder.executeBack(),
+        // which targets the split-screen nav controller (the one showing the
+        // user's main wallet UI), not the root controller this <dialog> sits
+        // on. Popping there would either pop the wallet screen or fall
+        // through to activity.finish() if the wallet screen has no back
+        // stack — closing the app on Accept. DialogFragment.dismiss() lets
+        // the DialogFragmentNavigator clean up the correct destination.
+        _dismissEvent.value = Event(Unit)
     }
 
     fun termsClicked() {

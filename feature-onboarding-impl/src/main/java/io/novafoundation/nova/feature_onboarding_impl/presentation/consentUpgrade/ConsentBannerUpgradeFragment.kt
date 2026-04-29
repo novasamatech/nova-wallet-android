@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.consentUpgra
 import android.graphics.Color
 import android.text.method.LinkMovementMethod
 import android.text.style.UnderlineSpan
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -24,11 +25,18 @@ class ConsentBannerUpgradeFragment : BaseBottomSheetFragment<ConsentBannerUpgrad
     override fun initViews() {
         // Legal compliance: the user MUST tap Accept; no other dismissal
         // path is permitted. isCancelable=false blocks back-press and
-        // tap-outside; isHideable=false on the BottomSheetBehavior locks
-        // swipe-to-dismiss because the hidden state is the swipe-down
-        // terminal state and disabling it prevents that gesture.
+        // tap-outside. On the BottomSheetBehavior we lock the sheet in the
+        // EXPANDED state — skipCollapsed prevents the peek state, isHideable
+        // prevents reaching STATE_HIDDEN, and forcing STATE_EXPANDED on
+        // display ensures the full content (consent text + Accept button)
+        // is visible immediately rather than clipped at the default peek
+        // height.
         isCancelable = false
-        getBehaviour().isHideable = false
+        with(getBehaviour()) {
+            isHideable = false
+            skipCollapsed = true
+            state = BottomSheetBehavior.STATE_EXPANDED
+        }
 
         configureConsentText()
 
@@ -77,5 +85,7 @@ class ConsentBannerUpgradeFragment : BaseBottomSheetFragment<ConsentBannerUpgrad
         viewModel.acceptButtonState.observe { state ->
             binder.consentUpgradeAccept.setState(state)
         }
+
+        viewModel.dismissEvent.observeEvent { dismiss() }
     }
 }
