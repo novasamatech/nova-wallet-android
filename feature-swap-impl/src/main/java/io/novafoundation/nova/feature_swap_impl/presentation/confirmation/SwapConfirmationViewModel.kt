@@ -189,7 +189,7 @@ class SwapConfirmationViewModel(
         launch {
             val state = confirmationStateFlow.first()
             val includesFee = state.swapQuote.involvesHydraSwap()
-            launchSwapRateDescription(resourceManager, includesFee, NovaSwapCommission.FEE_PERCENT_DISPLAY)
+            launchSwapRateDescription(resourceManager, if (includesFee) NovaSwapCommission.FEE_PERCENT_DISPLAY else null)
         }
     }
 

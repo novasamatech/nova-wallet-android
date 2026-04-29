@@ -123,8 +123,7 @@ class SwapDetailViewModel(
     fun rateClicked() {
         descriptionBottomSheetLauncher.launchSwapRateDescription(
             resourceManager = resourceManager,
-            includesNovaFee = false,
-            feePercentDisplay = ""
+            feePercentDisplay = null
         )
     }
 

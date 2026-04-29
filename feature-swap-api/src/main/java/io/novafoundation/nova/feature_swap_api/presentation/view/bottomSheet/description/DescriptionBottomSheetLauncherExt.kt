@@ -6,10 +6,9 @@ import io.novafoundation.nova.feature_swap_api.R
 
 fun DescriptionBottomSheetLauncher.launchSwapRateDescription(
     resourceManager: ResourceManager,
-    includesNovaFee: Boolean,
-    feePercentDisplay: String
+    feePercentDisplay: String?
 ) {
-    if (includesNovaFee) {
+    if (feePercentDisplay != null) {
         val description = resourceManager.getString(R.string.swap_rate_includes_fee_description, feePercentDisplay)
         launchDescriptionBottomSheet(
             titleRes = R.string.swap_rate_title,

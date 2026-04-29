@@ -371,7 +371,7 @@ class SwapMainSettingsViewModel(
         launch {
             val includesFee = (quotingState.value as? QuotingState.Loaded)
                 ?.quote?.involvesHydraSwap() ?: false
-            launchSwapRateDescription(resourceManager, includesFee, NovaSwapCommission.FEE_PERCENT_DISPLAY)
+            launchSwapRateDescription(resourceManager, if (includesFee) NovaSwapCommission.FEE_PERCENT_DISPLAY else null)
         }
     }
 

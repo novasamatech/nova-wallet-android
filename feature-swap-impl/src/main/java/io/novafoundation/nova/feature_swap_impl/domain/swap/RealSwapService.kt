@@ -266,9 +266,10 @@ internal class RealSwapService(
                     val commissionAmount = if (isCommissionSegment) getCommissionAmount(operation, actualSwapLimit) else BigInteger.ZERO
 
                     operation.execute(segmentSubmissionArgs, commissionActions).map { executionCorrection ->
-                        // Subtract commission from actualReceivedAmount so subsequent segments see the true available balance
+                        // Subtract commission from actualReceivedAmount so subsequent segments see the true available balance.
+                        // Clamp at zero in case actualReceivedAmount dips below amountOutMin under dry-run mismatch.
                         SwapExecutionCorrection(
-                            actualReceivedAmount = executionCorrection.actualReceivedAmount - commissionAmount
+                            actualReceivedAmount = (executionCorrection.actualReceivedAmount - commissionAmount).atLeastZero()
                         )
                     }.onFailure {
                         Log.e("SwapSubmission", "Swap failed on stage '$displayData'", it)
@@ -325,8 +326,7 @@ internal class RealSwapService(
 
         if (!chain.swap.hydraDxSupported()) return BigInteger.ZERO
 
-        val commissionAmount = NovaSwapCommission.feeAmount(actualSwapLimit.amountOutMin)
-        return if (commissionAmount > BigInteger.ZERO) commissionAmount else BigInteger.ZERO
+        return NovaSwapCommission.feeAmount(actualSwapLimit.amountOutMin).atLeastZero()
     }
 
     /**

@@ -90,7 +90,7 @@ class SwapExecutionViewModel(
 
     fun rateClicked() = launchUnit {
         val includesFee = swapStateFlow.first().quote.involvesHydraSwap()
-        launchSwapRateDescription(resourceManager, includesFee, NovaSwapCommission.FEE_PERCENT_DISPLAY)
+        launchSwapRateDescription(resourceManager, if (includesFee) NovaSwapCommission.FEE_PERCENT_DISPLAY else null)
     }
 
     fun priceDifferenceClicked() {
