@@ -39,7 +39,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
-import io.novafoundation.nova.feature_swap_impl.domain.swap.NovaSwapCommission
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.domain.swap.displaySwapRate
 import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime

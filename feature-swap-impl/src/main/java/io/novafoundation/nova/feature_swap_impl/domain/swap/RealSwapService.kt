@@ -45,6 +45,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationA
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.BundleExtraActions
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
@@ -85,9 +86,8 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversi
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxAssetExchange.HydraDxOperation
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
-import io.novafoundation.nova.common.utils.Modules
-import io.novafoundation.nova.common.utils.firstExistingCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -95,15 +95,13 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromFiatOrZe
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.Geneses
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.ext.isUtility
-import io.novafoundation.nova.runtime.ext.isUtilityAsset
-import io.novafoundation.nova.runtime.ext.ormlCurrencyId
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.ext.utilityAssetOf
-import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainWithAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
@@ -116,6 +114,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -350,48 +349,20 @@ internal class RealSwapService(
 
         if (commissionAmount <= BigInteger.ZERO) return null
 
-        return buildCommissionTransferCall(assetOut, commissionAmount)
-    }
+        val transferBase = AssetTransferBase(
+            recipient = chain.addressOf(NovaSwapCommission.feeAccountId),
+            originChain = chain,
+            originChainAsset = assetOut,
+            destinationChain = chain,
+            destinationChainAsset = assetOut,
+            feePaymentCurrency = FeePaymentCurrency.Native,
+            amountPlanks = commissionAmount
+        )
+        val commissionCall: GenericCall.Instance = assetSourceRegistry.sourceFor(assetOut).transfers
+            .constructTransferCall(transferBase)
 
-    /**
-     * Creates a [BundleExtraActions] lambda that adds a transfer call for the commission.
-     * Uses Balances.transfer_keep_alive for native assets.
-     * For ORML tokens, dynamically resolves between Currencies and Tokens modules
-     * using [firstExistingCall], matching the approach in [OrmlAssetTransfers].
-     */
-    private fun buildCommissionTransferCall(
-        assetOut: Chain.Asset,
-        commissionAmount: Balance
-    ): BundleExtraActions {
         return {
-            if (assetOut.isUtilityAsset) {
-                // Native asset: use Balances.transfer_keep_alive
-                call(
-                    moduleName = Modules.BALANCES,
-                    callName = "transfer_keep_alive",
-                    arguments = mapOf(
-                        "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, NovaSwapCommission.feeAccountId),
-                        "value" to commissionAmount
-                    )
-                )
-            } else {
-                // ORML token: dynamically resolve between Currencies.transfer and Tokens.transfer
-                val ormlTransferCandidates = listOf(
-                    Modules.CURRENCIES to "transfer",
-                    Modules.TOKENS to "transfer"
-                )
-                val (moduleIndex, callIndex) = runtime.metadata.firstExistingCall(ormlTransferCandidates).index
-
-                call(
-                    moduleIndex = moduleIndex,
-                    callIndex = callIndex,
-                    arguments = mapOf(
-                        "dest" to AddressInstanceConstructor.constructInstance(runtime.typeRegistry, NovaSwapCommission.feeAccountId),
-                        "currency_id" to assetOut.ormlCurrencyId(runtime),
-                        "amount" to commissionAmount
-                    )
-                )
-            }
+            call(commissionCall)
         }
     }
 

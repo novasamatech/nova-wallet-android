@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.domain.swap
+package io.novafoundation.nova.feature_swap_api.domain.model
 
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novasama.substrate_sdk_android.extensions.fromHex

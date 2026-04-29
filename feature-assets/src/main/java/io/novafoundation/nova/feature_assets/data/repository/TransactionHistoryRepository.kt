@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.data.repository
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
 import io.novafoundation.nova.common.utils.Filter
@@ -7,6 +8,8 @@ import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
 import io.novafoundation.nova.core_db.model.operation.OperationJoin
+import io.novafoundation.nova.feature_account_api.domain.account.system.AccountSystemAccountMatcher
+import io.novafoundation.nova.feature_account_api.domain.account.system.CompoundSystemAccountMatcher
 import io.novafoundation.nova.feature_account_api.domain.account.system.SystemAccountMatcher
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationLocalToOperation
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationToOperationLocalDb
@@ -14,6 +17,8 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.poolRewardAccountMatcher
+import io.novafoundation.nova.feature_swap_api.domain.model.HydrationSystemAccounts
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
@@ -24,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.findNearestCoinRate
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
 import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
@@ -183,10 +189,21 @@ class RealTransactionHistoryRepository(
             matcher?.let { IgnoreTransfersFromSystemAccount(it, chain) }
         }
 
+        val hydrationSwapSystemAccountFilter = if (chain.swap.hydraDxSupported()) {
+            val matcher = CompoundSystemAccountMatcher(
+                AccountSystemAccountMatcher(AccountIdKey(NovaSwapCommission.feeAccountId)),
+                AccountSystemAccountMatcher(AccountIdKey(HydrationSystemAccounts.routerAccountId))
+            )
+            IgnoreTransfersInvolvingSystemAccount(matcher, chain)
+        } else {
+            null
+        }
+
         return listOfNotNull(
             IgnoreUnsafeOperations(this),
             systemAccountFilterCreator(poolAccountDerivation.poolRewardAccountMatcher(chain.id)),
-            systemAccountFilterCreator(mythosMainPotMatcherFactory.create(chainAsset))
+            systemAccountFilterCreator(mythosMainPotMatcherFactory.create(chainAsset)),
+            hydrationSwapSystemAccountFilter
         )
     }
 
@@ -207,6 +224,24 @@ class RealTransactionHistoryRepository(
 
         override fun shouldInclude(model: Operation): Boolean {
             return assetsHistory.isOperationSafe(model)
+        }
+    }
+
+    private class IgnoreTransfersInvolvingSystemAccount(
+        private val systemAccountMatcher: SystemAccountMatcher,
+        private val chain: Chain
+    ) : Filter<Operation> {
+
+        override fun shouldInclude(model: Operation): Boolean {
+            val operationType = model.type as? Operation.Type.Transfer ?: return true
+
+            return !chain.matchesSystemAccount(operationType.sender) &&
+                !chain.matchesSystemAccount(operationType.receiver)
+        }
+
+        private fun Chain.matchesSystemAccount(address: String): Boolean {
+            val accountId = accountIdOrNull(address) ?: return false
+            return systemAccountMatcher.isSystemAccount(accountId)
         }
     }
 }
