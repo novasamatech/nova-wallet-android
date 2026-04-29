@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.consentUpgrade
 
 import android.graphics.Color
-import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.text.style.UnderlineSpan
-import android.view.View
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseBottomSheetFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -23,9 +21,7 @@ class ConsentBannerUpgradeFragment : BaseBottomSheetFragment<ConsentBannerUpgrad
 
     override fun createBinding() = FragmentConsentBannerUpgradeBinding.inflate(layoutInflater)
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun initViews() {
         // Legal compliance: the user MUST tap Accept; no other dismissal
         // path is permitted. isCancelable=false blocks back-press and
         // tap-outside; isHideable=false on the BottomSheetBehavior locks
@@ -33,9 +29,7 @@ class ConsentBannerUpgradeFragment : BaseBottomSheetFragment<ConsentBannerUpgrad
         // terminal state and disabling it prevents that gesture.
         isCancelable = false
         getBehaviour().isHideable = false
-    }
 
-    override fun initViews() {
         configureConsentText()
 
         binder.consentUpgradeCheckbox.setOnCheckedChangeListener { _, isChecked ->

@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.consentUpgrade
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseViewModel
