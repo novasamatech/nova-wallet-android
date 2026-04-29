@@ -6,24 +6,41 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.preferences.ConsentBannerConstants
 import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.mixin.api.Browserable
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
+import io.novafoundation.nova.feature_onboarding_impl.R
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 class WelcomeViewModel(
     shouldShowBack: Boolean,
     private val router: OnboardingRouter,
     private val addAccountPayload: AddAccountPayload,
     updateNotificationsInteractor: UpdateNotificationsInteractor,
-    private val consentRepository: ConsentRepository
+    private val consentRepository: ConsentRepository,
+    private val resourceManager: ResourceManager,
 ) : BaseViewModel(),
     Browserable {
 
     val shouldShowBackLiveData: LiveData<Boolean> = MutableLiveData(shouldShowBack)
 
-    private val _consentAccepted = MutableLiveData(consentRepository.hasAcceptedCurrentVersion())
-    val consentAccepted: LiveData<Boolean> = _consentAccepted
+    private val _consentAccepted = MutableStateFlow(consentRepository.hasAcceptedCurrentVersion())
+    val consentAccepted: Flow<Boolean> = _consentAccepted
+
+    val createButtonState: Flow<DescriptiveButtonState> = _consentAccepted.map { accepted ->
+        val label = resourceManager.getString(R.string.onboarding_create_wallet)
+        if (accepted) DescriptiveButtonState.Enabled(label) else DescriptiveButtonState.Disabled(label)
+    }
+
+    val restoreButtonState: Flow<DescriptiveButtonState> = _consentAccepted.map { accepted ->
+        val label = resourceManager.getString(R.string.onboarding_restore_wallet)
+        if (accepted) DescriptiveButtonState.Enabled(label) else DescriptiveButtonState.Disabled(label)
+    }
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 

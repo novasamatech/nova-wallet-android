@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatt
 import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.utils.toSpannable
+import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
@@ -108,8 +109,14 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
             if (binder.welcomeConsentCheckbox.isChecked != accepted) {
                 binder.welcomeConsentCheckbox.isChecked = accepted
             }
-            binder.welcomeCreateWalletButton.isEnabled = accepted
-            binder.welcomeRestoreWalletButton.isEnabled = accepted
+        }
+
+        viewModel.createButtonState.observe { state ->
+            binder.welcomeCreateWalletButton.setState(state)
+        }
+
+        viewModel.restoreButtonState.observe { state ->
+            binder.welcomeRestoreWalletButton.setState(state)
         }
     }
 }
