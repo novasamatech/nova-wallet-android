@@ -84,6 +84,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterA
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.SharedSwapSubscriptions
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.HydraDxQuotableEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxAssetExchange.HydraDxOperation
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
@@ -475,14 +476,30 @@ internal class RealSwapService(
         )
 
         val amountIn = quotedTrade.amountIn()
-        val amountOut = quotedTrade.amountOut()
+        val amountOutGross = quotedTrade.amountOut()
+
+        // Price impact is computed against the raw pool quote, NOT the post-commission
+        // amount, otherwise the commission inflates the price-impact reading.
+        val priceImpact = args.calculatePriceImpact(amountIn, amountOutGross)
+
+        // Override SwapQuote.amountOut to the post-commission amount so every consumer
+        // (UI, validations, rate display) sees what the user actually receives. The
+        // gross pool quote remains accessible via quotedPath.lastSegmentQuote for
+        // anything that needs it (notably segment-level SwapLimit construction, which
+        // drives the on-chain extrinsic).
+        val involvesHydraSwap = quotedTrade.path.any { it.edge is HydraDxQuotableEdge }
+        val amountOutNet = if (involvesHydraSwap) {
+            NovaSwapCommission.amountOutAfterFee(amountOutGross)
+        } else {
+            amountOutGross
+        }
 
         val atomicOperationsEstimates = quotedTrade.estimateOperationsMaximumExecutionTime()
 
         return SwapQuote(
             amountIn = args.tokenIn.configuration.withAmount(amountIn),
-            amountOut = args.tokenOut.configuration.withAmount(amountOut),
-            priceImpact = args.calculatePriceImpact(amountIn, amountOut),
+            amountOut = args.tokenOut.configuration.withAmount(amountOutNet),
+            priceImpact = priceImpact,
             quotedPath = quotedTrade,
             executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER),
             direction = args.swapDirection,

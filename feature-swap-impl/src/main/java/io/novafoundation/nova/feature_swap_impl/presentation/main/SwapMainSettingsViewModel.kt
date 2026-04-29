@@ -40,7 +40,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
-import io.novafoundation.nova.feature_swap_impl.domain.swap.displaySwapRate
+import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
@@ -539,7 +539,7 @@ class SwapMainSettingsViewModel(
     }
 
     private fun formatRate(swapQuote: SwapQuote): String {
-        val rate = swapQuote.displaySwapRate()
+        val rate = swapQuote.swapRate()
         return swapRateFormatter.format(rate, swapQuote.assetIn, swapQuote.assetOut)
     }
 
