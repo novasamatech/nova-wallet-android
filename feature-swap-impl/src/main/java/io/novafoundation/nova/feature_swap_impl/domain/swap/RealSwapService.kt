@@ -83,6 +83,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterA
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.SharedSwapSubscriptions
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxAssetExchange.HydraDxOperation
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.common.utils.firstExistingCall
@@ -282,19 +283,14 @@ internal class RealSwapService(
     }
 
     /**
-     * Finds the index of the last segment whose output chain supports HydraDx swaps.
-     * Returns -1 if no segment runs on a Hydra chain.
+     * Finds the index of the last [HydraDxOperation] segment, or -1 if none.
+     *
+     * Operation-type detection is required: chain-id detection over-matches
+     * cross-chain transfer segments landing on Hydra, which silently drop
+     * bundleExtraActions and would skip commission on-chain.
      */
-    private suspend fun findLastHydraSegmentIndex(segments: List<SwapFee.SwapSegment>): Int {
-        var lastIndex = -1
-        segments.forEachIndexed { index, (_, operation) ->
-            val chainId = operation.assetOut.chainId
-            val chain = chainRegistry.getChain(chainId)
-            if (chain.swap.hydraDxSupported()) {
-                lastIndex = index
-            }
-        }
-        return lastIndex
+    private fun findLastHydraSegmentIndex(segments: List<SwapFee.SwapSegment>): Int {
+        return segments.indexOfLast { (_, operation) -> operation is HydraDxOperation }
     }
 
     override suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult> {

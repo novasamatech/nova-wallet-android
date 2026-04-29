@@ -98,7 +98,6 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -244,10 +243,7 @@ class SwapMainSettingsViewModel(
 
     val showNovaFeeDisclaimer: Flow<Boolean> = quotingState.mapNotNull {
         when (it) {
-            is QuotingState.Loaded -> {
-                val chainsById = chainRegistry.chainsById()
-                it.quote.involvesHydraSwap(chainsById)
-            }
+            is QuotingState.Loaded -> it.quote.involvesHydraSwap()
             is QuotingState.Default,
             is QuotingState.Error -> false
             else -> null
@@ -373,9 +369,8 @@ class SwapMainSettingsViewModel(
 
     fun rateDetailsClicked() {
         launch {
-            val chainsById = chainRegistry.chainsById()
             val includesFee = (quotingState.value as? QuotingState.Loaded)
-                ?.quote?.involvesHydraSwap(chainsById) ?: false
+                ?.quote?.involvesHydraSwap() ?: false
             launchSwapRateDescription(resourceManager, includesFee, NovaSwapCommission.FEE_PERCENT_DISPLAY)
         }
     }
@@ -543,9 +538,8 @@ class SwapMainSettingsViewModel(
         swapDirectionFlipped.value = newSettings.swapDirection!!.event()
     }
 
-    private suspend fun formatRate(swapQuote: SwapQuote): String {
-        val chainsById = chainRegistry.chainsById()
-        val rate = swapQuote.displaySwapRate(chainsById)
+    private fun formatRate(swapQuote: SwapQuote): String {
+        val rate = swapQuote.displaySwapRate()
         return swapRateFormatter.format(rate, swapQuote.assetIn, swapQuote.assetOut)
     }
 

@@ -131,7 +131,7 @@ class HydraDxExchangeFactory(
 private const val ROUTE_EXECUTED_AMOUNT_OUT_IDX = 3
 private const val FEE_QUOTE_BUFFER = 1.1
 
-private class HydraDxAssetExchange(
+internal class HydraDxAssetExchange(
     private val delegate: HydraDxQuoting,
     private val remoteStorageSource: StorageDataSource,
     private val chain: Chain,

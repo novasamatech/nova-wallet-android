@@ -27,7 +27,6 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
-import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
@@ -90,8 +89,7 @@ class SwapExecutionViewModel(
     }
 
     fun rateClicked() = launchUnit {
-        val chainsById = chainRegistry.chainsById()
-        val includesFee = swapStateFlow.first().quote.involvesHydraSwap(chainsById)
+        val includesFee = swapStateFlow.first().quote.involvesHydraSwap()
         launchSwapRateDescription(resourceManager, includesFee, NovaSwapCommission.FEE_PERCENT_DISPLAY)
     }
 

@@ -34,7 +34,6 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_impl.domain.swap.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
-import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
@@ -160,8 +159,7 @@ class SwapConfirmationViewModel(
     }
 
     val showNovaFeeDisclaimer: Flow<Boolean> = confirmationStateFlow.map {
-        val chainsById = chainRegistry.chainsById()
-        it.swapQuote.involvesHydraSwap(chainsById)
+        it.swapQuote.involvesHydraSwap()
     }
         .distinctUntilChanged()
         .shareInBackground()
@@ -189,9 +187,8 @@ class SwapConfirmationViewModel(
 
     fun rateClicked() {
         launch {
-            val chainsById = chainRegistry.chainsById()
             val state = confirmationStateFlow.first()
-            val includesFee = state.swapQuote.involvesHydraSwap(chainsById)
+            val includesFee = state.swapQuote.involvesHydraSwap()
             launchSwapRateDescription(resourceManager, includesFee, NovaSwapCommission.FEE_PERCENT_DISPLAY)
         }
     }

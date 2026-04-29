@@ -22,7 +22,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -48,8 +47,7 @@ class RealSwapConfirmationDetailsFormatter(
         val chainIn = chainRegistry.getChain(assetIn.chainId)
         val chainOut = chainRegistry.getChain(assetOut.chainId)
 
-        val chainsById = chainRegistry.chainsById()
-        val displayRate = quote.displaySwapRate(chainsById)
+        val displayRate = quote.displaySwapRate()
 
         return SwapConfirmationDetailsModel(
             assets = SwapAssetsView.Model(
