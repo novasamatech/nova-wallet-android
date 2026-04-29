@@ -632,6 +632,11 @@ class Navigator(
             .navigateInRoot()
     }
 
+    override fun openConsentBannerUpgrade() {
+        navigationBuilder().action(R.id.action_open_consent_banner_upgrade)
+            .navigateInRoot()
+    }
+
     override fun openPushWelcome() {
         navigationBuilder().action(R.id.action_open_pushNotificationsWelcome)
             .navigateInFirstAttachedContext()

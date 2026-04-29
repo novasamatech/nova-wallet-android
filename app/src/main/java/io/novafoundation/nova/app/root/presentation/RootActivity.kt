@@ -10,7 +10,6 @@ import io.novafoundation.nova.app.databinding.ActivityRootBinding
 import io.novafoundation.nova.app.root.di.RootApi
 import io.novafoundation.nova.app.root.di.RootComponent
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
-import io.novafoundation.nova.app.root.presentation.consentBanner.ConsentBannerUpgradeDialogFragment
 import io.novafoundation.nova.common.base.BaseActivity
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.resources.ContextManager
@@ -127,22 +126,6 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
         viewModel.dialogMessageEvents.observeEvent { dialog(this, decorator = it) }
 
         viewModel.walletConnectErrorsLiveData.observeEvent { it?.let { showError(it) } }
-
-        viewModel.showConsentBannerUpgradeEvent.observeEvent {
-            showConsentBannerUpgradeDialog()
-        }
-    }
-
-    private fun showConsentBannerUpgradeDialog() {
-        // Avoid presenting twice if a configuration change occurs while the
-        // dialog is already on screen.
-        if (supportFragmentManager.findFragmentByTag(ConsentBannerUpgradeDialogFragment.TAG) != null) {
-            return
-        }
-
-        ConsentBannerUpgradeDialogFragment().also {
-            it.onAccepted = { viewModel.consentBannerUpgradeAccepted() }
-        }.show(supportFragmentManager, ConsentBannerUpgradeDialogFragment.TAG)
     }
 
     override fun removeSplashBackground() {
