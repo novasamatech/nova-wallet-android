@@ -34,6 +34,10 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_consent_banner_upgrade"
+        app:destination="@id/consentBannerUpgradeFragment" />
+
+    <action
         android:id="@+id/action_open_sign_ledger"
         app:destination="@id/sign_ledger_nav_graph"
         app:enterAnim="@anim/fragment_open_enter"
@@ -256,6 +260,11 @@
         android:id="@+id/walletConnectApproveSessionFragment"
         android:name="io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.approve.WalletConnectApproveSessionFragment"
         android:label="WalletConnectApproveSessionFragment" />
+
+    <dialog
+        android:id="@+id/consentBannerUpgradeFragment"
+        android:name="io.novafoundation.nova.feature_onboarding_impl.presentation.consentUpgrade.ConsentBannerUpgradeFragment"
+        android:label="ConsentBannerUpgradeFragment" />
 
     <dialog
         android:id="@+id/selectWalletFragment"
