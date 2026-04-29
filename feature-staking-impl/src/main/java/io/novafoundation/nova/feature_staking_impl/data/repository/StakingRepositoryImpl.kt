@@ -335,7 +335,7 @@ class StakingRepositoryImpl(
 
         return callApi.call(
             section = "Inflation",
-            method = "experimental_inflation_prediction_info",
+            method = "experimental_issuance_prediction_info",
             arguments = emptyMap(),
             returnBinding = InflationPredictionInfo::fromDecoded
         )
