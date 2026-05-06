@@ -14,6 +14,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.SUBTENSOR
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import kotlinx.coroutines.CoroutineScope
@@ -87,6 +88,10 @@ private class CompoundStakingComponent<S, E, A>(
             TURING -> turingComponentCreator(stakingOption, childHostContext)
             NOMINATION_POOLS -> nominationPoolsCreator(stakingOption, childHostContext)
             MYTHOS -> mythosCreator(stakingOption, childHostContext)
+            // Subtensor is rendered by its own dedicated screen (not the
+            // compound component flow). The dashboard router branches before
+            // reaching here, so this path is defensive.
+            SUBTENSOR -> UnsupportedComponent()
         }
     }
 }

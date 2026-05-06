@@ -63,6 +63,10 @@ fun mapChainAssetTypeToRaw(type: Chain.Asset.Type): Pair<String, Map<String, Any
         ASSET_EQUILIBRIUM_ON_CHAIN_ID to type.id.toString()
     )
 
+    is Chain.Asset.Type.SubtensorAlpha -> ASSET_SUBTENSOR_ALPHA to mapOf(
+        SUBTENSOR_ALPHA_EXTRAS_NETUID to type.netuid
+    )
+
     Chain.Asset.Type.Unsupported -> ASSET_UNSUPPORTED to null
 }
 

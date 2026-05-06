@@ -45,6 +45,10 @@ class TypeBasedAssetSourceRegistry(
             is Chain.Asset.Type.EvmErc20 -> evmErc20Source.get()
             is Chain.Asset.Type.EvmNative -> evmNativeSource.get()
             is Chain.Asset.Type.Equilibrium -> equilibriumAssetSource.get()
+            // Subtensor alpha balances live in pallet runtime API state, not
+            // any of the standard balance sources — fall back to unsupported
+            // here. The dashboard updater handles position fetching directly.
+            is Chain.Asset.Type.SubtensorAlpha -> unsupportedBalanceSource
             Chain.Asset.Type.Unsupported -> unsupportedBalanceSource
         }
     }
@@ -64,6 +68,9 @@ class TypeBasedAssetSourceRegistry(
         return when (chainAsset.type) {
             is Chain.Asset.Type.Equilibrium,
             Chain.Asset.Type.EvmNative,
+            // Subtensor alpha emissions are tracked via runtime API, not the
+            // standard event-detector pipeline.
+            is Chain.Asset.Type.SubtensorAlpha,
 
             Chain.Asset.Type.Unsupported -> UnsupportedEventDetector()
 

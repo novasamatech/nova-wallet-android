@@ -12,6 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.SUBTENSOR
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -33,7 +34,7 @@ class ParachainStakingRewardCalculatorFactory(
         return when (stakingOption.additional.stakingType) {
             PARACHAIN -> defaultCalculator(chainId, snapshots)
             TURING -> turingCalculator(chainId, snapshots)
-            NOMINATION_POOLS, RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED, MYTHOS -> {
+            NOMINATION_POOLS, RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, UNSUPPORTED, MYTHOS, SUBTENSOR -> {
                 throw IllegalStateException("Unknown staking type in ParachainStakingRewardCalculatorFactory")
             }
         }

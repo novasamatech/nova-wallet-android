@@ -36,6 +36,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain.subtensorNetuid
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -107,8 +109,27 @@ class StakingDashboardViewModel(
         val stakingTypes = noStakeItemState.flowType.allStakingTypes
         val chain = withoutStakeItem.chain
         val chainAsset = withoutStakeItem.token.configuration
+        val firstStakingType = stakingTypes.first()
 
-        stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
+        // Subtensor doesn't fit the start-staking landing flow (no `RewardCalculator`
+        // for SUBTENSOR yet) — route straight to the detail screen instead.
+        // Mirrors iOS `StakingDashboardWireframe.showSubtensorStakingDetails`:
+        // normalize to the native TAO asset before publishing to shared state
+        // so balance / fee / signing flows always operate on TAO. The entry
+        // netuid is preserved separately so the detail screen can scope.
+        if (firstStakingType == Chain.Asset.StakingType.SUBTENSOR) {
+            val taoAsset = chain.subtensorTaoAssetOrNull() ?: return@launch
+            stakingSharedState.setSelectedOption(
+                chain = chain,
+                chainAsset = taoAsset,
+                stakingType = firstStakingType,
+                subtensorEntryNetuid = chainAsset.subtensorNetuid(),
+            )
+            router.openSubtensorStakingMain()
+            return@launch
+        }
+
+        stakingSharedState.setSelectedOption(chain, chainAsset, firstStakingType)
 
         val payload = StartStakingLandingPayload(
             availableStakingOptions = AvailableStakingOptionsPayload(chain.id, chainAsset.id, stakingTypes)
@@ -191,12 +212,36 @@ class StakingDashboardViewModel(
         chainAsset: Chain.Asset,
         stakingType: Chain.Asset.StakingType
     ) {
-        stakingSharedState.setSelectedOption(
-            chain = chain,
-            chainAsset = chainAsset,
-            stakingType = stakingType
-        )
-
-        router.openChainStakingMain()
+        if (stakingType == Chain.Asset.StakingType.SUBTENSOR) {
+            // Mirrors iOS `StakingDashboardWireframe.showSubtensorStakingDetails`:
+            // normalize the entry chainAsset to the native TAO asset, but
+            // preserve the originally tapped row's netuid so the detail
+            // screen scopes correctly (e.g. tapping SN8 → entryNetuid 8).
+            val taoAsset = chain.subtensorTaoAssetOrNull() ?: return
+            stakingSharedState.setSelectedOption(
+                chain = chain,
+                chainAsset = taoAsset,
+                stakingType = stakingType,
+                subtensorEntryNetuid = chainAsset.subtensorNetuid(),
+            )
+            router.openSubtensorStakingMain()
+        } else {
+            stakingSharedState.setSelectedOption(
+                chain = chain,
+                chainAsset = chainAsset,
+                stakingType = stakingType
+            )
+            router.openChainStakingMain()
+        }
     }
+}
+
+/**
+ * Returns the chain's native TAO asset (utility asset) when the chain
+ * supports Subtensor staking, otherwise null. Mirrors the iOS extension
+ * `chainAsset.subtensorTaoAsset()` used by `StakingDashboardWireframe`.
+ */
+private fun Chain.subtensorTaoAssetOrNull(): Chain.Asset? {
+    val utility = utilityAsset
+    return utility.takeIf { Chain.Asset.StakingType.SUBTENSOR in it.staking }
 }

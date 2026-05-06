@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/subtensorStakeTypeToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/subtensor_stake_type_title" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/subtensorStakeTypeToolbar"
+        app:layout_constraintBottom_toTopOf="@id/subtensorStakeTypeContinue">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/subtensorStakeTypeRootCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_subtensor_stake_type_card"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="107dp"
+                    android:layout_gravity="end|top"
+                    android:src="@drawable/ic_direct_staking_banner_picture"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <RadioButton
+                        android:id="@+id/subtensorStakeTypeRootRadio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:checked="true"
+                        android:buttonTint="@color/button_text_accent" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="96dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/subtensor_stake_type_root_title"
+                            android:textAppearance="@style/TextAppearance.NovaFoundation.Bold.Title3"
+                            android:textColor="@color/text_primary" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@string/subtensor_stake_type_root_details"
+                            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                            android:textColor="@color/text_secondary"
+                            android:lineSpacingExtra="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/subtensorStakeTypeSubnetCard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_subtensor_stake_type_card"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:layout_width="140dp"
+                    android:layout_height="107dp"
+                    android:layout_gravity="end|top"
+                    android:src="@drawable/ic_pool_staking_banner_picture"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <RadioButton
+                        android:id="@+id/subtensorStakeTypeSubnetRadio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:clickable="false"
+                        android:focusable="false"
+                        android:buttonTint="@color/button_text_accent" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:layout_marginEnd="96dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/subtensor_stake_type_subnet_title"
+                            android:textAppearance="@style/TextAppearance.NovaFoundation.Bold.Title3"
+                            android:textColor="@color/text_primary" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="@string/subtensor_stake_type_subnet_details"
+                            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                            android:textColor="@color/text_secondary"
+                            android:lineSpacingExtra="2dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/subtensorStakeTypeWikiFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_secondary"
+                tools:text="Find out more about Root and Subnet staking over at the Nova Wiki >" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/subtensorStakeTypeContinue"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/common_continue"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

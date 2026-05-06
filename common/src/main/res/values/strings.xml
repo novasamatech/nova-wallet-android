@@ -2762,4 +2762,44 @@
     <string name="wallet_send_phishing_warning_title">Scam alert</string>
     <string name="wallet_transfer_details_title">Transfer details</string>
     <string name="yesterday">Yesterday</string>
+
+    <!-- Subtensor (TAO) staking -->
+    <string name="subtensor_staking_title">TAO staking</string>
+    <string name="subtensor_your_stake">Your stake</string>
+    <string name="subtensor_your_validator">Your validator</string>
+    <string name="subtensor_your_validators">Your validators</string>
+    <string name="subtensor_no_active_stakes">No active stakes</string>
+    <string name="subtensor_no_active_stakes_message">Choose a validator and delegate TAO to start earning rewards.</string>
+    <string name="subtensor_staking_info">Staking info</string>
+    <string name="subtensor_minimum_stake">Minimum stake</string>
+    <string name="subtensor_minimum_stake_value">0.01 TAO</string>
+    <string name="subtensor_unstaking_period">Unstaking period</string>
+    <string name="subtensor_unstaking_period_instant">Instant</string>
+    <string name="subtensor_stake_more">Stake more</string>
+    <string name="subtensor_unstake">Unstake</string>
+    <string name="subtensor_action_coming_soon">Coming soon</string>
+    <string name="subtensor_stake_type_title">Staking Type</string>
+    <string name="subtensor_stake_type_root_title">Root staking</string>
+    <string name="subtensor_stake_type_root_details">Minimum stake: 0.01 TAO\nRewards: Auto-compounded\nNo unbonding period\nStake denominated in TAO</string>
+    <string name="subtensor_stake_type_subnet_title">Subnet staking</string>
+    <string name="subtensor_stake_type_subnet_details">Minimum stake: 0.01 TAO\nRewards: Subnet alpha tokens\nNo unbonding period\nSubnet alpha tokens can fluctuate in value versus TAO</string>
+    <string name="subtensor_stake_type_wiki_footer"><![CDATA[Find out more about Root and Subnet staking over at the <font color="#1F78FF"><u>Nova&#160;Wiki&#160;&gt;</u></font>]]></string>
+    <string name="subtensor_setup_validator_label">Validator</string>
+    <string name="subtensor_setup_select_validator">Select validator</string>
+    <string name="subtensor_setup_amount_label">Amount</string>
+    <string name="subtensor_setup_amount_placeholder">0.00</string>
+    <string name="subtensor_subnet_picker_title">Select subnet</string>
+    <string name="subtensor_subnet_picker_row_subtitle">SN%1$d · %2$s</string>
+    <string name="subtensor_subnet_picker_empty">No active subnets found. Pull to retry.</string>
+    <string name="subtensor_validator_picker_title">Select validator</string>
+    <string name="subtensor_validator_picker_loading_failed">Failed to load validators</string>
+    <string name="subtensor_validator_picker_empty">No validators available</string>
+    <string name="subtensor_setup_invalid_validator">Invalid validator hotkey</string>
+    <string name="subtensor_setup_submit_failed">Stake submission failed</string>
+    <string name="subtensor_setup_submitting">Submitting…</string>
+    <string name="subtensor_unstake_position_label">Position</string>
+    <string name="subtensor_unstake_max">Max</string>
+    <string name="subtensor_unstake_amount_exceeds">Amount exceeds your stake</string>
+    <string name="subtensor_unstake_pick_validator">Unstake from</string>
+    <string name="subtensor_unstake_no_positions">No positions to unstake</string>
 </resources>

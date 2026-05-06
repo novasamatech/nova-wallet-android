@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/subtensorStakeSetupToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/subtensor_staking_title" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/subtensorStakeSetupToolbar"
+        app:layout_constraintBottom_toTopOf="@id/subtensorStakeSetupContinue">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subtensor_setup_validator_label"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_secondary" />
+
+            <LinearLayout
+                android:id="@+id/subtensorStakeSetupValidator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                android:background="@drawable/bg_block_12"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/subtensorStakeSetupValidatorLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/subtensor_setup_select_validator"
+                    android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body"
+                    android:textColor="@color/text_secondary" />
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_chevron_right"
+                    app:tint="@color/text_secondary"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/subtensor_setup_amount_label"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_secondary" />
+
+            <EditText
+                android:id="@+id/subtensorStakeSetupAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                android:background="@drawable/bg_block_12"
+                android:hint="@string/subtensor_setup_amount_placeholder"
+                android:inputType="numberDecimal"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_secondary"
+                android:textCursorDrawable="@null"
+                tools:hint="0.00" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/subtensorStakeSetupContinue"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:enabled="false"
+        android:text="@string/common_continue"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

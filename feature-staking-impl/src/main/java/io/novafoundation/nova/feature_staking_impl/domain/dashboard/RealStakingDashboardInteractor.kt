@@ -159,7 +159,12 @@ class RealStakingDashboardInteractor(
                 val asset = chain.assetsById[assetId] ?: return@innerForEach
 
                 if (dashboardItems.isNoStakePresent()) {
-                    if (!chain.isTestNet) {
+                    // Subnet alpha rows are written by the Subtensor updater
+                    // for every netuid (1..128) regardless of stake — surfacing
+                    // them in "Available to stake" would flood the dashboard
+                    // with 128 empty SN rows. Mirrors iOS `StakingDashboardBuilder`
+                    // filter on `type == "subtensor-alpha"`.
+                    if (!chain.isTestNet && asset.type !is Chain.Asset.Type.SubtensorAlpha) {
                         noStake.add(noStakeAggregatedOption(chain, asset, dashboardItems, syncingStageMap))
                     }
                 } else {
@@ -203,6 +208,10 @@ class RealStakingDashboardInteractor(
 
             itemsByChain.forEach innerForEach@{ assetId, dashboardItems ->
                 val asset = chain.assetsById[assetId] ?: return@innerForEach
+
+                // Same alpha-row filter as `constructStakingDashboard` — iOS
+                // applies it universally in `StakingDashboardBuilder.swift:145`.
+                if (asset.type is Chain.Asset.Type.SubtensorAlpha) return@innerForEach
 
                 if (dashboardItems.isNoStakePresent()) {
                     if (chain.isTestNet) {
@@ -456,6 +465,8 @@ class RealStakingDashboardInteractor(
             StakingTypeGroup.NOMINATION_POOL -> transferableInPlanks
             StakingTypeGroup.UNSUPPORTED -> Balance.ZERO
             StakingTypeGroup.MYTHOS -> freeInPlanks
+            // Subtensor: TAO root staking spends free balance like relaychain.
+            StakingTypeGroup.SUBTENSOR -> freeInPlanks
         }
     }
 

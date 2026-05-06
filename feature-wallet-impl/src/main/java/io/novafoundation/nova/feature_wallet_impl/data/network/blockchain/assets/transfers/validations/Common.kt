@@ -121,5 +121,8 @@ private fun Chain.Asset.existentialDepositError(amount: BigDecimal): WillRemoveA
     is Type.Statemine -> WillRemoveAccount.WillTransferDust(amount)
     is Type.EvmErc20, is Type.EvmNative -> WillRemoveAccount.WillBurnDust
     is Type.Equilibrium -> WillRemoveAccount.WillBurnDust
+    // Subtensor alpha assets are not transferable in the standard sense; ED
+    // doesn't apply. Throwing matches the unsupported-asset semantics.
+    is Type.SubtensorAlpha -> throw IllegalArgumentException("Subtensor alpha not transferable")
     Type.Unsupported -> throw IllegalArgumentException("Unsupported")
 }

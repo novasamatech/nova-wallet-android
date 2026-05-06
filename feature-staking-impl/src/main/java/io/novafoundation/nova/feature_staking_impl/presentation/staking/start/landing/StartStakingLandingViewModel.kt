@@ -235,6 +235,7 @@ class StartStakingLandingViewModel(
 
             StakingTypeGroup.MYTHOS -> router.openStartMythosStaking()
 
+            StakingTypeGroup.SUBTENSOR -> Unit // Subtensor start-staking flow is opened directly from the dashboard.
             StakingTypeGroup.UNSUPPORTED -> Unit
         }
     }

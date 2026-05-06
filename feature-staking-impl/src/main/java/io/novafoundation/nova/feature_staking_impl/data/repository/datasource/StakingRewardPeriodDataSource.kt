@@ -119,6 +119,7 @@ class RealStakingRewardPeriodDataSource(
             Chain.Asset.StakingType.TURING -> "TURING"
             Chain.Asset.StakingType.NOMINATION_POOLS -> "NOMINATION_POOLS"
             Chain.Asset.StakingType.MYTHOS -> "MYTHOS"
+            Chain.Asset.StakingType.SUBTENSOR -> "SUBTENSOR"
         }
     }
 }

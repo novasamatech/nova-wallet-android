@@ -23,6 +23,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.SUBTENSOR
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.UNSUPPORTED
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Type
@@ -172,7 +173,7 @@ fun ChainId.chainIdHexPrefix16(): String {
 
 enum class StakingTypeGroup {
 
-    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, MYTHOS, UNSUPPORTED
+    RELAYCHAIN, PARACHAIN, NOMINATION_POOL, MYTHOS, SUBTENSOR, UNSUPPORTED
 }
 
 fun Chain.Asset.StakingType.group(): StakingTypeGroup {
@@ -182,6 +183,7 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
         PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
         MYTHOS -> StakingTypeGroup.MYTHOS
         NOMINATION_POOLS -> StakingTypeGroup.NOMINATION_POOL
+        SUBTENSOR -> StakingTypeGroup.SUBTENSOR
     }
 }
 
@@ -581,6 +583,9 @@ val Chain.Asset.onChainAssetId: String?
         is Type.EvmErc20 -> this.type.contractAddress
         is Type.Native -> null
         is Type.EvmNative -> null
+        // Subtensor alpha assets are addressed by netuid, not an on-chain
+        // assetId — they live entirely in pallet runtime API state.
+        is Type.SubtensorAlpha -> null
         Type.Unsupported -> error("Unsupported assetId type: ${this.type::class.simpleName}")
     }
 

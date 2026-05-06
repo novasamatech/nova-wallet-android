@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/subtensorUnstakeSetupToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleText="@string/subtensor_unstake" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="8dp"
+        app:layout_constraintTop_toBottomOf="@id/subtensorUnstakeSetupToolbar"
+        app:layout_constraintBottom_toTopOf="@id/subtensorUnstakeSetupContinue">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subtensor_setup_validator_label"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_secondary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                android:background="@drawable/bg_block_12"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/subtensorUnstakeSetupValidator"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body"
+                    android:textColor="@color/text_primary"
+                    tools:text="5GgYg…XEm9zT" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/subtensor_unstake_position_label"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/subtensorUnstakeSetupPosition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="16dp"
+                android:background="@drawable/bg_block_12"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body"
+                android:textColor="@color/text_primary"
+                tools:text="10.0000 TAO" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/subtensor_setup_amount_label"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_secondary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="@drawable/bg_block_12"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/subtensorUnstakeSetupAmount"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:hint="@string/subtensor_setup_amount_placeholder"
+                    android:inputType="numberDecimal"
+                    android:paddingVertical="16dp"
+                    android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_secondary"
+                    android:textCursorDrawable="@null"
+                    tools:hint="0.00" />
+
+                <TextView
+                    android:id="@+id/subtensorUnstakeSetupMax"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:padding="8dp"
+                    android:text="@string/subtensor_unstake_max"
+                    android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Caption1"
+                    android:textColor="@color/button_text_accent" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/subtensorUnstakeSetupContinue"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:enabled="false"
+        android:text="@string/common_continue"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

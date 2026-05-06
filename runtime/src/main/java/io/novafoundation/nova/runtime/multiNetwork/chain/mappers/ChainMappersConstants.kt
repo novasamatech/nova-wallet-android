@@ -26,3 +26,6 @@ const val ORML_EXTRAS_TRANSFERS_ENABLED = "transfersEnabled"
 const val EVM_EXTRAS_CONTRACT_ADDRESS = "contractAddress"
 
 const val ORML_TRANSFERS_ENABLED_DEFAULT = true
+
+const val ASSET_SUBTENSOR_ALPHA = "subtensor-alpha"
+const val SUBTENSOR_ALPHA_EXTRAS_NETUID = "netuid"

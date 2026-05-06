@@ -12,6 +12,8 @@ fun mapStakingTypeToSubQueryId(stakingType: Chain.Asset.StakingType): String? {
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
         Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pool"
         Chain.Asset.StakingType.MYTHOS -> "mythos"
+        // Subtensor has no SubQuery indexer yet — null disables off-chain stats.
+        Chain.Asset.StakingType.SUBTENSOR -> null
     }
 }
 

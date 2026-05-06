@@ -23,8 +23,17 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Rea
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.RealTotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
+import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.BittensorDelegatesClient
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.StubSubtensorValidatorDataSource
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorPositionCache
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorSubnetFetcher
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorValidatorDataSource
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorValidatorProvider
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorPositionFetcher
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
+import okhttp3.OkHttpClient
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -64,6 +73,61 @@ class StakingDashboardModule {
 
     @Provides
     @FeatureScope
+    fun provideBittensorDelegatesClient(
+        gson: Gson,
+    ): BittensorDelegatesClient {
+        // The shared app OkHttpClient isn't exposed via StakingFeatureDependencies
+        // and adding it there would touch every existing staking-impl call site.
+        // BittensorDelegatesClient hits a single static GitHub URL once per
+        // session so a dedicated client is cheap and avoids the dependency tax.
+        return BittensorDelegatesClient(OkHttpClient(), gson)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSubtensorSubnetFetcher(
+        gson: Gson,
+    ): SubtensorSubnetFetcher = SubtensorSubnetFetcher(OkHttpClient(), gson)
+
+    @Provides
+    @FeatureScope
+    fun provideSubtensorValidatorDataSource(): SubtensorValidatorDataSource =
+        // Release fallback. Numeric data source (TaoStats / Nova indexer)
+        // can be swapped here without touching the picker. Mirrors iOS
+        // `StubSubtensorValidatorDataSource`.
+        StubSubtensorValidatorDataSource()
+
+    @Provides
+    @FeatureScope
+    fun provideSubtensorValidatorProvider(
+        delegatesClient: BittensorDelegatesClient,
+        dataSource: SubtensorValidatorDataSource,
+        chainRegistry: ChainRegistry,
+    ): SubtensorValidatorProvider {
+        // Bittensor mainnet uses ss58 prefix 42. The validator picker only
+        // ever runs on Bittensor, so a constant is fine — if a second TAO
+        // chain ever appears the prefix can be plumbed through DI.
+        return SubtensorValidatorProvider(
+            delegatesClient = delegatesClient,
+            dataSource = dataSource,
+            identityAddressPrefix = 42,
+        )
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideSubtensorPositionFetcher(
+        chainRegistry: ChainRegistry,
+    ): SubtensorPositionFetcher = SubtensorPositionFetcher(chainRegistry)
+
+    @Provides
+    @FeatureScope
+    fun provideSubtensorPositionCache(
+        fetcher: SubtensorPositionFetcher,
+    ): SubtensorPositionCache = SubtensorPositionCache(fetcher)
+
+    @Provides
+    @FeatureScope
     fun provideStakingDashboardUpdaterFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         stakingDashboardCache: StakingDashboardCache,
@@ -71,13 +135,15 @@ class StakingDashboardModule {
         poolAccountDerivation: PoolAccountDerivation,
         storageCache: StorageCache,
         balanceLocksRepository: BalanceLocksRepository,
+        subtensorPositionCache: SubtensorPositionCache,
     ) = StakingDashboardUpdaterFactory(
         stakingDashboardCache = stakingDashboardCache,
         remoteStorageSource = remoteStorageSource,
         nominationPoolBalanceRepository = nominationPoolBalanceRepository,
         poolAccountDerivation = poolAccountDerivation,
         storageCache = storageCache,
-        balanceLocksRepository = balanceLocksRepository
+        balanceLocksRepository = balanceLocksRepository,
+        subtensorPositionCache = subtensorPositionCache,
     )
 
     @Provides

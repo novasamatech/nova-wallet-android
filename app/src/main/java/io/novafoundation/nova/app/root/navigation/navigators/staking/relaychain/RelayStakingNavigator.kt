@@ -7,8 +7,14 @@ import io.novafoundation.nova.app.root.navigation.navigators.Navigator
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
+import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.setup.SubtensorStakeSetupFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorValidatorPickerFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.setup.SubtensorUnstakeSetupFragment
+import androidx.lifecycle.asFlow
+import kotlinx.coroutines.flow.Flow
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
@@ -141,6 +147,64 @@ class RelayStakingNavigator(
 
     override fun openChainStakingMain() {
         navigationBuilder().action(R.id.action_mainFragment_to_stakingGraph)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSubtensorStakingMain() {
+        navigationBuilder().action(R.id.action_mainFragment_to_subtensorStakingMain)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSubtensorStakeType() {
+        navigationBuilder().action(R.id.action_subtensorStakingMain_to_subtensorStakeType)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSubtensorSubnetPicker() {
+        navigationBuilder().action(R.id.action_subtensorStakeType_to_subtensorSubnetPicker)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSubtensorStakeSetup(netuid: Int, subnetName: String?) {
+        val bundle = SubtensorStakeSetupFragment.bundle(netuid = netuid, subnetName = subnetName)
+        val action = if (netuid == SubtensorStakingConstants.ROOT_NETUID) {
+            R.id.action_subtensorStakeType_to_subtensorStakeSetup
+        } else {
+            R.id.action_subtensorSubnetPicker_to_subtensorStakeSetup
+        }
+        navigationBuilder().action(action)
+            .setArgs(bundle)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openSubtensorValidatorPicker(netuid: Int) {
+        val bundle = SubtensorValidatorPickerFragment.bundle(netuid = netuid)
+        navigationBuilder().action(R.id.action_subtensorStakeSetup_to_subtensorValidatorPicker)
+            .setArgs(bundle)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun respondAndPopValidatorPicker(hotkey: String) {
+        previousBackStackEntry!!.savedStateHandle.set(
+            SubtensorStakeSetupFragment.KEY_SELECTED_VALIDATOR_HOTKEY,
+            hotkey,
+        )
+        back()
+    }
+
+    override val subtensorSelectedValidatorFlow: Flow<String?>
+        get() = currentBackStackEntry!!.savedStateHandle
+            .getLiveData<String?>(SubtensorStakeSetupFragment.KEY_SELECTED_VALIDATOR_HOTKEY)
+            .asFlow()
+
+    override fun openSubtensorUnstakeSetup(netuid: Int, hotkeyAddress: String, positionPlanks: java.math.BigInteger) {
+        val bundle = SubtensorUnstakeSetupFragment.bundle(
+            netuid = netuid,
+            hotkeyAddress = hotkeyAddress,
+            positionPlanks = positionPlanks,
+        )
+        navigationBuilder().action(R.id.action_subtensorStakingMain_to_subtensorUnstakeSetup)
+            .setArgs(bundle)
             .navigateInFirstAttachedContext()
     }
 
