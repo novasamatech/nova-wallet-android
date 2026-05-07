@@ -1,80 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mirrors iOS SubtensorSubnetCell density:
+     [name (semibold subheadline)]              [TAO reserve]
+     [SN# (caption secondary)]                  [spot price (caption secondary)]
+     Each cell is its own rounded block_background card with 4dp gap above and below;
+     the picker container layers them vertically with no extra dividers. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?selectableItemBackground"
-    android:orientation="vertical">
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/bg_block_12"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp">
+        android:layout_weight="1"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <TextView
+            android:id="@+id/subtensorSubnetPickerRowName"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+            android:textColor="@color/text_primary"
+            tools:text="Apex" />
 
-            <TextView
-                android:id="@+id/subtensorSubnetPickerRowName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
-                tools:text="Apex" />
-
-            <TextView
-                android:id="@+id/subtensorSubnetPickerRowNetuid"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
-                tools:text="SN1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/subtensorSubnetPickerRowNetuid"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:gravity="end"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/subtensorSubnetPickerRowReserve"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
-                tools:text="42,103 TAO" />
-
-            <TextView
-                android:id="@+id/subtensorSubnetPickerRowPrice"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
-                tools:text="0.0182 TAO/α" />
-        </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_arrow_right"
-            app:tint="@color/icon_secondary" />
+            android:layout_marginTop="2dp"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            tools:text="SN1" />
     </LinearLayout>
 
-    <View
-        android:id="@+id/subtensorSubnetPickerRowDivider"
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:layout_marginStart="16dp"
-        android:background="@color/divider" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:gravity="end"
+        android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/subtensorSubnetPickerRowReserve"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            tools:text="42,103 TAO" />
+
+        <TextView
+            android:id="@+id/subtensorSubnetPickerRowPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+            tools:text="0.0182 TAO/α" />
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_arrow_right"
+        app:tint="@color/icon_secondary" />
 </LinearLayout>

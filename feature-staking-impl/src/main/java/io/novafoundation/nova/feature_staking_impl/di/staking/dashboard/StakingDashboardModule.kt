@@ -25,12 +25,14 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Sta
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
 import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.BuildConfig
 import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.BittensorDelegatesClient
 import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.StubSubtensorValidatorDataSource
 import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorPositionCache
 import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorSubnetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorValidatorDataSource
 import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorValidatorProvider
+import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.TaoStatsValidatorDataSource
 import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.SubtensorPositionFetcher
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
 import okhttp3.OkHttpClient
@@ -91,11 +93,22 @@ class StakingDashboardModule {
 
     @Provides
     @FeatureScope
-    fun provideSubtensorValidatorDataSource(): SubtensorValidatorDataSource =
-        // Release fallback. Numeric data source (TaoStats / Nova indexer)
-        // can be swapped here without touching the picker. Mirrors iOS
-        // `StubSubtensorValidatorDataSource`.
-        StubSubtensorValidatorDataSource()
+    fun provideSubtensorValidatorDataSource(
+        gson: Gson,
+    ): SubtensorValidatorDataSource {
+        // Mirrors iOS `SubtensorStakeSetupViewFactory`: if a TaoStats key
+        // is available in the build (read from local.properties or the
+        // shared key file at build time — see feature-staking-impl/build.gradle),
+        // use the TaoStats REST data source so APR + commission render in
+        // the picker. Otherwise fall back to the empty stub so the picker
+        // still works in identity-only mode.
+        val key: String? = BuildConfig.TAOSTATS_API_KEY
+        return if (!key.isNullOrBlank()) {
+            TaoStatsValidatorDataSource(apiKey = key, httpClient = OkHttpClient(), gson = gson)
+        } else {
+            StubSubtensorValidatorDataSource()
+        }
+    }
 
     @Provides
     @FeatureScope

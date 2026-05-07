@@ -12,7 +12,9 @@ import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.Subten
 import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withTimeoutOrNull
 import java.math.BigInteger
 import kotlin.time.Duration.Companion.seconds
 
@@ -103,7 +105,14 @@ class StakingDashboardSubtensorUpdater(
                     emit(StakingDashboardUpdaterEvent.AllSynced(optionId, NO_OFF_CHAIN_INDEX))
                 }
             }
-            kotlinx.coroutines.delay(SubtensorStakingConstants.DASHBOARD_RESYNC_SECONDS.seconds)
+            // Race the regular poll interval against an "invalidate kick"
+            // from SubtensorPositionCache — fired right after stake / unstake
+            // confirmation so the dashboard reflects the new state within
+            // one Bittensor block instead of waiting up to the full
+            // resync interval.
+            withTimeoutOrNull(SubtensorStakingConstants.DASHBOARD_RESYNC_SECONDS.seconds) {
+                positionCache.invalidateKick.first()
+            }
         }
     }
 

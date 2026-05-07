@@ -167,6 +167,14 @@ class StakingDashboardViewModel(
             null
         }
 
+        // Subtensor (root + subnet) has no off-chain rewards indexer — iOS
+        // hides the "X.XX% per year" row for every Bittensor row. Subnet
+        // alpha additionally has no priceId, so iOS hides the fiat lines
+        // for those too. Detect via staking type / chain-asset type from
+        // nova-utils (`staking: ["subtensor"]`, `type: "subtensor-alpha"`).
+        val isSubtensor = hasStake.stakingState.stakingType == Chain.Asset.StakingType.SUBTENSOR
+        val isSubnetAlpha = hasStake.token.configuration.type is Chain.Asset.Type.SubtensorAlpha
+
         return StakingDashboardModel.HasStakeItem(
             assetLabel = resourceManager.getString(R.string.staking_rewards, hasStake.token.configuration.name).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.fullId,
@@ -181,7 +189,9 @@ class StakingDashboardViewModel(
             status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
             earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
             stakingTypeBadge = stakingTypBadge,
-            assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary)
+            assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary),
+            hideFiat = isSubnetAlpha,
+            hideEarnings = isSubtensor,
         )
     }
 

@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Background gets swapped dynamically in SubtensorStakingFragment.renderState:
+     gradient for the populated detail state (matches the rest of Nova),
+     solid black for the empty/landing state (matches AZERO landing). -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/subtensorRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/drawable_background_image">
 
+    <!-- Toolbar matches the canonical StartStakingLanding (close icon, no
+         title) so the empty/landing state visually mirrors the AZERO etc.
+         landings. The detail content (when there's an active stake) wires
+         the title text dynamically in the Fragment. -->
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/subtensorStakingToolbar"
         android:layout_width="match_parent"
@@ -13,8 +21,8 @@
         android:background="@android:color/transparent"
         app:contentBackground="@android:color/transparent"
         app:dividerVisible="false"
-        app:layout_constraintTop_toTopOf="parent"
-        app:titleText="@string/subtensor_staking_title" />
+        app:homeButtonIcon="@drawable/ic_close"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/subtensorScroll"
@@ -22,7 +30,7 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintTop_toBottomOf="@id/subtensorStakingToolbar"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toTopOf="@id/subtensorLandingBottomContainer">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -40,30 +48,117 @@
                 android:layout_marginTop="48dp"
                 android:visibility="gone" />
 
+            <!-- iOS-parity gold landing. Replaces the prior "No active stakes"
+                 empty card. Mirrors the bullets, copy and accent colour of
+                 `StartStakingInfoSubtensorPresenter`. The Start CTA + balance
+                 are pinned to the bottom of the screen via a sibling
+                 container outside the scroll view (see below). -->
             <LinearLayout
                 android:id="@+id/subtensorEmptyState"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:paddingTop="64dp"
+                android:paddingTop="24dp"
                 android:visibility="gone"
                 tools:visibility="visible">
 
                 <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/subtensor_no_active_stakes"
-                    android:textAppearance="@style/TextAppearance.NovaFoundation.Bold.Title3" />
-
-                <TextView
+                    android:id="@+id/subtensorLandingTitle"
+                    style="@style/TextAppearance.NovaFoundation.Bold.Title1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:gravity="center_horizontal"
-                    android:text="@string/subtensor_no_active_stakes_message"
-                    android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-                    android:textColor="@color/text_secondary" />
+                    android:gravity="center"
+                    android:textColor="@color/text_primary"
+                    tools:text="Earn up to 20.01%\non your TAO tokens\nper year" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_stake_anytime" />
+
+                    <TextView
+                        android:id="@+id/subtensorLandingBulletStake"
+                        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="48dp"
+                        android:textColor="@color/text_primary"
+                        tools:text="Stake anytime with as little as 0.01 TAO. Your stake will actively earn rewards in 1 minute" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_unstake_anytime" />
+
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="48dp"
+                        android:text="@string/subtensor_landing_unstake_condition"
+                        android:textColor="@color/text_primary" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_rewards" />
+
+                    <TextView
+                        android:id="@+id/subtensorLandingBulletRewards"
+                        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="48dp"
+                        android:textColor="@color/text_primary"
+                        tools:text="Rewards accrue every 1 hour and added back to the stake" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_monitor_your_stake" />
+
+                    <TextView
+                        android:id="@+id/subtensorLandingBulletMonitor"
+                        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="48dp"
+                        android:textColor="@color/text_primary"
+                        tools:text="Rewards and staking status vary over time. Monitor your stake from time to time" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/subtensorLandingMoreInfo"
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="32dp"
+                    android:gravity="center"
+                    android:textColor="@color/text_secondary"
+                    tools:text="Find out more information about Bittensor staking over at the Nova Wiki ›" />
             </LinearLayout>
 
             <LinearLayout
@@ -287,5 +382,41 @@
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom container for the landing CTA. Only visible while the empty
+         state is on screen — once a position loads, the scroll view takes
+         the full height again. Mirrors fragment_start_staking_landing.xml. -->
+    <LinearLayout
+        android:id="@+id/subtensorLandingBottomContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_bottom_button_container"
+        android:orientation="vertical"
+        android:paddingHorizontal="17dp"
+        android:paddingTop="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:visibility="visible">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/subtensorLandingStartButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/subtensor_landing_start_staking" />
+
+        <TextView
+            android:id="@+id/subtensorLandingAvailableBalance"
+            style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            tools:text="Available balance: 0.0373 TAO" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

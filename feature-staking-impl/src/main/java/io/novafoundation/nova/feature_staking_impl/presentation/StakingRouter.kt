@@ -49,6 +49,13 @@ interface StakingRouter {
     fun openSubtensorStakeSetup(netuid: Int, subnetName: String? = null)
 
     /**
+     * Subtensor stake-add Confirm screen. Pushed from Setup's Continue
+     * after validation. The payload carries the snapshotted fee so what
+     * the user agreed to is what they sign — same idiom as ConfirmBondMore.
+     */
+    fun openSubtensorStakeConfirm(payload: io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.confirm.SubtensorStakeConfirmPayload)
+
+    /**
      * Subtensor validator picker. Pushed from the stake-setup screen's
      * "Select validator" slot. Selection is reported back via
      * [SubtensorStakeSetupFragment.KEY_SELECTED_VALIDATOR_HOTKEY] on the
@@ -57,18 +64,18 @@ interface StakingRouter {
     fun openSubtensorValidatorPicker(netuid: Int)
 
     /**
-     * Writes the picked hotkey into the previous back-stack entry's saved
-     * state handle and pops the validator picker. Same idiom as the
-     * crowdloan-bonus round-trip (see `Navigator.setCustomBonus`).
+     * Writes the picked validator (hotkey + identity) into the previous
+     * back-stack entry's saved state handle and pops the validator picker.
+     * Same idiom as the crowdloan-bonus round-trip (see `Navigator.setCustomBonus`).
      */
-    fun respondAndPopValidatorPicker(hotkey: String)
+    fun respondAndPopValidatorPicker(picked: io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorPickedValidator)
 
     /**
-     * Stream of the most-recently-picked Subtensor validator hotkey, scoped
-     * to the current Stake Setup back-stack entry. Mirrors the crowdloan
-     * `customBonusFlow` pattern.
+     * Stream of the most-recently-picked Subtensor validator (hotkey +
+     * identity), scoped to the current Stake Setup back-stack entry.
+     * Mirrors the crowdloan `customBonusFlow` pattern.
      */
-    val subtensorSelectedValidatorFlow: Flow<String?>
+    val subtensorSelectedValidatorFlow: Flow<io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorPickedValidator?>
 
     /**
      * Subtensor unstake setup screen. Pushed from the main TAO staking
@@ -78,6 +85,13 @@ interface StakingRouter {
      * `SubtensorStakingWireframe.pushUnstakeSetup`.
      */
     fun openSubtensorUnstakeSetup(netuid: Int, hotkeyAddress: String, positionPlanks: java.math.BigInteger)
+
+    /**
+     * Subtensor unstake Confirm screen. Pushed from Setup's Continue
+     * after the snapshot fee + amount + identity are resolved. Mirrors
+     * the stake-confirm path.
+     */
+    fun openSubtensorUnstakeConfirm(payload: io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.confirm.SubtensorUnstakeConfirmPayload)
 
     fun openStartChangeValidators()
 

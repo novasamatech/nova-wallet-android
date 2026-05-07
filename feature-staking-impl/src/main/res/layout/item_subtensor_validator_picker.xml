@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Mirrors iOS SubtensorValidatorTableViewCell + SubtensorValidatorPickerViewLayout
+     (UITableView style: .plain, separator: .singleLine, color: container_border).
+     Row height ~56dp; flat against the screen background; thin separator inset
+     16dp from the leading edge to align under the title text, not under the icon. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -9,72 +12,57 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="56dp"
         android:gravity="center_vertical"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="14dp">
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/subtensorValidatorPickerRowIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            tools:src="@drawable/ic_identicon_placeholder_with_background" />
+
+        <TextView
+            android:id="@+id/subtensorValidatorPickerRowName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/subtensorValidatorPickerRowName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
-                tools:text="Opentensor Foundation" />
-
-            <TextView
-                android:id="@+id/subtensorValidatorPickerRowHotkey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
-                tools:text="5GgYg…XEm9zT" />
-        </LinearLayout>
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:textColor="@color/text_primary"
+            tools:text="Opentensor Foundation" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
             android:gravity="end"
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/subtensorValidatorPickerRowStake"
+                android:id="@+id/subtensorValidatorPickerRowApr"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
-                tools:text="42,103.50 TAO" />
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_positive"
+                tools:text="14.32%" />
 
             <TextView
-                android:id="@+id/subtensorValidatorPickerRowMeta"
+                android:id="@+id/subtensorValidatorPickerRowCommission"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
-                tools:text="12.30% APR · 18.0% fee" />
+                tools:text="18% commission" />
         </LinearLayout>
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_arrow_right"
-            app:tint="@color/icon_secondary" />
     </LinearLayout>
 
     <View
-        android:id="@+id/subtensorValidatorPickerRowDivider"
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_marginStart="16dp"
-        android:background="@color/divider" />
-
+        android:background="@color/container_border" />
 </LinearLayout>

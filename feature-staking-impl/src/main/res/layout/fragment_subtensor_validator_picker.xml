@@ -16,6 +16,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleText="@string/subtensor_validator_picker_title" />
 
+    <io.novafoundation.nova.common.view.SearchView
+        android:id="@+id/subtensorValidatorPickerSearch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:hint="@string/common_search"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerToolbar"
+        tools:visibility="visible" />
+
     <ProgressBar
         android:id="@+id/subtensorValidatorPickerProgress"
         style="@style/Widget.Nova.ProgressBar.Indeterminate"
@@ -25,7 +38,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerToolbar"
+        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerSearch"
         tools:visibility="visible" />
 
     <TextView
@@ -40,7 +53,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerToolbar" />
+        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerSearch" />
 
     <TextView
         android:id="@+id/subtensorValidatorPickerError"
@@ -54,25 +67,22 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerToolbar" />
+        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerSearch" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="12dp"
         android:paddingBottom="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerToolbar">
+        app:layout_constraintTop_toBottomOf="@id/subtensorValidatorPickerSearch">
 
         <LinearLayout
             android:id="@+id/subtensorValidatorPickerList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_block_12"
             android:orientation="vertical"
             android:visibility="gone"
             tools:visibility="visible" />

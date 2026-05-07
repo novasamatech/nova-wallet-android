@@ -16,6 +16,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:titleText="@string/subtensor_subnet_picker_title" />
 
+    <io.novafoundation.nova.common.view.SearchView
+        android:id="@+id/subtensorSubnetPickerSearch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:hint="@string/common_search"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subtensorSubnetPickerToolbar"
+        tools:visibility="visible" />
+
     <ProgressBar
         android:id="@+id/subtensorSubnetPickerProgress"
         style="@style/Widget.Nova.ProgressBar.Indeterminate"
@@ -25,7 +38,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtensorSubnetPickerToolbar"
+        app:layout_constraintTop_toBottomOf="@id/subtensorSubnetPickerSearch"
         tools:visibility="visible" />
 
     <TextView
@@ -40,7 +53,7 @@
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtensorSubnetPickerToolbar" />
+        app:layout_constraintTop_toBottomOf="@id/subtensorSubnetPickerSearch" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -52,13 +65,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/subtensorSubnetPickerToolbar">
+        app:layout_constraintTop_toBottomOf="@id/subtensorSubnetPickerSearch">
 
         <LinearLayout
             android:id="@+id/subtensorSubnetPickerList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_block_12"
             android:orientation="vertical"
             android:visibility="gone"
             tools:visibility="visible" />

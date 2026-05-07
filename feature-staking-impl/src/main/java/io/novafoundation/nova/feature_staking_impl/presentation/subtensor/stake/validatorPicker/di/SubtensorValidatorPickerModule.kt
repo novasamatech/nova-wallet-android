@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
@@ -25,12 +26,14 @@ class SubtensorValidatorPickerModule {
         validatorProvider: SubtensorValidatorProvider,
         stakingSharedState: StakingSharedState,
         chainRegistry: ChainRegistry,
+        addressIconGenerator: AddressIconGenerator,
         netuid: Int,
     ): ViewModel = SubtensorValidatorPickerViewModel(
         router = router,
         validatorProvider = validatorProvider,
         stakingSharedState = stakingSharedState,
         chainRegistry = chainRegistry,
+        addressIconGenerator = addressIconGenerator,
         netuid = netuid,
     )
 

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mirrors iOS SubtensorValidatorFilterViewController:
+     "Show" section with two switches, "Sort by:" section with two radios,
+     Apply button at the bottom. Reset action lives in the toolbar. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/subtensor_validator_filter_title"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Body" />
+
+        <TextView
+            android:id="@+id/subtensorValidatorFilterReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/common_reset"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+            android:textColor="@color/button_text_accent" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/subtensor_validator_filter_show"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+        android:textColor="@color/text_secondary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_block_12"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp">
+
+        <LinearLayout
+            android:id="@+id/subtensorValidatorFilterIdentityRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/subtensor_validator_filter_identity"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/subtensorValidatorFilterIdentitySwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/container_border" />
+
+        <LinearLayout
+            android:id="@+id/subtensorValidatorFilterCommissionRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/subtensor_validator_filter_hide_max_commission"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/subtensorValidatorFilterCommissionSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="@string/subtensor_validator_filter_sort_by"
+        android:textAllCaps="true"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+        android:textColor="@color/text_secondary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_block_12"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="4dp">
+
+        <LinearLayout
+            android:id="@+id/subtensorValidatorFilterSortAprRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/subtensor_validator_filter_sort_apr"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body" />
+
+            <RadioButton
+                android:id="@+id/subtensorValidatorFilterSortAprRadio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/container_border" />
+
+        <LinearLayout
+            android:id="@+id/subtensorValidatorFilterSortStakeRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?selectableItemBackground"
+            android:gravity="center_vertical"
+            android:minHeight="48dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/subtensor_validator_filter_sort_total_stake"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Body" />
+
+            <RadioButton
+                android:id="@+id/subtensorValidatorFilterSortStakeRadio"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/subtensorValidatorFilterApply"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/common_apply" />
+</LinearLayout>

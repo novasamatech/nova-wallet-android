@@ -2,6 +2,22 @@ apply plugin: 'kotlin-parcelize'
 apply from: '../tests.gradle'
 apply from: '../scripts/secrets.gradle'
 
+// [TEMP-TAOSTATS] Mirrors iOS `TaoStatsKeyProvider`: pull the API key from
+// either `local.properties` (TAOSTATS_API_KEY=...) or the same plain-text
+// file iOS reads at runtime — `~/Desktop/tao-ewt-staking/taostats-api-key.txt`.
+// Wraps in BuildConfig.TAOSTATS_API_KEY (String, null when absent).
+// Drop both this block and the field once Nova's Bittensor indexer ships.
+def taoStatsKey = readStringSecretOrNull("TAOSTATS_API_KEY")
+if (taoStatsKey == null) {
+    def keyFile = new File("${System.getProperty('user.home')}/Desktop/tao-ewt-staking/taostats-api-key.txt")
+    if (keyFile.exists()) {
+        def content = keyFile.text.trim()
+        if (!content.isEmpty()) {
+            taoStatsKey = "\"${content}\""
+        }
+    }
+}
+
 android {
 
     defaultConfig {
@@ -10,6 +26,8 @@ android {
 
         buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config_dev.json\""
         buildConfigField "String", "RECOMMENDED_VALIDATORS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/validators/v1/nova_validators_dev.json\""
+
+        buildConfigField "String", "TAOSTATS_API_KEY", taoStatsKey ?: "null"
     }
 
     buildTypes {

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
@@ -111,6 +112,30 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
         earningsGroup.applyState(earningsState) { text = it }
 
         binder.itemDashboardHasStakeEarningsSuffix.setVisible(earningsState.isLoaded())
+    }
+
+    /** Subnet alpha rows have no price feed (so fiat is meaningless) and no
+     *  off-chain rewards indexer (so the "X.XX% per year" estimate is too).
+     *  iOS keeps the rewards label + token amount visible (shows "0 SN68"
+     *  next to "SN68 rewards") and only hides the two fiat lines and the
+     *  earnings group. Mirroring that here.
+     *
+     *  Re-applied from each payload bind path because `setEarnings` /
+     *  `setStake` / `setRewards` toggle visibilities of their own that would
+     *  otherwise re-show the hidden views on a partial update — see
+     *  `DashboardHasStakeViewHolder.bind*`. */
+    /** Toggles fiat-under-amount + earnings-APY visibility independently —
+     *  iOS hides the APY for every Bittensor row (no off-chain indexer)
+     *  but only hides fiat for subnet alpha (no priceId). Uses INVISIBLE,
+     *  not GONE, so the constraint chain still reserves the height — cards
+     *  stay the same size as relaychain cards regardless. */
+    fun setHideFiatAndEarnings(hideFiat: Boolean, hideEarnings: Boolean) {
+        val invisible = View.INVISIBLE
+        binder.itemDashboardHasStakeRewardsFiatContainer.setVisible(!hideFiat, invisible)
+        binder.itemDashboardHasStakeStakesFiatContainer.setVisible(!hideFiat, invisible)
+        binder.itemDashboardHasStakeEarningsLabel.setVisible(!hideEarnings, invisible)
+        binder.itemDashboardHasStakeEarningsContainer.setVisible(!hideEarnings, invisible)
+        binder.itemDashboardHasStakeEarningsSuffix.setVisible(!hideEarnings, invisible)
     }
 
     fun setStakingTypeBadge(model: StakingTypeModel?) {

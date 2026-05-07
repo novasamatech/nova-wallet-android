@@ -4,6 +4,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.Subten
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -51,6 +54,16 @@ class SubtensorPositionCache(
     private val cache = mutableMapOf<Key, CacheEntry>()
     private val inFlight = mutableMapOf<Key, CompletableDeferred<List<SubtensorRawPosition>>>()
     private val generation = mutableMapOf<Key, Int>()
+
+    /**
+     * Fires whenever [invalidate] is called. The dashboard updater races
+     * this against its 30s polling delay so a fresh stake/unstake appears
+     * on the dashboard within one Bittensor block of `inBlock` instead of
+     * up to 30s later. Replay 0 because subscribers join long-lived; we
+     * never want a buffered "kick" to retrigger a poll on subscription.
+     */
+    private val _invalidateKick = MutableSharedFlow<Unit>(replay = 0, extraBufferCapacity = 1)
+    val invalidateKick: SharedFlow<Unit> = _invalidateKick.asSharedFlow()
 
     suspend fun positions(chainId: ChainId, coldkey: ByteArray): List<SubtensorRawPosition> {
         val key = Key(chainId, coldkey.toList())
@@ -122,5 +135,10 @@ class SubtensorPositionCache(
                 generation[key] = generation.getOrDefault(key, 0) + 1
             }
         }
+        // Wake up the dashboard updater so the new stake appears within one
+        // Bittensor block of `inBlock` instead of up to the 30s polling
+        // interval later. tryEmit (extraBufferCapacity = 1) is non-suspending
+        // and fine to drop if no subscriber is listening yet.
+        _invalidateKick.tryEmit(Unit)
     }
 }

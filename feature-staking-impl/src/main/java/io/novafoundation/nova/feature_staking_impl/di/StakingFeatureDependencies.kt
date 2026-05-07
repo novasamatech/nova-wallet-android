@@ -51,6 +51,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -114,6 +115,11 @@ interface StakingFeatureDependencies {
     val runtimeCallsApi: MultiChainRuntimeCallsApi
 
     val arbitraryAssetUseCase: ArbitraryAssetUseCase
+
+    /** Used by Subtensor unstake setup to fetch fiat by priceId directly,
+     *  sidestepping the symbol-keyed `tokens` table that conflates Fusotao
+     *  and Bittensor (both declare symbol "TAO" in chains_dev.json). */
+    val arbitraryTokenUseCase: ArbitraryTokenUseCase
 
     val locksRepository: BalanceLocksRepository
 

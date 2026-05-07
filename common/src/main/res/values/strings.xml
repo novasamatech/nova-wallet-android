@@ -2791,15 +2791,52 @@
     <string name="subtensor_subnet_picker_title">Select subnet</string>
     <string name="subtensor_subnet_picker_row_subtitle">SN%1$d · %2$s</string>
     <string name="subtensor_subnet_picker_empty">No active subnets found. Pull to retry.</string>
+    <string name="subtensor_subnet_filter_sort_total_stake">Total stake (TAO)</string>
+    <string name="subtensor_subnet_filter_sort_netuid">Subnet number</string>
     <string name="subtensor_validator_picker_title">Select validator</string>
     <string name="subtensor_validator_picker_loading_failed">Failed to load validators</string>
     <string name="subtensor_validator_picker_empty">No validators available</string>
+    <string name="subtensor_validator_filter_title">Filters</string>
+    <string name="subtensor_validator_filter_show">Show</string>
+    <string name="subtensor_validator_filter_identity">Having on-chain identity</string>
+    <string name="subtensor_validator_filter_hide_max_commission">Hide 100% commission</string>
+    <string name="subtensor_validator_filter_sort_by">Sort by</string>
+    <string name="subtensor_validator_filter_sort_apr">APR (high to low)</string>
+    <string name="subtensor_validator_filter_sort_total_stake">Total stake</string>
     <string name="subtensor_setup_invalid_validator">Invalid validator hotkey</string>
     <string name="subtensor_setup_submit_failed">Stake submission failed</string>
     <string name="subtensor_setup_submitting">Submitting…</string>
-    <string name="subtensor_unstake_position_label">Position</string>
+    <string name="subtensor_setup_available_label">Available: %1$s</string>
+    <string name="subtensor_setup_min_stake_label">Minimum stake</string>
+    <string name="subtensor_setup_network_fee_label">Network fee</string>
+    <string name="subtensor_confirm_subnet_title">Confirm — %1$s</string>
+    <string name="subtensor_unstake_position_label">Your stake</string>
     <string name="subtensor_unstake_max">Max</string>
     <string name="subtensor_unstake_amount_exceeds">Amount exceeds your stake</string>
     <string name="subtensor_unstake_pick_validator">Unstake from</string>
     <string name="subtensor_unstake_no_positions">No positions to unstake</string>
+    <string name="subtensor_unstake_remainder_title">Remaining stake too low</string>
+    <string name="subtensor_unstake_remainder_message">Your remaining stake would fall below the 0.01 TAO minimum. Would you like to unstake everything instead?</string>
+    <string name="subtensor_unstake_all">Unstake all</string>
+    <string name="subtensor_stake_below_min">Minimum stake is 0.01 TAO</string>
+    <string name="subtensor_unstake_youll_receive">You\'ll receive</string>
+    <string name="subtensor_unstake_max_label">Max: %1$s</string>
+
+    <!-- Bittensor "no active stakes" landing — mirrors iOS
+         StartStakingInfoSubtensorPresenter exactly, gold-accented title +
+         4 bullet conditions + Nova Wiki link + Start staking CTA. -->
+    <string name="subtensor_landing_title">Earn up to %1$s\non your TAO tokens\nper year</string>
+    <string name="subtensor_landing_default_max_apy">20.01%</string>
+    <string name="subtensor_landing_min_stake_condition">Stake anytime with as little as %1$s. Your stake will actively earn rewards %2$s</string>
+    <string name="subtensor_landing_min_stake_value">0.01 TAO</string>
+    <string name="subtensor_landing_first_reward_time">in 1 minute</string>
+    <string name="subtensor_landing_unstake_condition">Unstake anytime — funds are available immediately with no waiting period</string>
+    <string name="subtensor_landing_rewards_frequency_condition">Rewards accrue %1$s and added back to the stake</string>
+    <string name="subtensor_landing_rewards_frequency_value">every 1 hour</string>
+    <string name="subtensor_landing_monitor_condition">Rewards and staking status vary over time. %1$s</string>
+    <string name="subtensor_landing_monitor_accent">Monitor your stake from time to time</string>
+    <string name="subtensor_landing_more_info">Find out more information about Bittensor staking over at the %1$s</string>
+    <string name="subtensor_landing_wiki_link">Nova Wiki ›</string>
+    <string name="subtensor_landing_start_staking">Start staking</string>
+    <string name="subtensor_landing_available_balance">Available balance: %1$s</string>
 </resources>

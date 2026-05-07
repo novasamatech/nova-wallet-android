@@ -1,13 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.setup
 
 import android.os.Bundle
-import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSubtensorStakeSetupBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setupAmountChooser
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 
 class SubtensorStakeSetupFragment : BaseFragment<SubtensorStakeSetupViewModel, FragmentSubtensorStakeSetupBinding>() {
 
@@ -17,10 +18,11 @@ class SubtensorStakeSetupFragment : BaseFragment<SubtensorStakeSetupViewModel, F
 
         /**
          * Saved-state-handle key the validator picker uses to report its
-         * selection back to this screen. Picker writes the SS58 hotkey;
-         * the ViewModel observes via [StakingRouter.subtensorSelectedValidatorFlow].
+         * selection back to this screen. Picker writes a
+         * [SubtensorPickedValidator] (hotkey + identity); the ViewModel
+         * observes via [StakingRouter.subtensorSelectedValidatorFlow].
          */
-        const val KEY_SELECTED_VALIDATOR_HOTKEY = "subtensor_setup_selected_hotkey"
+        const val KEY_SELECTED_VALIDATOR = "subtensor_setup_selected_validator"
 
         fun bundle(netuid: Int, subnetName: String? = null): Bundle = Bundle().apply {
             putInt(ARG_NETUID, netuid)
@@ -33,9 +35,12 @@ class SubtensorStakeSetupFragment : BaseFragment<SubtensorStakeSetupViewModel, F
     override fun initViews() {
         binder.subtensorStakeSetupToolbar.setHomeButtonListener { viewModel.backClicked() }
         binder.subtensorStakeSetupValidator.setOnClickListener { viewModel.selectValidatorClicked() }
-        binder.subtensorStakeSetupAmount.doAfterTextChanged { viewModel.amountChanged(it?.toString().orEmpty()) }
         binder.subtensorStakeSetupContinue.prepareForProgress(viewLifecycleOwner)
         binder.subtensorStakeSetupContinue.setOnClickListener { viewModel.continueClicked() }
+
+        // Min stake row is static — set once and forget. Mirrors iOS
+        // `TitleAmountView.dark()` rendered with `MIN_NOMINATOR_STAKE_RAO`.
+        binder.subtensorStakeSetupMinStake.showValue("0.01 TAO")
     }
 
     override fun inject() {
@@ -51,18 +56,18 @@ class SubtensorStakeSetupFragment : BaseFragment<SubtensorStakeSetupViewModel, F
     }
 
     override fun subscribe(viewModel: SubtensorStakeSetupViewModel) {
-        viewModel.canContinue.observe { enabled ->
-            binder.subtensorStakeSetupContinue.isEnabled = enabled
-        }
+        // Canonical Nova staking-flow wiring — same setup helpers used by
+        // bond_more, parachain start, nomination-pools setup, etc. so the
+        // amount/fee rows look + behave identically across all flows.
+        setupAmountChooser(viewModel.amountChooserMixin, binder.subtensorStakeSetupAmount)
+        setupFeeLoading(viewModel.originFeeMixin, binder.subtensorStakeSetupFee)
+
         viewModel.titleText.observe { binder.subtensorStakeSetupToolbar.setTitle(it) }
-        viewModel.selectedValidatorLabel.observe { label ->
-            binder.subtensorStakeSetupValidatorLabel.text = label
-        }
-        viewModel.submitting.observe { submitting ->
-            binder.subtensorStakeSetupContinue.setProgressState(submitting)
-        }
-        viewModel.toastEvents.observeEvent { message ->
-            android.widget.Toast.makeText(requireContext(), message, android.widget.Toast.LENGTH_LONG).show()
+        viewModel.validatorTargetModel.observe { binder.subtensorStakeSetupValidator.setModel(it) }
+        viewModel.canContinue.observe { binder.subtensorStakeSetupContinue.isEnabled = it }
+        viewModel.submitting.observe { binder.subtensorStakeSetupContinue.setProgressState(it) }
+        viewModel.toastEvents.observeEvent { msg ->
+            android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_LONG).show()
         }
     }
 }

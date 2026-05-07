@@ -4,10 +4,11 @@ import android.os.Bundle
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSubtensorUnstakeSetupBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.setupFeeLoading
 import java.math.BigInteger
 
 class SubtensorUnstakeSetupFragment : BaseFragment<SubtensorUnstakeSetupViewModel, FragmentSubtensorUnstakeSetupBinding>() {
@@ -28,9 +29,15 @@ class SubtensorUnstakeSetupFragment : BaseFragment<SubtensorUnstakeSetupViewMode
 
     override fun initViews() {
         binder.subtensorUnstakeSetupToolbar.setHomeButtonListener { viewModel.backClicked() }
-        binder.subtensorUnstakeSetupAmount.doAfterTextChanged { viewModel.amountChanged(it?.toString().orEmpty()) }
-        binder.subtensorUnstakeSetupMax.setOnClickListener { viewModel.maxClicked() }
-        binder.subtensorUnstakeSetupContinue.prepareForProgress(viewLifecycleOwner)
+        binder.subtensorUnstakeSetupAmountInput.amountInput.doAfterTextChanged {
+            viewModel.amountChanged(it?.toString().orEmpty())
+        }
+        // MaxAmountView wires the click via setMaxActionAvailability — set
+        // it once with our handler. The widget colours itself based on
+        // availability (blue when clickable, grey otherwise).
+        binder.subtensorUnstakeSetupMax.setMaxActionAvailability(
+            MaxActionAvailability.Available { viewModel.maxClicked() }
+        )
         binder.subtensorUnstakeSetupContinue.setOnClickListener { viewModel.continueClicked() }
     }
 
@@ -48,22 +55,50 @@ class SubtensorUnstakeSetupFragment : BaseFragment<SubtensorUnstakeSetupViewMode
     }
 
     override fun subscribe(viewModel: SubtensorUnstakeSetupViewModel) {
+        // Canonical Nova fee row — same wire-up as bond_more / parachain
+        // start. The mixin owns shimmer / loaded / error states.
+        setupFeeLoading(viewModel.feeMixin, binder.subtensorUnstakeSetupFee)
+
         viewModel.titleText.observe { binder.subtensorUnstakeSetupToolbar.setTitle(it) }
-        viewModel.validatorLabel.observe { binder.subtensorUnstakeSetupValidator.text = it }
-        viewModel.positionLabel.observe { binder.subtensorUnstakeSetupPosition.text = it }
+        viewModel.validatorTargetModel.observe { binder.subtensorUnstakeSetupValidator.setModel(it) }
+        viewModel.positionLabel.observe { binder.subtensorUnstakeSetupPosition.showValue(it) }
+        viewModel.maxLabel.observe { binder.subtensorUnstakeSetupMax.setMaxAmountDisplay(it) }
+
+        // Static chip — the ticker ("SN56" / "TAO") doesn't change after
+        // construction. Set once instead of plumbing a Flow.
+        binder.subtensorUnstakeSetupAmountInput.setAssetName(viewModel.ticker)
+        viewModel.tokenIcon.observe { icon ->
+            icon?.let { binder.subtensorUnstakeSetupAmountInput.loadAssetImage(it) }
+        }
+        viewModel.fiatAmount.observe { fiat ->
+            binder.subtensorUnstakeSetupAmountInput.setFiatAmount(fiat)
+        }
+
         viewModel.amount.observe { current ->
-            // Only push back into the EditText when programmatic — Max button.
-            // Avoid loops when the user is typing.
-            val edt = binder.subtensorUnstakeSetupAmount
+            val edt = binder.subtensorUnstakeSetupAmountInput.amountInput
             if (edt.text?.toString().orEmpty() != current) {
                 edt.setText(current)
                 edt.setSelection(current.length)
             }
         }
         viewModel.canContinue.observe { binder.subtensorUnstakeSetupContinue.isEnabled = it }
-        viewModel.submitting.observe { binder.subtensorUnstakeSetupContinue.setProgressState(it) }
         viewModel.toastEvents.observeEvent { msg ->
             android.widget.Toast.makeText(requireContext(), msg, android.widget.Toast.LENGTH_LONG).show()
         }
+        viewModel.unstakeAllPromptEvent.observeEvent { showUnstakeAllPrompt() }
+    }
+
+    private fun showUnstakeAllPrompt() {
+        // Mirrors the iOS relaychain "min stake not crossed" affordance:
+        // user is about to leave dust under the chain minimum, offer to
+        // unstake everything as a single action instead.
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(io.novafoundation.nova.feature_staking_impl.R.string.subtensor_unstake_remainder_title)
+            .setMessage(io.novafoundation.nova.feature_staking_impl.R.string.subtensor_unstake_remainder_message)
+            .setPositiveButton(io.novafoundation.nova.feature_staking_impl.R.string.subtensor_unstake_all) { _, _ ->
+                viewModel.confirmUnstakeAll()
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
     }
 }

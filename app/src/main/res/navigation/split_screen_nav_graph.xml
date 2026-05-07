@@ -740,7 +740,21 @@
         android:id="@+id/subtensorUnstakeSetupFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.setup.SubtensorUnstakeSetupFragment"
         android:label="SubtensorUnstakeSetupFragment"
-        tools:layout="@layout/fragment_subtensor_unstake_setup" />
+        tools:layout="@layout/fragment_subtensor_unstake_setup">
+        <action
+            android:id="@+id/action_subtensorUnstakeSetup_to_subtensorUnstakeConfirm"
+            app:destination="@id/subtensorUnstakeConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subtensorUnstakeConfirmFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.confirm.SubtensorUnstakeConfirmFragment"
+        android:label="SubtensorUnstakeConfirmFragment"
+        tools:layout="@layout/fragment_subtensor_unstake_confirm" />
 
     <fragment
         android:id="@+id/subtensorStakeTypeFragment"
@@ -789,6 +803,13 @@
             app:exitAnim="@anim/fragment_open_exit"
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_subtensorStakeSetup_to_subtensorStakeConfirm"
+            app:destination="@id/subtensorStakeConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
 
     <fragment
@@ -796,6 +817,12 @@
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorValidatorPickerFragment"
         android:label="SubtensorValidatorPickerFragment"
         tools:layout="@layout/fragment_subtensor_validator_picker" />
+
+    <fragment
+        android:id="@+id/subtensorStakeConfirmFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.confirm.SubtensorStakeConfirmFragment"
+        android:label="SubtensorStakeConfirmFragment"
+        tools:layout="@layout/fragment_subtensor_stake_confirm" />
 
     <fragment
         android:id="@+id/nodesFragment"
