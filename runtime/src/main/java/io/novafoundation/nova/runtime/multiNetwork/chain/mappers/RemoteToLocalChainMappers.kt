@@ -47,6 +47,11 @@ private const val SESSION_LENGTH = "sessionLength"
 private const val SESSIONS_PER_ERA = "sessionsPerEra"
 private const val TIMELINE_CHAIN = "timelineChain"
 
+// [TEMP-QA-HACK] EWX chain id — used to inject the staking theme color and
+// other settings until nova-utils chains.json carries them upstream.
+private const val EWX_CHAIN_ID = "5a51e04b88a4784d205091aa7bada002f3e5da3045e5b05655ee4db2589c33b5"
+private const val EWX_THEME_COLOR = "#A566FF"
+
 fun mapRemoteChainToLocal(
     chainRemote: ChainRemote,
     oldChain: ChainLocal?,
@@ -61,9 +66,11 @@ fun mapRemoteChainToLocal(
     }
 
     val additional = chainRemote.additional?.let {
+        val themeColor = (it[CHAIN_THEME_COLOR] as? String)
+            ?: EWX_THEME_COLOR.takeIf { chainRemote.chainId == EWX_CHAIN_ID }
         Chain.Additional(
             defaultTip = (it[CHAIN_ADDITIONAL_TIP] as? String)?.toBigInteger(),
-            themeColor = (it[CHAIN_THEME_COLOR] as? String),
+            themeColor = themeColor,
             stakingWiki = (it[CHAIN_STAKING_WIKI] as? String),
             defaultBlockTimeMillis = it[DEFAULT_BLOCK_TIME].asGsonParsedLongOrNull(),
             relaychainAsNative = it[RELAYCHAIN_AS_NATIVE] as? Boolean,
@@ -76,6 +83,25 @@ fun mapRemoteChainToLocal(
             sessionsPerEra = it[SESSIONS_PER_ERA].asGsonParsedIntOrNull(),
             timelineChain = it[TIMELINE_CHAIN] as? ChainId
         )
+    } ?: run {
+        // [TEMP-QA-HACK] EWX chain may arrive with no `additional` block at all.
+        if (chainRemote.chainId == EWX_CHAIN_ID) {
+            Chain.Additional(
+                defaultTip = null,
+                themeColor = EWX_THEME_COLOR,
+                stakingWiki = null,
+                defaultBlockTimeMillis = null,
+                relaychainAsNative = null,
+                stakingMaxElectingVoters = null,
+                feeViaRuntimeCall = null,
+                supportLedgerGenericApp = null,
+                identityChain = null,
+                disabledCheckMetadataHash = null,
+                sessionLength = null,
+                sessionsPerEra = null,
+                timelineChain = null
+            )
+        } else null
     }
 
     val chainLocal = with(chainRemote) {
@@ -164,7 +190,7 @@ fun mapRemoteAssetToLocal(
         chainId = chainRemote.chainId,
         name = assetRemote.name ?: chainRemote.name,
         priceId = assetRemote.priceId,
-        staking = mapRemoteStakingTypesToLocal(assetRemote.staking),
+        staking = applyEwtStakingOverride(assetRemote, mapRemoteStakingTypesToLocal(assetRemote.staking)),
         type = assetRemote.type,
         source = AssetSourceLocal.DEFAULT,
         buyProviders = gson.toJson(assetRemote.buyProviders),
@@ -242,6 +268,15 @@ private fun mapRemoteStakingTypesToLocal(stakingTypesRemote: List<String>?): Str
     }
 }
 
+// [TEMP-QA-HACK] EWT staking: inject "parachain-avn" for EWT on EWX
+// until nova-utils PR adds it to chains.json. Remove once the upstream
+// change ships and the app re-fetches the chain registry.
+private fun applyEwtStakingOverride(assetRemote: ChainAssetRemote, localStaking: String): String {
+    if (localStaking.isNotEmpty()) return localStaking
+    if (assetRemote.priceId != "energy-web-token") return localStaking
+    return mapStakingTypeToLocal(Chain.Asset.StakingType.PARACHAIN_AVN)
+}
+
 fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingType {
     return when (stakingString) {
         null -> Chain.Asset.StakingType.UNSUPPORTED
@@ -252,6 +287,7 @@ fun mapStakingStringToStakingType(stakingString: String?): Chain.Asset.StakingTy
         "turing" -> Chain.Asset.StakingType.TURING
         "aleph-zero" -> Chain.Asset.StakingType.ALEPH_ZERO
         "mythos" -> Chain.Asset.StakingType.MYTHOS
+        "parachain-avn" -> Chain.Asset.StakingType.PARACHAIN_AVN
         else -> Chain.Asset.StakingType.UNSUPPORTED
     }
 }
@@ -266,6 +302,7 @@ fun mapStakingTypeToStakingString(stakingType: Chain.Asset.StakingType): String?
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
         Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pools"
         Chain.Asset.StakingType.MYTHOS -> "mythos"
+        Chain.Asset.StakingType.PARACHAIN_AVN -> "parachain-avn"
     }
 }
 

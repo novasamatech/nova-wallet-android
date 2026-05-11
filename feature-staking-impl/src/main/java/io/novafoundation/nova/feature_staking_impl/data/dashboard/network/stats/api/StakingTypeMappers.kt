@@ -12,6 +12,7 @@ fun mapStakingTypeToSubQueryId(stakingType: Chain.Asset.StakingType): String? {
         Chain.Asset.StakingType.ALEPH_ZERO -> "aleph-zero"
         Chain.Asset.StakingType.NOMINATION_POOLS -> "nomination-pool"
         Chain.Asset.StakingType.MYTHOS -> "mythos"
+        Chain.Asset.StakingType.PARACHAIN_AVN -> null
     }
 }
 

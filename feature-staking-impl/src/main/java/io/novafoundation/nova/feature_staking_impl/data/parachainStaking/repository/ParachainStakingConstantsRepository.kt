@@ -30,25 +30,37 @@ class RuntimeParachainStakingConstantsRepository(
 ) : ParachainStakingConstantsRepository {
 
     override suspend fun maxRewardedDelegatorsPerCollator(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "MaxTopDelegationsPerCandidate")
+        // EWX (AvN) renames to MaxTopNominationsPerCandidate.
+        return numberConstantOrNull(chainId, "MaxTopNominationsPerCandidate")
+            ?: numberConstant(chainId, "MaxTopDelegationsPerCandidate")
     }
 
     override suspend fun minimumDelegation(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "MinDelegation")
+        // EWX (AvN) renames to MinNominationPerCollator.
+        return numberConstantOrNull(chainId, "MinNominationPerCollator")
+            ?: numberConstant(chainId, "MinDelegation")
     }
 
     override suspend fun minimumDelegatorStake(chainId: ChainId): BigInteger {
-        return numberConstantOrNull(chainId, "MinDelegatorStk")
+        return numberConstantOrNull(chainId, "MinNominationPerCollator")
+            ?: numberConstantOrNull(chainId, "MinDelegatorStk")
             // Starting from runtime 2500, MinDelegatorStk was removed and only MinDelegation remained
             ?: minimumDelegation(chainId)
     }
 
     override suspend fun delegationBondLessDelay(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "DelegationBondLessDelay")
+        // EWX (AvN) has no equivalent constant — the unbond delay is the
+        // `Delay` storage value (~2 eras). The reward calculator uses this
+        // delay for display only, so fall back to 2 if the constant is
+        // absent. A precise on-chain read would require storage access
+        // outside this repository's surface.
+        return numberConstantOrNull(chainId, "DelegationBondLessDelay") ?: BigInteger.TWO
     }
 
     override suspend fun maxDelegationsPerDelegator(chainId: ChainId): BigInteger {
-        return numberConstant(chainId, "MaxDelegationsPerDelegator")
+        // EWX (AvN) renames to MaxNominationsPerNominator.
+        return numberConstantOrNull(chainId, "MaxNominationsPerNominator")
+            ?: numberConstant(chainId, "MaxDelegationsPerDelegator")
     }
 
     private suspend fun numberConstant(chainId: ChainId, name: String): BigInteger {

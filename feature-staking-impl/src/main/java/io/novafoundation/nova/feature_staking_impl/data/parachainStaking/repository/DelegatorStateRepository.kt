@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
+import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
@@ -68,7 +69,9 @@ class RealDelegatorStateRepository(
 
     override fun observeDelegatorState(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): Flow<DelegatorState> {
         return localStorage.subscribe(chain.id) {
-            runtime.metadata.parachainStaking().storage("DelegatorState").observe(
+            val parachainStaking = runtime.metadata.parachainStaking()
+            val storageName = if (parachainStaking.hasStorage("NominatorState")) "NominatorState" else "DelegatorState"
+            parachainStaking.storage(storageName).observe(
                 accountId,
                 binding = { bindDelegatorState(it, accountId, chain, chainAsset) }
             )
@@ -77,7 +80,9 @@ class RealDelegatorStateRepository(
 
     override suspend fun getDelegationState(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): DelegatorState {
         return localStorage.query(chain.id) {
-            runtime.metadata.parachainStaking().storage("DelegatorState").query(
+            val parachainStaking = runtime.metadata.parachainStaking()
+            val storageName = if (parachainStaking.hasStorage("NominatorState")) "NominatorState" else "DelegatorState"
+            parachainStaking.storage(storageName).query(
                 accountId,
                 binding = { bindDelegatorState(it, accountId, chain, chainAsset) }
             )

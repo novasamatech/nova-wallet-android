@@ -21,6 +21,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN_AVN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
@@ -179,7 +180,7 @@ fun Chain.Asset.StakingType.group(): StakingTypeGroup {
     return when (this) {
         UNSUPPORTED -> StakingTypeGroup.UNSUPPORTED
         RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> StakingTypeGroup.RELAYCHAIN
-        PARACHAIN, TURING -> StakingTypeGroup.PARACHAIN
+        PARACHAIN, TURING, PARACHAIN_AVN -> StakingTypeGroup.PARACHAIN
         MYTHOS -> StakingTypeGroup.MYTHOS
         NOMINATION_POOLS -> StakingTypeGroup.NOMINATION_POOL
     }

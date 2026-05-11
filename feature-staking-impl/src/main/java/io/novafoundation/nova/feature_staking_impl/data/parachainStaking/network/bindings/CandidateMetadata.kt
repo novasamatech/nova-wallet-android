@@ -57,12 +57,17 @@ fun CandidateMetadata.minimumStakeToGetRewards(techMinimumStake: Balance): Balan
 
 fun bindCandidateMetadata(decoded: Any?): CandidateMetadata {
     return decoded.castToStruct().let { struct ->
+        val nominationCount: Any? = struct.mapping["delegationCount"] ?: struct.mapping["nominationCount"]
+        val lowestBottom: Any? = struct.mapping["lowestBottomDelegationAmount"] ?: struct.mapping["lowestBottomNominationAmount"]
+        val lowestTop: Any? = struct.mapping["lowestTopDelegationAmount"] ?: struct.mapping["lowestTopNominationAmount"]
+        val highestBottom: Any? = struct.mapping["highestBottomDelegationAmount"] ?: struct.mapping["highestBottomNominationAmount"]
+
         CandidateMetadata(
             totalCounted = bindNumber(struct["totalCounted"]),
-            delegationCount = bindNumber(struct["delegationCount"]),
-            lowestBottomDelegationAmount = bindNumber(struct["lowestBottomDelegationAmount"]),
-            lowestTopDelegationAmount = bindNumber(struct["lowestTopDelegationAmount"]),
-            highestBottomDelegationAmount = bindNumber(struct["highestBottomDelegationAmount"]),
+            delegationCount = bindNumber(nominationCount),
+            lowestBottomDelegationAmount = bindNumber(lowestBottom),
+            lowestTopDelegationAmount = bindNumber(lowestTop),
+            highestBottomDelegationAmount = bindNumber(highestBottom),
             topCapacity = bindCollectionEnum(struct["topCapacity"]),
             bottomCapacity = bindCollectionEnum(struct["bottomCapacity"]),
             status = bindCollectionEnum(struct["status"])
