@@ -8,6 +8,8 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.MoreSta
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingDApp
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.notices.model.StakingNotice
+import io.novafoundation.nova.feature_staking_impl.data.notices.repository.StakingNoticesRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
@@ -17,6 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.m
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -28,17 +32,27 @@ class MoreStakingOptionsViewModel(
     private val stakingSharedState: StakingSharedState,
     private val presentationMapper: StakingDashboardPresentationMapper,
     private val stakingRouter: StakingRouter,
+    private val stakingNoticesRepository: StakingNoticesRepository,
 ) : BaseViewModel() {
 
     init {
         syncDApps()
+        launch {
+            runCatching { stakingNoticesRepository.syncStakingNotices() }
+        }
     }
 
     private val moreStakingOptionsFlow = interactor.moreStakingOptionsFlow()
         .shareInBackground()
 
-    val moreStakingOptionsUiFlow = moreStakingOptionsFlow
+    private val noticesFlow = stakingNoticesRepository.observeStakingNotices()
+        .shareInBackground()
+
+    private val moreStakingOptionsUiWithoutNotices = moreStakingOptionsFlow
         .map(::mapMoreOptionsToUi)
+
+    val moreStakingOptionsUiFlow = moreStakingOptionsUiWithoutNotices
+        .combine(noticesFlow) { model, notices -> applyNotices(model, notices) }
         .shareInBackground()
 
     fun onInAppStakingItemClicked(index: Int) = launch {
@@ -58,6 +72,13 @@ class MoreStakingOptionsViewModel(
 
     private fun syncDApps() = launch {
         interactor.syncDapps()
+    }
+
+    private fun applyNotices(model: MoreStakingOptionsModel, notices: Map<ChainId, StakingNotice>): MoreStakingOptionsModel {
+        return MoreStakingOptionsModel(
+            inAppStaking = model.inAppStaking.map { item -> item.copy(notice = notices[item.assetId.chainId]) },
+            browserStaking = model.browserStaking
+        )
     }
 
     private fun mapMoreOptionsToUi(moreStakingOptions: MoreStakingOptions): MoreStakingOptionsModel {

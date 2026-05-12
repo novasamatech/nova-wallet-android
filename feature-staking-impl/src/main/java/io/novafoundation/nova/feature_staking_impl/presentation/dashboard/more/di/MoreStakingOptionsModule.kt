@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.data.notices.repository.StakingNoticesRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.MoreStakingOptionsViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
@@ -32,7 +33,8 @@ class MoreStakingOptionsModule {
         stakingSharedState: StakingSharedState,
         presentationMapperFactory: StakingDashboardPresentationMapperFactory,
         startMultiStakingRouter: StartMultiStakingRouter,
-        maskableValueFormatterFactory: MaskableValueFormatterFactory
+        maskableValueFormatterFactory: MaskableValueFormatterFactory,
+        stakingNoticesRepository: StakingNoticesRepository
     ): ViewModel {
         return MoreStakingOptionsViewModel(
             interactor = interactor,
@@ -41,7 +43,8 @@ class MoreStakingOptionsModule {
             stakingRouter = stakingRouter,
             stakingSharedState = stakingSharedState,
             // Show all items in more staking options
-            presentationMapper = presentationMapperFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED))
+            presentationMapper = presentationMapperFactory.create(maskableValueFormatterFactory.create(MaskingMode.DISABLED)),
+            stakingNoticesRepository = stakingNoticesRepository
         )
     }
 

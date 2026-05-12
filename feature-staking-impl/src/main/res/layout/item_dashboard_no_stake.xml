@@ -46,6 +46,18 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
+    <io.novafoundation.nova.feature_staking_impl.presentation.common.view.StakingNoticeChipView
+        android:id="@+id/noStakeRowNoticeChip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/item_dashboard_no_stake_token_name_container"
+        app:layout_constraintStart_toEndOf="@+id/item_dashboard_no_stake_token_name_container"
+        app:layout_constraintTop_toTopOf="@+id/item_dashboard_no_stake_token_name_container"
+        tools:text="Notice"
+        tools:visibility="visible" />
+
     <io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.StakingTypeBadgeView
         android:id="@+id/itemDashboardNoStakeStakingType"
         style="@style/Widget.Nova.StakingTypeBadge.Small"
@@ -54,7 +66,7 @@
         android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="@+id/item_dashboard_no_stake_token_name_container"
         app:layout_constraintEnd_toStartOf="@+id/itemDashboardNoStakeEarningsContainer"
-        app:layout_constraintStart_toEndOf="@+id/item_dashboard_no_stake_token_name_container"
+        app:layout_constraintStart_toEndOf="@+id/noStakeRowNoticeChip"
         app:layout_constraintTop_toTopOf="@+id/item_dashboard_no_stake_token_name_container"
         tools:text="@string/nomination_pools_direct" />
 

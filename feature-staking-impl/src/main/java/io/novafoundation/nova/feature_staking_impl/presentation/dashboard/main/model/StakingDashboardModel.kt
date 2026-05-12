@@ -34,6 +34,7 @@ class StakingDashboardModel(
         val tokenName: SyncingData<String>,
         val availableBalance: CharSequence?,
         val earnings: ExtendedLoadingState<SyncingData<String>>,
+        val notice: StakingNotice? = null,
     ) : BaseItem
 
     interface BaseItem {
