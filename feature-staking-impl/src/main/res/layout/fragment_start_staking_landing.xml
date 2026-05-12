@@ -16,6 +16,19 @@
         app:homeButtonIcon="@drawable/ic_close"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <io.novafoundation.nova.feature_staking_impl.presentation.common.view.StakingNoticeBlockView
+        android:id="@+id/startStakingLandingNoticeBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/startStakingLandingToolbar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:visibility="visible" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/startStakingLandingList"
         android:layout_width="match_parent"
@@ -27,7 +40,7 @@
         android:paddingBottom="28dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@+id/startStakingLandingButtonContainer"
-        app:layout_constraintTop_toBottomOf="@+id/startStakingLandingToolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/startStakingLandingNoticeBlock" />
 
     <LinearLayout
         android:id="@+id/startStakingLandingButtonContainer"

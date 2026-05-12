@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitableActionFlow
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -66,6 +67,11 @@ class StartStakingLandingFragment :
         observeValidations(viewModel)
 
         viewModel.isContinueButtonLoading.observe(binder.startStakingLandingButton::setProgressState)
+
+        viewModel.noticeForCurrentChain.observe { notice ->
+            binder.startStakingLandingNoticeBlock.setVisible(notice != null)
+            notice?.let { binder.startStakingLandingNoticeBlock.bind(it) }
+        }
 
         viewModel.modelFlow.observe {
             val isLoaded = it.isLoaded()
