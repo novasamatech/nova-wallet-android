@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
 import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.notices.model.StakingNotice
+import io.novafoundation.nova.feature_staking_impl.data.notices.repository.StakingNoticesRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.ComponentHostContext
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.alerts.AlertsComponentFactory
@@ -28,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -56,6 +59,7 @@ class StakingViewModel(
     private val resourceManager: ResourceManager,
     private val externalActionsMixin: ExternalActions.Presentation,
     private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
+    private val stakingNoticesRepository: StakingNoticesRepository,
     stakingUpdateSystem: UpdateSystem,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -92,6 +96,12 @@ class StakingViewModel(
     val yourPoolComponent = yourPoolComponentFactory.create(componentHostContext)
 
     private val dateFormatter = getChainMigrationDateFormat()
+
+    val noticeForCurrentChain: Flow<StakingNotice?> = combine(
+        stakingNoticesRepository.observeStakingNotices(),
+        stakingSharedState.selectedOption
+    ) { notices, option -> notices[option.assetWithChain.chain.id] }
+        .shareInBackground()
 
     val migrationAlertFlow = selectedAssetFlow.flatMapLatest {
         val chainAsset = it.token.configuration
@@ -133,6 +143,8 @@ class StakingViewModel(
     init {
         stakingUpdateSystem.start()
             .launchIn(this)
+
+        launch { runCatching { stakingNoticesRepository.syncStakingNotices() } }
     }
 
     private fun learnMoreMigrationClicked(config: ChainMigrationConfig) {

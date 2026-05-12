@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.unbonding.UnbondingComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.userRewards.UserRewardsComponentFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.YourPoolComponentFactory
+import io.novafoundation.nova.feature_staking_impl.data.notices.repository.StakingNoticesRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 
@@ -52,7 +53,8 @@ class StakingModule {
         stakingSharedState: StakingSharedState,
         resourceManager: ResourceManager,
         externalActionsMixin: ExternalActions.Presentation,
-        chainMigrationInfoUseCase: ChainMigrationInfoUseCase
+        chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
+        stakingNoticesRepository: StakingNoticesRepository
     ): ViewModel {
         return StakingViewModel(
             selectedAccountUseCase = selectedAccountUseCase,
@@ -70,7 +72,8 @@ class StakingModule {
             stakingSharedState = stakingSharedState,
             resourceManager = resourceManager,
             externalActionsMixin = externalActionsMixin,
-            chainMigrationInfoUseCase = chainMigrationInfoUseCase
+            chainMigrationInfoUseCase = chainMigrationInfoUseCase,
+            stakingNoticesRepository = stakingNoticesRepository
         )
     }
 
