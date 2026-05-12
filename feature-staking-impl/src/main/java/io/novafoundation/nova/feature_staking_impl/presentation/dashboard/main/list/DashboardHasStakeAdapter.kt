@@ -38,6 +38,7 @@ class DashboardHasStakeAdapter(
                 HasStakeItem::assetIcon -> holder.bindAssetIcon(item)
                 HasStakeItem::assetLabel -> holder.bindAssetLabel(item)
                 HasStakeItem::stakingTypeBadge -> holder.bindStakingType(item)
+                HasStakeItem::notice -> holder.bindNotice(item)
             }
         }
     }
@@ -60,6 +61,7 @@ class DashboardHasStakeViewHolder(
         bindAssetIcon(model)
         bindAssetLabel(model)
         bindStakingType(model)
+        bindNotice(model)
     }
 
     fun bindAssetIcon(model: HasStakeItem) {
@@ -89,6 +91,10 @@ class DashboardHasStakeViewHolder(
     fun bindStatus(model: HasStakeItem) {
         containerView.setStatus(model.status)
     }
+
+    fun bindNotice(model: HasStakeItem) {
+        containerView.setNotice(model.notice)
+    }
 }
 
 private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem>() {
@@ -101,7 +107,8 @@ private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem
         HasStakeItem::rewards,
         HasStakeItem::assetIcon,
         HasStakeItem::assetLabel,
-        HasStakeItem::stakingTypeBadge
+        HasStakeItem::stakingTypeBadge,
+        HasStakeItem::notice
     )
 
     override fun areItemsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.notices.repository.StakingNoticesRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
@@ -41,7 +42,8 @@ class StakingDashboardModule {
         startMultiStakingRouter: StartMultiStakingRouter,
         valueFormatterProvider: MaskableValueFormatterProvider,
         amountFormatter: AmountFormatter,
-        assetIconProvider: AssetIconProvider
+        assetIconProvider: AssetIconProvider,
+        stakingNoticesRepository: StakingNoticesRepository
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
@@ -55,7 +57,8 @@ class StakingDashboardModule {
             startMultiStakingRouter = startMultiStakingRouter,
             maskableValueFormatterProvider = valueFormatterProvider,
             amountFormatter = amountFormatter,
-            assetIconProvider = assetIconProvider
+            assetIconProvider = assetIconProvider,
+            stakingNoticesRepository = stakingNoticesRepository
         )
     }
 

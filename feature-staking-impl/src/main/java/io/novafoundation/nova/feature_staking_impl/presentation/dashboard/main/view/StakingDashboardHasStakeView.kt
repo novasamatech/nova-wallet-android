@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
@@ -21,6 +22,8 @@ import io.novafoundation.nova.common.utils.unsafeLazy
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardHasStakeBinding
+import io.novafoundation.nova.feature_staking_impl.data.notices.model.StakingNotice
+import io.novafoundation.nova.feature_staking_impl.presentation.common.view.StakingNoticeStripView
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -36,6 +39,10 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
     private val imageLoader: ImageLoader
 
     private val binder = ItemDashboardHasStakeBinding.inflate(inflater(), this)
+
+    private val noticeStripView: StakingNoticeStripView by unsafeLazy {
+        findViewById(R.id.stakingActiveCardNoticeStrip)
+    }
 
     private val rewardsAmountGroup by unsafeLazy {
         ShimmerableGroup(
@@ -115,5 +122,14 @@ class StakingDashboardHasStakeView @JvmOverloads constructor(
 
     fun setStakingTypeBadge(model: StakingTypeModel?) {
         binder.itemDashboardHasStakeStakingType.setModelOrHide(model)
+    }
+
+    fun setNotice(notice: StakingNotice?) {
+        if (notice != null) {
+            noticeStripView.bind(notice)
+            noticeStripView.visibility = View.VISIBLE
+        } else {
+            noticeStripView.visibility = View.GONE
+        }
     }
 }

@@ -4,6 +4,7 @@ import androidx.annotation.DrawableRes
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.masking.MaskableModel
 import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.feature_staking_impl.data.notices.model.StakingNotice
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.SyncingData
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -23,6 +24,7 @@ class StakingDashboardModel(
         val stake: SyncingData<MaskableModel<AmountModel>>,
         val status: ExtendedLoadingState<SyncingData<StakeStatusModel>>,
         val earnings: ExtendedLoadingState<SyncingData<String>>,
+        val notice: StakingNotice? = null,
     ) : BaseItem
 
     data class NoStakeItem(
