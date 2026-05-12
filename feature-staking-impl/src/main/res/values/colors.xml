@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Notice strip / block severity colors.
+         CRITICAL (red): references common text_negative + error_block_background.
+         INFO (yellow): references common text_warning + warning_block_background. -->
+    <color name="notice_critical_bg">@color/error_block_background</color>
+    <color name="notice_critical_text">@color/text_negative</color>
+    <color name="notice_info_bg">@color/warning_block_background</color>
+    <color name="notice_info_text">@color/text_warning</color>
+</resources>
