@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStartStakingLandingBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.critical.StartStakingCriticalNoticeBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 class StartStakingLandingFragment :
@@ -112,6 +113,14 @@ class StartStakingLandingFragment :
                     action.onSuccess(Unit)
                 }
             }
+        }
+
+        viewModel.showCriticalNoticeEvent.observe { notice ->
+            StartStakingCriticalNoticeBottomSheet(
+                context = requireContext(),
+                notice = notice,
+                onContinueClicked = { viewModel.userConfirmedCriticalNotice() }
+            ).show()
         }
     }
 

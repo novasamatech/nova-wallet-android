@@ -72,6 +72,7 @@ import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
@@ -167,19 +168,40 @@ class StartStakingLandingViewModel(
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
 
+    private val _showCriticalNoticeEvent = MutableSharedFlow<StakingNotice>(extraBufferCapacity = 1)
+    val showCriticalNoticeEvent: Flow<StakingNotice> = _showCriticalNoticeEvent
+
+    @Volatile
+    private var currentNotice: StakingNotice? = null
+
     init {
         launchSync()
 
         closeOnStakingStarted()
 
         launch { runCatching { stakingNoticesRepository.syncStakingNotices() } }
+
+        launch { noticeForCurrentChain.collect { currentNotice = it } }
     }
 
     fun back() {
         router.back()
     }
 
-    fun continueClicked() = launch {
+    fun continueClicked() {
+        val notice = currentNotice
+        if (notice?.severity == StakingNotice.Severity.CRITICAL) {
+            launch { _showCriticalNoticeEvent.emit(notice) }
+            return
+        }
+        proceedToStakeSetup()
+    }
+
+    fun userConfirmedCriticalNotice() {
+        proceedToStakeSetup()
+    }
+
+    private fun proceedToStakeSetup() = launch {
         val interactor = startStakingInteractor.first()
 
         val validationSystem = interactor.validationSystem()
