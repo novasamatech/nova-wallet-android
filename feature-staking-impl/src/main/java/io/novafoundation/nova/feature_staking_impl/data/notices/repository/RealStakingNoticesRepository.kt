@@ -26,9 +26,10 @@ class RealStakingNoticesRepository(
     private val sharedPreferencesLanguageKey: String,
     private val remoteUrl: String,
     private val timeProvider: () -> Long = { System.currentTimeMillis() },
+    externalScope: CoroutineScope? = null,
 ) : StakingNoticesRepository {
 
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val scope = externalScope ?: CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val flow = MutableSharedFlow<Map<ChainId, StakingNotice>>(
         replay = 1,
