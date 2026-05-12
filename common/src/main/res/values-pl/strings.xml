@@ -2067,4 +2067,5 @@
     <string name="yield_boost_stake_increase_time">Czas zwiększenia Stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost automatycznie Stake %s wszystkie moje przenośne tokeny powyżej %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="staking_notice_chip_label">Uwaga</string>
 </resources>

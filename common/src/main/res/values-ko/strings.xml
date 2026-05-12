@@ -2025,4 +2025,5 @@
     <string name="yield_boost_stake_increase_time">Stake 증가 시간</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost가 %s 모든 양도 가능한 토큰을 %s 이상 자동으로 Stake 합니다</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="staking_notice_chip_label">안내</string>
 </resources>
