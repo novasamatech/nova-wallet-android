@@ -16,6 +16,7 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.BDDMockito.given
 import org.mockito.BDDMockito.never
 import org.mockito.BDDMockito.times
@@ -120,6 +121,46 @@ class RealStakingNoticesRepositoryTest {
         repo.syncStakingNotices()
         val after = repo.observeStakingNotices().firstOrNull()
         assertEquals(initial, after)
+    }
+
+    @Test
+    fun `decode uses SharedPreferences language code, picks ru from locale map`() = runTest {
+        val localeMapJson = """
+            [
+              {
+                "chainId": "f3c7ad88f6a80f366c4be216691411ef0622e8b809b1046ea297ef106058d4eb",
+                "severity": "info",
+                "shortText": { "en": "EN", "ru": "RU short" },
+                "longText":  { "en": "EN long", "ru": "RU long" }
+              }
+            ]
+        """.trimIndent()
+        given(sharedPreferences.getString(eq("lang"), Mockito.isNull())).willReturn("ru")
+        given(diskCache.read()).willReturn(localeMapJson)
+        val repo = newRepo()
+        advanceUntilIdle()
+        val map = repo.observeStakingNotices().firstOrNull()
+        assertEquals("RU short", map?.values?.first()?.shortText)
+    }
+
+    @Test
+    fun `Android pt language code is mapped to JSON pt-PT key`() = runTest {
+        val localeMapJson = """
+            [
+              {
+                "chainId": "f3c7ad88f6a80f366c4be216691411ef0622e8b809b1046ea297ef106058d4eb",
+                "severity": "info",
+                "shortText": { "en": "EN", "pt-PT": "PT short" },
+                "longText":  { "en": "EN long", "pt-PT": "PT long" }
+              }
+            ]
+        """.trimIndent()
+        given(sharedPreferences.getString(eq("lang"), Mockito.isNull())).willReturn("pt")
+        given(diskCache.read()).willReturn(localeMapJson)
+        val repo = newRepo()
+        advanceUntilIdle()
+        val map = repo.observeStakingNotices().firstOrNull()
+        assertEquals("PT short", map?.values?.first()?.shortText)
     }
 
     @Test

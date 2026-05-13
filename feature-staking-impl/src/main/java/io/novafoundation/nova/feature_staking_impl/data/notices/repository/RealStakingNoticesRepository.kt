@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.Locale
 
 class RealStakingNoticesRepository(
     private val api: StakingNoticesApi,
@@ -74,12 +73,32 @@ class RealStakingNoticesRepository(
     private fun decode(rawJson: String): Map<ChainId, StakingNotice>? {
         return runCatching {
             val dtos = gson.fromJson(rawJson, Array<StakingNoticeDto>::class.java) ?: emptyArray()
-            val locale = Locale.getDefault().toLanguageTag()
+            val locale = preferredLocale()
             dtos.mapNotNull { it.toDomain(locale) }.associateBy { it.chainId }
         }.getOrNull()
     }
 
+    /**
+     * Reads Nova's selected language directly from SharedPreferences (NOT Locale.getDefault(),
+     * which can lag behind ContextManager.updateResources()). Maps Android's iso639-only codes
+     * to the BCP-47 tags used as JSON keys (the JSON ships iOS-style "pt-PT", "zh-Hans", "id";
+     * Android stores "pt", "zh", "in" respectively). The iterative LocaleResolver then handles
+     * the full cascade.
+     */
+    private fun preferredLocale(): String {
+        val androidCode = sharedPreferences.getString(sharedPreferencesLanguageKey, null) ?: "en"
+        return ANDROID_TO_JSON_LOCALE[androidCode] ?: androidCode
+    }
+
     companion object {
         private const val DEBOUNCE_MILLIS = 5 * 60 * 1000L
+
+        // Map Android-stored iso639 codes to the BCP-47-style keys used in nova-utils JSON.
+        // Cross-platform JSON convention follows iOS LocalizationManager naming.
+        private val ANDROID_TO_JSON_LOCALE = mapOf(
+            "pt" to "pt-PT",
+            "zh" to "zh-Hans",
+            "in" to "id",
+        )
     }
 }
