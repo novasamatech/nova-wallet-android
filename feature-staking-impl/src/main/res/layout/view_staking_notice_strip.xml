@@ -8,11 +8,11 @@
         android:layout_width="match_parent"
         android:layout_height="28dp"
         android:gravity="center"
-        android:textSize="13sp"
-        android:textStyle="bold"
+        android:textSize="14sp"
+        android:fontFamily="sans-serif-medium"
         android:maxLines="1"
         android:ellipsize="end"
-        android:paddingHorizontal="12dp"
+        android:paddingHorizontal="14dp"
         tools:text="Manta Atlantic critical notice short text" />
 
 </merge>

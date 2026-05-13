@@ -138,7 +138,7 @@
         android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stakingActiveCardNoticeStrip"
         app:layout_constraintWidth_min="130dp"
         tools:background="@color/block_background_dark" />
 
@@ -150,7 +150,7 @@
         android:layout_marginEnd="14dp"
         android:src="@drawable/ic_chevron_right"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/stakingActiveCardNoticeStrip"
         app:tint="@color/icon_secondary" />
 
     <com.facebook.shimmer.ShimmerFrameLayout
