@@ -206,10 +206,13 @@ class StakingDashboardViewModel(
         notices: Map<ChainId, StakingNotice>
     ): ExtendedLoadingState<StakingDashboardModel> {
         return dashboardLoading.map { model ->
-            val enriched = model.hasStakeItems.map { item ->
+            val enrichedHasStake = model.hasStakeItems.map { item ->
                 item.copy(notice = notices[item.assetId.chainId])
             }
-            StakingDashboardModel(hasStakeItems = enriched, noStakeItems = model.noStakeItems)
+            val enrichedNoStake = model.noStakeItems.map { item ->
+                item.copy(notice = notices[item.assetId.chainId])
+            }
+            StakingDashboardModel(hasStakeItems = enrichedHasStake, noStakeItems = enrichedNoStake)
         }
     }
 
