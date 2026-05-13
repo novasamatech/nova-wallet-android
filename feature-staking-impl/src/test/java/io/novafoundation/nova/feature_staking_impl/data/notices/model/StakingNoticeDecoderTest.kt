@@ -54,6 +54,13 @@ class StakingNoticeDecoderTest {
     }
 
     @Test
+    fun `locale strips multiple region segments iteratively`() {
+        // zh-Hans-CN should resolve via zh-Hans, not skip straight to en.
+        val notices = decode("notice_locale_map_with_intermediate.json", locale = "zh-Hans-CN")
+        assertEquals("ZH-HANS", notices[0].shortText)
+    }
+
+    @Test
     fun `past endDate is filtered out`() {
         val notices = decode("notice_past_enddate.json", locale = "en", today = LocalDate.of(2026, 5, 12))
         assertTrue("past-endDate notice should be filtered", notices.isEmpty())
