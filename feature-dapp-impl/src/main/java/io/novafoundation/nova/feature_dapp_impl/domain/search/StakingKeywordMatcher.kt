@@ -7,8 +7,7 @@ object StakingKeywordMatcher {
         "validate email", "validate form", "james bond"
     )
 
-    private val LATIN_KEYWORDS = listOf(
-        // English
+    private val ENGLISH_KEYWORDS = listOf(
         "staking", "stake", "staked", "unstake", "unstaking", "restake", "restaking",
         "nominate", "nominator", "nomination", "nomination pool", "nom pool",
         "validator", "validators", "validate", "collator", "collators",
@@ -21,7 +20,10 @@ object StakingKeywordMatcher {
         "earn rewards", "earn dot", "earn ksm", "passive income",
         "stake tokens", "stake dot", "stake ksm",
         "parachain staking", "dapp staking", "manage staking",
-        "my validators", "my nominations",
+        "my validators", "my nominations"
+    )
+
+    private val MULTILINGUAL_KEYWORDS = listOf(
         // Russian
         "\u0441\u0442\u0435\u0439\u043a\u0438\u043d\u0433", "\u0441\u0442\u0435\u0439\u043a\u0430\u0442\u044c",
         "\u043d\u0430\u0433\u0440\u0430\u0434\u044b", "\u0432\u0430\u043b\u0438\u0434\u0430\u0442\u043e\u0440",
@@ -83,10 +85,17 @@ object StakingKeywordMatcher {
         // Check false positives first
         if (FALSE_POSITIVE_PATTERNS.any { trimmed.contains(it) }) return false
 
-        // Latin keywords: exact match or query starts with keyword + space
-        if (LATIN_KEYWORDS.any { keyword -> trimmed == keyword || trimmed.startsWith("$keyword ") }) return true
+        // English keywords: exact match or query starts with keyword + space.
+        // Strict matching avoids false positives on common short English words
+        // without needing every excluded form in the FALSE_POSITIVE_PATTERNS list.
+        if (ENGLISH_KEYWORDS.any { keyword -> trimmed == keyword || trimmed.startsWith("$keyword ") }) return true
 
-        // CJK/non-Latin keywords: contains
+        // Non-English Latin and Cyrillic keywords: substring match.
+        // Handles inflection (Russian declensions), agglutination (Turkish),
+        // and arbitrary keyword position within a query.
+        if (MULTILINGUAL_KEYWORDS.any { keyword -> trimmed.contains(keyword) }) return true
+
+        // CJK keywords: substring match
         if (CJK_KEYWORDS.any { keyword -> trimmed.contains(keyword) }) return true
 
         return false
