@@ -2039,4 +2039,11 @@
     <string name="yield_boost_stake_increase_time">Tempo de aumento de stake</string>
     <string name="yield_boost_terms" formatted="false">O Impulso de Rendimento irá automaticamente fazer o stake de %s de todos os meus tokens transferíveis acima de %s</string>
     <string name="yiled_boost_yield_boosted">Com Impulso de Rendimento</string>
+    <string name="dapp_search_staking_banner_text">Quer fazer staking? A Nova Wallet tem staking integrado.</string>
+    <string name="dapp_search_staking_banner_button">Ir para o Staking</string>
+    <string name="dapp_staking_competitor_warning_title">Aviso</string>
+    <string name="dapp_staking_competitor_warning_subtitle">Os sites de staking de terceiros tornam-se frequentemente obsoletos. Recomendamos a utilização das funcionalidades de staking integradas da Nova Wallet.</string>
+    <string name="dapp_staking_competitor_go_to_stake">Ir para o Staking</string>
+    <string name="dapp_staking_competitor_advanced">Avançado</string>
+    <string name="dapp_staking_competitor_continue">Continuar para o site</string>
 </resources>

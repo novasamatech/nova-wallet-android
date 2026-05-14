@@ -2067,4 +2067,11 @@
     <string name="yield_boost_stake_increase_time">Частота увеличения стейка</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost будет автоматически стейкать %s все мои переводные токены выше %s</string>
     <string name="yiled_boost_yield_boosted">С Yield Boost</string>
+    <string name="dapp_search_staking_banner_text">Хотите застейкать? В Nova Wallet встроен стейкинг.</string>
+    <string name="dapp_search_staking_banner_button">Перейти к стейкингу</string>
+    <string name="dapp_staking_competitor_warning_title">Уведомление</string>
+    <string name="dapp_staking_competitor_warning_subtitle">Сторонние сайты стейкинга часто перестают поддерживаться. Рекомендуем использовать встроенные функции стейкинга Nova Wallet.</string>
+    <string name="dapp_staking_competitor_go_to_stake">Перейти к стейкингу</string>
+    <string name="dapp_staking_competitor_advanced">Дополнительно</string>
+    <string name="dapp_staking_competitor_continue">Перейти на сайт</string>
 </resources>

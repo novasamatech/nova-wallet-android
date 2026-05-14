@@ -2039,4 +2039,11 @@
     <string name="yield_boost_stake_increase_time">Tempo di aumento dello stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost stakerà automaticamente %s tutti i miei token trasferibili oltre %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="dapp_search_staking_banner_text">Vuoi fare staking? Nova Wallet ha lo staking integrato.</string>
+    <string name="dapp_search_staking_banner_button">Vai allo Staking</string>
+    <string name="dapp_staking_competitor_warning_title">Avviso</string>
+    <string name="dapp_staking_competitor_warning_subtitle">I siti di staking di terze parti diventano spesso obsoleti. Consigliamo di utilizzare le funzionalità di staking integrate di Nova Wallet.</string>
+    <string name="dapp_staking_competitor_go_to_stake">Vai allo Staking</string>
+    <string name="dapp_staking_competitor_advanced">Avanzato</string>
+    <string name="dapp_staking_competitor_continue">Continua al sito</string>
 </resources>

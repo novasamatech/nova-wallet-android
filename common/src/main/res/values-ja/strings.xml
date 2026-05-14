@@ -2025,4 +2025,11 @@
     <string name="yield_boost_stake_increase_time">Stake増加時間</string>
     <string name="yield_boost_terms" formatted="false">Yield Boostは自動的に%s私の全ての譲渡可能なトークンを%s以上ステークします</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="dapp_search_staking_banner_text">ステーキングをお考えですか?Nova Walletにはステーキング機能が組み込まれています。</string>
+    <string name="dapp_search_staking_banner_button">ステーキングへ</string>
+    <string name="dapp_staking_competitor_warning_title">お知らせ</string>
+    <string name="dapp_staking_competitor_warning_subtitle">サードパーティのステーキングサイトは非推奨になることがよくあります。Nova Walletの組み込みステーキング機能の利用をお勧めします。</string>
+    <string name="dapp_staking_competitor_go_to_stake">ステーキングへ</string>
+    <string name="dapp_staking_competitor_advanced">詳細</string>
+    <string name="dapp_staking_competitor_continue">サイトに進む</string>
 </resources>

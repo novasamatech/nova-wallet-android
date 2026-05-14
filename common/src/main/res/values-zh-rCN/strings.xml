@@ -2025,4 +2025,11 @@
     <string name="yield_boost_stake_increase_time">加注时间</string>
     <string name="yield_boost_terms" formatted="false">收益增强将自动加注我所有可转让代币中超过%s的%s</string>
     <string name="yiled_boost_yield_boosted">已增强收益</string>
+    <string name="dapp_search_staking_banner_text">想要质押?Nova Wallet 内置了质押功能。</string>
+    <string name="dapp_search_staking_banner_button">前往质押</string>
+    <string name="dapp_staking_competitor_warning_title">提示</string>
+    <string name="dapp_staking_competitor_warning_subtitle">第三方质押网站经常会被弃用。我们建议使用 Nova Wallet 的内置质押功能。</string>
+    <string name="dapp_staking_competitor_go_to_stake">前往质押</string>
+    <string name="dapp_staking_competitor_advanced">高级</string>
+    <string name="dapp_staking_competitor_continue">继续访问网站</string>
 </resources>
