@@ -47,14 +47,12 @@ class RealSwapConfirmationDetailsFormatter(
         val chainIn = chainRegistry.getChain(assetIn.chainId)
         val chainOut = chainRegistry.getChain(assetOut.chainId)
 
-        val displayRate = quote.swapRate()
-
         return SwapConfirmationDetailsModel(
             assets = SwapAssetsView.Model(
                 assetIn = formatAssetDetails(chainIn, assetIn, quote.planksIn),
                 assetOut = formatAssetDetails(chainOut, assetOut, quote.planksOut)
             ),
-            rate = formatRate(displayRate, assetIn, assetOut),
+            rate = formatRate(quote.swapRate(), assetIn, assetOut),
             priceDifference = formatPriceDifference(quote.priceImpact),
             slippage = slippage.formatPercents(),
             swapRouteModel = swapRouteFormatter.formatSwapRoute(quote),

@@ -1793,7 +1793,6 @@
     <string name="swap_price_difference_title">价格差异</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">两种不同加密货币之间的汇率。它表示您可以用一定数量的另一种加密货币交换获得多少加密货币。</string>
-    <string name="swap_rate_includes_fee_description">找到的最佳汇率，含 %s%% Nova Wallet 费用。</string>
     <string name="swap_network_fees_label">网络费用</string>
     <string name="swap_nova_fee_disclaimer">含 %s%% Nova 费用。</string>
     <string name="swap_rate_title">汇率</string>

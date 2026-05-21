@@ -42,6 +42,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
+import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -246,7 +248,7 @@ class SwapMainSettingsViewModel(
             is QuotingState.Loaded -> it.quote.involvesHydraSwap()
             is QuotingState.Default,
             is QuotingState.Error -> false
-            else -> null
+            is QuotingState.Loading -> null
         }
     }
         .distinctUntilChanged()
@@ -368,11 +370,9 @@ class SwapMainSettingsViewModel(
     }
 
     fun rateDetailsClicked() {
-        launch {
-            val includesFee = (quotingState.value as? QuotingState.Loaded)
-                ?.quote?.involvesHydraSwap() ?: false
-            launchSwapRateDescription(resourceManager, if (includesFee) NovaSwapCommission.FEE_PERCENT_DISPLAY else null)
-        }
+        val mode = (quotingState.value as? QuotingState.Loaded)?.quote?.swapRateDescriptionMode()
+            ?: SwapRateDescriptionMode.Default
+        launchSwapRateDescription(resourceManager, mode)
     }
 
     fun flipAssets() = launch {

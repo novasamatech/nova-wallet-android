@@ -26,6 +26,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionP
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
@@ -123,7 +124,7 @@ class SwapDetailViewModel(
     fun rateClicked() {
         descriptionBottomSheetLauncher.launchSwapRateDescription(
             resourceManager = resourceManager,
-            feePercentDisplay = null
+            mode = SwapRateDescriptionMode.Default,
         )
     }
 

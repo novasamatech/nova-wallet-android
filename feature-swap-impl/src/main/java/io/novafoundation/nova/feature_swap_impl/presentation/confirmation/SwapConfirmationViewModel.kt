@@ -34,6 +34,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
+import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
@@ -185,12 +186,9 @@ class SwapConfirmationViewModel(
         swapRouter.back()
     }
 
-    fun rateClicked() {
-        launch {
-            val state = confirmationStateFlow.first()
-            val includesFee = state.swapQuote.involvesHydraSwap()
-            launchSwapRateDescription(resourceManager, if (includesFee) NovaSwapCommission.FEE_PERCENT_DISPLAY else null)
-        }
+    fun rateClicked() = launchUnit {
+        val quote = confirmationStateFlow.first().swapQuote
+        launchSwapRateDescription(resourceManager, quote.swapRateDescriptionMode())
     }
 
     fun priceDifferenceClicked() {

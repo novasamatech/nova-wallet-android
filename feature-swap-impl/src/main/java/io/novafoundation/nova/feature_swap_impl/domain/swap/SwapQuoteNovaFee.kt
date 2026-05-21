@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_swap_impl.domain.swap
 
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.HydraDxQuotableEdge
 
 /**
@@ -11,4 +13,12 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
  */
 fun SwapQuote.involvesHydraSwap(): Boolean {
     return quotedPath.path.any { it.edge is HydraDxQuotableEdge }
+}
+
+fun SwapQuote.swapRateDescriptionMode(): SwapRateDescriptionMode {
+    return if (involvesHydraSwap()) {
+        SwapRateDescriptionMode.IncludesFee(NovaSwapCommission.FEE_PERCENT_DISPLAY)
+    } else {
+        SwapRateDescriptionMode.Default
+    }
 }

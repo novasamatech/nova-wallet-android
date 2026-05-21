@@ -31,6 +31,8 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
         binder.swapConfirmationAccount.setOnClickListener { viewModel.accountClicked() }
         binder.swapConfirmationButton.setOnClickListener { viewModel.confirmButtonClicked() }
         binder.swapConfirmationRoute.setOnClickListener { viewModel.routeClicked() }
+
+        binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
     }
 
     override fun inject() {
@@ -66,7 +68,6 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
 
         viewModel.validationInProgress.observe(binder.swapConfirmationButton::setProgressState)
 
-        binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
         viewModel.showNovaFeeDisclaimer.observe { binder.swapNovaFeeDisclaimer.setVisible(it) }
     }
 }

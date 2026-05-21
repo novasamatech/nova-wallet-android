@@ -1805,7 +1805,6 @@
     <string name="swap_price_difference_title">Differenza di prezzo</string>
     <string name="swap_price_impact" formatted="false">%s \u2248 %s</string>
     <string name="swap_rate_description">Tasso di cambio tra due diverse criptovalute. Rappresenta quanto di una criptovaluta puoi ottenere in cambio di una certa quantità di un\'altra criptovaluta.</string>
-    <string name="swap_rate_includes_fee_description">Il miglior tasso trovato, inclusa una commissione Nova Wallet dello %s%%.</string>
     <string name="swap_network_fees_label">Commissioni di rete</string>
     <string name="swap_nova_fee_disclaimer">Include una commissione Nova dello %s%%.</string>
     <string name="swap_rate_title">Tasso di cambio</string>

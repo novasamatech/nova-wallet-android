@@ -4,20 +4,26 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_swap_api.R
 
+sealed class SwapRateDescriptionMode {
+
+    object Default : SwapRateDescriptionMode()
+
+    data class IncludesFee(val feePercentDisplay: String) : SwapRateDescriptionMode()
+}
+
 fun DescriptionBottomSheetLauncher.launchSwapRateDescription(
     resourceManager: ResourceManager,
-    feePercentDisplay: String?
+    mode: SwapRateDescriptionMode,
 ) {
-    if (feePercentDisplay != null) {
-        val description = resourceManager.getString(R.string.swap_rate_includes_fee_description, feePercentDisplay)
-        launchDescriptionBottomSheet(
+    when (mode) {
+        is SwapRateDescriptionMode.Default -> launchDescriptionBottomSheet(
             titleRes = R.string.swap_rate_title,
-            descriptionText = description
+            descriptionRes = R.string.swap_rate_description,
         )
-    } else {
-        launchDescriptionBottomSheet(
+
+        is SwapRateDescriptionMode.IncludesFee -> launchDescriptionBottomSheet(
             titleRes = R.string.swap_rate_title,
-            descriptionRes = R.string.swap_rate_description
+            descriptionText = resourceManager.getString(R.string.swap_rate_includes_fee_description, mode.feePercentDisplay),
         )
     }
 }
