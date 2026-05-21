@@ -44,8 +44,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.BundleExtraActions
-import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
@@ -55,7 +53,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapFeeArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraph
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
-import io.novafoundation.nova.feature_swap_api.domain.model.amountOutMin
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgress
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapProgressStep
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
@@ -84,11 +81,8 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterA
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.SharedSwapSubscriptions
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
-import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.HydraDxQuotableEdge
-import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxAssetExchange.HydraDxOperation
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
-import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -96,7 +90,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromFiatOrZe
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.formatPlanks
 import io.novafoundation.nova.runtime.ext.Geneses
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
@@ -115,8 +108,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chainsById
 import io.novafoundation.nova.runtime.multiNetwork.enabledChainById
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -232,11 +223,9 @@ internal class RealSwapService(
 
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
         val segments = calculatedFee.segments
+        val lastIndex = segments.lastIndex
 
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
-
-        // Pre-determine the last Hydra segment index - commission should only apply there
-        val lastHydraSegmentIndex = findLastHydraSegmentIndex(segments)
 
         return flow {
             segments.withIndex().fold(initialCorrection) { prevStepCorrection, (index, segment) ->
@@ -258,20 +247,12 @@ internal class RealSwapService(
                     // We cannot execute buy for segments after first one since we deal with actualReceivedAmount there
                     val shouldReplaceBuyWithSell = correction != null
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
-                    val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
+                    val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
+                        actualSwapLimit = actualSwapLimit,
+                        isLastSwapOperation = index == lastIndex,
+                    )
 
-                    // Only apply commission on the last Hydra segment
-                    val isCommissionSegment = index == lastHydraSegmentIndex
-                    val commissionActions = if (isCommissionSegment) buildCommissionActions(operation, actualSwapLimit) else null
-                    val commissionAmount = if (isCommissionSegment) getCommissionAmount(operation, actualSwapLimit) else BigInteger.ZERO
-
-                    operation.execute(segmentSubmissionArgs, commissionActions).map { executionCorrection ->
-                        // Subtract commission from actualReceivedAmount so subsequent segments see the true available balance.
-                        // Clamp at zero in case actualReceivedAmount dips below amountOutMin under dry-run mismatch.
-                        SwapExecutionCorrection(
-                            actualReceivedAmount = (executionCorrection.actualReceivedAmount - commissionAmount).atLeastZero()
-                        )
-                    }.onFailure {
+                    operation.execute(segmentSubmissionArgs).onFailure {
                         Log.e("SwapSubmission", "Swap failed on stage '$displayData'", it)
 
                         emit(SwapProgress.Failure(it, attemptedStep = step))
@@ -283,87 +264,24 @@ internal class RealSwapService(
         }
     }
 
-    /**
-     * Finds the index of the last [HydraDxOperation] segment, or -1 if none.
-     *
-     * Operation-type detection is required: chain-id detection over-matches
-     * cross-chain transfer segments landing on Hydra, which silently drop
-     * bundleExtraActions and would skip commission on-chain.
-     */
-    private fun findLastHydraSegmentIndex(segments: List<SwapFee.SwapSegment>): Int {
-        return segments.indexOfLast { (_, operation) -> operation is HydraDxOperation }
-    }
-
     override suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult> {
         val (_, operation) = calculatedFee.segments.firstOrNull() ?: return Result.failure(IllegalStateException("No segments"))
 
         val amountIn = operation.estimatedSwapLimit.estimatedAmountIn() + calculatedFee.additionalAmountForSwap.amount
         val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(amountIn, false)
 
-        val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
+        val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
+            actualSwapLimit = actualSwapLimit,
+            isLastSwapOperation = calculatedFee.segments.size == 1,
+        )
 
-        val commissionActions = buildCommissionActions(operation, actualSwapLimit)
-
-        return operation.submit(segmentSubmissionArgs, commissionActions)
+        return operation.submit(segmentSubmissionArgs)
     }
 
     private fun SwapLimit.estimatedAmountIn(): Balance {
         return when (this) {
             is SwapLimit.SpecifiedIn -> amountIn
             is SwapLimit.SpecifiedOut -> amountInQuote
-        }
-    }
-
-    /**
-     * Returns the commission amount for this operation, or [BigInteger.ZERO] if not applicable.
-     */
-    private suspend fun getCommissionAmount(
-        operation: AtomicSwapOperation,
-        actualSwapLimit: SwapLimit
-    ): Balance {
-        val chainId = operation.assetOut.chainId
-        val chain = chainRegistry.getChain(chainId)
-
-        if (!chain.swap.hydraDxSupported()) return BigInteger.ZERO
-
-        return NovaSwapCommission.feeAmount(actualSwapLimit.amountOutMin).atLeastZero()
-    }
-
-    /**
-     * Builds commission transfer actions to bundle with the swap extrinsic on Hydration.
-     * Returns null if the operation is not on a Hydration chain.
-     *
-     * The commission is [NovaSwapCommission.FEE_PERCENT_DISPLAY]% of the swap output,
-     * calculated from [SwapLimit.amountOutMin] (the post-slippage minimum) for safety.
-     */
-    private suspend fun buildCommissionActions(
-        operation: AtomicSwapOperation,
-        actualSwapLimit: SwapLimit
-    ): BundleExtraActions? {
-        val chainId = operation.assetOut.chainId
-        val chain = chainRegistry.getChain(chainId)
-
-        if (!chain.swap.hydraDxSupported()) return null
-
-        val assetOut = chain.assetsById[operation.assetOut.assetId] ?: return null
-        val commissionAmount = NovaSwapCommission.feeAmount(actualSwapLimit.amountOutMin)
-
-        if (commissionAmount <= BigInteger.ZERO) return null
-
-        val transferBase = AssetTransferBase(
-            recipient = chain.addressOf(NovaSwapCommission.feeAccountId),
-            originChain = chain,
-            originChainAsset = assetOut,
-            destinationChain = chain,
-            destinationChainAsset = assetOut,
-            feePaymentCurrency = FeePaymentCurrency.Native,
-            amountPlanks = commissionAmount
-        )
-        val commissionCall: GenericCall.Instance = assetSourceRegistry.sourceFor(assetOut).transfers
-            .constructTransferCall(transferBase)
-
-        return {
-            call(commissionCall)
         }
     }
 
@@ -478,23 +396,15 @@ internal class RealSwapService(
         val amountIn = quotedTrade.amountIn()
         val amountOutGross = quotedTrade.amountOut()
 
-        // Price impact is computed against the raw pool quote, NOT the post-commission
-        // amount, otherwise the commission inflates the price-impact reading.
+        val prototypes = quotedTrade.path.constructAtomicOperationPrototypes()
+
+        // Let the final operation adjust the displayed amountOut (e.g. Hydration commission).
+        // Price impact stays computed against the raw pool quote so per-operation fees don't
+        // inflate the slippage reading.
+        val amountOutNet = prototypes.last().postProcessFinalAmountOut(amountOutGross)
         val priceImpact = args.calculatePriceImpact(amountIn, amountOutGross)
 
-        // Override SwapQuote.amountOut to the post-commission amount so every consumer
-        // (UI, validations, rate display) sees what the user actually receives. The
-        // gross pool quote remains accessible via quotedPath.lastSegmentQuote for
-        // anything that needs it (notably segment-level SwapLimit construction, which
-        // drives the on-chain extrinsic).
-        val involvesHydraSwap = quotedTrade.path.any { it.edge is HydraDxQuotableEdge }
-        val amountOutNet = if (involvesHydraSwap) {
-            NovaSwapCommission.amountOutAfterFee(amountOutGross)
-        } else {
-            amountOutGross
-        }
-
-        val atomicOperationsEstimates = quotedTrade.estimateOperationsMaximumExecutionTime()
+        val atomicOperationsEstimates = prototypes.map { it.maximumExecutionTime() }
 
         return SwapQuote(
             amountIn = args.tokenIn.configuration.withAmount(amountIn),
@@ -504,11 +414,6 @@ internal class RealSwapService(
             executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER),
             direction = args.swapDirection,
         )
-    }
-
-    private suspend fun QuotedTrade.estimateOperationsMaximumExecutionTime(): List<Duration> {
-        return path.constructAtomicOperationPrototypes()
-            .map { it.maximumExecutionTime() }
     }
 
     override suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig {

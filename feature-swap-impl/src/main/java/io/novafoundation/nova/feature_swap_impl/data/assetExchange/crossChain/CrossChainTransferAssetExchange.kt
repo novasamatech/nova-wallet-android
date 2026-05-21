@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.BundleExtraActions
 import io.novafoundation.nova.feature_swap_api.domain.model.FeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
@@ -271,10 +270,7 @@ class CrossChainTransferAssetExchange(
             )
         }
 
-        override suspend fun execute(
-            args: AtomicSwapOperationSubmissionArgs,
-            bundleExtraActions: BundleExtraActions?
-        ): Result<SwapExecutionCorrection> {
+        override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
             return dryRunTransfer(transfer)
@@ -282,10 +278,7 @@ class CrossChainTransferAssetExchange(
                 .map(::SwapExecutionCorrection)
         }
 
-        override suspend fun submit(
-            args: AtomicSwapOperationSubmissionArgs,
-            bundleExtraActions: BundleExtraActions?
-        ): Result<SwapSubmissionResult> {
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
             val transfer = createTransfer(amount = args.actualSwapLimit.crossChainTransferAmount)
 
             return dryRunTransfer(transfer)

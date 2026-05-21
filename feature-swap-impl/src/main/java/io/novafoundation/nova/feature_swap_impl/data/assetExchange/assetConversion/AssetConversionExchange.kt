@@ -20,7 +20,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.BundleExtraActions
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
@@ -293,10 +292,7 @@ private class AssetConversionExchange(
             )
         }
 
-        override suspend fun execute(
-            args: AtomicSwapOperationSubmissionArgs,
-            bundleExtraActions: BundleExtraActions?
-        ): Result<SwapExecutionCorrection> {
+        override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
             return submitInternal(args)
                 .mapCatching {
                     SwapExecutionCorrection(
@@ -305,10 +301,7 @@ private class AssetConversionExchange(
                 }
         }
 
-        override suspend fun submit(
-            args: AtomicSwapOperationSubmissionArgs,
-            bundleExtraActions: BundleExtraActions?
-        ): Result<SwapSubmissionResult> {
+        override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
             return submitInternal(args)
                 .map { SwapSubmissionResult(it.submissionHierarchy) }
         }
