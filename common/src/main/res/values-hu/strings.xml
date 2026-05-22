@@ -2039,11 +2039,4 @@
     <string name="yield_boost_stake_increase_time">Stake növekedési idő</string>
     <string name="yield_boost_terms" formatted="false">A  Yield Boost %s automatikusan stake-elni fogja a %s feletti utalható tokeneket</string>
     <string name="yiled_boost_yield_boosted">Yield Boost-olt</string>
-    <string name="dapp_search_staking_banner_text">Stakingelnél? A Nova Wallet beépített stakinget kínál.</string>
-    <string name="dapp_search_staking_banner_button">Ugrás a Stakinghez</string>
-    <string name="dapp_staking_competitor_warning_title">Figyelmeztetés</string>
-    <string name="dapp_staking_competitor_warning_subtitle">A külső staking oldalak gyakran elavulnak. Javasoljuk a Nova Wallet beépített staking funkcióinak használatát.</string>
-    <string name="dapp_staking_competitor_go_to_stake">Ugrás a Stakinghez</string>
-    <string name="dapp_staking_competitor_advanced">Haladó</string>
-    <string name="dapp_staking_competitor_continue">Tovább az oldalra</string>
 </resources>

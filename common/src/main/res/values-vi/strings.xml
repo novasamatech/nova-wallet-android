@@ -2025,11 +2025,4 @@
     <string name="yield_boost_stake_increase_time">Thời gian tăng Stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost sẽ tự động stake %s tất cả token có thể chuyển được của tôi trên %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
-    <string name="dapp_search_staking_banner_text">Muốn staking? Nova Wallet đã tích hợp sẵn tính năng staking.</string>
-    <string name="dapp_search_staking_banner_button">Đi đến Staking</string>
-    <string name="dapp_staking_competitor_warning_title">Thông báo</string>
-    <string name="dapp_staking_competitor_warning_subtitle">Các trang staking bên thứ ba thường bị ngừng hỗ trợ. Chúng tôi khuyến nghị sử dụng các tính năng staking tích hợp sẵn của Nova Wallet.</string>
-    <string name="dapp_staking_competitor_go_to_stake">Đi đến Staking</string>
-    <string name="dapp_staking_competitor_advanced">Nâng cao</string>
-    <string name="dapp_staking_competitor_continue">Tiếp tục đến trang</string>
 </resources>

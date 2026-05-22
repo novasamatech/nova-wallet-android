@@ -2039,11 +2039,4 @@
     <string name="yield_boost_stake_increase_time">Bahis artış süresi</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost, %s tüm transfer edilebilir tokenlerimi otomatik olarak %s üzerinde stake edecek</string>
     <string name="yiled_boost_yield_boosted">Yield Boost\'lu</string>
-    <string name="dapp_search_staking_banner_text">Staking yapmak ister misiniz? Nova Wallet\'ta yerleşik staking var.</string>
-    <string name="dapp_search_staking_banner_button">Staking\'e Git</string>
-    <string name="dapp_staking_competitor_warning_title">Uyarı</string>
-    <string name="dapp_staking_competitor_warning_subtitle">Üçüncü taraf staking siteleri genellikle kullanım dışı kalır. Nova Wallet\'ın yerleşik staking özelliklerini kullanmanızı öneririz.</string>
-    <string name="dapp_staking_competitor_go_to_stake">Staking\'e Git</string>
-    <string name="dapp_staking_competitor_advanced">Gelişmiş</string>
-    <string name="dapp_staking_competitor_continue">Siteye devam et</string>
 </resources>
