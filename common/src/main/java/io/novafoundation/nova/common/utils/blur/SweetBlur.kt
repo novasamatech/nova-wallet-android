@@ -15,7 +15,7 @@ import android.view.animation.DecelerateInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.graphics.times
 import androidx.core.graphics.toRect
-import com.google.android.renderscript.Toolkit
+import io.novafoundation.nova.common.utils.blur.StackBlur
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -173,7 +173,7 @@ class SweetBlur(
     }
 
     fun blurBitmap(src: Bitmap): Bitmap {
-        return Toolkit.blur(src, radius)
+        return StackBlur.blur(src, radius)
     }
 
     private fun captureBitmap(): Bitmap? {

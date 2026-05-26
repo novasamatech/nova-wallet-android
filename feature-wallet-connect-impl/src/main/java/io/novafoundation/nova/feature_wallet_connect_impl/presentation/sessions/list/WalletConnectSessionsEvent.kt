@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.presentation.sessions.list
 
 import android.util.Log
-import com.walletconnect.web3.wallet.client.Wallet
-import com.walletconnect.web3.wallet.client.Web3Wallet
+import com.reown.walletkit.client.Wallet
+import com.reown.walletkit.client.WalletKit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -21,14 +21,9 @@ sealed class WalletConnectSessionsEvent {
     data class SessionDeleted(val delete: Wallet.Model.SessionDelete) : WalletConnectSessionsEvent()
 }
 
-fun Web3Wallet.sessionEventsFlow(scope: CoroutineScope): Flow<WalletConnectSessionsEvent> {
+fun WalletKit.sessionEventsFlow(scope: CoroutineScope): Flow<WalletConnectSessionsEvent> {
     return callbackFlow {
-        setWalletDelegate(object : Web3Wallet.WalletDelegate {
-
-            override fun onAuthRequest(authRequest: Wallet.Model.AuthRequest, verifyContext: Wallet.Model.VerifyContext) {
-                Log.d("WalletConnect", "Auth request: $authRequest")
-            }
-
+        setWalletDelegate(object : WalletKit.WalletDelegate {
             override fun onConnectionStateChange(state: Wallet.Model.ConnectionState) {
                 Log.d("WalletConnect", "on connection state change: $state")
             }

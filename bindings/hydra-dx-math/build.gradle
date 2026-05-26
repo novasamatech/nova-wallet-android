@@ -2,7 +2,7 @@ apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 
 android {
 
-    ndkVersion "26.1.10909125"
+    ndkVersion "29.0.14206865"
 
     
     buildTypes {

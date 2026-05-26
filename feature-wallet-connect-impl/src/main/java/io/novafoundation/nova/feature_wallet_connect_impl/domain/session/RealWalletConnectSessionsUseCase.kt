@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session
 
-import com.walletconnect.android.CoreClient
-import com.walletconnect.web3.wallet.client.Web3Wallet
+import com.reown.android.CoreClient
+import com.reown.walletkit.client.WalletKit
 import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
@@ -39,7 +39,7 @@ internal class RealWalletConnectSessionsUseCase(
 
         pairingRepository.removeAllPairingsOtherThan(activePairingTopics)
 
-        val activeSessionTopics = Web3Wallet.getListOfActiveSessions()
+        val activeSessionTopics = WalletKit.getListOfActiveSessions()
         sessionRepository.setSessions(activeSessionTopics)
     }
 }

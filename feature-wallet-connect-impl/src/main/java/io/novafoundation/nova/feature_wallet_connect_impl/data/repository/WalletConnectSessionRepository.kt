@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.data.repository
 
-import com.walletconnect.web3.wallet.client.Wallet.Model.Session
+import com.reown.walletkit.client.Wallet.Model.Session
 import io.novafoundation.nova.common.utils.added
 import io.novafoundation.nova.common.utils.removed
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
