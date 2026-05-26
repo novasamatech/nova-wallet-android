@@ -79,9 +79,7 @@ class DAppNavigator(
     }
 
     override fun navigateToStaking() {
-        // DApp browser/search lives in the root nav graph, so we pop the root back stack
-        // to return to the split screen, then switch to the staking tab via bottom navigation.
-        back()
+        navigationBuilder().action(R.id.action_open_split_screen).navigateInRoot()
         stakingDashboardNavigator.openStakingDashboard()
     }
 

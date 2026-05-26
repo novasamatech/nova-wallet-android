@@ -51,7 +51,6 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
         binder.bottomNavigationView.setupWithNavController(navController!!)
         binder.bottomNavigationView.itemIconTintList = null
-        stakingDashboardNavigator.setBottomNavigationView(binder.bottomNavigationView)
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 
