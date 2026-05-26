@@ -25,7 +25,6 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentDappBrowserBinding
-import io.novafoundation.nova.feature_dapp_impl.data.repository.StakingCompetitorDomainsRepository
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
@@ -78,9 +77,6 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
     @Inject
     lateinit var imageLoader: ImageLoader
 
-    @Inject
-    lateinit var stakingCompetitorDomainsRepository: StakingCompetitorDomainsRepository
-
     private var webViewClient: Web3WebViewClient? = null
 
     var backCallback: OnBackPressedCallback? = null
@@ -132,8 +128,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
         binder.dappBrowserStakingWarningGoToStake.setOnClickListener { viewModel.navigateToStaking() }
         binder.dappBrowserStakingWarningAdvanced.setOnClickListener {
-            binder.dappBrowserStakingWarningAdvanced.isVisible = false
-            binder.dappBrowserStakingWarningContinue.isVisible = true
+            viewModel.onStakingWarningAdvancedClicked()
         }
         binder.dappBrowserStakingWarningContinue.setOnClickListener {
             viewModel.onStakingWarningContinue()
@@ -216,14 +211,11 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
             }
         }
 
-        viewModel.showStakingWarning.observe { show ->
-            binder.dappBrowserStakingWarning.isVisible = show
-            binder.dappBrowserWebViewContainer.isVisible = !show
-            // Reset the advanced/continue button state when showing the warning
-            if (show) {
-                binder.dappBrowserStakingWarningAdvanced.isVisible = true
-                binder.dappBrowserStakingWarningContinue.isVisible = false
-            }
+        viewModel.stakingWarningState.observe { state ->
+            binder.dappBrowserStakingWarning.isVisible = state.visible
+            binder.dappBrowserWebViewContainer.isVisible = !state.visible
+            binder.dappBrowserStakingWarningAdvanced.isVisible = state.visible && !state.advancedRevealed
+            binder.dappBrowserStakingWarningContinue.isVisible = state.visible && state.advancedRevealed
         }
 
         viewModel.browserCommandEvent.observeEvent {
@@ -340,10 +332,8 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
         val url = request.url.toString()
 
-        // Check staking competitor domains before the page loads.
-        // onStakingCompetitorIntercepted returns false if the domain has been bypassed by the user.
-        if (stakingCompetitorDomainsRepository.isStakingCompetitor(url) && viewModel.onStakingCompetitorIntercepted(url)) {
-            return true // Block navigation
+        if (viewModel.onStakingCompetitorIntercepted(url)) {
+            return true
         }
 
         return webViewRequestInterceptor.intercept(request)

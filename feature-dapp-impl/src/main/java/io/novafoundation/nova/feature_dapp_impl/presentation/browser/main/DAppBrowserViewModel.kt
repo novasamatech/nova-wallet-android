@@ -69,6 +69,15 @@ enum class ConfirmationState {
 
 data class DesktopModeChangedEvent(val desktopModeEnabled: Boolean, val url: String)
 
+data class StakingWarningState(
+    val visible: Boolean,
+    val advancedRevealed: Boolean
+) {
+    companion object {
+        val HIDDEN = StakingWarningState(visible = false, advancedRevealed = false)
+    }
+}
+
 class DAppBrowserViewModel(
     private val router: DAppRouter,
     private val signRequester: ExternalSignRequester,
@@ -106,8 +115,8 @@ class DAppBrowserViewModel(
     private val _openBrowserOptionsEvent = MutableLiveData<Event<DAppOptionsPayload>>()
     val openBrowserOptionsEvent: LiveData<Event<DAppOptionsPayload>> = _openBrowserOptionsEvent
 
-    private val _showStakingWarning = MutableLiveData(false)
-    val showStakingWarning: LiveData<Boolean> = _showStakingWarning
+    private val _stakingWarningState = MutableLiveData(StakingWarningState.HIDDEN)
+    val stakingWarningState: LiveData<StakingWarningState> = _stakingWarningState
 
     // URL that was blocked by staking competitor interception, pending user decision
     private var pendingStakingCompetitorUrl: String? = null
@@ -160,7 +169,7 @@ class DAppBrowserViewModel(
                     if (stakingCompetitorDomainsRepository.isStakingCompetitor(payload.address)) {
                         initialLoadIntercepted = true
                         pendingStakingCompetitorUrl = payload.address
-                        _showStakingWarning.postValue(true)
+                        _stakingWarningState.postValue(StakingWarningState(visible = true, advancedRevealed = false))
                     } else {
                         browserTabService.createAndSelectTab(payload.address)
                     }
@@ -295,17 +304,30 @@ class DAppBrowserViewModel(
     }
 
     /**
-     * Called from the Fragment when shouldOverrideUrlLoading detects a staking competitor URL.
-     * Shows the full-screen warning overlay, blocking the page from loading.
-     * Skips domains the user has already explicitly chosen to continue to.
+     * Called from the Fragment's WebView shouldOverrideUrlLoading callback.
+     * Returns true if this URL is a staking competitor AND not already bypassed
+     * (and therefore the Fragment should block the WebView navigation); false
+     * if the URL should load normally.
      */
     fun onStakingCompetitorIntercepted(url: String): Boolean {
+        if (!stakingCompetitorDomainsRepository.isStakingCompetitor(url)) return false
+
         val host = runCatching { Urls.hostOf(url) }.getOrNull() ?: return false
         if (host in bypassedStakingCompetitorDomains) return false
 
         pendingStakingCompetitorUrl = url
-        _showStakingWarning.postValue(true)
+        _stakingWarningState.postValue(StakingWarningState(visible = true, advancedRevealed = false))
         return true
+    }
+
+    /**
+     * User chose "Advanced" on the staking competitor warning, revealing the
+     * Continue option. Updates the warning state so the Fragment's observer
+     * binds the new visibility.
+     */
+    fun onStakingWarningAdvancedClicked() {
+        val current = _stakingWarningState.value ?: return
+        _stakingWarningState.value = current.copy(advancedRevealed = true)
     }
 
     /**
@@ -323,10 +345,10 @@ class DAppBrowserViewModel(
             initialLoadIntercepted = false
             launch {
                 browserTabService.createAndSelectTab(url)
-                _showStakingWarning.postValue(false)
+                _stakingWarningState.postValue(StakingWarningState.HIDDEN)
             }
         } else {
-            _showStakingWarning.value = false
+            _stakingWarningState.value = StakingWarningState.HIDDEN
             _browserCommandEvent.value = BrowserCommand.OpenUrl(url).event()
         }
     }
@@ -336,14 +358,14 @@ class DAppBrowserViewModel(
      * Navigates to the staking tab.
      */
     fun navigateToStaking() {
-        _showStakingWarning.value = false
+        _stakingWarningState.value = StakingWarningState.HIDDEN
         pendingStakingCompetitorUrl = null
         initialLoadIntercepted = false
         router.navigateToStaking()
     }
 
     private fun forceLoad(url: String) {
-        if (stakingCompetitorDomainsRepository.isStakingCompetitor(url) && onStakingCompetitorIntercepted(url)) {
+        if (onStakingCompetitorIntercepted(url)) {
             return
         }
 
