@@ -15,7 +15,6 @@ import android.view.animation.DecelerateInterpolator
 import androidx.annotation.ColorInt
 import androidx.core.graphics.times
 import androidx.core.graphics.toRect
-import io.novafoundation.nova.common.utils.blur.StackBlur
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
