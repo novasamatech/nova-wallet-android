@@ -25,8 +25,8 @@ import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentDappBrowserBinding
+import io.novafoundation.nova.feature_dapp_impl.data.repository.StakingCompetitorDomainsRepository
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.StakingCompetitorDomains
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
@@ -77,6 +77,9 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
     @Inject
     lateinit var imageLoader: ImageLoader
+
+    @Inject
+    lateinit var stakingCompetitorDomainsRepository: StakingCompetitorDomainsRepository
 
     private var webViewClient: Web3WebViewClient? = null
 
@@ -339,7 +342,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
         // Check staking competitor domains before the page loads.
         // onStakingCompetitorIntercepted returns false if the domain has been bypassed by the user.
-        if (StakingCompetitorDomains.isStakingCompetitor(url) && viewModel.onStakingCompetitorIntercepted(url)) {
+        if (stakingCompetitorDomainsRepository.isStakingCompetitor(url) && viewModel.onStakingCompetitorIntercepted(url)) {
             return true // Block navigation
         }
 

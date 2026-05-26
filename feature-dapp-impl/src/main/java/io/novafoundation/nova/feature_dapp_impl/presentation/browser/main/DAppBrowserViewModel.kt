@@ -12,12 +12,12 @@ import io.novafoundation.nova.common.utils.removeHexPrefix
 import io.novafoundation.nova.common.utils.singleReplaySharedFlow
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
+import io.novafoundation.nova.feature_dapp_impl.data.repository.StakingCompetitorDomainsRepository
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPage
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.StakingCompetitorDomains
 import io.novafoundation.nova.feature_dapp_api.presentation.addToFavorites.AddToFavouritesPayload
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.DAppOptionsPayload
@@ -80,7 +80,8 @@ class DAppBrowserViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val chainRegistry: ChainRegistry,
-    private val browserTabService: BrowserTabService
+    private val browserTabService: BrowserTabService,
+    private val stakingCompetitorDomainsRepository: StakingCompetitorDomainsRepository
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -156,7 +157,7 @@ class DAppBrowserViewModel(
                 is DAppBrowserPayload.Tab -> browserTabService.selectTab(payload.id)
 
                 is DAppBrowserPayload.Address -> {
-                    if (StakingCompetitorDomains.isStakingCompetitor(payload.address)) {
+                    if (stakingCompetitorDomainsRepository.isStakingCompetitor(payload.address)) {
                         initialLoadIntercepted = true
                         pendingStakingCompetitorUrl = payload.address
                         _showStakingWarning.postValue(true)
@@ -166,6 +167,8 @@ class DAppBrowserViewModel(
                 }
             }
         }
+
+        launch { stakingCompetitorDomainsRepository.sync() }
     }
 
     override suspend fun authorizeDApp(payload: AuthorizeDappBottomSheet.Payload): State {
@@ -340,7 +343,7 @@ class DAppBrowserViewModel(
     }
 
     private fun forceLoad(url: String) {
-        if (StakingCompetitorDomains.isStakingCompetitor(url) && onStakingCompetitorIntercepted(url)) {
+        if (stakingCompetitorDomainsRepository.isStakingCompetitor(url) && onStakingCompetitorIntercepted(url)) {
             return
         }
 

@@ -6,7 +6,7 @@ import io.novafoundation.nova.feature_dapp_api.data.model.BrowserHostSettings
 import io.novafoundation.nova.feature_dapp_api.data.repository.BrowserHostSettingsRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.StakingCompetitorDomains
+import io.novafoundation.nova.feature_dapp_impl.data.repository.StakingCompetitorDomainsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.net.URL
@@ -14,7 +14,8 @@ import java.net.URL
 class DappBrowserInteractor(
     private val phishingSitesRepository: PhishingSitesRepository,
     private val favouritesDAppRepository: FavouritesDAppRepository,
-    private val browserHostSettingsRepository: BrowserHostSettingsRepository
+    private val browserHostSettingsRepository: BrowserHostSettingsRepository,
+    private val stakingCompetitorDomainsRepository: StakingCompetitorDomainsRepository
 ) {
 
     suspend fun getHostSettings(url: String): BrowserHostSettings? {
@@ -31,7 +32,7 @@ class DappBrowserInteractor(
             runCatching {
                 val security = when {
                     phishingSitesRepository.isPhishing(browserPage.url) -> BrowserPageAnalyzed.Security.DANGEROUS
-                    StakingCompetitorDomains.isStakingCompetitor(browserPage.url) -> BrowserPageAnalyzed.Security.STAKING_COMPETITOR
+                    stakingCompetitorDomainsRepository.isStakingCompetitor(browserPage.url) -> BrowserPageAnalyzed.Security.STAKING_COMPETITOR
                     URL(browserPage.url).isSecure -> BrowserPageAnalyzed.Security.SECURE
                     else -> BrowserPageAnalyzed.Security.UNKNOWN
                 }

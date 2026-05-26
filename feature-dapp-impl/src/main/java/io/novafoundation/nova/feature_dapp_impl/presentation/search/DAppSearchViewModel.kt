@@ -20,8 +20,8 @@ import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchGroup
 import io.novafoundation.nova.feature_dapp_impl.domain.search.DappSearchResult
 import io.novafoundation.nova.feature_dapp_impl.domain.search.SearchDappInteractor
+import io.novafoundation.nova.feature_dapp_impl.data.repository.StakingCompetitorDomainsRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.search.StakingKeywordMatcher
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.StakingCompetitorDomains
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.dappCategoryToUi
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.model.DappSearchModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -40,7 +40,8 @@ class DAppSearchViewModel(
     private val payload: SearchPayload,
     private val dAppSearchResponder: DAppSearchResponder,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val appLinksProvider: AppLinksProvider
+    private val appLinksProvider: AppLinksProvider,
+    private val stakingCompetitorDomainsRepository: StakingCompetitorDomainsRepository
 ) : BaseViewModel() {
 
     val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
@@ -85,6 +86,8 @@ class DAppSearchViewModel(
         launch {
             dappInteractor.dAppsSync()
         }
+
+        launch { stakingCompetitorDomainsRepository.sync() }
     }
 
     fun cancelClicked() {
@@ -138,7 +141,7 @@ class DAppSearchViewModel(
 
             // Always show the unknown DApp warning for staking competitor domains,
             // even if the DApp is present in the catalogue.
-            val isStakingCompetitor = StakingCompetitorDomains.isStakingCompetitor(newUrl)
+            val isStakingCompetitor = stakingCompetitorDomainsRepository.isStakingCompetitor(newUrl)
 
             if (!searchResult.isTrustedByNova || isStakingCompetitor) {
                 dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
