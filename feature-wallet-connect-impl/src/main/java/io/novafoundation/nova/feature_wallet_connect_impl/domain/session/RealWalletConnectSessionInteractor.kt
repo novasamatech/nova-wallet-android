@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session
 
-import com.walletconnect.android.Core
-import com.walletconnect.web3.wallet.client.Wallet
-import com.walletconnect.web3.wallet.client.Wallet.Model.Namespace
-import com.walletconnect.web3.wallet.client.Wallet.Model.SessionProposal
-import com.walletconnect.web3.wallet.client.Web3Wallet
+import com.reown.android.Core
+import com.reown.walletkit.client.Wallet
+import com.reown.walletkit.client.Wallet.Model.Namespace
+import com.reown.walletkit.client.Wallet.Model.SessionProposal
+import com.reown.walletkit.client.WalletKit
 import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.caip.caip2.isValidCaip2
@@ -84,7 +84,7 @@ class RealWalletConnectSessionInteractor(
 
         val response = sessionProposal.approved(namespaceSessions)
 
-        Web3Wallet.approveSession(response)
+        WalletKit.approveSession(response)
             .onSuccess { registerPendingSettlement(sessionProposal, metaAccount) }
     }
 
@@ -107,7 +107,7 @@ class RealWalletConnectSessionInteractor(
     override suspend fun rejectSession(proposal: SessionProposal): Result<Unit> = withContext(Dispatchers.Default) {
         val response = proposal.rejected("Rejected by user")
 
-        Web3Wallet.rejectSession(response)
+        WalletKit.rejectSession(response)
     }
 
     override suspend fun parseSessionRequest(request: Wallet.Model.SessionRequest): Result<WalletConnectRequest> = runCatching {
@@ -172,7 +172,7 @@ class RealWalletConnectSessionInteractor(
 
     override suspend fun disconnect(sessionTopic: String): Result<*> {
         return withContext(Dispatchers.Default) {
-            Web3Wallet.disconnectSession(sessionTopic).onSuccess {
+            WalletKit.disconnectSession(sessionTopic).onSuccess {
                 walletConnectSessionRepository.removeSession(sessionTopic)
             }
         }

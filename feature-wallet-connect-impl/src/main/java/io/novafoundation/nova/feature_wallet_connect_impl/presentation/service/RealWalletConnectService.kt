@@ -2,10 +2,10 @@ package io.novafoundation.nova.feature_wallet_connect_impl.presentation.service
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.walletconnect.android.Core
-import com.walletconnect.android.CoreClient
-import com.walletconnect.web3.wallet.client.Wallet
-import com.walletconnect.web3.wallet.client.Web3Wallet
+import com.reown.android.Core
+import com.reown.android.CoreClient
+import com.reown.walletkit.client.Wallet
+import com.reown.walletkit.client.WalletKit
 import io.novafoundation.nova.common.navigation.awaitResponse
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.LOG_TAG
@@ -39,7 +39,7 @@ internal class RealWalletConnectService(
     CoroutineScope by parentScope,
     WithCoroutineScopeExtensions by WithCoroutineScopeExtensions(parentScope) {
 
-    private val events = Web3Wallet.sessionEventsFlow(scope = this)
+    private val events = WalletKit.sessionEventsFlow(scope = this)
 
     override val onPairErrorLiveData: MutableLiveData<Event<Throwable>> = MutableLiveData()
 
@@ -69,7 +69,7 @@ internal class RealWalletConnectService(
     }
 
     override fun pair(uri: String) {
-        Web3Wallet.pair(Wallet.Params.Pair(uri), onError = { onPairErrorLiveData.postValue(Event(it.throwable)) })
+        WalletKit.pair(Wallet.Params.Pair(uri), onError = { onPairErrorLiveData.postValue(Event(it.throwable)) })
     }
 
     private suspend fun handleSessionProposal(proposal: Wallet.Model.SessionProposal) = withContext(Dispatchers.Main) {
@@ -125,7 +125,7 @@ internal class RealWalletConnectService(
     ): Result<*> {
         val response = sessionRequest.failed(WalletConnectError.NO_SESSION_FOR_TOPIC)
 
-        return Web3Wallet.respondSessionRequest(response)
+        return WalletKit.respondSessionRequest(response)
     }
 
     private suspend fun respondWithError(
@@ -135,6 +135,6 @@ internal class RealWalletConnectService(
         val error = exception as? WalletConnectError ?: WalletConnectError.GENERAL_FAILURE
         val response = sessionRequest.failed(error)
 
-        return Web3Wallet.respondSessionRequest(response)
+        return WalletKit.respondSessionRequest(response)
     }
 }

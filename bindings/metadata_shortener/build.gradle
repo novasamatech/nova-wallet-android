@@ -3,7 +3,7 @@ apply plugin: 'org.mozilla.rust-android-gradle.rust-android'
 android {
     namespace 'io.novafoundation.nova.metadata_shortener'
 
-    ndkVersion "26.1.10909125"
+    ndkVersion "29.0.14206865"
 
     
     buildTypes {

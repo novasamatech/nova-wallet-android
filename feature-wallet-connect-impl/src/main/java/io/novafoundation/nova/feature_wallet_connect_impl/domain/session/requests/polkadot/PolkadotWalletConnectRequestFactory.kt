@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.reques
 
 import android.content.Context
 import com.google.gson.Gson
-import com.walletconnect.web3.wallet.client.Wallet.Model.SessionRequest
+import com.reown.walletkit.client.Wallet.Model.SessionRequest
 import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.identifier.Caip2Identifier
 import io.novafoundation.nova.caip.caip2.parseCaip2OrThrow
