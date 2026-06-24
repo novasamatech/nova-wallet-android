@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.setup.SubtensorStakeSetupViewModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
@@ -32,6 +33,7 @@ class SubtensorStakeSetupModule {
         stakingSharedState: StakingSharedState,
         extrinsicService: ExtrinsicService,
         assetUseCase: AssetUseCase,
+        amountFormatter: AmountFormatter,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         maxActionProviderFactory: MaxActionProviderFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -44,6 +46,7 @@ class SubtensorStakeSetupModule {
         stakingSharedState = stakingSharedState,
         extrinsicService = extrinsicService,
         assetUseCase = assetUseCase,
+        amountFormatter = amountFormatter,
         feeLoaderMixinFactory = feeLoaderMixinFactory,
         maxActionProviderFactory = maxActionProviderFactory,
         amountChooserMixinFactory = amountChooserMixinFactory,

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake
 import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSubtensorStakeSetupBinding
@@ -41,6 +42,16 @@ class SubtensorStakeSetupFragment : BaseFragment<SubtensorStakeSetupViewModel, F
         // Min stake row is static — set once and forget. Mirrors iOS
         // `TitleAmountView.dark()` rendered with `MIN_NOMINATOR_STAKE_RAO`.
         binder.subtensorStakeSetupMinStake.showValue("0.01 TAO")
+
+        // Nova-fee disclosure — visible only when the fee applies (subnet +
+        // recipient set). Inert today (recipient null → hidden). The caption is
+        // static; the fee row's value is observed in subscribe().
+        binder.subtensorStakeSetupNovaFee.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorStakeSetupNovaFeeDisclaimer.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorStakeSetupNovaFeeDisclaimer.text = getString(
+            io.novafoundation.nova.feature_staking_impl.R.string.subtensor_setup_nova_fee_disclaimer,
+            io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants.NOVA_FEE_PERCENT_DISPLAY,
+        )
     }
 
     override fun inject() {
@@ -61,6 +72,10 @@ class SubtensorStakeSetupFragment : BaseFragment<SubtensorStakeSetupViewModel, F
         // amount/fee rows look + behave identically across all flows.
         setupAmountChooser(viewModel.amountChooserMixin, binder.subtensorStakeSetupAmount)
         setupFeeLoading(viewModel.originFeeMixin, binder.subtensorStakeSetupFee)
+
+        // Nova-fee row — observed independently of the network-fee mixin. Reuses
+        // the standard FeeView.setFeeStatus binding; NoFee hides the row.
+        viewModel.novaFeeStatusFlow.observe(binder.subtensorStakeSetupNovaFee::setFeeStatus)
 
         viewModel.titleText.observe { binder.subtensorStakeSetupToolbar.setTitle(it) }
         viewModel.validatorTargetModel.observe { binder.subtensorStakeSetupValidator.setModel(it) }

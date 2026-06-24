@@ -4,7 +4,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.Subten
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 import kotlin.math.ceil
 import kotlin.math.floor
 
@@ -27,7 +29,8 @@ private const val ONE_TAO_IN_RAO = 1_000_000_000L
  *
  * For root (`netuid == 0`), [spotPriceTaoPerAlpha] is ignored and a
  * cushioned RAO baseline is used. For subnets, pass the live AMM rate
- * (`SubnetTAO / SubnetAlphaIn`); the limit_price is encoded as I96F32.
+ * (`SubnetTAO / SubnetAlphaIn`); the limit_price is a u64 in RAO per whole
+ * alpha (per the pallet docstring) — see [computeLimitPrice].
  */
 fun ExtrinsicBuilder.addStakeLimit(
     hotkey: AccountId,
@@ -106,14 +109,21 @@ private fun computeLimitPrice(
     spotPriceTaoPerAlpha: Double?,
 ): BigInteger {
     if (netuid == SubtensorStakingConstants.ROOT_NETUID) {
-        val multiplier = if (isStake) 1.0 + slippage else 1.0 - slippage
-        val raw = ONE_TAO_IN_RAO.toDouble() * multiplier
-        // Stake rounds up (max price willing to pay), unstake rounds down (min
-        // price willing to accept). iOS uses NSDecimalRound(.up/.down); plain
-        // toLong() would truncate toward zero on both directions, tightening
-        // the cushion for stake — see review note 1.
-        val cushioned = if (isStake) ceil(raw).toLong() else floor(raw).toLong()
-        return BigInteger.valueOf(cushioned.coerceAtLeast(1L))
+        // Root: no AMM, RAO-denominated 1:1 baseline. Exact BigDecimal rounding
+        // (CEILING for stake = max willing to pay, FLOOR for unstake = min willing
+        // to accept) to mirror iOS NSDecimalRound exactly. Double ceil/floor drifts
+        // by ±1 RAO at some slippages (e.g. 1e9 * 0.995 as a Double floors to
+        // 994999999, not 995000000) — see review note 1.
+        val multiplier = if (isStake) {
+            BigDecimal.ONE.add(BigDecimal.valueOf(slippage))
+        } else {
+            BigDecimal.ONE.subtract(BigDecimal.valueOf(slippage))
+        }
+        val cushioned = BigDecimal.valueOf(ONE_TAO_IN_RAO)
+            .multiply(multiplier)
+            .setScale(0, if (isStake) RoundingMode.CEILING else RoundingMode.FLOOR)
+            .toBigInteger()
+        return cushioned.max(BigInteger.ONE)
     }
 
     val spot = spotPriceTaoPerAlpha ?: 0.001

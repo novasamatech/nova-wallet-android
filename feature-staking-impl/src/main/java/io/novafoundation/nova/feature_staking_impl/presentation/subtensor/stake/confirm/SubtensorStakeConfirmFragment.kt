@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake
 import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -27,6 +28,16 @@ class SubtensorStakeConfirmFragment : BaseFragment<SubtensorStakeConfirmViewMode
         binder.subtensorStakeConfirmValidator.setOnClickListener { viewModel.validatorClicked() }
         binder.subtensorStakeConfirmConfirm.prepareForProgress(viewLifecycleOwner)
         binder.subtensorStakeConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
+
+        // Nova-fee disclosure — visible only when the fee applies (subnet +
+        // recipient set). Inert today (recipient null → hidden). The caption is
+        // static; the fee row's value is observed in subscribe().
+        binder.subtensorStakeConfirmNovaFee.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorStakeConfirmNovaFeeDisclaimer.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorStakeConfirmNovaFeeDisclaimer.text = getString(
+            io.novafoundation.nova.feature_staking_impl.R.string.subtensor_setup_nova_fee_disclaimer,
+            io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants.NOVA_FEE_PERCENT_DISPLAY,
+        )
     }
 
     override fun inject() {
@@ -48,6 +59,7 @@ class SubtensorStakeConfirmFragment : BaseFragment<SubtensorStakeConfirmViewMode
         viewModel.walletUiFlow.observe(binder.subtensorStakeConfirmExtrinsicInformation::setWallet)
         viewModel.originAddressModelFlow.observe(binder.subtensorStakeConfirmExtrinsicInformation::setAccount)
         viewModel.feeStatusFlow.observe(binder.subtensorStakeConfirmExtrinsicInformation::setFeeStatus)
+        viewModel.novaFeeStatusFlow.observe(binder.subtensorStakeConfirmNovaFee::setFeeStatus)
         viewModel.validatorLabel.observe { binder.subtensorStakeConfirmValidator.showValue(it) }
         viewModel.submitting.observe { binder.subtensorStakeConfirmConfirm.setProgressState(it) }
         viewModel.toastEvents.observeEvent { msg ->

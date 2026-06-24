@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.subtensor.model
 
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 /**
@@ -39,4 +40,34 @@ object SubtensorStakingConstants {
 
     /** Per-coldkey fetch cache TTL. */
     const val POSITION_CACHE_TTL_SECONDS: Long = 15
+
+    /**
+     * Nova Wallet service fee on subnet staking, expressed as a numerator over
+     * [NOVA_FEE_DENOMINATOR]. 30 / 10_000 = 0.3%. Mirrors the shipped iOS
+     * feature. Root staking (netuid == [ROOT_NETUID]) is exempt.
+     */
+    const val NOVA_FEE_NUMERATOR: Int = 30
+    const val NOVA_FEE_DENOMINATOR: Int = 10_000
+
+    /** Human-readable fee percentage for UI copy. */
+    const val NOVA_FEE_PERCENT_DISPLAY: String = "0.3"
+
+    /**
+     * Recipient of the Nova service fee.
+     *
+     * `null` means the feature is fully INERT: no fee leg is added and the
+     * stake/unstake extrinsics behave exactly as before. A real value MUST be
+     * a validated 32-byte AccountId (the decoded public key, not an SS58
+     * string) on the Bittensor chain — set it deliberately, never from
+     * unvalidated input.
+     */
+    val NOVA_FEE_RECIPIENT: AccountId? = null
+
+    /**
+     * The Nova service fee, in planks, charged on [gross]. Integer (plank) math
+     * with floor rounding: `floor(gross * 30 / 10_000)`. Sub-threshold dust
+     * floors to 0.
+     */
+    fun novaFeeAmount(gross: BigInteger): BigInteger =
+        gross * NOVA_FEE_NUMERATOR.toBigInteger() / NOVA_FEE_DENOMINATOR.toBigInteger()
 }

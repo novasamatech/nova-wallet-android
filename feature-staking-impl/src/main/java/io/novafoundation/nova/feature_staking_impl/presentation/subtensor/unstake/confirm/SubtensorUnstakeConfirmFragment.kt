@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -28,6 +29,17 @@ class SubtensorUnstakeConfirmFragment : BaseFragment<SubtensorUnstakeConfirmView
         binder.subtensorUnstakeConfirmValidator.setOnClickListener { viewModel.validatorClicked() }
         binder.subtensorUnstakeConfirmConfirm.prepareForProgress(viewLifecycleOwner)
         binder.subtensorUnstakeConfirmConfirm.setOnClickListener { viewModel.confirmClicked() }
+
+        // Nova-fee disclosure — visible only when the fee applies (subnet +
+        // recipient set). Inert today (recipient null → hidden). The caption is
+        // static; the fee row's value is observed in subscribe() once reserves
+        // arrive.
+        binder.subtensorUnstakeConfirmNovaFee.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorUnstakeConfirmNovaFeeDisclaimer.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorUnstakeConfirmNovaFeeDisclaimer.text = getString(
+            io.novafoundation.nova.feature_staking_impl.R.string.subtensor_setup_nova_fee_disclaimer,
+            io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants.NOVA_FEE_PERCENT_DISPLAY,
+        )
     }
 
     override fun inject() {
@@ -49,6 +61,7 @@ class SubtensorUnstakeConfirmFragment : BaseFragment<SubtensorUnstakeConfirmView
         viewModel.walletUiFlow.observe(binder.subtensorUnstakeConfirmExtrinsicInformation::setWallet)
         viewModel.originAddressModelFlow.observe(binder.subtensorUnstakeConfirmExtrinsicInformation::setAccount)
         viewModel.feeStatusFlow.observe(binder.subtensorUnstakeConfirmExtrinsicInformation::setFeeStatus)
+        viewModel.novaFeeStatusFlow.observe(binder.subtensorUnstakeConfirmNovaFee::setFeeStatus)
         viewModel.validatorLabel.observe { binder.subtensorUnstakeConfirmValidator.showValue(it) }
         viewModel.expectedReceiveLabel.observe { receive ->
             // Subnet only — the row is hidden on root since 1 alpha = 1 TAO.

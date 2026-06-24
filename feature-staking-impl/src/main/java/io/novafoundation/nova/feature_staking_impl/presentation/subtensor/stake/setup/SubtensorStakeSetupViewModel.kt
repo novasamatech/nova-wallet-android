@@ -14,12 +14,16 @@ import io.novafoundation.nova.feature_staking_impl.data.subtensor.extrinsic.addS
 import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.common.SubtensorNovaFee
 import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.confirm.SubtensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorPickedValidator
 import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
@@ -50,6 +54,7 @@ class SubtensorStakeSetupViewModel(
     private val stakingSharedState: StakingSharedState,
     private val extrinsicService: ExtrinsicService,
     private val assetUseCase: AssetUseCase,
+    private val amountFormatter: AmountFormatter,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     maxActionProviderFactory: MaxActionProviderFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
@@ -58,6 +63,10 @@ class SubtensorStakeSetupViewModel(
 ) : BaseViewModel() {
 
     val isRoot: Boolean = netuid == SubtensorStakingConstants.ROOT_NETUID
+
+    /** True only when the Nova fee applies (subnet + recipient set). Drives the
+     *  fee row + caption visibility. Inert (false) today since the recipient is null. */
+    val novaFeeApplies: Boolean = SubtensorNovaFee.feeApplies(netuid)
 
     val titleText: StateFlow<String> = MutableStateFlow(resolveTitle()).asStateFlow()
 
@@ -95,6 +104,25 @@ class SubtensorStakeSetupViewModel(
         assetFlow = assetFlow,
         maxActionProvider = maxActionProvider,
     )
+
+    /**
+     * Nova service-fee row — live 0.3% of the typed stake amount, in TAO.
+     * Sits beside [originFeeMixin]'s network-fee row. Emits [FeeStatus.NoFee]
+     * (hidden) when the fee doesn't apply (root / no recipient). Isolated from
+     * the network-fee mixin. Declared after [amountChooserMixin] since it reads
+     * its back-pressured planks.
+     */
+    val novaFeeStatusFlow: StateFlow<FeeStatus<*, FeeDisplay>> = combine(
+        assetFlow,
+        amountChooserMixin.backPressuredPlanks,
+    ) { asset, amountPlanks ->
+        SubtensorNovaFee.nativeFeeStatus(
+            netuid = netuid,
+            grossPlanks = amountPlanks,
+            token = asset.token,
+            amountFormatter = amountFormatter,
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, FeeStatus.NoFee)
 
     val canContinue: StateFlow<Boolean> = combine(
         _selectedValidator,

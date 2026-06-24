@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentSubtensorUnstakeSetupBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
@@ -39,6 +40,16 @@ class SubtensorUnstakeSetupFragment : BaseFragment<SubtensorUnstakeSetupViewMode
             MaxActionAvailability.Available { viewModel.maxClicked() }
         )
         binder.subtensorUnstakeSetupContinue.setOnClickListener { viewModel.continueClicked() }
+
+        // Nova-fee disclosure — visible only when the fee applies (subnet +
+        // recipient set). Inert today (recipient null → hidden). The caption is
+        // static; the fee row's value is observed in subscribe().
+        binder.subtensorUnstakeSetupNovaFee.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorUnstakeSetupNovaFeeDisclaimer.setVisible(viewModel.novaFeeApplies)
+        binder.subtensorUnstakeSetupNovaFeeDisclaimer.text = getString(
+            io.novafoundation.nova.feature_staking_impl.R.string.subtensor_setup_nova_fee_disclaimer,
+            io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants.NOVA_FEE_PERCENT_DISPLAY,
+        )
     }
 
     override fun inject() {
@@ -58,6 +69,10 @@ class SubtensorUnstakeSetupFragment : BaseFragment<SubtensorUnstakeSetupViewMode
         // Canonical Nova fee row — same wire-up as bond_more / parachain
         // start. The mixin owns shimmer / loaded / error states.
         setupFeeLoading(viewModel.feeMixin, binder.subtensorUnstakeSetupFee)
+
+        // Nova-fee row — observed independently of the network-fee mixin. Reuses
+        // the standard FeeView.setFeeStatus binding; NoFee hides the row.
+        viewModel.novaFeeStatusFlow.observe(binder.subtensorUnstakeSetupNovaFee::setFeeStatus)
 
         viewModel.titleText.observe { binder.subtensorUnstakeSetupToolbar.setTitle(it) }
         viewModel.validatorTargetModel.observe { binder.subtensorUnstakeSetupValidator.setModel(it) }

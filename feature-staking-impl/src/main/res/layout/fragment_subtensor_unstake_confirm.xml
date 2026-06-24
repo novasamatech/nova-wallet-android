@@ -26,7 +26,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="24dp" />
+        android:layout_marginTop="24dp">
+
+        <!-- Nova Wallet service-fee row, added as a cell INSIDE the extrinsic-info
+             table so it sits in the same card directly beneath the network-fee row.
+             TableView lays out + dividers all its children uniformly, so no margins
+             or own divider here. Subnet only + recipient set; hidden today
+             (NOVA_FEE_RECIPIENT == null). -->
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+            android:id="@+id/subtensorUnstakeConfirmNovaFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:title="@string/subtensor_setup_nova_fee_label" />
+
+    </io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView>
+
+    <TextView
+        android:id="@+id/subtensorUnstakeConfirmNovaFeeDisclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone" />
 
     <io.novafoundation.nova.common.view.TableView
         android:layout_width="match_parent"

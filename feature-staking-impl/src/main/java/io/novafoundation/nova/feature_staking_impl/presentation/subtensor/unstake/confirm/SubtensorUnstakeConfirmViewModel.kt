@@ -19,24 +19,29 @@ import io.novafoundation.nova.feature_staking_impl.domain.subtensor.SubtensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.common.SubtensorNovaFee
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.runtime.state.chain
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAccountId
 import io.novasama.substrate_sdk_android.ss58.SS58Encoder.toAddress
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import java.math.BigInteger
 
 class SubtensorUnstakeConfirmViewModel(
     private val router: StakingRouter,
@@ -115,8 +120,37 @@ class SubtensorUnstakeConfirmViewModel(
     private val _expectedReceiveLabel = MutableStateFlow<String?>(null)
     val expectedReceiveLabel: StateFlow<String?> = _expectedReceiveLabel.asStateFlow()
 
+    /** True only when the Nova fee applies (subnet + recipient set). Drives the
+     *  fee row + caption visibility. Inert (false) today since the recipient is null. */
+    val novaFeeApplies: Boolean = SubtensorNovaFee.feeApplies(payload.netuid)
+
+    /**
+     * Nova service-fee row — 0.3% of the minimum TAO received, in TAO. Computed
+     * in [fetchAmmEstimate] from the same live AMM reserves the "You'll receive"
+     * estimate uses: minTaoOut = amount × spotPrice × (1 - DEFAULT_SLIPPAGE).
+     * Starts as [FeeStatus.NoFee] (hidden) until reserves arrive / when the fee
+     * doesn't apply. Isolated from the network-fee flow.
+     */
+    private val _novaFeeStatus = MutableStateFlow<FeeStatus<*, FeeDisplay>>(FeeStatus.NoFee)
+    val novaFeeStatusFlow: StateFlow<FeeStatus<*, FeeDisplay>> = _novaFeeStatus.asStateFlow()
+
+    /**
+     * Single source of truth for the unstake fee. [fetchAmmEstimate] resolves the
+     * spot price ONCE, uses it for the displayed fee, and stores it here so the
+     * submit path charges the fee from the exact same reserve read (no second
+     * fetch → no displayed-vs-charged drift). [ammResolved] gates confirm until
+     * that estimate settles, mirroring iOS deferring confirm until the commission
+     * resolves. Root has no AMM, so it resolves immediately with a null price.
+     */
+    private var resolvedSpotPrice: Double? = null
+    private val ammResolved = CompletableDeferred<Unit>()
+
     init {
-        if (!isRoot) viewModelScope.launch { fetchAmmEstimate() }
+        if (!isRoot) {
+            viewModelScope.launch { fetchAmmEstimate() }
+        } else {
+            ammResolved.complete(Unit)
+        }
     }
 
     fun confirmClicked() {
@@ -141,20 +175,49 @@ class SubtensorUnstakeConfirmViewModel(
     }
 
     private suspend fun fetchAmmEstimate() {
-        val reserves = runCatching {
-            withContext(Dispatchers.IO) { subnetFetcher.fetchReserves(payload.netuid) }
-        }.getOrNull() ?: return
-        val spotPrice = reserves.spotPrice
-        if (spotPrice <= 0.0) return
+        try {
+            val reserves = runCatching {
+                withContext(Dispatchers.IO) { subnetFetcher.fetchReserves(payload.netuid) }
+            }.getOrNull() ?: return
+            val spotPrice = reserves.spotPrice
+            if (spotPrice <= 0.0) return
 
-        // alpha_amount × spot_price → tao_received. Both sides expressed in
-        // their respective whole-token units, so we work in BigDecimal for
-        // precision (then format with 4 decimals).
-        val alphaAmount = payload.amountInPlanks
-            .toBigDecimal()
-            .movePointLeft(9)
-        val taoReceived = alphaAmount.multiply(BigDecimal.valueOf(spotPrice))
-        _expectedReceiveLabel.value = "≈ %.4f TAO".format(taoReceived)
+            // Resolved once here; reused verbatim by the submit path (see
+            // [resolvedSpotPrice]) so the charged fee matches this displayed one.
+            resolvedSpotPrice = spotPrice
+
+            // Convert alpha planks → whole tokens with the asset's own precision
+            // (alpha shares TAO's 9 decimals on Bittensor); use the SAME precision
+            // going back to planks below so display and charge can't diverge.
+            val asset = assetFlow.first()
+            val precision = asset.token.configuration.precision.value.toInt()
+
+            // alpha_amount × spot_price → tao_received (whole tokens; BigDecimal
+            // for precision, formatted to 4 decimals for the "You'll receive" row).
+            val alphaAmount = payload.amountInPlanks
+                .toBigDecimal()
+                .movePointLeft(precision)
+            val taoReceived = alphaAmount.multiply(BigDecimal.valueOf(spotPrice))
+            _expectedReceiveLabel.value = "≈ %.4f TAO".format(taoReceived)
+
+            // Nova fee = 0.3% of the MINIMUM TAO out (received minus slippage), in
+            // TAO — mirrors iOS, which charges the fee on minTaoOut so it can never
+            // exceed what's actually received. minTaoOut → planks via the same precision.
+            val minTaoOut = taoReceived.multiply(
+                BigDecimal.valueOf(1.0 - SubtensorStakingConstants.DEFAULT_SLIPPAGE)
+            )
+            val minTaoOutPlanks = minTaoOut.movePointRight(precision).toBigInteger().max(BigInteger.ZERO)
+            _novaFeeStatus.value = SubtensorNovaFee.nativeFeeStatus(
+                netuid = payload.netuid,
+                grossPlanks = minTaoOutPlanks,
+                token = asset.token,
+                amountFormatter = amountFormatter,
+            )
+        } finally {
+            // Release a pending confirm() on every path — success, empty reserves,
+            // or non-positive spot — so the user is never stuck behind the gate.
+            ammResolved.complete(Unit)
+        }
     }
 
     private fun sendTransaction() {
@@ -167,10 +230,16 @@ class SubtensorUnstakeConfirmViewModel(
                 return@launch
             }
 
+            // Gate on the AMM estimate so the fee charged comes from the SAME
+            // reserve read the screen displayed (iOS defers confirm likewise).
+            // Root has no AMM and already resolved in init.
+            if (!isRoot) ammResolved.await()
+
             val result = submitInteractor.submitUnstake(
                 netuid = payload.netuid,
                 hotkey = hotkeyBytes,
                 amountInPlanks = payload.amountInPlanks,
+                spotPriceTaoPerAlpha = resolvedSpotPrice,
             )
             _submitting.value = false
             result.fold(

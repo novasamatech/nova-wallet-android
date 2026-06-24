@@ -2809,6 +2809,8 @@
     <string name="subtensor_setup_available_label">Available: %1$s</string>
     <string name="subtensor_setup_min_stake_label">Minimum stake</string>
     <string name="subtensor_setup_network_fee_label">Network fee</string>
+    <string name="subtensor_setup_nova_fee_label">Nova Wallet fee</string>
+    <string name="subtensor_setup_nova_fee_disclaimer">Includes %1$s%% Nova Wallet fee.</string>
     <string name="subtensor_confirm_subnet_title">Confirm — %1$s</string>
     <string name="subtensor_unstake_position_label">Your stake</string>
     <string name="subtensor_unstake_max">Max</string>

@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.subtensor.SubtensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.common.SubtensorNovaFee
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -84,6 +85,25 @@ class SubtensorStakeConfirmViewModel(
             amountFormatter = amountFormatter,
         )
         FeeStatus.Loaded(feeModel)
+    }.shareInBackground()
+
+    /** True only when the Nova fee applies (subnet + recipient set). Drives the
+     *  fee row + caption visibility. Inert (false) today since the recipient is null. */
+    val novaFeeApplies: Boolean = SubtensorNovaFee.feeApplies(payload.netuid)
+
+    /**
+     * Nova service-fee row — 0.3% of the confirmed stake amount, in TAO. Sits
+     * beneath the network-fee row in [GenericExtrinsicInformationView]. Emits
+     * [FeeStatus.NoFee] (hidden) when the fee doesn't apply. Isolated from the
+     * network-fee flow.
+     */
+    val novaFeeStatusFlow = assetFlow.map { asset ->
+        SubtensorNovaFee.nativeFeeStatus(
+            netuid = payload.netuid,
+            grossPlanks = payload.amountInPlanks,
+            token = asset.token,
+            amountFormatter = amountFormatter,
+        )
     }.shareInBackground()
 
     /** Validator row label. Identity threading is part of the Validator Picker iOS-parity work. */

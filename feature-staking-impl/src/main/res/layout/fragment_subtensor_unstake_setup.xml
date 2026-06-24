@@ -104,6 +104,29 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 app:dividerVisible="false" />
+
+            <!-- Nova Wallet service-fee disclosure (subnet only, recipient set).
+                 Hidden today since NOVA_FEE_RECIPIENT == null. -->
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:id="@+id/subtensorUnstakeSetupNovaFee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone"
+                app:dividerVisible="false"
+                app:title="@string/subtensor_setup_nova_fee_label" />
+
+            <TextView
+                android:id="@+id/subtensorUnstakeSetupNovaFeeDisclaimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

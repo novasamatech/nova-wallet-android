@@ -26,9 +26,12 @@ import io.novafoundation.nova.feature_staking_impl.data.subtensor.network.Subten
 import io.novafoundation.nova.feature_staking_impl.domain.subtensor.model.SubtensorStakingConstants
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.common.SubtensorNovaFee
 import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.confirm.SubtensorUnstakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeToParcel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitOptionalFee
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
@@ -129,6 +132,29 @@ class SubtensorUnstakeSetupViewModel(
         scope = this,
         selectedChainAssetFlow = selectedChainAsset.filterNotNull().shareInBackground(),
     )
+
+    /** True only when the Nova fee applies (subnet + recipient set). Drives the
+     *  fee row + caption visibility. Inert (false) today since the recipient is null. */
+    val novaFeeApplies: Boolean = SubtensorNovaFee.feeApplies(netuid)
+
+    /**
+     * Nova service-fee row — live 0.3% of the entered amount, shown in the
+     * screen's (alpha) asset units (e.g. "SN56"), mirroring iOS which shows the
+     * unstake-setup fee in the subnet token. Sits beside [feeMixin]'s
+     * network-fee row. Emits [FeeStatus.NoFee] (hidden) when the fee doesn't
+     * apply. Isolated from the network-fee mixin.
+     */
+    val novaFeeStatusFlow: StateFlow<FeeStatus<*, FeeDisplay>> = combine(
+        _amountInPlanks,
+        precision,
+    ) { amountPlanks, precision ->
+        SubtensorNovaFee.alphaFeeStatus(
+            netuid = netuid,
+            grossPlanks = amountPlanks,
+            precision = precision,
+            ticker = ticker,
+        )
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, FeeStatus.NoFee)
 
     val canContinue: StateFlow<Boolean> = combine(_amount, _submitting) { amt, submitting ->
         !submitting && amt.isNotBlank() && (amt.toBigDecimalOrNull()?.signum() ?: 0) > 0
