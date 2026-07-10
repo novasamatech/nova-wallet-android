@@ -58,6 +58,14 @@ val StakingRuntimeApi.activeEra: QueryableStorageEntry0<EraIndex>
     get() = storage0("ActiveEra", binding = ::bindActiveEra)
 
 context(RuntimeContext)
+val StakingRuntimeApi.lastValidatorEraOrNull: QueryableStorageEntry1<AccountId, EraIndex>?
+    get() = storage1OrNull("LastValidatorEra", binding = { decoded, _ -> bindEraIndex(decoded) })
+
+context(RuntimeContext)
+val StakingRuntimeApi.areNominatorsSlashableOrNull: QueryableStorageEntry0<Boolean>?
+    get() = storage0OrNull("AreNominatorsSlashable", binding = { decoded -> decoded as Boolean })
+
+context(RuntimeContext)
 val StakingRuntimeApi.erasStartSessionIndexOrNull: QueryableStorageEntry1<EraIndex, SessionIndex>?
     get() = storage1OrNull("ErasStartSessionIndex", binding = { decoded, _ -> bindSessionIndex(decoded) })
 
