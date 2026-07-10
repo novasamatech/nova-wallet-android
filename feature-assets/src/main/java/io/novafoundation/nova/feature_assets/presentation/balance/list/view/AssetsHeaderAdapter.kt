@@ -137,7 +137,7 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
                     Payload.NFT_PREVIEWS -> holder.bindNftPreviews(nftPreviews)
                     Payload.WALLET_CONNECT -> holder.bindWalletConnect(walletConnectModel)
                     Payload.PENDING_OPERATIONS_COUNT -> holder.bindPendingOperationsModel(pendingOperationsModel)
-                    Payload.WATCH_ONLY_WARNING -> holder.bindPendingOperationsModel(pendingOperationsModel)
+                    Payload.WATCH_ONLY_WARNING -> holder.bindWatchOnlyWarning(showWatchOnlyWarning)
                     Payload.TOTAL_BALANCE_TITLE -> holder.bindTotalBalanceTitle(totalBalanceTitle)
                 }
             }
