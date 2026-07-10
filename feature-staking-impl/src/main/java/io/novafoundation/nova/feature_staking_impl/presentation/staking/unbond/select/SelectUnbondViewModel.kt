@@ -66,7 +66,10 @@ class SelectUnbondViewModel(
     val transferableFlow = assetFlow.mapLatest { transferableAmountModelOf(amountFormatter, it) }
         .shareInBackground()
 
-    val hintsMixin = unbondHintsMixinFactory.create(coroutineScope = this)
+    val hintsMixin = unbondHintsMixinFactory.create(
+        coroutineScope = this,
+        stashAccountIdProvider = { accountStakingFlow.first().stashId }
+    )
 
     val originFeeMixin = feeLoaderMixinFactory.createDefault(
         this,

@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_api.domain.model.isRedeemableIn
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.UnstakingDurationRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.common.calculateDurationTill
 import io.novafoundation.nova.feature_staking_impl.domain.common.eraTimeCalculator
@@ -54,7 +55,7 @@ class PoolUnlockChunksLimitValidation(
 }
 
 class PoolMemberUnlockChunksLimitValidation(
-    private val stakingConstantsRepository: StakingConstantsRepository,
+    private val unstakingDurationRepository: UnstakingDurationRepository,
     private val stakingRepository: StakingRepository,
     private val nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     private val stakingSharedState: StakingSharedState,
@@ -64,10 +65,10 @@ class PoolMemberUnlockChunksLimitValidation(
         val stakingOption = stakingSharedState.selectedOption()
         val chainId = stakingOption.assetWithChain.chain.id
 
-        val bondingDuration = stakingConstantsRepository.lockupPeriodInEras(chainId)
+        val nominatorUnbondDuration = unstakingDurationRepository.getUnstakingDurationInEras(chainId).nominator
         val currentEra = stakingRepository.getCurrentEraIndex(chainId)
 
-        val unbondEra = currentEra + bondingDuration
+        val unbondEra = currentEra + nominatorUnbondDuration
 
         val maxUnlockingChunks = nominationPoolGlobalsRepository.maxUnlockChunks(chainId).toInt()
 

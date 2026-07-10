@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.11.6'
+        substrateSdkVersion = '2.11.9'
 
         gifVersion = '1.2.31'
 
@@ -252,7 +252,6 @@ allprojects {
         mavenCentral()
         jcenter()
         maven { url "https://jitpack.io" }
-        maven { url "https://nexus.iroha.tech/repository/maven-soramitsu/" }
         mavenLocal()
         flatDir { dirs "$rootDir/common/libs" }
     }

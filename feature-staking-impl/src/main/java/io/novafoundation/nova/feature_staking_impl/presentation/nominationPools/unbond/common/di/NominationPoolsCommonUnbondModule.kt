@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolGlobalsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.UnstakingDurationRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolMemberUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.common.NominationPoolSharedComputation
@@ -32,6 +33,7 @@ class NominationPoolsCommonUnbondModule {
     @ScreenScope
     fun provideUnbondValidationFactory(
         stakingConstantsRepository: StakingConstantsRepository,
+        unstakingDurationRepository: UnstakingDurationRepository,
         stakingRepository: StakingRepository,
         stakingSharedComputation: StakingSharedComputation,
         nominationPoolSharedComputation: NominationPoolSharedComputation,
@@ -39,6 +41,7 @@ class NominationPoolsCommonUnbondModule {
         nominationPoolGlobalsRepository: NominationPoolGlobalsRepository,
     ) = NominationPoolsUnbondValidationFactory(
         stakingConstantsRepository = stakingConstantsRepository,
+        unstakingDurationRepository = unstakingDurationRepository,
         stakingRepository = stakingRepository,
         stakingSharedComputation = stakingSharedComputation,
         nominationPoolSharedComputation = nominationPoolSharedComputation,

@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.data.mappers.mapAccountToStak
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.UnstakingDurationRepository
 import io.novafoundation.nova.feature_staking_impl.domain.common.ActiveEraInfo
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingSharedComputation
@@ -35,6 +36,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.model.StashNoneStatus
 import io.novafoundation.nova.feature_staking_impl.domain.model.TotalReward
 import io.novafoundation.nova.feature_staking_impl.domain.model.ValidatorStatus
 import io.novafoundation.nova.feature_staking_impl.domain.period.RewardPeriod
+import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.duration.UnlockingDuration
+import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.duration.UnstakingDurationVariant
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -69,6 +72,7 @@ class StakingInteractor(
     private val stakingRepository: StakingRepository,
     private val stakingRewardsRepository: StakingRewardsRepository,
     private val stakingConstantsRepository: StakingConstantsRepository,
+    private val unstakingDurationRepository: UnstakingDurationRepository,
     private val identityRepository: OnChainIdentityRepository,
     private val stakingSharedState: StakingSharedState,
     private val payoutRepository: PayoutRepository,
@@ -219,6 +223,16 @@ class StakingInteractor(
         getLockupDuration(stakingSharedState.chainId(), sharedComputationScope)
     }
 
+    suspend fun getUnlockingDuration(sharedComputationScope: CoroutineScope): UnlockingDuration =
+        withContext(Dispatchers.Default) {
+            getUnlockingDuration(stakingSharedState.chainId(), sharedComputationScope)
+        }
+
+    suspend fun getStashUnstakingVariant(stashAccountId: ByteArray): UnstakingDurationVariant =
+        withContext(Dispatchers.Default) {
+            unstakingDurationRepository.getStashUnstakingVariant(stakingSharedState.chainId(), stashAccountId)
+        }
+
     fun selectedAccountStakingStateFlow(scope: CoroutineScope) = flowOfAll {
         val assetWithChain = stakingSharedState.chainAndAsset()
 
@@ -350,10 +364,19 @@ class StakingInteractor(
     }
 
     private suspend fun getLockupDuration(chainId: ChainId, coroutineScope: CoroutineScope): Duration {
+        return getUnlockingDuration(chainId, coroutineScope).nominator
+    }
+
+    private suspend fun getUnlockingDuration(chainId: ChainId, coroutineScope: CoroutineScope): UnlockingDuration {
         val eraCalculator = getEraTimeCalculator(coroutineScope)
         val eraDuration = eraCalculator.eraDuration()
 
-        return eraDuration * stakingConstantsRepository.lockupPeriodInEras(chainId).toInt()
+        val unstakingInEras = unstakingDurationRepository.getUnstakingDurationInEras(chainId)
+
+        return UnlockingDuration(
+            validator = eraDuration * unstakingInEras.validator.toInt(),
+            nominator = eraDuration * unstakingInEras.nominator.toInt()
+        )
     }
 
     private class StatusResolutionContext(
