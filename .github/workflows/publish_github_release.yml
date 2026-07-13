@@ -3,18 +3,17 @@ name: Publish GitHub release
 on:
   push:
     tags:
-      - '*'
+      - "*"
 
 permissions:
   contents: write
 
 jobs:
   build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    uses: ./.github/workflows/reusable_android_build.yml
     with:
-      branch: master
       gradlew-command: assembleReleaseGithub
-      keystore-file-name: github_key.jks
+      keystore-source: github
     secrets: inherit
 
   create-release:
@@ -22,7 +21,7 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Download built artifact
         uses: actions/download-artifact@v4
@@ -35,7 +34,7 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           name: Release ${{ github.ref_name }}
           tag_name: ${{ github.ref_name }}

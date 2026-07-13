@@ -7,16 +7,11 @@ on:
         description: 'Firebase group'
         required: true
         default: dev-team
-      branch:
-        description: 'From which branch the application will be built'
-        required: true
-        default: develop
 
 jobs:
   build:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    uses: ./.github/workflows/reusable_android_build.yml
     with:
-      branch: ${{ github.event.inputs.branch }}
       gradlew-command: assembleDevelop
     secrets: inherit
 
@@ -25,7 +20,17 @@ jobs:
     needs: build
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: 🔐 Fetch secrets from Scaleway
+        uses: ./.github/actions/install
+        with:
+          scw_access_key: ${{ secrets.SCW_ACCESS_KEY }}
+          scw_secret_key: ${{ secrets.SCW_SECRET_KEY }}
+          scw_default_project_id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          scw_default_organization_id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+          minimal_mode: "true"
+
       - name: Download built artifact
         uses: actions/download-artifact@v4
         with:
@@ -33,10 +38,10 @@ jobs:
           path: app
 
       - name: 🗳 Upload to Firebase
-        uses: ./.github/workflows/upload-to-firebase
+        uses: ./.github/actions/upload-to-firebase
         with:
-          appId: ${{ secrets.ANDROID_DEVELOP_FIREBASE_APP_ID }}
-          firebase-token: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          appId: ${{ env.DEVELOP_FIREBASE_APP_ID }}
+          firebase-token: ${{ env.DEVELOP_FIREBASE_SERVICE_ACCOUNT_JSON }}
           releaseNotes: ${{ github.event.head_commit.message }}
           test-groups: ${{ github.event.inputs.firebase_group }}
           upload-file: app/develop/app-develop.apk

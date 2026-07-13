@@ -1,0 +1,44 @@
+name: Upload to Google Play
+description: Upload APK to Google Play Store
+
+inputs:
+  service-account-json:
+    description: 'Google Play service account JSON content (plain text, not base64)'
+    required: true
+  package-name:
+    description: 'Application package name'
+    required: false
+    default: 'io.novafoundation.nova'
+  release-file:
+    description: 'Path to APK file'
+    required: true
+  track:
+    description: 'Google Play track (internal/alpha/beta/production)'
+    required: false
+    default: 'internal'
+  status:
+    description: 'Release status (draft/completed/inProgress/halted)'
+    required: false
+    default: 'draft'
+  in-app-update-priority:
+    description: 'In-app update priority (0-5)'
+    required: false
+    default: '2'
+  mapping-file:
+    description: 'Path to mapping.txt for deobfuscation'
+    required: false
+    default: ''
+
+runs:
+  using: "composite"
+  steps:
+    - name: 📦 Upload to Google Play
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ inputs.service-account-json }}
+        packageName: ${{ inputs.package-name }}
+        releaseFiles: ${{ inputs.release-file }}
+        track: ${{ inputs.track }}
+        status: ${{ inputs.status }}
+        inAppUpdatePriority: ${{ inputs.in-app-update-priority }}
+        mappingFile: ${{ inputs.mapping-file }}

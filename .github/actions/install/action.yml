@@ -1,0 +1,90 @@
+name: Install dependencies for Android build
+description: Installs all dependencies for Android build and fetches secrets from Scaleway Secret Manager
+
+inputs:
+  scw_access_key:
+    description: "Scaleway Access Key"
+    required: true
+  scw_secret_key:
+    description: "Scaleway Secret Key"
+    required: true
+  scw_default_project_id:
+    description: "Scaleway Default Project ID"
+    required: true
+  scw_default_organization_id:
+    description: "Scaleway Default Organization ID"
+    required: true
+  minimal_mode:
+    description: "Skip SDK/toolchain setup, only fetch secrets (for upload-only jobs)"
+    required: false
+    default: "false"
+
+runs:
+  using: "composite"
+  steps:
+    - name: 🔐 Fetch secrets from Scaleway
+      uses: scaleway/action-scw-secret@v0
+      with:
+        secret-names: |
+          CI_MARKET_KEYSTORE_PASS,/dev/android/GPLAY_KEYSTORE_PASSWORD
+          CI_MARKET_KEYSTORE_KEY_ALIAS,/dev/android/GPLAY_KEYSTORE_KEY_ALIAS
+          CI_MARKET_KEYSTORE_KEY_PASS,/dev/android/GPLAY_KEYSTORE_KEY_PASSWORD
+          GPLAY_KEYSTORE_FILE_BASE64,/dev/android/GPLAY_KEYSTORE_FILE_BASE64
+          CI_KEYSTORE_PASS,/dev/android/DEBUG_KEYSTORE_PASSWORD
+          CI_KEYSTORE_KEY_ALIAS,/dev/android/DEBUG_KEYSTORE_KEY_ALIAS
+          CI_KEYSTORE_KEY_PASS,/dev/android/DEBUG_KEYSTORE_KEY_PASSWORD
+          CI_GITHUB_KEYSTORE_PASS,/dev/android/GITHUB_KEYSTORE_PASSWORD
+          CI_GITHUB_KEYSTORE_KEY_ALIAS,/dev/android/GITHUB_KEYSTORE_KEY_ALIAS
+          CI_GITHUB_KEYSTORE_KEY_PASS,/dev/android/GITHUB_KEYSTORE_KEY_PASSWORD
+          GITHUB_KEYSTORE_FILE_BASE64,/dev/android/GITHUB_KEYSTORE_FILE_BASE64
+          GPLAY_SERVICE_ACCOUNT_JSON,/dev/android/GPLAY_SERVICE_ACCOUNT_JSON
+          CI_DEVELOP_GOOGLE_SERVICES_FILE,/dev/android/GOOGLE_SERVICES_DEBUG_BASE64
+          CI_PRODUCTION_GOOGLE_SERVICES_FILE,/dev/android/GOOGLE_SERVICES_RELEASE_BASE64
+          DEVELOP_FIREBASE_APP_ID,/dev/android/DEVELOP_FIREBASE_APP_ID
+          DEVELOP_FIREBASE_SERVICE_ACCOUNT_JSON,/dev/android/DEVELOP_FIREBASE_SERVICE_ACCOUNT_JSON
+        access-key: ${{ inputs.scw_access_key }}
+        secret-key: ${{ inputs.scw_secret_key }}
+        default-project-id: ${{ inputs.scw_default_project_id }}
+        default-organization-id: ${{ inputs.scw_default_organization_id }}
+
+    - name: ☕️ Install Java
+      if: inputs.minimal_mode != 'true'
+      uses: actions/setup-java@v4.0.0
+      with:
+        distribution: "temurin"
+        java-version: "17"
+        cache: "gradle"
+
+    - name: Setup Android SDK
+      if: inputs.minimal_mode != 'true'
+      uses: android-actions/setup-android@v3
+      with:
+        cmdline-tools-version: 12266719
+
+    - name: Install NDK
+      if: inputs.minimal_mode != 'true'
+      run: echo "y" | sudo ${ANDROID_SDK_ROOT}/cmdline-tools/16.0/bin/sdkmanager --install "ndk;26.1.10909125" --sdk_root=${ANDROID_SDK_ROOT}
+      shell: bash
+
+    - name: Set ndk.dir in local.properties
+      if: inputs.minimal_mode != 'true'
+      run: echo "ndk.dir=${ANDROID_SDK_ROOT}/ndk/26.1.10909125" >> local.properties
+      shell: bash
+
+    - name: 🦀 Install Rust
+      if: inputs.minimal_mode != 'true'
+      uses: actions-rs/toolchain@v1
+      with:
+        profile: minimal
+        toolchain: stable
+        override: true
+        components: rustfmt, clippy
+
+    - name: Add targets
+      if: inputs.minimal_mode != 'true'
+      run: |
+        rustup target add armv7-linux-androideabi
+        rustup target add i686-linux-android
+        rustup target add x86_64-linux-android
+        rustup target add aarch64-linux-android
+      shell: bash

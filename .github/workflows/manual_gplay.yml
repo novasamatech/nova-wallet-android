@@ -1,0 +1,96 @@
+name: Manual Google Play distribution
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Google Play track"
+        required: true
+        type: choice
+        options:
+          - internal
+          - beta
+          - production
+        default: "internal"
+      release_status:
+        description: "Release status on the track"
+        required: true
+        type: choice
+        options:
+          - draft
+          - completed
+        default: "draft"
+
+env:
+  DEFAULT_GPLAY_TRACK: internal
+  DEFAULT_GPLAY_RELEASE_STATUS: draft
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  resolve-version-code:
+    name: Resolve versionCode
+    runs-on: ubuntu-latest
+    outputs:
+      ci_build_id: ${{ steps.version_code.outputs.ci_build_id }}
+    steps:
+      - name: Calculate CI build id
+        id: version_code
+        run: |
+          echo "ci_build_id=$((1000 + GITHUB_RUN_NUMBER))" >> "$GITHUB_OUTPUT"
+          echo "Using CI_BUILD_ID=$((1000 + GITHUB_RUN_NUMBER))"
+
+  run-tests:
+    name: Run unit tests
+    needs: resolve-version-code
+    uses: ./.github/workflows/reusable_android_build.yml
+    with:
+      gradlew-command: "false"
+      ci-build-id: ${{ needs.resolve-version-code.outputs.ci_build_id }}
+      run-tests: true
+    secrets: inherit
+
+  build:
+    name: Build releaseMarket AAB
+    needs: resolve-version-code
+    uses: ./.github/workflows/reusable_android_build.yml
+    with:
+      gradlew-command: bundleReleaseMarket
+      ci-build-id: ${{ needs.resolve-version-code.outputs.ci_build_id }}
+      build-output-type: bundle
+      keystore-source: market
+      run-tests: false
+    secrets: inherit
+
+  upload-to-gplay:
+    name: Upload to Google Play
+    runs-on: ubuntu-latest
+    needs: [run-tests, build]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔐 Fetch secrets from Scaleway
+        uses: ./.github/actions/install
+        with:
+          scw_access_key: ${{ secrets.SCW_ACCESS_KEY }}
+          scw_secret_key: ${{ secrets.SCW_SECRET_KEY }}
+          scw_default_project_id: ${{ secrets.SCW_DEFAULT_PROJECT_ID }}
+          scw_default_organization_id: ${{ secrets.SCW_DEFAULT_ORGANIZATION_ID }}
+          minimal_mode: "true"
+
+      - name: Download built artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: apk
+          path: app
+
+      - name: 📦 Upload to Google Play
+        uses: ./.github/actions/upload-to-gplay
+        with:
+          service-account-json: ${{ env.GPLAY_SERVICE_ACCOUNT_JSON }}
+          package-name: io.novafoundation.nova.market
+          release-file: app/releaseMarket/app-releaseMarket.aab
+          track: ${{ inputs.track || env.DEFAULT_GPLAY_TRACK }}
+          status: ${{ inputs.release_status || env.DEFAULT_GPLAY_RELEASE_STATUS }}
