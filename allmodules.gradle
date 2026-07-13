@@ -34,4 +34,10 @@ subprojects {
             freeCompilerArgs = ["-Xcontext-receivers"]
         }
     }
+
+    configurations.configureEach {
+        resolutionStrategy {
+            force "com.google.android.material:material:$rootProject.supportVersion"
+        }
+    }
 }
