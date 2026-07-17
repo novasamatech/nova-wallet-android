@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_staking_api.domain.api
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
+import io.novafoundation.nova.feature_staking_api.domain.model.EraRewardAllocation
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
-import io.novafoundation.nova.feature_staking_api.domain.model.InflationPredictionInfo
 import io.novafoundation.nova.feature_staking_api.domain.model.RewardDestination
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
@@ -58,7 +58,7 @@ interface StakingRepository {
 
     suspend fun nominatorsCount(chainId: ChainId): BigInteger?
 
-    suspend fun getInflationPredictionInfo(chainId: ChainId): InflationPredictionInfo
+    suspend fun getEraRewardAllocation(chainId: ChainId, era: EraIndex): EraRewardAllocation
 }
 
 suspend fun StakingRepository.historicalEras(chainId: ChainId): List<BigInteger> {

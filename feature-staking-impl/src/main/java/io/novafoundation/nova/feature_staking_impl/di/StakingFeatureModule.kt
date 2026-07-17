@@ -192,16 +192,14 @@ class StakingFeatureModule {
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         walletConstants: WalletConstants,
         chainRegistry: ChainRegistry,
-        storageCache: StorageCache,
-        multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
+        storageCache: StorageCache
     ): StakingRepository = StakingRepositoryImpl(
         accountStakingDao = accountStakingDao,
         remoteStorage = remoteStorageSource,
         localStorage = localStorageSource,
         walletConstants = walletConstants,
         chainRegistry = chainRegistry,
-        storageCache = storageCache,
-        multiChainRuntimeCallsApi = multiChainRuntimeCallsApi
+        storageCache = storageCache
     )
 
     @Provides

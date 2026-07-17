@@ -100,7 +100,7 @@ class RewardCalculatorFactory(
     ): RewardCalculator? {
         return when (chain.id) {
             Chain.Geneses.VARA -> Vara(chain.id, validators, totalIssuance)
-            Chain.Geneses.POLKADOT_ASSET_HUB -> PolkadotInflationPrediction(validators, totalIssuance, scope)
+            Chain.Geneses.POLKADOT_ASSET_HUB -> PolkadotEraRewardAllocation(validators, totalIssuance, scope)
             else -> null
         }
     }
@@ -129,26 +129,31 @@ class RewardCalculatorFactory(
             .getOrNull()
     }
 
-    private suspend fun StakingOption.PolkadotInflationPrediction(
+    private suspend fun StakingOption.PolkadotEraRewardAllocation(
         validators: List<RewardCalculationTarget>,
         totalIssuance: BigInteger,
         scope: CoroutineScope
     ): RewardCalculator? {
         return runCatching {
-            val eraRewardCalculator = shareStakingSharedComputation.get().eraTimeCalculator(this, scope)
-            val eraDuration = eraRewardCalculator.eraDuration()
+            val eraTimeCalculator = shareStakingSharedComputation.get().eraTimeCalculator(this, scope)
+            val eraDuration = eraTimeCalculator.eraDuration()
 
-            val inflationPredictionInfo = stakingRepository.getInflationPredictionInfo(chain.id)
+            val activeEra = eraTimeCalculator.activeEra
+            require(activeEra > BigInteger.ZERO) { "No completed era to read the reward allocation for" }
 
-            InflationPredictionInfoCalculator(
-                inflationPredictionInfo = inflationPredictionInfo,
+            // the allocation is snapshotted at era end, so the active era itself reads zero
+            val eraRewardAllocation = stakingRepository.getEraRewardAllocation(chain.id, activeEra - BigInteger.ONE)
+            require(eraRewardAllocation.stakerRewards > BigInteger.ZERO) { "Era reward allocation is empty" }
+
+            EraRewardAllocationRewardCalculator(
+                stakersEraReward = eraRewardAllocation.stakerRewards,
                 eraDuration = eraDuration,
                 totalIssuance = totalIssuance,
                 validators = validators
             )
         }
             .onFailure {
-                Log.e("RewardCalculatorFactory", "Failed to create Polkadot Inflation Prediction reward calculator, fallbacking to default", it)
+                Log.e("RewardCalculatorFactory", "Failed to create Polkadot era reward allocation calculator, fallbacking to default", it)
             }
             .getOrNull()
     }

@@ -13,17 +13,18 @@ import io.novafoundation.nova.common.utils.metadata
 import io.novafoundation.nova.common.utils.numberConstant
 import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novafoundation.nova.common.utils.staking
+import io.novafoundation.nova.common.utils.toByteArray
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.domain.model.EraIndex
+import io.novafoundation.nova.feature_staking_api.domain.model.EraRewardAllocation
 import io.novafoundation.nova.feature_staking_api.domain.model.Exposure
 import io.novafoundation.nova.feature_staking_api.domain.model.ExposureOverview
 import io.novafoundation.nova.feature_staking_api.domain.model.ExposurePage
 import io.novafoundation.nova.feature_staking_api.domain.model.IndividualExposure
-import io.novafoundation.nova.feature_staking_api.domain.model.InflationPredictionInfo
 import io.novafoundation.nova.feature_staking_api.domain.model.Nominations
 import io.novafoundation.nova.feature_staking_api.domain.model.SlashingSpans
 import io.novafoundation.nova.feature_staking_api.domain.model.StakingLedger
@@ -53,11 +54,12 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.ValidatorExposureUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.activeEraStorageKey
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
-import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
+import io.novafoundation.nova.runtime.multiNetwork.getSocket
+import io.novafoundation.nova.runtime.network.rpc.stateCall
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novafoundation.nova.runtime.storage.source.observeNonNull
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
@@ -68,9 +70,13 @@ import io.novafoundation.nova.runtime.storage.source.queryNonNull
 import io.novasama.substrate_sdk_android.extensions.fromHex
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.runtime.definitions.types.useScaleWriter
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import io.novasama.substrate_sdk_android.runtime.metadata.storageOrNull
+import io.novasama.substrate_sdk_android.scale.dataType.uint32
+import io.novasama.substrate_sdk_android.scale.utils.directWrite
+import io.novasama.substrate_sdk_android.wsrpc.request.runtime.state.StateCallRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -89,7 +95,6 @@ class StakingRepositoryImpl(
     private val walletConstants: WalletConstants,
     private val chainRegistry: ChainRegistry,
     private val storageCache: StorageCache,
-    private val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi,
 ) : StakingRepository {
 
     override suspend fun eraStartSessionIndex(chainId: ChainId, era: EraIndex): EraIndex {
@@ -330,15 +335,21 @@ class StakingRepositoryImpl(
         chainId = chainId
     )
 
-    override suspend fun getInflationPredictionInfo(chainId: ChainId): InflationPredictionInfo {
-        val callApi = multiChainRuntimeCallsApi.forChain(chainId)
+    override suspend fun getEraRewardAllocation(chainId: ChainId, era: EraIndex): EraRewardAllocation {
+        val socket = chainRegistry.getSocket(chainId)
 
-        return callApi.call(
-            section = "Inflation",
-            method = "experimental_issuance_prediction_info",
-            arguments = emptyMap(),
-            returnBinding = InflationPredictionInfo::fromDecoded
-        )
+        // View functions are not declared as runtime apis in the metadata version the app
+        // requests (their ids/types ship with v16), so the request is assembled statically:
+        // the 32-byte view function id followed by the arguments as a SCALE `Vec<u8>`.
+        val payload = useScaleWriter {
+            directWrite(EraRewardAllocation.ERA_REWARD_ALLOCATION_VIEW_FUNCTION_ID)
+            writeByteArray(uint32.toByteArray(era.toInt().toUInt()))
+        }
+
+        val request = StateCallRequest("RuntimeViewFunction_execute_view_function", payload.toHexString(withPrefix = true))
+        val response = socket.stateCall(request) ?: error("Empty era reward allocation response")
+
+        return EraRewardAllocation.fromStateCallResult(response.fromHex())
     }
 
     private suspend fun <T> queryStorageIfExists(
