@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.sdk
 
-import com.walletconnect.web3.wallet.client.Wallet
-import com.walletconnect.web3.wallet.client.Wallet.Model.Namespace.Session
-import com.walletconnect.web3.wallet.client.Wallet.Model.SessionProposal
-import com.walletconnect.web3.wallet.client.Wallet.Params.SessionApprove
-import com.walletconnect.web3.wallet.client.Web3Wallet
+import com.reown.walletkit.client.Wallet
+import com.reown.walletkit.client.Wallet.Model.Namespace.Session
+import com.reown.walletkit.client.Wallet.Model.SessionProposal
+import com.reown.walletkit.client.Wallet.Params.SessionApprove
+import com.reown.walletkit.client.WalletKit
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -65,7 +65,7 @@ fun Wallet.Model.SessionRequest.rejected(): Wallet.Params.SessionRequestResponse
     return failed(WalletConnectError.REJECTED)
 }
 
-suspend fun Web3Wallet.approveSession(approve: SessionApprove): Result<Unit> {
+suspend fun WalletKit.approveSession(approve: SessionApprove): Result<Unit> {
     return suspendCoroutine { continuation ->
         approveSession(
             params = approve,
@@ -75,7 +75,7 @@ suspend fun Web3Wallet.approveSession(approve: SessionApprove): Result<Unit> {
     }
 }
 
-suspend fun Web3Wallet.rejectSession(reject: Wallet.Params.SessionReject): Result<Unit> {
+suspend fun WalletKit.rejectSession(reject: Wallet.Params.SessionReject): Result<Unit> {
     return suspendCoroutine { continuation ->
         rejectSession(
             params = reject,
@@ -85,7 +85,7 @@ suspend fun Web3Wallet.rejectSession(reject: Wallet.Params.SessionReject): Resul
     }
 }
 
-suspend fun Web3Wallet.disconnectSession(sessionTopic: String): Result<Unit> {
+suspend fun WalletKit.disconnectSession(sessionTopic: String): Result<Unit> {
     return suspendCoroutine { continuation ->
         disconnectSession(
             params = Wallet.Params.SessionDisconnect(sessionTopic),
@@ -95,7 +95,7 @@ suspend fun Web3Wallet.disconnectSession(sessionTopic: String): Result<Unit> {
     }
 }
 
-suspend fun Web3Wallet.respondSessionRequest(response: Wallet.Params.SessionRequestResponse): Result<Unit> {
+suspend fun WalletKit.respondSessionRequest(response: Wallet.Params.SessionRequestResponse): Result<Unit> {
     return suspendCoroutine { continuation ->
         respondSessionRequest(
             params = response,

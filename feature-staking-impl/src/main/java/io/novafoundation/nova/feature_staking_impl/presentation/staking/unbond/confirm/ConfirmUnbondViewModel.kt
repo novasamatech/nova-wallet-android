@@ -63,12 +63,15 @@ class ConfirmUnbondViewModel(
     private val _showNextProgress = MutableLiveData(false)
     val showNextProgress: LiveData<Boolean> = _showNextProgress
 
-    val hintsMixin = unbondHintsMixinFactory.create(coroutineScope = this)
-
     private val accountStakingFlow = interactor.selectedAccountStakingStateFlow(viewModelScope)
         .filterIsInstance<StakingState.Stash>()
         .inBackground()
         .share()
+
+    val hintsMixin = unbondHintsMixinFactory.create(
+        coroutineScope = this,
+        stashAccountIdProvider = { accountStakingFlow.first().stashId }
+    )
 
     private val assetFlow = accountStakingFlow.flatMapLatest {
         interactor.assetFlow(it.controllerAddress)

@@ -141,6 +141,12 @@ android {
         resources.excludes.add("META-INF/versions/9/previous-compilation-data.bin")
         resources.excludes.add("META-INF/DEPENDENCIES")
         resources.excludes.add("META-INF/NOTICE.md")
+        resources.excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
+        resources.excludes.add("META-INF/versions/**/OSGI-INF/MANIFEST.MF")
+
+        jniLibs {
+            useLegacyPackaging = false
+        }
     }
 
     buildFeatures {

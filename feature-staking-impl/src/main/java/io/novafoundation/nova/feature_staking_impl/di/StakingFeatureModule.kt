@@ -53,7 +53,9 @@ import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingRe
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealStakingVersioningRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.RealVaraRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.SessionRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.RealUnstakingDurationRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingConstantsRepository
+import io.novafoundation.nova.feature_staking_impl.data.repository.UnstakingDurationRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingPeriodRepository
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRepositoryImpl
 import io.novafoundation.nova.feature_staking_impl.data.repository.StakingRewardsRepository
@@ -156,13 +158,13 @@ class StakingFeatureModule {
     fun provideStakingEraInteractorFactory(
         roundDurationEstimator: RoundDurationEstimator,
         stakingSharedComputation: StakingSharedComputation,
-        stakingConstantsRepository: StakingConstantsRepository,
+        unstakingDurationRepository: UnstakingDurationRepository,
         mythosSharedComputation: MythosSharedComputation,
         mythosStakingRepository: MythosStakingRepository,
     ) = StakingEraInteractorFactory(
         roundDurationEstimator = roundDurationEstimator,
         stakingSharedComputation = stakingSharedComputation,
-        stakingConstantsRepository = stakingConstantsRepository,
+        unstakingDurationRepository = unstakingDurationRepository,
         mythosSharedComputation = mythosSharedComputation,
         mythosStakingRepository = mythosStakingRepository
     )
@@ -245,6 +247,7 @@ class StakingFeatureModule {
         stakingRepository: StakingRepository,
         stakingRewardsRepository: StakingRewardsRepository,
         stakingConstantsRepository: StakingConstantsRepository,
+        unstakingDurationRepository: UnstakingDurationRepository,
         identityRepository: OnChainIdentityRepository,
         payoutRepository: PayoutRepository,
         stakingSharedState: StakingSharedState,
@@ -256,6 +259,7 @@ class StakingFeatureModule {
         stakingRepository,
         stakingRewardsRepository,
         stakingConstantsRepository,
+        unstakingDurationRepository,
         identityRepository,
         stakingSharedState,
         payoutRepository,
@@ -383,6 +387,18 @@ class StakingFeatureModule {
         chainRegistry: ChainRegistry,
         runtimeCallsApi: MultiChainRuntimeCallsApi
     ) = StakingConstantsRepository(chainRegistry, runtimeCallsApi)
+
+    @Provides
+    @FeatureScope
+    fun provideUnstakingDurationRepository(
+        chainRegistry: ChainRegistry,
+        @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
+        stakingConstantsRepository: StakingConstantsRepository,
+    ): UnstakingDurationRepository = RealUnstakingDurationRepository(
+        chainRegistry = chainRegistry,
+        remoteStorageSource = remoteStorageSource,
+        stakingConstantsRepository = stakingConstantsRepository
+    )
 
     @Provides
     @FeatureScope

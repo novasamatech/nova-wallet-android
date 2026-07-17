@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '10.8.3'
-        versionCode = 259
+        versionName = '10.8.4'
+        versionCode = 261
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -47,13 +47,13 @@ buildscript {
         robolectricVersion = '4.1'
         allureVersion = '2.4.0'
 
-        bouncyCastleVersion = '1.65'
+        bouncyCastleVersion = '1.78.1'
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.11.0'
+        substrateSdkVersion = '2.11.9'
 
-        gifVersion = '1.2.19'
+        gifVersion = '1.2.31'
 
         zXingVersion = '3.4.0'
         zXingEmbeddedVersion = '3.5.0@aar'
@@ -83,8 +83,7 @@ buildscript {
 
         firebaseBomVersion = '32.7.1'
 
-        walletConnectCoreVersion = "1.27.2"
-        walletConnectWalletVersion = "1.20.2"
+        reownVersion = "1.6.13"
 
         playServicesAuthVersion = "20.0.0"
         googleApiClientVersion = "1.32.1"
@@ -150,7 +149,7 @@ buildscript {
         navigationFragmentDep = "androidx.navigation:navigation-fragment-ktx:$navControllerVersion"
         navigationUiDep = "androidx.navigation:navigation-ui-ktx:$navControllerVersion"
 
-        bouncyCastleDep = "org.bouncycastle:bcprov-jdk15on:$bouncyCastleVersion"
+        bouncyCastleDep = "org.bouncycastle:bcprov-jdk18on:$bouncyCastleVersion"
 
         retrofitDep = "com.squareup.retrofit2:retrofit:$retrofitVersion"
         interceptorVersion = "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
@@ -201,8 +200,8 @@ buildscript {
 
         multibaseDep = "com.github.multiformats:java-multibase:$multibaseVersion"
 
-        walletConnectCoreDep = "com.walletconnect:android-core:$walletConnectCoreVersion"
-        walletConnectWalletDep = "com.walletconnect:web3wallet:$walletConnectWalletVersion"
+        walletConnectCoreDep = "com.reown:android-core:$reownVersion"
+        walletConnectWalletDep = "com.reown:walletkit:$reownVersion"
 
         canonizationJsonDep = "io.github.erdtman:java-json-canonicalization:1.1"
 
@@ -237,7 +236,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.7.3'
+        classpath 'com.android.tools.build:gradle:8.9.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'com.google.gms:google-services:4.3.14'
         classpath 'org.mozilla.rust-android-gradle:plugin:0.9.6'
@@ -253,7 +252,6 @@ allprojects {
         mavenCentral()
         jcenter()
         maven { url "https://jitpack.io" }
-        maven { url "https://nexus.iroha.tech/repository/maven-soramitsu/" }
         mavenLocal()
         flatDir { dirs "$rootDir/common/libs" }
     }

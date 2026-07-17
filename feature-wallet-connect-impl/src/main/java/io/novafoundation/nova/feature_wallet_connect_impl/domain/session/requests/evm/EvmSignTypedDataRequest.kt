@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.domain.session.requests.evm
 
 import android.content.Context
-import com.walletconnect.web3.wallet.client.Wallet
-import com.walletconnect.web3.wallet.client.Wallet.Params.SessionRequestResponse
+import com.reown.walletkit.client.Wallet
+import com.reown.walletkit.client.Wallet.Params.SessionRequestResponse
 import io.novafoundation.nova.feature_external_sign_api.model.ExternalSignCommunicator.Response
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload

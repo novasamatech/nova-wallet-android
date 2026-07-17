@@ -6,7 +6,7 @@ import android.graphics.Matrix
 import android.graphics.Path
 import android.graphics.RectF
 import android.view.View
-import com.google.android.renderscript.Toolkit
+import io.novafoundation.nova.common.utils.blur.StackBlur
 
 fun Path.applyRoundRect(rectF: RectF, radius: Float) {
     reset()
@@ -50,7 +50,7 @@ fun Bitmap.convertToAlphaMask(): Bitmap {
 
 fun Bitmap.blurBitmap(size: Int): Bitmap {
     if (size == 0) return this
-    return Toolkit.blur(this, size)
+    return StackBlur.blur(this, size)
 }
 
 fun Bitmap.downscale(factor: Float): Bitmap {

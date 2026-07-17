@@ -33,6 +33,9 @@ class StakingConstantsRepository(
 
     suspend fun lockupPeriodInEras(chainId: ChainId): BigInteger = getNumberConstant(chainId, "BondingDuration")
 
+    suspend fun nominatorFastUnbondDurationInErasOrNull(chainId: ChainId): BigInteger? =
+        getOptionalNumberConstant(chainId, "NominatorFastUnbondDuration")
+
     suspend fun maxValidatorsPerNominator(chainId: ChainId, stake: Balance): Int {
         return getOptionalNumberConstant(chainId, "MaxNominations")?.toInt()
             ?: getMaxNominationsQuota(chainId, stake)?.toInt()
