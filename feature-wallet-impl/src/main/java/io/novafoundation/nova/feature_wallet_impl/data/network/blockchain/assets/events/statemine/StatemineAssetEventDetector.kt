@@ -42,7 +42,7 @@ class StatemineAssetEventDetector(
     }
 
     private fun detectTokensDeposited(event: GenericEvent.Instance): DepositEvent? {
-        if (!event.instanceOf(assetType.palletNameOrDefault(), "Issued")) return null
+        if (!event.instanceOf(assetType.palletNameOrDefault(), "Issued", "Deposited")) return null
 
         val (assetId, who, amount) = event.arguments
 
