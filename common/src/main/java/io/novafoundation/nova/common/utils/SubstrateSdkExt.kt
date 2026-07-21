@@ -36,6 +36,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.sign
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliases
 import io.novasama.substrate_sdk_android.runtime.definitions.types.skipAliasesOrNull
 import io.novasama.substrate_sdk_android.runtime.definitions.types.toByteArray
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicVersion
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.getGenesisHashOrThrow
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SignedRaw
@@ -473,6 +474,14 @@ val InheritedImplication.chainId: String
 
 fun ExtrinsicBuilder.getChainIdOrThrow(): String {
     return getGenesisHashOrThrow().toHexString()
+}
+
+fun InheritedImplication.signingPayloadPreimage(): ByteArray {
+    return when (extrinsicVersion) {
+        is ExtrinsicVersion.V4 -> encodedCall() + encodedExtensions()
+
+        is ExtrinsicVersion.V5 -> encoded()
+    }
 }
 
 fun RuntimeMetadata.moduleOrFallback(name: String, vararg fallbacks: String): Module = modules[name]
