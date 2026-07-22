@@ -4,6 +4,7 @@ import android.view.View
 import coil.ImageLoader
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
@@ -57,6 +58,11 @@ class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>()
         setupExternalActions(viewModel)
 
         viewModel.migrationAlertFlow.observe { binder.stakingMigrationAlert.setModelOrHide(it) }
+
+        viewModel.noticeForCurrentChain.observe { notice ->
+            binder.stakingDetailsNoticeBlock.setVisible(notice != null)
+            notice?.let { binder.stakingDetailsNoticeBlock.bind(it) }
+        }
 
         setupNetworkInfoComponent(viewModel.networkInfoComponent, binder.stakingNetworkInfo)
         setupStakeSummaryComponent(viewModel.stakeSummaryComponent, binder.stakingStakeSummary)

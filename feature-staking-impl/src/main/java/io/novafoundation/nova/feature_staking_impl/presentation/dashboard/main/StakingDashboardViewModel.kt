@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
@@ -21,6 +22,9 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSynci
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.notices.model.StakingNotice
+import io.novafoundation.nova.feature_staking_impl.data.notices.repository.StakingNoticesRepository
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
@@ -62,7 +66,8 @@ class StakingDashboardViewModel(
     private val dashboardUpdatePeriod: Duration = 200.milliseconds,
     private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
     private val amountFormatter: AmountFormatter,
-    private val assetIconProvider: AssetIconProvider
+    private val assetIconProvider: AssetIconProvider,
+    private val stakingNoticesRepository: StakingNoticesRepository,
 ) : BaseViewModel() {
 
     private val dashboardFormattersFlow = maskableValueFormatterProvider.provideFormatter()
@@ -77,15 +82,25 @@ class StakingDashboardViewModel(
     private val stakingDashboardFlow = interactor.stakingDashboardFlow()
         .shareInBackground()
 
-    val stakingDashboardUiFlow = stakingDashboardFlow
+    private val noticesFlow = stakingNoticesRepository.observeStakingNotices()
+        .shareInBackground()
+
+    private val dashboardUiWithoutNotices = stakingDashboardFlow
         .throttleLast(dashboardUpdatePeriod)
         .combine(dashboardFormattersFlow) { dashboardLoading, valueFormatter -> dashboardLoading.map { mapDashboardToUi(it, valueFormatter) } }
+
+    val stakingDashboardUiFlow = dashboardUiWithoutNotices
+        .combine(noticesFlow) { dashboardLoading, notices -> applyNotices(dashboardLoading, notices) }
         .shareInBackground()
 
     init {
         stakingDashboardUpdateSystem.start()
             .inBackground()
             .launchIn(this)
+
+        launch {
+            runCatching { stakingNoticesRepository.syncStakingNotices() }
+        }
     }
 
     fun onHasStakeItemClicked(index: Int) = launch {
@@ -183,6 +198,21 @@ class StakingDashboardViewModel(
                 text = resourceManager.getString(R.string.common_waiting),
                 textColorRes = R.color.text_primary
             )
+        }
+    }
+
+    private fun applyNotices(
+        dashboardLoading: ExtendedLoadingState<StakingDashboardModel>,
+        notices: Map<ChainId, StakingNotice>
+    ): ExtendedLoadingState<StakingDashboardModel> {
+        return dashboardLoading.map { model ->
+            val enrichedHasStake = model.hasStakeItems.map { item ->
+                item.copy(notice = notices[item.assetId.chainId])
+            }
+            val enrichedNoStake = model.noStakeItems.map { item ->
+                item.copy(notice = notices[item.assetId.chainId])
+            }
+            StakingDashboardModel(hasStakeItems = enrichedHasStake, noStakeItems = enrichedNoStake)
         }
     }
 

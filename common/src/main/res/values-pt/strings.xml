@@ -2039,4 +2039,5 @@
     <string name="yield_boost_stake_increase_time">Tempo de aumento de stake</string>
     <string name="yield_boost_terms" formatted="false">O Impulso de Rendimento irá automaticamente fazer o stake de %s de todos os meus tokens transferíveis acima de %s</string>
     <string name="yiled_boost_yield_boosted">Com Impulso de Rendimento</string>
+    <string name="staking_notice_chip_label">Aviso</string>
 </resources>

@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
+import io.novafoundation.nova.feature_staking_impl.data.notices.repository.StakingNoticesRepository
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
@@ -57,7 +58,8 @@ class StartStakingLandingModule {
         stakingStartedDetectionService: StakingStartedDetectionService,
         chainRegistry: ChainRegistry,
         contextManager: ContextManager,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        stakingNoticesRepository: StakingNoticesRepository
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -72,7 +74,8 @@ class StartStakingLandingModule {
             stakingStartedDetectionService = stakingStartedDetectionService,
             chainRegistry = chainRegistry,
             contextManager = contextManager,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            stakingNoticesRepository = stakingNoticesRepository
         )
     }
 

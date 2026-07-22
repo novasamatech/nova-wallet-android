@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import coil.ImageLoader
@@ -17,7 +18,10 @@ import io.novafoundation.nova.common.utils.setShimmerShown
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.utils.unsafeLazy
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.notices.model.StakingNotice
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardNoStakeBinding
+import io.novafoundation.nova.feature_staking_impl.presentation.common.view.StakingNoticeChipView
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.StakingTypeModel
 
 class StakingDashboardNoStakeView @JvmOverloads constructor(
@@ -27,6 +31,10 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr), WithContextExtensions by WithContextExtensions(context) {
 
     private val binder = ItemDashboardNoStakeBinding.inflate(inflater(), this)
+
+    private val noticeChipView: StakingNoticeChipView by unsafeLazy {
+        findViewById(R.id.noStakeRowNoticeChip)
+    }
 
     private val imageLoader: ImageLoader
 
@@ -79,6 +87,15 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
 
     fun setStakingTypeBadge(model: StakingTypeModel?) {
         binder.itemDashboardNoStakeStakingType.setModelOrHide(model)
+    }
+
+    fun setNotice(notice: StakingNotice?) {
+        if (notice != null) {
+            noticeChipView.bind(notice)
+            noticeChipView.visibility = View.VISIBLE
+        } else {
+            noticeChipView.visibility = View.GONE
+        }
     }
 
     fun unbind() {

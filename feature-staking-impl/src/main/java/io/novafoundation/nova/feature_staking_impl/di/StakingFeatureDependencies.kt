@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import android.content.Context
 import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
@@ -154,6 +155,8 @@ interface StakingFeatureDependencies {
     val assetIconProvider: AssetIconProvider
 
     fun contextManager(): ContextManager
+
+    fun context(): Context
 
     fun computationalCache(): ComputationalCache
 

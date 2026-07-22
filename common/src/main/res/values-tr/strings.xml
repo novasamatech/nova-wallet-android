@@ -2039,4 +2039,5 @@
     <string name="yield_boost_stake_increase_time">Bahis artış süresi</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost, %s tüm transfer edilebilir tokenlerimi otomatik olarak %s üzerinde stake edecek</string>
     <string name="yiled_boost_yield_boosted">Yield Boost\'lu</string>
+    <string name="staking_notice_chip_label">Bildirim</string>
 </resources>

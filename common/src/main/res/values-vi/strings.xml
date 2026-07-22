@@ -2025,4 +2025,5 @@
     <string name="yield_boost_stake_increase_time">Thời gian tăng Stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost sẽ tự động stake %s tất cả token có thể chuyển được của tôi trên %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="staking_notice_chip_label">Thông báo</string>
 </resources>

@@ -2039,4 +2039,5 @@
     <string name="yield_boost_stake_increase_time">Stake növekedési idő</string>
     <string name="yield_boost_terms" formatted="false">A  Yield Boost %s automatikusan stake-elni fogja a %s feletti utalható tokeneket</string>
     <string name="yiled_boost_yield_boosted">Yield Boost-olt</string>
+    <string name="staking_notice_chip_label">Értesítés</string>
 </resources>

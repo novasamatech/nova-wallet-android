@@ -36,6 +36,7 @@ class DashboardNoStakeAdapter(
                 NoStakeItem::tokenName -> holder.bindTokenName(item)
                 NoStakeItem::assetIcon -> holder.bindAssetIcon(item)
                 NoStakeItem::stakingTypeBadge -> holder.bindStakingType(item)
+                NoStakeItem::notice -> holder.bindNotice(item)
             }
         }
     }
@@ -56,6 +57,7 @@ class DashboardNoStakeViewHolder(
         bindTokenName(model)
         bindAssetIcon(model)
         bindStakingType(model)
+        bindNotice(model)
     }
 
     fun bindTokenName(model: NoStakeItem) {
@@ -78,6 +80,10 @@ class DashboardNoStakeViewHolder(
         containerView.setAssetIcon(model.assetIcon)
     }
 
+    fun bindNotice(model: NoStakeItem) {
+        containerView.setNotice(model.notice)
+    }
+
     override fun unbind() {
         containerView.unbind()
     }
@@ -90,7 +96,8 @@ private class DashboardNoStakeDiffCallback : DiffUtil.ItemCallback<NoStakeItem>(
         NoStakeItem::availableBalance,
         NoStakeItem::tokenName,
         NoStakeItem::assetIcon,
-        NoStakeItem::stakingTypeBadge
+        NoStakeItem::stakingTypeBadge,
+        NoStakeItem::notice
     )
 
     override fun areItemsTheSame(oldItem: NoStakeItem, newItem: NoStakeItem): Boolean {

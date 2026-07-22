@@ -12,12 +12,14 @@ import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
 import io.novafoundation.nova.common.mixin.actionAwaitable.awaitableActionFlow
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.dialog.dialog
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStartStakingLandingBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.critical.StartStakingCriticalNoticeBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 class StartStakingLandingFragment :
@@ -67,6 +69,11 @@ class StartStakingLandingFragment :
 
         viewModel.isContinueButtonLoading.observe(binder.startStakingLandingButton::setProgressState)
 
+        viewModel.noticeForCurrentChain.observe { notice ->
+            binder.startStakingLandingNoticeBlock.setVisible(notice != null)
+            notice?.let { binder.startStakingLandingNoticeBlock.bind(it) }
+        }
+
         viewModel.modelFlow.observe {
             val isLoaded = it.isLoaded()
 
@@ -106,6 +113,14 @@ class StartStakingLandingFragment :
                     action.onSuccess(Unit)
                 }
             }
+        }
+
+        viewModel.showCriticalNoticeEvent.observe { notice ->
+            StartStakingCriticalNoticeBottomSheet(
+                context = requireContext(),
+                notice = notice,
+                onContinueClicked = { viewModel.userConfirmedCriticalNotice() }
+            ).show()
         }
     }
 

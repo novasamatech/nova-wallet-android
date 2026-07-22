@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_staking_impl.di.staking.UpdatersModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.dashboard.StakingDashboardModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.MythosModule
+import io.novafoundation.nova.feature_staking_impl.di.staking.notices.StakingNoticesModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.nominationPool.NominationPoolModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.parachain.ParachainStakingModule
 import io.novafoundation.nova.feature_staking_impl.di.staking.stakingTypeDetails.StakingTypeDetailsModule
@@ -115,7 +116,8 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
         MythosModule::class,
         StakingDashboardModule::class,
         StartMultiStakingModule::class,
-        StakingTypeDetailsModule::class
+        StakingTypeDetailsModule::class,
+        StakingNoticesModule::class
     ]
 )
 @FeatureScope

@@ -30,6 +30,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Staking
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.StakingOptionId
 import io.novafoundation.nova.feature_staking_api.data.dashboard.common.stakingChainsById
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.model.StakingDashboardItem
+import io.novafoundation.nova.feature_staking_impl.data.dashboard.tier.StakingDashboardTierConfig
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -149,7 +150,7 @@ class RealStakingDashboardInteractor(
             val itemsByChain = itemsByChainAndAsset[chain.id]
 
             if (itemsByChain == null) {
-                if (!chain.isTestNet) {
+                if (!chain.isTestNet && chain.id !in StakingDashboardTierConfig.demotedChainIds) {
                     notYetResolved.add(notYetResolvedChainOption(chain, chain.utilityAsset))
                 }
                 return@forEach
@@ -159,7 +160,7 @@ class RealStakingDashboardInteractor(
                 val asset = chain.assetsById[assetId] ?: return@innerForEach
 
                 if (dashboardItems.isNoStakePresent()) {
-                    if (!chain.isTestNet) {
+                    if (!chain.isTestNet && chain.id !in StakingDashboardTierConfig.demotedChainIds) {
                         noStake.add(noStakeAggregatedOption(chain, asset, dashboardItems, syncingStageMap))
                     }
                 } else {
@@ -195,7 +196,7 @@ class RealStakingDashboardInteractor(
             val itemsByChain = itemsByChainAndAsset[chain.id]
 
             if (itemsByChain == null) {
-                if (chain.isTestNet) {
+                if (chain.isTestNet || chain.id in StakingDashboardTierConfig.demotedChainIds) {
                     notYetResolved.add(notYetResolvedChainOption(chain, chain.utilityAsset))
                 }
                 return@forEach
@@ -205,7 +206,7 @@ class RealStakingDashboardInteractor(
                 val asset = chain.assetsById[assetId] ?: return@innerForEach
 
                 if (dashboardItems.isNoStakePresent()) {
-                    if (chain.isTestNet) {
+                    if (chain.isTestNet || chain.id in StakingDashboardTierConfig.demotedChainIds) {
                         noStake.add(noStakeAggregatedOption(chain, asset, dashboardItems, syncingStageMap))
                     }
                 } else {

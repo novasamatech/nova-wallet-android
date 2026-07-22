@@ -1,0 +1,8 @@
+[
+  {
+    "chainId": "f3c7ad88f6a80f366c4be216691411ef0622e8b809b1046ea297ef106058d4eb",
+    "severity": "info",
+    "shortText": { "en": "EN short", "ru": "RU short", "es": "ES short" },
+    "longText": { "en": "EN long", "ru": "RU long", "es": "ES long" }
+  }
+]
