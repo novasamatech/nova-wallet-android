@@ -1829,6 +1829,8 @@
     <string name="swap_price_difference_title">Różnica cen</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">Kurs wymiany między dwiema różnymi kryptowalutami. Oznacza to, ile jednej kryptowaluty możesz otrzymać w zamian za określoną ilość innej kryptowaluty.</string>
+    <string name="swap_network_fees_label">Opłaty sieciowe</string>
+    <string name="swap_nova_fee_disclaimer">Zawiera opłatę Nova w wysokości %s%%.</string>
     <string name="swap_rate_title">Kurs</string>
     <string name="swap_rate_was_updated_failure_message">Stary kurs: %1$s ≈ %2$s.\nNowy kurs: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Kurs wymiany został zaktualizowany</string>

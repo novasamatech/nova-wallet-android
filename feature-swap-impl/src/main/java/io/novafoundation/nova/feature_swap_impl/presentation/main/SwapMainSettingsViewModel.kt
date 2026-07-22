@@ -38,8 +38,12 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAcco
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
-import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
+import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
+import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
+import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -239,6 +243,22 @@ class SwapMainSettingsViewModel(
         .distinctUntilChanged()
         .shareInBackground()
 
+    val showNovaFeeDisclaimer: Flow<Boolean> = quotingState.mapNotNull {
+        when (it) {
+            is QuotingState.Loaded -> it.quote.involvesHydraSwap()
+            is QuotingState.Default,
+            is QuotingState.Error -> false
+            is QuotingState.Loading -> null
+        }
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val novaFeeDisclaimerText: String = resourceManager.getString(
+        R.string.swap_nova_fee_disclaimer,
+        NovaSwapCommission.FEE_PERCENT_DISPLAY
+    )
+
     private val _validationProgress = MutableStateFlow(false)
 
     val validationProgress = _validationProgress
@@ -350,7 +370,9 @@ class SwapMainSettingsViewModel(
     }
 
     fun rateDetailsClicked() {
-        launchSwapRateDescription()
+        val mode = (quotingState.value as? QuotingState.Loaded)?.quote?.swapRateDescriptionMode()
+            ?: SwapRateDescriptionMode.Default
+        launchSwapRateDescription(resourceManager, mode)
     }
 
     fun flipAssets() = launch {
@@ -517,7 +539,8 @@ class SwapMainSettingsViewModel(
     }
 
     private fun formatRate(swapQuote: SwapQuote): String {
-        return swapRateFormatter.format(swapQuote.swapRate(), swapQuote.assetIn, swapQuote.assetOut)
+        val rate = swapQuote.swapRate()
+        return swapRateFormatter.format(rate, swapQuote.assetIn, swapQuote.assetOut)
     }
 
     private fun formatButtonStates(
@@ -570,8 +593,6 @@ class SwapMainSettingsViewModel(
             swapInteractor.runSubscriptions(selectedAccountUseCase.getSelectedMetaAccount())
                 .catch { Log.e(this@SwapMainSettingsViewModel.LOG_TAG, "Failure during subscriptions run", it) }
         }.onEach {
-            Log.d("Swap", "ReQuote triggered from subscription")
-
             val currentSwapSettings = swapSettings.first()
 
             performQuote(currentSwapSettings, shouldShowLoading = false)

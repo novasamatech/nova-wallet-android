@@ -1793,6 +1793,8 @@
     <string name="swap_price_difference_title">価格差</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">二つの異なる暗号通貨間の交換レートです。これは、ある量の暗号通貨と引き換えにどれだけの別の暗号通貨を得られるかを表します。</string>
+    <string name="swap_network_fees_label">ネットワーク手数料</string>
+    <string name="swap_nova_fee_disclaimer">%s%%のNova手数料が含まれます。</string>
     <string name="swap_rate_title">レート</string>
     <string name="swap_rate_was_updated_failure_message">旧レート: %1$s ≈ %2$s。\n新レート: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">交換レートが更新されました</string>

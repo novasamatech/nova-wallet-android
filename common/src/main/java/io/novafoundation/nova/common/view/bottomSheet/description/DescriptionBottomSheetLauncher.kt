@@ -12,6 +12,8 @@ interface DescriptionBottomSheetLauncher {
     val showDescriptionEvent: LiveData<Event<DescriptionModel>>
 
     fun launchDescriptionBottomSheet(titleRes: Int, descriptionRes: Int)
+
+    fun launchDescriptionBottomSheet(titleRes: Int, descriptionText: String)
 }
 
 fun DescriptionBottomSheetLauncher.launchNetworkFeeDescription() {
@@ -25,15 +27,20 @@ class RealDescriptionBottomSheetLauncher : DescriptionBottomSheetLauncher {
     override fun launchDescriptionBottomSheet(titleRes: Int, descriptionRes: Int) {
         showDescriptionEvent.value = DescriptionModel(titleRes, descriptionRes).event()
     }
+
+    override fun launchDescriptionBottomSheet(titleRes: Int, descriptionText: String) {
+        showDescriptionEvent.value = DescriptionModel(titleRes, descriptionRes = 0, descriptionText = descriptionText).event()
+    }
 }
 
 fun BaseFragment<*, *>.observeDescription(launcher: DescriptionBottomSheetLauncher) {
     launcher.showDescriptionEvent.observeEvent { event ->
-        val dialog = DescriptionBottomSheet(
-            context = requireContext(),
-            titleRes = event.titleRes,
-            descriptionRes = event.descriptionRes
-        )
+        val descriptionText = event.descriptionText
+        val dialog = if (descriptionText != null) {
+            DescriptionBottomSheet(requireContext(), event.titleRes, descriptionText)
+        } else {
+            DescriptionBottomSheet(requireContext(), event.titleRes, event.descriptionRes)
+        }
 
         dialog.show()
     }

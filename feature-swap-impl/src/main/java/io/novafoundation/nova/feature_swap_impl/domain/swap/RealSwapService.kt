@@ -166,8 +166,6 @@ internal class RealSwapService(
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
-        Log.d("Swaps", "Syncing swap service")
-
         exchangeRegistry(coroutineScope)
             .allExchanges()
             .forEachAsync { it.sync() }
@@ -225,6 +223,7 @@ internal class RealSwapService(
 
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
         val segments = calculatedFee.segments
+        val lastIndex = segments.lastIndex
 
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
 
@@ -248,9 +247,10 @@ internal class RealSwapService(
                     // We cannot execute buy for segments after first one since we deal with actualReceivedAmount there
                     val shouldReplaceBuyWithSell = correction != null
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
-                    val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
-
-                    Log.d("SwapSubmission", "$displayData with $actualSwapLimit")
+                    val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
+                        actualSwapLimit = actualSwapLimit,
+                        isLastSwapOperation = index == lastIndex,
+                    )
 
                     operation.execute(segmentSubmissionArgs).onFailure {
                         Log.e("SwapSubmission", "Swap failed on stage '$displayData'", it)
@@ -270,7 +270,10 @@ internal class RealSwapService(
         val amountIn = operation.estimatedSwapLimit.estimatedAmountIn() + calculatedFee.additionalAmountForSwap.amount
         val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(amountIn, false)
 
-        val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(actualSwapLimit)
+        val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
+            actualSwapLimit = actualSwapLimit,
+            isLastSwapOperation = calculatedFee.segments.size == 1,
+        )
 
         return operation.submit(segmentSubmissionArgs)
     }
@@ -391,23 +394,26 @@ internal class RealSwapService(
         )
 
         val amountIn = quotedTrade.amountIn()
-        val amountOut = quotedTrade.amountOut()
+        val amountOutGross = quotedTrade.amountOut()
 
-        val atomicOperationsEstimates = quotedTrade.estimateOperationsMaximumExecutionTime()
+        val prototypes = quotedTrade.path.constructAtomicOperationPrototypes()
+
+        // Let the final operation adjust the displayed amountOut (e.g. Hydration commission).
+        // Price impact stays computed against the raw pool quote so per-operation fees don't
+        // inflate the slippage reading.
+        val amountOutNet = prototypes.last().postProcessFinalAmountOut(amountOutGross)
+        val priceImpact = args.calculatePriceImpact(amountIn, amountOutGross)
+
+        val atomicOperationsEstimates = prototypes.map { it.maximumExecutionTime() }
 
         return SwapQuote(
             amountIn = args.tokenIn.configuration.withAmount(amountIn),
-            amountOut = args.tokenOut.configuration.withAmount(amountOut),
-            priceImpact = args.calculatePriceImpact(amountIn, amountOut),
+            amountOut = args.tokenOut.configuration.withAmount(amountOutNet),
+            priceImpact = priceImpact,
             quotedPath = quotedTrade,
             executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER),
             direction = args.swapDirection,
         )
-    }
-
-    private suspend fun QuotedTrade.estimateOperationsMaximumExecutionTime(): List<Duration> {
-        return path.constructAtomicOperationPrototypes()
-            .map { it.maximumExecutionTime() }
     }
 
     override suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig {
@@ -734,6 +740,8 @@ internal class RealSwapService(
     }
 
     private fun logFee(fee: SwapFee) {
+        if (!debug) return
+
         val route = fee.segments.joinToString(separator = "\n") { segment ->
             val allFees = buildList {
                 add(segment.fee.submissionFee)

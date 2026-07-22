@@ -42,6 +42,7 @@ interface AtomicSwapOperation {
 
 class AtomicSwapOperationSubmissionArgs(
     val actualSwapLimit: SwapLimit,
+    val isLastSwapOperation: Boolean,
 )
 
 class AtomicSwapOperationArgs(

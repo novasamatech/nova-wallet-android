@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateF
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapDirectionParcel
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
@@ -53,6 +55,7 @@ class SwapDetailViewModel(
     private val walletUiUseCase: WalletUiUseCase,
     private val swapRateFormatter: SwapRateFormatter,
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+    private val resourceManager: ResourceManager,
     private val assetIconProvider: AssetIconProvider,
     val operation: OperationParcelizeModel.Swap,
     private val amountFormatter: AmountFormatter
@@ -119,7 +122,10 @@ class SwapDetailViewModel(
     }
 
     fun rateClicked() {
-        descriptionBottomSheetLauncher.launchSwapRateDescription()
+        descriptionBottomSheetLauncher.launchSwapRateDescription(
+            resourceManager = resourceManager,
+            mode = SwapRateDescriptionMode.Default,
+        )
     }
 
     fun feeClicked() {

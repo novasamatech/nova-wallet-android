@@ -1793,6 +1793,8 @@
     <string name="swap_price_difference_title">Sự khác biệt về giá</string>
     <string name="swap_price_impact" formatted="false">%s 	%s</string>
     <string name="swap_rate_description">Tỷ giá trao đổi giữa hai loại tiền điện tử khác nhau. Nó thể hiện số lượng của một loại tiền điện tử mà bạn có thể nhận được để đổi lấy một số lượng nhất định của loại tiền điện tử khác.</string>
+    <string name="swap_network_fees_label">Phí mạng</string>
+    <string name="swap_nova_fee_disclaimer">Bao gồm phí Nova %s%%.</string>
     <string name="swap_rate_title">Tỷ giá</string>
     <string name="swap_rate_was_updated_failure_message">Tỷ giá cũ: %1$s 	 %2$s.\nTỷ giá mới: %1$s 	 %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Tỷ giá hoán đổi đã được cập nhật</string>

@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.setMessageOrHide
 import io.novafoundation.nova.common.view.setProgressState
 import io.novafoundation.nova.common.view.showValueOrHide
@@ -30,6 +31,8 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
         binder.swapConfirmationAccount.setOnClickListener { viewModel.accountClicked() }
         binder.swapConfirmationButton.setOnClickListener { viewModel.confirmButtonClicked() }
         binder.swapConfirmationRoute.setOnClickListener { viewModel.routeClicked() }
+
+        binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
     }
 
     override fun inject() {
@@ -64,5 +67,7 @@ class SwapConfirmationFragment : BaseFragment<SwapConfirmationViewModel, Fragmen
         viewModel.slippageAlertMixin.slippageAlertMessage.observe { binder.swapConfirmationAlert.setMessageOrHide(it) }
 
         viewModel.validationInProgress.observe(binder.swapConfirmationButton::setProgressState)
+
+        viewModel.showNovaFeeDisclaimer.observe { binder.swapNovaFeeDisclaimer.setVisible(it) }
     }
 }

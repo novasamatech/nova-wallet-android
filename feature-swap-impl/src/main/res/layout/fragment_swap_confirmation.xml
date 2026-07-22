@@ -74,7 +74,7 @@
                 android:id="@+id/swapConfirmationNetworkFee"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:title="@string/common_total_fee"
+                app:title="@string/swap_network_fees_label"
                 app:titleIcon="@drawable/ic_info" />
 
         </io.novafoundation.nova.common.view.TableView>
@@ -102,6 +102,20 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/swapNovaFeeDisclaimer"
+        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        tools:text="A 0.85% fee is included in the exchange rate shown above."
+        tools:visibility="visible" />
+
     <io.novafoundation.nova.common.view.AlertView
         android:id="@+id/swapConfirmationAlert"
         android:layout_width="match_parent"
@@ -110,7 +124,7 @@
         android:layout_marginTop="8dp"
         android:visibility="gone"
         app:alertMode="warning"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/swapNovaFeeDisclaimer"
         tools:layout_editor_absoluteX="16dp" />
 
     <io.novafoundation.nova.common.view.PrimaryButton

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIde
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountInfo
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -14,6 +15,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.TransferMode
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.nativeTransfer
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
@@ -25,9 +27,11 @@ import io.novafoundation.nova.runtime.ext.accountIdOrDefault
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
@@ -75,6 +79,21 @@ class NativeAssetTransfers(
         val recipient = bindAccountIdentifier(call.arguments["dest"]).intoKey()
 
         return TransferParsedFromCall(asset.withAmount(amount), recipient)
+    }
+
+    override suspend fun constructTransferCall(transfer: AssetTransferBase): GenericCall.Instance {
+        val runtime = chainRegistry.getRuntime(transfer.originChain.id)
+        return runtime.composeCall(
+            moduleName = Modules.BALANCES,
+            callName = TRANSFER_KEEP_ALIVE,
+            arguments = mapOf(
+                "dest" to AddressInstanceConstructor.constructInstance(
+                    runtime.typeRegistry,
+                    transfer.recipientAccountId.value
+                ),
+                "value" to transfer.amountPlanks
+            )
+        )
     }
 
     override fun ExtrinsicBuilder.transfer(transfer: AssetTransfer) {
