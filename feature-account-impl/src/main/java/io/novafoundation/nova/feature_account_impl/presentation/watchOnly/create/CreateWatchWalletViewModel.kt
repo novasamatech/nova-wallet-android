@@ -4,6 +4,9 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -36,7 +39,8 @@ class CreateWatchWalletViewModel(
     private val interactor: CreateWatchWalletInteractor,
     private val accountInteractor: AccountInteractor,
     private val resourceManager: ResourceManager,
-    private val appLinksProvider: AppLinksProvider
+    private val appLinksProvider: AppLinksProvider,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel() {
 
     private val customPage = createCustomPage()
@@ -111,7 +115,10 @@ class CreateWatchWalletViewModel(
         }
 
         result
-            .onSuccess { continueBasedOnCodeStatus() }
+            .onSuccess {
+                analyticsService.track(AnalyticsEvent.WalletCreationCompleted(WalletCreationMethod.IMPORT_WATCH_ONLY))
+                continueBasedOnCodeStatus()
+            }
             .onFailure { it.printStackTrace(); showError(it) }
     }
 

@@ -4,6 +4,7 @@ import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
@@ -59,6 +60,8 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface GovernanceFeatureDependencies {
+
+    val analyticsService: AnalyticsService
 
     val maskableValueFormatterFactory: MaskableValueFormatterFactory
 

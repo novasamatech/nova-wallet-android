@@ -3,6 +3,10 @@ package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.OnboardingSource
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
@@ -15,7 +19,8 @@ class WelcomeViewModel(
     private val router: OnboardingRouter,
     private val appLinksProvider: AppLinksProvider,
     private val addAccountPayload: AddAccountPayload,
-    updateNotificationsInteractor: UpdateNotificationsInteractor
+    updateNotificationsInteractor: UpdateNotificationsInteractor,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     Browserable {
 
@@ -25,9 +30,15 @@ class WelcomeViewModel(
 
     init {
         updateNotificationsInteractor.allowInAppUpdateCheck()
+
+        // Only track for add_wallet flow — fresh install can't fire (user hasn't consented to analytics yet)
+        if (shouldShowBack) {
+            analyticsService.track(AnalyticsEvent.OnboardingStarted(OnboardingSource.ADD_WALLET))
+        }
     }
 
     fun createAccountClicked() {
+        analyticsService.track(AnalyticsEvent.WalletCreationMethodSelected(WalletCreationMethod.CREATE))
         when (addAccountPayload) {
             is AddAccountPayload.MetaAccount -> router.openCreateFirstWallet()
             is AddAccountPayload.ChainAccount -> router.openMnemonicScreen(accountName = null, addAccountPayload)
@@ -35,6 +46,7 @@ class WelcomeViewModel(
     }
 
     fun importAccountClicked() {
+        analyticsService.track(AnalyticsEvent.WalletCreationMethodSelected(WalletCreationMethod.IMPORT_MNEMONIC))
         router.openImportOptionsScreen()
     }
 

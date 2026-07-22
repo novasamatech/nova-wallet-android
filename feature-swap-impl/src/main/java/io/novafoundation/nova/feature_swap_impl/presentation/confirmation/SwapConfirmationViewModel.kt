@@ -4,6 +4,12 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AmountBucket
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.DurationBucket
+import io.novafoundation.nova.common.data.analytics.SlippageBucket
+import io.novafoundation.nova.common.data.analytics.SwapFailureReason
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.combineToPair
@@ -68,6 +74,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
 import kotlinx.coroutines.launch
 
 private data class SwapConfirmationState(
@@ -99,7 +106,8 @@ class SwapConfirmationViewModel(
     private val swapConfirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val resourceManager: ResourceManager,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -250,19 +258,54 @@ class SwapConfirmationViewModel(
     }
 
     private fun executeSwap(validPayload: SwapValidationPayload) = launchUnit {
+        val isWatchOnly = accountRepository.getSelectedMetaAccount().type == io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.WATCH_ONLY
+        if (!isWatchOnly) {
+            trackSwapConfirmed(validPayload)
+        }
+
         if (swapInteractor.isDeepSwapAvailable()) {
             swapStateStoreProvider.setState(validPayload.toSwapState())
 
             swapRouter.openSwapExecution()
         } else {
-            executeFirstSwapStep(validPayload.fee)
+            executeFirstSwapStep(validPayload)
         }
     }
 
-    private suspend fun executeFirstSwapStep(fee: SwapFee) {
-        swapInteractor.submitFirstSwapStep(fee)
+    private suspend fun trackSwapConfirmed(payload: SwapValidationPayload) {
+        try {
+            val quote = payload.swapQuote
+            val assetIn = assetInFlow.first()
+            val usdAmount = assetIn.token.planksToFiat(quote.planksIn)
+            val amountBucket = AmountBucket.from(usdAmount)
+            val slippageBucket = SlippageBucket.from(slippageFlow.first().inPercents)
+
+            val chainIn = chainRegistry.getChain(quote.assetIn.chainId)
+            val chainOut = chainRegistry.getChain(quote.assetOut.chainId)
+
+            analyticsService.track(
+                AnalyticsEvent.SwapConfirmed(
+                    amountBucket = amountBucket,
+                    slippageBucket = slippageBucket,
+                    assetIn = quote.assetIn.symbol.value,
+                    assetOut = quote.assetOut.symbol.value,
+                    networkIn = chainIn.name,
+                    networkOut = chainOut.name
+                )
+            )
+        } catch (_: Exception) {
+            // Don't let analytics tracking break user flow
+        }
+    }
+
+    private suspend fun executeFirstSwapStep(validPayload: SwapValidationPayload) {
+        val swapStartTime = System.currentTimeMillis()
+
+        swapInteractor.submitFirstSwapStep(validPayload.fee)
             .onSuccess {
                 _validationInProgress.value = false
+
+                trackSwapCompletedLegacy(validPayload, swapStartTime)
 
                 this.showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
@@ -273,8 +316,50 @@ class SwapConfirmationViewModel(
             }.onFailure {
                 _validationInProgress.value = false
 
+                trackSwapFailedLegacy(it)
+
                 showFirstSwapStepFailure(it)
             }
+    }
+
+    private suspend fun trackSwapCompletedLegacy(payload: SwapValidationPayload, startTime: Long) {
+        try {
+            val durationMs = System.currentTimeMillis() - startTime
+            val durationBucket = DurationBucket.from(durationMs)
+            val quote = payload.swapQuote
+            val assetIn = assetInFlow.first()
+            val usdAmount = assetIn.token.planksToFiat(quote.planksIn)
+            val amountBucket = AmountBucket.from(usdAmount)
+
+            val chainIn = chainRegistry.getChain(quote.assetIn.chainId)
+            val chainOut = chainRegistry.getChain(quote.assetOut.chainId)
+
+            analyticsService.track(
+                AnalyticsEvent.SwapCompleted(
+                    amountBucket = amountBucket,
+                    durationBucket = durationBucket,
+                    assetIn = quote.assetIn.symbol.value,
+                    assetOut = quote.assetOut.symbol.value,
+                    networkIn = chainIn.name,
+                    networkOut = chainOut.name
+                )
+            )
+        } catch (_: Exception) {
+            // Don't let analytics tracking break user flow
+        }
+    }
+
+    private fun trackSwapFailedLegacy(error: Throwable) = launch {
+        val isWatchOnly = accountRepository.getSelectedMetaAccount().type == io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.WATCH_ONLY
+        val reason = when {
+            isWatchOnly -> SwapFailureReason.SIGNING_UNAVAILABLE
+            error is SigningCancelledException -> SwapFailureReason.USER_CANCELLED
+            error is SwapOperationSubmissionException.SimulationFailed -> SwapFailureReason.EXECUTION_REVERTED
+            error is java.io.IOException -> SwapFailureReason.NETWORK_ERROR
+            else -> SwapFailureReason.UNKNOWN
+        }
+
+        analyticsService.track(AnalyticsEvent.SwapFailed(reason))
     }
 
     private fun showFirstSwapStepFailure(error: Throwable) {

@@ -2,6 +2,11 @@ package io.novafoundation.nova.feature_swap_impl.presentation.execution
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AmountBucket
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.DurationBucket
+import io.novafoundation.nova.common.data.analytics.SwapFailureReason
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
@@ -32,6 +37,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapSt
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
@@ -43,6 +49,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
+import java.io.IOException
 
 class SwapExecutionViewModel(
     private val swapStateStoreProvider: SwapStateStoreProvider,
@@ -55,6 +63,9 @@ class SwapExecutionViewModel(
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val analyticsService: AnalyticsService,
+    private val tokenRepository: TokenRepository,
+    private val accountRepository: io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository,
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
@@ -136,12 +147,65 @@ class SwapExecutionViewModel(
     }
 
     private fun executeSwap() = launchUnit {
-        val fee = swapStateFlow.first().fee
+        val swapState = swapStateFlow.first()
+        val fee = swapState.fee
+        val swapStartTime = System.currentTimeMillis()
 
         swapInteractor.executeSwap(fee)
-            .onEach(swapProgressFlow::emit)
+            .onEach { progress ->
+                swapProgressFlow.emit(progress)
+
+                when (progress) {
+                    is SwapProgress.Done -> {
+                        trackSwapCompleted(swapState, swapStartTime)
+                    }
+                    is SwapProgress.Failure -> trackSwapFailed(progress)
+                    is SwapProgress.StepStarted -> { /* no tracking needed */ }
+                }
+            }
             .inBackground()
             .collect()
+    }
+
+    private suspend fun trackSwapCompleted(swapState: SwapState, startTime: Long) {
+        try {
+            val durationMs = System.currentTimeMillis() - startTime
+            val durationBucket = DurationBucket.from(durationMs)
+
+            val quote = swapState.quote
+            val token = tokenRepository.getToken(quote.assetIn)
+            val usdAmount = token.planksToFiat(quote.planksIn)
+            val amountBucket = AmountBucket.from(usdAmount)
+
+            val chainIn = chainRegistry.getChain(quote.assetIn.chainId)
+            val chainOut = chainRegistry.getChain(quote.assetOut.chainId)
+
+            analyticsService.track(
+                AnalyticsEvent.SwapCompleted(
+                    amountBucket = amountBucket,
+                    durationBucket = durationBucket,
+                    assetIn = quote.assetIn.symbol.value,
+                    assetOut = quote.assetOut.symbol.value,
+                    networkIn = chainIn.name,
+                    networkOut = chainOut.name
+                )
+            )
+        } catch (_: Exception) {
+            // Don't let analytics tracking break user flow
+        }
+    }
+
+    private suspend fun trackSwapFailed(failure: SwapProgress.Failure) {
+        val isWatchOnly = accountRepository.getSelectedMetaAccount().type == io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.WATCH_ONLY
+        val reason = when {
+            isWatchOnly -> SwapFailureReason.SIGNING_UNAVAILABLE
+            failure.error is SigningCancelledException -> SwapFailureReason.USER_CANCELLED
+            failure.error is SwapOperationSubmissionException.SimulationFailed -> SwapFailureReason.EXECUTION_REVERTED
+            failure.error is IOException -> SwapFailureReason.NETWORK_ERROR
+            else -> SwapFailureReason.UNKNOWN
+        }
+
+        analyticsService.track(AnalyticsEvent.SwapFailed(reason))
     }
 
     private suspend fun SwapProgress.toUi(swapState: SwapState): SwapProgressModel {

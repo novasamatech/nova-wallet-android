@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vo
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.data.analytics.AmountBucket
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -62,7 +65,8 @@ class ConfirmReferendumVoteViewModel(
     private val referendumFormatter: ReferendumFormatter,
     private val locksChangeFormatter: LocksChangeFormatter,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -131,12 +135,22 @@ class ConfirmReferendumVoteViewModel(
 
     private fun performVote() = launch {
         val accountVote = accountVoteFlow.first()
+        val (chain, _) = governanceSharedState.chainAndAsset()
 
         val result = withContext(Dispatchers.Default) {
             interactor.voteReferendum(payload.referendumId, accountVote)
         }
 
         result.onSuccess {
+            analyticsService.track(
+                AnalyticsEvent.GovernanceVoteCast(
+                    voteDirection = payload.vote.voteType.name.lowercase(),
+                    network = chain.name,
+                    amountBucket = AmountBucket.from(assetFlow.first().token.amountToFiat(payload.vote.amount)),
+                    convictionLevel = payload.vote.conviction.name.lowercase()
+                )
+            )
+
             showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
             startNavigation(it.submissionHierarchy) { router.backToReferendumDetails() }

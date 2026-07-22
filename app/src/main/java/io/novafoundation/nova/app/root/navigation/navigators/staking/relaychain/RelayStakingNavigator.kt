@@ -279,7 +279,7 @@ class RelayStakingNavigator(
     }
 
     override fun openDAppBrowser(url: String) {
-        dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url))
+        dAppRouter.openDAppBrowser(DAppBrowserPayload.Address(url, source = "staking"))
     }
 
     override fun openStakingDashboard() {

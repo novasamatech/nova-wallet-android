@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapDAppCatal
 import io.novafoundation.nova.feature_dapp_impl.presentation.common.mapFavoriteDappToDappModel
 import io.novafoundation.nova.feature_dapp_impl.presentation.main.model.DAppCategoryState
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -89,7 +90,21 @@ class MainDAppViewModel(
     }
 
     fun dappClicked(dapp: DappModel) {
-        router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url))
+        launch {
+            val source = determineDappSource(dapp)
+            router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url, source = source))
+        }
+    }
+
+    private suspend fun determineDappSource(dapp: DappModel): String {
+        val catalog = groupedDAppsFlow.first()
+        val isPopular = catalog.popular.any { it.url == dapp.url }
+        if (isPopular) return "catalog_popular"
+
+        val category = catalog.categoriesWithDApps.entries.firstOrNull { (_, dapps) ->
+            dapps.any { it.url == dapp.url }
+        }
+        return category?.let { "catalog_${it.key.id}" } ?: "catalog_unknown"
     }
 
     fun searchClicked() {

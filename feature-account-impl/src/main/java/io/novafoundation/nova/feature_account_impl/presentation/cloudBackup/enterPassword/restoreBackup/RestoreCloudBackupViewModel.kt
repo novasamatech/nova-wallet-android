@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.enterPassword.restoreBackup
 
 import io.novafoundation.nova.common.base.showError
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
@@ -18,6 +21,7 @@ class RestoreCloudBackupViewModel(
     interactor: EnterCloudBackupInteractor,
     actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val analyticsService: AnalyticsService
 ) : EnterCloudBackupPasswordViewModel(
     router,
     resourceManager,
@@ -28,7 +32,10 @@ class RestoreCloudBackupViewModel(
 
     override suspend fun continueInternal(password: String) {
         interactor.restoreCloudBackup(password)
-            .onSuccess { continueBasedOnCodeStatus() }
+            .onSuccess {
+                analyticsService.track(AnalyticsEvent.WalletCreationCompleted(WalletCreationMethod.CLOUD_BACKUP))
+                continueBasedOnCodeStatus()
+            }
             .onFailure {
                 val titleAndMessage = mapRestoreBackupFailureToUi(
                     resourceManager,

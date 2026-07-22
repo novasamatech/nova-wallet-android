@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.mapLoading
@@ -102,7 +104,8 @@ class StartStakingLandingViewModel(
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val chainRegistry: ChainRegistry,
     private val contextManager: ContextManager,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
@@ -163,6 +166,13 @@ class StartStakingLandingViewModel(
         launchSync()
 
         closeOnStakingStarted()
+
+        trackStakingFlowOpened()
+    }
+
+    private fun trackStakingFlowOpened() = launch {
+        val chain = chainRegistry.getChain(availableStakingOptionsPayload.chainId)
+        analyticsService.track(AnalyticsEvent.StakingFlowOpened(chain.name, "staking"))
     }
 
     fun back() {

@@ -5,6 +5,7 @@ import coil.ImageLoader
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.resources.LanguagesHolder
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 
 interface BannersFeatureDependencies {
@@ -20,4 +21,6 @@ interface BannersFeatureDependencies {
     val networkApiCreator: NetworkApiCreator
 
     val automaticInteractionGate: AutomaticInteractionGate
+
+    val analyticsService: AnalyticsService
 }

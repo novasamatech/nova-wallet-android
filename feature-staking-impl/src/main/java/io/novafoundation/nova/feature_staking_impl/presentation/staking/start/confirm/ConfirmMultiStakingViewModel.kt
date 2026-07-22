@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.c
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.AmountBucket
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOfAll
@@ -15,6 +18,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.navigation.Extri
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
+import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.stakeAmount
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.activateDetection
@@ -56,10 +61,11 @@ class ConfirmMultiStakingViewModel(
     selectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
     assetUseCase: ArbitraryAssetUseCase,
     walletUiUseCase: WalletUiUseCase,
-    selectedAccountUseCase: SelectedAccountUseCase,
+    private val selectedAccountUseCase: SelectedAccountUseCase,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -159,15 +165,36 @@ class ConfirmMultiStakingViewModel(
     }
 
     private fun sendTransaction(validationPayload: StartMultiStakingValidationPayload) = launch {
+        val selection = validationPayload.selection
+        val stakingTypeName = selection.stakingOption.stakingType.name.lowercase()
+        val networkName = selection.stakingOption.chain.name
+        val asset = assetFlow.first()
+        val usdAmount = asset.token.amountToFiat(selection.stakeAmount())
+        val amountBucket = AmountBucket.from(usdAmount)
+
+        analyticsService.track(AnalyticsEvent.StakingInitiated(stakingTypeName, networkName, amountBucket))
+
         stakingStartedDetectionService.pauseDetection(viewModelScope)
 
         interactor.startStaking(validationPayload.selection)
             .onSuccess {
+                analyticsService.track(AnalyticsEvent.StakingConfirmed(stakingTypeName, networkName, amountBucket))
+                // StakingCompleted removed - fires at same time as Confirmed, no on-chain tracking available
+
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { finishFlow() }
             }
             .onFailure {
+                val isWatchOnly = selectedAccountUseCase.getSelectedMetaAccount().type == io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.WATCH_ONLY
+                val reason = when {
+                    isWatchOnly -> "signing_unavailable"
+                    it is io.novafoundation.nova.common.base.errors.SigningCancelledException -> "user_cancelled"
+                    it is java.io.IOException -> "network_error"
+                    else -> "unknown"
+                }
+                analyticsService.track(AnalyticsEvent.StakingFailed(stakingTypeName, networkName, reason))
+
                 showError(it)
 
                 stakingStartedDetectionService.activateDetection(viewModelScope)

@@ -6,10 +6,12 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.navigation.ExtrinsicNavigationWrapper
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
@@ -17,6 +19,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.SwapExecutionViewModel
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -37,6 +40,9 @@ class SwapExecutionModule {
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        analyticsService: AnalyticsService,
+        tokenRepository: TokenRepository,
+        accountRepository: AccountRepository,
     ): ViewModel {
         return SwapExecutionViewModel(
             swapStateStoreProvider = swapStateStoreProvider,
@@ -48,7 +54,10 @@ class SwapExecutionModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
             swapFlowScopeAggregator = swapFlowScopeAggregator,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            analyticsService = analyticsService,
+            tokenRepository = tokenRepository,
+            accountRepository = accountRepository
         )
     }
 

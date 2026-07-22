@@ -4,6 +4,8 @@ android {
 
     defaultConfig {
 
+        buildConfigField "String", "ANALYTICS_API_KEY", "\"phc_sGA7fK8DPZTBqrc2dNKrzjeF9mr2nWJ2stIlWX3e9ZD\""
+
         buildConfigField "String", "WEBSITE_URL", "\"https://novawallet.io\""
         buildConfigField "String", "PRIVACY_URL", "\"https://novawallet.io/privacy\""
         buildConfigField "String", "TERMS_URL", "\"https://novawallet.io/terms\""

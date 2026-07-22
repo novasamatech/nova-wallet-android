@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -30,7 +31,8 @@ class WalletManagmentModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         metaAccountListingMixinFactory: MetaAccountWithBalanceListingMixinFactory,
         cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
-        listSelectorMixinFactory: ListSelectorMixin.Factory
+        listSelectorMixinFactory: ListSelectorMixin.Factory,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return WalletManagmentViewModel(
             interactor,
@@ -39,7 +41,8 @@ class WalletManagmentModule {
             actionAwaitableMixinFactory,
             metaAccountListingMixinFactory,
             cloudBackupChangingWarningMixinFactory,
-            listSelectorMixinFactory
+            listSelectorMixinFactory,
+            analyticsService
         )
     }
 

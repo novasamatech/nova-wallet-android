@@ -14,6 +14,10 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.CachingAddressIconGenerator
 import io.novafoundation.nova.common.address.StatelessAddressIconGenerator
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
+import io.novafoundation.nova.common.data.analytics.AnalyticsOptOutManager
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.PostHogAnalyticsService
+import io.novafoundation.nova.common.data.analytics.RealAnalyticsOptOutManager
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
@@ -114,6 +118,7 @@ import io.novafoundation.nova.common.view.input.selector.ListSelectorMixin
 import io.novafoundation.nova.common.view.input.selector.RealListSelectorMixinFactory
 import io.novasama.substrate_sdk_android.encrypt.Signer
 import io.novasama.substrate_sdk_android.icon.IconGenerator
+import okhttp3.OkHttpClient
 import java.security.SecureRandom
 import java.util.Random
 import javax.inject.Qualifier
@@ -505,5 +510,24 @@ class CommonModule {
     @ApplicationScope
     fun provideDeviceIdProvider(context: Context): DeviceIdProvider {
         return AndroidDeviceIdProvider(context)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideAnalyticsService(okHttpClient: OkHttpClient): AnalyticsService {
+        return PostHogAnalyticsService(
+            okHttpClient = okHttpClient,
+            apiKey = BuildConfig.ANALYTICS_API_KEY,
+            host = "https://us.i.posthog.com"
+        ).also { it.initialize() }
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideAnalyticsOptOutManager(
+        preferences: Preferences,
+        analyticsService: AnalyticsService
+    ): AnalyticsOptOutManager {
+        return RealAnalyticsOptOutManager(preferences, analyticsService)
     }
 }

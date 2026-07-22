@@ -68,9 +68,7 @@ class SlideShowView @JvmOverloads constructor(
         slideVisibilityLyfeCycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }
 
-    override fun getLifecycle(): Lifecycle {
-        return slideVisibilityLyfeCycle
-    }
+    override fun getLifecycle(): Lifecycle = slideVisibilityLyfeCycle
 
     private fun setupSlideShow() {
         slideUpdateJob?.cancel()

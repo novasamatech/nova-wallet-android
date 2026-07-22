@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -38,9 +39,10 @@ class ConfirmMnemonicModule {
         deviceVibrator: DeviceVibrator,
         resourceManager: ResourceManager,
         config: ConfirmMnemonicConfig,
-        payload: ConfirmMnemonicPayload
+        payload: ConfirmMnemonicPayload,
+        analyticsService: AnalyticsService
     ): ViewModel {
-        return ConfirmMnemonicViewModel(interactor, addAccountInteractor, router, deviceVibrator, resourceManager, config, payload)
+        return ConfirmMnemonicViewModel(interactor, addAccountInteractor, router, deviceVibrator, resourceManager, config, payload, analyticsService)
     }
 
     @Provides

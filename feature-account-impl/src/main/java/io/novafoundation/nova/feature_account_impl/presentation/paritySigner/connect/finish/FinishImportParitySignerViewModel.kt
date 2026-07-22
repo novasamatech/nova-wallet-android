@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.presentation.paritySigner.connect.finish
 
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -14,7 +17,8 @@ class FinishImportParitySignerViewModel(
     private val resourceManager: ResourceManager,
     private val payload: ParitySignerAccountPayload,
     private val accountInteractor: AccountInteractor,
-    private val interactor: FinishImportParitySignerInteractor
+    private val interactor: FinishImportParitySignerInteractor,
+    private val analyticsService: AnalyticsService
 ) : CreateWalletNameViewModel(router, resourceManager) {
 
     override fun proceed(name: String) = launchUnit {
@@ -32,7 +36,14 @@ class FinishImportParitySignerViewModel(
             )
         }
 
-        result.onSuccess { continueBasedOnCodeStatus() }
+        result.onSuccess {
+                val method = when (payload.variant) {
+                    io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant.PARITY_SIGNER -> WalletCreationMethod.IMPORT_PARITY_SIGNER
+                    io.novafoundation.nova.feature_account_api.domain.model.PolkadotVaultVariant.POLKADOT_VAULT -> WalletCreationMethod.IMPORT_POLKADOT_VAULT
+                }
+                analyticsService.track(AnalyticsEvent.WalletCreationCompleted(method))
+                continueBasedOnCodeStatus()
+            }
             .onFailure(::showError)
     }
 

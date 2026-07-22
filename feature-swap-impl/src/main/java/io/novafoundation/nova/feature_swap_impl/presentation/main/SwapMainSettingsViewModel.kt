@@ -4,6 +4,11 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AmountBucket
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.AssetCategoryClassifier
+import io.novafoundation.nova.common.data.analytics.SwapSource
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -144,6 +149,7 @@ class SwapMainSettingsViewModel(
     private val swapStateStoreProvider: SwapStateStoreProvider,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
+    private val analyticsService: AnalyticsService,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -284,6 +290,9 @@ class SwapMainSettingsViewModel(
     private var quotingJob: Job? = null
 
     init {
+        val swapSource = if (payload is SwapSettingsPayload.RepeatOperation) SwapSource.ASSET_DETAILS else SwapSource.MAIN_SCREEN
+        analyticsService.track(AnalyticsEvent.SwapScreenOpened(swapSource))
+
         initPayload()
 
         launch { swapInteractor.warmUpSwapCommonlyUsedChains(swapFlowScope) }
@@ -369,9 +378,44 @@ class SwapMainSettingsViewModel(
     }
 
     private fun openSwapConfirmation(validPayload: SwapValidationPayload) = launchUnit {
+        trackSwapInitiated(validPayload)
+
         swapStateStoreProvider.setState(validPayload.toSwapState())
 
         swapRouter.openSwapConfirmation()
+    }
+
+    private suspend fun trackSwapInitiated(validPayload: SwapValidationPayload) {
+        try {
+            val quote = validPayload.swapQuote
+            val assetIn = assetInFlow.firstOrNull()
+
+            val assetInCategory = AssetCategoryClassifier.classify(quote.assetIn.symbol.value)
+            val assetOutCategory = AssetCategoryClassifier.classify(quote.assetOut.symbol.value)
+
+            val usdAmount = assetIn?.token?.planksToFiat(quote.planksIn) ?: java.math.BigDecimal.ZERO
+            val amountBucket = AmountBucket.from(usdAmount)
+
+            val swapSource = if (payload is SwapSettingsPayload.RepeatOperation) SwapSource.ASSET_DETAILS else SwapSource.MAIN_SCREEN
+
+            val chainIn = chainRegistry.getChain(quote.assetIn.chainId)
+            val chainOut = chainRegistry.getChain(quote.assetOut.chainId)
+
+            analyticsService.track(
+                AnalyticsEvent.SwapInitiated(
+                    source = swapSource,
+                    assetInCategory = assetInCategory,
+                    assetOutCategory = assetOutCategory,
+                    assetIn = quote.assetIn.symbol.value,
+                    assetOut = quote.assetOut.symbol.value,
+                    networkIn = chainIn.name,
+                    networkOut = chainOut.name,
+                    amountBucket = amountBucket
+                )
+            )
+        } catch (_: Exception) {
+            // Don't let analytics tracking break user flow
+        }
     }
 
     private fun setSwapStateAndThen(action: suspend () -> Unit) {

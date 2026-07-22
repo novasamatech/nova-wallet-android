@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -40,14 +41,16 @@ class FinishImportGenericLedgerModule {
         resourceManager: ResourceManager,
         payload: FinishImportGenericLedgerPayload,
         accountInteractor: AccountInteractor,
-        interactor: FinishImportGenericLedgerInteractor
+        interactor: FinishImportGenericLedgerInteractor,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return FinishImportGenericLedgerViewModel(
             router = router,
             resourceManager = resourceManager,
             payload = payload,
             accountInteractor = accountInteractor,
-            interactor = interactor
+            interactor = interactor,
+            analyticsService = analyticsService
         )
     }
 

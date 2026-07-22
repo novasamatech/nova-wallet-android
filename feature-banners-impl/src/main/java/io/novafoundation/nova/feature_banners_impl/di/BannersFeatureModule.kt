@@ -6,6 +6,7 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.LanguagesHolder
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
@@ -56,8 +57,9 @@ class BannersFeatureModule {
     fun providePromotionBannersMixinFactory(
         promotionBannersInteractor: PromotionBannersInteractor,
         imageLoader: ImageLoader,
-        context: Context
+        context: Context,
+        analyticsService: AnalyticsService
     ): PromotionBannersMixinFactory {
-        return RealPromotionBannersMixinFactory(imageLoader, context, promotionBannersInteractor)
+        return RealPromotionBannersMixinFactory(imageLoader, context, promotionBannersInteractor, analyticsService)
     }
 }

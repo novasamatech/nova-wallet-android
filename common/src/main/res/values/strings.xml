@@ -2762,4 +2762,12 @@
     <string name="wallet_send_phishing_warning_title">Scam alert</string>
     <string name="wallet_transfer_details_title">Transfer details</string>
     <string name="yesterday">Yesterday</string>
+
+    <string name="settings_analytics_title">Anonymous Analytics</string>
+    <string name="settings_analytics_subtitle">Help improve Nova Wallet</string>
+
+    <string name="analytics_prompt_title">Help Improve Nova Wallet</string>
+    <string name="analytics_prompt_message">Share anonymous usage data to help us build a better wallet.\n\n• No personal data collected\n• No wallet addresses tracked\n• You can change this anytime in Settings</string>
+    <string name="analytics_prompt_enable">Enable Analytics</string>
+    <string name="analytics_prompt_later">Maybe Later</string>
 </resources>

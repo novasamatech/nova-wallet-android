@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -46,14 +47,16 @@ class FinishImportParitySignerModule {
         resourceManager: ResourceManager,
         payload: ParitySignerAccountPayload,
         accountInteractor: AccountInteractor,
-        interactor: FinishImportParitySignerInteractor
+        interactor: FinishImportParitySignerInteractor,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return FinishImportParitySignerViewModel(
             router = router,
             resourceManager = resourceManager,
             payload = payload,
             accountInteractor = accountInteractor,
-            interactor = interactor
+            interactor = interactor,
+            analyticsService = analyticsService
         )
     }
 

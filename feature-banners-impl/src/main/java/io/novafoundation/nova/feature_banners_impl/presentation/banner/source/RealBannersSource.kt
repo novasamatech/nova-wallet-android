@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.Flow
 class RealBannersSource(
     private val bannersUrl: String,
     private val localisationUrl: String,
-    private val bannersInteractor: PromotionBannersInteractor
+    private val bannersInteractor: PromotionBannersInteractor,
+    override val screenName: String
 ) : BannersSource {
 
     override fun observeBanners(): Flow<List<PromotionBanner>> {

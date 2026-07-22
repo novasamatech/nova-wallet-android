@@ -9,5 +9,5 @@ interface DAppBrowserPayload : Parcelable {
     class Tab(val id: String) : DAppBrowserPayload
 
     @Parcelize
-    class Address(val address: String) : DAppBrowserPayload
+    class Address(val address: String, val source: String = "address_bar") : DAppBrowserPayload
 }

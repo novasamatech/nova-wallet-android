@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.analytics.AmountBucket
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
@@ -50,7 +53,8 @@ class NominationPoolsConfirmUnbondViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -132,14 +136,30 @@ class NominationPoolsConfirmUnbondViewModel(
     private fun sendTransaction(validationPayload: NominationPoolsUnbondValidationPayload) = launch {
         val token = validationPayload.asset.token
         val amountInPlanks = token.planksFromAmount(payload.amount)
+        val network = stakingSharedState.chain().name
+        val stakingType = "nomination_pools"
+        val usdAmount = token.amountToFiat(payload.amount)
+        val amountBucket = AmountBucket.from(usdAmount)
+
+        analyticsService.track(AnalyticsEvent.UnstakeInitiated(stakingType, network, amountBucket))
 
         interactor.unbond(validationPayload.poolMember, amountInPlanks)
             .onSuccess {
+                analyticsService.track(AnalyticsEvent.UnstakeCompleted(stakingType, network, amountBucket))
+
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { finishFlow() }
             }
-            .onFailure(::showError)
+            .onFailure {
+                val reason = when {
+                    it is io.novafoundation.nova.common.base.errors.SigningCancelledException -> "user_cancelled"
+                    it is java.io.IOException -> "network_error"
+                    else -> "unknown"
+                }
+                analyticsService.track(AnalyticsEvent.UnstakeFailed(stakingType, network, reason))
+                showError(it)
+            }
 
         _showNextProgress.value = false
     }

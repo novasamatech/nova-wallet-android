@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.presentation.cloudBackup.createPassword.createWallet
 
 import io.novafoundation.nova.common.base.showError
+import io.novafoundation.nova.common.data.analytics.AnalyticsEvent
+import io.novafoundation.nova.common.data.analytics.AnalyticsService
+import io.novafoundation.nova.common.data.analytics.WalletCreationMethod
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncherFactory
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
@@ -16,6 +19,7 @@ class CreateWalletBackupPasswordViewModel(
     actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val payload: CreateBackupPasswordPayload,
     private val accountInteractor: AccountInteractor,
+    private val analyticsService: AnalyticsService
 ) : BackupCreatePasswordViewModel(
     router,
     resourceManager,
@@ -25,7 +29,10 @@ class CreateWalletBackupPasswordViewModel(
 
     override suspend fun internalContinueClicked(password: String) {
         interactor.createAndBackupAccount(payload.walletName, password)
-            .onSuccess { continueBasedOnCodeStatus() }
+            .onSuccess {
+                analyticsService.track(AnalyticsEvent.WalletCreationCompleted(WalletCreationMethod.CLOUD_BACKUP))
+                continueBasedOnCodeStatus()
+            }
             .onFailure {
                 val titleAndMessage = mapWriteBackupFailureToUi(resourceManager, it)
                 showError(titleAndMessage)
