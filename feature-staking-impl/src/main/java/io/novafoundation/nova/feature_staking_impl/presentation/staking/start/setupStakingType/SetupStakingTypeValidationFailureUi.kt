@@ -33,7 +33,7 @@ fun handleSetupStakingTypeValidationFailure(chainAsset: Chain.Asset, error: Edit
                     resourceManager.getString(R.string.setup_staking_type_already_used_title),
                     resourceManager.getString(R.string.setup_staking_type_pool_already_used_message)
                 )
-                StakingTypeGroup.UNSUPPORTED -> TitleAndMessage(
+                StakingTypeGroup.UNSUPPORTED, StakingTypeGroup.SUBTENSOR -> TitleAndMessage(
                     resourceManager.getString(R.string.setup_staking_type_already_used_title),
                     resourceManager.getString(R.string.setup_staking_type_unsupported_staking_type_used_fallback_message)
                 )

@@ -60,6 +60,9 @@ class DashboardHasStakeViewHolder(
         bindAssetIcon(model)
         bindAssetLabel(model)
         bindStakingType(model)
+        // Subnet alpha rows have no price feed / rewards indexer; hide the
+        // fiat + APY rows entirely. Idempotent — safe to call on every bind.
+        containerView.setHideFiatAndEarnings(hideFiat = model.hideFiat, hideEarnings = model.hideEarnings)
     }
 
     fun bindAssetIcon(model: HasStakeItem) {
@@ -72,6 +75,9 @@ class DashboardHasStakeViewHolder(
 
     fun bindEarnings(model: HasStakeItem) {
         containerView.setEarnings(model.earnings)
+        // setEarnings re-shows the "/y" suffix on every loaded state — re-apply
+        // the subnet-alpha hide so partial updates don't bring it back.
+        containerView.setHideFiatAndEarnings(hideFiat = model.hideFiat, hideEarnings = model.hideEarnings)
     }
 
     fun bindStakingType(model: HasStakeItem) {
@@ -80,10 +86,16 @@ class DashboardHasStakeViewHolder(
 
     fun bindStake(model: HasStakeItem) {
         containerView.setStake(model.stake)
+        // setStake toggles the fiat-container shimmer, which forces it back
+        // to visible — reapply the hide flag for subnet-alpha rows.
+        containerView.setHideFiatAndEarnings(hideFiat = model.hideFiat, hideEarnings = model.hideEarnings)
     }
 
     fun bindRewards(model: HasStakeItem) {
         containerView.setRewards(model.rewards)
+        // Same reason as bindStake / bindEarnings — partial updates would
+        // otherwise re-show the rewards token + fiat for subnet-alpha rows.
+        containerView.setHideFiatAndEarnings(hideFiat = model.hideFiat, hideEarnings = model.hideEarnings)
     }
 
     fun bindStatus(model: HasStakeItem) {

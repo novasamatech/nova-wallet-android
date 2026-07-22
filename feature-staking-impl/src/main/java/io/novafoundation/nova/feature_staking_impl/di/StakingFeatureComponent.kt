@@ -86,6 +86,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.di.StartStakingLandingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount.di.SetupAmountMultiStakingComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.di.SetupStakingTypeComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.main.di.SubtensorStakingComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.confirm.di.SubtensorStakeConfirmComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.setup.di.SubtensorStakeSetupComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.subnetPicker.di.SubtensorSubnetPickerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.type.di.SubtensorStakeTypeComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.di.SubtensorValidatorPickerComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.confirm.di.SubtensorUnstakeConfirmComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.setup.di.SubtensorUnstakeSetupComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.di.ConfirmUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.select.di.SelectUnbondComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.confirm.di.ConfirmChangeValidatorsComponent
@@ -264,6 +272,23 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun claimMythosRewardsFactory(): MythosClaimRewardsComponent.Factory
 
     fun currentMythosCollatorsFactory(): MythosCurrentCollatorsComponent.Factory
+
+    // Subtensor (TAO) staking
+    fun subtensorStakingFactory(): SubtensorStakingComponent.Factory
+
+    fun subtensorStakeTypeFactory(): SubtensorStakeTypeComponent.Factory
+
+    fun subtensorSubnetPickerFactory(): SubtensorSubnetPickerComponent.Factory
+
+    fun subtensorStakeSetupFactory(): SubtensorStakeSetupComponent.Factory
+
+    fun subtensorStakeConfirmFactory(): SubtensorStakeConfirmComponent.Factory
+
+    fun subtensorValidatorPickerFactory(): SubtensorValidatorPickerComponent.Factory
+
+    fun subtensorUnstakeSetupFactory(): SubtensorUnstakeSetupComponent.Factory
+
+    fun subtensorUnstakeConfirmFactory(): SubtensorUnstakeConfirmComponent.Factory
 
     @Component.Factory
     interface Factory {

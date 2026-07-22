@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mirrors iOS SubtensorUnstakeSetupViewLayout: validator (read-only,
+     pre-filled from position) + amount header w/ Max + amount input +
+     Position row + NetworkFeeView + Continue. Validator slot uses Nova's
+     StakingTargetView for visual parity with the stake-side flow. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/subtensorUnstakeSetupToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false"
+        app:titleText="@string/subtensor_unstake" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/subtensor_setup_validator_label"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_secondary" />
+
+            <io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarget.StakingTargetView
+                android:id="@+id/subtensorUnstakeSetupValidator"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp" />
+
+            <!-- Amount header: title left, "Max: 0.30 SN8" tappable right -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/subtensor_setup_amount_label"
+                    android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:textColor="@color/text_secondary" />
+
+                <!-- Canonical Nova widget: "Max" stays blue, the amount goes
+                     white — matches the AVAIL/USDT/etc. unstake screens. -->
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.MaxAmountView
+                    android:id="@+id/subtensorUnstakeSetupMax"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?selectableItemBackground"
+                    android:padding="4dp" />
+            </LinearLayout>
+
+            <!-- Token chip (TAO icon + "SN56"/"TAO" ticker on left) + amount
+                 input (right-aligned) — same widget the canonical Nova
+                 stake/transfer flows use. Mirrors iOS amount field. -->
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountInputView
+                android:id="@+id/subtensorUnstakeSetupAmountInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/subtensorUnstakeSetupPosition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginEnd="16dp"
+                app:dividerVisible="false"
+                app:title="@string/subtensor_unstake_position_label" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:id="@+id/subtensorUnstakeSetupFee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                app:dividerVisible="false" />
+
+            <!-- Nova Wallet service-fee disclosure (subnet only, recipient set).
+                 Hidden today since NOVA_FEE_RECIPIENT == null. -->
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                android:id="@+id/subtensorUnstakeSetupNovaFee"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:visibility="gone"
+                app:dividerVisible="false"
+                app:title="@string/subtensor_setup_nova_fee_label" />
+
+            <TextView
+                android:id="@+id/subtensorUnstakeSetupNovaFeeDisclaimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/subtensorUnstakeSetupContinue"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:enabled="false"
+        android:text="@string/common_continue" />
+</LinearLayout>

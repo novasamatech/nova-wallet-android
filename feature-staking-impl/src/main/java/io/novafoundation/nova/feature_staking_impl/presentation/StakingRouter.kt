@@ -13,10 +13,85 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.rewardDe
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
+import kotlinx.coroutines.flow.Flow
 
 interface StakingRouter {
 
     fun openChainStakingMain()
+
+    /**
+     * Routes the dashboard tap on a Bittensor (`SUBTENSOR`) row to its own
+     * detail fragment instead of the compound-component `StakingFragment`.
+     * Subtensor doesn't fit the relaychain/parachain/Mythos component model.
+     */
+    fun openSubtensorStakingMain()
+
+    /**
+     * Subtensor stake-add type picker (Root TAO vs Subnet alpha). Pushed
+     * from the Subtensor staking detail screen when the user taps
+     * "Stake more". Mirrors iOS `SubtensorStakingWireframe.showStakingFlow`.
+     */
+    fun openSubtensorStakeType()
+
+    /**
+     * Subnet alpha picker. Pushed from the Type Picker when the user picks
+     * Subnet on Continue. Selecting a row routes onward to the stake setup
+     * screen with that netuid.
+     */
+    fun openSubtensorSubnetPicker()
+
+    /**
+     * Subtensor stake-add amount + validator setup screen. Pushed either
+     * from the Type Picker (Root path, netuid = 0) or from the Subnet
+     * Picker (subnet path, netuid 1..128). `subnetName` is rendered in the
+     * setup screen header for subnet flows; null for root.
+     */
+    fun openSubtensorStakeSetup(netuid: Int, subnetName: String? = null)
+
+    /**
+     * Subtensor stake-add Confirm screen. Pushed from Setup's Continue
+     * after validation. The payload carries the snapshotted fee so what
+     * the user agreed to is what they sign — same idiom as ConfirmBondMore.
+     */
+    fun openSubtensorStakeConfirm(payload: io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.confirm.SubtensorStakeConfirmPayload)
+
+    /**
+     * Subtensor validator picker. Pushed from the stake-setup screen's
+     * "Select validator" slot. Selection is reported back via
+     * [SubtensorStakeSetupFragment.KEY_SELECTED_VALIDATOR_HOTKEY] on the
+     * setup screen's saved state handle.
+     */
+    fun openSubtensorValidatorPicker(netuid: Int)
+
+    /**
+     * Writes the picked validator (hotkey + identity) into the previous
+     * back-stack entry's saved state handle and pops the validator picker.
+     * Same idiom as the crowdloan-bonus round-trip (see `Navigator.setCustomBonus`).
+     */
+    fun respondAndPopValidatorPicker(picked: io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorPickedValidator)
+
+    /**
+     * Stream of the most-recently-picked Subtensor validator (hotkey +
+     * identity), scoped to the current Stake Setup back-stack entry.
+     * Mirrors the crowdloan `customBonusFlow` pattern.
+     */
+    val subtensorSelectedValidatorFlow: Flow<io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorPickedValidator?>
+
+    /**
+     * Subtensor unstake setup screen. Pushed from the main TAO staking
+     * screen — the user has already picked a position (or there's only
+     * one), so the destination receives a fully-resolved
+     * (netuid, hotkey, position-amount) triple. Mirrors iOS
+     * `SubtensorStakingWireframe.pushUnstakeSetup`.
+     */
+    fun openSubtensorUnstakeSetup(netuid: Int, hotkeyAddress: String, positionPlanks: java.math.BigInteger)
+
+    /**
+     * Subtensor unstake Confirm screen. Pushed from Setup's Continue
+     * after the snapshot fee + amount + identity are resolved. Mirrors
+     * the stake-confirm path.
+     */
+    fun openSubtensorUnstakeConfirm(payload: io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.confirm.SubtensorUnstakeConfirmPayload)
 
     fun openStartChangeValidators()
 

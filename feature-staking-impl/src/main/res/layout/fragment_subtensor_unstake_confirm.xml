@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/subtensorUnstakeConfirmToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/subtensor_unstake" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+        android:id="@+id/subtensorUnstakeConfirmAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
+        android:id="@+id/subtensorUnstakeConfirmExtrinsicInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="24dp">
+
+        <!-- Nova Wallet service-fee row, added as a cell INSIDE the extrinsic-info
+             table so it sits in the same card directly beneath the network-fee row.
+             TableView lays out + dividers all its children uniformly, so no margins
+             or own divider here. Subnet only + recipient set; hidden today
+             (NOVA_FEE_RECIPIENT == null). -->
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+            android:id="@+id/subtensorUnstakeConfirmNovaFee"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:title="@string/subtensor_setup_nova_fee_label" />
+
+    </io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView>
+
+    <TextView
+        android:id="@+id/subtensorUnstakeConfirmNovaFeeDisclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone" />
+
+    <io.novafoundation.nova.common.view.TableView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp">
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/subtensorUnstakeConfirmValidator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:title="@string/subtensor_setup_validator_label" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/subtensorUnstakeConfirmReceive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:title="@string/subtensor_unstake_youll_receive"
+            tools:visibility="visible" />
+    </io.novafoundation.nova.common.view.TableView>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/subtensorUnstakeConfirmConfirm"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/common_confirm" />
+</LinearLayout>

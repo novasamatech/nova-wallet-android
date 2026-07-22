@@ -23,6 +23,15 @@ class StakingDashboardModel(
         val stake: SyncingData<MaskableModel<AmountModel>>,
         val status: ExtendedLoadingState<SyncingData<StakeStatusModel>>,
         val earnings: ExtendedLoadingState<SyncingData<String>>,
+        /** Hide both fiat-under-stake lines (rewards fiat + stake fiat).
+         *  True only for subnet-alpha rows, which have no priceId. iOS does
+         *  the same — alpha never has a CoinGecko feed. Root TAO keeps fiat. */
+        val hideFiat: Boolean = false,
+        /** Hide the "X.XX% per year" group (label + value + suffix). True
+         *  for all Subtensor rows — Bittensor has no off-chain rewards
+         *  indexer, so the estimated APY is meaningless on both root and
+         *  subnet. Mirrors iOS dashboard mapper. */
+        val hideEarnings: Boolean = false,
     ) : BaseItem
 
     data class NoStakeItem(

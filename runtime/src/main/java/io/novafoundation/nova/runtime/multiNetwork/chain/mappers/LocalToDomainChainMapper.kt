@@ -87,6 +87,14 @@ private fun mapChainAssetTypeFromRaw(type: String?, typeExtras: Map<String, Any?
 
         ASSET_EQUILIBRIUM -> Chain.Asset.Type.Equilibrium((typeExtras!![ASSET_EQUILIBRIUM_ON_CHAIN_ID] as String).toBigInteger())
 
+        ASSET_SUBTENSOR_ALPHA -> {
+            // typeExtras.netuid arrives as a JSON Number → Double after Gson
+            // round-trip — coerce safely to Int. Missing extras → root (0)
+            // so a malformed asset still maps to a usable type.
+            val netuid = (typeExtras?.get(SUBTENSOR_ALPHA_EXTRAS_NETUID) as? Number)?.toInt() ?: 0
+            Chain.Asset.Type.SubtensorAlpha(netuid = netuid)
+        }
+
         else -> Chain.Asset.Type.Unsupported
     }
 }

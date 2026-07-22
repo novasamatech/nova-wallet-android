@@ -124,6 +124,14 @@ data class Chain(
                 val id: BigInteger
             ) : Type()
 
+            /**
+             * Bittensor subnet alpha asset. `netuid` distinguishes between
+             * subnets (1..128) — root TAO uses `Native` instead. Sourced
+             * from nova-utils chain config: `type: "subtensor-alpha"` with
+             * `typeExtras: {netuid: N}`.
+             */
+            data class SubtensorAlpha(val netuid: Int) : Type()
+
             object Unsupported : Type()
         }
 
@@ -132,7 +140,8 @@ data class Chain(
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
             PARACHAIN, TURING, // parachain-staking like
             NOMINATION_POOLS,
-            MYTHOS
+            MYTHOS,
+            SUBTENSOR // bittensor (TAO root + dTAO subnet alpha)
         }
 
         override val identifier = "$chainId:$id"

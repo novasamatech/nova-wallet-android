@@ -12,7 +12,17 @@ typealias StakingOption = SupportedAssetOption<StakingSharedState.OptionAddition
 
 class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.OptionAdditionalData> {
 
-    class OptionAdditionalData(val stakingType: Chain.Asset.StakingType)
+    class OptionAdditionalData(
+        val stakingType: Chain.Asset.StakingType,
+        /**
+         * The netuid the user tapped on the multistaking dashboard, scoped
+         * to Subtensor. iOS threads this through `SubtensorStakingViewFactory
+         * .createView(... entryNetuid:)`; Android pipes it via the shared
+         * state because the detail Fragment is created by the nav graph
+         * without arguments. Null for non-Subtensor flows.
+         */
+        val subtensorEntryNetuid: Int? = null,
+    )
 
     private val _selectedOption = singleReplaySharedFlow<StakingOption>()
     override val selectedOption: Flow<StakingOption> = _selectedOption
@@ -20,9 +30,10 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
     suspend fun setSelectedOption(
         chain: Chain,
         chainAsset: Chain.Asset,
-        stakingType: Chain.Asset.StakingType
+        stakingType: Chain.Asset.StakingType,
+        subtensorEntryNetuid: Int? = null,
     ) {
-        val selectedOption = createStakingOption(chain, chainAsset, stakingType)
+        val selectedOption = createStakingOption(chain, chainAsset, stakingType, subtensorEntryNetuid)
 
         setSelectedOption(selectedOption)
     }
@@ -32,17 +43,27 @@ class StakingSharedState : SelectedAssetOptionSharedState<StakingSharedState.Opt
     }
 }
 
-fun createStakingOption(chainWithAsset: ChainWithAsset, stakingType: Chain.Asset.StakingType): StakingOption {
+fun createStakingOption(
+    chainWithAsset: ChainWithAsset,
+    stakingType: Chain.Asset.StakingType,
+    subtensorEntryNetuid: Int? = null,
+): StakingOption {
     return StakingOption(
         assetWithChain = chainWithAsset,
-        additional = StakingSharedState.OptionAdditionalData(stakingType)
+        additional = StakingSharedState.OptionAdditionalData(stakingType, subtensorEntryNetuid)
     )
 }
 
-fun createStakingOption(chain: Chain, chainAsset: Chain.Asset, stakingType: Chain.Asset.StakingType): StakingOption {
+fun createStakingOption(
+    chain: Chain,
+    chainAsset: Chain.Asset,
+    stakingType: Chain.Asset.StakingType,
+    subtensorEntryNetuid: Int? = null,
+): StakingOption {
     return createStakingOption(
         chainWithAsset = ChainWithAsset(chain, chainAsset),
-        stakingType = stakingType
+        stakingType = stakingType,
+        subtensorEntryNetuid = subtensorEntryNetuid,
     )
 }
 

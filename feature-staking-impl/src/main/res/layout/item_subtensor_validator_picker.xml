@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Mirrors iOS SubtensorValidatorTableViewCell + SubtensorValidatorPickerViewLayout
+     (UITableView style: .plain, separator: .singleLine, color: container_border).
+     Row height ~56dp; flat against the screen background; thin separator inset
+     16dp from the leading edge to align under the title text, not under the icon. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?selectableItemBackground"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp">
+
+        <ImageView
+            android:id="@+id/subtensorValidatorPickerRowIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="12dp"
+            tools:src="@drawable/ic_identicon_placeholder_with_background" />
+
+        <TextView
+            android:id="@+id/subtensorValidatorPickerRowName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:textColor="@color/text_primary"
+            tools:text="Opentensor Foundation" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/subtensorValidatorPickerRowApr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:textColor="@color/text_positive"
+                tools:text="14.32%" />
+
+            <TextView
+                android:id="@+id/subtensorValidatorPickerRowCommission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1.Secondary"
+                tools:text="18% commission" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="16dp"
+        android:background="@color/container_border" />
+</LinearLayout>

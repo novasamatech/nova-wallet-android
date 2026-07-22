@@ -139,6 +139,8 @@ class SubqueryHistoryRequest(
             StakingTypeGroup.MYTHOS -> "reward"
 
             StakingTypeGroup.NOMINATION_POOL -> "poolReward"
+            // Subtensor rewards aren't surfaced via the SubQuery indexer yet.
+            StakingTypeGroup.SUBTENSOR -> null
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }

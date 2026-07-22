@@ -596,6 +596,14 @@
             app:popExitAnim="@anim/fragment_close_exit" />
 
         <action
+            android:id="@+id/action_mainFragment_to_subtensorStakingMain"
+            app:destination="@id/subtensorStakingFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+
+        <action
             android:id="@+id/action_mainFragment_to_startStackingLanding"
             app:destination="@id/start_staking_nav_graph"
             app:enterAnim="@anim/fragment_open_enter"
@@ -706,6 +714,115 @@
         android:name="io.novafoundation.nova.feature_account_impl.presentation.account.list.multipleSelecting.SelectMultipleWalletsFragment"
         android:label="SelectMultipleWalletsFragment"
         tools:layout="@layout/fragment_select_multiple_wallets" />
+
+    <fragment
+        android:id="@+id/subtensorStakingFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.main.SubtensorStakingFragment"
+        android:label="SubtensorStakingFragment"
+        tools:layout="@layout/fragment_subtensor_staking">
+        <action
+            android:id="@+id/action_subtensorStakingMain_to_subtensorStakeType"
+            app:destination="@id/subtensorStakeTypeFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_subtensorStakingMain_to_subtensorUnstakeSetup"
+            app:destination="@id/subtensorUnstakeSetupFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subtensorUnstakeSetupFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.setup.SubtensorUnstakeSetupFragment"
+        android:label="SubtensorUnstakeSetupFragment"
+        tools:layout="@layout/fragment_subtensor_unstake_setup">
+        <action
+            android:id="@+id/action_subtensorUnstakeSetup_to_subtensorUnstakeConfirm"
+            app:destination="@id/subtensorUnstakeConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subtensorUnstakeConfirmFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.unstake.confirm.SubtensorUnstakeConfirmFragment"
+        android:label="SubtensorUnstakeConfirmFragment"
+        tools:layout="@layout/fragment_subtensor_unstake_confirm" />
+
+    <fragment
+        android:id="@+id/subtensorStakeTypeFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.type.SubtensorStakeTypeFragment"
+        android:label="SubtensorStakeTypeFragment"
+        tools:layout="@layout/fragment_subtensor_stake_type">
+        <action
+            android:id="@+id/action_subtensorStakeType_to_subtensorStakeSetup"
+            app:destination="@id/subtensorStakeSetupFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_subtensorStakeType_to_subtensorSubnetPicker"
+            app:destination="@id/subtensorSubnetPickerFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subtensorSubnetPickerFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.subnetPicker.SubtensorSubnetPickerFragment"
+        android:label="SubtensorSubnetPickerFragment"
+        tools:layout="@layout/fragment_subtensor_subnet_picker">
+        <action
+            android:id="@+id/action_subtensorSubnetPicker_to_subtensorStakeSetup"
+            app:destination="@id/subtensorStakeSetupFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subtensorStakeSetupFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.setup.SubtensorStakeSetupFragment"
+        android:label="SubtensorStakeSetupFragment"
+        tools:layout="@layout/fragment_subtensor_stake_setup">
+        <action
+            android:id="@+id/action_subtensorStakeSetup_to_subtensorValidatorPicker"
+            app:destination="@id/subtensorValidatorPickerFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+        <action
+            android:id="@+id/action_subtensorStakeSetup_to_subtensorStakeConfirm"
+            app:destination="@id/subtensorStakeConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/subtensorValidatorPickerFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.validatorPicker.SubtensorValidatorPickerFragment"
+        android:label="SubtensorValidatorPickerFragment"
+        tools:layout="@layout/fragment_subtensor_validator_picker" />
+
+    <fragment
+        android:id="@+id/subtensorStakeConfirmFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.subtensor.stake.confirm.SubtensorStakeConfirmFragment"
+        android:label="SubtensorStakeConfirmFragment"
+        tools:layout="@layout/fragment_subtensor_stake_confirm" />
 
     <fragment
         android:id="@+id/nodesFragment"
