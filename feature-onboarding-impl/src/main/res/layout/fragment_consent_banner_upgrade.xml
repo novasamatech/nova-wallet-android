@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingBottom="20dp"
+    tools:background="@color/bottom_sheet_background">
+
+    <View
+        android:id="@+id/consentUpgradePuller"
+        style="@style/Widget.Nova.Puller"
+        android:layout_gravity="center_horizontal" />
+
+    <TextView
+        android:id="@+id/consentUpgradeTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:textColor="@color/text_primary"
+        android:text="@string/consent_banner_upgrade_title" />
+
+    <TextView
+        android:id="@+id/consentUpgradeDescription"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:textColor="@color/text_secondary"
+        android:text="@string/consent_banner_upgrade_description" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:baselineAligned="false"
+        android:orientation="horizontal"
+        android:paddingBottom="4dp">
+
+        <CheckBox
+            android:id="@+id/consentUpgradeCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp" />
+
+        <TextView
+            android:id="@+id/consentUpgradeText"
+            style="@style/TextAppearance.NovaFoundation.Body1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:gravity="start"
+            android:lineSpacingExtra="2dp"
+            android:textColor="@color/text_secondary"
+            android:textColorLink="@color/text_primary"
+            tools:text="@string/consent_banner_text_template" />
+    </LinearLayout>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/consentUpgradeAccept"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        app:appearance="primary" />
+
+</LinearLayout>

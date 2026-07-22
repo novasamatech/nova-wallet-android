@@ -8,6 +8,8 @@ interface RootRouter {
 
     fun openUpdateNotifications()
 
+    fun openConsentBannerUpgrade()
+
     fun openPushWelcome()
 
     fun openCloudBackupSettings()

@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecutor
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
@@ -159,6 +160,8 @@ interface CommonApi {
     fun provideAppLinksProvider(): AppLinksProvider
 
     fun providePreferences(): Preferences
+
+    fun consentRepository(): ConsentRepository
 
     fun backgroundAccessObserver(): BackgroundAccessObserver
 

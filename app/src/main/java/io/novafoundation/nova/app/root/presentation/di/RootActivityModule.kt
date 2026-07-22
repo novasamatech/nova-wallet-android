@@ -10,6 +10,7 @@ import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.RootViewModel
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
@@ -20,6 +21,7 @@ import io.novafoundation.nova.common.utils.DialogMessageManager
 import io.novafoundation.nova.common.utils.ToastMessageManager
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.feature_crowdloan_api.domain.contributions.ContributionsInteractor
@@ -65,7 +67,9 @@ class RootActivityModule {
         toastMessageManager: ToastMessageManager,
         dialogMessageManager: DialogMessageManager,
         multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
-        deviceNetworkStateObserver: DeviceNetworkStateObserver
+        deviceNetworkStateObserver: DeviceNetworkStateObserver,
+        consentRepository: ConsentRepository,
+        automaticInteractionGate: AutomaticInteractionGate
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -89,7 +93,9 @@ class RootActivityModule {
             toastMessageManager,
             dialogMessageManager,
             multisigPushNotificationsAlertMixinFactory,
-            deviceNetworkStateObserver
+            deviceNetworkStateObserver,
+            consentRepository,
+            automaticInteractionGate
         )
     }
 

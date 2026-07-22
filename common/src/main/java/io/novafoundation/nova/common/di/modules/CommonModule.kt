@@ -24,6 +24,8 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.memory.RealComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
+import io.novafoundation.nova.common.data.preferences.SharedPrefsConsentRepository
 import io.novafoundation.nova.common.data.providers.deviceid.AndroidDeviceIdProvider
 import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
@@ -163,6 +165,12 @@ class CommonModule {
     @ApplicationScope
     fun providePreferences(sharedPreferences: SharedPreferences): Preferences {
         return PreferencesImpl(sharedPreferences)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideConsentRepository(preferences: Preferences): ConsentRepository {
+        return SharedPrefsConsentRepository(preferences)
     }
 
     @Provides

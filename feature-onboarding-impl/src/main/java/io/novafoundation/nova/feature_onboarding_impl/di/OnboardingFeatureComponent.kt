@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.di.CloudBackupFeatureApi
 import io.novafoundation.nova.feature_ledger_core.di.LedgerCoreApi
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
+import io.novafoundation.nova.feature_onboarding_impl.presentation.consentUpgrade.di.ConsentBannerUpgradeComponent
 import io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser.di.ImportWalletOptionsComponent
 import io.novafoundation.nova.feature_onboarding_impl.presentation.welcome.di.WelcomeComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
@@ -27,6 +28,8 @@ interface OnboardingFeatureComponent : OnboardingFeatureApi {
     fun welcomeComponentFactory(): WelcomeComponent.Factory
 
     fun importWalletOptionsComponentFactory(): ImportWalletOptionsComponent.Factory
+
+    fun consentBannerUpgradeComponentFactory(): ConsentBannerUpgradeComponent.Factory
 
     @Component.Factory
     interface Factory {

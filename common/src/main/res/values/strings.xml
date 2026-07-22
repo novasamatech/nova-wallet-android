@@ -740,6 +740,12 @@
     <string name="settings_push_notifications_only_available_from_google_play_error">Push notifications are available only for the Nova Wallet version downloaded from Google Play.</string>
 
     <string name="onboarding_terms_and_conditions_1_v2_2_1">By continuing, you agree to our\n%1$s and %2$s</string>
+    <string name="consent_banner_text_template">I agree to the %1$s, and acknowledge the %2$s.</string>
+    <string name="consent_banner_terms_of_service">Terms of Service</string>
+    <string name="consent_banner_privacy_notice">Privacy Notice</string>
+    <string name="consent_banner_upgrade_title">Updated Terms</string>
+    <string name="consent_banner_upgrade_description">We\'ve updated our Terms of Service and Privacy Notice. Please review and accept the updated documents to continue using Nova Wallet.</string>
+    <string name="consent_banner_upgrade_accept">Accept and Continue</string>
 
     <string name="backup_settings_no_wallets_error_title">No wallets to back up</string>
     <string name="backup_settings_no_wallets_error_message">You haven\'t added any wallets with a passphrase.</string>

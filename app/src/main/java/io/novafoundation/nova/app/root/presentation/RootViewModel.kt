@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.formatDeepLinkHandlingException
 import io.novafoundation.nova.app.root.presentation.requestBusHandler.CompoundRequestBusHandler
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.preferences.ConsentRepository
 import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import io.novafoundation.nova.common.mixin.api.NetworkStateMixin
 import io.novafoundation.nova.common.mixin.api.NetworkStateUi
@@ -19,6 +20,8 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.mapEvent
 import io.novafoundation.nova.common.utils.network.DeviceNetworkStateObserver
 import io.novafoundation.nova.common.utils.onFailureInstance
+import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.common.utils.sequrity.awaitInteractionAllowed
 import io.novafoundation.nova.common.utils.sequrity.BackgroundAccessObserver
 import io.novafoundation.nova.common.view.bottomSheet.action.ActionBottomSheetLauncher
 import io.novafoundation.nova.core.updater.Updater
@@ -59,7 +62,9 @@ class RootViewModel(
     private val toastMessageManager: ToastMessageManager,
     private val dialogMessageManager: DialogMessageManager,
     private val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
-    private val deviceNetworkStateObserver: DeviceNetworkStateObserver
+    private val deviceNetworkStateObserver: DeviceNetworkStateObserver,
+    private val consentRepository: ConsentRepository,
+    private val automaticInteractionGate: AutomaticInteractionGate
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -121,6 +126,29 @@ class RootViewModel(
         deviceNetworkStateObserver.observeIsNetworkAvailable()
             .onEach { interactor.loadMigrationDetailsConfigs() }
             .launchIn(this)
+
+        checkForConsentBannerUpgrade()
+    }
+
+    /**
+     * On launch, if the user already has a wallet (so they would land on the
+     * main UI rather than the welcome screen) AND they have not yet accepted
+     * the current ToS / Privacy Notice version, navigate to the blocking
+     * upgrade screen. New users are gated by the welcome-screen checkbox
+     * instead — they never see this screen.
+     */
+    private fun checkForConsentBannerUpgrade() {
+        launch {
+            if (!interactor.isAccountSelected()) return@launch
+            if (consentRepository.hasAcceptedCurrentVersion()) return@launch
+
+            // Wait until the user has passed PIN authentication so the screen
+            // doesn't overlay the PIN entry. Mirrors iOS's
+            // securedLayer.scheduleExecutionIfAuthorized gate.
+            automaticInteractionGate.awaitInteractionAllowed()
+
+            rootRouter.openConsentBannerUpgrade()
+        }
     }
 
     private fun observeBusEvents() {
