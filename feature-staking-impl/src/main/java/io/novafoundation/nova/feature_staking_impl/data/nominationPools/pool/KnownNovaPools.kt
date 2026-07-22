@@ -8,9 +8,14 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 interface KnownNovaPools {
 
     val novaPoolIds: Set<Pair<ChainId, PoolId>>
+
+    val forcedPoolChainIds: Set<ChainId>
 }
 
 fun KnownNovaPools.isNovaPool(chainId: ChainId, poolId: PoolId) = chainId to poolId in novaPoolIds
+
+fun KnownNovaPools.novaPoolIdForChain(chainId: ChainId): PoolId? =
+    novaPoolIds.firstOrNull { it.first == chainId }?.second
 
 class FixedKnownNovaPools : KnownNovaPools {
 
@@ -20,6 +25,11 @@ class FixedKnownNovaPools : KnownNovaPools {
         key(Chain.Geneses.ALEPH_ZERO, 74),
         key(Chain.Geneses.VARA, 65),
         key(Chain.Geneses.AVAIL, 3)
+    )
+
+    override val forcedPoolChainIds: Set<ChainId> = setOf(
+        Chain.Geneses.POLKADOT_ASSET_HUB,
+        Chain.Geneses.KUSAMA_ASSET_HUB
     )
 
     private fun key(chainId: ChainId, poolId: Int) = chainId to PoolId(poolId)

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.s
 
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.nominationPools.pool.KnownNovaPools
 import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.model.PayoutType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
@@ -14,17 +15,20 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.isDirectStaking
 import io.novafoundation.nova.runtime.ext.isPoolStaking
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 
 class EditableStakingTypeItemFormatter(
     private val resourceManager: ResourceManager,
     private val multiStakingTargetSelectionFormatter: MultiStakingTargetSelectionFormatter,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val knownNovaPools: KnownNovaPools,
 ) {
 
     suspend fun format(
         asset: Asset,
         validatedStakingType: ValidatedStakingTypeDetails,
-        selection: RecommendableMultiStakingSelection
+        selection: RecommendableMultiStakingSelection,
+        chainId: ChainId
     ): EditableStakingTypeRVItem? {
         val stakingTarget = multiStakingTargetSelectionFormatter.formatForStakingType(selection)
         val selectedStakingType = selection.selection.stakingOption.stakingType
@@ -37,14 +41,17 @@ class EditableStakingTypeItemFormatter(
         }
 
         val isSelected = selectedStakingType == stakingType
+        val isPoolForced = stakingType.isPoolStaking() && chainId in knownNovaPools.forcedPoolChainIds
+        val isEditable = !isPoolForced
 
         return EditableStakingTypeRVItem(
             isSelected = isSelected,
             isSelectable = validatedStakingType.isAvailable || isSelected,
+            isEditable = isEditable,
             title = resourceManager.getString(titleRes),
             imageRes = imageRes,
             conditions = mapConditions(asset, validatedStakingType.stakingTypeDetails),
-            stakingTarget = stakingTarget.takeIf { selectedStakingType == stakingType }
+            stakingTarget = if (isPoolForced) null else stakingTarget.takeIf { selectedStakingType == stakingType }
         )
     }
 

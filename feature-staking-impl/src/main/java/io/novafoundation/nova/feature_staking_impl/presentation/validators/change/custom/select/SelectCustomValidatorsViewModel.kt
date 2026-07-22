@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlin.math.max
 import kotlinx.coroutines.launch
 
 class SelectCustomValidatorsViewModel(
@@ -114,16 +115,19 @@ class SelectCustomValidatorsViewModel(
 
     val buttonState = selectedValidators.map {
         val maxSelectedValidators = maxSelectedValidatorsFlow.first()
+        val lockedCount = it.count { item -> item.value.isNovaValidator }
+        val availableSlots = maxSelectedValidators - lockedCount
+        val communitySelected = it.size - lockedCount
 
-        if (it.isEmpty()) {
+        if (communitySelected == 0 && lockedCount == 0) {
             ContinueButtonState(
                 enabled = false,
-                text = resourceManager.getString(R.string.staking_custom_proceed_button_disabled_title, maxSelectedValidators)
+                text = resourceManager.getString(R.string.staking_custom_proceed_button_disabled_title, availableSlots)
             )
         } else {
             ContinueButtonState(
                 enabled = true,
-                text = resourceManager.getString(R.string.staking_custom_proceed_button_enabled_title, it.size, maxSelectedValidators)
+                text = resourceManager.getString(R.string.staking_custom_proceed_button_enabled_title, max(communitySelected, 0), availableSlots)
             )
         }
     }
@@ -144,7 +148,9 @@ class SelectCustomValidatorsViewModel(
     val clearFiltersEnabled = recommendationSettingsFlow.map { it.customEnabledFilters.isNotEmpty() || it.postProcessors.isNotEmpty() }
         .share()
 
-    val deselectAllEnabled = selectedValidators.map { it.isNotEmpty() }
+    val deselectAllEnabled = selectedValidators.map { selected ->
+        selected.any { !it.value.isNovaValidator }
+    }
         .share()
 
     init {
@@ -171,6 +177,8 @@ class SelectCustomValidatorsViewModel(
     }
 
     fun validatorClicked(validatorModel: ValidatorStakeTargetModel) {
+        if (validatorModel.isLocked) return
+
         mutateSelected {
             it.toggle(validatorModel.stakeTarget.asSetItem())
         }
@@ -203,7 +211,9 @@ class SelectCustomValidatorsViewModel(
     }
 
     fun deselectAll() {
-        mutateSelected { emptySet() }
+        mutateSelected { selected ->
+            selected.filter { it.value.isNovaValidator }.toSet()
+        }
     }
 
     fun fillRestWithRecommended() {

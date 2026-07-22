@@ -78,6 +78,10 @@ class StakingTypeView @JvmOverloads constructor(
         binder.stakingTypeTarget.setModel(stakingTarget)
     }
 
+    fun setStakingTargetEditable(editable: Boolean) {
+        binder.stakingTypeTarget.setChevronVisible(editable)
+    }
+
     fun setStakingTargetClickListener(listener: OnClickListener) {
         binder.stakingTypeTarget.setOnClickListener(listener)
     }

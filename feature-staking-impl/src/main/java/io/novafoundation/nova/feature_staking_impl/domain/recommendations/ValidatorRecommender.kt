@@ -38,7 +38,7 @@ class ValidatorRecommender(
 
         val cappedOthers = others.take(limit - cappedNovaValidators.size)
 
-        return (cappedNovaValidators + cappedOthers).sortedWith(sorting)
+        return cappedOthers.sortedWith(sorting) + cappedNovaValidators.sortedWith(sorting)
     }
 
     private fun List<Validator>.applyFiltersAdaptingToEmptyResult(filters: List<RecommendationFilter>): List<Validator> {

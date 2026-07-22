@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.view.stakingTarg
 class EditableStakingTypeRVItem(
     val isSelected: Boolean,
     val isSelectable: Boolean,
+    val isEditable: Boolean,
     val title: String,
     @DrawableRes val imageRes: Int,
     val conditions: List<String>,

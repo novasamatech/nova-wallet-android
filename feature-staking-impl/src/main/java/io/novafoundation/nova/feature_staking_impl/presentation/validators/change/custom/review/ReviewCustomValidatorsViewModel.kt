@@ -89,6 +89,8 @@ class ReviewCustomValidatorsViewModel(
     val isInEditMode = MutableStateFlow(false)
 
     fun deleteClicked(validatorModel: ValidatorStakeTargetModel) {
+        if (validatorModel.isLocked) return
+
         launch {
             val validators = selectedValidators.first()
 
