@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBro
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.PhishingSitesRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.RealBrowserHostSettingsRepository
+import io.novafoundation.nova.feature_dapp_impl.data.repository.StakingCompetitorDomainsRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.DappInteractor
 import io.novafoundation.nova.feature_dapp_impl.domain.browser.DappBrowserInteractor
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserViewModel
@@ -50,11 +51,13 @@ class DAppBrowserModule {
     fun provideInteractor(
         phishingSitesRepository: PhishingSitesRepository,
         favouritesDAppRepository: FavouritesDAppRepository,
-        browserHostSettingsRepository: BrowserHostSettingsRepository
+        browserHostSettingsRepository: BrowserHostSettingsRepository,
+        stakingCompetitorDomainsRepository: StakingCompetitorDomainsRepository
     ) = DappBrowserInteractor(
         phishingSitesRepository = phishingSitesRepository,
         favouritesDAppRepository = favouritesDAppRepository,
-        browserHostSettingsRepository = browserHostSettingsRepository
+        browserHostSettingsRepository = browserHostSettingsRepository,
+        stakingCompetitorDomainsRepository = stakingCompetitorDomainsRepository
     )
 
     @Provides
@@ -103,7 +106,8 @@ class DAppBrowserModule {
         dAppInteractor: DappInteractor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         chainRegistry: ChainRegistry,
-        browserTabService: BrowserTabService
+        browserTabService: BrowserTabService,
+        stakingCompetitorDomainsRepository: StakingCompetitorDomainsRepository
     ): ViewModel {
         return DAppBrowserViewModel(
             router = router,
@@ -116,7 +120,8 @@ class DAppBrowserModule {
             extensionStoreFactory = extensionStoreFactory,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             chainRegistry = chainRegistry,
-            browserTabService = browserTabService
+            browserTabService = browserTabService,
+            stakingCompetitorDomainsRepository = stakingCompetitorDomainsRepository
         )
     }
 }

@@ -87,6 +87,15 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
             binder.searchDappCategories.isVisible = it.isLoaded()
             it.onLoaded { categoriesAdapter.submitList(it) }
         }
+
+        viewModel.showStakingBanner.observe { show ->
+            binder.searchDappStakingBanner.isVisible = show
+        }
+
+        binder.searchDappStakingBannerButton.setOnClickListener {
+            hideKeyboard()
+            viewModel.goToStakingClicked()
+        }
     }
 
     override fun itemClicked(searchResult: DappSearchResult) {

@@ -2161,6 +2161,15 @@
     <string name="dapp_phishing_subtitle">Nova Wallet believes that this website could compromise the security of your accounts and your tokens</string>
     <string name="dapp_phishing_go_back">Okay, take me back</string>
 
+    <string name="dapp_search_staking_banner_text">Looking to stake? Nova Wallet has built-in staking.</string>
+    <string name="dapp_search_staking_banner_button">Go to Staking</string>
+
+    <string name="dapp_staking_competitor_warning_title">Notice</string>
+    <string name="dapp_staking_competitor_warning_subtitle">Third-party staking sites often become deprecated. We recommend using Nova Wallet\'s built-in staking features.</string>
+    <string name="dapp_staking_competitor_go_to_stake">Go to Staking</string>
+    <string name="dapp_staking_competitor_advanced">Advanced</string>
+    <string name="dapp_staking_competitor_continue">Continue to site</string>
+
     <string name="staking_start_change_validators_recommended_subtitle">Nova Wallet will select the top validators based on security and profitability criteria</string>
 
     <string name="staking_nominations_rewarded_format" formatted="false">%s rewarded</string>

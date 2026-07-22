@@ -26,4 +26,6 @@ interface DAppRouter : ReturnableRouter {
     fun closeTabsScreen()
 
     fun openDAppFavorites()
+
+    fun navigateToStaking()
 }

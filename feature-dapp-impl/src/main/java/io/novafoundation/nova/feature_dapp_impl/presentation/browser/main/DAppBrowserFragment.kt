@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.feature_dapp_api.di.DAppFeatureApi
@@ -25,7 +26,7 @@ import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBro
 import io.novafoundation.nova.feature_dapp_impl.R
 import io.novafoundation.nova.feature_dapp_impl.databinding.FragmentDappBrowserBinding
 import io.novafoundation.nova.feature_dapp_impl.di.DAppFeatureComponent
-import io.novafoundation.nova.feature_dapp_impl.domain.browser.isSecure
+import io.novafoundation.nova.feature_dapp_impl.domain.browser.BrowserPageAnalyzed
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DappPendingConfirmation.Action
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.sheets.AcknowledgePhishingBottomSheet
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.options.OptionsBottomSheetDialog
@@ -125,6 +126,14 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
         binder.dappBrowserFavorite.setOnClickListener { viewModel.onFavoriteClick() }
         binder.dappBrowserMore.setOnClickListener { moreClicked() }
 
+        binder.dappBrowserStakingWarningGoToStake.setOnClickListener { viewModel.navigateToStaking() }
+        binder.dappBrowserStakingWarningAdvanced.setOnClickListener {
+            viewModel.onStakingWarningAdvancedClicked()
+        }
+        binder.dappBrowserStakingWarningContinue.setOnClickListener {
+            viewModel.onStakingWarningContinue()
+        }
+
         requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
 
         binder.dappBrowserTransitionImage.transitionName = DAPP_SHARED_ELEMENT_ID_IMAGE_TAB
@@ -202,6 +211,13 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
             }
         }
 
+        viewModel.stakingWarningState.observe { state ->
+            binder.dappBrowserStakingWarning.isVisible = state.visible
+            binder.dappBrowserWebViewContainer.isVisible = !state.visible
+            binder.dappBrowserStakingWarningAdvanced.isVisible = state.visible && !state.advancedRevealed
+            binder.dappBrowserStakingWarningContinue.isVisible = state.visible && state.advancedRevealed
+        }
+
         viewModel.browserCommandEvent.observeEvent {
             when (it) {
                 BrowserCommand.Reload -> dappBrowserWebView?.reload()
@@ -221,7 +237,7 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
 
         viewModel.currentPageAnalyzed.observe {
             binder.dappBrowserAddressBar.setAddress(it.display)
-            binder.dappBrowserAddressBar.showSecure(it.isSecure)
+            binder.dappBrowserAddressBar.showSecure(it.security == BrowserPageAnalyzed.Security.SECURE || it.security == BrowserPageAnalyzed.Security.STAKING_COMPETITOR)
             binder.dappBrowserFavorite.setImageResource(favoriteIcon(it.isFavourite))
 
             updateButtonsState()
@@ -314,6 +330,12 @@ class DAppBrowserFragment : BaseFragment<DAppBrowserViewModel, FragmentDappBrows
     }
 
     override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
+        val url = request.url.toString()
+
+        if (viewModel.onStakingCompetitorIntercepted(url)) {
+            return true
+        }
+
         return webViewRequestInterceptor.intercept(request)
     }
 
