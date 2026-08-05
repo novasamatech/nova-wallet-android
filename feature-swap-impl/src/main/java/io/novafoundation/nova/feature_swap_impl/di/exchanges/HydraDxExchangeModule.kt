@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdC
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.aave.AaveSwapSourceFactory
@@ -75,6 +76,7 @@ class HydraDxExchangeModule {
         hydrationPriceConversionFallback: HydrationPriceConversionFallback,
         hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
         assetSourceRegistry: AssetSourceRegistry,
+        novaSwapCommission: NovaSwapCommission,
     ): HydraDxExchangeFactory {
         return HydraDxExchangeFactory(
             remoteStorageSource = remoteStorageSource,
@@ -89,6 +91,7 @@ class HydraDxExchangeModule {
             hydrationPriceConversionFallback = hydrationPriceConversionFallback,
             hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher,
             assetSourceRegistry = assetSourceRegistry,
+            novaSwapCommission = novaSwapCommission,
         )
     }
 }

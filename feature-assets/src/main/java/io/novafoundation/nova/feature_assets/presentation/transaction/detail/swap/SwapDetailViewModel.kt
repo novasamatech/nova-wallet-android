@@ -129,7 +129,7 @@ class SwapDetailViewModel(
     }
 
     fun feeClicked() {
-        descriptionBottomSheetLauncher.launchNetworkFeeDescription()
+        descriptionBottomSheetLauncher.launchNetworkFeeDescription(resourceManager)
     }
 
     fun repeatOperationClicked() {

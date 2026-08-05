@@ -192,11 +192,11 @@ class SwapConfirmationViewModel(
     }
 
     fun priceDifferenceClicked() {
-        launchPriceDifferenceDescription()
+        launchPriceDifferenceDescription(resourceManager)
     }
 
     fun slippageClicked() {
-        launchSlippageDescription()
+        launchSlippageDescription(resourceManager)
     }
 
     fun networkFeeClicked() = setSwapStateAndThen {

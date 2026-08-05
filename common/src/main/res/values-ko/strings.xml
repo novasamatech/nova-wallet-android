@@ -1793,8 +1793,6 @@
     <string name="swap_price_difference_title">가격 차이</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">두 개의 다른 암호화폐 간의 환율입니다. 이는 일정량의 한 암호화폐를 교환할 때 얼마나 많은 다른 암호화폐를 얻을 수 있는지를 나타냅니다.</string>
-    <string name="swap_network_fees_label">네트워크 수수료</string>
-    <string name="swap_nova_fee_disclaimer">%s%% Nova 수수료가 포함됩니다.</string>
     <string name="swap_rate_title">환율</string>
     <string name="swap_rate_was_updated_failure_message">이전 환율: %1$s ≈ %2$s.\n새 환율: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">교환 비율이 업데이트되었습니다</string>

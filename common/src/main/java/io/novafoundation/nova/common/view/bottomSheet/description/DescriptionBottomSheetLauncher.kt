@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.event
 
@@ -11,37 +12,27 @@ interface DescriptionBottomSheetLauncher {
 
     val showDescriptionEvent: LiveData<Event<DescriptionModel>>
 
-    fun launchDescriptionBottomSheet(titleRes: Int, descriptionRes: Int)
-
-    fun launchDescriptionBottomSheet(titleRes: Int, descriptionText: String)
+    fun launchDescriptionBottomSheet(title: String, description: String)
 }
 
-fun DescriptionBottomSheetLauncher.launchNetworkFeeDescription() {
-    launchDescriptionBottomSheet(R.string.network_fee, R.string.swap_network_fee_description)
+fun DescriptionBottomSheetLauncher.launchNetworkFeeDescription(resourceManager: ResourceManager) {
+    launchDescriptionBottomSheet(
+        title = resourceManager.getString(R.string.network_fee),
+        description = resourceManager.getString(R.string.swap_network_fee_description)
+    )
 }
 
 class RealDescriptionBottomSheetLauncher : DescriptionBottomSheetLauncher {
 
     override val showDescriptionEvent = MutableLiveData<Event<DescriptionModel>>()
 
-    override fun launchDescriptionBottomSheet(titleRes: Int, descriptionRes: Int) {
-        showDescriptionEvent.value = DescriptionModel(titleRes, descriptionRes).event()
-    }
-
-    override fun launchDescriptionBottomSheet(titleRes: Int, descriptionText: String) {
-        showDescriptionEvent.value = DescriptionModel(titleRes, descriptionRes = 0, descriptionText = descriptionText).event()
+    override fun launchDescriptionBottomSheet(title: String, description: String) {
+        showDescriptionEvent.value = DescriptionModel(title, description).event()
     }
 }
 
 fun BaseFragment<*, *>.observeDescription(launcher: DescriptionBottomSheetLauncher) {
     launcher.showDescriptionEvent.observeEvent { event ->
-        val descriptionText = event.descriptionText
-        val dialog = if (descriptionText != null) {
-            DescriptionBottomSheet(requireContext(), event.titleRes, descriptionText)
-        } else {
-            DescriptionBottomSheet(requireContext(), event.titleRes, event.descriptionRes)
-        }
-
-        dialog.show()
+        DescriptionBottomSheet(requireContext(), event.title, event.description).show()
     }
 }

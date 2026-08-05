@@ -109,8 +109,8 @@ class MultisigOperationFullDetailsViewModel(
 
     fun depositClicked() {
         launchDescriptionBottomSheet(
-            titleRes = R.string.multisig_deposit,
-            descriptionRes = R.string.multisig_deposit_description
+            title = resourceManager.getString(R.string.multisig_deposit),
+            description = resourceManager.getString(R.string.multisig_deposit_description)
         )
     }
 

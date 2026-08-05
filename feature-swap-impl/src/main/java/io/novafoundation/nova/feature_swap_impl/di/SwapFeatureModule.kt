@@ -15,6 +15,8 @@ import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_swap_api.data.history.HydrationSwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_swap_api.domain.model.HydrationSystemAccounts
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
@@ -253,4 +255,12 @@ class SwapFeatureModule {
     fun provideHydrationSwapTransferFilterFactory(
         real: RealHydrationSwapTransferFilterFactory,
     ): HydrationSwapTransferFilterFactory = real
+
+    @Provides
+    @FeatureScope
+    fun provideNovaSwapCommission(): NovaSwapCommission = NovaSwapCommission()
+
+    @Provides
+    @FeatureScope
+    fun provideHydrationSystemAccounts(): HydrationSystemAccounts = HydrationSystemAccounts()
 }

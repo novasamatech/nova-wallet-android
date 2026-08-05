@@ -15,29 +15,28 @@ fun DescriptionBottomSheetLauncher.launchSwapRateDescription(
     resourceManager: ResourceManager,
     mode: SwapRateDescriptionMode,
 ) {
-    when (mode) {
-        is SwapRateDescriptionMode.Default -> launchDescriptionBottomSheet(
-            titleRes = R.string.swap_rate_title,
-            descriptionRes = R.string.swap_rate_description,
-        )
+    val description = when (mode) {
+        is SwapRateDescriptionMode.Default -> resourceManager.getString(R.string.swap_rate_description)
 
-        is SwapRateDescriptionMode.IncludesFee -> launchDescriptionBottomSheet(
-            titleRes = R.string.swap_rate_title,
-            descriptionText = resourceManager.getString(R.string.swap_rate_includes_fee_description, mode.feePercentDisplay),
-        )
+        is SwapRateDescriptionMode.IncludesFee -> resourceManager.getString(R.string.swap_rate_includes_fee_description, mode.feePercentDisplay)
     }
-}
 
-fun DescriptionBottomSheetLauncher.launchPriceDifferenceDescription() {
     launchDescriptionBottomSheet(
-        titleRes = R.string.swap_price_difference_title,
-        descriptionRes = R.string.swap_price_difference_description
+        title = resourceManager.getString(R.string.swap_rate_title),
+        description = description,
     )
 }
 
-fun DescriptionBottomSheetLauncher.launchSlippageDescription() {
+fun DescriptionBottomSheetLauncher.launchPriceDifferenceDescription(resourceManager: ResourceManager) {
     launchDescriptionBottomSheet(
-        titleRes = R.string.swap_slippage_title,
-        descriptionRes = R.string.swap_slippage_description
+        title = resourceManager.getString(R.string.swap_price_difference_title),
+        description = resourceManager.getString(R.string.swap_price_difference_description)
+    )
+}
+
+fun DescriptionBottomSheetLauncher.launchSlippageDescription(resourceManager: ResourceManager) {
+    launchDescriptionBottomSheet(
+        title = resourceManager.getString(R.string.swap_slippage_title),
+        description = resourceManager.getString(R.string.swap_slippage_description)
     )
 }

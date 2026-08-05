@@ -16,14 +16,17 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import javax.inject.Inject
 
 @FeatureScope
-class RealHydrationSwapTransferFilterFactory @Inject constructor() : HydrationSwapTransferFilterFactory {
+class RealHydrationSwapTransferFilterFactory @Inject constructor(
+    private val novaSwapCommission: NovaSwapCommission,
+    private val hydrationSystemAccounts: HydrationSystemAccounts,
+) : HydrationSwapTransferFilterFactory {
 
     override fun create(chain: Chain): Filter<Operation>? {
         if (!chain.swap.hydraDxSupported()) return null
 
         val matcher = CompoundSystemAccountMatcher(
-            AccountSystemAccountMatcher(AccountIdKey(NovaSwapCommission.feeAccountId)),
-            AccountSystemAccountMatcher(AccountIdKey(HydrationSystemAccounts.routerAccountId)),
+            AccountSystemAccountMatcher(AccountIdKey(novaSwapCommission.feeAccountId)),
+            AccountSystemAccountMatcher(AccountIdKey(hydrationSystemAccounts.routerAccountId)),
         )
         return IgnoreTransfersInvolvingSystemAccount(matcher, chain)
     }

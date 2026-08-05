@@ -1829,8 +1829,6 @@
     <string name="swap_price_difference_title">Разница в цене</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">Курс обмена двух разных криптовалют. Он показывает, сколько криптовалюты вы можете получить в обмен на определенное количество другой криптовалюты.</string>
-    <string name="swap_network_fees_label">Комиссии сети</string>
-    <string name="swap_nova_fee_disclaimer">Включает комиссию Nova %s%%.</string>
     <string name="swap_rate_title">Курс</string>
     <string name="swap_rate_was_updated_failure_message">Старый курс: %1$s ≈ %2$s.\nНовый курс: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">Обменный курс изменился</string>

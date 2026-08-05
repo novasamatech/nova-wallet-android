@@ -11,12 +11,6 @@ import java.math.BigDecimal
 
 data class SwapQuote(
     val amountIn: ChainAssetWithAmount,
-    /**
-     * For Hydra-involving routes, this is the post-commission (net) amount the user actually
-     * receives. The pool's gross quote remains accessible via [quotedPath]'s last-segment quote
-     * for anything that needs it — notably segment-level [SwapLimit] construction, which drives
-     * the on-chain extrinsic args independently of this field.
-     */
     val amountOut: ChainAssetWithAmount,
     val priceImpact: Fraction,
     val quotedPath: QuotedPath<SwapGraphEdge>,

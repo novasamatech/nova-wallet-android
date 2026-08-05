@@ -115,6 +115,7 @@ class HydraDxExchangeFactory(
     private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
     private val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val novaSwapCommission: NovaSwapCommission,
 ) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(chain: Chain, swapHost: AssetExchange.SwapHost): AssetExchange {
@@ -133,6 +134,7 @@ class HydraDxExchangeFactory(
             hydrationPriceConversionFallback = hydrationPriceConversionFallback,
             hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher,
             assetSourceRegistry = assetSourceRegistry,
+            novaSwapCommission = novaSwapCommission,
         )
     }
 }
@@ -155,6 +157,7 @@ internal class HydraDxAssetExchange(
     private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
     private val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val novaSwapCommission: NovaSwapCommission,
 ) : AssetExchange {
 
     private val swapSources: List<HydraDxSwapSource> = createSources()
@@ -306,7 +309,7 @@ internal class HydraDxAssetExchange(
         }
 
         override suspend fun postProcessFinalAmountOut(amountOut: Balance): Balance {
-            return NovaSwapCommission.amountOutAfterFee(amountOut)
+            return novaSwapCommission.amountOutAfterFee(amountOut)
         }
     }
 
@@ -339,10 +342,6 @@ internal class HydraDxAssetExchange(
         }
 
         override suspend fun estimateFee(): AtomicSwapOperationFee {
-            // The Nova commission transfer is intentionally NOT included in fee estimation.
-            // Its weight would propagate via intermediateSegmentFeesInAssetIn → additionalAmountForSwap
-            // and inflate the cross-chain assetIn dry-run beyond the user's balance.
-            // The commission is appended only at submission time (see submitInternal).
             val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
@@ -421,7 +420,7 @@ internal class HydraDxAssetExchange(
         }
 
         private fun novaCommissionAmount(actualSwapLimit: SwapLimit): Balance {
-            return NovaSwapCommission.feeAmount(actualSwapLimit.amountOutMin).atLeastZero()
+            return novaSwapCommission.feeAmount(actualSwapLimit.amountOutMin).atLeastZero()
         }
 
         private suspend fun ExtrinsicBuilder.appendNovaCommissionCall(actualSwapLimit: SwapLimit) {
@@ -431,7 +430,7 @@ internal class HydraDxAssetExchange(
             if (commissionAmount <= BigInteger.ZERO) return
 
             val transferBase = AssetTransferBase(
-                recipient = chain.addressOf(NovaSwapCommission.feeAccountId),
+                recipient = chain.addressOf(novaSwapCommission.feeAccountId),
                 originChain = chain,
                 originChainAsset = assetOut,
                 destinationChain = chain,

@@ -1805,8 +1805,6 @@
     <string name="swap_price_difference_title">Diferencia de precio</string>
     <string name="swap_price_impact" formatted="false">%s ≈ %s</string>
     <string name="swap_rate_description">Tasa de cambio entre dos criptomonedas diferentes. Representa cuánto de una criptomoneda puedes obtener a cambio de una cierta cantidad de otra criptomoneda.</string>
-    <string name="swap_network_fees_label">Comisiones de red</string>
-    <string name="swap_nova_fee_disclaimer">Incluye una comisión Nova del %s%%.</string>
     <string name="swap_rate_title">Tasa</string>
     <string name="swap_rate_was_updated_failure_message">Tasa antigua: %1$s ≈ %2$s.\nNueva tasa: %1$s ≈ %3$s</string>
     <string name="swap_rate_was_updated_failure_title">La tasa de intercambio fue actualizada</string>
