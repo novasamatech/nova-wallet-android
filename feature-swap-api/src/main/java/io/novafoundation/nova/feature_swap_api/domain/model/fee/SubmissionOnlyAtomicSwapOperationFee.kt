@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.domain.model.fee
 
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData.SwapFeeComponentDisplay

@@ -10,12 +10,12 @@ class NovaSwapCommission {
         FEE_ACCOUNT_HEX.fromHex()
     }
 
-    fun feeAmount(amountOut: Balance): Balance {
-        return amountOut * FEE_NUMERATOR / FEE_DENOMINATOR
+    fun commissionToAddOnTop(net: Balance): Balance {
+        return net * FEE_NUMERATOR / FEE_DENOMINATOR
     }
 
-    fun amountOutAfterFee(amountOut: Balance): Balance {
-        return amountOut - feeAmount(amountOut)
+    fun commissionIncludedIn(gross: Balance): Balance {
+        return gross * FEE_NUMERATOR / (FEE_DENOMINATOR + FEE_NUMERATOR)
     }
 
     companion object {

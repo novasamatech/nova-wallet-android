@@ -19,6 +19,13 @@ interface AtomicSwapOperation {
 
     val assetOut: FullChainAssetId
 
+    /**
+     * Whether this operation levies a Nova service fee on its output. The commission is charged by
+     * the **last** operation in the route for which this is true (see [AtomicSwapOperationSubmissionArgs.isServiceCommissionOperation]).
+     */
+    val chargesServiceCommission: Boolean
+        get() = false
+
     suspend fun constructDisplayData(): AtomicOperationDisplayData
 
     suspend fun estimateFee(): AtomicSwapOperationFee
@@ -42,7 +49,7 @@ interface AtomicSwapOperation {
 
 class AtomicSwapOperationSubmissionArgs(
     val actualSwapLimit: SwapLimit,
-    val isLastSwapOperation: Boolean,
+    val isServiceCommissionOperation: Boolean,
 )
 
 class AtomicSwapOperationArgs(

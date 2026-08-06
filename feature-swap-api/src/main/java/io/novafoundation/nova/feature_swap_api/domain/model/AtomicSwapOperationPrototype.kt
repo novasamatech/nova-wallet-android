@@ -18,12 +18,24 @@ interface AtomicSwapOperationPrototype {
     suspend fun maximumExecutionTime(): Duration
 
     /**
-     * Final-segment hook for adjusting the displayed amountOut. Default is identity.
-     * Operations that levy a per-operation fee on the user-visible output (e.g. Hydration
-     * commission) override this to return the post-fee amount, so the quote layer stays
-     * source-agnostic.
+     * Whether this operation levies a Nova service fee on its output. The quote layer applies the
+     * fee to the **last** operation that charges it (see [serviceCommissionToAddOnTop]/[serviceCommissionIncludedIn]),
+     * keeping the layer source-agnostic. Default: false.
      */
-    suspend fun postProcessFinalAmountOut(amountOut: Balance): Balance = amountOut
+    val chargesServiceFee: Boolean
+        get() = false
+
+    /**
+     * Extra output the operation levies on top of a net amount (SPECIFIED_OUT gross-up).
+     * `gross = net + serviceFeeToAddOnTop(net)`. Default: no fee.
+     */
+    fun serviceCommissionToAddOnTop(net: Balance): Balance = Balance.ZERO
+
+    /**
+     * Service fee portion embedded within a gross amount (SPECIFIED_IN reduction).
+     * `net = gross - serviceFeeIncludedIn(gross)`. Default: no fee.
+     */
+    fun serviceCommissionIncludedIn(gross: Balance): Balance = Balance.ZERO
 }
 
 interface UsdConverter {
