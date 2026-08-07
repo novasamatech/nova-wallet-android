@@ -7,7 +7,10 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDi
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee.PostSubmissionFees
 
-class SubmissionOnlyAtomicSwapOperationFee(submissionFee: SubmissionFee) : AtomicSwapOperationFee {
+class SubmissionOnlyAtomicSwapOperationFee(
+    submissionFee: SubmissionFee,
+    override val serviceCommission: FeeBase? = null,
+) : AtomicSwapOperationFee {
 
     override val submissionFee: SubmissionFeeWithLabel = SubmissionFeeWithLabel(submissionFee)
 

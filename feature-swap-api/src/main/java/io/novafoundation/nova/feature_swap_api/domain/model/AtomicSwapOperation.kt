@@ -28,7 +28,12 @@ interface AtomicSwapOperation {
 
     suspend fun constructDisplayData(): AtomicOperationDisplayData
 
-    suspend fun estimateFee(): AtomicSwapOperationFee
+    /**
+     * @param isServiceCommissionOperation true only for the last operation in the route that charges the
+     * Nova service commission — mirrors [AtomicSwapOperationSubmissionArgs.isServiceCommissionOperation],
+     * so the estimate includes exactly the calls that will actually be submitted.
+     */
+    suspend fun estimateFee(isServiceCommissionOperation: Boolean): AtomicSwapOperationFee
 
     /**
      * Calculates how much of assetIn (of the current segment) is needed to buy given [extraOutAmount] of asset out (of the current segment)

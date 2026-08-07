@@ -122,7 +122,6 @@ import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.MathContext
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -166,6 +165,8 @@ internal class RealSwapService(
     }
 
     override suspend fun sync(coroutineScope: CoroutineScope) {
+        Log.d("Swaps", "Syncing swap service")
+
         exchangeRegistry(coroutineScope)
             .allExchanges()
             .forEachAsync { it.sync() }
@@ -209,7 +210,11 @@ internal class RealSwapService(
     override suspend fun estimateFee(executeArgs: SwapFeeArgs): SwapFee {
         val atomicOperations = executeArgs.constructAtomicOperations()
 
-        val fees = atomicOperations.mapAsync { SwapFee.SwapSegment(it.estimateFee(), it) }
+        val commissionOperationIndex = atomicOperations.indexOfLast { it.chargesServiceCommission }
+        val fees = atomicOperations.withIndex().mapAsync { (index, operation) ->
+            val isServiceCommissionOperation = index == commissionOperationIndex
+            SwapFee.SwapSegment(operation.estimateFee(isServiceCommissionOperation), operation)
+        }
         val convertedFees = fees.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
 
         val firstOperation = atomicOperations.first()
@@ -223,7 +228,7 @@ internal class RealSwapService(
 
     override suspend fun swap(calculatedFee: SwapFee): Flow<SwapProgress> {
         val segments = calculatedFee.segments
-        val lastIndex = segments.lastIndex
+        val serviceFeeOperationIndex = segments.indexOfLast { it.operation.chargesServiceCommission }
 
         val initialCorrection: Result<SwapExecutionCorrection?> = Result.success(null)
 
@@ -249,7 +254,7 @@ internal class RealSwapService(
                     val actualSwapLimit = operation.estimatedSwapLimit.replaceAmountIn(newAmountIn, shouldReplaceBuyWithSell)
                     val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
                         actualSwapLimit = actualSwapLimit,
-                        isLastSwapOperation = index == lastIndex,
+                        isServiceCommissionOperation = index == serviceFeeOperationIndex,
                     )
 
                     operation.execute(segmentSubmissionArgs).onFailure {
@@ -272,7 +277,7 @@ internal class RealSwapService(
 
         val segmentSubmissionArgs = AtomicSwapOperationSubmissionArgs(
             actualSwapLimit = actualSwapLimit,
-            isLastSwapOperation = calculatedFee.segments.size == 1,
+            isServiceCommissionOperation = operation.chargesServiceCommission,
         )
 
         return operation.submit(segmentSubmissionArgs)
@@ -393,28 +398,83 @@ internal class RealSwapService(
             computationSharingScope = computationSharingScope
         )
 
-        val amountIn = quotedTrade.amountIn()
-        val amountOutGross = quotedTrade.amountOut()
+        val serviceFeeCharger = quotedTrade.path.constructAtomicOperationPrototypes()
+            .lastOrNull { it.chargesServiceFee }
 
-        val prototypes = quotedTrade.path.constructAtomicOperationPrototypes()
+        val adjusted = quotedTrade.applyServiceFee(args, serviceFeeCharger, computationSharingScope)
 
-        // Let the final operation adjust the displayed amountOut (e.g. Hydration commission).
-        // Price impact stays computed against the raw pool quote so per-operation fees don't
-        // inflate the slippage reading.
-        val amountOutNet = prototypes.last().postProcessFinalAmountOut(amountOutGross)
-        val priceImpact = args.calculatePriceImpact(amountIn, amountOutGross)
+        val prototypes = adjusted.trade.path.constructAtomicOperationPrototypes()
+
+        val priceImpact = args.calculatePriceImpact(adjusted.amountIn, adjusted.grossAmountOut)
 
         val atomicOperationsEstimates = prototypes.map { it.maximumExecutionTime() }
 
         return SwapQuote(
-            amountIn = args.tokenIn.configuration.withAmount(amountIn),
-            amountOut = args.tokenOut.configuration.withAmount(amountOutNet),
+            amountIn = args.tokenIn.configuration.withAmount(adjusted.amountIn),
+            amountOut = args.tokenOut.configuration.withAmount(adjusted.amountOut),
             priceImpact = priceImpact,
-            quotedPath = quotedTrade,
+            quotedPath = adjusted.trade,
             executionEstimate = SwapExecutionEstimate(atomicOperationsEstimates, ADDITIONAL_ESTIMATE_BUFFER),
             direction = args.swapDirection,
         )
     }
+
+    /**
+     * Adjusts a raw quote for the Nova service fee charged by [serviceFeeCharger] (null = no fee).
+     * Keeps the user's received amount equal to the displayed amountOut in both directions.
+     */
+    private suspend fun QuotedTrade.applyServiceFee(
+        args: SwapQuoteArgs,
+        serviceFeeCharger: AtomicSwapOperationPrototype?,
+        computationSharingScope: CoroutineScope,
+    ): ServiceFeeAdjustedTrade {
+        val rawAmountIn = amountIn()
+        val rawAmountOut = amountOut()
+
+        if (serviceFeeCharger == null) {
+            return ServiceFeeAdjustedTrade(this, rawAmountIn, rawAmountOut, grossAmountOut = rawAmountOut)
+        }
+
+        return when (args.swapDirection) {
+            // Entered amountOut is final: buy `entered + fee` from the pool so the on-chain commission
+            // leaves exactly `entered`. Re-quote to get the accurate (grown) amountIn.
+            SwapDirection.SPECIFIED_OUT -> {
+                val net = args.amount
+                val grossFinal = net + serviceFeeCharger.serviceCommissionToAddOnTop(net)
+                val grossTrade = quoteTrade(
+                    chainAssetIn = args.tokenIn.configuration,
+                    chainAssetOut = args.tokenOut.configuration,
+                    amount = grossFinal,
+                    swapDirection = SwapDirection.SPECIFIED_OUT,
+                    computationSharingScope = computationSharingScope,
+                )
+                ServiceFeeAdjustedTrade(
+                    trade = grossTrade,
+                    amountIn = grossTrade.amountIn(),
+                    amountOut = net,
+                    grossAmountOut = grossFinal,
+                )
+            }
+
+            // Entered amountIn is final: the commission is deducted from the pool output.
+            SwapDirection.SPECIFIED_IN -> {
+                val net = rawAmountOut - serviceFeeCharger.serviceCommissionIncludedIn(rawAmountOut)
+                ServiceFeeAdjustedTrade(
+                    trade = this,
+                    amountIn = rawAmountIn,
+                    amountOut = net,
+                    grossAmountOut = rawAmountOut,
+                )
+            }
+        }
+    }
+
+    private class ServiceFeeAdjustedTrade(
+        val trade: QuotedTrade,
+        val amountIn: Balance,
+        val amountOut: Balance,
+        val grossAmountOut: Balance,
+    )
 
     override suspend fun defaultSlippageConfig(chainId: ChainId): SlippageConfig {
         return SlippageConfig.default()

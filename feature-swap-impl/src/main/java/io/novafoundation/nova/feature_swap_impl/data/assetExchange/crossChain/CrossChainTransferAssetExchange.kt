@@ -247,7 +247,7 @@ class CrossChainTransferAssetExchange(
             )
         }
 
-        override suspend fun estimateFee(): AtomicSwapOperationFee {
+        override suspend fun estimateFee(isServiceCommissionOperation: Boolean): AtomicSwapOperationFee {
             val transfer = createTransfer(amount = estimatedSwapLimit.crossChainTransferAmount)
 
             val crossChainFee = with(crossChainTransfersUseCase) {

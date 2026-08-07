@@ -261,7 +261,7 @@ private class AssetConversionExchange(
             )
         }
 
-        override suspend fun estimateFee(): AtomicSwapOperationFee {
+        override suspend fun estimateFee(isServiceCommissionOperation: Boolean): AtomicSwapOperationFee {
             val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
