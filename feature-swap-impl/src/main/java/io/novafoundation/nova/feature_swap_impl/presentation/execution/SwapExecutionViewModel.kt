@@ -25,8 +25,6 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
-import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
-import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
 import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
