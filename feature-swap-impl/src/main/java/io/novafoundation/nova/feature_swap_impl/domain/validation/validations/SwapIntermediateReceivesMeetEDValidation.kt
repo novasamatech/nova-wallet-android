@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation.validations
 
+import io.novafoundation.nova.common.utils.atLeastZero
+import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validOrError
@@ -26,16 +28,19 @@ class SwapIntermediateReceivesMeetEDValidation(private val assetsValidationConte
 
     private suspend fun checkSegmentDestinationMeetsEd(segment: SwapFee.SwapSegment): ValidationStatus<SwapValidationFailure>? {
         val amountOutMin = segment.operation.estimatedSwapLimit.amountOutMin
-        val assetOut = segment.operation.assetOut
 
+        val serviceCommission = segment.fee.serviceCommission?.amount.orZero()
+        val netAmountOut = (amountOutMin - serviceCommission).atLeastZero()
+
+        val assetOut = segment.operation.assetOut
         val existentialDeposit = assetsValidationContext.getExistentialDeposit(assetOut)
         val outAssetBalance = assetsValidationContext.getAsset(assetOut)
 
-        return validOrError(outAssetBalance.balanceCountedTowardsEDInPlanks + amountOutMin >= existentialDeposit) {
+        return validOrError(outAssetBalance.balanceCountedTowardsEDInPlanks + netAmountOut >= existentialDeposit) {
             SwapValidationFailure.IntermediateAmountOutIsTooLowToStayAboveED(
                 asset = outAssetBalance.token.configuration,
                 existentialDeposit = existentialDeposit,
-                amount = amountOutMin
+                amount = netAmountOut
             )
         }
     }
