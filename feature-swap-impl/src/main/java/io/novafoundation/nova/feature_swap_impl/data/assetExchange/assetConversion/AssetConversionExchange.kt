@@ -22,13 +22,12 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationP
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee.SwapSegment.SegmentNetFlow
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
-import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
-import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.SubmissionOnlyAtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
@@ -254,10 +253,10 @@ private class AssetConversionExchange(
 
         override val assetIn: FullChainAssetId = fromAsset.fullId
 
-        override suspend fun constructDisplayData(): AtomicOperationDisplayData {
+        override suspend fun constructDisplayData(netFlow: SegmentNetFlow): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Swap(
-                from = fromAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountIn),
-                to = toAsset.fullId.withAmount(estimatedSwapLimit.estimatedAmountOut),
+                from = fromAsset.fullId.withAmount(netFlow.amountIn),
+                to = toAsset.fullId.withAmount(netFlow.amountOut),
             )
         }
 

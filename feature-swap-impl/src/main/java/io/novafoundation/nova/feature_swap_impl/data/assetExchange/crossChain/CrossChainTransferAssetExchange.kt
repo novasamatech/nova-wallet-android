@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.FeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee.SwapSegment.SegmentNetFlow
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
@@ -31,7 +32,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapOperationSubmiss
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.crossChain
-import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.network
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.Weights
@@ -239,11 +239,11 @@ class CrossChainTransferAssetExchange(
 
         override val assetIn: FullChainAssetId = edge.from
 
-        override suspend fun constructDisplayData(): AtomicOperationDisplayData {
+        override suspend fun constructDisplayData(netFlow: SegmentNetFlow): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Transfer(
                 from = edge.from,
                 to = edge.to,
-                amount = estimatedSwapLimit.estimatedAmountIn
+                amount = netFlow.amountIn
             )
         }
 

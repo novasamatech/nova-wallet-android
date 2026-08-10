@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationS
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee.SwapSegment.SegmentNetFlow
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
@@ -46,7 +47,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.amountOutMin
 import io.novafoundation.nova.feature_swap_api.domain.model.createAggregated
-import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.SubmissionOnlyAtomicSwapOperationFee
@@ -344,10 +344,10 @@ internal class HydraDxAssetExchange(
             return HydraDxOperation(segments + nextSegment, feePaymentCurrency)
         }
 
-        override suspend fun constructDisplayData(): AtomicOperationDisplayData {
+        override suspend fun constructDisplayData(netFlow: SegmentNetFlow): AtomicOperationDisplayData {
             return AtomicOperationDisplayData.Swap(
-                from = assetIn.withAmount(estimatedSwapLimit.estimatedAmountIn),
-                to = assetOut.withAmount(estimatedSwapLimit.estimatedAmountOut),
+                from = assetIn.withAmount(netFlow.amountIn),
+                to = assetOut.withAmount(netFlow.amountOut),
             )
         }
 

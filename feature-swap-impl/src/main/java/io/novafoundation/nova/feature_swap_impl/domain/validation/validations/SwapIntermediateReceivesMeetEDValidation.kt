@@ -1,12 +1,9 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation.validations
 
-import io.novafoundation.nova.common.utils.atLeastZero
-import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.valid
 import io.novafoundation.nova.common.validation.validOrError
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee
-import io.novafoundation.nova.feature_swap_api.domain.model.amountOutMin
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationPayload
@@ -27,10 +24,8 @@ class SwapIntermediateReceivesMeetEDValidation(private val assetsValidationConte
     }
 
     private suspend fun checkSegmentDestinationMeetsEd(segment: SwapFee.SwapSegment): ValidationStatus<SwapValidationFailure>? {
-        val amountOutMin = segment.operation.estimatedSwapLimit.amountOutMin
-
-        val serviceCommission = segment.fee.serviceCommission?.amount.orZero()
-        val netAmountOut = (amountOutMin - serviceCommission).atLeastZero()
+        // Worst-case output that actually lands, already net of the Nova commission carried down the route
+        val netAmountOut = segment.netFlow.amountOutMin
 
         val assetOut = segment.operation.assetOut
         val existentialDeposit = assetsValidationContext.getExistentialDeposit(assetOut)

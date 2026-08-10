@@ -60,6 +60,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.amountToLeaveOnOriginToPayTxFees
+import io.novafoundation.nova.feature_swap_api.domain.model.buildSwapSegments
 import io.novafoundation.nova.feature_swap_api.domain.model.replaceAmountIn
 import io.novafoundation.nova.feature_swap_api.domain.model.totalFeeEnsuringSubmissionAsset
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
@@ -212,15 +213,15 @@ internal class RealSwapService(
 
         val commissionOperationIndex = atomicOperations.indexOfLast { it.chargesServiceCommission }
         val fees = atomicOperations.withIndex().mapAsync { (index, operation) ->
-            val isServiceCommissionOperation = index == commissionOperationIndex
-            SwapFee.SwapSegment(operation.estimateFee(isServiceCommissionOperation), operation)
+            operation.estimateFee(isServiceCommissionOperation = index == commissionOperationIndex)
         }
-        val convertedFees = fees.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
+        val segments = buildSwapSegments(fees, atomicOperations)
+        val convertedFees = segments.convertIntermediateSegmentsFeesToAssetIn(executeArgs.assetIn)
 
         val firstOperation = atomicOperations.first()
 
         return SwapFee(
-            segments = fees,
+            segments = segments,
             intermediateSegmentFeesInAssetIn = convertedFees,
             additionalMaxAmountDeduction = firstOperation.additionalMaxAmountDeduction(),
         ).also(::logFee)
@@ -237,7 +238,7 @@ internal class RealSwapService(
                 val (segmentFee, operation) = segment
 
                 prevStepCorrection.flatMap { correction ->
-                    val displayData = operation.constructDisplayData()
+                    val displayData = operation.constructDisplayData(segment.netFlow)
                     val step = SwapProgressStep(index, displayData, operation)
 
                     emit(SwapProgress.StepStarted(step))
