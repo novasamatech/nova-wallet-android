@@ -74,7 +74,20 @@ class DappSearchFragment : BaseFragment<DAppSearchViewModel, FragmentSearchDappB
 
     override fun subscribe(viewModel: DAppSearchViewModel) {
         setupDAppNotInCatalogWarning()
+
+        viewModel.showStakingNoticeEvent.observeEvent {
+            DAppStakingNoticeBottomSheet(
+                context = requireContext(),
+                onGoToStaking = viewModel::goToStakingClicked,
+                onContinueToSite = viewModel::continueToStakingSiteClicked
+            ).show()
+        }
+
         binder.searchDappSearch.searchInput.content.bindTo(viewModel.query, lifecycleScope)
+
+        binder.searchDappStakingBannerAction.setOnClickListener { viewModel.goToStakingClicked() }
+
+        viewModel.stakingBannerVisible.observe { binder.searchDappStakingBanner.isVisible = it }
 
         viewModel.searchResults.observe(::submitListPreservingViewPoint)
 

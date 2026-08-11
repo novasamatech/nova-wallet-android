@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.list.GroupedList
 import io.novafoundation.nova.common.utils.Urls
 import io.novafoundation.nova.feature_dapp_api.data.model.DApp
 import io.novafoundation.nova.feature_dapp_api.data.model.DappCategory
+import io.novafoundation.nova.feature_dapp_api.data.model.isStaking
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_dapp_impl.data.repository.FavouritesDAppRepository
 import io.novafoundation.nova.feature_dapp_impl.domain.common.buildUrlToDappMapping
@@ -51,6 +52,27 @@ class SearchDappInteractor(
             if (dappsGroupContent.isNotEmpty()) {
                 put(DappSearchGroup.DAPPS, dappsGroupContent)
             }
+        }
+    }
+
+    suspend fun isThirdPartyStakingSite(result: DappSearchResult): Boolean = withContext(Dispatchers.Default) {
+        val url = when (result) {
+            is DappSearchResult.Dapp -> result.dapp.url
+            is DappSearchResult.Url -> result.url
+            is DappSearchResult.Search -> return@withContext false
+        }
+
+        val host = Urls.domainOf(url)
+
+        DAppStakingDetection.isStakingHost(host) || hasCuratedStakingDApp(host)
+    }
+
+    private suspend fun hasCuratedStakingDApp(host: String): Boolean {
+        val normalizedHost = DAppStakingDetection.normalizeHost(host)
+
+        return dAppMetadataRepository.getDAppCatalog().dApps.any { metadata ->
+            metadata.categories.any { it.isStaking() } &&
+                DAppStakingDetection.normalizeHost(Urls.domainOf(metadata.url)) == normalizedHost
         }
     }
 

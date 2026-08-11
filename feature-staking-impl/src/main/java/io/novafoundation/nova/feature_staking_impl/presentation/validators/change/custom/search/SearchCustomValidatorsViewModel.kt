@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -60,6 +61,10 @@ class SearchCustomValidatorsViewModel(
         validatorRecommenderFactory.create(scope = viewModelScope).availableValidators.toSet()
     }
 
+    private val lockedValidatorIds by lazyAsync {
+        validatorRecommenderFactory.create(scope = viewModelScope).lockedValidators.mapToSet { it.accountIdHex }
+    }
+
     private val foundValidatorsState = enteredQuery
         .mapLatest {
             if (it.isNotEmpty()) {
@@ -78,18 +83,26 @@ class SearchCustomValidatorsViewModel(
     ) { selectedValidators, foundValidators, token ->
         val chain = singleAssetSharedState.chain()
 
+        val lockedIds = lockedValidatorIds()
+
         foundValidators?.map { validator ->
             mapValidatorToValidatorModel(
                 chain = chain,
                 validator = validator,
                 iconGenerator = addressIconGenerator,
                 token = token,
-                isChecked = validator in selectedValidators
+                isChecked = validator in selectedValidators,
+                isLocked = validator.accountIdHex in lockedIds
             )
         }
     }
 
     override fun itemClicked(item: ValidatorStakeTargetModel) {
+        if (item.isLocked) {
+            showError(resourceManager.getString(R.string.staking_custom_locked_validator_message))
+            return
+        }
+
         if (item.stakeTarget.prefs!!.blocked) {
             showError(resourceManager.getString(R.string.staking_custom_blocked_warning))
             return

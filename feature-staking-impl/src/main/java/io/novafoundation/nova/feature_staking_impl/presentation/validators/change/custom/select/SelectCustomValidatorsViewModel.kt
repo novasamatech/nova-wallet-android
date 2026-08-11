@@ -11,6 +11,7 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.lazyAsync
+import io.novafoundation.nova.common.utils.mapToSet
 import io.novafoundation.nova.common.utils.toggle
 import io.novafoundation.nova.feature_staking_api.domain.model.Validator
 import io.novafoundation.nova.feature_staking_impl.R
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.activeStake
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.common.CustomValidatorsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.model.ContinueButtonState
+import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.model.ValidatorSelectionState
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.getSelectedValidatorsOrNull
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.setCustomValidators
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
@@ -96,6 +98,24 @@ class SelectCustomValidatorsViewModel(
         interactor.maxValidatorsPerNominator(setupStakingSharedState.activeStake())
     }.shareInBackground()
 
+    private val lockedValidatorIdsFlow = flowOf {
+        recommendator().lockedValidators.mapToSet { it.accountIdHex }
+    }.shareInBackground()
+
+    private val selectionStateFlow = combine(
+        selectedValidators,
+        lockedValidatorIdsFlow,
+        maxSelectedValidatorsFlow
+    ) { selected, lockedIds, maxSelected ->
+        val lockedSelected = selected.count { it.value.accountIdHex in lockedIds }
+
+        ValidatorSelectionState(
+            communitySelected = selected.size - lockedSelected,
+            communityLimit = (maxSelected - lockedIds.size).coerceAtLeast(0),
+            lockedSelected = lockedSelected
+        )
+    }.shareInBackground()
+
     val validatorModelsFlow = combine(
         shownValidators,
         selectedValidators,
@@ -112,18 +132,20 @@ class SelectCustomValidatorsViewModel(
         resourceManager.getString(R.string.staking_custom_header_validators_title, it.size, recommendator().availableValidators.size)
     }.inBackground().share()
 
-    val buttonState = selectedValidators.map {
-        val maxSelectedValidators = maxSelectedValidatorsFlow.first()
-
-        if (it.isEmpty()) {
+    val buttonState = selectionStateFlow.map { selection ->
+        if (selection.isEmpty()) {
             ContinueButtonState(
                 enabled = false,
-                text = resourceManager.getString(R.string.staking_custom_proceed_button_disabled_title, maxSelectedValidators)
+                text = resourceManager.getString(R.string.staking_custom_proceed_button_disabled_title, selection.communityLimit)
             )
         } else {
             ContinueButtonState(
                 enabled = true,
-                text = resourceManager.getString(R.string.staking_custom_proceed_button_enabled_title, it.size, maxSelectedValidators)
+                text = resourceManager.getString(
+                    R.string.staking_custom_proceed_button_enabled_title,
+                    selection.communitySelected,
+                    selection.communityLimit
+                )
             )
         }
     }
@@ -137,14 +159,14 @@ class SelectCustomValidatorsViewModel(
         }
     }.inBackground().share()
 
-    val fillWithRecommendedEnabled = selectedValidators.map { it.size < maxSelectedValidatorsFlow.first() }
+    val fillWithRecommendedEnabled = selectionStateFlow.map { it.communitySelected < it.communityLimit }
         .onStart { emit(false) }
         .share()
 
     val clearFiltersEnabled = recommendationSettingsFlow.map { it.customEnabledFilters.isNotEmpty() || it.postProcessors.isNotEmpty() }
         .share()
 
-    val deselectAllEnabled = selectedValidators.map { it.isNotEmpty() }
+    val deselectAllEnabled = selectionStateFlow.map { it.communitySelected > 0 }
         .share()
 
     init {
@@ -171,6 +193,11 @@ class SelectCustomValidatorsViewModel(
     }
 
     fun validatorClicked(validatorModel: ValidatorStakeTargetModel) {
+        if (validatorModel.isLocked) {
+            showError(resourceManager.getString(R.string.staking_custom_locked_validator_message))
+            return
+        }
+
         mutateSelected {
             it.toggle(validatorModel.stakeTarget.asSetItem())
         }
@@ -203,7 +230,11 @@ class SelectCustomValidatorsViewModel(
     }
 
     fun deselectAll() {
-        mutateSelected { emptySet() }
+        mutateSelected { selected ->
+            val lockedIds = lockedValidatorIdsFlow.first()
+
+            selected.filterTo(mutableSetOf()) { it.value.accountIdHex in lockedIds }
+        }
     }
 
     fun fillRestWithRecommended() {
@@ -213,7 +244,8 @@ class SelectCustomValidatorsViewModel(
             val recommended = recommendator().recommendations(defaultSettings)
 
             val missingFromRecommended = recommended.asSetItems() - selected
-            val neededToFill = maxSelectedValidatorsFlow.first() - selected.size
+            val selection = selectionStateFlow.first()
+            val neededToFill = (selection.communityLimit - selection.communitySelected).coerceAtLeast(0)
 
             selected + missingFromRecommended.take(neededToFill).toSet()
         }
@@ -222,8 +254,19 @@ class SelectCustomValidatorsViewModel(
     private fun observeExternalSelectionChanges() {
         setupStakingSharedState.setupStakingProcess
             .mapNotNull { it.getSelectedValidatorsOrNull() }
-            .onEach { validators -> selectedValidators.value = validators.asSetItems() }
+            .onEach { validators -> selectedValidators.value = validators.seedWithLocked() }
             .launchIn(viewModelScope)
+    }
+
+    private suspend fun List<Validator>.seedWithLocked(): Set<SetItem<Validator>> {
+        val maxSelected = maxSelectedValidatorsFlow.first()
+        val locked = recommendator().lockedValidators.take(maxSelected)
+        val lockedIds = locked.mapToSet { it.accountIdHex }
+
+        val community = filterNot { it.accountIdHex in lockedIds }
+            .take(maxSelected - locked.size)
+
+        return (community + locked).asSetItems()
     }
 
     private suspend fun convertToModels(
@@ -232,6 +275,8 @@ class SelectCustomValidatorsViewModel(
         selectedValidators: Set<SetItem<Validator>>,
         token: Token,
     ): List<ValidatorStakeTargetModel> {
+        val lockedIds = lockedValidatorIdsFlow.first()
+
         return validators.map { validator ->
             mapValidatorToValidatorModel(
                 chain = chain,
@@ -239,7 +284,8 @@ class SelectCustomValidatorsViewModel(
                 iconGenerator = addressIconGenerator,
                 token = token,
                 isChecked = validator.asSetItem() in selectedValidators,
-                sorting = recommendationSettingsFlow.first().sorting
+                sorting = recommendationSettingsFlow.first().sorting,
+                isLocked = validator.accountIdHex in lockedIds
             )
         }
     }
