@@ -6,9 +6,8 @@ on:
 
 jobs:
   test:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    uses: ./.github/workflows/reusable_android_build.yml
     with:
-      branch: ${{github.head_ref}}
       gradlew-command: assembleDevelop
       build-debug-tests: false # TODO: Enable this, when debug build will be fixed for tests
     secrets: inherit

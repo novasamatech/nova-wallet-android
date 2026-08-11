@@ -7,9 +7,8 @@ on:
 
 jobs:
   build-app:
-    uses: novasamatech/nova-wallet-android/.github/workflows/android_build.yml@develop
+    uses: ./.github/workflows/reusable_android_build.yml
     with:
-      branch: ${{github.head_ref}}
       gradlew-command: assembleDebug
       upload-name: develop-apk
       run-tests: false
@@ -27,6 +26,12 @@ jobs:
         with:
           name: develop-apk
           path: app
+
+      - name: Download debug test artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: develop-apk-androidTest
+          path: app/androidTest
 
       - name: Debug path
         run: |
@@ -69,7 +74,7 @@ jobs:
           ls -laR
 
       - name: Generate report
-        uses: ./.github/workflows/report/
+        uses: ./.github/actions/report/
         with:
           token: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           keep-reports-history: 30
@@ -80,14 +85,18 @@ jobs:
     if: failure()
     steps:
       - name: Notify Telegram channel
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          format: html
-          message: |
-            💸 Balances tests failed.
+        run: |
+          message=$(cat <<'EOF'
+          💸 Balances tests failed.
 
-            Test Results: https://novasamatech.github.io/balances_test_result/${{ github.run_number }}/index.html
-            
-            Github run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          Test Results: https://novasamatech.github.io/balances_test_result/${{ github.run_number }}/index.html
+
+          Github run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          EOF
+          )
+
+          curl -fsS -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+            --data-urlencode "chat_id=${{ secrets.TELEGRAM_TO }}" \
+            --data-urlencode "parse_mode=HTML" \
+            --data-urlencode "text=${message}"
+        shell: bash

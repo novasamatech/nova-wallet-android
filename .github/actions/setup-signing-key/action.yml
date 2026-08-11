@@ -1,0 +1,54 @@
+name: Setup Signing Key
+description: Decode base64 keystore file for app signing
+
+inputs:
+  keystore-source:
+    description: "Signing key source (market or github)"
+    required: true
+  market-keystore-file-name:
+    description: "File name to use for market signing key"
+    required: false
+    default: "market_key.jks"
+  github-keystore-file-name:
+    description: "File name to use for github signing key"
+    required: false
+    default: "github_key.jks"
+
+outputs:
+  keystore-file-name:
+    description: "Decoded keystore file name"
+    value: ${{ steps.resolve.outputs.keystore_file_name }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Resolve signing key file name
+      id: resolve
+      shell: bash
+      run: |
+        case "${{ inputs.keystore-source }}" in
+          market)
+            echo "keystore_file_name=${{ inputs.market-keystore-file-name }}" >> "$GITHUB_OUTPUT"
+            ;;
+          github)
+            echo "keystore_file_name=${{ inputs.github-keystore-file-name }}" >> "$GITHUB_OUTPUT"
+            ;;
+          *)
+            echo "Unsupported keystore source: ${{ inputs.keystore-source }}" >&2
+            exit 1
+            ;;
+        esac
+
+    - name: 🔐 Decode market signing key
+      if: ${{ inputs.keystore-source == 'market' }}
+      shell: bash
+      run: |
+        mkdir -p ./app
+        printf '%s' '${{ env.GPLAY_KEYSTORE_FILE_BASE64 }}' | base64 --decode > "./app/${{ steps.resolve.outputs.keystore_file_name }}"
+
+    - name: 🔐 Decode github signing key
+      if: ${{ inputs.keystore-source == 'github' }}
+      shell: bash
+      run: |
+        mkdir -p ./app
+        printf '%s' '${{ env.GITHUB_KEYSTORE_FILE_BASE64 }}' | base64 --decode > "./app/${{ steps.resolve.outputs.keystore_file_name }}"
