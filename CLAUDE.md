@@ -97,6 +97,9 @@ Screen graph — a `@Subcomponent` with `@ScreenScope`, created from the Fragmen
 
 Dagger runs through **KSP**, not kapt.
 
+Adding a whole feature module (or a screen) touches ~8 files across `app` and the feature — the exact
+checklist and the traps live in @docs/adding-a-feature-module.md
+
 ## Screen anatomy
 
 `BaseFragment<VM, Binding>` (`common/.../base/BaseFragment.kt`) + `BaseScreenMixin`
@@ -131,6 +134,9 @@ try/catch. `BaseViewModel` *is* a `CoroutineScope` backed by `viewModelScope`.
 
 **Chain access** — never construct chain config by hand; go through `ChainRegistry`
 (`runtime/.../multiNetwork/ChainRegistry.kt`) for chains, assets, connections and runtime providers.
+
+Swaps carry a 0.85 % Nova commission on Hydration routes, with non-obvious gross/net bookkeeping shared by
+display and validations — see @docs/swap-service-commission.md before touching swap amounts.
 
 ## Code style
 
