@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
@@ -33,21 +34,32 @@
         android:text="@string/legal_consent_subtitle"
         android:textColor="@color/text_secondary" />
 
-    <include
-        android:id="@+id/legalConsentTermsRow"
-        layout="@layout/view_legal_consent_row"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="28dp" />
+        android:layout_marginTop="28dp"
+        android:orientation="horizontal">
 
-    <include
-        android:id="@+id/legalConsentPrivacyRow"
-        layout="@layout/view_legal_consent_row"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="4dp" />
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/legalConsentCheckBox"
+            style="@style/Widget.Nova.Checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top" />
+
+        <TextView
+            android:id="@+id/legalConsentText"
+            style="@style/TextAppearance.NovaFoundation.Regular.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:textColor="@color/text_secondary"
+            android:textColorLink="@color/text_primary"
+            tools:text="@string/legal_consent_agreement" />
+
+    </LinearLayout>
 
     <io.novafoundation.nova.common.view.PrimaryButton
         android:id="@+id/legalConsentAcceptButton"

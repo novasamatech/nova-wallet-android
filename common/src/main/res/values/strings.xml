@@ -2767,10 +2767,8 @@
     <string name="common_privacy_notice">Privacy Notice</string>
 
     <string name="legal_consent_implicit">By continuing you agree to the %1$s and acknowledge the %2$s.</string>
+    <string name="legal_consent_agreement">I agree to the %1$s, and acknowledge the %2$s.</string>
     <string name="legal_consent_title">Updated Terms</string>
-    <string name="legal_consent_subtitle">Please review and accept both documents to continue using Nova Wallet.</string>
-    <string name="legal_consent_terms_row">I agree to the Terms of Service</string>
-    <string name="legal_consent_privacy_row">I acknowledge the Privacy Notice</string>
-    <string name="legal_consent_document_updated">Updated %s</string>
+    <string name="legal_consent_subtitle">We’ve updated our Terms of Service and Privacy Notice. Please review and accept the updated documents to continue using Nova Wallet.</string>
     <string name="legal_consent_accept">Accept and Continue</string>
 </resources>

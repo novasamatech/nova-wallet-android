@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.formatting.applyTermsAndPrivacyPolicy
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
 import io.novafoundation.nova.common.utils.setVisible
+import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
@@ -45,14 +46,16 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
     }
 
     override fun initViews() {
-        binder.welcomeTerms.applyTermsAndPrivacyPolicy(
-            containerResId = R.string.legal_consent_implicit,
+        binder.welcomeConsentText.applyTermsAndPrivacyPolicy(
+            containerResId = R.string.legal_consent_agreement,
             termsResId = R.string.common_terms_of_service,
             privacyResId = R.string.common_privacy_notice,
             termsClicked = viewModel::termsClicked,
             privacyClicked = viewModel::privacyClicked,
             underlineLinks = true
         )
+
+        binder.welcomeConsentCheckBox.setOnCheckedChangeListener { _, isChecked -> viewModel.consentCheckChanged(isChecked) }
 
         binder.welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
         binder.welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
@@ -75,5 +78,12 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
         observeBrowserEvents(viewModel)
 
         viewModel.shouldShowBackLiveData.observe(binder.welcomeBackButton::setVisible)
+
+        viewModel.canProceed.observe { canProceed ->
+            val state = if (canProceed) ButtonState.NORMAL else ButtonState.DISABLED
+
+            binder.welcomeCreateWalletButton.setState(state)
+            binder.welcomeRestoreWalletButton.setState(state)
+        }
     }
 }
