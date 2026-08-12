@@ -7,7 +7,6 @@ import io.novafoundation.nova.common.data.legal.LegalConsentRepository
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
@@ -15,8 +14,6 @@ import io.novafoundation.nova.feature_onboarding_impl.OnboardingRouter
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 
 class WelcomeViewModel(
     shouldShowBack: Boolean,
