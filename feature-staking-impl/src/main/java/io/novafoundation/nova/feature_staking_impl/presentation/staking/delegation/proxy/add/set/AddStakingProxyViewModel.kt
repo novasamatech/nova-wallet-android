@@ -167,7 +167,7 @@ class AddStakingProxyViewModel(
     }
 
     fun showProxyDepositDescription() {
-        descriptionBottomSheetLauncher.launchProxyDepositDescription()
+        descriptionBottomSheetLauncher.launchProxyDepositDescription(resourceManager)
     }
 
     fun selectAuthorityWallet() {

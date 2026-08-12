@@ -13,7 +13,10 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_swap_api.data.history.HydrationSwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
+import io.novafoundation.nova.feature_swap_api.domain.model.HydrationSystemAccounts
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowScopeAggregator
@@ -22,6 +25,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
+import io.novafoundation.nova.feature_swap_impl.data.history.RealHydrationSwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
@@ -245,4 +249,18 @@ class SwapFeatureModule {
     fun provideSwapFlowScopeAggregator(): SwapFlowScopeAggregator {
         return RealSwapFlowScopeAggregator()
     }
+
+    @Provides
+    @FeatureScope
+    fun provideHydrationSwapTransferFilterFactory(
+        real: RealHydrationSwapTransferFilterFactory,
+    ): HydrationSwapTransferFilterFactory = real
+
+    @Provides
+    @FeatureScope
+    fun provideNovaSwapCommission(): NovaSwapCommission = NovaSwapCommission()
+
+    @Provides
+    @FeatureScope
+    fun provideHydrationSystemAccounts(): HydrationSystemAccounts = HydrationSystemAccounts()
 }

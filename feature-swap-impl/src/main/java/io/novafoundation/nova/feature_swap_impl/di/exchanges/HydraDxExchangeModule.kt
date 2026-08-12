@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdC
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.aave.AaveSwapSourceFactory
@@ -18,6 +19,7 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.refer
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.stableswap.StableSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.xyk.XYKSwapSourceFactory
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -73,6 +75,8 @@ class HydraDxExchangeModule {
         swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
         hydrationPriceConversionFallback: HydrationPriceConversionFallback,
         hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
+        assetSourceRegistry: AssetSourceRegistry,
+        novaSwapCommission: NovaSwapCommission,
     ): HydraDxExchangeFactory {
         return HydraDxExchangeFactory(
             remoteStorageSource = remoteStorageSource,
@@ -85,7 +89,9 @@ class HydraDxExchangeModule {
             chainStateRepository = chainStateRepository,
             swapDeductionUseCase = swapDeductionUseCase,
             hydrationPriceConversionFallback = hydrationPriceConversionFallback,
-            hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher
+            hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher,
+            assetSourceRegistry = assetSourceRegistry,
+            novaSwapCommission = novaSwapCommission,
         )
     }
 }

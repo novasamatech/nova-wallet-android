@@ -32,6 +32,9 @@ import io.novafoundation.nova.feature_swap_api.presentation.navigation.SwapFlowS
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchPriceDifferenceDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
+import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
+import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.R
@@ -156,6 +159,17 @@ class SwapConfirmationViewModel(
         swapConfirmationDetailsFormatter.format(it.swapQuote, slippageFlow.first())
     }
 
+    val showNovaFeeDisclaimer: Flow<Boolean> = confirmationStateFlow.map {
+        it.swapQuote.involvesHydraSwap()
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val novaFeeDisclaimerText: String = resourceManager.getString(
+        R.string.swap_nova_fee_disclaimer,
+        NovaSwapCommission.FEE_PERCENT_DISPLAY
+    )
+
     val wallet: Flow<WalletModel> = walletUiUseCase.selectedWalletUiFlow()
 
     val addressFlow: Flow<AddressModel> = combine(chainIn, metaAccountFlow) { chainId, metaAccount ->
@@ -172,16 +186,17 @@ class SwapConfirmationViewModel(
         swapRouter.back()
     }
 
-    fun rateClicked() {
-        launchSwapRateDescription()
+    fun rateClicked() = launchUnit {
+        val quote = confirmationStateFlow.first().swapQuote
+        launchSwapRateDescription(resourceManager, quote.swapRateDescriptionMode())
     }
 
     fun priceDifferenceClicked() {
-        launchPriceDifferenceDescription()
+        launchPriceDifferenceDescription(resourceManager)
     }
 
     fun slippageClicked() {
-        launchSlippageDescription()
+        launchSlippageDescription(resourceManager)
     }
 
     fun networkFeeClicked() = setSwapStateAndThen {

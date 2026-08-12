@@ -8,6 +8,7 @@ import io.novafoundation.nova.app.root.navigation.navigators.dApp.DAppSearchComm
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DAppSearchCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
 @Module
 class DAppNavigationModule {
@@ -15,8 +16,9 @@ class DAppNavigationModule {
     @ApplicationScope
     @Provides
     fun provideRouter(
-        navigationHoldersRegistry: NavigationHoldersRegistry
-    ): DAppRouter = DAppNavigator(navigationHoldersRegistry)
+        navigationHoldersRegistry: NavigationHoldersRegistry,
+        stakingDashboardRouter: StakingDashboardRouter
+    ): DAppRouter = DAppNavigator(navigationHoldersRegistry, stakingDashboardRouter)
 
     @ApplicationScope
     @Provides

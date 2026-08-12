@@ -47,10 +47,11 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
         val nestedNavHostFragment = childFragmentManager.findFragmentById(R.id.bottomNavHost) as NavHostFragment
 
         navController = nestedNavHostFragment.navController
-        stakingDashboardNavigator.setStakingTabNavController(navController!!)
 
         binder.bottomNavigationView.setupWithNavController(navController!!)
         binder.bottomNavigationView.itemIconTintList = null
+
+        stakingDashboardNavigator.setStakingTabNavController(navController!!)
 
         requireActivity().onBackPressedDispatcher.addCallback(backCallback)
 

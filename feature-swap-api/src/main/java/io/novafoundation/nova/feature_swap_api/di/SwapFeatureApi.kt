@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.di
 
+import io.novafoundation.nova.feature_swap_api.data.history.HydrationSwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
@@ -17,4 +18,6 @@ interface SwapFeatureApi {
     val swapRateFormatter: SwapRateFormatter
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
+
+    val hydrationSwapTransferFilterFactory: HydrationSwapTransferFilterFactory
 }

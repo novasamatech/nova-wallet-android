@@ -21,6 +21,7 @@ fun BottomSheetActionBinding.setupView(
     val actionButton: PrimaryButton = actionBottomSheetPositiveBtn
     val alert: AlertView = actionBottomSheetAlert
     val checkBox: CheckBox = actionBottomSheetCheckBox
+    val secondaryAction: TextView = actionBottomSheetSecondaryAction
 
     iconView.setImageResource(payload.imageRes)
     titleView.text = payload.title
@@ -60,4 +61,10 @@ fun BottomSheetActionBinding.setupView(
             preferences.onCheckChanged?.invoke(isChecked)
         }
     } ?: checkBox.makeGone()
+
+    payload.secondaryTextAction?.let { action ->
+        secondaryAction.makeVisible()
+        secondaryAction.text = action.text
+        secondaryAction.setOnClickListener { action.onClick() }
+    } ?: secondaryAction.makeGone()
 }
