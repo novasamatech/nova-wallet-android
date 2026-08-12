@@ -48,13 +48,15 @@ suspend fun mapValidatorToValidatorModel(
     token: Token,
     isChecked: Boolean? = null,
     sorting: RecommendationSorting = APYSorting,
+    isLocked: Boolean = false,
 ) = mapValidatorToValidatorModel(
     chain = chain,
     validator = validator,
     createIcon = { iconGenerator.createSubstrateAddressModel(it, ICON_SIZE_DP, validator.identity?.display, AddressIconGenerator.BACKGROUND_TRANSPARENT) },
     token = token,
     isChecked = isChecked,
-    sorting = sorting
+    sorting = sorting,
+    isLocked = isLocked
 )
 
 suspend fun mapValidatorToValidatorModel(
@@ -64,6 +66,7 @@ suspend fun mapValidatorToValidatorModel(
     token: Token,
     isChecked: Boolean? = null,
     sorting: RecommendationSorting = APYSorting,
+    isLocked: Boolean = false,
 ): ValidatorStakeTargetModel {
     val address = chain.addressOf(validator.accountIdHex.fromHex())
     val addressModel = createIcon(address)
@@ -86,7 +89,8 @@ suspend fun mapValidatorToValidatorModel(
             scoring = scoring,
             isChecked = isChecked,
             stakeTarget = validator,
-            subtitle = null // TODO relaychain subtitles
+            subtitle = null, // TODO relaychain subtitles
+            isLocked = isLocked
         )
     }
 }

@@ -24,7 +24,8 @@ class EditableStakingTypeItemFormatter(
     suspend fun format(
         asset: Asset,
         validatedStakingType: ValidatedStakingTypeDetails,
-        selection: RecommendableMultiStakingSelection
+        selection: RecommendableMultiStakingSelection,
+        isPoolForced: Boolean
     ): EditableStakingTypeRVItem? {
         val stakingTarget = multiStakingTargetSelectionFormatter.formatForStakingType(selection)
         val selectedStakingType = selection.selection.stakingOption.stakingType
@@ -38,13 +39,15 @@ class EditableStakingTypeItemFormatter(
 
         val isSelected = selectedStakingType == stakingType
 
+        val canChangeTarget = !(isPoolForced && stakingType.isPoolStaking())
+
         return EditableStakingTypeRVItem(
             isSelected = isSelected,
             isSelectable = validatedStakingType.isAvailable || isSelected,
             title = resourceManager.getString(titleRes),
             imageRes = imageRes,
             conditions = mapConditions(asset, validatedStakingType.stakingTypeDetails),
-            stakingTarget = stakingTarget.takeIf { selectedStakingType == stakingType }
+            stakingTarget = stakingTarget.takeIf { isSelected && canChangeTarget }
         )
     }
 

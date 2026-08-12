@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.ext.isPoolStakingForced
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chainWithAsset
@@ -194,8 +195,10 @@ class SetupStakingTypeViewModel(
         stakingTypesDetails: List<ValidatedStakingTypeDetails>,
         selection: RecommendableMultiStakingSelection
     ): List<EditableStakingTypeRVItem> {
+        val isPoolForced = isPoolStakingForced(payload.availableStakingOptions.chainId)
+
         return stakingTypesDetails.mapNotNull {
-            editableStakingTypeItemFormatter.format(asset, it, selection)
+            editableStakingTypeItemFormatter.format(asset, it, selection, isPoolForced)
         }
     }
 

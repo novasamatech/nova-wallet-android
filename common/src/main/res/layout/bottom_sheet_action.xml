@@ -89,4 +89,20 @@
             tools:text="@string/common_ok_back" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/actionBottomSheetSecondaryAction"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Callout"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-16dp"
+        android:layout_marginBottom="16dp"
+        android:background="?selectableItemBackground"
+        android:gravity="center"
+        android:paddingHorizontal="16dp"
+        android:textColor="@color/text_secondary"
+        android:visibility="gone"
+        tools:text="@string/common_advanced"
+        tools:visibility="visible" />
+
 </LinearLayout>

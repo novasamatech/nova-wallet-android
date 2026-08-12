@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.validators
 
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +12,7 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.StakeTargetModel
@@ -65,7 +67,7 @@ class StakeTargetAdapter<V>(
             onUnknownPayload = { holder.bindIcon(mode, item, itemHandler) },
             onDiffCheck = {
                 when (it) {
-                    StakeTargetModel<*>::isChecked -> holder.bindIcon(mode, item, itemHandler)
+                    StakeTargetModel<*>::isChecked, StakeTargetModel<*>::isLocked -> holder.bindIcon(mode, item, itemHandler)
                     StakeTargetModel<*>::scoring -> holder.bindScoring(item)
                     StakeTargetModel<*>::subtitle -> holder.bindSubtitle(item)
                 }
@@ -105,7 +107,7 @@ class StakingTargetViewHolder<V>(private val binder: ItemValidatorBinding) : Rec
     ) = with(binder) {
         when {
             mode == StakeTargetAdapter.Mode.EDIT -> {
-                itemStakingTargetActionIcon.makeVisible()
+                itemStakingTargetActionIcon.setVisible(!StakeTargetModel.isLocked)
                 itemStakingTargetCheck.makeGone()
 
                 itemStakingTargetActionIcon.setOnClickListener { handler.removeClicked(StakeTargetModel) }
@@ -121,6 +123,8 @@ class StakingTargetViewHolder<V>(private val binder: ItemValidatorBinding) : Rec
                 itemStakingTargetCheck.makeVisible()
 
                 itemStakingTargetCheck.isChecked = StakeTargetModel.isChecked
+                val tintRes = if (StakeTargetModel.isLocked) R.color.icon_inactive else R.color.tint_radio_button
+                itemStakingTargetCheck.buttonTintList = ContextCompat.getColorStateList(itemStakingTargetCheck.context, tintRes)
             }
         }
     }
@@ -172,7 +176,8 @@ class StakingTargetDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>(
     }
 
     override fun areContentsTheSame(oldItem: StakeTargetModel<V>, newItem: StakeTargetModel<V>): Boolean {
-        return oldItem.scoring == newItem.scoring && oldItem.isChecked == newItem.isChecked && oldItem.subtitle == newItem.subtitle
+        return oldItem.scoring == newItem.scoring && oldItem.isChecked == newItem.isChecked &&
+            oldItem.subtitle == newItem.subtitle && oldItem.isLocked == newItem.isLocked
     }
 
     override fun getChangePayload(oldItem: StakeTargetModel<V>, newItem: StakeTargetModel<V>): Any? {
@@ -182,6 +187,7 @@ class StakingTargetDiffCallback<V> : DiffUtil.ItemCallback<StakeTargetModel<V>>(
 
 private object StakingTargetPayloadGenerator : PayloadGenerator<StakeTargetModel<*>>(
     StakeTargetModel<*>::isChecked,
+    StakeTargetModel<*>::isLocked,
     StakeTargetModel<*>::scoring,
     StakeTargetModel<*>::subtitle
 )

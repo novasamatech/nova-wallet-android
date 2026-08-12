@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.inBackground
+import io.novafoundation.nova.feature_staking_api.domain.model.isLocked
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
@@ -80,7 +81,7 @@ class ReviewCustomValidatorsViewModel(
         validators.map { validator ->
             val chain = selectedAssetState.chain()
 
-            mapValidatorToValidatorModel(chain, validator, addressIconGenerator, token)
+            mapValidatorToValidatorModel(chain, validator, addressIconGenerator, token, isLocked = validator.isLocked)
         }
     }
         .inBackground()
@@ -89,6 +90,11 @@ class ReviewCustomValidatorsViewModel(
     val isInEditMode = MutableStateFlow(false)
 
     fun deleteClicked(validatorModel: ValidatorStakeTargetModel) {
+        if (validatorModel.isLocked) {
+            showError(resourceManager.getString(R.string.staking_custom_locked_validator_message))
+            return
+        }
+
         launch {
             val validators = selectedValidators.first()
 

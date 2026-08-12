@@ -14,6 +14,7 @@ data class StakeTargetModel<V>(
     val addressModel: AddressModel,
     val isChecked: Boolean?,
     val stakeTarget: V,
+    val isLocked: Boolean = false,
 ) {
 
     data class Subtitle(
