@@ -332,6 +332,10 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_legalConsent"
+        app:destination="@id/legalConsentBottomSheet" />
+
+    <action
         android:id="@+id/action_open_pushNotificationsWelcome"
         app:destination="@id/pushNotificationsWelcomeFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -1326,6 +1330,12 @@
         android:id="@+id/swapDetailFragment"
         android:name="io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap.SwapDetailFragment"
         android:label="SwapDetailFragment" />
+
+    <dialog
+        android:id="@+id/legalConsentBottomSheet"
+        android:name="io.novafoundation.nova.app.root.presentation.legal.LegalConsentBottomSheet"
+        android:label="LegalConsentBottomSheet"
+        tools:layout="@layout/bottom_sheet_legal_consent" />
 
     <fragment
         android:id="@+id/pushNotificationsWelcomeFragment"
