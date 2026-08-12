@@ -1,21 +1,15 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.welcome
 
-import android.graphics.Color
 import android.os.Bundle
-import android.text.method.LinkMovementMethod
 import android.view.View
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
+import io.novafoundation.nova.common.utils.formatting.applyTermsAndPrivacyPolicy
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.clickableSpan
-import io.novafoundation.nova.common.utils.colorSpan
-import io.novafoundation.nova.common.utils.formatting.spannable.SpannableFormatter
-import io.novafoundation.nova.common.utils.setFullSpan
 import io.novafoundation.nova.common.utils.setVisible
-import io.novafoundation.nova.common.utils.toSpannable
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_onboarding_api.di.OnboardingFeatureApi
 import io.novafoundation.nova.feature_onboarding_impl.R
@@ -47,32 +41,23 @@ class WelcomeFragment : BaseFragment<WelcomeViewModel, FragmentWelcomeBinding>()
 
     override fun applyInsets(rootView: View) {
         binder.welcomeStatus.applyStatusBarInsets()
-        binder.welcomeTerms.applyNavigationBarInsets()
+        binder.welcomeBottomStack.applyNavigationBarInsets()
     }
 
     override fun initViews() {
-        configureTermsAndPrivacy(
-            getString(R.string.onboarding_terms_and_conditions_1_v2_2_1),
-            getString(R.string.onboarding_terms_and_conditions_2),
-            getString(R.string.onboarding_privacy_policy)
+        binder.welcomeTerms.applyTermsAndPrivacyPolicy(
+            containerResId = R.string.legal_consent_implicit,
+            termsResId = R.string.common_terms_of_service,
+            privacyResId = R.string.common_privacy_notice,
+            termsClicked = viewModel::termsClicked,
+            privacyClicked = viewModel::privacyClicked,
+            underlineLinks = true
         )
-        binder.welcomeTerms.movementMethod = LinkMovementMethod.getInstance()
-        binder.welcomeTerms.highlightColor = Color.TRANSPARENT
 
         binder.welcomeCreateWalletButton.setOnClickListener { viewModel.createAccountClicked() }
         binder.welcomeRestoreWalletButton.setOnClickListener { viewModel.importAccountClicked() }
 
         binder.welcomeBackButton.setOnClickListener { viewModel.backClicked() }
-    }
-
-    private fun configureTermsAndPrivacy(sourceText: String, terms: String, privacy: String) {
-        val clickableColor = requireContext().getColor(R.color.text_primary)
-
-        binder.welcomeTerms.text = SpannableFormatter.format(
-            sourceText,
-            terms.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::termsClicked)),
-            privacy.toSpannable(colorSpan(clickableColor)).setFullSpan(clickableSpan(viewModel::privacyClicked)),
-        )
     }
 
     override fun inject() {

@@ -17,7 +17,7 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_create_wallet_background"
-        app:layout_constraintBottom_toTopOf="@+id/welcomeCreateWalletButton"
+        app:layout_constraintBottom_toTopOf="@+id/welcomeBottomStack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -36,47 +36,45 @@
         app:tint="@color/icon_primary"
         tools:visibility="visible" />
 
-    <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/welcomeCreateWalletButton"
+    <LinearLayout
+        android:id="@+id/welcomeBottomStack"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="10dp"
-        android:text="@string/onboarding_create_wallet"
-        app:appearance="primary"
-        app:layout_constraintBottom_toTopOf="@+id/welcomeRestoreWalletButton"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <io.novafoundation.nova.common.view.PrimaryButton
-        android:id="@+id/welcomeRestoreWalletButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:text="@string/onboarding_restore_wallet"
-        app:appearance="secondary"
-        app:icon="@drawable/ic_watch_only_filled"
-        app:layout_constraintBottom_toTopOf="@+id/welcomeTerms"
-        app:layout_constraintEnd_toEndOf="@+id/welcomeCreateWalletButton"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/welcomeCreateWalletButton"
-        app:subTitle="@string/account_add_watch_only_description" />
-
-    <TextView
-        android:id="@+id/welcomeTerms"
-        style="@style/TextAppearance.NovaFoundation.Body1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/x2"
-        android:layout_marginEnd="@dimen/x2"
-        android:layout_marginBottom="24dp"
-        android:gravity="center"
-        android:textColor="@color/text_secondary"
-        android:textColorLink="@color/text_primary"
+        android:orientation="vertical"
+        android:paddingHorizontal="20dp"
+        android:paddingBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="@string/onboarding_terms_and_conditions_1_v2_2_1" />
+        app:layout_constraintStart_toStartOf="parent">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/welcomeCreateWalletButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/onboarding_create_wallet"
+            app:appearance="primary" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/welcomeRestoreWalletButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/onboarding_restore_wallet"
+            app:appearance="secondary"
+            app:icon="@drawable/ic_watch_only_filled"
+            app:subTitle="@string/account_add_watch_only_description" />
+
+        <TextView
+            android:id="@+id/welcomeTerms"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center"
+            android:textColor="@color/text_secondary"
+            android:textColorLink="@color/text_primary"
+            tools:text="@string/legal_consent_implicit" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

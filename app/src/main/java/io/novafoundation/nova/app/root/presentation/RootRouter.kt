@@ -10,6 +10,8 @@ interface RootRouter {
 
     fun openPushWelcome()
 
+    fun openLegalConsent()
+
     fun openCloudBackupSettings()
 
     fun openChainMigrationDetails(chainId: String)

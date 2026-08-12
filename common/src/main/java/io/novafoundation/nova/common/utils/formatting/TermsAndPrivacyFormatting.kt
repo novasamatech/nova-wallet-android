@@ -2,6 +2,7 @@ package io.novafoundation.nova.common.utils.formatting
 
 import android.graphics.Color
 import android.text.method.LinkMovementMethod
+import android.text.style.UnderlineSpan
 import android.widget.TextView
 import io.novafoundation.nova.common.R
 import io.novafoundation.nova.common.utils.clickableSpan
@@ -15,19 +16,21 @@ fun TextView.applyTermsAndPrivacyPolicy(
     termsResId: Int,
     privacyResId: Int,
     termsClicked: () -> Unit,
-    privacyClicked: () -> Unit
+    privacyClicked: () -> Unit,
+    underlineLinks: Boolean = false
 ) {
     movementMethod = LinkMovementMethod.getInstance()
     highlightColor = Color.TRANSPARENT
     val linkColor = context.getColor(R.color.text_primary)
 
+    fun link(textResId: Int, onClick: () -> Unit) = context.getString(textResId)
+        .toSpannable(clickableSpan(onClick))
+        .setFullSpan(colorSpan(linkColor))
+        .apply { if (underlineLinks) setFullSpan(UnderlineSpan()) }
+
     text = SpannableFormatter.format(
         context.getString(containerResId),
-        context.getString(termsResId)
-            .toSpannable(clickableSpan(termsClicked))
-            .setFullSpan(colorSpan(linkColor)),
-        context.getString(privacyResId)
-            .toSpannable(clickableSpan(privacyClicked))
-            .setFullSpan(colorSpan(linkColor))
+        link(termsResId, termsClicked),
+        link(privacyResId, privacyClicked)
     )
 }

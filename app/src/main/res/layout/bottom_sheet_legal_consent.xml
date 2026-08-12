@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingBottom="24dp">
+
+    <View
+        style="@style/Widget.Nova.Puller"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/legalConsentTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:text="@string/legal_consent_title"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        android:id="@+id/legalConsentSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/legal_consent_subtitle"
+        android:textColor="@color/text_secondary" />
+
+    <include
+        android:id="@+id/legalConsentTermsRow"
+        layout="@layout/view_legal_consent_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="28dp" />
+
+    <include
+        android:id="@+id/legalConsentPrivacyRow"
+        layout="@layout/view_legal_consent_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="4dp" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/legalConsentAcceptButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/legal_consent_accept"
+        app:appearance="primary" />
+
+</LinearLayout>

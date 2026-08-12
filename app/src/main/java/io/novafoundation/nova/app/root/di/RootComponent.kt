@@ -7,6 +7,7 @@ import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationH
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
+import io.novafoundation.nova.app.root.presentation.legal.di.LegalConsentComponent
 import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponent
 import io.novafoundation.nova.app.root.presentation.splitScreen.di.SplitScreenFragmentComponent
 import io.novafoundation.nova.common.di.CommonApi
@@ -54,6 +55,8 @@ interface RootComponent {
     fun splitScreenFragmentComponentFactory(): SplitScreenFragmentComponent.Factory
 
     fun mainFragmentComponentFactory(): MainFragmentComponent.Factory
+
+    fun legalConsentComponentFactory(): LegalConsentComponent.Factory
 
     @Component.Factory
     interface Factory {

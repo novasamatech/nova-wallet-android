@@ -8,9 +8,11 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
+import io.novafoundation.nova.common.data.legal.LegalConsentRepository
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.utils.sequrity.AutomaticInteractionGate
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationDetailsSelectToShowUseCase
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
@@ -30,12 +32,16 @@ class MainFragmentModule {
         automaticInteractionGate: AutomaticInteractionGate,
         welcomePushNotificationsInteractor: WelcomePushNotificationsInteractor,
         chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase,
+        legalConsentRepository: LegalConsentRepository,
+        accountRepository: AccountRepository,
         rootRouter: RootRouter
     ): ViewModel {
         return MainViewModel(
             updateNotificationsInteractor,
             automaticInteractionGate,
             welcomePushNotificationsInteractor,
+            legalConsentRepository,
+            accountRepository,
             rootRouter,
             chainMigrationDetailsSelectToShowUseCase
         )
