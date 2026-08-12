@@ -39,9 +39,10 @@ class SwapRouteViewModel(
     private suspend fun SwapFee.toSwapRouteUi(): List<SwapRouteItemModel> {
         val pricedFees = swapInteractor.calculateSegmentFiatPrices(this)
 
-        return pricedFees.zip(segments).mapIndexed { index, (pricedFee, segment) ->
-            val displayData = segment.operation.constructDisplayData()
-            displayData.toUi(pricedFee, id = index)
+        return segments.mapIndexed { index, segment ->
+            val displayData = segment.operation.constructDisplayData(segment.netFlow)
+
+            displayData.toUi(pricedFees[index], id = index)
         }
     }
 

@@ -56,6 +56,8 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
 
             hideKeyboard()
         }
+
+        binder.swapNovaFeeDisclaimer.text = viewModel.novaFeeDisclaimerText
     }
 
     override fun inject() {
@@ -96,5 +98,7 @@ class SwapMainSettingsFragment : BaseFragment<SwapMainSettingsViewModel, Fragmen
         }
 
         viewModel.validationProgress.observe(binder.swapMainSettingsContinue::setProgressState)
+
+        viewModel.showNovaFeeDisclaimer.observe { binder.swapNovaFeeDisclaimer.setVisible(it) }
     }
 }

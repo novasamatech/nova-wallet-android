@@ -62,6 +62,7 @@ import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_gift_api.domain.GiftsAccountSupportedUseCase
 import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
+import io.novafoundation.nova.feature_swap_api.data.history.HydrationSwapTransferFilterFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
@@ -209,12 +210,14 @@ class AssetsFeatureModule {
         coinPriceRepository: CoinPriceRepository,
         poolAccountDerivation: PoolAccountDerivation,
         mythosMainPotMatcherFactory: MythosMainPotMatcherFactory,
+        hydrationSwapTransferFilterFactory: HydrationSwapTransferFilterFactory,
     ): TransactionHistoryRepository = RealTransactionHistoryRepository(
         assetSourceRegistry = assetSourceRegistry,
         operationDao = operationsDao,
         coinPriceRepository = coinPriceRepository,
         poolAccountDerivation = poolAccountDerivation,
-        mythosMainPotMatcherFactory = mythosMainPotMatcherFactory
+        mythosMainPotMatcherFactory = mythosMainPotMatcherFactory,
+        hydrationSwapTransferFilterFactory = hydrationSwapTransferFilterFactory,
     )
 
     @Provides

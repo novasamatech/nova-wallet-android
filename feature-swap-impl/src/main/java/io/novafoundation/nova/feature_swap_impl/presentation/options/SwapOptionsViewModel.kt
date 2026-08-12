@@ -16,6 +16,7 @@ import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBot
 import io.novafoundation.nova.feature_swap_api.domain.model.SlippageConfig
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettings
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
+import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
@@ -92,10 +93,7 @@ class SwapOptionsViewModel(
     }
 
     fun slippageInfoClicked() {
-        launchDescriptionBottomSheet(
-            titleRes = R.string.swap_slippage_title,
-            descriptionRes = R.string.swap_slippage_description
-        )
+        launchSlippageDescription(resourceManager)
     }
 
     fun tipClicked(index: Int) {

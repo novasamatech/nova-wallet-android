@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_api.domain.model.fee
 
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.FeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
@@ -12,6 +13,12 @@ interface AtomicSwapOperationFee {
     val submissionFee: SubmissionFeeWithLabel
 
     val postSubmissionFees: PostSubmissionFees
+
+    /**
+     * Nova service fee levied on this operation's output, denominated in the operation's assetOut.
+     */
+    val serviceCommission: FeeBase?
+        get() = null
 
     fun constructDisplayData(): AtomicOperationFeeDisplayData
 
