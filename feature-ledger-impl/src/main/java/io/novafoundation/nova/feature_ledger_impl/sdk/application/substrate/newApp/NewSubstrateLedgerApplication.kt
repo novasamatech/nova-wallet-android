@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_ledger_impl.sdk.application.substrate.new
 import android.util.Log
 import io.novafoundation.nova.common.utils.chunked
 import io.novafoundation.nova.common.utils.littleEndianBytes
+import io.novafoundation.nova.common.utils.signingPayloadPreimage
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.LedgerSubstrateAccount
 import io.novafoundation.nova.feature_ledger_api.sdk.application.substrate.SubstrateLedgerApplication
 import io.novafoundation.nova.feature_ledger_api.sdk.device.LedgerDevice
@@ -18,7 +19,10 @@ import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerServic
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicVersion
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
+import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.signingPayload
 
 abstract class NewSubstrateLedgerApplication(
     private val transport: LedgerTransport,
@@ -123,7 +127,7 @@ abstract class NewSubstrateLedgerApplication(
         chainId: ChainId,
         payload: InheritedImplication
     ): List<ByteArray> {
-        val payloadBytes = payload.encoded()
+        val payloadBytes = payload.signingPayloadPreimage()
 
         val derivationPath = getDerivationPath(metaId, chainId)
         val encodedDerivationPath = encodeDerivationPath(derivationPath)
