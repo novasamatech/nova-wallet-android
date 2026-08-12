@@ -19,10 +19,7 @@ import io.novafoundation.nova.runtime.extrinsic.metadata.MetadataShortenerServic
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novasama.substrate_sdk_android.encrypt.SignatureWrapper
-import io.novasama.substrate_sdk_android.extensions.toHexString
-import io.novasama.substrate_sdk_android.runtime.extrinsic.ExtrinsicVersion
 import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.InheritedImplication
-import io.novasama.substrate_sdk_android.runtime.extrinsic.v5.transactionExtension.signingPayload
 
 abstract class NewSubstrateLedgerApplication(
     private val transport: LedgerTransport,
