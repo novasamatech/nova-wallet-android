@@ -2236,6 +2236,11 @@
     <string name="common_close">Close</string>
 
     <string name="dapp_search_hint">Search by name or enter URL</string>
+    <string name="dapp_staking_banner_message">Looking to stake? Nova Wallet has built-in staking.</string>
+    <string name="dapp_staking_notice_title">Notice</string>
+    <string name="dapp_staking_notice_message">Third-party staking sites often become deprecated. We recommend using Nova Wallet\'s built-in staking features.</string>
+    <string name="dapp_staking_notice_continue">Continue to site</string>
+    <string name="common_go_to_staking">Go to Staking</string>
     <string name="common_all">All</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Make sure the operation is correct</string>
     <string name="dapp_sign_extrinsic_failed">Failed to sign requested operation</string>
@@ -2557,6 +2562,7 @@
     <string name="staking_custom_blocked_warning">This validator is blocked and cannot be selected at the moment. Please, try again in the next era.</string>
     <string name="staking_custom_clear_button_title">Clear filters</string>
     <string name="staking_custom_deselect_button_title">Deselect all</string>
+    <string name="staking_custom_locked_validator_message">This validator is operated by Nova and is always part of your nomination.</string>
     <string name="staking_custom_fill_button_title">Fill rest with recommended</string>
     <string name="staking_custom_header_validators_title" formatted="false">Validators: %d of %d</string>
     <string name="staking_custom_proceed_button_disabled_title">Select validators (max %d)</string>
