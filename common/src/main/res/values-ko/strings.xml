@@ -2025,4 +2025,20 @@
     <string name="yield_boost_stake_increase_time">Stake 증가 시간</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost가 %s 모든 양도 가능한 토큰을 %s 이상 자동으로 Stake 합니다</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="common_go_to_staking">Staking으로 이동</string>
+    <string name="common_privacy_notice">개인정보 보호정책</string>
+    <string name="common_terms_of_service">서비스 약관</string>
+    <string name="dapp_staking_banner_message">Stake하려고 하시나요? Nova Wallet에는 Staking 기능이 내장되어 있습니다.</string>
+    <string name="dapp_staking_notice_continue">사이트로 계속하기</string>
+    <string name="dapp_staking_notice_message">타사 Staking 사이트는 자주 지원이 중단됩니다. Nova Wallet의 내장 Staking 기능을 사용하는 것을 권장합니다.</string>
+    <string name="dapp_staking_notice_title">알림</string>
+    <string name="legal_consent_accept">동의하고 계속하기</string>
+    <string name="legal_consent_agreement">%1$s에 동의하고 %2$s을(를) 확인합니다.</string>
+    <string name="legal_consent_implicit">계속하면 %1$s에 동의하고 %2$s을(를) 확인하는 것으로 간주됩니다.</string>
+    <string name="legal_consent_subtitle">서비스 약관 및 개인정보 보호정책이 업데이트되었습니다. Nova Wallet을 계속 사용하려면 업데이트된 문서를 검토하고 동의해 주세요.</string>
+    <string name="legal_consent_title">업데이트된 약관</string>
+    <string name="staking_custom_locked_validator_message">이 검증인은 Nova에서 운영하며 항상 귀하의 지명에 포함됩니다.</string>
+    <string name="swap_network_fees_label">네트워크 수수료</string>
+    <string name="swap_nova_fee_disclaimer">%s%% Nova 수수료가 포함됩니다.</string>
+    <string name="swap_rate_includes_fee_description">%s%% Nova Wallet 수수료를 포함하여 찾은 최적의 환율입니다.</string>
 </resources>

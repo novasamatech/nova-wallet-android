@@ -2025,4 +2025,20 @@
     <string name="yield_boost_stake_increase_time">Stake増加時間</string>
     <string name="yield_boost_terms" formatted="false">Yield Boostは自動的に%s私の全ての譲渡可能なトークンを%s以上ステークします</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="common_go_to_staking">Stakingへ移動</string>
+    <string name="common_privacy_notice">プライバシーに関する通知</string>
+    <string name="common_terms_of_service">利用規約</string>
+    <string name="dapp_staking_banner_message">Stakeをご希望ですか？Nova WalletにはStaking機能が組み込まれています。</string>
+    <string name="dapp_staking_notice_continue">サイトへ続行</string>
+    <string name="dapp_staking_notice_message">第三者のStakingサイトは、利用できなくなることがよくあります。Nova Walletに組み込まれたStaking機能のご利用をおすすめします。</string>
+    <string name="dapp_staking_notice_title">通知</string>
+    <string name="legal_consent_accept">同意して続行</string>
+    <string name="legal_consent_agreement">%1$sに同意し、%2$sを確認しました。</string>
+    <string name="legal_consent_implicit">続行することで、%1$sに同意し、%2$sを確認したものとみなされます。</string>
+    <string name="legal_consent_subtitle">利用規約とプライバシーに関する通知を更新しました。Nova Walletの利用を続けるには、更新された文書を確認して同意してください。</string>
+    <string name="legal_consent_title">更新された利用規約</string>
+    <string name="staking_custom_locked_validator_message">このバリデーターはNovaが運用しており、常にノミネーションの対象となります。</string>
+    <string name="swap_network_fees_label">ネットワーク手数料</string>
+    <string name="swap_nova_fee_disclaimer">%s%%のNova手数料を含みます。</string>
+    <string name="swap_rate_includes_fee_description">%s%%のNova Wallet手数料を含む、見つかった最良のレートです。</string>
 </resources>

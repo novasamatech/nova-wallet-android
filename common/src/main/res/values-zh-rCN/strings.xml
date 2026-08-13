@@ -2025,4 +2025,20 @@
     <string name="yield_boost_stake_increase_time">加注时间</string>
     <string name="yield_boost_terms" formatted="false">收益增强将自动加注我所有可转让代币中超过%s的%s</string>
     <string name="yiled_boost_yield_boosted">已增强收益</string>
+    <string name="common_go_to_staking">前往质押</string>
+    <string name="common_privacy_notice">隐私声明</string>
+    <string name="common_terms_of_service">服务条款</string>
+    <string name="dapp_staking_banner_message">想要进行质押？Nova Wallet 内置质押功能。</string>
+    <string name="dapp_staking_notice_continue">继续前往网站</string>
+    <string name="dapp_staking_notice_message">第三方质押网站经常会停止维护。我们建议使用 Nova Wallet 内置的质押功能。</string>
+    <string name="dapp_staking_notice_title">提示</string>
+    <string name="legal_consent_accept">接受并继续</string>
+    <string name="legal_consent_agreement">我同意%1$s，并确认已知悉%2$s。</string>
+    <string name="legal_consent_implicit">继续操作即表示您同意%1$s，并确认已知悉%2$s。</string>
+    <string name="legal_consent_subtitle">我们已更新《服务条款》和《隐私声明》。请查看并接受更新后的文件，以继续使用 Nova Wallet。</string>
+    <string name="legal_consent_title">更新后的条款</string>
+    <string name="staking_custom_locked_validator_message">该验证人由 Nova 运营，并始终属于您的提名范围。</string>
+    <string name="swap_network_fees_label">网络费用</string>
+    <string name="swap_nova_fee_disclaimer">包含 %s%% 的 Nova 手续费。</string>
+    <string name="swap_rate_includes_fee_description">找到的最佳汇率，已包含 %s%% 的 Nova Wallet 手续费。</string>
 </resources>

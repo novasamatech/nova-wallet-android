@@ -2025,4 +2025,20 @@
     <string name="yield_boost_stake_increase_time">Waktu peningkatan staking</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost akan secara otomatis melakukan staking %s semua token yang dapat ditransfer di atas %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="common_go_to_staking">Buka Staking</string>
+    <string name="common_privacy_notice">Pemberitahuan Privasi</string>
+    <string name="common_terms_of_service">Ketentuan Layanan</string>
+    <string name="dapp_staking_banner_message">Ingin melakukan staking? Nova Wallet memiliki fitur staking bawaan.</string>
+    <string name="dapp_staking_notice_continue">Lanjutkan ke situs</string>
+    <string name="dapp_staking_notice_message">Situs staking pihak ketiga sering kali tidak lagi tersedia. Kami menyarankan Anda menggunakan fitur staking bawaan Nova Wallet.</string>
+    <string name="dapp_staking_notice_title">Pemberitahuan</string>
+    <string name="legal_consent_accept">Setujui dan Lanjutkan</string>
+    <string name="legal_consent_agreement">Saya menyetujui %1$s dan mengakui %2$s.</string>
+    <string name="legal_consent_implicit">Dengan melanjutkan, Anda menyetujui %1$s dan mengakui %2$s.</string>
+    <string name="legal_consent_subtitle">Kami telah memperbarui Ketentuan Layanan dan Pemberitahuan Privasi kami. Harap tinjau dan setujui dokumen yang diperbarui untuk terus menggunakan Nova Wallet.</string>
+    <string name="legal_consent_title">Ketentuan yang Diperbarui</string>
+    <string name="staking_custom_locked_validator_message">Validator ini dioperasikan oleh Nova dan selalu menjadi bagian dari nominasi Anda.</string>
+    <string name="swap_network_fees_label">Biaya jaringan</string>
+    <string name="swap_nova_fee_disclaimer">Termasuk biaya Nova sebesar %s%%.</string>
+    <string name="swap_rate_includes_fee_description">Nilai tukar terbaik yang ditemukan, termasuk biaya Nova Wallet sebesar %s%%.</string>
 </resources>
