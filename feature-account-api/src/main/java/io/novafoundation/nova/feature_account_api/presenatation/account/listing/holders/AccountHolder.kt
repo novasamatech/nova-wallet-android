@@ -30,6 +30,10 @@ class AccountHolder(
         fun deleteClicked(accountModel: AccountUi) {
             // default no op
         }
+
+        fun favouriteClicked(accountModel: AccountUi) {
+            // default no op
+        }
     }
 
     enum class Mode {
@@ -55,6 +59,8 @@ class AccountHolder(
         bindSubtitle(accountModel)
         bindMode(mode, accountModel, handler)
 
+        bindFavourite(mode, accountModel, handler)
+
         itemAccountIcon.setImageDrawable(accountModel.picture)
         itemChainIcon.letOrHide(accountModel.chainIcon) {
             itemChainIcon.colorFilter = AlphaColorFilter(accountModel.chainIconOpacity)
@@ -65,6 +71,24 @@ class AccountHolder(
             itemAccountTitle.setDrawableEnd(R.drawable.shape_account_updated_indicator, paddingInDp = 8)
         } else {
             itemAccountTitle.removeDrawableEnd()
+        }
+    }
+
+    private fun bindFavourite(
+        mode: Mode,
+        accountModel: AccountUi,
+        handler: AccountItemHandler?
+    ) = with(binder) {
+        val showFav = accountModel.showFavouriteToggle && mode != Mode.EDIT
+        itemAccountFavourite.isVisible = showFav
+        if (showFav) {
+            itemAccountFavourite.setImageResource(
+                if (accountModel.isFavourite) android.R.drawable.btn_star_big_on
+                else android.R.drawable.btn_star_big_off
+            )
+            itemAccountFavourite.setOnClickListener { handler?.favouriteClicked(accountModel) }
+        } else {
+            itemAccountFavourite.setOnClickListener(null)
         }
     }
 

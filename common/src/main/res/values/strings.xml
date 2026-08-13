@@ -223,6 +223,10 @@
 
     <string name="account_proxieds">Delegated to you (Proxied)</string>
 
+    <string name="favourites_section_header">★ Favourites</string>
+    <string name="wallets_section_header">Wallets</string>
+    <string name="search_wallets_placeholder">Search wallets…</string>
+
     <string name="multisig_signing_reject_confirmation_subtitle">Transaction will be rejected. Multisig deposit will be returned to %s.</string>
 
     <string name="common_full_details">Full details</string>

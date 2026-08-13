@@ -65,12 +65,13 @@ abstract class CommonAccountsAdapter<Group : AccountGroupRvItem>(
             holder,
             position,
             payloads,
-            onUnknownPayload = { holder.bindMode(mode, child, accountItemHandler) },
+            onUnknownPayload = { holder.bind(mode, child, accountItemHandler) },
             onDiffCheck = {
                 when (it) {
                     AccountUi::title -> holder.bindName(child)
                     AccountUi::subtitle -> holder.bindSubtitle(child)
-                    AccountUi::isSelected -> holder.bindMode(mode, child, accountItemHandler)
+                    AccountUi::isSelected -> holder.bind(mode, child, accountItemHandler)
+                    AccountUi::isFavourite -> holder.bind(mode, child, accountItemHandler)
                 }
             }
         )
@@ -87,11 +88,18 @@ class AccountDiffCallback<Group : AccountGroupRvItem>(groupClass: Class<Group>) 
     }
 
     override fun areChildItemsTheSame(oldItem: AccountUi, newItem: AccountUi): Boolean {
-        return oldItem.id == newItem.id
+        // Identity = wallet id + groupTag. The same wallet can appear twice
+        // (once in Favourites, once in its original group) and DiffUtil must
+        // treat them as distinct rows so the favourites toggle does not flicker
+        // or dedupe entries.
+        return oldItem.id == newItem.id && oldItem.groupTag == newItem.groupTag
     }
 
     override fun areChildContentsTheSame(oldItem: AccountUi, newItem: AccountUi): Boolean {
-        return oldItem.title == newItem.title && oldItem.subtitle == newItem.subtitle && oldItem.isSelected == newItem.isSelected
+        return oldItem.title == newItem.title &&
+            oldItem.subtitle == newItem.subtitle &&
+            oldItem.isSelected == newItem.isSelected &&
+            oldItem.isFavourite == newItem.isFavourite
     }
 
     override fun getChildChangePayload(oldItem: AccountUi, newItem: AccountUi): Any? {

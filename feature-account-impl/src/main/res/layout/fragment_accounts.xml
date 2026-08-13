@@ -25,6 +25,21 @@
             app:textRight="@string/common_edit"
             app:titleText="@string/profile_accounts_title_2_0" />
 
+        <EditText
+            android:id="@+id/accountsSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_primary_list_item"
+            android:hint="@string/search_wallets_placeholder"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:padding="12dp"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            android:textColorHint="@color/text_secondary" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/accountsList"
             android:layout_width="match_parent"

@@ -2039,4 +2039,7 @@
     <string name="yield_boost_stake_increase_time">La mise augmente avec le temps</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost misera automatiquement %s tous mes actifs transférables au-dessus de %s</string>
     <string name="yiled_boost_yield_boosted">Rendement boosté</string>
+    <string name="favourites_section_header">★ Favoris</string>
+    <string name="wallets_section_header">Portefeuilles</string>
+    <string name="search_wallets_placeholder">Rechercher des portefeuilles…</string>
 </resources>

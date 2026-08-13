@@ -39,6 +39,14 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel, FragmentA
         binder.accountListToolbar.setHomeButtonListener { viewModel.backClicked() }
 
         binder.addAccount.setOnClickListener { viewModel.addAccountClicked() }
+
+        binder.accountsSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.onSearchQueryChanged(s?.toString().orEmpty())
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
     }
 
     override fun inject() {
@@ -78,5 +86,9 @@ class WalletManagmentFragment : BaseFragment<WalletManagmentViewModel, FragmentA
 
     override fun deleteClicked(accountModel: AccountUi) {
         viewModel.deleteClicked(accountModel)
+    }
+
+    override fun favouriteClicked(accountModel: AccountUi) {
+        viewModel.favouriteClicked(accountModel)
     }
 }

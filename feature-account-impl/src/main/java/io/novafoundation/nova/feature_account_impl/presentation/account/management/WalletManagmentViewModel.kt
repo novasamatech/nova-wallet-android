@@ -32,7 +32,17 @@ class WalletManagmentViewModel(
 
     val cloudBackupChangingWarningMixin = cloudBackupChangingWarningMixinFactory.create(viewModelScope)
 
-    val walletsListingMixin = accountListingMixinFactory.create(this)
+    val searchQueryFlow = MutableStateFlow("")
+
+    fun onSearchQueryChanged(query: String) {
+        searchQueryFlow.value = query
+    }
+
+    val walletsListingMixin = accountListingMixinFactory.create(
+        coroutineScope = this,
+        showFavouriteToggle = true,
+        searchQueryFlow = searchQueryFlow
+    )
 
     val mode = MutableStateFlow(Mode.SELECT)
 
@@ -57,6 +67,12 @@ class WalletManagmentViewModel(
         val newMode = if (mode.value == Mode.SELECT) Mode.EDIT else Mode.SELECT
 
         mode.value = newMode
+    }
+
+    fun favouriteClicked(account: AccountUi) {
+        launch {
+            accountInteractor.setFavourite(account.id, !account.isFavourite)
+        }
     }
 
     fun deleteClicked(account: AccountUi) {

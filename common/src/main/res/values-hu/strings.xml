@@ -2039,4 +2039,7 @@
     <string name="yield_boost_stake_increase_time">Stake növekedési idő</string>
     <string name="yield_boost_terms" formatted="false">A  Yield Boost %s automatikusan stake-elni fogja a %s feletti utalható tokeneket</string>
     <string name="yiled_boost_yield_boosted">Yield Boost-olt</string>
+    <string name="favourites_section_header">★ Kedvencek</string>
+    <string name="wallets_section_header">Tárcák</string>
+    <string name="search_wallets_placeholder">Tárcák keresése…</string>
 </resources>

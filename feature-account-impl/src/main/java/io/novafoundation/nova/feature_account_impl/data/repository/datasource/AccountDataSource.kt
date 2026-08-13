@@ -71,6 +71,11 @@ interface AccountDataSource : SecretStoreV1 {
     fun metaAccountFlow(metaId: Long): Flow<MetaAccount>
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
+
+    suspend fun setFavourite(metaId: Long, isFavourite: Boolean)
+
+    fun observeFavouriteMetaIds(): Flow<List<Long>>
+
     suspend fun deleteMetaAccount(metaId: Long): List<MetaIdWithType>
 
     suspend fun insertMetaAccountWithChainAccounts(metaAccount: MetaAccountInsertionData, chainAccounts: List<ChainAccountInsertionData>): Long

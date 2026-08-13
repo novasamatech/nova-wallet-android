@@ -187,6 +187,12 @@ interface MetaAccountDao {
     @Query("UPDATE meta_accounts SET name = :newName WHERE id = :metaId")
     suspend fun updateName(metaId: Long, newName: String)
 
+    @Query("UPDATE meta_accounts SET isFavourite = :isFavourite WHERE id = :metaId")
+    suspend fun setFavourite(metaId: Long, isFavourite: Boolean)
+
+    @Query("SELECT id FROM meta_accounts WHERE isFavourite = 1")
+    fun observeFavouriteIds(): Flow<List<Long>>
+
     @Query(
         """
         WITH RECURSIVE accounts_to_delete AS (

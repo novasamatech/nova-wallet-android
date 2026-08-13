@@ -36,7 +36,9 @@ class MetaAccountLocal(
     @ColumnInfo(defaultValue = "ACTIVE")
     val status: Status,
     val globallyUniqueId: String,
-    val typeExtras: SerializedJson?
+    val typeExtras: SerializedJson?,
+    @ColumnInfo(name = "isFavourite", defaultValue = "0")
+    val isFavourite: Boolean = false
 ) {
 
     enum class Status {
@@ -56,6 +58,7 @@ class MetaAccountLocal(
 
             const val NAME = "name"
             const val IS_SELECTED = "isSelected"
+            const val IS_FAVOURITE = "isFavourite"
             const val POSITION = "position"
             const val ID = "id"
         }
@@ -83,7 +86,8 @@ class MetaAccountLocal(
             type = type,
             status = status,
             globallyUniqueId = globallyUniqueId,
-            typeExtras = typeExtras
+            typeExtras = typeExtras,
+            isFavourite = isFavourite
         ).also {
             it.id = id
         }
@@ -108,6 +112,7 @@ class MetaAccountLocal(
         if (status != other.status) return false
         if (globallyUniqueId != other.globallyUniqueId) return false
         if (typeExtras != other.typeExtras) return false
+        if (isFavourite != other.isFavourite) return false
 
         return true
     }
@@ -127,6 +132,7 @@ class MetaAccountLocal(
         result = 31 * result + status.hashCode()
         result = 31 * result + globallyUniqueId.hashCode()
         result = 31 * result + (typeExtras?.hashCode() ?: 0)
+        result = 31 * result + isFavourite.hashCode()
         result = 31 * result + id.hashCode()
         return result
     }

@@ -77,6 +77,12 @@ class AccountInteractorImpl(
     /**
      * return true if all accounts was deleted
      */
+    override suspend fun setFavourite(metaId: Long, isFavourite: Boolean) {
+        accountRepository.setFavourite(metaId, isFavourite)
+    }
+
+    override fun observeFavouriteMetaIds() = accountRepository.observeFavouriteMetaIds()
+
     override suspend fun deleteAccount(metaId: Long) = withContext(Dispatchers.Default) {
         accountRepository.deleteAccount(metaId)
         if (!accountRepository.isAccountSelected()) {

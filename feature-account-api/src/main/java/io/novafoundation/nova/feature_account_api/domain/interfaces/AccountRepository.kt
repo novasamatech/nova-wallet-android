@@ -58,6 +58,10 @@ interface AccountRepository {
 
     suspend fun updateMetaAccountName(metaId: Long, newName: String)
 
+    suspend fun setFavourite(metaId: Long, isFavourite: Boolean)
+
+    fun observeFavouriteMetaIds(): Flow<List<Long>>
+
     suspend fun isAccountSelected(): Boolean
 
     suspend fun deleteAccount(metaId: Long)

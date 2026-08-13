@@ -166,6 +166,14 @@ class AccountRepositoryImpl(
         metaAccountChangesEventBus.notify(event, source = null)
     }
 
+    override suspend fun setFavourite(metaId: Long, isFavourite: Boolean) = withContext(Dispatchers.Default) {
+        accountDataSource.setFavourite(metaId, isFavourite)
+    }
+
+    override fun observeFavouriteMetaIds(): Flow<List<Long>> {
+        return accountDataSource.observeFavouriteMetaIds()
+    }
+
     override suspend fun isAccountSelected(): Boolean {
         return accountDataSource.anyAccountSelected()
     }
