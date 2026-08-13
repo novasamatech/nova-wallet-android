@@ -4,59 +4,115 @@ on:
   pull_request:
     branches:
       - 'master'
-  pull_request_review_comment:
-    types: [created, edited, deleted]
- 
+  # The release notes are posted as a regular PR comment, so `issue_comment` is what
+  # re-runs this workflow once they show up. `pull_request_review_comment` only fires
+  # for comments on a diff, which `find-comment` never looks at.
+  issue_comment:
+    types: [created, edited]
+
 jobs:
   checkRef:
-    if: github.event.pull_request.base.ref == 'master' || github.event_name == 'pull_request'
+    # `on.pull_request.branches` already restricts the base branch, `issue_comment`
+    # fires for issues too, so keep only the comments left on pull requests.
+    if: github.event_name == 'pull_request' || github.event.issue.pull_request
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     outputs:
       is_rc: ${{ steps.check_ref.outputs.ref_contains_rc }}
-    
+      pr_number: ${{ steps.pr_data.outputs.pr_number }}
+      head_ref: ${{ steps.pr_data.outputs.head_ref }}
+
     steps:
-      - uses: actions/checkout@v2
-      - name: Check if "rc" or "hotfix" is present in github.ref
-        id: check_ref
+      - name: Resolve pull request data
+        id: pr_data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.issue.number }}
+          EVENT_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          EVENT_BASE_REF: ${{ github.event.pull_request.base.ref }}
         run: |
-          echo ${{ github.head_ref || github.ref_name }}
-          if [[ "${{ github.head_ref || github.ref_name }}" == "rc/"* || "${{ github.head_ref || github.ref_name }}" == "hotfix/"* ]]; then
-            echo "ref_contains_rc=1" >> $GITHUB_OUTPUT
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            HEAD_REF="$EVENT_HEAD_REF"
+            BASE_REF="$EVENT_BASE_REF"
           else
-            echo "ref_contains_rc=0" >> $GITHUB_OUTPUT
+            # `issue_comment` carries no pull request refs, so read them from the API
+            PR_JSON=$(gh api "repos/${{ github.repository }}/pulls/${PR_NUMBER}")
+            HEAD_REF=$(jq -r '.head.ref' <<< "$PR_JSON")
+            BASE_REF=$(jq -r '.base.ref' <<< "$PR_JSON")
           fi
-      
+          {
+            echo "pr_number=${PR_NUMBER}"
+            echo "head_ref=${HEAD_REF}"
+            echo "base_ref=${BASE_REF}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check if "rc" or "hotfix" is present in the head ref
+        id: check_ref
+        env:
+          HEAD_REF: ${{ steps.pr_data.outputs.head_ref }}
+          BASE_REF: ${{ steps.pr_data.outputs.base_ref }}
+        run: |
+          echo "head_ref=$HEAD_REF base_ref=$BASE_REF"
+          if [[ "$BASE_REF" == "master" && ( "$HEAD_REF" == "rc/"* || "$HEAD_REF" == "hotfix/"* ) ]]; then
+            echo "ref_contains_rc=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref_contains_rc=0" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Output check result
         run: |
           echo "Output: ${{ steps.check_ref.outputs.ref_contains_rc }}"
 
-  make-or-update-pr:
+  findReleaseNotes:
     runs-on: ubuntu-latest
-    permissions: write-all
     needs: checkRef
     if: needs.checkRef.outputs.is_rc == '1'
+    permissions:
+      issues: read
+      pull-requests: read
+    outputs:
+      comment_id: ${{ steps.fc.outputs.comment-id }}
 
     steps:
-      - uses: actions/checkout@v4
       - name: Find Comment
         uses: peter-evans/find-comment@v2
         id: fc
         with:
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: ${{ needs.checkRef.outputs.pr_number }}
           body-includes: Release notes
+
+      - name: Report missing comment
+        if: steps.fc.outputs.comment-id == ''
+        run: |
+          echo "::notice::No 'Release notes' comment on PR #${{ needs.checkRef.outputs.pr_number }} yet. Add a comment with 'Release severity: Major | Critical | Normal' and 'Release notes:' — the release PR will be created automatically once it is posted."
+
+  make-or-update-pr:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    needs: [checkRef, findReleaseNotes]
+    # The comment is written by a human after the PR is opened, so it is normally
+    # absent on `opened`/`synchronize`. Skip until the `issue_comment` run picks it up.
+    if: needs.findReleaseNotes.outputs.comment_id != ''
+
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Create comment link
         id: create_link
         run: |
-          echo "COMMENT_LINK=https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ steps.fc.outputs.comment-id }}" >> $GITHUB_ENV
+          echo "COMMENT_LINK=https://api.github.com/repos/${{ github.repository }}/issues/comments/${{ needs.findReleaseNotes.outputs.comment_id }}" >> "$GITHUB_ENV"
         shell: bash
 
       - name: Extract version from branch name
         id: extract_version
+        env:
+          HEAD_REF: ${{ needs.checkRef.outputs.head_ref }}
         run: |
-          VERSION=${{ github.head_ref }}
-          VERSION=${VERSION/hotfix/rc} # Replace "hotfix" with "rc"
-          echo "::set-output name=version::${VERSION#*rc/}"
+          VERSION=${HEAD_REF/hotfix/rc} # Replace "hotfix" with "rc"
+          echo "version=${VERSION#*rc/}" >> "$GITHUB_OUTPUT"
 
       - uses: tibdex/github-app-token@v1
         id: generate-token
