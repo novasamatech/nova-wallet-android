@@ -2039,4 +2039,20 @@
     <string name="yield_boost_stake_increase_time">La mise augmente avec le temps</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost misera automatiquement %s tous mes actifs transférables au-dessus de %s</string>
     <string name="yiled_boost_yield_boosted">Rendement boosté</string>
+    <string name="common_go_to_staking">Accéder au Staking</string>
+    <string name="common_privacy_notice">Avis de confidentialité</string>
+    <string name="common_terms_of_service">Conditions d’utilisation</string>
+    <string name="dapp_staking_banner_message">Vous souhaitez faire du Staking ? Nova Wallet intègre le Staking.</string>
+    <string name="dapp_staking_notice_continue">Continuer vers le site</string>
+    <string name="dapp_staking_notice_message">Les sites de Staking tiers deviennent souvent obsolètes. Nous vous recommandons d’utiliser les fonctionnalités de Staking intégrées à Nova Wallet.</string>
+    <string name="dapp_staking_notice_title">Avis</string>
+    <string name="legal_consent_accept">Accepter et continuer</string>
+    <string name="legal_consent_agreement">J’accepte les %1$s et reconnais les %2$s.</string>
+    <string name="legal_consent_implicit">En continuant, vous acceptez les %1$s et reconnaissez les %2$s.</string>
+    <string name="legal_consent_subtitle">Nous avons mis à jour nos Conditions d’utilisation et notre Avis de confidentialité. Veuillez consulter et accepter les documents mis à jour pour continuer à utiliser Nova Wallet.</string>
+    <string name="legal_consent_title">Conditions mises à jour</string>
+    <string name="staking_custom_locked_validator_message">Ce validateur est géré par Nova et fait toujours partie de votre nomination.</string>
+    <string name="swap_network_fees_label">Frais du réseau</string>
+    <string name="swap_nova_fee_disclaimer">Inclut des frais Nova de %s%%.</string>
+    <string name="swap_rate_includes_fee_description">Meilleur taux trouvé, incluant des frais de %s%% de Nova Wallet.</string>
 </resources>

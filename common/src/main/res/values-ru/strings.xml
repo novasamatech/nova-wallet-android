@@ -2067,4 +2067,20 @@
     <string name="yield_boost_stake_increase_time">Частота увеличения стейка</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost будет автоматически стейкать %s все мои переводные токены выше %s</string>
     <string name="yiled_boost_yield_boosted">С Yield Boost</string>
+    <string name="common_go_to_staking">Перейти к Staking</string>
+    <string name="common_privacy_notice">Уведомление о конфиденциальности</string>
+    <string name="common_terms_of_service">Условия использования</string>
+    <string name="dapp_staking_banner_message">Хотите заняться stake? В Nova Wallet есть встроенный Staking.</string>
+    <string name="dapp_staking_notice_continue">Перейти на сайт</string>
+    <string name="dapp_staking_notice_message">Сторонние сайты для Staking часто прекращают работу. Мы рекомендуем использовать встроенные функции Staking в Nova Wallet.</string>
+    <string name="dapp_staking_notice_title">Уведомление</string>
+    <string name="legal_consent_accept">Принять и продолжить</string>
+    <string name="legal_consent_agreement">Я принимаю %1$s и подтверждаю ознакомление с %2$s.</string>
+    <string name="legal_consent_implicit">Продолжая, вы принимаете %1$s и подтверждаете ознакомление с %2$s.</string>
+    <string name="legal_consent_subtitle">Мы обновили Условия использования и Уведомление о конфиденциальности. Ознакомьтесь с обновлёнными документами и примите их, чтобы продолжить пользоваться Nova Wallet.</string>
+    <string name="legal_consent_title">Обновлённые условия</string>
+    <string name="staking_custom_locked_validator_message">Этот валидатор управляется Nova и всегда входит в вашу номинацию.</string>
+    <string name="swap_network_fees_label">Сетевые комиссии</string>
+    <string name="swap_nova_fee_disclaimer">Включает комиссию Nova в размере %s%%.</string>
+    <string name="swap_rate_includes_fee_description">Лучший найденный курс, включая комиссию Nova Wallet в размере %s%%.</string>
 </resources>

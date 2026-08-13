@@ -2039,4 +2039,20 @@
     <string name="yield_boost_stake_increase_time">Bahis artış süresi</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost, %s tüm transfer edilebilir tokenlerimi otomatik olarak %s üzerinde stake edecek</string>
     <string name="yiled_boost_yield_boosted">Yield Boost\'lu</string>
+    <string name="common_go_to_staking">Stake etmeye git</string>
+    <string name="common_privacy_notice">Gizlilik Bildirimi</string>
+    <string name="common_terms_of_service">Hizmet Koşulları</string>
+    <string name="dapp_staking_banner_message">Stake etmek mi istiyorsunuz? Nova Wallet yerleşik staking özelliğine sahiptir.</string>
+    <string name="dapp_staking_notice_continue">Siteye devam et</string>
+    <string name="dapp_staking_notice_message">Üçüncü taraf staking siteleri genellikle kullanımdan kaldırılır. Nova Wallet\'ın yerleşik staking özelliklerini kullanmanızı öneririz.</string>
+    <string name="dapp_staking_notice_title">Bildirim</string>
+    <string name="legal_consent_accept">Kabul et ve devam et</string>
+    <string name="legal_consent_agreement">%1$s sözleşmesini kabul ediyor ve %2$s belgesini okuduğumu onaylıyorum.</string>
+    <string name="legal_consent_implicit">Devam ederek %1$s sözleşmesini kabul ediyor ve %2$s belgesini okuduğunuzu onaylıyorsunuz.</string>
+    <string name="legal_consent_subtitle">Hizmet Koşullarımızı ve Gizlilik Bildirimimizi güncelledik. Nova Wallet\'ı kullanmaya devam etmek için lütfen güncellenen belgeleri inceleyip kabul edin.</string>
+    <string name="legal_consent_title">Güncellenen Koşullar</string>
+    <string name="staking_custom_locked_validator_message">Bu doğrulayıcı Nova tarafından işletilir ve aday gösteriminizin her zaman bir parçasıdır.</string>
+    <string name="swap_network_fees_label">Ağ ücretleri</string>
+    <string name="swap_nova_fee_disclaimer">%s%% Nova ücretini içerir.</string>
+    <string name="swap_rate_includes_fee_description">%s%% Nova Wallet ücreti dâhil olmak üzere bulunan en iyi kur.</string>
 </resources>
