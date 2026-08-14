@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydraDxQ
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydrationConversionFeePayment
 import io.novafoundation.nova.feature_account_impl.data.fee.types.hydra.HydrationFastLookupFeeCapability
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationOraclePriceConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -24,6 +25,7 @@ class HydrationFeePaymentProvider @AssistedInject constructor(
     private val chainRegistry: ChainRegistry,
     private val hydraDxQuoteSharedComputation: HydraDxQuoteSharedComputation,
     private val hydrationFeeInjector: HydrationFeeInjector,
+    private val hydrationOraclePriceConverter: HydrationOraclePriceConverter,
     private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
     private val accountRepository: AccountRepository,
     private val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher
@@ -43,6 +45,7 @@ class HydrationFeePaymentProvider @AssistedInject constructor(
             hydraDxQuoteSharedComputation = hydraDxQuoteSharedComputation,
             accountRepository = accountRepository,
             coroutineScope = coroutineScope!!,
+            hydrationOraclePriceConverter = hydrationOraclePriceConverter,
             hydrationPriceConversionFallback = hydrationPriceConversionFallback,
             hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher
         )
