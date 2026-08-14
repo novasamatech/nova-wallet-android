@@ -112,7 +112,8 @@ class SelectCustomValidatorsViewModel(
         ValidatorSelectionState(
             communitySelected = selected.size - lockedSelected,
             communityLimit = (maxSelected - lockedIds.size).coerceAtLeast(0),
-            lockedSelected = lockedSelected
+            lockedSelected = lockedSelected,
+            totalLimit = maxSelected
         )
     }.shareInBackground()
 
@@ -136,15 +137,15 @@ class SelectCustomValidatorsViewModel(
         if (selection.isEmpty()) {
             ContinueButtonState(
                 enabled = false,
-                text = resourceManager.getString(R.string.staking_custom_proceed_button_disabled_title, selection.communityLimit)
+                text = resourceManager.getString(R.string.staking_custom_proceed_button_disabled_title, selection.totalLimit)
             )
         } else {
             ContinueButtonState(
                 enabled = true,
                 text = resourceManager.getString(
                     R.string.staking_custom_proceed_button_enabled_title,
-                    selection.communitySelected,
-                    selection.communityLimit
+                    selection.totalSelected,
+                    selection.totalLimit
                 )
             )
         }
