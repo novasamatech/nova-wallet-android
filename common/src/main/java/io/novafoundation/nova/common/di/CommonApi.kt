@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
+import io.novafoundation.nova.common.data.legal.LegalConsentRepository
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
@@ -131,6 +132,8 @@ interface CommonApi {
     val addressSchemeFormatter: AddressSchemeFormatter
 
     val splashPassedObserver: SplashPassedObserver
+
+    val legalConsentRepository: LegalConsentRepository
 
     val integrityService: IntegrityService
 

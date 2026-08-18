@@ -4,11 +4,13 @@ import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.Modules
+import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.common.utils.firstExistingCall
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
@@ -27,6 +29,8 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.definitions.types.instances.AddressInstanceConstructor
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.call
+import io.novasama.substrate_sdk_android.runtime.metadata.callOrNull
+import io.novasama.substrate_sdk_android.runtime.metadata.moduleOrNull
 import java.math.BigInteger
 
 open class OrmlAssetTransfers(
@@ -69,6 +73,25 @@ open class OrmlAssetTransfers(
         return TransferParsedFromCall(
             amount = chainAsset.withAmount(amount),
             destination = destination
+        )
+    }
+
+    override suspend fun constructTransferCall(transfer: AssetTransferBase): GenericCall.Instance {
+        val runtime = chainRegistry.getRuntime(transfer.originChain.id)
+        val (moduleName, callName) = transferFunctions.first { (m, c) ->
+            runtime.metadata.moduleOrNull(m)?.callOrNull(c) != null
+        }
+        return runtime.composeCall(
+            moduleName = moduleName,
+            callName = callName,
+            arguments = mapOf(
+                "dest" to AddressInstanceConstructor.constructInstance(
+                    runtime.typeRegistry,
+                    transfer.recipientAccountId.value
+                ),
+                "currency_id" to transfer.originChainAsset.ormlCurrencyId(runtime),
+                "amount" to transfer.amountPlanks
+            )
         )
     }
 

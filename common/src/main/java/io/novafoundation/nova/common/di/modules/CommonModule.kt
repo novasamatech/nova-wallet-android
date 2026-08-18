@@ -33,6 +33,9 @@ import io.novafoundation.nova.common.data.repository.RealAssetsIconModeRepositor
 import io.novafoundation.nova.common.data.repository.RealAssetsViewModeRepository
 import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
 import io.novafoundation.nova.common.data.repository.RealToggleFeatureRepository
+import io.novafoundation.nova.common.data.legal.LegalConsentRepository
+import io.novafoundation.nova.common.data.legal.LegalDocumentsApi
+import io.novafoundation.nova.common.data.legal.RealLegalConsentRepository
 import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1Impl
@@ -181,6 +184,21 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideSplashPassedObserver(): SplashPassedObserver = RealSplashPassedObserver()
+
+    @Provides
+    @ApplicationScope
+    fun provideLegalDocumentsApi(networkApiCreator: NetworkApiCreator): LegalDocumentsApi {
+        return networkApiCreator.create(LegalDocumentsApi::class.java)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideLegalConsentRepository(
+        legalDocumentsApi: LegalDocumentsApi,
+        preferences: Preferences
+    ): LegalConsentRepository {
+        return RealLegalConsentRepository(legalDocumentsApi, preferences)
+    }
 
     @Provides
     @ApplicationScope

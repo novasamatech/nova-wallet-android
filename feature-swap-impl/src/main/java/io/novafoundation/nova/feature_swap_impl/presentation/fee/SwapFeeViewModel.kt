@@ -51,7 +51,7 @@ class SwapFeeViewModel(
         val allTokens = swapInteractor.getAllFeeTokens(this)
 
         return segments.map { segment ->
-            val operationData = segment.operation.constructDisplayData()
+            val operationData = segment.operation.constructDisplayData(segment.netFlow)
             val feeDisplayData = segment.fee.constructDisplayData()
 
             SwapSegmentFeeModel(

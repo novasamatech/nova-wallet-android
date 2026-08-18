@@ -29,3 +29,9 @@ class Validator(
 
     override val identifier: String = address
 }
+
+val Validator.isLockEligible: Boolean
+    get() = prefs?.blocked != true && electedInfo?.isOversubscribed != true
+
+val Validator.isLocked: Boolean
+    get() = isNovaValidator && isLockEligible

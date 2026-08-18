@@ -1,12 +1,16 @@
 package io.novafoundation.nova.feature_swap_api.domain.model.fee
 
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationFeeDisplayData.SwapFeeComponentDisplay
 import io.novafoundation.nova.feature_swap_api.domain.model.SubmissionFeeWithLabel
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee.PostSubmissionFees
 
-class SubmissionOnlyAtomicSwapOperationFee(submissionFee: SubmissionFee) : AtomicSwapOperationFee {
+class SubmissionOnlyAtomicSwapOperationFee(
+    submissionFee: SubmissionFee,
+    override val serviceCommission: FeeBase? = null,
+) : AtomicSwapOperationFee {
 
     override val submissionFee: SubmissionFeeWithLabel = SubmissionFeeWithLabel(submissionFee)
 

@@ -2067,4 +2067,20 @@
     <string name="yield_boost_stake_increase_time">Czas zwiększenia Stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost automatycznie Stake %s wszystkie moje przenośne tokeny powyżej %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="common_go_to_staking">Przejdź do Staking</string>
+    <string name="common_privacy_notice">Informacja o prywatności</string>
+    <string name="common_terms_of_service">Warunki korzystania z usługi</string>
+    <string name="dapp_staking_banner_message">Chcesz korzystać ze Staking? Nova Wallet ma wbudowany Staking.</string>
+    <string name="dapp_staking_notice_continue">Przejdź do strony</string>
+    <string name="dapp_staking_notice_message">Zewnętrzne strony Staking często stają się niedostępne. Zalecamy korzystanie z wbudowanych funkcji Staking w Nova Wallet.</string>
+    <string name="dapp_staking_notice_title">Uwaga</string>
+    <string name="legal_consent_accept">Akceptuję i kontynuuję</string>
+    <string name="legal_consent_agreement">Akceptuję %1$s i potwierdzam zapoznanie się z %2$s.</string>
+    <string name="legal_consent_implicit">Kontynuując, akceptujesz %1$s i potwierdzasz zapoznanie się z %2$s.</string>
+    <string name="legal_consent_subtitle">Zaktualizowaliśmy nasze Warunki korzystania z usługi i Informację o prywatności. Zapoznaj się ze zaktualizowanymi dokumentami i zaakceptuj je, aby nadal korzystać z Nova Wallet.</string>
+    <string name="legal_consent_title">Zaktualizowane warunki</string>
+    <string name="staking_custom_locked_validator_message">Ten walidator jest obsługiwany przez Nova i zawsze jest częścią Twojej nominacji.</string>
+    <string name="swap_network_fees_label">Opłaty sieciowe</string>
+    <string name="swap_nova_fee_disclaimer">Zawiera opłatę Nova w wysokości %s%%.</string>
+    <string name="swap_rate_includes_fee_description">Najlepszy znaleziony kurs, uwzględniający opłatę Nova Wallet w wysokości %s%%.</string>
 </resources>

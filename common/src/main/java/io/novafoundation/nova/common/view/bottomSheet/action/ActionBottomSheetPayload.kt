@@ -11,7 +11,13 @@ class ActionBottomSheetPayload(
     val actionButtonPreferences: ButtonPreferences,
     val neutralButtonPreferences: ButtonPreferences? = null,
     val alertModel: AlertModel? = null,
-    val checkBoxPreferences: CheckBoxPreferences? = null
+    val checkBoxPreferences: CheckBoxPreferences? = null,
+    val secondaryTextAction: TextAction? = null
+)
+
+class TextAction(
+    val text: CharSequence,
+    val onClick: () -> Unit
 )
 
 class CheckBoxPreferences(

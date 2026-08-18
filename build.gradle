@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '10.8.6'
-        versionCode = 263
+        versionName = '10.9.0'
+        versionCode = 265
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -51,7 +51,7 @@ buildscript {
 
         web3jVersion = '4.9.5'
 
-        substrateSdkVersion = '2.11.9'
+        substrateSdkVersion = '2.12.0'
 
         gifVersion = '1.2.31'
 

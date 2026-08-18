@@ -637,6 +637,11 @@ class Navigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openLegalConsent() {
+        navigationBuilder().action(R.id.action_open_legalConsent)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openCloudBackupSettings() {
         navigationBuilder().action(R.id.action_open_cloudBackupSettings)
             .navigateInFirstAttachedContext()

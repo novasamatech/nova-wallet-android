@@ -176,6 +176,18 @@ interface AssetTransfers {
      */
     @Internal
     suspend fun parseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall?
+
+    /**
+     * Constructs a transfer call without submitting it. Suitable for bundling alongside other
+     * calls in a single extrinsic (e.g. swap output + commission transfer). Default impl
+     * throws — only override in subclasses that genuinely support this.
+     */
+    @Internal
+    suspend fun constructTransferCall(transfer: AssetTransferBase): GenericCall.Instance {
+        throw UnsupportedOperationException(
+            "constructTransferCall not implemented for ${this::class.simpleName}"
+        )
+    }
 }
 
 suspend fun AssetTransfers.tryParseTransfer(call: GenericCall.Instance, chain: Chain): TransferParsedFromCall? {

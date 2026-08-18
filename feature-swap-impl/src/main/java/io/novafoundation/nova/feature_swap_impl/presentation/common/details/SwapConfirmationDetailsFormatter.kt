@@ -7,8 +7,8 @@ import io.novafoundation.nova.common.utils.formatting.formatPercents
 import io.novafoundation.nova.feature_account_api.data.mappers.mapChainToUi
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
-import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
+import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
 import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView

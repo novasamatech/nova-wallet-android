@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheetLauncher
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -38,6 +39,7 @@ class SwapDetailModule {
         swapRateFormatter: SwapRateFormatter,
         assetIconProvider: AssetIconProvider,
         descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
+        resourceManager: ResourceManager,
         amountFormatter: AmountFormatter
     ): ViewModel {
         return SwapDetailViewModel(
@@ -50,6 +52,7 @@ class SwapDetailModule {
             walletUiUseCase = walletUiUseCase,
             swapRateFormatter = swapRateFormatter,
             descriptionBottomSheetLauncher = descriptionBottomSheetLauncher,
+            resourceManager = resourceManager,
             assetIconProvider = assetIconProvider,
             amountFormatter = amountFormatter
         )

@@ -1148,6 +1148,9 @@
     <string name="swap_price_difference_description">Price difference refers to the difference in price between two different assets. When making a swap in crypto, the price difference is usually the difference between the price of the asset you are swapping for and the price of the asset you are swapping with.</string>
     <string name="swap_slippage_description">Swap slippage is a common occurrence in decentralized trading where the final price of a swap transaction might slightly differ from the expected price, due to changing market conditions.</string>
     <string name="swap_network_fee_description">A network fees charged by the blockchain to process and validate any transactions. May vary depending on network conditions or transaction speed.</string>
+    <string name="swap_network_fees_label">Network fees</string>
+    <string name="swap_nova_fee_disclaimer">Includes %s%% Nova fee.</string>
+    <string name="swap_rate_includes_fee_description">The best rate found, including a %s%% Nova Wallet fee.</string>
 
     <string name="swap_main_settings_asset_in_not_selecting_button_state">Select a token to pay</string>
     <string name="swap_main_settings_asset_out_not_selecting_button_state">Select a token to receive</string>
@@ -2233,6 +2236,11 @@
     <string name="common_close">Close</string>
 
     <string name="dapp_search_hint">Search by name or enter URL</string>
+    <string name="dapp_staking_banner_message">Looking to stake? Nova Wallet has built-in staking.</string>
+    <string name="dapp_staking_notice_title">Notice</string>
+    <string name="dapp_staking_notice_message">Third-party staking sites often become deprecated. We recommend using Nova Wallet\'s built-in staking features.</string>
+    <string name="dapp_staking_notice_continue">Continue to site</string>
+    <string name="common_go_to_staking">Go to Staking</string>
     <string name="common_all">All</string>
     <string name="dapp_sign_extrinsic_details_subtitle">Make sure the operation is correct</string>
     <string name="dapp_sign_extrinsic_failed">Failed to sign requested operation</string>
@@ -2554,6 +2562,7 @@
     <string name="staking_custom_blocked_warning">This validator is blocked and cannot be selected at the moment. Please, try again in the next era.</string>
     <string name="staking_custom_clear_button_title">Clear filters</string>
     <string name="staking_custom_deselect_button_title">Deselect all</string>
+    <string name="staking_custom_locked_validator_message">This validator is operated by Nova and is always part of your nomination.</string>
     <string name="staking_custom_fill_button_title">Fill rest with recommended</string>
     <string name="staking_custom_header_validators_title" formatted="false">Validators: %d of %d</string>
     <string name="staking_custom_proceed_button_disabled_title">Select validators (max %d)</string>
@@ -2762,4 +2771,13 @@
     <string name="wallet_send_phishing_warning_title">Scam alert</string>
     <string name="wallet_transfer_details_title">Transfer details</string>
     <string name="yesterday">Yesterday</string>
+
+    <string name="common_terms_of_service">Terms of Service</string>
+    <string name="common_privacy_notice">Privacy Notice</string>
+
+    <string name="legal_consent_implicit">By continuing you agree to the %1$s and acknowledge the %2$s.</string>
+    <string name="legal_consent_agreement">I agree to the %1$s, and acknowledge the %2$s.</string>
+    <string name="legal_consent_title">Updated Terms</string>
+    <string name="legal_consent_subtitle">We’ve updated our Terms of Service and Privacy Notice. Please review and accept the updated documents to continue using Nova Wallet.</string>
+    <string name="legal_consent_accept">Accept and Continue</string>
 </resources>

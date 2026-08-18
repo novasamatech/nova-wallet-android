@@ -154,7 +154,7 @@ class ConfirmAddStakingProxyViewModel(
     }
 
     fun depositClicked() {
-        descriptionBottomSheetLauncher.launchProxyDepositDescription()
+        descriptionBottomSheetLauncher.launchProxyDepositDescription(resourceManager)
     }
 
     fun proxyAccountClicked() {

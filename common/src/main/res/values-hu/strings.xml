@@ -2039,4 +2039,20 @@
     <string name="yield_boost_stake_increase_time">Stake növekedési idő</string>
     <string name="yield_boost_terms" formatted="false">A  Yield Boost %s automatikusan stake-elni fogja a %s feletti utalható tokeneket</string>
     <string name="yiled_boost_yield_boosted">Yield Boost-olt</string>
+    <string name="common_go_to_staking">Ugrás a stakinghez</string>
+    <string name="common_privacy_notice">Adatvédelmi nyilatkozat</string>
+    <string name="common_terms_of_service">Szolgáltatási feltételek</string>
+    <string name="dapp_staking_banner_message">Stakelni szeretnél? A Nova Wallet beépített stakinget kínál.</string>
+    <string name="dapp_staking_notice_continue">Tovább az oldalra</string>
+    <string name="dapp_staking_notice_message">A harmadik felek stakingoldalai gyakran elavulnak. Javasoljuk, hogy használd a Nova Wallet beépített stakingfunkcióit.</string>
+    <string name="dapp_staking_notice_title">Figyelem</string>
+    <string name="legal_consent_accept">Elfogadás és folytatás</string>
+    <string name="legal_consent_agreement">Elfogadom a(z) %1$s dokumentumot, és tudomásul veszem a(z) %2$s dokumentumot.</string>
+    <string name="legal_consent_implicit">A folytatással elfogadod a(z) %1$s dokumentumot, és tudomásul veszed a(z) %2$s dokumentumot.</string>
+    <string name="legal_consent_subtitle">Frissítettük a Szolgáltatási feltételeket és az Adatvédelmi nyilatkozatot. A Nova Wallet további használatához tekintsd át és fogadd el a frissített dokumentumokat.</string>
+    <string name="legal_consent_title">Frissített feltételek</string>
+    <string name="staking_custom_locked_validator_message">Ezt a validátort a Nova üzemelteti, és mindig része a jelölésednek.</string>
+    <string name="swap_network_fees_label">Hálózati díjak</string>
+    <string name="swap_nova_fee_disclaimer">%s%% Nova-díjat tartalmaz.</string>
+    <string name="swap_rate_includes_fee_description">A megtalált legjobb árfolyam, amely tartalmazza a Nova Wallet %s%%-os díját.</string>
 </resources>

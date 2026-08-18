@@ -67,6 +67,7 @@ import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatch
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
+import io.novafoundation.nova.feature_swap_api.data.history.HydrationSwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
@@ -219,6 +220,8 @@ interface AssetsFeatureDependencies {
     val assetIconProvider: AssetIconProvider
 
     val swapFlowScopeAggregator: SwapFlowScopeAggregator
+
+    val hydrationSwapTransferFilterFactory: HydrationSwapTransferFilterFactory
 
     val okHttpClient: OkHttpClient
 

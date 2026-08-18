@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.feature_dapp_impl.domain.search.DAppStakingDetection
 import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBrowserPayload
 import io.novafoundation.nova.feature_dapp_impl.R
@@ -26,6 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -42,7 +44,16 @@ class DAppSearchViewModel(
 
     val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
 
+    private val _showStakingNoticeEvent = MutableLiveData<Event<Unit>>()
+    val showStakingNoticeEvent: LiveData<Event<Unit>> = _showStakingNoticeEvent
+
+    private var pendingStakingSiteResult: DappSearchResult? = null
+
     val query = MutableStateFlow(payload.initialUrl.orEmpty())
+
+    val stakingBannerVisible = query.map(DAppStakingDetection::isStakingQuery)
+        .distinctUntilChanged()
+        .share()
 
     private val _selectQueryTextEvent = MutableLiveData<Event<Unit>>()
     val selectQueryTextEvent: LiveData<Event<Unit>> = _selectQueryTextEvent
@@ -120,26 +131,44 @@ class DAppSearchViewModel(
         }
     }
 
+    fun goToStakingClicked() {
+        router.openStaking()
+    }
+
+    fun continueToStakingSiteClicked() {
+        pendingStakingSiteResult?.let(::openSearchResult)
+    }
+
     fun searchResultClicked(searchResult: DappSearchResult) {
         launch {
-            val newUrl = when (searchResult) {
-                is DappSearchResult.Dapp -> searchResult.dapp.url
-                is DappSearchResult.Search -> searchResult.searchUrl
-                is DappSearchResult.Url -> searchResult.url
+            if (interactor.isThirdPartyStakingSite(searchResult)) {
+                pendingStakingSiteResult = searchResult
+                _showStakingNoticeEvent.sendEvent()
+                return@launch
             }
 
-            if (!searchResult.isTrustedByNova) {
-                dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
+            openSearchResult(searchResult)
+        }
+    }
+
+    private fun openSearchResult(searchResult: DappSearchResult) = launch {
+        val newUrl = when (searchResult) {
+            is DappSearchResult.Dapp -> searchResult.dapp.url
+            is DappSearchResult.Search -> searchResult.searchUrl
+            is DappSearchResult.Url -> searchResult.url
+        }
+
+        if (!searchResult.isTrustedByNova) {
+            dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
+        }
+
+        when (payload.request) {
+            SearchPayload.Request.GO_TO_URL -> {
+                dAppSearchResponder.respond(DAppSearchCommunicator.Response.NewUrl(newUrl))
+                router.finishDappSearch()
             }
 
-            when (payload.request) {
-                SearchPayload.Request.GO_TO_URL -> {
-                    dAppSearchResponder.respond(DAppSearchCommunicator.Response.NewUrl(newUrl))
-                    router.finishDappSearch()
-                }
-
-                SearchPayload.Request.OPEN_NEW_URL -> router.openDAppBrowser(DAppBrowserPayload.Address(newUrl))
-            }
+            SearchPayload.Request.OPEN_NEW_URL -> router.openDAppBrowser(DAppBrowserPayload.Address(newUrl))
         }
     }
 

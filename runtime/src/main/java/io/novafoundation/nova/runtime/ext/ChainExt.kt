@@ -192,6 +192,15 @@ fun Chain.Asset.StakingType.isDirectStaking(): Boolean {
     }
 }
 
+private val FORCED_POOL_CHAIN_IDS = setOf(
+    ChainGeneses.POLKADOT_ASSET_HUB,
+    ChainGeneses.KUSAMA_ASSET_HUB
+)
+
+fun isPoolStakingForced(chainId: ChainId): Boolean {
+    return chainId in FORCED_POOL_CHAIN_IDS
+}
+
 fun Chain.Asset.StakingType.isPoolStaking(): Boolean {
     return group() == StakingTypeGroup.NOMINATION_POOL
 }

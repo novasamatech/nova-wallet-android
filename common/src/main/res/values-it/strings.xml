@@ -2039,4 +2039,20 @@
     <string name="yield_boost_stake_increase_time">Tempo di aumento dello stake</string>
     <string name="yield_boost_terms" formatted="false">Yield Boost stakerà automaticamente %s tutti i miei token trasferibili oltre %s</string>
     <string name="yiled_boost_yield_boosted">Yield Boosted</string>
+    <string name="common_go_to_staking">Vai allo staking</string>
+    <string name="common_privacy_notice">Informativa sulla privacy</string>
+    <string name="common_terms_of_service">Termini di servizio</string>
+    <string name="dapp_staking_banner_message">Vuoi fare staking? Nova Wallet offre lo staking integrato.</string>
+    <string name="dapp_staking_notice_continue">Continua al sito</string>
+    <string name="dapp_staking_notice_message">I siti di staking di terze parti spesso diventano obsoleti. Ti consigliamo di utilizzare le funzionalità di staking integrate di Nova Wallet.</string>
+    <string name="dapp_staking_notice_title">Avviso</string>
+    <string name="legal_consent_accept">Accetta e continua</string>
+    <string name="legal_consent_agreement">Accetto i %1$s e riconosco i %2$s.</string>
+    <string name="legal_consent_implicit">Continuando, accetti i %1$s e riconosci i %2$s.</string>
+    <string name="legal_consent_subtitle">Abbiamo aggiornato i nostri Termini di servizio e l\'Informativa sulla privacy. Esamina e accetta i documenti aggiornati per continuare a utilizzare Nova Wallet.</string>
+    <string name="legal_consent_title">Termini aggiornati</string>
+    <string name="staking_custom_locked_validator_message">Questo validatore è gestito da Nova e fa sempre parte della tua nomina.</string>
+    <string name="swap_network_fees_label">Commissioni di rete</string>
+    <string name="swap_nova_fee_disclaimer">Include una commissione Nova del %s%%.</string>
+    <string name="swap_rate_includes_fee_description">Il miglior tasso trovato, inclusa una commissione Nova Wallet del %s%%.</string>
 </resources>

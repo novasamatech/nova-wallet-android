@@ -13,9 +13,11 @@ import io.novafoundation.nova.feature_dapp_api.presentation.browser.main.DAppBro
 import io.novafoundation.nova.feature_dapp_impl.presentation.browser.main.DAppBrowserFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.DappSearchFragment
 import io.novafoundation.nova.feature_dapp_impl.presentation.search.SearchPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 
 class DAppNavigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
+    private val stakingDashboardRouter: StakingDashboardRouter,
 ) : BaseNavigator(navigationHoldersRegistry), DAppRouter {
 
     override fun openChangeAccount() {
@@ -74,6 +76,13 @@ class DAppNavigator(
     override fun openDAppFavorites() {
         navigationBuilder().action(R.id.action_open_dapp_favorites)
             .navigateInFirstAttachedContext()
+    }
+
+    override fun openStaking() {
+        navigationBuilder().action(R.id.action_open_split_screen)
+            .navigateInRoot()
+
+        stakingDashboardRouter.openStakingDashboard()
     }
 
     private fun NavigationBuilder.setDappAnimations(): NavigationBuilder {

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingBottom="24dp">
+
+    <View
+        style="@style/Widget.Nova.Puller"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/legalConsentTitle"
+        style="@style/TextAppearance.NovaFoundation.Bold.Title3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="14dp"
+        android:gravity="center"
+        android:text="@string/legal_consent_title"
+        android:textColor="@color/text_primary" />
+
+    <TextView
+        android:id="@+id/legalConsentSubtitle"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="@string/legal_consent_subtitle"
+        android:textColor="@color/text_secondary" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="28dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/legalConsentCheckBox"
+            style="@style/Widget.Nova.Checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top" />
+
+        <TextView
+            android:id="@+id/legalConsentText"
+            style="@style/TextAppearance.NovaFoundation.Regular.Body"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:textColor="@color/text_secondary"
+            android:textColorLink="@color/text_primary"
+            tools:text="@string/legal_consent_agreement" />
+
+    </LinearLayout>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/legalConsentAcceptButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/legal_consent_accept"
+        app:appearance="primary" />
+
+</LinearLayout>
