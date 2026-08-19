@@ -39,9 +39,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_gravity="center_vertical"
             android:includeFontPadding="false"
             android:textColor="@color/text_primary"
-            tools:text="@tools:sample/lorem[8]" />
+            tools:text="@tools:sample/lorem[4]" />
 
     </LinearLayout>
 
