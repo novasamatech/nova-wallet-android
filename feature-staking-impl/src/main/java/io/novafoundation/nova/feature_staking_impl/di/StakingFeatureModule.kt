@@ -8,7 +8,10 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.common.data.announcements.AnnouncementsRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.RealStakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core.storage.StorageCache
@@ -707,6 +710,12 @@ class StakingFeatureModule {
         extrinsicService = extrinsicService,
         externalAccountsSyncService = externalAccountsSyncService
     )
+
+    @Provides
+    @FeatureScope
+    fun provideStakingAnnouncementsUseCase(
+        announcementsRepository: AnnouncementsRepository
+    ): StakingAnnouncementsUseCase = RealStakingAnnouncementsUseCase(announcementsRepository)
 
     @Provides
     @FeatureScope

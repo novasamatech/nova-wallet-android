@@ -17,7 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardSectionAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHasStakeAdapter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardAnnouncementsAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.AnnouncementsAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHeaderAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.MoreStakingOptionsAdapter
 
@@ -31,7 +31,7 @@ class StakingDashboardFragment :
     override fun createBinding() = FragmentStakingDashboardBinding.inflate(layoutInflater)
 
     private val headerAdapter = DashboardHeaderAdapter(this)
-    private val announcementsAdapter = DashboardAnnouncementsAdapter()
+    private val announcementsAdapter = AnnouncementsAdapter()
     private val hasStakeLoadingAdapter = DashboardLoadingAdapter(initialNumberOfItems = 1, layout = R.layout.item_dashboard_has_stake_loading)
     private val hasStakeAdapter = DashboardHasStakeAdapter(this)
     private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_no_stake_header)

@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list
+package io.novafoundation.nova.feature_staking_impl.presentation.announcements
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -7,15 +7,14 @@ import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.AnnouncementModel
 
-class DashboardAnnouncementsAdapter : BaseListAdapter<AnnouncementModel, DashboardAnnouncementHolder>(DiffCallback) {
+class AnnouncementsAdapter : BaseListAdapter<AnnouncementModel, AnnouncementHolder>(DiffCallback) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DashboardAnnouncementHolder {
-        return DashboardAnnouncementHolder(parent.inflateChild(R.layout.item_dashboard_announcement) as AlertView)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnnouncementHolder {
+        return AnnouncementHolder(parent.inflateChild(R.layout.item_announcement) as AlertView)
     }
 
-    override fun onBindViewHolder(holder: DashboardAnnouncementHolder, position: Int) {
+    override fun onBindViewHolder(holder: AnnouncementHolder, position: Int) {
         holder.bind(getItem(position))
     }
 }
@@ -31,7 +30,7 @@ private object DiffCallback : DiffUtil.ItemCallback<AnnouncementModel>() {
     }
 }
 
-class DashboardAnnouncementHolder(private val alertView: AlertView) : BaseViewHolder(alertView) {
+class AnnouncementHolder(private val alertView: AlertView) : BaseViewHolder(alertView) {
 
     fun bind(model: AnnouncementModel) = with(alertView) {
         setStylePreset(model.stylePreset)

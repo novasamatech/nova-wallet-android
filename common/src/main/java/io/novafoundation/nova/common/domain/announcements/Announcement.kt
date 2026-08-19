@@ -1,6 +1,7 @@
 package io.novafoundation.nova.common.domain.announcements
 
-class Announcement(
+data class Announcement(
+    val chainId: String?,
     val style: Style,
     val description: String
 ) {

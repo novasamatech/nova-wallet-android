@@ -1,9 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.data.announcements.AnnouncementsRepository
 import io.novafoundation.nova.common.domain.announcements.Announcement
-import io.novafoundation.nova.common.domain.announcements.AnnouncementSection
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
@@ -28,8 +26,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.AnnouncementModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
@@ -41,9 +40,7 @@ import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValu
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.common.view.AlertView
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -69,7 +66,7 @@ class StakingDashboardViewModel(
     private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
     private val amountFormatter: AmountFormatter,
     private val assetIconProvider: AssetIconProvider,
-    private val announcementsRepository: AnnouncementsRepository
+    private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
 ) : BaseViewModel() {
 
     private val dashboardFormattersFlow = maskableValueFormatterProvider.provideFormatter()
@@ -81,15 +78,23 @@ class StakingDashboardViewModel(
     val walletUi = accountUseCase.selectedWalletModelFlow()
         .shareInBackground()
 
-    val announcements = flow { emit(loadAnnouncements()) }
-        .shareInBackground()
-
     private val stakingDashboardFlow = interactor.stakingDashboardFlow()
         .shareInBackground()
 
-    val stakingDashboardUiFlow = stakingDashboardFlow
-        .throttleLast(dashboardUpdatePeriod)
-        .combine(dashboardFormattersFlow) { dashboardLoading, valueFormatter -> dashboardLoading.map { mapDashboardToUi(it, valueFormatter) } }
+    val announcements = stakingAnnouncementsUseCase.generalAnnouncementsFlow()
+        .map { announcements -> announcements.map(::mapAnnouncementToUi) }
+        .shareInBackground()
+
+    private val announcementsByChain = stakingAnnouncementsUseCase.announcementsByChainFlow()
+        .shareInBackground()
+
+    val stakingDashboardUiFlow = combine(
+        stakingDashboardFlow.throttleLast(dashboardUpdatePeriod),
+        dashboardFormattersFlow,
+        announcementsByChain
+    ) { dashboardLoading, valueFormatter, chainAnnouncements ->
+        dashboardLoading.map { mapDashboardToUi(it, valueFormatter, chainAnnouncements) }
+    }
         .shareInBackground()
 
     init {
@@ -135,36 +140,21 @@ class StakingDashboardViewModel(
         router.openSwitchWallet()
     }
 
-    private suspend fun loadAnnouncements(): List<AnnouncementModel> {
-        return announcementsRepository.getAnnouncements(AnnouncementSection.STAKING)
-            .map(::mapAnnouncementToUi)
-    }
-
-    private fun mapAnnouncementToUi(announcement: Announcement): AnnouncementModel {
-        return AnnouncementModel(
-            stylePreset = mapAnnouncementStyleToUi(announcement.style),
-            description = announcement.description
-        )
-    }
-
-    private fun mapAnnouncementStyleToUi(style: Announcement.Style): AlertView.StylePreset {
-        return when (style) {
-            Announcement.Style.INFO -> AlertView.StylePreset.INFO
-            Announcement.Style.WARNING -> AlertView.StylePreset.WARNING
-            Announcement.Style.ERROR -> AlertView.StylePreset.ERROR
-        }
-    }
-
-    private fun mapDashboardToUi(dashboard: StakingDashboard, formatters: DashboardFormatters): StakingDashboardModel {
+    private fun mapDashboardToUi(
+        dashboard: StakingDashboard,
+        formatters: DashboardFormatters,
+        chainAnnouncements: Map<String, Announcement>
+    ): StakingDashboardModel {
         return StakingDashboardModel(
-            hasStakeItems = dashboard.hasStake.map { mapHasStakeItemToUi(it, formatters) },
+            hasStakeItems = dashboard.hasStake.map { mapHasStakeItemToUi(it, formatters, chainAnnouncements) },
             noStakeItems = dashboard.withoutStake.map(formatters.presentationMapper::mapWithoutStakeItemToUi),
         )
     }
 
     private fun mapHasStakeItemToUi(
         hasStake: AggregatedStakingDashboardOption<HasStake>,
-        formatters: DashboardFormatters
+        formatters: DashboardFormatters,
+        chainAnnouncements: Map<String, Announcement>
     ): StakingDashboardModel.HasStakeItem {
         val stats = hasStake.stakingState.stats
         val isSyncingPrimary = hasStake.syncingStage.isSyncingPrimary()
@@ -190,7 +180,8 @@ class StakingDashboardViewModel(
             status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
             earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
             stakingTypeBadge = stakingTypBadge,
-            assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary)
+            assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary),
+            announcement = chainAnnouncements[hasStake.chain.id]?.let(::mapAnnouncementToUi)
         )
     }
 

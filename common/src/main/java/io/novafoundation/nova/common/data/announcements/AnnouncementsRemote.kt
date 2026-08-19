@@ -3,6 +3,7 @@ package io.novafoundation.nova.common.data.announcements
 typealias AnnouncementsRemote = Map<String, List<AnnouncementRemote>>
 
 class AnnouncementRemote(
+    val chainId: String?,
     val style: String?,
     val description: Map<String, String>
 )

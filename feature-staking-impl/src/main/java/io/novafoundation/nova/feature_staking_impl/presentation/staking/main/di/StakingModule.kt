@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -52,7 +53,8 @@ class StakingModule {
         stakingSharedState: StakingSharedState,
         resourceManager: ResourceManager,
         externalActionsMixin: ExternalActions.Presentation,
-        chainMigrationInfoUseCase: ChainMigrationInfoUseCase
+        chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
+        stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
     ): ViewModel {
         return StakingViewModel(
             selectedAccountUseCase = selectedAccountUseCase,
@@ -70,7 +72,8 @@ class StakingModule {
             stakingSharedState = stakingSharedState,
             resourceManager = resourceManager,
             externalActionsMixin = externalActionsMixin,
-            chainMigrationInfoUseCase = chainMigrationInfoUseCase
+            chainMigrationInfoUseCase = chainMigrationInfoUseCase,
+            stakingAnnouncementsUseCase = stakingAnnouncementsUseCase
         )
     }
 

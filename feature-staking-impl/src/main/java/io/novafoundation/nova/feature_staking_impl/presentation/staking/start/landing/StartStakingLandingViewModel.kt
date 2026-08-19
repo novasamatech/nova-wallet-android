@@ -65,6 +65,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -102,7 +104,8 @@ class StartStakingLandingViewModel(
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val chainRegistry: ChainRegistry,
     private val contextManager: ContextManager,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
@@ -113,6 +116,10 @@ class StartStakingLandingViewModel(
 
     private val availableStakingOptionsPayload = startStakingLandingPayload.availableStakingOptions
     private val stakingOptionIds = availableStakingOptionsPayload.toStakingOptionIds()
+
+    val announcementFlow = stakingAnnouncementsUseCase.announcementFlow(availableStakingOptionsPayload.chainId)
+        .map { announcement -> announcement?.let(::mapAnnouncementToUi) }
+        .shareInBackground()
 
     private val startStakingInteractor = flowOf {
         stakingTypeDetailsCompoundInteractorFactory.create(

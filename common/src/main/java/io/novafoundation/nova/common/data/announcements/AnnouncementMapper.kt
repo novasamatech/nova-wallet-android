@@ -15,6 +15,7 @@ private fun mapAnnouncementFromRemote(remote: AnnouncementRemote, languageCode: 
     val description = remote.description.localizedOrDefault(languageCode) ?: return null
 
     return Announcement(
+        chainId = remote.chainId,
         style = mapStyleFromRemote(remote.style),
         description = description
     )

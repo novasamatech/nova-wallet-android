@@ -8,7 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
-import io.novafoundation.nova.common.data.announcements.AnnouncementsRepository
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -43,7 +43,7 @@ class StakingDashboardModule {
         valueFormatterProvider: MaskableValueFormatterProvider,
         amountFormatter: AmountFormatter,
         assetIconProvider: AssetIconProvider,
-        announcementsRepository: AnnouncementsRepository
+        stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
@@ -58,7 +58,7 @@ class StakingDashboardModule {
             maskableValueFormatterProvider = valueFormatterProvider,
             amountFormatter = amountFormatter,
             assetIconProvider = assetIconProvider,
-            announcementsRepository = announcementsRepository
+            stakingAnnouncementsUseCase = stakingAnnouncementsUseCase
         )
     }
 
