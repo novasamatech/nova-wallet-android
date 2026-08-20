@@ -63,11 +63,40 @@ object HydrationOnChain {
     const val LAST_BLOCK_ORACLE_PERIOD = "LastBlock"
 
     /**
-     * `into_smoothing(TenMinutes)` - the per-block EMA smoothing factor for [FEE_ORACLE_PERIOD], copied
-     * verbatim from the runtime: `Fraction` bits in U1F127 fixed point (127 fractional bits), ~2/101 for
-     * the 100-block period.
+     * `OraclePeriod::TenMinutes::as_period()` - the fee oracle period expressed in blocks.
      *
-     * https://github.com/galacticcouncil/hydration-node/blob/846b2232e54045ad1a6bc02f701455b8d7835e99/pallets/ema-oracle/src/types.rs#L233-L244
+     * The runtime derives it from its block time (`10 * MINUTES`, `MINUTES = 60_000 / MILLISECS_PER_BLOCK`),
+     * so it changes with every block time upgrade - Hydration moving from 6s to 2s blocks turns 100 into 300.
+     * Deriving it here instead of hardcoding keeps the smoothing factor correct across that upgrade.
      */
-    val TEN_MINUTES_SMOOTHING = BigInteger("3369132345751865974884897103284833777")
+    fun feeOraclePeriodInBlocks(blockTimeMillis: Long): Int {
+        val blocksPerMinute = MILLIS_PER_MINUTE / blockTimeMillis.coerceAtLeast(1)
+
+        return (FEE_ORACLE_PERIOD_MINUTES * blocksPerMinute).toInt().coerceAtLeast(1)
+    }
+
+    /**
+     * `into_smoothing(TenMinutes)` - the runtime keeps this as a hardcoded table, but generates it with
+     * `fraction::frac(2, period + 1)`, rounding to nearest with ties down. Plain truncation is off by a bit
+     * for some periods, so the rounding is reproduced here
+     */
+    fun feeOracleSmoothing(blockTimeMillis: Long): BigInteger {
+        val denominator = (feeOraclePeriodInBlocks(blockTimeMillis) + 1).toBigInteger()
+        val (quotient, remainder) = (TWO * FRACTION_ONE).divideAndRemainder(denominator)
+
+        return if (remainder.shiftLeft(1) > denominator) quotient + BigInteger.ONE else quotient
+    }
+
+    /**
+     * One in the runtime oracle's U1F127 fixed point (127 fractional bits)
+     */
+    val FRACTION_ONE: BigInteger = BigInteger.ONE.shiftLeft(FRACTION_BITS)
+
+    const val FRACTION_BITS = 127
+
+    private val TWO = 2.toBigInteger()
+
+    private const val MILLIS_PER_MINUTE = 60_000L
+
+    private const val FEE_ORACLE_PERIOD_MINUTES = 10L
 }

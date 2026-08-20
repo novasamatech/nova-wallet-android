@@ -13,8 +13,11 @@ import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationOr
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
+import kotlin.math.ceil
+import kotlin.math.ln
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -23,21 +26,18 @@ import javax.inject.Named
  */
 private val FIXED_U128_DIV = BigInteger.TEN.pow(18)
 
-/**
- * One in the runtime oracle's U1F127 fixed point (127 fractional bits)
- */
-private val FRACTION_ONE = BigInteger.ONE.shiftLeft(127)
+private val MAX_STALE_BLOCKS = Int.MAX_VALUE.toBigInteger()
 
 /**
- * `1 - s` for the fee oracle period - the per-block decay of a stale entry's weight
+ * Staleness at which `(1-s)^k` underflows the runtime's fixed point to zero and the fast-forwarded price
+ * becomes the last-trade one. Derived from the smoothing factor since it moves with the block time
  */
-private val SMOOTHING_COMPLEMENT = FRACTION_ONE - HydrationOnChain.TEN_MINUTES_SMOOTHING
+internal fun saturationBlocks(smoothing: BigInteger): Int {
+    val decayPerBlock = (HydrationOnChain.FRACTION_ONE - smoothing).toDouble() / HydrationOnChain.FRACTION_ONE.toDouble()
+    if (decayPerBlock <= 0.0) return 1
 
-/**
- * `(1-s)^k` underflows the runtime's fixed point to exactly zero around k=4400 (~7.3h of staleness),
- * from where the fast-forwarded price equals the last-trade price
- */
-private const val SMOOTHING_SATURATION_BLOCKS = 4400
+    return ceil(HydrationOnChain.FRACTION_BITS * ln(2.0) / -ln(decayPerBlock)).toInt()
+}
 
 /**
  * An exact price ratio, mirroring the runtime's `EmaPrice`. Kept as a pair of integers for the whole
@@ -58,12 +58,15 @@ private operator fun PriceRatio.times(other: PriceRatio): PriceRatio {
 private class HydrationFeeContext(
     val nativeAssetId: HydraDxAssetId,
     val hubAssetId: HydraDxAssetId,
-    val parentBlock: BigInteger
+    val parentBlock: BigInteger,
+    val smoothing: BigInteger,
+    val saturationBlocks: Int
 )
 
 @FeatureScope
 class RealHydrationOraclePriceConverter @Inject constructor(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
+    private val chainStateRepository: ChainStateRepository,
     @Named(REMOTE_STORAGE_SOURCE)
     private val remoteStorageSource: StorageDataSource,
 ) : HydrationOraclePriceConverter {
@@ -86,13 +89,18 @@ class RealHydrationOraclePriceConverter @Inject constructor(
     }
 
     private suspend fun loadContext(chainId: String): HydrationFeeContext {
+        val blockTimeMillis = chainStateRepository.expectedBlockTimeInMillis(chainId).toLong()
+        val smoothing = HydrationOnChain.feeOracleSmoothing(blockTimeMillis)
+
         return remoteStorageSource.query(chainId) {
             HydrationFeeContext(
                 nativeAssetId = metadata.multiTransactionPayment().numberConstant("NativeAssetId", runtime),
                 hubAssetId = metadata.omnipool().numberConstant("HubAssetId", runtime),
                 // The chain prices fees during `on_initialize` against the parent block's oracle state;
                 // the current head is the closest available stand-in for the parent of the inclusion block
-                parentBlock = metadata.hydrationSystem.number.query() ?: error("No block number")
+                parentBlock = metadata.hydrationSystem.number.query() ?: error("No block number"),
+                smoothing = smoothing,
+                saturationBlocks = saturationBlocks(smoothing)
             )
         }
     }
@@ -208,7 +216,7 @@ class RealHydrationOraclePriceConverter @Inject constructor(
         val stored = entriesByPeriod.entryFor(HydrationOnChain.FEE_ORACLE_PERIOD, lower, higher)
         val lastBlock = entriesByPeriod.entryFor(HydrationOnChain.LAST_BLOCK_ORACLE_PERIOD, lower, higher)
 
-        val current = fastForward(stored, lastBlock, context.parentBlock)
+        val current = fastForward(stored, lastBlock, context)
 
         return if (assetA == lower) current else PriceRatio(current.denominator, current.numerator)
     }
@@ -239,18 +247,18 @@ class RealHydrationOraclePriceConverter @Inject constructor(
     private fun fastForward(
         stored: HydrationOracleEntry,
         lastBlock: HydrationOracleEntry,
-        parentBlock: BigInteger
+        context: HydrationFeeContext
     ): PriceRatio {
-        val staleBlocks = (parentBlock - stored.updatedAt).toInt()
+        val staleBlocks = (context.parentBlock - stored.updatedAt).coerceAtMost(MAX_STALE_BLOCKS).toInt()
 
         return when {
             staleBlocks <= 0 -> PriceRatio(stored.numerator, stored.denominator)
 
-            staleBlocks >= SMOOTHING_SATURATION_BLOCKS -> PriceRatio(lastBlock.numerator, lastBlock.denominator)
+            staleBlocks >= context.saturationBlocks -> PriceRatio(lastBlock.numerator, lastBlock.denominator)
 
             else -> {
-                val decay = SMOOTHING_COMPLEMENT.pow(staleBlocks)
-                val one = BigInteger.ONE.shiftLeft(127 * staleBlocks)
+                val decay = (HydrationOnChain.FRACTION_ONE - context.smoothing).pow(staleBlocks)
+                val one = BigInteger.ONE.shiftLeft(HydrationOnChain.FRACTION_BITS * staleBlocks)
 
                 PriceRatio(
                     numerator = stored.numerator * decay * lastBlock.denominator +
