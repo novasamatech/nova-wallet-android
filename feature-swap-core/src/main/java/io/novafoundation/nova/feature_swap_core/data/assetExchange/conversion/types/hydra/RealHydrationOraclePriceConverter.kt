@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra
 
+import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.BalanceOf
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.metadata
@@ -12,8 +13,8 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.toOnChainIdOrTh
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationOraclePriceConverter
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ext.isUtilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import java.math.BigInteger
 import kotlin.math.ceil
@@ -24,6 +25,8 @@ import javax.inject.Named
 /**
  * `FixedU128::DIV` - the scale substrate's fixed point numbers are stored at
  */
+private const val LOG_TAG = "HydrationOraclePrice"
+
 private val FIXED_U128_DIV = BigInteger.TEN.pow(18)
 
 private val MAX_STALE_BLOCKS = Int.MAX_VALUE.toBigInteger()
@@ -66,7 +69,7 @@ private class HydrationFeeContext(
 @FeatureScope
 class RealHydrationOraclePriceConverter @Inject constructor(
     private val hydraDxAssetIdConverter: HydraDxAssetIdConverter,
-    private val chainStateRepository: ChainStateRepository,
+    private val chainRegistry: ChainRegistry,
     @Named(REMOTE_STORAGE_SOURCE)
     private val remoteStorageSource: StorageDataSource,
 ) : HydrationOraclePriceConverter {
@@ -85,12 +88,15 @@ class RealHydrationOraclePriceConverter @Inject constructor(
             val price = routePrice(chainId, route, context)
 
             convertFeeWithPrice(nativeAmount, price)
-        }.getOrNull()
+        }
+            .onFailure { Log.e(LOG_TAG, "Failed to price the fee with the oracle, falling back", it) }
+            .getOrNull()
     }
 
     private suspend fun loadContext(chainId: String): HydrationFeeContext {
-        val blockTimeMillis = chainStateRepository.expectedBlockTimeInMillis(chainId).toLong()
-        val smoothing = HydrationOnChain.feeOracleSmoothing(blockTimeMillis)
+        val blockTimeMillis = chainRegistry.getChain(chainId).additional?.defaultBlockTimeMillis
+        val smoothing = blockTimeMillis?.let(HydrationOnChain::feeOracleSmoothing)
+            ?: error("Unknown block time for $chainId - cannot derive the oracle smoothing factor")
 
         return remoteStorageSource.query(chainId) {
             HydrationFeeContext(

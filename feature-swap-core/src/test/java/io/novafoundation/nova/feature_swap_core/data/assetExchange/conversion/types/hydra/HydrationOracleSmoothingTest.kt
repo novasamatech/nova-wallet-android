@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra
 
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigInteger
@@ -39,17 +40,15 @@ class HydrationOracleSmoothingTest {
     @Test
     fun `smoothing stays below one`() {
         listOf(SIX_SECOND_BLOCKS, TWO_SECOND_BLOCKS, 500L, 12_000L).forEach { blockTime ->
-            assertTrue(HydrationOnChain.feeOracleSmoothing(blockTime) < HydrationOnChain.FRACTION_ONE)
+            assertTrue(HydrationOnChain.feeOracleSmoothing(blockTime)!! < HydrationOnChain.FRACTION_ONE)
         }
     }
 
     @Test
-    fun `degenerate block time still yields a usable period`() {
+    fun `unusable block time yields no smoothing rather than a guess`() {
         listOf(0L, -1L, Long.MAX_VALUE).forEach { blockTime ->
-            val period = HydrationOnChain.feeOraclePeriodInBlocks(blockTime)
-
-            assertTrue("period must stay positive for $blockTime", period >= 1)
-            assertTrue("smoothing must stay <= 1 for $blockTime", HydrationOnChain.feeOracleSmoothing(blockTime) <= HydrationOnChain.FRACTION_ONE)
+            assertNull("period must be absent for $blockTime", HydrationOnChain.feeOraclePeriodInBlocks(blockTime))
+            assertNull("smoothing must be absent for $blockTime", HydrationOnChain.feeOracleSmoothing(blockTime))
         }
     }
 

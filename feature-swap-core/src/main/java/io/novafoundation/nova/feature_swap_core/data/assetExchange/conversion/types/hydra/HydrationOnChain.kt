@@ -65,14 +65,18 @@ object HydrationOnChain {
     /**
      * `OraclePeriod::TenMinutes::as_period()` - the fee oracle period expressed in blocks.
      *
-     * The runtime derives it from its block time (`10 * MINUTES`, `MINUTES = 60_000 / MILLISECS_PER_BLOCK`),
-     * so it changes with every block time upgrade - Hydration moving from 6s to 2s blocks turns 100 into 300.
-     * Deriving it here instead of hardcoding keeps the smoothing factor correct across that upgrade.
+     * The runtime rounds at the minute (`10 * MINUTES`, `MINUTES = 60_000 / MILLISECS_PER_BLOCK`), so the
+     * division is reproduced in the same order. Returns null when the block time is unknown - a guessed
+     * period silently yields a plausible but wrong smoothing factor
+     *
+     * https://github.com/galacticcouncil/hydration-node/blob/master/traits/src/oracle.rs#L87-L96
      */
-    fun feeOraclePeriodInBlocks(blockTimeMillis: Long): Int {
-        val blocksPerMinute = MILLIS_PER_MINUTE / blockTimeMillis.coerceAtLeast(1)
+    fun feeOraclePeriodInBlocks(blockTimeMillis: Long): Int? {
+        if (blockTimeMillis <= 0) return null
 
-        return (FEE_ORACLE_PERIOD_MINUTES * blocksPerMinute).toInt().coerceAtLeast(1)
+        val blocksPerMinute = MILLIS_PER_MINUTE / blockTimeMillis
+
+        return (FEE_ORACLE_PERIOD_MINUTES * blocksPerMinute).toInt().takeIf { it > 0 }
     }
 
     /**
@@ -80,8 +84,10 @@ object HydrationOnChain {
      * `fraction::frac(2, period + 1)`, rounding to nearest with ties down. Plain truncation is off by a bit
      * for some periods, so the rounding is reproduced here
      */
-    fun feeOracleSmoothing(blockTimeMillis: Long): BigInteger {
-        val denominator = (feeOraclePeriodInBlocks(blockTimeMillis) + 1).toBigInteger()
+    fun feeOracleSmoothing(blockTimeMillis: Long): BigInteger? {
+        val periodInBlocks = feeOraclePeriodInBlocks(blockTimeMillis) ?: return null
+
+        val denominator = (periodInBlocks + 1).toBigInteger()
         val (quotient, remainder) = (TWO * FRACTION_ONE).divideAndRemainder(denominator)
 
         return if (remainder.shiftLeft(1) > denominator) quotient + BigInteger.ONE else quotient
