@@ -52,6 +52,8 @@ android {
 
         buildConfigField "String", "LEGAL_DOCUMENTS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/legal/v1/documents_dev.json\""
 
+        buildConfigField "String", "ANNOUNCEMENTS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/announcements/v1/announcements_dev.json\""
+
         buildConfigField "String", "WATCH_ONLY_SCAM_WIKI", "\"https://docs.novawallet.io/nova-wallet-wiki/wallet-management/watch-only-wallets/scam-warning\""
     }
 
@@ -68,6 +70,8 @@ android {
             buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/global/config.json\""
 
             buildConfigField "String", "LEGAL_DOCUMENTS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/legal/v1/documents.json\""
+
+            buildConfigField "String", "ANNOUNCEMENTS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/announcements/v1/announcements.json\""
         }
 
         releaseGithub {

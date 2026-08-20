@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardNoStakeAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.list.DashboardSectionAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHasStakeAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.AnnouncementsAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHeaderAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.MoreStakingOptionsAdapter
 
@@ -30,6 +31,7 @@ class StakingDashboardFragment :
     override fun createBinding() = FragmentStakingDashboardBinding.inflate(layoutInflater)
 
     private val headerAdapter = DashboardHeaderAdapter(this)
+    private val announcementsAdapter = AnnouncementsAdapter()
     private val hasStakeLoadingAdapter = DashboardLoadingAdapter(initialNumberOfItems = 1, layout = R.layout.item_dashboard_has_stake_loading)
     private val hasStakeAdapter = DashboardHasStakeAdapter(this)
     private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_no_stake_header)
@@ -56,6 +58,7 @@ class StakingDashboardFragment :
 
         binder.stakingDashboardContent.adapter = ConcatAdapter(
             headerAdapter,
+            announcementsAdapter,
             hasStakeLoadingAdapter,
             hasStakeAdapter,
             sectionAdapter,
@@ -82,6 +85,8 @@ class StakingDashboardFragment :
         }
 
         viewModel.walletUi.observe(headerAdapter::setSelectedWallet)
+
+        viewModel.announcements.observe(announcementsAdapter::submitList)
 
         viewModel.scrollToTopEvent.observeEvent {
             binder.stakingDashboardContent.scrollToPosition(0)

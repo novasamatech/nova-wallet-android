@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.announcements.AnnouncementsRepository
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.legal.LegalConsentRepository
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -255,4 +256,6 @@ interface CommonApi {
     fun copyValueMixin(): CopyValueMixin
 
     fun globalConfigDataSource(): GlobalConfigDataSource
+
+    fun announcementsRepository(): AnnouncementsRepository
 }

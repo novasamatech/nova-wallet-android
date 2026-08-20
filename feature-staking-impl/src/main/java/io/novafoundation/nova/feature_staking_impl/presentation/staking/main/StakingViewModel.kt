@@ -13,6 +13,8 @@ import io.novafoundation.nova.core.updater.UpdateSystem
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
 import io.novafoundation.nova.feature_ahm_api.domain.model.ChainMigrationConfig
 import io.novafoundation.nova.feature_ahm_api.presentation.getChainMigrationDateFormat
 import io.novafoundation.nova.feature_staking_impl.R
@@ -29,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.runtime.state.selectedAssetFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -56,6 +59,7 @@ class StakingViewModel(
     private val resourceManager: ResourceManager,
     private val externalActionsMixin: ExternalActions.Presentation,
     private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
+    private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase,
     stakingUpdateSystem: UpdateSystem,
 ) : BaseViewModel(),
     Validatable by validationExecutor,
@@ -90,6 +94,13 @@ class StakingViewModel(
     val networkInfoComponent = networkInfoComponentFactory.create(componentHostContext)
     val alertsComponent = alertsComponentFactory.create(componentHostContext)
     val yourPoolComponent = yourPoolComponentFactory.create(componentHostContext)
+
+    val announcementFlow = selectedAssetFlow
+        .map { it.token.configuration.chainId }
+        .distinctUntilChanged()
+        .flatMapLatest { chainId -> stakingAnnouncementsUseCase.announcementFlow(chainId) }
+        .map { announcement -> announcement?.let(::mapAnnouncementToUi) }
+        .shareInBackground()
 
     private val dateFormatter = getChainMigrationDateFormat()
 

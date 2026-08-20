@@ -29,6 +29,15 @@ import org.web3j.protocol.http.HttpService
 import org.web3j.protocol.websocket.events.Notification
 import java.io.IOException
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledExecutorService
+import java.util.concurrent.TimeUnit
+
+private const val RETRY_DELAY_MILLIS = 1_000L
+
+private val retryScheduler: ScheduledExecutorService = Executors.newSingleThreadScheduledExecutor { runnable ->
+    Thread(runnable, "web3j-retry").apply { isDaemon = true }
+}
 
 class BalancingHttpWeb3jService(
     initialNodes: Chain.Nodes,
@@ -135,7 +144,7 @@ class BalancingHttpWeb3jService(
                 if (future.isCancelled) return
 
                 nodeSwitcher.markCurrentNodeNotAccessible()
-                enqueueRetryingRequest(future, payload, retriableProcessResponse, nonRetriableProcessResponse)
+                scheduleRetry(future, payload, retriableProcessResponse, nonRetriableProcessResponse)
             }
 
             override fun onResponse(call: Call, response: okhttp3.Response) {
@@ -153,10 +162,27 @@ class BalancingHttpWeb3jService(
                     }
                 } catch (_: Exception) {
                     nodeSwitcher.markCurrentNodeNotAccessible()
-                    enqueueRetryingRequest(future, payload, retriableProcessResponse, nonRetriableProcessResponse)
+                    scheduleRetry(future, payload, retriableProcessResponse, nonRetriableProcessResponse)
                 }
             }
         })
+    }
+
+    private fun <T> scheduleRetry(
+        future: CallCancellableFuture<T>,
+        payload: String,
+        retriableProcessResponse: (okhttp3.Response) -> T,
+        nonRetriableProcessResponse: (T) -> Unit
+    ) {
+        retryScheduler.schedule(
+            {
+                if (!future.isCancelled) {
+                    enqueueRetryingRequest(future, payload, retriableProcessResponse, nonRetriableProcessResponse)
+                }
+            },
+            RETRY_DELAY_MILLIS,
+            TimeUnit.MILLISECONDS
+        )
     }
 
     private fun createHttpCall(request: String, url: String): Call {
@@ -289,6 +315,8 @@ private fun <T> NodeSwitcher.makeRetryingRequest(request: (url: String) -> T): T
             Log.w("Failed to execute request for url $url", e)
 
             markCurrentNodeNotAccessible()
+
+            Thread.sleep(RETRY_DELAY_MILLIS)
 
             continue
         }
