@@ -66,6 +66,8 @@ class OrmlAssetHistory(
             if (!call.isTransfer(runtime)) return null
 
             val inferredAsset = chain.findAssetByOrmlCurrencyId(runtime, call.arguments["currency_id"]) ?: return null
+            if (inferredAsset.id != chainAsset.id) return null
+
             val amount = bindNumber(call.arguments["amount"])
 
             return RealtimeHistoryUpdate.Type.Transfer(
