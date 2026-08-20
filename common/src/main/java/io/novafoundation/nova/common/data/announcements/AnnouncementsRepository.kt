@@ -4,9 +4,15 @@ import android.util.Log
 import io.novafoundation.nova.common.domain.announcements.Announcement
 import io.novafoundation.nova.common.domain.announcements.AnnouncementSection
 import io.novafoundation.nova.common.resources.ContextManager
+import io.novafoundation.nova.common.utils.coroutines.DangerousScope
+import io.novafoundation.nova.common.utils.coroutines.RootScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 
 private const val LOG_TAG = "AnnouncementsRepository"
 
@@ -15,17 +21,19 @@ interface AnnouncementsRepository {
     fun announcementsFlow(section: AnnouncementSection): Flow<List<Announcement>>
 }
 
+@OptIn(DangerousScope::class)
 class RealAnnouncementsRepository(
     private val announcementsApi: AnnouncementsApi,
-    private val contextManager: ContextManager
+    private val contextManager: ContextManager,
+    rootScope: RootScope,
 ) : AnnouncementsRepository {
 
     @Volatile
     private var cache: AnnouncementsRemote? = null
 
-    override fun announcementsFlow(section: AnnouncementSection): Flow<List<Announcement>> = flow {
+    private val remoteAnnouncements = flow {
         val cached = cache
-        if (cached != null) emit(mapSection(cached, section))
+        if (cached != null) emit(cached)
 
         val fresh = runCatching { announcementsApi.getAnnouncements() }
             .onFailure { Log.e(LOG_TAG, "Failed to load announcements", it) }
@@ -34,14 +42,20 @@ class RealAnnouncementsRepository(
         when {
             fresh != null -> {
                 cache = fresh
-                emit(mapSection(fresh, section))
+                emit(fresh)
             }
 
-            cached == null -> emit(emptyList())
+            cached == null -> emit(emptyMap())
         }
-    }.distinctUntilChanged()
+    }.shareIn(rootScope, SharingStarted.WhileSubscribed(), replay = 1)
 
-    private fun mapSection(remote: AnnouncementsRemote, section: AnnouncementSection): List<Announcement> {
-        return mapAnnouncementsFromRemote(remote, section, contextManager.getLocale().language)
+    override fun announcementsFlow(section: AnnouncementSection): Flow<List<Announcement>> {
+        return remoteAnnouncements
+            .map { mapAnnouncementsFromRemote(it, section, contextManager.getLocale().language) }
+            .catch {
+                Log.e(LOG_TAG, "Failed to map announcements", it)
+                emit(emptyList())
+            }
+            .distinctUntilChanged()
     }
 }

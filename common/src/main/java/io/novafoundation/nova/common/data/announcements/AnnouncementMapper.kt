@@ -11,8 +11,8 @@ fun mapAnnouncementsFromRemote(
     return remote[section.key].orEmpty().mapNotNull { mapAnnouncementFromRemote(it, languageCode) }
 }
 
-private fun mapAnnouncementFromRemote(remote: AnnouncementRemote, languageCode: String): Announcement? {
-    val description = remote.description.localizedOrDefault(languageCode) ?: return null
+private fun mapAnnouncementFromRemote(remote: AnnouncementRemote?, languageCode: String): Announcement? {
+    val description = remote?.description?.localizedOrDefault(languageCode) ?: return null
 
     return Announcement(
         chainId = remote.chainId,

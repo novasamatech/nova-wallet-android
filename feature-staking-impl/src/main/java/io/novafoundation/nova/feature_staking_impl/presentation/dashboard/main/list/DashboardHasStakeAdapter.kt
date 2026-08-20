@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.utils.withRippleMask
+import io.novafoundation.nova.common.view.asStyle
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getBottomRoundedCornerDrawable
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardHasStakeContainerBinding
@@ -110,12 +111,14 @@ class DashboardHasStakeViewHolder(
 
     fun bindAnnouncement(model: HasStakeItem) {
         binder.itemDashboardHasStakeAnnouncement.letOrHide(model.announcement) { announcement ->
+            val style = announcement.stylePreset.asStyle()
+
             with(binder) {
                 itemDashboardHasStakeAnnouncement.background = root.context.getBottomRoundedCornerDrawable(
-                    fillColorRes = announcement.backgroundColorRes
+                    fillColorRes = style.backgroundColorRes
                 )
-                itemDashboardHasStakeAnnouncementIcon.setImageResource(announcement.iconRes)
-                itemDashboardHasStakeAnnouncementIcon.setImageTintRes(null)
+                itemDashboardHasStakeAnnouncementIcon.setImageResource(style.iconRes)
+                itemDashboardHasStakeAnnouncementIcon.setImageTintRes(style.iconTintRes)
                 itemDashboardHasStakeAnnouncementText.text = announcement.description
             }
         }

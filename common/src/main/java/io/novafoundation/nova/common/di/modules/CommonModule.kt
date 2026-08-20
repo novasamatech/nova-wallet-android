@@ -520,10 +520,11 @@ class CommonModule {
     @ApplicationScope
     fun provideAnnouncementsRepository(
         networkApiCreator: NetworkApiCreator,
-        contextManager: ContextManager
+        contextManager: ContextManager,
+        rootScope: RootScope
     ): AnnouncementsRepository {
         val api = networkApiCreator.create(AnnouncementsApi::class.java)
-        return RealAnnouncementsRepository(api, contextManager)
+        return RealAnnouncementsRepository(api, contextManager, rootScope)
     }
 
     @Provides
