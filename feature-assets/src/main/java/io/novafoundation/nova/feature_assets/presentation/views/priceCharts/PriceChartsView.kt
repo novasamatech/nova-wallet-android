@@ -26,6 +26,14 @@ sealed class PriceChartModel(val buttonText: String) {
 
     class Loading(buttonText: String) : PriceChartModel(buttonText)
 
+    /**
+     * There is nothing to draw for this period - either the price feed returned no points or the request has failed
+     */
+    class Empty(buttonText: String, val message: String) : PriceChartModel(buttonText)
+
+    /**
+     * [priceChart] is expected to be non-empty - a period without points should be mapped to [Empty] instead
+     */
     class Chart(
         buttonText: String,
         val periodName: String,
@@ -58,7 +66,7 @@ class PriceChartsView @JvmOverloads constructor(
 
     init {
         controller = ChartController(binder.priceChart, this)
-        setEmptyState()
+        showLoadingState()
     }
 
     fun setTitle(title: String) {
@@ -78,7 +86,7 @@ class PriceChartsView @JvmOverloads constructor(
         }
 
         if (charts.isEmpty()) {
-            setEmptyState()
+            showLoadingState()
         } else {
             if (selectedChartIndex >= charts.size) {
                 selectedChartIndex = 0
@@ -104,18 +112,36 @@ class PriceChartsView @JvmOverloads constructor(
         dateTextInjector?.format(selectedEntry.x.roundToLong(), isEntrySelected, binder.priceChartDate, charts[selectedChartIndex])
     }
 
-    private fun setEmptyState() {
-        showCharts(false)
+    private fun showLoadingState() {
+        setChartContentVisible(false)
+        binder.priceChartEmptyLabel.isGone = true
+        setShimmeringVisible(true)
     }
 
-    private fun showCharts(show: Boolean) {
-        binder.priceChart.setVisible(show, falseState = View.INVISIBLE)
-        binder.priceChartDate.setVisible(show, falseState = View.INVISIBLE)
-        binder.priceChartPriceChange.setVisible(show, falseState = View.INVISIBLE)
-        binder.priceChartCurrentPrice.setVisible(show, falseState = View.INVISIBLE)
-        binder.priceChartPriceChangeShimmering.isGone = show
-        binder.priceChartCurrentPriceShimmering.isGone = show
-        binder.priceChartShimmering.isGone = show
+    private fun showEmptyState(message: String) {
+        setChartContentVisible(false)
+        binder.priceChartEmptyLabel.text = message
+        binder.priceChartEmptyLabel.isGone = false
+        setShimmeringVisible(false)
+    }
+
+    private fun showChartState() {
+        setChartContentVisible(true)
+        binder.priceChartEmptyLabel.isGone = true
+        setShimmeringVisible(false)
+    }
+
+    private fun setChartContentVisible(visible: Boolean) {
+        binder.priceChart.setVisible(visible, falseState = View.INVISIBLE)
+        binder.priceChartDate.setVisible(visible, falseState = View.INVISIBLE)
+        binder.priceChartPriceChange.setVisible(visible, falseState = View.INVISIBLE)
+        binder.priceChartCurrentPrice.setVisible(visible, falseState = View.INVISIBLE)
+    }
+
+    private fun setShimmeringVisible(visible: Boolean) {
+        binder.priceChartPriceChangeShimmering.isGone = !visible
+        binder.priceChartCurrentPriceShimmering.isGone = !visible
+        binder.priceChartShimmering.isGone = !visible
     }
 
     private fun selectChart(index: Int) {
@@ -125,14 +151,16 @@ class PriceChartsView @JvmOverloads constructor(
             view.isSelected = i == index
         }
 
-        val currentChart = charts[index]
-        if (currentChart is PriceChartModel.Loading) {
-            setEmptyState()
-            return
-        } else if (currentChart is PriceChartModel.Chart) {
-            controller.setEntries(currentChart.asEntries())
+        when (val currentChart = charts[index]) {
+            is PriceChartModel.Loading -> showLoadingState()
 
-            showCharts(true)
+            is PriceChartModel.Empty -> showEmptyState(currentChart.message)
+
+            is PriceChartModel.Chart -> {
+                controller.setEntries(currentChart.asEntries())
+
+                showChartState()
+            }
         }
     }
 

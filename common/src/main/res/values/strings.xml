@@ -450,6 +450,9 @@
     <string name="price_chart_year">1Y</string>
     <string name="price_chart_max">All</string>
 
+    <string name="price_chart_no_data">No data for this period</string>
+    <string name="price_chart_load_failed">Unable to load chart data</string>
+
     <string name="app_link_host" translatable="false">app.novawallet.io</string>
 
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
