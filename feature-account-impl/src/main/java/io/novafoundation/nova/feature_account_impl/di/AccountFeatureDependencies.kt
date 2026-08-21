@@ -53,6 +53,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdC
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationOraclePriceConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_versions_api.domain.UpdateNotificationsInteractor
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
@@ -129,6 +130,8 @@ interface AccountFeatureDependencies {
     val chainStateRepository: ChainStateRepository
 
     val metadataShortenerService: MetadataShortenerService
+
+    val hydrationOraclePriceConverter: HydrationOraclePriceConverter
 
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
 

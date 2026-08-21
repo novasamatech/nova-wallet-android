@@ -60,6 +60,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDir
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationOraclePriceConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.AssetExchange
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentProviderOverride
@@ -115,6 +116,7 @@ class HydraDxExchangeFactory(
     private val chainStateRepository: ChainStateRepository,
     private val swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
     private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
+    private val hydrationOraclePriceConverter: HydrationOraclePriceConverter,
     private val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val novaSwapCommission: NovaSwapCommission,
@@ -134,6 +136,7 @@ class HydraDxExchangeFactory(
             chainStateRepository = chainStateRepository,
             swapDeductionUseCase = swapDeductionUseCase,
             hydrationPriceConversionFallback = hydrationPriceConversionFallback,
+            hydrationOraclePriceConverter = hydrationOraclePriceConverter,
             hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher,
             assetSourceRegistry = assetSourceRegistry,
             novaSwapCommission = novaSwapCommission,
@@ -157,6 +160,7 @@ internal class HydraDxAssetExchange(
     private val chainStateRepository: ChainStateRepository,
     private val swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
     private val hydrationPriceConversionFallback: HydrationPriceConversionFallback,
+    private val hydrationOraclePriceConverter: HydrationOraclePriceConverter,
     private val hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
     private val assetSourceRegistry: AssetSourceRegistry,
     private val novaSwapCommission: NovaSwapCommission,
@@ -652,9 +656,12 @@ internal class HydraDxAssetExchange(
                 swapDirection = SwapDirection.SPECIFIED_OUT
             )
 
-            val quotedFee = runCatching { swapHost.quote(args) }
-                .recoverCatching { hydrationPriceConversionFallback.convertNativeAmount(nativeFee.amount, customFeeAsset) }
-                .getOrThrow()
+            // The chain converts the fee with an oracle price and falls back to `AcceptedCurrencies`, never swapping.
+            // A best-path quote lands on whichever pool is furthest from the market, so it is only a last resort here
+            val quotedFee = hydrationOraclePriceConverter.convertNativeAmount(nativeFee.amount, customFeeAsset)
+                ?: runCatching { hydrationPriceConversionFallback.convertNativeAmount(nativeFee.amount, customFeeAsset) }
+                    .recoverCatching { swapHost.quote(args) }
+                    .getOrThrow()
 
             // Fees in non-native assets are especially volatile since conversion happens through swaps so we add some buffer to mitigate volatility
             val quotedFeeWithBuffer = quotedFee * FEE_QUOTE_BUFFER

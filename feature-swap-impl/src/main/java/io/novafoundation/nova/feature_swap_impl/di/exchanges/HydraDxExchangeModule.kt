@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.Hydration
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationOraclePriceConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
@@ -74,6 +75,7 @@ class HydraDxExchangeModule {
         chainStateRepository: ChainStateRepository,
         swapDeductionUseCase: AssetInAdditionalSwapDeductionUseCase,
         hydrationPriceConversionFallback: HydrationPriceConversionFallback,
+        hydrationOraclePriceConverter: HydrationOraclePriceConverter,
         hydrationAcceptedFeeCurrenciesFetcher: HydrationAcceptedFeeCurrenciesFetcher,
         assetSourceRegistry: AssetSourceRegistry,
         novaSwapCommission: NovaSwapCommission,
@@ -89,6 +91,7 @@ class HydraDxExchangeModule {
             chainStateRepository = chainStateRepository,
             swapDeductionUseCase = swapDeductionUseCase,
             hydrationPriceConversionFallback = hydrationPriceConversionFallback,
+            hydrationOraclePriceConverter = hydrationOraclePriceConverter,
             hydrationAcceptedFeeCurrenciesFetcher = hydrationAcceptedFeeCurrenciesFetcher,
             assetSourceRegistry = assetSourceRegistry,
             novaSwapCommission = novaSwapCommission,

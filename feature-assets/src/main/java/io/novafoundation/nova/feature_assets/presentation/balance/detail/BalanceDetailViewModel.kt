@@ -407,13 +407,20 @@ class BalanceDetailViewModel(
     private fun mapChartsToUi(assetPriceChart: AssetPriceChart): PriceChartModel {
         val buttonText = mapButtonText(assetPriceChart.range)
 
-        return if (assetPriceChart.chart is ExtendedLoadingState.Loaded) {
-            val periodName = mapPeriodName(assetPriceChart.range)
-            val supportTimeShowing = supportTimeShowing(assetPriceChart.range)
-            val mappedChart = assetPriceChart.chart.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
-            PriceChartModel.Chart(buttonText, periodName, supportTimeShowing, mappedChart)
-        } else {
-            PriceChartModel.Loading(buttonText)
+        return when (val chart = assetPriceChart.chart) {
+            is ExtendedLoadingState.Loading -> PriceChartModel.Loading(buttonText)
+
+            is ExtendedLoadingState.Error -> PriceChartModel.Empty(buttonText, resourceManager.getString(R.string.price_chart_load_failed))
+
+            // Price feed may successfully return no points at all - for example, when the feed is stale or the asset has just been listed
+            is ExtendedLoadingState.Loaded -> if (chart.data.isEmpty()) {
+                PriceChartModel.Empty(buttonText, resourceManager.getString(R.string.price_chart_no_data))
+            } else {
+                val periodName = mapPeriodName(assetPriceChart.range)
+                val supportTimeShowing = supportTimeShowing(assetPriceChart.range)
+                val mappedChart = chart.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
+                PriceChartModel.Chart(buttonText, periodName, supportTimeShowing, mappedChart)
+            }
         }
     }
 

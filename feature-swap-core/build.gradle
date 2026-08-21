@@ -1,3 +1,4 @@
+apply from: '../tests.gradle'
 
 android {
     namespace 'io.novafoundation.nova.feature_swap_core'
@@ -19,6 +20,8 @@ dependencies {
     implementation androidDep
 
     api project(':core-api')
+
+    testImplementation jUnitDep
 
     androidTestImplementation androidTestRunnerDep
     androidTestImplementation androidTestRulesDep
