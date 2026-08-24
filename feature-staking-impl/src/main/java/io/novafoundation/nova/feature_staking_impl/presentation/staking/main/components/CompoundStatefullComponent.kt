@@ -12,6 +12,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN_AVN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
@@ -83,7 +84,7 @@ private class CompoundStakingComponent<S, E, A>(
         return when (stakingOption.additional.stakingType) {
             UNSUPPORTED -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(stakingOption, childHostContext)
-            PARACHAIN -> parachainComponentCreator(stakingOption, childHostContext)
+            PARACHAIN, PARACHAIN_AVN -> parachainComponentCreator(stakingOption, childHostContext)
             TURING -> turingComponentCreator(stakingOption, childHostContext)
             NOMINATION_POOLS -> nominationPoolsCreator(stakingOption, childHostContext)
             MYTHOS -> mythosCreator(stakingOption, childHostContext)

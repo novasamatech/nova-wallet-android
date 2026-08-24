@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters
 
+import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -26,6 +27,8 @@ class DelegatorStateUpdater(
 
         val accountId = account.accountIdIn(chain) ?: return null
 
-        return runtime.metadata.parachainStaking().storage("DelegatorState").storageKey(runtime, accountId)
+        val parachainStaking = runtime.metadata.parachainStaking()
+        val storageName = if (parachainStaking.hasStorage("NominatorState")) "NominatorState" else "DelegatorState"
+        return parachainStaking.storage(storageName).storageKey(runtime, accountId)
     }
 }

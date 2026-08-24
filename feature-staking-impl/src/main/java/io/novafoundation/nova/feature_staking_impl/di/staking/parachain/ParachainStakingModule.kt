@@ -18,6 +18,8 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposit
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealCandidatesRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealCurrentRoundRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealDelegatorStateRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainAvnStaking.repository.AvnRewardsRepository
+import io.novafoundation.nova.feature_staking_impl.data.parachainAvnStaking.repository.RealAvnRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RealRewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RewardsRepository
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.RuntimeParachainStakingConstantsRepository
@@ -83,6 +85,12 @@ class ParachainStakingModule {
 
     @Provides
     @FeatureScope
+    fun provideAvnRewardsRepository(
+        @Named(LOCAL_STORAGE_SOURCE) storageDataSource: StorageDataSource
+    ): AvnRewardsRepository = RealAvnRewardsRepository(storageDataSource)
+
+    @Provides
+    @FeatureScope
     fun provideCandidatesRepository(
         @Named(REMOTE_STORAGE_SOURCE) storageDataSource: StorageDataSource
     ): CandidatesRepository = RealCandidatesRepository(storageDataSource)
@@ -106,10 +114,11 @@ class ParachainStakingModule {
     @FeatureScope
     fun provideRewardCalculatorFactory(
         rewardsRepository: RewardsRepository,
+        avnRewardsRepository: AvnRewardsRepository,
         commonStakingRepository: TotalIssuanceRepository,
         currentRoundRepository: CurrentRoundRepository,
         turingStakingRewardsRepository: TuringStakingRewardsRepository,
-    ) = ParachainStakingRewardCalculatorFactory(rewardsRepository, currentRoundRepository, commonStakingRepository, turingStakingRewardsRepository)
+    ) = ParachainStakingRewardCalculatorFactory(rewardsRepository, avnRewardsRepository, currentRoundRepository, commonStakingRepository, turingStakingRewardsRepository)
 
     @Provides
     @FeatureScope
