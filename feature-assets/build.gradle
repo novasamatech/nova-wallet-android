@@ -9,6 +9,7 @@ android {
         
 
         buildConfigField "String", "NOVA_CARD_WIDGET_ID", "\"4ce98182-ed76-4933-ba1b-b85e4a51d75a\""
+        buildConfigField "String", "DEFAULT_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/default_assets.json\""
     }
 
     buildTypes {

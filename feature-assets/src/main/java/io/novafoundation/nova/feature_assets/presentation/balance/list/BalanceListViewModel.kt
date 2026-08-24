@@ -35,6 +35,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.mode
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownItem
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.BalanceBreakdownTotal
 import io.novafoundation.nova.feature_assets.presentation.balance.breakdown.model.TotalBalanceBreakdownModel
+import io.novafoundation.nova.feature_assets.data.repository.defaultTokens.LoadMoreTokensPreferences
 import io.novafoundation.nova.feature_assets.presentation.balance.common.AssetListMixinFactory
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.buySell.BuySellSelectorMixinFactory
@@ -102,7 +103,8 @@ class BalanceListViewModel(
     private val novaCardRestrictionCheckMixin: NovaCardRestrictionCheckMixin,
     private val maskingModeUseCase: MaskingModeUseCase,
     private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
-    private val appLinksProvider: AppLinksProvider
+    private val appLinksProvider: AppLinksProvider,
+    private val loadMoreTokensPreferences: LoadMoreTokensPreferences
 ) : BaseViewModel(), Browserable {
 
     private val maskableAmountFormatterFlow = maskableValueFormatterProvider.provideFormatter()
@@ -223,6 +225,18 @@ class BalanceListViewModel(
         }
     }.distinctUntilChanged()
 
+    val showLoadMoreFlow = assetListMixin.defaultFilterActiveFlow
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val loadMoreButtonTextRes = assetListMixin.assetsViewModeFlow.map {
+        when (it) {
+            AssetViewMode.TOKENS -> R.string.assets_load_more_tokens
+            AssetViewMode.NETWORKS -> R.string.assets_load_more_networks
+        }
+    }.distinctUntilChanged()
+        .shareInBackground()
+
     val pendingOperationsCountModel = multisigPendingOperationsService.pendingOperationsCountFlow()
         .withSafeLoading()
         .combine(maskableAmountFormatterFlow, ::formatPendingOperationsCount)
@@ -284,6 +298,10 @@ class BalanceListViewModel(
     }
 
     fun manageClicked() {
+        router.openManageTokens()
+    }
+
+    fun loadMoreClicked() {
         router.openManageTokens()
     }
 

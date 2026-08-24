@@ -27,6 +27,14 @@
             app:textRight="@string/manage_assets_add_token"
             app:titleText="@string/assets_manage_tokens_title" />
 
+        <io.novafoundation.nova.common.view.SegmentedTabLayout
+            android:id="@+id/manageTokensTabs"
+            style="@style/SegmentedTab"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp" />
+
         <io.novafoundation.nova.common.view.SearchView
             android:id="@+id/manageTokensSearch"
             android:layout_width="match_parent"
@@ -37,15 +45,98 @@
             android:hint="@string/assets_search_hint"
             app:layout_constraintTop_toBottomOf="@id/manageTokensToolbar" />
 
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/manageTokensSwitchZeroBalances"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:paddingHorizontal="16dp"
-            android:text="@string/wallet_filter_hide_zero_balance"
-            android:textColor="@color/text_secondary" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/manageTokensSwitchZeroBalances"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:paddingHorizontal="16dp"
+                android:text="@string/wallet_filter_hide_zero_balance"
+                android:textColor="@color/text_secondary" />
+
+            <TextView
+                android:id="@+id/manageTokensSelectAll"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:paddingVertical="8dp"
+                android:paddingHorizontal="8dp"
+                android:textColor="@color/text_positive"
+                tools:text="@string/manage_tokens_select_all" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/manageTokensDustFilterContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:paddingStart="32dp"
+            tools:visibility="visible">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/manageTokensSwitchDustFilter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="16dp"
+                android:text="@string/wallet_filter_hide_dust"
+                android:textColor="@color/text_secondary" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/manageTokensDustThresholdGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:paddingHorizontal="16dp"
+                android:visibility="gone"
+                app:singleSelection="true"
+                tools:visibility="visible">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/manageTokensDustThreshold1"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="@string/wallet_filter_dust_threshold_1" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/manageTokensDustThreshold5"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="@string/wallet_filter_dust_threshold_5" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/manageTokensDustThreshold10"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="@string/wallet_filter_dust_threshold_10" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/manageTokensDustThreshold50"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:text="@string/wallet_filter_dust_threshold_50" />
+
+            </com.google.android.material.chip.ChipGroup>
+
+        </LinearLayout>
 
         <View
             android:layout_width="match_parent"
@@ -78,6 +169,6 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/manageTokensToolbarContainer"
-        tools:listitem="@layout/item_manage_token_multichain" />
+        tools:listitem="@layout/item_manage_token_header" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
