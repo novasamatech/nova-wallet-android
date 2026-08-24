@@ -30,7 +30,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindin
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindValidatorPrefs
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.PayoutTarget
-import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.repository.PayoutRepository.ValidatorEraStake.NominatorInfo
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -56,7 +55,6 @@ typealias HistoricalMapping<T> = Map<BigInteger, T> // EraIndex -> T
 
 class PayoutRepository(
     private val stakingRepository: StakingRepository,
-    private val validatorSetFetcher: SubQueryValidatorSetFetcher,
     private val chainRegistry: ChainRegistry,
     private val remoteStorage: StorageDataSource,
     private val rpcCalls: RpcCalls,
@@ -67,7 +65,7 @@ class PayoutRepository(
             is StakingState.Stash.Nominator -> calculateUnpaidPayouts(
                 chain = stakingState.chain,
                 retrievePayoutTargets = { historicalRange ->
-                    validatorSetFetcher.findNominatorPayoutTargets(stakingState.chain, stakingState.stashAddress, historicalRange)
+                    resolveNominatorPayoutTargets(stakingState, historicalRange)
                 },
                 calculatePayout = {
                     calculateNominatorReward(stakingState.stashId, it)
@@ -83,6 +81,16 @@ class PayoutRepository(
             )
 
             else -> throw IllegalStateException("Cannot calculate payouts for ${stakingState::class.simpleName} state")
+        }
+    }
+
+    private fun resolveNominatorPayoutTargets(
+        stakingState: StakingState.Stash.Nominator,
+        historicalRange: List<BigInteger>,
+    ): List<PayoutTarget> {
+        val currentTargets = stakingState.nominations.targets.map { it.intoKey() }
+        return historicalRange.flatMap { era ->
+            currentTargets.map { validator -> PayoutTarget(validator, era) }
         }
     }
 

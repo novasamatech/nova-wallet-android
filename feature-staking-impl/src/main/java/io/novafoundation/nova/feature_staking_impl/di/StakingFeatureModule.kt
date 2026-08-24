@@ -39,7 +39,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
-import io.novafoundation.nova.feature_staking_impl.data.network.subquery.SubQueryValidatorSetFetcher
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.network.blockhain.updater.RealPooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolDelegatedStakeRepository
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolMembersRepository
@@ -487,14 +486,6 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideValidatorSetFetcher(
-        stakingApi: StakingApi,
-    ): SubQueryValidatorSetFetcher {
-        return SubQueryValidatorSetFetcher(stakingApi)
-    }
-
-    @Provides
-    @FeatureScope
     @DefaultBulkRetriever
     fun provideDefaultBulkRetriever(): BulkRetriever {
         return BulkRetriever(DEFAULT_BULK_RETRIEVER_PAGE_SIZE)
@@ -511,12 +502,11 @@ class StakingFeatureModule {
     @FeatureScope
     fun providePayoutRepository(
         stakingRepository: StakingRepository,
-        validatorSetFetcher: SubQueryValidatorSetFetcher,
         chainRegistry: ChainRegistry,
         rpcCalls: RpcCalls,
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource
     ): PayoutRepository {
-        return PayoutRepository(stakingRepository, validatorSetFetcher, chainRegistry, remoteStorageSource, rpcCalls)
+        return PayoutRepository(stakingRepository, chainRegistry, remoteStorageSource, rpcCalls)
     }
 
     @Provides
