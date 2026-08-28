@@ -741,6 +741,7 @@ class SwapMainSettingsViewModel(
         actions = actions,
         amountInSwapMaxAction = ::setMaxAvailableAmountIn,
         amountOutSwapMinAction = ::setMinAmountOut,
+        amountInSetAction = ::setAmountIn,
     )
 
     private fun setMaxAvailableAmountIn() {
@@ -751,7 +752,18 @@ class SwapMainSettingsViewModel(
 
     private fun setMinAmountOut(chainAsset: Chain.Asset, amountInPlanks: Balance) {
         amountOutInput.requestFocusLiveData.sendEvent()
-        amountOutInput.setAmount(chainAsset.amountFromPlanks(amountInPlanks))
+
+        // initiatedByUser = true so the change passes the initiatedByUser filter in handleInputChanges
+        // and triggers a re-quote - it is a direct reaction to the user's tap in the dialog
+        amountOutInput.setAmount(chainAsset.amountFromPlanks(amountInPlanks), initiatedByUser = true)
+    }
+
+    private fun setAmountIn(chainAsset: Chain.Asset, amountInPlanks: Balance) {
+        amountInInput.requestFocusLiveData.sendEvent()
+
+        // initiatedByUser = true so the change passes the initiatedByUser filter in handleInputChanges
+        // and triggers a re-quote - it is a direct reaction to the user's tap in the dialog
+        amountInInput.setAmount(chainAsset.amountFromPlanks(amountInPlanks), initiatedByUser = true)
     }
 
     private fun Flow<Asset?>.token(): Flow<Token?> = map { it?.token }
