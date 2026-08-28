@@ -4,6 +4,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdC
 import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuoting
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationAcceptedFeeCurrenciesFetcher
+import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationOraclePriceConverter
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydrationPriceConversionFallback
 
 interface SwapCoreApi {
@@ -15,6 +16,8 @@ interface SwapCoreApi {
     val hydraDxAssetIdConverter: HydraDxAssetIdConverter
 
     val hydrationPriceConversionFallback: HydrationPriceConversionFallback
+
+    val hydrationOraclePriceConverter: HydrationOraclePriceConverter
 
     val pathQuoterFactory: PathQuoter.Factory
 }

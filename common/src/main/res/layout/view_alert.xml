@@ -53,6 +53,7 @@
         app:layout_constraintStart_toEndOf="@+id/alertIconContainer"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_goneMarginBottom="10dp"
+        app:layout_goneMarginEnd="16dp"
         tools:text="@tools:sample/lorem[20]" />
 
     <LinearLayout

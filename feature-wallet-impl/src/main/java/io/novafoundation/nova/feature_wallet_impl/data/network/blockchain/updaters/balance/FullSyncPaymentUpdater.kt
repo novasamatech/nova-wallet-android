@@ -83,6 +83,7 @@ internal class FullSyncPaymentUpdater(
                 .onSuccess { blockOperations ->
                     val localOperations = blockOperations
                         .filter { it.type.relates(accountId) }
+                        .withoutTransfersFromSwapExtrinsics()
                         .map { operation -> createOperationLocal(chainAsset, operation, accountId) }
 
                     operationDao.insertAll(localOperations)
@@ -97,6 +98,13 @@ internal class FullSyncPaymentUpdater(
 
             BalanceSyncUpdate.NoCause -> {}
         }
+    }
+
+    private fun List<RealtimeHistoryUpdate>.withoutTransfersFromSwapExtrinsics(): List<RealtimeHistoryUpdate> {
+        val swapHashes = filter { it.type is RealtimeHistoryUpdate.Type.Swap }
+            .mapTo(mutableSetOf()) { it.txHash }
+
+        return filterNot { it.type is RealtimeHistoryUpdate.Type.Transfer && it.txHash in swapHashes }
     }
 
     private suspend fun createOperationLocal(

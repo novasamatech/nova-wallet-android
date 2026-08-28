@@ -6,8 +6,15 @@ import androidx.recyclerview.widget.ListAdapter
 import io.novafoundation.nova.common.list.BaseViewHolder
 import io.novafoundation.nova.common.list.PayloadGenerator
 import io.novafoundation.nova.common.list.resolvePayload
+import io.novafoundation.nova.common.utils.inflater
+import io.novafoundation.nova.common.utils.letOrHide
+import io.novafoundation.nova.common.utils.setImageTintRes
+import io.novafoundation.nova.common.utils.withRippleMask
+import io.novafoundation.nova.common.view.asStyle
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.shape.getBottomRoundedCornerDrawable
+import io.novafoundation.nova.feature_staking_impl.databinding.ItemDashboardHasStakeContainerBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel.HasStakeItem
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.StakingDashboardHasStakeView
 
 class DashboardHasStakeAdapter(
     private val handler: Handler,
@@ -19,7 +26,9 @@ class DashboardHasStakeAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DashboardHasStakeViewHolder {
-        return DashboardHasStakeViewHolder(StakingDashboardHasStakeView(parent.context), handler)
+        val binder = ItemDashboardHasStakeContainerBinding.inflate(parent.inflater(), parent, false)
+
+        return DashboardHasStakeViewHolder(binder, handler)
     }
 
     override fun onBindViewHolder(holder: DashboardHasStakeViewHolder, position: Int) {
@@ -38,18 +47,27 @@ class DashboardHasStakeAdapter(
                 HasStakeItem::assetIcon -> holder.bindAssetIcon(item)
                 HasStakeItem::assetLabel -> holder.bindAssetLabel(item)
                 HasStakeItem::stakingTypeBadge -> holder.bindStakingType(item)
+                HasStakeItem::announcement -> holder.bindAnnouncement(item)
             }
         }
     }
 }
 
 class DashboardHasStakeViewHolder(
-    override val containerView: StakingDashboardHasStakeView,
+    private val binder: ItemDashboardHasStakeContainerBinding,
     private val handler: DashboardHasStakeAdapter.Handler,
-) : BaseViewHolder(containerView) {
+) : BaseViewHolder(binder.root) {
+
+    private val card = binder.itemDashboardHasStakeCard
 
     init {
-        containerView.setOnClickListener { handler.onHasStakeItemClicked(bindingAdapterPosition) }
+        card.background = null
+
+        with(binder.root) {
+            background = context.getBlockDrawable().withRippleMask()
+        }
+
+        binder.root.setOnClickListener { handler.onHasStakeItemClicked(bindingAdapterPosition) }
     }
 
     fun bind(model: HasStakeItem) {
@@ -60,34 +78,50 @@ class DashboardHasStakeViewHolder(
         bindAssetIcon(model)
         bindAssetLabel(model)
         bindStakingType(model)
+        bindAnnouncement(model)
     }
 
     fun bindAssetIcon(model: HasStakeItem) {
-        containerView.setAssetIcon(model.assetIcon)
+        card.setAssetIcon(model.assetIcon)
     }
 
     fun bindAssetLabel(model: HasStakeItem) {
-        containerView.setAssetLabel(model.assetLabel)
+        card.setAssetLabel(model.assetLabel)
     }
 
     fun bindEarnings(model: HasStakeItem) {
-        containerView.setEarnings(model.earnings)
+        card.setEarnings(model.earnings)
     }
 
     fun bindStakingType(model: HasStakeItem) {
-        containerView.setStakingTypeBadge(model.stakingTypeBadge)
+        card.setStakingTypeBadge(model.stakingTypeBadge)
     }
 
     fun bindStake(model: HasStakeItem) {
-        containerView.setStake(model.stake)
+        card.setStake(model.stake)
     }
 
     fun bindRewards(model: HasStakeItem) {
-        containerView.setRewards(model.rewards)
+        card.setRewards(model.rewards)
     }
 
     fun bindStatus(model: HasStakeItem) {
-        containerView.setStatus(model.status)
+        card.setStatus(model.status)
+    }
+
+    fun bindAnnouncement(model: HasStakeItem) {
+        binder.itemDashboardHasStakeAnnouncement.letOrHide(model.announcement) { announcement ->
+            val style = announcement.stylePreset.asStyle()
+
+            with(binder) {
+                itemDashboardHasStakeAnnouncement.background = root.context.getBottomRoundedCornerDrawable(
+                    fillColorRes = style.backgroundColorRes
+                )
+                itemDashboardHasStakeAnnouncementIcon.setImageResource(style.iconRes)
+                itemDashboardHasStakeAnnouncementIcon.setImageTintRes(style.iconTintRes)
+                itemDashboardHasStakeAnnouncementText.text = announcement.description
+            }
+        }
     }
 }
 
@@ -101,7 +135,8 @@ private class DashboardHasStakeDiffCallback : DiffUtil.ItemCallback<HasStakeItem
         HasStakeItem::rewards,
         HasStakeItem::assetIcon,
         HasStakeItem::assetLabel,
-        HasStakeItem::stakingTypeBadge
+        HasStakeItem::stakingTypeBadge,
+        HasStakeItem::announcement
     )
 
     override fun areItemsTheSame(oldItem: HasStakeItem, newItem: HasStakeItem): Boolean {

@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.insets.applyNavigationBarInsets
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
+import io.novafoundation.nova.common.utils.letOrHide
 import io.novafoundation.nova.common.view.setModelOrHide
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -57,6 +58,13 @@ class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>()
         setupExternalActions(viewModel)
 
         viewModel.migrationAlertFlow.observe { binder.stakingMigrationAlert.setModelOrHide(it) }
+
+        viewModel.announcementFlow.observe { announcement ->
+            binder.stakingAnnouncement.letOrHide(announcement) {
+                binder.stakingAnnouncement.setStylePreset(it.stylePreset)
+                binder.stakingAnnouncement.setMessage(it.description)
+            }
+        }
 
         setupNetworkInfoComponent(viewModel.networkInfoComponent, binder.stakingNetworkInfo)
         setupStakeSummaryComponent(viewModel.stakeSummaryComponent, binder.stakingStakeSummary)

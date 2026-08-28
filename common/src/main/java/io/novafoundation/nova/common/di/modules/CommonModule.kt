@@ -17,6 +17,9 @@ import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.FileProviderImpl
 import io.novafoundation.nova.common.data.GoogleApiAvailabilityProvider
 import io.novafoundation.nova.common.data.RealGoogleApiAvailabilityProvider
+import io.novafoundation.nova.common.data.announcements.AnnouncementsApi
+import io.novafoundation.nova.common.data.announcements.AnnouncementsRepository
+import io.novafoundation.nova.common.data.announcements.RealAnnouncementsRepository
 import io.novafoundation.nova.common.data.config.GlobalConfigApi
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.config.RealGlobalConfigDataSource
@@ -511,6 +514,17 @@ class CommonModule {
     ): GlobalConfigDataSource {
         val api = networkApiCreator.create(GlobalConfigApi::class.java)
         return RealGlobalConfigDataSource(api)
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideAnnouncementsRepository(
+        networkApiCreator: NetworkApiCreator,
+        contextManager: ContextManager,
+        rootScope: RootScope
+    ): AnnouncementsRepository {
+        val api = networkApiCreator.create(AnnouncementsApi::class.java)
+        return RealAnnouncementsRepository(api, contextManager, rootScope)
     }
 
     @Provides

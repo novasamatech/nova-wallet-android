@@ -181,7 +181,9 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     }
 
     private fun List<Entry>.isBullish(): Boolean {
-        return last().y >= first().y
+        val firstEntry = firstOrNull() ?: return true
+
+        return last().y >= firstEntry.y
     }
 
     private fun LineChart.getEntryByTouchPoint(event: MotionEvent): Entry? {
