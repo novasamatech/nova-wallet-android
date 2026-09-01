@@ -1,0 +1,33 @@
+android {
+
+    defaultConfig {
+        def analyticsHost = project.findProperty("analyticsHost") ?: "https://analytics.novawallet.io/"
+        buildConfigField "String", "ANALYTICS_HOST", "\"$analyticsHost\""
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    namespace 'io.novafoundation.nova.analytics'
+}
+
+dependencies {
+    implementation project(':common')
+    implementation project(':infrastructure')
+    implementation project(':core-db')
+
+    implementation kotlinDep
+    implementation coroutinesDep
+    implementation "androidx.lifecycle:lifecycle-process:$architectureComponentVersion"
+
+    implementation daggerDep
+    ksp daggerCompiler
+
+    implementation retrofitDep
+    implementation gsonDep
+    implementation roomDep
+
+    testImplementation jUnitDep
+    testImplementation coroutinesTestDep
+}

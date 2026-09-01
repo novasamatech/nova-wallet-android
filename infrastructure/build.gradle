@@ -1,0 +1,33 @@
+android {
+
+    defaultConfig {
+        def infrastructureHost = project.findProperty("infrastructureHost")
+            ?: project.findProperty("analyticsHost")
+            ?: "https://analytics.novawallet.io/"
+        buildConfigField "String", "INFRASTRUCTURE_HOST", "\"$infrastructureHost\""
+
+        // Dev-only attestation secret for local backends; empty keeps debug builds unattested
+        def attestationSharedSecret = project.findProperty("attestationSharedSecret") ?: ""
+        buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"$attestationSharedSecret\""
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    namespace 'io.novafoundation.nova.infrastructure'
+}
+
+dependencies {
+    implementation project(':common')
+
+    implementation kotlinDep
+    implementation coroutinesDep
+
+    implementation daggerDep
+    ksp daggerCompiler
+
+    implementation retrofitDep
+
+    testImplementation jUnitDep
+}

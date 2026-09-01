@@ -58,6 +58,8 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
 
         binder.settingsWalletConnect.setOnClickListener { viewModel.walletConnectClicked() }
 
+        binder.settingsAnalytics.setOnClickListener { viewModel.changeAnalytics() }
+
         binder.settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
     }
 
@@ -123,6 +125,10 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
         viewModel.openEmailEvent.observeEvent { requireContext().sendEmailIntent(it) }
 
         viewModel.walletConnectSessionsUi.observe(binder.settingsWalletConnect::setValue)
+
+        viewModel.analyticsEnabledState.observe {
+            binder.settingsAnalytics.setChecked(it)
+        }
     }
 
     override fun onResume() {

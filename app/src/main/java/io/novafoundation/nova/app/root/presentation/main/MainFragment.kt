@@ -57,6 +57,8 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
         navController!!.addOnDestinationChangedListener { _, destination, _ ->
             backCallback.isEnabled = !isAtHomeTab(destination)
+
+            viewModel.onDestinationChanged(destination.id)
         }
     }
 
