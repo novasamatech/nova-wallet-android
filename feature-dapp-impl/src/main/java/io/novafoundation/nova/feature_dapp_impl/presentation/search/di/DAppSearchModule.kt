@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -47,7 +48,8 @@ class DAppSearchModule {
         searchResponder: DAppSearchCommunicator,
         payload: SearchPayload,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        appLinksProvider: AppLinksProvider
+        appLinksProvider: AppLinksProvider,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return DAppSearchViewModel(
             router = router,
@@ -57,7 +59,8 @@ class DAppSearchModule {
             payload = payload,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             appLinksProvider = appLinksProvider,
-            dappInteractor = dappInteractor
+            dappInteractor = dappInteractor,
+            analyticsService = analyticsService
         )
     }
 }

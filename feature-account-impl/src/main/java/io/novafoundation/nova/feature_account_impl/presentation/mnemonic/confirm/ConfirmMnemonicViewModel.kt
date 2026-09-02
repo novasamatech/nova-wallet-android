@@ -1,6 +1,10 @@
 package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.confirm
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.WalletCreationMethod
+import io.novafoundation.nova.analytics.WalletCreationStep
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -9,6 +13,7 @@ import io.novafoundation.nova.common.utils.modified
 import io.novafoundation.nova.common.utils.removed
 import io.novafoundation.nova.common.vibration.DeviceVibrator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryption
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
@@ -30,7 +35,8 @@ class ConfirmMnemonicViewModel(
     private val deviceVibrator: DeviceVibrator,
     private val resourceManager: ResourceManager,
     private val config: ConfirmMnemonicConfig,
-    private val payload: ConfirmMnemonicPayload
+    private val payload: ConfirmMnemonicPayload,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel() {
 
     private val originMnemonic = payload.mnemonic
@@ -52,6 +58,11 @@ class ConfirmMnemonicViewModel(
     }
 
     val skipVisible = payload.createExtras != null && config.allowShowingSkip
+
+    /**
+     * Set once the user navigates to the next step of the flow so that leaving the screen afterwards is not reported as abandoning
+     */
+    private var proceededToNextStep = false
 
     fun homeButtonClicked() {
         router.back()
@@ -143,7 +154,13 @@ class ConfirmMnemonicViewModel(
                 val advancedEncryption = advancedEncryptionModel.toAdvancedEncryption()
 
                 addAccountInteractor.createAccount(mnemonicString, advancedEncryption, addAccountType)
-                    .onSuccess { continueBasedOnCodeStatus() }
+                    .onSuccess {
+                        proceededToNextStep = true
+
+                        trackWalletCreationCompleted(extras)
+
+                        continueBasedOnCodeStatus()
+                    }
                     .onFailure(::showAccountCreationError)
             }
         }
@@ -170,6 +187,27 @@ class ConfirmMnemonicViewModel(
             router.openMain()
         } else {
             router.openCreatePincode()
+        }
+    }
+
+    override fun onCleared() {
+        trackWalletCreationAbandonedIfNeeded()
+
+        super.onCleared()
+    }
+
+    private fun trackWalletCreationAbandonedIfNeeded() {
+        if (proceededToNextStep) return
+
+        val createExtras = payload.createExtras ?: return
+        if (createExtras.addAccountPayload !is AddAccountPayload.MetaAccount) return
+
+        analyticsService.track(AnalyticsEvent.WalletCreationAbandoned(WalletCreationStep.CONFIRM_MNEMONIC))
+    }
+
+    private fun trackWalletCreationCompleted(extras: ConfirmMnemonicPayload.CreateExtras) {
+        if (extras.addAccountPayload is AddAccountPayload.MetaAccount) {
+            analyticsService.track(AnalyticsEvent.WalletCreationCompleted(WalletCreationMethod.CREATE))
         }
     }
 }

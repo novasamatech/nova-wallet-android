@@ -21,6 +21,7 @@ android {
 dependencies {
     implementation project(':core-db')
     implementation project(':common')
+    implementation project(':analytics')
     implementation project(':feature-wallet-api')
     implementation project(':feature-account-api')
     implementation project(':feature-nft-api')

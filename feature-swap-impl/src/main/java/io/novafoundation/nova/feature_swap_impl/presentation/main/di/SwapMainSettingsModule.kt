@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -97,6 +98,7 @@ class SwapMainSettingsModule {
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
         enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
         getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
+        analyticsService: AnalyticsService,
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -121,7 +123,8 @@ class SwapMainSettingsModule {
             swapStateStoreProvider = swapStateStoreProvider,
             maxActionProviderFactory = maxActionProviderFactory,
             swapRouteFormatter = swapRouteFormatter,
-            swapFlowScopeAggregator = swapFlowScopeAggregator
+            swapFlowScopeAggregator = swapFlowScopeAggregator,
+            analyticsService = analyticsService
         )
     }
 

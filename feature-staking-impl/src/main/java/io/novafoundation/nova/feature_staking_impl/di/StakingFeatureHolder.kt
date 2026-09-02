@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -42,6 +43,7 @@ class StakingFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val dependencies = DaggerStakingFeatureComponent_StakingFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))

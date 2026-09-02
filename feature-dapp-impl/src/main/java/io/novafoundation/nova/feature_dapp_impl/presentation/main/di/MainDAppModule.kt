@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -35,7 +36,8 @@ class MainDAppModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         router: DAppRouter,
         dappInteractor: DappInteractor,
-        resourceManager: ResourceManager
+        resourceManager: ResourceManager,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return MainDAppViewModel(
             promotionBannersMixinFactory = promotionBannersMixinFactory,
@@ -44,7 +46,8 @@ class MainDAppModule {
             selectedAccountUseCase = selectedAccountUseCase,
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             dappInteractor = dappInteractor,
-            resourceManager = resourceManager
+            resourceManager = resourceManager,
+            analyticsService = analyticsService
         )
     }
 }

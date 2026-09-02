@@ -2783,4 +2783,5 @@
     <string name="legal_consent_title">Updated Terms</string>
     <string name="legal_consent_subtitle">We’ve updated our Terms of Service and Privacy Notice. Please review and accept the updated documents to continue using Nova Wallet.</string>
     <string name="legal_consent_accept">Accept and Continue</string>
+    <string name="settings_analytics_title">Share Anonymous Usage Data</string>
 </resources>

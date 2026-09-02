@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.legal.LegalConsentRepository
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -32,6 +33,7 @@ class WelcomeModule {
         ledgerMigrationTracker: LedgerMigrationTracker,
         legalConsentRepository: LegalConsentRepository,
         accountRepository: AccountRepository,
+        analyticsService: AnalyticsService,
     ): ViewModel {
         return WelcomeViewModel(
             shouldShowBack,
@@ -40,6 +42,7 @@ class WelcomeModule {
             addAccountPayload,
             legalConsentRepository,
             accountRepository,
+            analyticsService,
             updateNotificationsInteractor
         )
     }

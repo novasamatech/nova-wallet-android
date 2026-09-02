@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.app.root.analytics.FeatureNavigationTracker
 import io.novafoundation.nova.app.root.domain.SplitScreenInteractor
 import io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenPayload
 import io.novafoundation.nova.app.root.presentation.splitScreen.SplitScreenViewModel
@@ -42,9 +43,18 @@ class SplitScreenFragmentModule {
         delayedNavigationRouter: DelayedNavigationRouter,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         resourceManager: ResourceManager,
-        payload: SplitScreenPayload
+        payload: SplitScreenPayload,
+        featureNavigationTracker: FeatureNavigationTracker
     ): ViewModel {
-        return SplitScreenViewModel(interactor, dAppRouter, delayedNavigationRouter, actionAwaitableMixinFactory, resourceManager, payload)
+        return SplitScreenViewModel(
+            interactor,
+            dAppRouter,
+            delayedNavigationRouter,
+            actionAwaitableMixinFactory,
+            resourceManager,
+            payload,
+            featureNavigationTracker
+        )
     }
 
     @Provides

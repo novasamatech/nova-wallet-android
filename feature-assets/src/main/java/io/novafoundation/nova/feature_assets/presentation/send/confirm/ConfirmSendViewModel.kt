@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_assets.presentation.send.confirm
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -29,6 +32,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.domain.send.model.TransferFee
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
+import io.novafoundation.nova.feature_assets.presentation.common.analytics.toSendFailureReason
 import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_wallet_api.presentation.validation.transfers.autoFixSendValidationPayload
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.buildAssetTransfer
@@ -81,6 +85,7 @@ class ConfirmSendViewModel(
     private val walletUiUseCase: WalletUiUseCase,
     private val hintsFactory: ConfirmSendHintsMixinFactory,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val analyticsService: AnalyticsService,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val transferDraft: TransferDraft,
     private val amountFormatter: AmountFormatter
@@ -253,12 +258,42 @@ class ConfirmSendViewModel(
     ) = launch {
         sendInteractor.performTransfer(transfer, originFee, crossChainFee, viewModelScope)
             .onSuccess {
+                trackSendCompleted()
+
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { finishSendFlow() }
-            }.onFailure(::showError)
+            }.onFailure {
+                trackSendFailed(it)
+
+                showError(it)
+            }
 
         _transferSubmittingLiveData.value = false
+    }
+
+    private suspend fun trackSendCompleted() {
+        val asset = assetFlow.first()
+
+        analyticsService.track(
+            AnalyticsEvent.SendCompleted(
+                asset = asset.token.configuration.symbol.value,
+                network = originChain().name,
+                amountBucket = AmountBucket.from(asset.token.amountToFiat(transferDraft.amount)),
+                destinationNetwork = destinationChain().name.takeIf { isCrossChain }
+            )
+        )
+    }
+
+    private suspend fun trackSendFailed(error: Throwable) {
+        analyticsService.track(
+            AnalyticsEvent.SendFailed(
+                asset = originAsset().symbol.value,
+                network = originChain().name,
+                reason = error.toSendFailureReason(),
+                destinationNetwork = destinationChain().name.takeIf { isCrossChain }
+            )
+        )
     }
 
     private fun finishSendFlow() = launch {

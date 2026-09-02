@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -68,7 +69,8 @@ class ConfirmMultiStakingModule {
         selectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
         stakingStartedDetectionService: StakingStartedDetectionService,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return ConfirmMultiStakingViewModel(
             router = router,
@@ -85,7 +87,8 @@ class ConfirmMultiStakingModule {
             selectionTypeProviderFactory = selectionTypeProviderFactory,
             stakingStartedDetectionService = stakingStartedDetectionService,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

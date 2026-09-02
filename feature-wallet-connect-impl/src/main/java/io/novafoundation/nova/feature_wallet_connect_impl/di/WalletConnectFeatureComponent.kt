@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.di
 
 import dagger.BindsInstance
 import dagger.Component
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.caip.di.CaipApi
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -50,6 +51,7 @@ interface WalletConnectFeatureComponent : WalletConnectFeatureApi {
 
     @Component(
         dependencies = [
+            AnalyticsFeatureApi::class,
             CommonApi::class,
             DbApi::class,
             AccountFeatureApi::class,

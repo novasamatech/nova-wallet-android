@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.io.MainThreadExecutor
@@ -45,7 +46,8 @@ class PinCodeModule {
         pinCodeAction: PinCodeAction,
         biometricService: BiometricService,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-        twoFactorVerificationExecutor: TwoFactorVerificationExecutor
+        twoFactorVerificationExecutor: TwoFactorVerificationExecutor,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return PinCodeViewModel(
             interactor,
@@ -56,6 +58,7 @@ class PinCodeModule {
             twoFactorVerificationExecutor,
             actionAwaitableMixinFactory,
             biometricService,
+            analyticsService,
             pinCodeAction
         )
     }

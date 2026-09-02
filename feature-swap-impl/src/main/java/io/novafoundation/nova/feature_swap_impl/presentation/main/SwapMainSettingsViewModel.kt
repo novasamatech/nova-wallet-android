@@ -3,6 +3,13 @@ package io.novafoundation.nova.feature_swap_impl.presentation.main
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.feature_swap_impl.presentation.common.analytics.toAnalyticsSource
+import io.novafoundation.nova.analytics.SwapStage
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.AssetCategoryClassifier
+import io.novafoundation.nova.analytics.SwapSource
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -78,6 +85,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountFieldValidator
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
@@ -148,6 +156,7 @@ class SwapMainSettingsViewModel(
     private val swapStateStoreProvider: SwapStateStoreProvider,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
+    private val analyticsService: AnalyticsService,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -248,6 +257,7 @@ class SwapMainSettingsViewModel(
             is QuotingState.Loaded -> it.quote.involvesHydraSwap()
             is QuotingState.Default,
             is QuotingState.Error -> false
+
             is QuotingState.Loading -> null
         }
     }
@@ -303,7 +313,13 @@ class SwapMainSettingsViewModel(
 
     private var quotingJob: Job? = null
 
+    /** Set when the user moves on to confirmation; anything else counts as leaving the flow. */
+    @Volatile
+    private var proceededToConfirmation = false
+
     init {
+        analyticsService.track(AnalyticsEvent.SwapScreenOpened(payload.source.toAnalyticsSource()))
+
         initPayload()
 
         launch { swapInteractor.warmUpSwapCommonlyUsedChains(swapFlowScope) }
@@ -365,6 +381,9 @@ class SwapMainSettingsViewModel(
         ) { validPayload ->
             _validationProgress.value = false
 
+            proceededToConfirmation = true
+
+            trackSwapInitiated()
             openSwapConfirmation(validPayload)
         }
     }
@@ -388,6 +407,29 @@ class SwapMainSettingsViewModel(
 
     fun backClicked() {
         swapRouter.back()
+    }
+
+    private fun trackSwapInitiated() = launch {
+        val quote = (quotingState.value as? QuotingState.Loaded)?.quote ?: return@launch
+
+        // fiat estimation is honestly unavailable without a token rate - skip the event in that case
+        val fiatIn = assetInFlow.first()?.token?.planksToFiatOrNull(quote.planksIn) ?: return@launch
+
+        val assetInSymbol = quote.assetIn.symbol.value
+        val assetOutSymbol = quote.assetOut.symbol.value
+
+        analyticsService.track(
+            AnalyticsEvent.SwapInitiated(
+                source = SwapSource.MAIN_SCREEN,
+                assetInCategory = AssetCategoryClassifier.classify(assetInSymbol),
+                assetOutCategory = AssetCategoryClassifier.classify(assetOutSymbol),
+                assetIn = assetInSymbol,
+                assetOut = assetOutSymbol,
+                networkIn = chainRegistry.getChain(quote.assetIn.chainId).name,
+                networkOut = chainRegistry.getChain(quote.assetOut.chainId).name,
+                amountBucket = AmountBucket.from(fiatIn)
+            )
+        )
     }
 
     private fun openSwapConfirmation(validPayload: SwapValidationPayload) = launchUnit {
@@ -755,4 +797,12 @@ class SwapMainSettingsViewModel(
     }
 
     private fun Flow<Asset?>.token(): Flow<Token?> = map { it?.token }
+
+    override fun onCleared() {
+        if (!proceededToConfirmation) {
+            analyticsService.track(AnalyticsEvent.SwapAbandoned(SwapStage.SETUP))
+        }
+
+        super.onCleared()
+    }
 }

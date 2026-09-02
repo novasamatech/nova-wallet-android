@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.confirm
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -22,6 +25,8 @@ import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.val
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.VoteReferendumValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.referendum.handleVoteReferendumValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.analytics.toAnalyticsConvictionLevel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.analytics.toAnalyticsVoteDirection
 import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.common.ReferendumFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
@@ -62,7 +67,8 @@ class ConfirmReferendumVoteViewModel(
     private val referendumFormatter: ReferendumFormatter,
     private val locksChangeFormatter: LocksChangeFormatter,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -137,6 +143,8 @@ class ConfirmReferendumVoteViewModel(
         }
 
         result.onSuccess {
+            trackVoteCast()
+
             showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
             startNavigation(it.submissionHierarchy) { router.backToReferendumDetails() }
@@ -144,6 +152,20 @@ class ConfirmReferendumVoteViewModel(
             .onFailure(::showError)
 
         _showNextProgress.value = false
+    }
+
+    private suspend fun trackVoteCast() {
+        val (chain, _) = governanceSharedState.chainAndAsset()
+        val asset = assetFlow.first()
+
+        analyticsService.track(
+            AnalyticsEvent.GovernanceVoteCast(
+                voteDirection = payload.vote.voteType.toAnalyticsVoteDirection(),
+                network = chain.name,
+                amountBucket = AmountBucket.from(asset.token.amountToFiat(payload.vote.amount)),
+                convictionLevel = payload.vote.conviction.toAnalyticsConvictionLevel()
+            )
+        )
     }
 
     private fun constructAccountVote(asset: Asset): AccountVote {

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.di
 import android.content.ContentResolver
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -124,6 +125,8 @@ import okhttp3.OkHttpClient
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    val analyticsService: AnalyticsService
 
     val maskingModeUseCase: MaskingModeUseCase
 

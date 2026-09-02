@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_buy_impl.di
 
 import android.content.Context
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
@@ -32,4 +33,6 @@ interface BuyFeatureDependencies {
     val resourceManager: ResourceManager
 
     val ipAddressReceiver: IpAddressReceiver
+
+    fun analyticsService(): AnalyticsService
 }

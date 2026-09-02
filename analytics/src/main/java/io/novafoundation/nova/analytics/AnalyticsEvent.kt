@@ -6,7 +6,6 @@ sealed class AnalyticsEvent(
 ) {
 
     // App lifecycle
-
     class AppOpened(isFirstLaunch: Boolean) : AnalyticsEvent(
         name = "app_opened",
         properties = mapOf(
@@ -27,7 +26,6 @@ sealed class AnalyticsEvent(
     )
 
     // Onboarding
-
     class OnboardingStarted(source: OnboardingSource) : AnalyticsEvent(
         name = "onboarding_started",
         properties = mapOf(
@@ -35,18 +33,16 @@ sealed class AnalyticsEvent(
         )
     )
 
-    class WalletCreationMethodSelected(method: WalletCreationMethod) : AnalyticsEvent(
-        name = "wallet_creation_method_selected",
+    class WalletImportMethodSelected(method: WalletCreationMethod) : AnalyticsEvent(
+        name = "wallet_import_method_selected",
         properties = mapOf(
             "method" to method.value
         )
     )
 
-    class WalletCreationStarted(method: WalletCreationMethod) : AnalyticsEvent(
+    object WalletCreationStarted : AnalyticsEvent(
         name = "wallet_creation_started",
-        properties = mapOf(
-            "method" to method.value
-        )
+        properties = mapOf()
     )
 
     class WalletCreationCompleted(
@@ -57,7 +53,6 @@ sealed class AnalyticsEvent(
         properties = buildMap {
             put("method", method.value)
             if (durationBucket != null) put("duration_bucket", durationBucket.value)
-            put("\$ip", false)
         }
     )
 
@@ -65,13 +60,6 @@ sealed class AnalyticsEvent(
         name = "wallet_creation_abandoned",
         properties = mapOf(
             "last_step" to lastStep.value
-        )
-    )
-
-    class FirstActionAfterWallet(action: FirstAction) : AnalyticsEvent(
-        name = "first_action_after_wallet",
-        properties = mapOf(
-            "action" to action.value
         )
     )
 
@@ -222,6 +210,13 @@ sealed class AnalyticsEvent(
         )
     )
 
+    class StakingAbandoned(stage: StakingStage) : AnalyticsEvent(
+        name = "staking_abandoned",
+        properties = mapOf(
+            "stage" to stage.value
+        )
+    )
+
     class UnstakeInitiated(stakingType: String, network: String, amountBucket: AmountBucket) : AnalyticsEvent(
         name = "unstake_initiated",
         properties = mapOf(
@@ -267,7 +262,6 @@ sealed class AnalyticsEvent(
             put("asset_category", assetCategory.value)
             put("amount_bucket", amountBucket.value)
             put("is_cross_chain", isCrossChain)
-            put("\$ip", false)
         }
     )
 
@@ -278,7 +272,6 @@ sealed class AnalyticsEvent(
             put("network", network)
             put("amount_bucket", amountBucket.value)
             if (destinationNetwork != null) put("destination_network", destinationNetwork)
-            put("\$ip", false)
         }
     )
 
@@ -289,7 +282,6 @@ sealed class AnalyticsEvent(
             put("network", network)
             put("reason", reason)
             if (destinationNetwork != null) put("destination_network", destinationNetwork)
-            put("\$ip", false)
         }
     )
 
@@ -339,6 +331,33 @@ sealed class AnalyticsEvent(
         )
     )
 
+    class BuyCompleted(provider: String, asset: String, network: String) : AnalyticsEvent(
+        name = "buy_completed",
+        properties = mapOf(
+            "provider" to provider,
+            "asset" to asset,
+            "network" to network
+        )
+    )
+
+    class SellInitiated(provider: String, asset: String, network: String) : AnalyticsEvent(
+        name = "sell_initiated",
+        properties = mapOf(
+            "provider" to provider,
+            "asset" to asset,
+            "network" to network
+        )
+    )
+
+    class SellCompleted(provider: String, asset: String, network: String) : AnalyticsEvent(
+        name = "sell_completed",
+        properties = mapOf(
+            "provider" to provider,
+            "asset" to asset,
+            "network" to network
+        )
+    )
+
     // Banner
 
     class BannerClicked(bannerId: String, bannerTitle: String, screen: String) : AnalyticsEvent(
@@ -363,6 +382,45 @@ sealed class AnalyticsEvent(
         name = "nft_section_opened",
         properties = mapOf(
             "nft_count" to nftCount
+        )
+    )
+
+    // Signing
+
+    class SignRequestShown(source: SignSource, method: String, chain: String) : AnalyticsEvent(
+        name = "sign_request_shown",
+        properties = mapOf(
+            "source" to source.value,
+            "method" to method,
+            "chain" to chain
+        )
+    )
+
+    class SignApproved(source: SignSource, method: String, chain: String) : AnalyticsEvent(
+        name = "sign_approved",
+        properties = mapOf(
+            "source" to source.value,
+            "method" to method,
+            "chain" to chain
+        )
+    )
+
+    class SignRejected(source: SignSource, method: String, chain: String) : AnalyticsEvent(
+        name = "sign_rejected",
+        properties = mapOf(
+            "source" to source.value,
+            "method" to method,
+            "chain" to chain
+        )
+    )
+
+    class SignFailed(source: SignSource, method: String, chain: String, reason: String) : AnalyticsEvent(
+        name = "sign_failed",
+        properties = mapOf(
+            "source" to source.value,
+            "method" to method,
+            "chain" to chain,
+            "reason" to reason
         )
     )
 }
@@ -391,23 +449,27 @@ enum class WalletCreationMethod(val value: String) {
 enum class SwapSource(val value: String) {
     ASSET_DETAILS("asset_details"),
     MAIN_SCREEN("main_screen"),
-    DEEP_LINK("deep_link")
+    OPERATION_DETAILS("operation_details"),
+    RETRY("retry")
 }
 
 enum class SwapFailureReason(val value: String) {
-    INSUFFICIENT_BALANCE("insufficient_balance"),
-    SLIPPAGE_EXCEEDED("slippage_exceeded"),
     NETWORK_ERROR("network_error"),
     EXECUTION_REVERTED("execution_reverted"),
     USER_CANCELLED("user_cancelled"),
-    SIGNING_UNAVAILABLE("signing_unavailable"),
     UNKNOWN("unknown")
+}
+
+enum class StakingStage(val value: String) {
+    LANDING("landing"),
+    SETUP("setup"),
+    TYPE_SELECTION("type_selection"),
+    CONFIRM("confirm")
 }
 
 enum class SwapStage(val value: String) {
     SETUP("setup"),
-    CONFIRM("confirm"),
-    EXECUTING("executing")
+    CONFIRM("confirm")
 }
 
 enum class FeatureId(val value: String) {
@@ -428,24 +490,18 @@ enum class OnboardingSource(val value: String) {
     ADD_WALLET("add_wallet")
 }
 
-enum class FirstAction(val value: String) {
-    SWAP("swap"),
-    SEND("send"),
-    RECEIVE("receive"),
-    STAKING("staking"),
-    DAPP("dapp"),
-    BUY("buy"),
-    OTHER("other")
-}
-
 enum class WalletCreationStep(val value: String) {
     WELCOME("welcome"),
     BACKUP("backup"),
     CONFIRM_MNEMONIC("confirm_mnemonic"),
     PIN_SETUP("pin_setup"),
-    NETWORK_SELECTION("network_selection"),
     SEED_ENTRY("seed_entry"),
     JSON_UPLOAD("json_upload"),
     LEDGER_CONNECT("ledger_connect"),
     OTHER("other")
+}
+
+enum class SignSource(val value: String) {
+    DAPP_BROWSER("dapp_browser"),
+    WALLET_CONNECT("walletconnect")
 }

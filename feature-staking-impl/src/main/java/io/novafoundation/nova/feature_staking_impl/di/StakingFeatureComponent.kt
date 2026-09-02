@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di
 
 import dagger.BindsInstance
 import dagger.Component
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core_db.di.DbApi
@@ -291,6 +292,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
 
     @Component(
         dependencies = [
+            AnalyticsFeatureApi::class,
             CommonApi::class,
             DbApi::class,
             RuntimeApi::class,

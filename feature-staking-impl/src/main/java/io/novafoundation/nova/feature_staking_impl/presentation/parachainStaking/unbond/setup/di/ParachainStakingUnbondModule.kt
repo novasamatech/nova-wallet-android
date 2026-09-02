@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -44,7 +45,8 @@ class ParachainStakingUnbondModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return ParachainStakingUnbondViewModel(
             router = router,
@@ -60,7 +62,8 @@ class ParachainStakingUnbondModule {
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
             hintsMixinFactory = hintsMixinFactory,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

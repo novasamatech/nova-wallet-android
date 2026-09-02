@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_buy_impl.di
 
 import dagger.BindsInstance
 import dagger.Component
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -36,6 +37,7 @@ interface BuyFeatureComponent : BuyFeatureApi {
             RuntimeApi::class,
             AccountFeatureApi::class,
             WalletFeatureApi::class,
+            AnalyticsFeatureApi::class,
         ]
     )
     interface BuyFeatureDependenciesComponent : BuyFeatureDependencies

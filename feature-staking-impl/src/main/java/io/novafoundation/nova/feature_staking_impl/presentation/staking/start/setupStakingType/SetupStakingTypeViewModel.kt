@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
@@ -11,13 +14,16 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.createStakingOption
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.RecommendableMultiStakingSelection
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.types.CompoundStakingTypeDetailsProvidersFactory
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupStakingType.model.ValidatedStakingTypeDetails
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsStakingType
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupStakingType.adapter.EditableStakingTypeRVItem
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
@@ -49,8 +55,14 @@ class SetupStakingTypeViewModel(
     private val setupStakingTypeFlowExecutorFactory: SetupStakingTypeFlowExecutorFactory,
     private val setupStakingTypeSelectionMixinFactory: SetupStakingTypeSelectionMixinFactory,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val analyticsService: AnalyticsService,
     chainRegistry: ChainRegistry
 ) : BaseViewModel(), Validatable by validationExecutor {
+
+    /**
+     * Whether user applied staking type selection. Used to detect flow abandoning in [onCleared]
+     */
+    private var flowContinued = false
 
     val closeConfirmationAction = actionAwaitableMixinFactory.confirmingAction<ConfirmationDialogInfo>()
 
@@ -140,8 +152,31 @@ class SetupStakingTypeViewModel(
         launch {
             setupStakingTypeSelectionMixin.apply()
 
+            trackStakingTypeSelected()
+
+            flowContinued = true
+
             router.back()
         }
+    }
+
+    override fun onCleared() {
+        if (!flowContinued) {
+            analyticsService.track(AnalyticsEvent.StakingAbandoned(StakingStage.TYPE_SELECTION))
+        }
+
+        super.onCleared()
+    }
+
+    private suspend fun trackStakingTypeSelected() {
+        val stakingOption = editableSelectionFlow.first().selection.stakingOption
+
+        analyticsService.track(
+            AnalyticsEvent.StakingTypeSelected(
+                stakingType = stakingOption.stakingType.toAnalyticsStakingType(),
+                network = stakingOption.chain.name
+            )
+        )
     }
 
     fun stakingTypeClicked(stakingTypeRVItem: EditableStakingTypeRVItem, position: Int) {

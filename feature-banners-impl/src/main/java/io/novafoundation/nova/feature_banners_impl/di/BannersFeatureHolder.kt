@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_banners_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -14,6 +15,7 @@ class BannersFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val accountFeatureDependencies = DaggerBannersFeatureComponent_BannersFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .build()
 
         return DaggerBannersFeatureComponent.factory()

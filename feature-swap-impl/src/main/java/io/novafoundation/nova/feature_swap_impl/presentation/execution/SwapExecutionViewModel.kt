@@ -1,6 +1,11 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.execution
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapEntryPoint
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.DurationBucket
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -27,12 +32,15 @@ import io.novafoundation.nova.feature_swap_impl.R
 import io.novafoundation.nova.feature_swap_impl.domain.interactor.SwapInteractor
 import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
+import io.novafoundation.nova.feature_swap_impl.presentation.common.analytics.toSwapFailureReason
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
@@ -56,6 +64,8 @@ class SwapExecutionViewModel(
     private val descriptionBottomSheetLauncher: DescriptionBottomSheetLauncher,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val tokenRepository: TokenRepository,
+    private val analyticsService: AnalyticsService,
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
@@ -130,6 +140,7 @@ class SwapExecutionViewModel(
             assetOut = failedOperation.assetOut.toAssetPayload(),
             amount = failedOperation.estimatedSwapLimit.quotedAmount,
             direction = failedOperation.estimatedSwapLimit.swapDirection.toParcel(),
+            source = SwapEntryPoint.RETRY,
         )
     }
 
@@ -139,11 +150,39 @@ class SwapExecutionViewModel(
 
     private fun executeSwap() = launchUnit {
         val fee = swapStateFlow.first().fee
+        val executionStartedAt = System.currentTimeMillis()
 
         swapInteractor.executeSwap(fee)
+            .onEach { trackSwapProgress(it, executionStartedAt) }
             .onEach(swapProgressFlow::emit)
             .inBackground()
             .collect()
+    }
+
+    private suspend fun trackSwapProgress(progress: SwapProgress, executionStartedAt: Long) {
+        when (progress) {
+            is SwapProgress.Done -> trackSwapCompleted(executionStartedAt)
+            is SwapProgress.Failure -> analyticsService.track(AnalyticsEvent.SwapFailed(progress.error.toSwapFailureReason()))
+            is SwapProgress.StepStarted -> {}
+        }
+    }
+
+    private suspend fun trackSwapCompleted(executionStartedAt: Long) {
+        val quote = swapStateFlow.first().quote
+
+        // fiat estimation is honestly unavailable without a token rate - skip the event in that case
+        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return
+
+        analyticsService.track(
+            AnalyticsEvent.SwapCompleted(
+                amountBucket = AmountBucket.from(fiatIn),
+                durationBucket = DurationBucket.from(System.currentTimeMillis() - executionStartedAt),
+                assetIn = quote.assetIn.symbol.value,
+                assetOut = quote.assetOut.symbol.value,
+                networkIn = chainRegistry.getChain(quote.assetIn.chainId).name,
+                networkOut = chainRegistry.getChain(quote.assetOut.chainId).name
+            )
+        )
     }
 
     private suspend fun SwapProgress.toUi(swapState: SwapState): SwapProgressModel {

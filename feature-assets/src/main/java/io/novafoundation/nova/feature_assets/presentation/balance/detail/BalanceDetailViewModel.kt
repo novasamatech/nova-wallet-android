@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.presentation.balance.detail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapEntryPoint
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.mixin.api.Browserable
@@ -306,7 +307,7 @@ class BalanceDetailViewModel(
     fun swapClicked() {
         launch {
             val chainAsset = assetFlow.first().token.configuration
-            val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload())
+            val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload(), SwapEntryPoint.ASSET_DETAILS)
             router.openSwapSetupAmount(payload)
         }
     }

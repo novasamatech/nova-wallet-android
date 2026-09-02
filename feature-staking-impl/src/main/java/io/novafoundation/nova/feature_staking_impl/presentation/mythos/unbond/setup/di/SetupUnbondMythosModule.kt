@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -46,7 +47,8 @@ class SetupUnbondMythosModule {
         mythosValidationFailureFormatter: MythosStakingValidationFailureFormatter,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         stakingSharedState: StakingSharedState,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return SetupUnbondMythosViewModel(
             router = router,
@@ -63,7 +65,8 @@ class SetupUnbondMythosModule {
             mythosValidationFailureFormatter = mythosValidationFailureFormatter,
             amountChooserMixinFactory = amountChooserMixinFactory,
             stakingSharedState = stakingSharedState,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

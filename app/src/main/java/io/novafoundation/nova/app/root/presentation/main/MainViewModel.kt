@@ -30,8 +30,6 @@ class MainViewModel(
 
         checkLegalConsent()
 
-        analyticsService.track(AnalyticsEvent.AppOpened(isFirstLaunch = false))
-
         if (welcomePushNotificationsInteractor.needToShowWelcomeScreen()) {
             rootRouter.openPushWelcome()
         }
