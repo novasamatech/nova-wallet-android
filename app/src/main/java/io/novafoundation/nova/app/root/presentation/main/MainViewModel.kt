@@ -1,5 +1,9 @@
 package io.novafoundation.nova.app.root.presentation.main
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -21,7 +25,8 @@ class MainViewModel(
     private val accountRepository: AccountRepository,
     private val rootRouter: RootRouter,
     private val chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val analyticsOptOutManager: AnalyticsOptOutManager
 ) : BaseViewModel() {
 
     init {
@@ -29,6 +34,8 @@ class MainViewModel(
         automaticInteractionGate.initialPinPassed()
 
         checkLegalConsent()
+
+        checkAnalyticsConsent()
 
         if (welcomePushNotificationsInteractor.needToShowWelcomeScreen()) {
             rootRouter.openPushWelcome()
@@ -46,6 +53,9 @@ class MainViewModel(
      * Only users that already have a wallet are asked to accept the updated documents - someone who has just
      * onboarded has accepted them on the welcome screen already.
      */
+    private val _showAnalyticsConsent = MutableLiveData<Event<Unit>>()
+    val showAnalyticsConsent: LiveData<Event<Unit>> = _showAnalyticsConsent
+
     private var currentTab: String? = null
 
     fun onDestinationChanged(destinationId: Int) {
@@ -67,6 +77,28 @@ class MainViewModel(
         R.id.stakingDashboardFragment -> "staking"
         R.id.profileFragment -> "settings"
         else -> null
+    }
+
+    fun onAnalyticsConsentGiven() {
+        analyticsOptOutManager.setAnalyticsEnabled(true)
+        analyticsOptOutManager.setAnalyticsPromptSeen()
+    }
+
+    fun onAnalyticsConsentDeclined() {
+        analyticsOptOutManager.setAnalyticsPromptSeen()
+    }
+
+    /**
+     * Asked once, and only of someone who already has a wallet: a person still going
+     * through onboarding should not meet this on top of the setup flow, and the legal
+     * consent screen takes precedence when both are due.
+     */
+    private fun checkAnalyticsConsent() = launch {
+        if (analyticsOptOutManager.hasSeenAnalyticsPrompt()) return@launch
+        if (!accountRepository.hasActiveMetaAccounts()) return@launch
+        if (legalConsentRepository.isConsentRequired()) return@launch
+
+        _showAnalyticsConsent.value = Event(Unit)
     }
 
     private fun checkLegalConsent() = launch {

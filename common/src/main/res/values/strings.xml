@@ -2784,4 +2784,8 @@
     <string name="legal_consent_subtitle">We’ve updated our Terms of Service and Privacy Notice. Please review and accept the updated documents to continue using Nova Wallet.</string>
     <string name="legal_consent_accept">Accept and Continue</string>
     <string name="settings_analytics_title">Share Anonymous Usage Data</string>
+    <string name="analytics_prompt_title">Help Improve Nova Wallet</string>
+    <string name="analytics_prompt_message">Share anonymous usage data to help us build a better wallet.\n\n• No personal data collected\n• No wallet addresses tracked\n• You can change this anytime in Settings</string>
+    <string name="analytics_prompt_enable">Enable Analytics</string>
+    <string name="analytics_prompt_decline">No Thanks</string>
 </resources>

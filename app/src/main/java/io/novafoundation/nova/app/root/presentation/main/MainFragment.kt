@@ -7,6 +7,9 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 
+import io.novafoundation.nova.common.R as CommonR
+import io.novafoundation.nova.common.view.dialog.dialog
+import io.novafoundation.nova.common.utils.observeEvent
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.databinding.FragmentMainBinding
 import io.novafoundation.nova.app.root.di.RootApi
@@ -69,7 +72,24 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
             .inject(this)
     }
 
-    override fun subscribe(viewModel: MainViewModel) {}
+    override fun subscribe(viewModel: MainViewModel) {
+        viewModel.showAnalyticsConsent.observeEvent {
+            showAnalyticsConsentDialog()
+        }
+    }
+
+    private fun showAnalyticsConsentDialog() {
+        dialog(requireContext()) {
+            setTitle(CommonR.string.analytics_prompt_title)
+            setMessage(CommonR.string.analytics_prompt_message)
+            setPositiveButton(CommonR.string.analytics_prompt_enable) { _, _ ->
+                viewModel.onAnalyticsConsentGiven()
+            }
+            setNegativeButton(CommonR.string.analytics_prompt_decline) { _, _ ->
+                viewModel.onAnalyticsConsentDeclined()
+            }
+        }
+    }
 
     private fun isAtHomeTab(destination: NavDestination) =
         destination.id == navController!!.graph.startDestination
