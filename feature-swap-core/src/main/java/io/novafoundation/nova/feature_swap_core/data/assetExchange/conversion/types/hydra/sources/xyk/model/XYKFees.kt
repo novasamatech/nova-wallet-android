@@ -4,8 +4,10 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindInt
 import io.novafoundation.nova.common.data.network.runtime.binding.castToList
 import io.novafoundation.nova.common.utils.constant
 import io.novafoundation.nova.common.utils.decoded
+import io.novafoundation.nova.common.utils.numberConstantOrNull
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import java.math.BigInteger
 
 class XYKFees(val nominator: Int, val denominator: Int)
 
@@ -17,4 +19,12 @@ fun bindXYKFees(decoded: Any?): XYKFees {
 
 fun Module.poolFeesConstant(runtimeSnapshot: RuntimeSnapshot): XYKFees {
     return bindXYKFees(constant("GetExchangeFee").decoded(runtimeSnapshot))
+}
+
+fun Module.maxInRatioConstant(runtimeSnapshot: RuntimeSnapshot): BigInteger? {
+    return numberConstantOrNull("MaxInRatio", runtimeSnapshot)
+}
+
+fun Module.maxOutRatioConstant(runtimeSnapshot: RuntimeSnapshot): BigInteger? {
+    return numberConstantOrNull("MaxOutRatio", runtimeSnapshot)
 }

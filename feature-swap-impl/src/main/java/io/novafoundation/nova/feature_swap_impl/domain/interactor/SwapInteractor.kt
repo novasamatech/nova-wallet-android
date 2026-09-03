@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.canPayAllFees
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughAssetInToPayForSwap
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughAssetInToPayForSwapAndFee
 import io.novafoundation.nova.feature_swap_impl.domain.validation.enoughLiquidity
+import io.novafoundation.nova.feature_swap_impl.domain.validation.poolTradeLimits
 import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountIn
 import io.novafoundation.nova.feature_swap_impl.domain.validation.positiveAmountOut
 import io.novafoundation.nova.feature_swap_impl.domain.validation.priceImpactValidation
@@ -159,6 +160,8 @@ class SwapInteractor(
             availableSlippage(swapService)
 
             enoughLiquidity(sharedQuoteValidationRetriever)
+
+            poolTradeLimits(assetsValidationContext)
 
             rateNotExceedSlippage(sharedQuoteValidationRetriever)
 
