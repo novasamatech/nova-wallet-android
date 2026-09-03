@@ -2,8 +2,7 @@ android {
 
     defaultConfig {
         def infrastructureHost = project.findProperty("infrastructureHost")
-            ?: project.findProperty("analyticsHost")
-            ?: "https://analytics.novawallet.io/"
+            ?: project.findProperty("analyticsHost") ?: ""
         buildConfigField "String", "INFRASTRUCTURE_HOST", "\"$infrastructureHost\""
 
         // Dev-only attestation secret for local backends; empty keeps debug builds unattested

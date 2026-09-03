@@ -6,6 +6,7 @@ import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
 import io.novafoundation.nova.core_db.model.AnalyticsEventLocal
 
 class QueuedEvent(
+    val id: String,
     val name: String,
     val timestamp: Long,
     val props: Map<String, Any?>
@@ -22,6 +23,7 @@ class AnalyticsEventQueue(
     suspend fun enqueue(event: QueuedEvent) {
         dao.insert(
             AnalyticsEventLocal(
+                eventId = event.id,
                 name = event.name,
                 timestamp = event.timestamp,
                 propsJson = gson.toJson(event.props)
@@ -33,6 +35,7 @@ class AnalyticsEventQueue(
     suspend fun peek(limit: Int): List<QueuedEvent> {
         return dao.peekOldest(limit).map { local ->
             QueuedEvent(
+                id = local.eventId,
                 name = local.name,
                 timestamp = local.timestamp,
                 props = gson.fromJson(local.propsJson, propsType) ?: emptyMap()

@@ -2,13 +2,12 @@ package io.novafoundation.nova.analytics.transport
 
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsService
+import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-
-private const val FLUSH_INTERVAL_MILLIS = 5 * 60 * 1000L
 
 class RealAnalyticsService(
     private val scope: CoroutineScope,
@@ -19,9 +18,6 @@ class RealAnalyticsService(
 ) : AnalyticsService {
 
     private val flushMutex = Mutex()
-
-    @Volatile
-    private var lastFlushAt = 0L
 
     @Volatile
     override var isEnabled: Boolean = false
@@ -36,12 +32,20 @@ class RealAnalyticsService(
     override fun track(event: AnalyticsEvent) {
         if (!isEnabled) return
 
-        val queued = QueuedEvent(event.name, System.currentTimeMillis(), event.properties)
+        // The identity is minted here, not at upload time: a retried upload must carry
+        // the same id, or the backend would store the same event twice.
+        val queued = QueuedEvent(
+            id = UUID.randomUUID().toString(),
+            name = event.name,
+            timestamp = System.currentTimeMillis(),
+            props = event.properties
+        )
 
         scope.launch(Dispatchers.IO) {
             queue.enqueue(queued)
 
-            if (shouldFlush()) flush()
+            // A full batch does not wait for the next tick: it is already a whole request.
+            if (queue.size() >= flushThreshold) flush()
         }
     }
 
@@ -49,15 +53,7 @@ class RealAnalyticsService(
         if (!isEnabled) return
 
         flushMutex.withLock {
-            lastFlushAt = System.currentTimeMillis()
-
             uploader.flush()
         }
-    }
-
-    private suspend fun shouldFlush(): Boolean {
-        if (queue.size() >= flushThreshold) return true
-
-        return System.currentTimeMillis() - lastFlushAt >= FLUSH_INTERVAL_MILLIS
     }
 }

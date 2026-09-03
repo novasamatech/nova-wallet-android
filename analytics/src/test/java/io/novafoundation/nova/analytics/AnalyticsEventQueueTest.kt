@@ -1,6 +1,7 @@
 package io.novafoundation.nova.analytics
 
 import com.google.gson.Gson
+import java.util.UUID
 import io.novafoundation.nova.analytics.transport.AnalyticsEventQueue
 import io.novafoundation.nova.analytics.transport.QueuedEvent
 import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
@@ -50,7 +51,7 @@ class AnalyticsEventQueueTest {
 
     @Test
     fun `events survive being written and read back`() = runTest {
-        queue.enqueue(QueuedEvent("app_opened", 1000L, mapOf("is_first_launch" to true)))
+        queue.enqueue(QueuedEvent(UUID.randomUUID().toString(), "app_opened", 1000L, mapOf("is_first_launch" to true)))
 
         val stored = queue.peek(10).single()
 
@@ -61,7 +62,7 @@ class AnalyticsEventQueueTest {
 
     @Test
     fun `peek preserves fifo order and drop removes the oldest`() = runTest {
-        repeat(3) { queue.enqueue(QueuedEvent("event_$it", it.toLong(), emptyMap())) }
+        repeat(3) { queue.enqueue(QueuedEvent(UUID.randomUUID().toString(), "event_$it", it.toLong(), emptyMap())) }
 
         assertEquals(listOf("event_0", "event_1", "event_2"), queue.peek(10).map { it.name })
 
@@ -72,7 +73,7 @@ class AnalyticsEventQueueTest {
 
     @Test
     fun `overflow keeps the newest events`() = runTest {
-        repeat(8) { queue.enqueue(QueuedEvent("event_$it", it.toLong(), emptyMap())) }
+        repeat(8) { queue.enqueue(QueuedEvent(UUID.randomUUID().toString(), "event_$it", it.toLong(), emptyMap())) }
 
         val names = queue.peek(10).map { it.name }
 
@@ -82,11 +83,22 @@ class AnalyticsEventQueueTest {
 
     @Test
     fun `clear empties the queue`() = runTest {
-        queue.enqueue(QueuedEvent("event", 1L, emptyMap()))
+        queue.enqueue(QueuedEvent(UUID.randomUUID().toString(), "event", 1L, emptyMap()))
 
         queue.clear()
 
         assertTrue(queue.peek(10).isEmpty())
         assertEquals(0, queue.size())
+    }
+
+    @Test
+    fun `event identity survives the round trip through storage`() = runTest {
+        // The backend deduplicates on this id, so a retried upload has to present the
+        // same value the event was created with.
+        val id = UUID.randomUUID().toString()
+        queue.enqueue(QueuedEvent(id, "swap_confirmed", 1L, emptyMap()))
+
+        assertEquals(id, queue.peek(10).single().id)
+        assertEquals(id, queue.peek(10).single().id)
     }
 }

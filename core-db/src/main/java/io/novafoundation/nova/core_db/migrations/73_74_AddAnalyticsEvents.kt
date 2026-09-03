@@ -10,6 +10,7 @@ val AddAnalyticsEvents_73_74 = object : Migration(73, 74) {
             """
             CREATE TABLE IF NOT EXISTS `analytics_pending_events` (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            `eventId` TEXT NOT NULL,
             `name` TEXT NOT NULL,
             `timestamp` INTEGER NOT NULL,
             `propsJson` TEXT NOT NULL);

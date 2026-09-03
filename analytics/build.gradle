@@ -1,7 +1,7 @@
 android {
 
     defaultConfig {
-        def analyticsHost = project.findProperty("analyticsHost") ?: "https://analytics.novawallet.io/"
+        def analyticsHost = project.findProperty("analyticsHost")
         buildConfigField "String", "ANALYTICS_HOST", "\"$analyticsHost\""
     }
 

@@ -2,10 +2,12 @@ package io.novafoundation.nova.analytics.di
 
 import android.content.Context
 import com.google.gson.Gson
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.NoOpAnalyticsService
 import io.novafoundation.nova.analytics.BuildConfig
 import io.novafoundation.nova.analytics.RealAnalyticsOptOutManager
 import io.novafoundation.nova.analytics.transport.AnalyticsApi
@@ -23,7 +25,8 @@ import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
 import io.novafoundation.nova.infrastructure.di.Attested
 
 private const val ANALYTICS_QUEUE_MAX_SIZE = 500
-private const val ANALYTICS_BATCH_SIZE = 50
+
+private const val ANALYTICS_BATCH_SIZE = 300
 
 @Module
 class AnalyticsFeatureModule {
@@ -69,10 +72,12 @@ class AnalyticsFeatureModule {
     fun provideAnalyticsService(
         rootScope: RootScope,
         queue: AnalyticsEventQueue,
-        uploader: AnalyticsUploader,
+        uploader: Lazy<AnalyticsUploader>,
         identity: AnalyticsIdentity
     ): AnalyticsService {
-        return RealAnalyticsService(rootScope, queue, uploader, identity, ANALYTICS_BATCH_SIZE)
+        if (BuildConfig.ANALYTICS_HOST.isBlank()) return NoOpAnalyticsService()
+
+        return RealAnalyticsService(rootScope, queue, uploader.get(), identity, ANALYTICS_BATCH_SIZE)
     }
 
     @Provides

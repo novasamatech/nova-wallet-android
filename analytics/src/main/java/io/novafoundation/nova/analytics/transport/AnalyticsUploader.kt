@@ -47,7 +47,7 @@ class AnalyticsUploader(
             install_id = identity.installId(),
             session_id = identity.sessionId,
             sent_at = formatIso8601(System.currentTimeMillis()),
-            events = batch.map { AnalyticsEventRequest(it.name, formatIso8601(it.timestamp), it.props) }
+            events = batch.map { AnalyticsEventRequest(it.id, it.name, formatIso8601(it.timestamp), it.props) }
         )
     }
 

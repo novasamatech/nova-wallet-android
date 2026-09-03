@@ -6,6 +6,7 @@ const val ANALYTICS_SCHEMA_VERSION = 1
 
 @Keep
 class AnalyticsEventRequest(
+    val id: String,
     val name: String,
     val ts: String,
     val props: Map<String, Any?>
