@@ -1,13 +1,66 @@
+apply from: '../scripts/secrets.gradle'
+
+// Attestation strength is a property of how the build is distributed, not of a flag someone
+// remembers to pass. Play-distributed releases prove themselves with Play Integrity; local
+// debug builds cannot (emulators fail device integrity) and use the development HMAC; every
+// other build type attests nothing because it also collects nothing.
 android {
 
     defaultConfig {
-        def infrastructureHost = project.findProperty("infrastructureHost")
-            ?: project.findProperty("analyticsHost") ?: ""
-        buildConfigField "String", "INFRASTRUCTURE_HOST", "\"$infrastructureHost\""
+        buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
+        buildConfigField "String", "ATTESTATION_MODE", "\"none\""
+        buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"\""
+    }
 
-        // Dev-only attestation secret for local backends; empty keeps debug builds unattested
-        def attestationSharedSecret = project.findProperty("attestationSharedSecret") ?: ""
-        buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"$attestationSharedSecret\""
+    buildTypes {
+        debug {
+            buildConfigField "String", "INFRASTRUCTURE_HOST", readStringSecretOrNull("DEBUG_NOVA_BACKEND_HOST") ?: "\"\""
+            buildConfigField "String", "ATTESTATION_MODE", "\"shared_secret\""
+            buildConfigField "String", "ATTESTATION_SHARED_SECRET", readStringSecretOrNull("DEBUG_ATTESTATION_SHARED_SECRET") ?: "\"\""
+        }
+
+        debugLocal {
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
+        }
+
+        release {
+            buildConfigField "String", "INFRASTRUCTURE_HOST", readStringSecretOrNull("RELEASE_NOVA_BACKEND_HOST") ?: "\"\""
+            buildConfigField "String", "ATTESTATION_MODE", "\"play_integrity\""
+        }
+
+        releaseMarket {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+        }
+
+        releaseGithub {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+        }
+
+        releaseTest {
+            initWith buildTypes.release
+            matchingFallbacks = ['release']
+            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
+            buildConfigField "String", "ATTESTATION_MODE", "\"none\""
+        }
+
+        develop {
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
+            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
+            buildConfigField "String", "ATTESTATION_MODE", "\"none\""
+            buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"\""
+        }
+
+        instrumentialTest {
+            initWith buildTypes.debug
+            matchingFallbacks = ['debug']
+            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
+            buildConfigField "String", "ATTESTATION_MODE", "\"none\""
+            buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"\""
+        }
     }
 
     buildFeatures {

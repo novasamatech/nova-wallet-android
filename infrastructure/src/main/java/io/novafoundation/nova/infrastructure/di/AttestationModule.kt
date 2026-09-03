@@ -53,12 +53,12 @@ class AttestationModule {
         keyPairStore: AttestationKeyPairStore,
         integrityService: IntegrityService
     ): ClientAttestationService {
+        // The build type decided this, not a runtime guess: see infrastructure/build.gradle.
+        val mode = AttestationMode.fromWireName(BuildConfig.ATTESTATION_MODE)
         val sharedSecret = BuildConfig.ATTESTATION_SHARED_SECRET.takeIf { it.isNotBlank() }
 
-        val mode = when {
-            !BuildConfig.DEBUG -> AttestationMode.PLAY_INTEGRITY
-            sharedSecret != null -> AttestationMode.SHARED_SECRET
-            else -> AttestationMode.UNATTESTED
+        require(mode != AttestationMode.SHARED_SECRET || sharedSecret != null) {
+            "shared_secret attestation needs DEBUG_ATTESTATION_SHARED_SECRET in local.properties"
         }
 
         return RealClientAttestationService(api, identity, keyPairStore, integrityService, context.packageName, mode, sharedSecret)

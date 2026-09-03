@@ -16,7 +16,15 @@ private const val PLATFORM_ANDROID = "android"
 enum class AttestationMode(val wireName: String) {
     PLAY_INTEGRITY("play_integrity"),
     SHARED_SECRET("shared_secret"),
-    UNATTESTED("none")
+    UNATTESTED("none");
+
+    companion object {
+
+        /** Resolves the mode a build was configured with, defaulting to no attestation. */
+        fun fromWireName(wireName: String): AttestationMode {
+            return entries.firstOrNull { it.wireName == wireName } ?: UNATTESTED
+        }
+    }
 }
 
 /** The backend rejected this client's attestation; retrying will not help. */
