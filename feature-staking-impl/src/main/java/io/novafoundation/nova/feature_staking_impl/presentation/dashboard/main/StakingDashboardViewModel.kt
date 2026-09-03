@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.announcements.Announcement
 import io.novafoundation.nova.common.domain.map
@@ -66,7 +68,8 @@ class StakingDashboardViewModel(
     private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
     private val amountFormatter: AmountFormatter,
     private val assetIconProvider: AssetIconProvider,
-    private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
+    private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel() {
 
     private val dashboardFormattersFlow = maskableValueFormatterProvider.provideFormatter()
@@ -124,6 +127,8 @@ class StakingDashboardViewModel(
         val chainAsset = withoutStakeItem.token.configuration
 
         stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
+
+        analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = "dashboard"))
 
         val payload = StartStakingLandingPayload(
             availableStakingOptions = AvailableStakingOptionsPayload(chain.id, chainAsset.id, stakingTypes)

@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.importing
 
 import android.content.Intent
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.WalletCreationStep
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.MixinFactory
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -9,7 +12,9 @@ import io.novafoundation.nova.common.utils.withFlagSet
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountAlreadyExistsException
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportAccountPayload
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.ImportType
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.data.mappers.mapAddAccountPayloadToAddAccountType
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -32,6 +37,7 @@ class ImportAccountViewModel(
     accountNameChooserFactory: MixinFactory<AccountNameChooserMixin.Presentation>,
     private val payload: ImportAccountPayload,
     private val importSourceFactory: ImportSourceFactory,
+    private val analyticsService: AnalyticsService,
 ) : BaseViewModel(),
     WithAccountNameChooserMixin {
 
@@ -46,6 +52,11 @@ class ImportAccountViewModel(
     )
 
     private val importInProgressFlow = MutableStateFlow(false)
+
+    /**
+     * Set once the user navigates to the next step of the flow so that leaving the screen afterwards is not reported as abandoning
+     */
+    private var proceededToNextStep = false
 
     private val nextButtonEnabledFlow = combine(
         importSource.fieldsValidFlow,
@@ -74,7 +85,11 @@ class ImportAccountViewModel(
             val addAccountType = mapAddAccountPayloadToAddAccountType(payload.addAccountPayload, nameState)
 
             importSource.performImport(addAccountType)
-                .onSuccess { continueBasedOnCodeStatus() }
+                .onSuccess {
+                    proceededToNextStep = true
+
+                    continueBasedOnCodeStatus()
+                }
                 .onFailure(::handleCreateAccountError)
         }
     }
@@ -87,6 +102,24 @@ class ImportAccountViewModel(
                 importSource.fileChosen(intent.data!!)
             }
         }
+    }
+
+    override fun onCleared() {
+        trackWalletCreationAbandonedIfNeeded()
+
+        super.onCleared()
+    }
+
+    private fun trackWalletCreationAbandonedIfNeeded() {
+        if (proceededToNextStep) return
+        if (payload.addAccountPayload !is AddAccountPayload.MetaAccount) return
+
+        val lastStep = when (payload.importType) {
+            is ImportType.Json -> WalletCreationStep.JSON_UPLOAD
+            is ImportType.Mnemonic, is ImportType.Seed -> WalletCreationStep.SEED_ENTRY
+        }
+
+        analyticsService.track(AnalyticsEvent.WalletCreationAbandoned(lastStep))
     }
 
     private suspend fun continueBasedOnCodeStatus() {

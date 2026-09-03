@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_onboarding_impl.presentation.importChooser
 
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.WalletCreationMethod
+import io.novafoundation.nova.analytics.WalletCreationStep
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
@@ -32,6 +36,7 @@ class ImportWalletOptionsViewModel(
     customDialogProvider: CustomDialogDisplayer.Presentation,
     cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
     private val ledgerMigrationTracker: LedgerMigrationTracker,
+    private val analyticsService: AnalyticsService,
 ) : BaseViewModel(), CustomDialogDisplayer.Presentation by customDialogProvider {
 
     val progressDialogMixin = progressDialogMixinFactory.create()
@@ -43,23 +48,43 @@ class ImportWalletOptionsViewModel(
     val showImportViaCloudButton = flowOf { onboardingInteractor.isCloudBackupAvailableForImport() }
         .shareInBackground()
 
+    /**
+     * Set once the user navigates to the next step of the flow so that leaving the screen afterwards is not reported as abandoning
+     */
+    private var proceededToNextStep = false
+
     fun backClicked() {
         router.back()
     }
 
+    override fun onCleared() {
+        if (!proceededToNextStep) {
+            analyticsService.track(AnalyticsEvent.WalletCreationAbandoned(WalletCreationStep.OTHER))
+        }
+
+        super.onCleared()
+    }
+
     fun importMnemonicClicked() {
+        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_MNEMONIC))
+
         openImportType(ImportType.Mnemonic())
     }
 
     fun importTrustWalletClicked() {
+        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_MNEMONIC))
+
         openImportType(ImportType.Mnemonic(origin = Origin.TRUST_WALLET))
     }
 
     fun importCloudClicked() = launch {
+        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.CLOUD_BACKUP))
+
         progressDialogMixin.startProgress(R.string.loocking_backup_progress) {
             onboardingInteractor.checkCloudBackupIsExist()
                 .onSuccess { isCloudBackupExist ->
                     if (isCloudBackupExist) {
+                        proceededToNextStep = true
                         router.restoreCloudBackup()
                     } else {
                         showBackupNotFoundError()
@@ -78,13 +103,30 @@ class ImportWalletOptionsViewModel(
                 val payload = SelectHardwareWalletBottomSheet.Payload(genericLedgerSupported)
 
                 when (val selection = selectHardwareWallet.awaitAction(payload)) {
-                    HardwareWalletModel.LedgerLegacy -> router.openStartImportLegacyLedger()
+                    HardwareWalletModel.LedgerLegacy -> {
+                        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_LEDGER))
+                        proceededToNextStep = true
+                        router.openStartImportLegacyLedger()
+                    }
 
-                    HardwareWalletModel.LedgerGeneric -> router.openStartImportGenericLedger()
+                    HardwareWalletModel.LedgerGeneric -> {
+                        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_LEDGER))
+                        proceededToNextStep = true
+                        router.openStartImportGenericLedger()
+                    }
 
                     is HardwareWalletModel.PolkadotVault -> when (selection.variant) {
-                        PolkadotVaultVariant.POLKADOT_VAULT -> router.openStartImportPolkadotVault()
-                        PolkadotVaultVariant.PARITY_SIGNER -> router.openStartImportParitySigner()
+                        PolkadotVaultVariant.POLKADOT_VAULT -> {
+                            analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_POLKADOT_VAULT))
+                            proceededToNextStep = true
+                            router.openStartImportPolkadotVault()
+                        }
+
+                        PolkadotVaultVariant.PARITY_SIGNER -> {
+                            analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_PARITY_SIGNER))
+                            proceededToNextStep = true
+                            router.openStartImportParitySigner()
+                        }
                     }
                 }
             }
@@ -92,21 +134,29 @@ class ImportWalletOptionsViewModel(
     }
 
     fun importWatchOnlyClicked() {
+        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_WATCH_ONLY))
+
         cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
+            proceededToNextStep = true
             router.openCreateWatchWallet()
         }
     }
 
     fun importRawSeedClicked() {
+        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_SEED))
+
         openImportType(ImportType.Seed)
     }
 
     fun importJsonClicked() {
+        analyticsService.track(AnalyticsEvent.WalletImportMethodSelected(WalletCreationMethod.IMPORT_JSON))
+
         openImportType(ImportType.Json)
     }
 
     private fun openImportType(importType: ImportType) {
         cloudBackupChangingWarningMixin.launchChangingConfirmationIfNeeded {
+            proceededToNextStep = true
             router.openImportAccountScreen(ImportAccountPayload(importType = importType, addAccountPayload = AddAccountPayload.MetaAccount))
         }
     }

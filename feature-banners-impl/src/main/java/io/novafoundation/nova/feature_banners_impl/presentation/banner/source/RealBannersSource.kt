@@ -7,7 +7,7 @@ import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersIntera
 import kotlinx.coroutines.flow.Flow
 
 class RealBannersSource(
-    private val bannersUrl: String,
+    val bannersUrl: String,
     private val localisationUrl: String,
     private val bannersInteractor: PromotionBannersInteractor
 ) : BannersSource {

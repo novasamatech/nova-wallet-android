@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -88,6 +89,7 @@ interface RootComponent {
             DAppFeatureApi::class,
             DbApi::class,
             CommonApi::class,
+            AnalyticsFeatureApi::class,
             RuntimeApi::class,
             VersionsFeatureApi::class,
             WalletConnectFeatureApi::class,

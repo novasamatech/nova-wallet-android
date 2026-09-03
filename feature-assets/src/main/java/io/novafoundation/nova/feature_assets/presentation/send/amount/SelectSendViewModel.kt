@@ -1,6 +1,10 @@
 package io.novafoundation.nova.feature_assets.presentation.send.amount
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AssetCategoryClassifier
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.headers.TextHeader
@@ -88,6 +92,7 @@ class SelectSendViewModel(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val accountRepository: AccountRepository,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val analyticsService: AnalyticsService,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -365,6 +370,8 @@ class SelectSendViewModel(
     }
 
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
+        trackSendInitiated(validPayload)
+
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
             transferringMaxAmount = validPayload.transfer.transferringMaxAmount,
@@ -382,6 +389,22 @@ class SelectSendViewModel(
         )
 
         router.openConfirmTransfer(transferDraft)
+    }
+
+    private fun trackSendInitiated(validPayload: AssetTransferPayload) {
+        val transfer = validPayload.transfer
+        val isCrossChain = transfer.originChain.id != transfer.destinationChain.id
+
+        analyticsService.track(
+            AnalyticsEvent.SendInitiated(
+                asset = transfer.originChainAsset.symbol.value,
+                network = transfer.originChain.name,
+                destinationNetwork = transfer.destinationChain.name.takeIf { isCrossChain },
+                assetCategory = AssetCategoryClassifier.classify(transfer.originChainAsset.symbol.value),
+                amountBucket = AmountBucket.from(validPayload.originUsedAsset.token.amountToFiat(transfer.amount)),
+                isCrossChain = isCrossChain
+            )
+        )
     }
 
     private suspend fun buildTransfer(

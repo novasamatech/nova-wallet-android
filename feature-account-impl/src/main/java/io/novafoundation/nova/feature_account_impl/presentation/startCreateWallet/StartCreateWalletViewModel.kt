@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_account_impl.presentation.startCreateWallet
 
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.WalletCreationMethod
+import io.novafoundation.nova.analytics.WalletCreationStep
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.mixin.api.displayDialogOrNothing
@@ -35,6 +39,7 @@ class StartCreateWalletViewModel(
     private val startCreateWalletInteractor: StartCreateWalletInteractor,
     private val actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
     private val payload: StartCreateWalletPayload,
+    private val analyticsService: AnalyticsService,
     customDialogProvider: CustomDialogDisplayer.Presentation
 ) : BaseViewModel(),
     ActionBottomSheetLauncher by actionBottomSheetLauncherFactory.create(),
@@ -42,6 +47,15 @@ class StartCreateWalletViewModel(
 
     // Used to cancel the job when the user navigates back
     private var cloudBackupValidationJob: Job? = null
+
+    /**
+     * Set once the user navigates to the next step of the flow so that leaving the screen afterwards is not reported as abandoning
+     */
+    private var proceededToNextStep = false
+
+    init {
+        analyticsService.track(AnalyticsEvent.WalletCreationStarted)
+    }
 
     private val _progressFlow = MutableStateFlow(false)
     val progressFlow: Flow<Boolean> = _progressFlow
@@ -101,7 +115,12 @@ class StartCreateWalletViewModel(
             if (startCreateWalletInteractor.isSyncWithCloudEnabled()) {
                 _progressFlow.value = true
                 startCreateWalletInteractor.createWalletAndSelect(nameInput.value)
-                    .onSuccess { router.openMain() }
+                    .onSuccess {
+                        proceededToNextStep = true
+
+                        analyticsService.track(AnalyticsEvent.WalletCreationCompleted(WalletCreationMethod.CREATE))
+                        router.openMain()
+                    }
                     .onFailure { error -> showError(error) }
                 _progressFlow.value = false
             } else {
@@ -117,6 +136,8 @@ class StartCreateWalletViewModel(
                 _progressFlow.value = true
                 val validationResult = startCreateWalletInteractor.validateCanCreateBackup()
                 if (validationResult is PreCreateValidationStatus.Ok) {
+                    proceededToNextStep = true
+
                     router.openCreateCloudBackupPassword(walletName)
                 } else {
                     val payload = mapPreCreateValidationStatusToUi(resourceManager, validationResult, ::userHasExistingBackup, ::initSignIn)
@@ -129,7 +150,26 @@ class StartCreateWalletViewModel(
     }
 
     fun manualBackupClicked() {
+        proceededToNextStep = true
+
         router.openMnemonicScreen(nameInput.value, AddAccountPayload.MetaAccount)
+    }
+
+    override fun onCleared() {
+        trackWalletCreationAbandonedIfNeeded()
+
+        super.onCleared()
+    }
+
+    private fun trackWalletCreationAbandonedIfNeeded() {
+        if (proceededToNextStep) return
+
+        val lastStep = when (_createWalletState.value) {
+            CreateWalletState.SETUP_NAME -> WalletCreationStep.OTHER
+            CreateWalletState.CHOOSE_BACKUP_WAY -> WalletCreationStep.BACKUP
+        }
+
+        analyticsService.track(AnalyticsEvent.WalletCreationAbandoned(lastStep))
     }
 
     private fun userHasExistingBackup() {

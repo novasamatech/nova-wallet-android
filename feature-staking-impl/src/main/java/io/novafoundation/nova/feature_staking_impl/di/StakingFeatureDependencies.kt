@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.di
 import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -79,6 +80,8 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface StakingFeatureDependencies {
+
+    fun analyticsService(): AnalyticsService
 
     val maskableValueFormatterFactory: MaskableValueFormatterFactory
 

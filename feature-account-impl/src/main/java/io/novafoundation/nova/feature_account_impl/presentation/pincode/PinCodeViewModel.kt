@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.pincode
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.WalletCreationStep
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.ConfirmationDialogInfo
@@ -35,6 +38,7 @@ class PinCodeViewModel(
     private val twoFactorVerificationExecutor: TwoFactorVerificationExecutor,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val biometricService: BiometricService,
+    private val analyticsService: AnalyticsService,
     val pinCodeAction: PinCodeAction
 ) : BaseViewModel() {
 
@@ -63,6 +67,11 @@ class PinCodeViewModel(
         .shareInBackground()
 
     private var currentState: ScreenState? = null
+
+    /**
+     * Set once the user completes the pin setup so that leaving the screen afterwards is not reported as abandoning
+     */
+    private var proceededToNextStep = false
 
     val isBackRoutingBlocked: Boolean
         get() = pinCodeAction is PinCodeAction.CheckAfterInactivity
@@ -173,7 +182,11 @@ class PinCodeViewModel(
 
     private fun authSuccess() {
         when (pinCodeAction) {
-            is PinCodeAction.Create -> router.openAfterPinCode(pinCodeAction.delayedNavigation)
+            is PinCodeAction.Create -> {
+                proceededToNextStep = true
+
+                router.openAfterPinCode(pinCodeAction.delayedNavigation)
+            }
             is PinCodeAction.Check -> {
                 router.openAfterPinCode(pinCodeAction.delayedNavigation)
                 backgroundAccessObserver.checkPassed()
@@ -197,6 +210,19 @@ class PinCodeViewModel(
                 router.back()
             }
         }
+    }
+
+    override fun onCleared() {
+        trackWalletCreationAbandonedIfNeeded()
+
+        super.onCleared()
+    }
+
+    private fun trackWalletCreationAbandonedIfNeeded() {
+        if (proceededToNextStep) return
+        if (pinCodeAction !is PinCodeAction.Create) return
+
+        analyticsService.track(AnalyticsEvent.WalletCreationAbandoned(WalletCreationStep.PIN_SETUP))
     }
 
     fun startBiometryAuth() {

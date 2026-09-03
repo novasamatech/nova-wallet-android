@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
@@ -32,7 +33,8 @@ class BackupMnemonicModule {
         resourceManager: ResourceManager,
         advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
         advancedEncryptionInteractor: AdvancedEncryptionInteractor,
-        conditionMixinFactory: ConditionMixinFactory
+        conditionMixinFactory: ConditionMixinFactory,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return BackupMnemonicViewModel(
             resourceManager,
@@ -43,6 +45,7 @@ class BackupMnemonicModule {
             advancedEncryptionInteractor,
             advancedEncryptionSelectionStoreProvider,
             conditionMixinFactory,
+            analyticsService,
         )
     }
 

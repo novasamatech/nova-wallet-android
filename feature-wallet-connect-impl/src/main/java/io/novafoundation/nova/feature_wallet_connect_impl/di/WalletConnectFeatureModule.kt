@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.di.scope.FeatureScope
@@ -98,12 +99,14 @@ class WalletConnectFeatureModule {
         interactor: WalletConnectSessionInteractor,
         dAppSignRequester: ExternalSignCommunicator,
         approveSessionCommunicator: ApproveSessionCommunicator,
+        analyticsService: AnalyticsService,
     ): WalletConnectService {
         return RealWalletConnectService(
             parentScope = rootScope,
             interactor = interactor,
             dAppSignRequester = dAppSignRequester,
-            approveSessionRequester = approveSessionCommunicator
+            approveSessionRequester = approveSessionCommunicator,
+            analyticsService = analyticsService
         )
     }
 

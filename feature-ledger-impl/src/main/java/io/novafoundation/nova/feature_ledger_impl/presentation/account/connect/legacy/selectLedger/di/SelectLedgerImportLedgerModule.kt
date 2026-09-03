@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.modules.shared.PermissionAskerForFragmentModule
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -56,7 +57,8 @@ class SelectLedgerImportLedgerModule {
         resourceManager: ResourceManager,
         messageFormatter: LedgerMessageFormatter,
         deviceMapperFactory: LedgerDeviceFormatter,
-        messageCommandFormatter: MessageCommandFormatter
+        messageCommandFormatter: MessageCommandFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return SelectLedgerLegacyImportViewModel(
             migrationUseCase = migrationUseCase,
@@ -69,7 +71,8 @@ class SelectLedgerImportLedgerModule {
             resourceManager = resourceManager,
             messageFormatter = messageFormatter,
             ledgerDeviceFormatter = deviceMapperFactory,
-            messageCommandFormatter = messageCommandFormatter
+            messageCommandFormatter = messageCommandFormatter,
+            analyticsService = analyticsService
         )
     }
 

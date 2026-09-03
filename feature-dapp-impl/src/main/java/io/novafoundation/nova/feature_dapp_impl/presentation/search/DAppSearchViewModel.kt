@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.search
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import android.net.Uri
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.list.headers.TextHeader
@@ -39,7 +42,8 @@ class DAppSearchViewModel(
     private val payload: SearchPayload,
     private val dAppSearchResponder: DAppSearchResponder,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
-    private val appLinksProvider: AppLinksProvider
+    private val appLinksProvider: AppLinksProvider,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel() {
 
     val dAppNotInCatalogWarning = actionAwaitableMixinFactory.confirmingAction<DappUnknownWarningModel>()
@@ -162,6 +166,8 @@ class DAppSearchViewModel(
             dAppNotInCatalogWarning.awaitAction(DappUnknownWarningModel(appLinksProvider.email))
         }
 
+        trackDappOpened(searchResult, newUrl)
+
         when (payload.request) {
             SearchPayload.Request.GO_TO_URL -> {
                 dAppSearchResponder.respond(DAppSearchCommunicator.Response.NewUrl(newUrl))
@@ -170,6 +176,22 @@ class DAppSearchViewModel(
 
             SearchPayload.Request.OPEN_NEW_URL -> router.openDAppBrowser(DAppBrowserPayload.Address(newUrl))
         }
+    }
+
+    private fun trackDappOpened(searchResult: DappSearchResult, url: String) {
+        val source = when (searchResult) {
+            is DappSearchResult.Dapp -> "search"
+            is DappSearchResult.Search -> "search"
+            is DappSearchResult.Url -> "manual_url"
+        }
+
+        analyticsService.track(
+            AnalyticsEvent.DappOpened(
+                dappHost = Uri.parse(url).host.orEmpty(),
+                source = source,
+                isKnownDapp = searchResult.isTrustedByNova
+            )
+        )
     }
 
     private fun shouldReportResult() = when (payload.request) {

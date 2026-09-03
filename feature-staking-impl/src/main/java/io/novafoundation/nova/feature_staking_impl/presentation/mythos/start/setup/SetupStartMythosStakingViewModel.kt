@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.setup
 
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.memory.ComputationalScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -27,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.mythos.start.validatio
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.DelegationsLimit
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_MYTHOS
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start.StartSingleSelectStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenRequester
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.MythosCollatorFormatter
@@ -44,10 +49,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.toParcel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.math.BigDecimal
 
 class SetupStartMythosStakingViewModel(
@@ -69,6 +76,7 @@ class SetupStartMythosStakingViewModel(
     private val interactor: StartMythosStakingInteractor,
     private val selectCollatorInterScreenRequester: SelectMythosInterScreenRequester,
     private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<MythosCollator, SetupStartMythosStakingViewModel.MythosLogic>(
     logicFactory = { scope ->
@@ -96,6 +104,23 @@ class SetupStartMythosStakingViewModel(
 ) {
 
     override val hintsMixin = NoHintsMixin()
+
+    /**
+     * Whether user moved further in the start staking flow. Used to detect flow abandoning in [onCleared]
+     */
+    private var flowContinued = false
+
+    /**
+     * Cached synchronously-readable snapshot of whether this is a new stake (as opposed to bond more).
+     * Needed since [onCleared] cannot suspend
+     */
+    private var isStartStakingFlow = true
+
+    init {
+        launch {
+            logic.currentDelegatorStateFlow.collect { isStartStakingFlow = !it.hasStakedCollators() }
+        }
+    }
 
     override suspend fun openSelectNewTarget() {
         val delegatorState = logic.currentDelegatorStateFlow.first()
@@ -141,9 +166,35 @@ class SetupStartMythosStakingViewModel(
         fee: Fee,
         amount: Balance,
         collator: MythosCollator,
-    ) {
+    ) = launch {
+        trackStakingInitiated(amount)
+
+        flowContinued = true
+
         val payload = ConfirmStartMythosStakingPayload(collator.toParcel(), amount, fee.toParcel())
         router.openConfirmStartStaking(payload)
+    }
+
+    private suspend fun trackStakingInitiated(amount: Balance) {
+        if (!isStartStakingFlow) return
+
+        val asset = assetFlow.first()
+
+        analyticsService.track(
+            AnalyticsEvent.StakingInitiated(
+                stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
+                network = selectedAssetState.chain().name,
+                amountBucket = AmountBucket.from(asset.token.planksToFiat(amount))
+            )
+        )
+    }
+
+    override fun onCleared() {
+        if (!flowContinued && isStartStakingFlow) {
+            analyticsService.track(AnalyticsEvent.StakingAbandoned(StakingStage.SETUP))
+        }
+
+        super.onCleared()
     }
 
     class MythosLogic(

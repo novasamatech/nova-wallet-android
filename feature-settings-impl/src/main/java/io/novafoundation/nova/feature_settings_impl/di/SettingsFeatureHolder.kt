@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_settings_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -30,6 +31,7 @@ class SettingsFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val accountFeatureDependencies = DaggerSettingsFeatureComponent_SettingsFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .assetsFeatureApi(getFeature(AssetsFeatureApi::class.java))
             .currencyFeatureApi(getFeature(CurrencyFeatureApi::class.java))

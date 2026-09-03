@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.transaction.detail.swap
 
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapEntryPoint
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -139,7 +140,8 @@ class SwapDetailViewModel(
             assetIn = operation.amountIn.assetId,
             assetOut = operation.amountOut.assetId,
             amount = amount,
-            direction = direction
+            direction = direction,
+            source = SwapEntryPoint.OPERATION_DETAILS
         )
         router.openSwapSetupAmount(payload)
     }

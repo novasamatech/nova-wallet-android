@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_account_impl.di
 import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
@@ -80,6 +81,8 @@ import java.util.Random
 import javax.inject.Named
 
 interface AccountFeatureDependencies {
+
+    fun analyticsService(): AnalyticsService
 
     val maskableValueFormatterProvider: MaskableValueFormatterProvider
 

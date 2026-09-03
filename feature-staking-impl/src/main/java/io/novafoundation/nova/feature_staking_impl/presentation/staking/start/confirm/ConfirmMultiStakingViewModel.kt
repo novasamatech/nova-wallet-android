@@ -1,6 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -15,6 +19,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.navigation.Extri
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.chain
 import io.novafoundation.nova.feature_staking_impl.data.components
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.activateDetection
@@ -26,6 +31,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.v
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.handleStartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsFailureReason
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsStakingType
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.types.ConfirmMultiStakingTypeFactory
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
@@ -59,7 +66,8 @@ class ConfirmMultiStakingViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -69,6 +77,11 @@ class ConfirmMultiStakingViewModel(
 
     private val _showNextProgress = MutableStateFlow(false)
     val showNextProgress: Flow<Boolean> = _showNextProgress
+
+    /**
+     * Whether staking was successfully submitted. Used to detect flow abandoning in [onCleared]
+     */
+    private var flowCompleted = false
 
     private val currentSelectionFlow = selectionStoreProvider.currentSelectionFlow(viewModelScope)
         .filterNotNull()
@@ -159,21 +172,63 @@ class ConfirmMultiStakingViewModel(
     }
 
     private fun sendTransaction(validationPayload: StartMultiStakingValidationPayload) = launch {
+        trackStakingEvent(AnalyticsEvent::StakingConfirmed)
+
         stakingStartedDetectionService.pauseDetection(viewModelScope)
 
         interactor.startStaking(validationPayload.selection)
             .onSuccess {
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
+                trackStakingEvent(AnalyticsEvent::StakingCompleted)
+
+                flowCompleted = true
+
                 startNavigation(it.submissionHierarchy) { finishFlow() }
             }
             .onFailure {
                 showError(it)
 
+                trackStakingFailed(it)
+
                 stakingStartedDetectionService.activateDetection(viewModelScope)
             }
 
         _showNextProgress.value = false
+    }
+
+    private suspend fun trackStakingEvent(eventConstructor: (String, String, AmountBucket) -> AnalyticsEvent) {
+        val selection = currentSelectionFlow.first().selection
+        val stakingOption = selection.stakingOption
+        val usdAmount = assetFlow.first().token.planksToFiat(selection.stake)
+
+        analyticsService.track(
+            eventConstructor(
+                stakingOption.stakingType.toAnalyticsStakingType(),
+                stakingOption.chain.name,
+                AmountBucket.from(usdAmount)
+            )
+        )
+    }
+
+    private suspend fun trackStakingFailed(error: Throwable) {
+        val stakingOption = currentSelectionFlow.first().selection.stakingOption
+
+        analyticsService.track(
+            AnalyticsEvent.StakingFailed(
+                stakingType = stakingOption.stakingType.toAnalyticsStakingType(),
+                network = stakingOption.chain.name,
+                reason = error.toAnalyticsFailureReason()
+            )
+        )
+    }
+
+    override fun onCleared() {
+        if (!flowCompleted) {
+            analyticsService.track(AnalyticsEvent.StakingAbandoned(StakingStage.CONFIRM))
+        }
+
+        super.onCleared()
     }
 
     private fun finishFlow() {

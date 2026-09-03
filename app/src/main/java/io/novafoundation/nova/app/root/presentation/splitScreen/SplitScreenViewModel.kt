@@ -1,5 +1,6 @@
 package io.novafoundation.nova.app.root.presentation.splitScreen
 
+import io.novafoundation.nova.app.root.analytics.FeatureNavigationTracker
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.domain.SplitScreenInteractor
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -31,7 +32,8 @@ class SplitScreenViewModel(
     private val delayedNavigationRouter: DelayedNavigationRouter,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val resourceManager: ResourceManager,
-    private val payload: SplitScreenPayload
+    private val payload: SplitScreenPayload,
+    private val featureNavigationTracker: FeatureNavigationTracker
 ) : BaseViewModel() {
 
     private val consumablePayload = Consumer(payload)
@@ -94,5 +96,13 @@ class SplitScreenViewModel(
                 } // Do nothing
             }
         }
+    }
+
+    /**
+     * Many product sections open inside the split screen rather than the root host,
+     * so its navigation feeds the same tracker.
+     */
+    fun onDestinationChanged(destinationId: Int) {
+        featureNavigationTracker.onDestinationChanged(destinationId)
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -32,7 +33,8 @@ class ImportWalletOptionsModule {
         onboardingInteractor: OnboardingInteractor,
         customDialogProvider: CustomDialogDisplayer.Presentation,
         cloudBackupChangingWarningMixinFactory: CloudBackupChangingWarningMixinFactory,
-        ledgerMigrationTracker: LedgerMigrationTracker
+        ledgerMigrationTracker: LedgerMigrationTracker,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return ImportWalletOptionsViewModel(
             resourceManager,
@@ -42,7 +44,8 @@ class ImportWalletOptionsModule {
             progressDialogMixinFactory,
             customDialogProvider,
             cloudBackupChangingWarningMixinFactory,
-            ledgerMigrationTracker
+            ledgerMigrationTracker,
+            analyticsService
         )
     }
 

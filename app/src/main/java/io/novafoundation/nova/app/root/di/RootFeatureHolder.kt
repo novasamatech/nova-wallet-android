@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
 import io.novafoundation.nova.common.navigation.DelayedNavigationRouter
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.core_db.di.DbApi
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.presentation.AccountRouter
@@ -54,6 +55,7 @@ class RootFeatureHolder @Inject constructor(
         val rootFeatureDependencies = DaggerRootComponent_RootFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .dbApi(getFeature(DbApi::class.java))
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .stakingFeatureApi(getFeature(StakingFeatureApi::class.java))

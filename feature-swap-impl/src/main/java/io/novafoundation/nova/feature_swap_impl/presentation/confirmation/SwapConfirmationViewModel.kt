@@ -1,6 +1,12 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.confirmation
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.SwapStage
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.DurationBucket
+import io.novafoundation.nova.analytics.SlippageBucket
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -44,6 +50,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.toSwapState
 import io.novafoundation.nova.feature_swap_impl.presentation.SwapRouter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.SlippageAlertMixinFactory
+import io.novafoundation.nova.feature_swap_impl.presentation.common.analytics.toSwapFailureReason
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.SwapConfirmationDetailsFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.fee.createForSwap
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapStateStoreProvider
@@ -53,6 +60,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.mapSwapValidat
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -102,7 +110,8 @@ class SwapConfirmationViewModel(
     private val swapConfirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
     private val resourceManager: ResourceManager,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
-    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+    private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -143,6 +152,8 @@ class SwapConfirmationViewModel(
         .shareInBackground()
 
     private val maxActionFlow = MutableStateFlow(MaxAction.DISABLED)
+
+    private var confirmedAt: Long? = null
 
     val feeMixin = feeLoaderMixinFactory.createForSwap(
         chainAssetIn = initialSwapState.map { it.quote.assetIn },
@@ -217,6 +228,8 @@ class SwapConfirmationViewModel(
     }
 
     fun confirmButtonClicked() {
+        confirmedAt = System.currentTimeMillis()
+
         launch {
             _validationInProgress.value = true
 
@@ -231,6 +244,18 @@ class SwapConfirmationViewModel(
                 block = ::executeSwap
             )
         }
+    }
+
+    /** Set once the user confirms; leaving the screen before that is an abandoned swap. */
+    @Volatile
+    private var confirmed = false
+
+    override fun onCleared() {
+        if (!confirmed) {
+            analyticsService.track(AnalyticsEvent.SwapAbandoned(SwapStage.CONFIRM))
+        }
+
+        super.onCleared()
     }
 
     private fun setSwapStateAndThen(action: () -> Unit) {
@@ -265,6 +290,10 @@ class SwapConfirmationViewModel(
     }
 
     private fun executeSwap(validPayload: SwapValidationPayload) = launchUnit {
+        confirmed = true
+
+        trackSwapConfirmed()
+
         if (swapInteractor.isDeepSwapAvailable()) {
             swapStateStoreProvider.setState(validPayload.toSwapState())
 
@@ -279,6 +308,8 @@ class SwapConfirmationViewModel(
             .onSuccess {
                 _validationInProgress.value = false
 
+                trackSwapCompleted()
+
                 this.showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) {
@@ -288,8 +319,47 @@ class SwapConfirmationViewModel(
             }.onFailure {
                 _validationInProgress.value = false
 
+                analyticsService.track(AnalyticsEvent.SwapFailed(it.toSwapFailureReason()))
+
                 showFirstSwapStepFailure(it)
             }
+    }
+
+    private fun trackSwapConfirmed() = launchUnit {
+        val quote = confirmationStateFlow.first().swapQuote
+
+        // fiat estimation is honestly unavailable without a token rate - skip the event in that case
+        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return@launchUnit
+
+        analyticsService.track(
+            AnalyticsEvent.SwapConfirmed(
+                amountBucket = AmountBucket.from(fiatIn),
+                slippageBucket = SlippageBucket.from(slippageFlow.first().inPercents),
+                assetIn = quote.assetIn.symbol.value,
+                assetOut = quote.assetOut.symbol.value,
+                networkIn = chainRegistry.getChain(quote.assetIn.chainId).name,
+                networkOut = chainRegistry.getChain(quote.assetOut.chainId).name
+            )
+        )
+    }
+
+    private fun trackSwapCompleted() = launchUnit {
+        val confirmedAt = confirmedAt ?: return@launchUnit
+        val quote = confirmationStateFlow.first().swapQuote
+
+        // fiat estimation is honestly unavailable without a token rate - skip the event in that case
+        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return@launchUnit
+
+        analyticsService.track(
+            AnalyticsEvent.SwapCompleted(
+                amountBucket = AmountBucket.from(fiatIn),
+                durationBucket = DurationBucket.from(System.currentTimeMillis() - confirmedAt),
+                assetIn = quote.assetIn.symbol.value,
+                assetOut = quote.assetOut.symbol.value,
+                networkIn = chainRegistry.getChain(quote.assetIn.chainId).name,
+                networkOut = chainRegistry.getChain(quote.assetOut.chainId).name
+            )
+        )
     }
 
     private fun showFirstSwapStepFailure(error: Throwable) {

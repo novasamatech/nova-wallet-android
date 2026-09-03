@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.swap.executor
 
+import io.novafoundation.nova.feature_swap_api.presentation.model.SwapEntryPoint
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
@@ -10,7 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 class InitialSwapFlowExecutor(private val assetsRouter: AssetsRouter) : SwapFlowExecutor {
 
     override suspend fun openNextScreen(coroutineScope: CoroutineScope, chainAsset: Chain.Asset) {
-        val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload())
+        val payload = SwapSettingsPayload.DefaultFlow(chainAsset.fullId.toAssetPayload(), SwapEntryPoint.MAIN_SCREEN)
         assetsRouter.finishSelectAndOpenSwapSetupAmount(payload)
     }
 }

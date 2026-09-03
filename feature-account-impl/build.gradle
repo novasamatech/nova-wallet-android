@@ -19,6 +19,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar', "*.aar"])
     implementation project(':core-db')
     implementation project(':common')
+    implementation project(':analytics')
     implementation project(':runtime')
     implementation project(':feature-account-api')
     implementation project(':feature-currency-api')

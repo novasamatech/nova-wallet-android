@@ -1,6 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_MYTHOS
+import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -68,6 +73,7 @@ class SetupUnbondMythosViewModel(
     private val mythosValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val stakingSharedState: StakingSharedState,
     private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -222,6 +228,21 @@ class SetupUnbondMythosViewModel(
             fee = fee.toParcel()
         )
 
+        trackUnstakeInitiated()
+
         router.openUnbondConfirm(nextScreenPayload)
+    }
+
+    private suspend fun trackUnstakeInitiated() {
+        val asset = assetFlow.first()
+        val fiatAmount = asset.token.amountFromPlanks(stakedAmount.first()).let(asset.token::amountToFiat)
+
+        analyticsService.track(
+            AnalyticsEvent.UnstakeInitiated(
+                stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
+                network = stakingSharedState.chain().name,
+                amountBucket = AmountBucket.from(fiatAmount)
+            )
+        )
     }
 }

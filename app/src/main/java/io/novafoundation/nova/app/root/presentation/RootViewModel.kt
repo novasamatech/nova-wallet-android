@@ -2,6 +2,9 @@ package io.novafoundation.nova.app.root.presentation
 
 import android.net.Uri
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.app.root.analytics.FeatureNavigationTracker
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.formatDeepLinkHandlingException
@@ -59,7 +62,9 @@ class RootViewModel(
     private val toastMessageManager: ToastMessageManager,
     private val dialogMessageManager: DialogMessageManager,
     private val multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
-    private val deviceNetworkStateObserver: DeviceNetworkStateObserver
+    private val deviceNetworkStateObserver: DeviceNetworkStateObserver,
+    private val analyticsService: AnalyticsService,
+    private val featureNavigationTracker: FeatureNavigationTracker
 ) : BaseViewModel(),
     NetworkStateUi by networkStateMixin,
     ActionBottomSheetLauncher by actionBottomSheetLauncher {
@@ -76,6 +81,8 @@ class RootViewModel(
     private var willBeClearedForLanguageChange = false
 
     init {
+        analyticsService.track(AnalyticsEvent.AppOpened(isFirstLaunch = false))
+
         contributionsInteractor.runUpdate()
             .launchIn(this)
 
@@ -242,5 +249,13 @@ class RootViewModel(
                     showError(errorMessage)
                 }
         }
+    }
+
+    /**
+     * Root-level navigation. The split screen reports through the same tracker,
+     * so a section opened from either host is counted once.
+     */
+    fun onRootDestinationChanged(destinationId: Int) {
+        featureNavigationTracker.onDestinationChanged(destinationId)
     }
 }

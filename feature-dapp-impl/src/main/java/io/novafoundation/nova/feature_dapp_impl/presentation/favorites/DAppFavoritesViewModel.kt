@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_dapp_impl.presentation.favorites
 
+import android.net.Uri
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
@@ -19,6 +22,7 @@ class DAppFavoritesViewModel(
     private val router: DAppRouter,
     private val interactor: DappInteractor,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+    private val analyticsService: AnalyticsService,
 ) : BaseViewModel() {
 
     val removeFavouriteConfirmationAwaitable = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -40,7 +44,21 @@ class DAppFavoritesViewModel(
     }
 
     fun openDApp(dapp: DappModel) {
+        trackDappOpened(dapp.url)
+
         router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url))
+    }
+
+    private fun trackDappOpened(url: String) = launch {
+        val isKnownDapp = runCatching { interactor.getDAppInfo(url).metadata != null }.getOrDefault(false)
+
+        analyticsService.track(
+            AnalyticsEvent.DappOpened(
+                dappHost = Uri.parse(url).host.orEmpty(),
+                source = "favorites",
+                isKnownDapp = isKnownDapp
+            )
+        )
     }
 
     fun onFavoriteClicked(dapp: DappModel) = launch {

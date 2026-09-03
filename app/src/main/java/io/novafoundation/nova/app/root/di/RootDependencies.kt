@@ -64,6 +64,8 @@ import io.novafoundation.nova.feature_wallet_connect_api.presentation.WalletConn
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import kotlinx.coroutines.flow.MutableStateFlow
+import io.novafoundation.nova.analytics.AnalyticsOptOutManager
+import io.novafoundation.nova.analytics.AnalyticsService
 
 interface RootDependencies {
 
@@ -192,4 +194,8 @@ interface RootDependencies {
     fun chainMigrationRepository(): ChainMigrationRepository
 
     fun migrationInfoRepository(): MigrationInfoRepository
+
+    fun analyticsService(): AnalyticsService
+
+    fun analyticsOptOutManager(): AnalyticsOptOutManager
 }

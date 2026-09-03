@@ -121,6 +121,7 @@ buildscript {
         lifecycleDep = "androidx.lifecycle:lifecycle-extensions:$architectureComponentVersion"
         lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$architectureComponentVersion"
         lifecycleRuntime = "androidx.lifecycle:lifecycle-runtime-android:$architectureComponentVersion"
+        lifecycleProcessDep = "androidx.lifecycle:lifecycle-process:$architectureComponentVersion"
 
         coroutinesDep = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
         coroutinesAndroidDep = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
