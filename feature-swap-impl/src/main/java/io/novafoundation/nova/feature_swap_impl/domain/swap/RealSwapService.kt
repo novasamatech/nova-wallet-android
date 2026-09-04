@@ -949,6 +949,9 @@ internal class RealSwapService(
             // First path segments don't have any extra restrictions
             if (pathPredecessor == null) return true
 
+            // A pool modified by the previous hop can't be entered again in the same route
+            if (edge.poolId != null && edge.poolId == pathPredecessor.poolId) return false
+
             // Second and subsequent edges are subject to checking whether we can execute them one by one immediately
             if (!canExecuteIntermediateEdgeSequentially(edge, pathPredecessor)) return false
 
