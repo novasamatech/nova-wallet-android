@@ -37,6 +37,12 @@ interface SwapGraphEdge : QuotableEdge {
     suspend fun debugLabel(): String
 
     /**
+     * The pool this edge trades through, when the route must not enter it twice
+     */
+    val poolId: SwapPoolId?
+        get() = null
+
+    /**
      * Whether this Edge fee check should be skipped when adding to after a specified [predecessor]
      * The main purpose is to mirror the behavior of [appendToOperation] - multiple segments appended together
      * most likely will only use fee configuration from the first segment in the batch

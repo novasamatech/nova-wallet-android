@@ -5,6 +5,8 @@ import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.XYKSwapQuotingSource
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.XYKSwapQuotingSourceFactory
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapPoolId
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxPoolId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -46,6 +48,8 @@ private class XYKSwapSource(
         override fun routerPoolArgument(): DictEnum.Entry<*> {
             return DictEnum.Entry("XYK", null)
         }
+
+        override val poolId: SwapPoolId = HydraDxPoolId.pair(HydraDxPoolId.XYK, from, to)
 
         override val standaloneSwap = null
 
