@@ -30,7 +30,7 @@ class EvmAssetsSyncService(
 
         val oldAssets = chainAssetDao.getAssetsBySource(AssetSourceLocal.ERC20)
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
-        val initialAssetEnabling = defaultAssetsRepository.initialAssetEnabling()
+        val initialAssetEnabling = retryUntilDone { defaultAssetsRepository.initialAssetEnabling() }
 
         val newAssets = retryUntilDone { chainFetcher.getEVMAssets() }
             .flatMap { mapEVMAssetRemoteToLocalAssets(it, gson) }

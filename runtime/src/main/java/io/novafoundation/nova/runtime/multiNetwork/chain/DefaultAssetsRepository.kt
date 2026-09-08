@@ -8,7 +8,6 @@ import io.novafoundation.nova.core_db.dao.FullAssetIdLocal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.DefaultAssetRemote
-import io.novafoundation.nova.runtime.multiNetwork.chain.remote.model.DefaultAssetsRemote
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -24,7 +23,6 @@ private const val PREF_DEFAULT_ASSETS_APPLIED = "DEFAULT_ASSETS_APPLIED"
 class DefaultAssetsRepository(
     private val chainAssetDao: ChainAssetDao,
     private val chainFetcher: ChainFetcher,
-    private val bundledDefaultAssets: BundledDefaultAssets,
     private val preferences: Preferences,
 ) {
 
@@ -35,13 +33,20 @@ class DefaultAssetsRepository(
     private var cachedDefaults: List<DefaultAssetRemote>? = null
 
     /**
-     * Default assets in config order. Empty only when neither the remote nor the bundled config
-     * could be read, which is a broken build rather than a missing network.
+     * Default assets in config order, for the Manage tokens section. Best-effort on purpose: a
+     * missing config costs the user a section header, which is not worth blocking a screen for.
      */
     suspend fun defaultAssetIds(): List<FullChainAssetId> = mutex.withLock {
-        loadDefaults().map { FullChainAssetId(it.chainId, it.assetId) }
+        val defaults = cachedDefaults ?: fetchDefaults()?.also { cachedDefaults = it }
+
+        defaults.orEmpty().map { FullChainAssetId(it.chainId, it.assetId) }
     }
 
+    /**
+     * Throws when the config cannot be read on a first launch. Callers retry, the same way they
+     * already retry the chains config - nothing may be written until the curated list is known,
+     * or the wallet ends up looking like an install that predates the feature with no way back.
+     */
     suspend fun initialAssetEnabling(): InitialAssetEnabling = mutex.withLock {
         cachedEnabling ?: resolveEnabling().also { cachedEnabling = it }
     }
@@ -57,37 +62,25 @@ class DefaultAssetsRepository(
             return InitialAssetEnabling.AlreadyApplied
         }
 
-        val defaults = loadDefaults().ifEmpty { return InitialAssetEnabling.Unavailable }
+        val defaults = fetchDefaultsOrThrow()
 
+        cachedDefaults = defaults
         preferences.putBoolean(PREF_DEFAULT_ASSETS_APPLIED, true)
 
-        val defaultIds = defaults.mapTo(mutableSetOf()) { FullAssetIdLocal(it.chainId, it.assetId) }
-
-        return InitialAssetEnabling.ApplyDefaults(defaultIds)
+        return InitialAssetEnabling.ApplyDefaults(defaults.mapTo(mutableSetOf()) { FullAssetIdLocal(it.chainId, it.assetId) })
     }
 
-    private suspend fun loadDefaults(): List<DefaultAssetRemote> {
-        cachedDefaults?.let { return it }
-
-        val loaded = remoteDefaults() ?: bundledDefaults() ?: emptyList()
-        cachedDefaults = loaded
-
-        return loaded
+    private suspend fun fetchDefaults(): List<DefaultAssetRemote>? {
+        return runCatching { fetchDefaultsOrThrow() }
+            .onFailure { Log.e(LOG_TAG, "Failed to fetch the default assets config: $it") }
+            .getOrNull()
     }
 
-    private suspend fun remoteDefaults() = runCatching { chainFetcher.getDefaultAssets() }
-        .onFailure { Log.e(LOG_TAG, "Failed to fetch the default assets config, falling back to the bundled one: $it") }
-        .getOrNull()
-        ?.usableDefaults()
+    private suspend fun fetchDefaultsOrThrow(): List<DefaultAssetRemote> {
+        val defaults = chainFetcher.getDefaultAssets().defaultAssets
 
-    private fun bundledDefaults() = runCatching { bundledDefaultAssets.read() }
-        .onFailure { Log.e(LOG_TAG, "Failed to read the bundled default assets config: $it") }
-        .getOrNull()
-        ?.usableDefaults()
-
-    /**
-     * An empty list would hide every token, which is never what the config means to say - treat it
-     * as a broken config and let the next source have a go.
-     */
-    private fun DefaultAssetsRemote.usableDefaults() = defaultAssets.takeIf { it.isNotEmpty() }
+        // An empty list would hide every token, which is never what the config means to say -
+        // treat it as broken and let the retry pick up a fixed one.
+        return defaults.ifEmpty { error("Default assets config is empty") }
+    }
 }

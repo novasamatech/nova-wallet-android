@@ -39,7 +39,7 @@ class ChainSyncService(
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
-        val initialAssetEnabling = defaultAssetsRepository.initialAssetEnabling()
+        val initialAssetEnabling = retryUntilDone { defaultAssetsRepository.initialAssetEnabling() }
 
         val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], source = ChainLocal.Source.DEFAULT, gson) }
         val newAssets = remoteChains.flatMap { chain ->

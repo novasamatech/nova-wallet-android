@@ -1,7 +1,6 @@
 package io.novafoundation.nova.runtime.multiNetwork.chain
 
 import io.novafoundation.nova.core_db.dao.FullAssetIdLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
 
 /**
  * Decides whether an asset that has no local state yet starts out visible.
@@ -29,14 +28,5 @@ sealed class InitialAssetEnabling {
     object AlreadyApplied : InitialAssetEnabling() {
 
         override fun isEnabled(assetId: FullAssetIdLocal) = false
-    }
-
-    /**
-     * The default list could not be fetched. Falls back to the historical behaviour on purpose:
-     * a new wallet showing every token is recoverable, an empty token list looks broken.
-     */
-    object Unavailable : InitialAssetEnabling() {
-
-        override fun isEnabled(assetId: FullAssetIdLocal) = ENABLED_DEFAULT_BOOL
     }
 }

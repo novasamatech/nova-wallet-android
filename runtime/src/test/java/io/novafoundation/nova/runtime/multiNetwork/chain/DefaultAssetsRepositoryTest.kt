@@ -12,9 +12,9 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
@@ -38,32 +38,21 @@ class DefaultAssetsRepositoryTest {
     lateinit var chainFetcher: ChainFetcher
 
     @Mock
-    lateinit var bundledDefaultAssets: BundledDefaultAssets
-
-    @Mock
     lateinit var preferences: Preferences
 
-    private fun repository() = DefaultAssetsRepository(chainAssetDao, chainFetcher, bundledDefaultAssets, preferences)
+    private fun repository() = DefaultAssetsRepository(chainAssetDao, chainFetcher, preferences)
 
     private fun defaults() = DefaultAssetsRemote(defaultAssets = listOf(DefaultAssetRemote(CHAIN_ID, 0)))
 
-    private fun bundledReturnsDefaults() {
-        `when`(bundledDefaultAssets.read()).thenReturn(defaults())
-    }
-
     private fun alreadyApplied(applied: Boolean) {
         `when`(preferences.getBoolean(PREF_APPLIED, false)).thenReturn(applied)
-    }
-
-    private suspend fun remoteReturnsDefaults() {
-        `when`(chainFetcher.getDefaultAssets()).thenReturn(defaults())
     }
 
     @Test
     fun `fresh install shows only the default list`() = runBlocking<Unit> {
         alreadyApplied(false)
         `when`(chainAssetDao.hasAnyAsset()).thenReturn(false)
-        remoteReturnsDefaults()
+        `when`(chainFetcher.getDefaultAssets()).thenReturn(defaults())
 
         val enabling = repository().initialAssetEnabling()
 
@@ -88,13 +77,43 @@ class DefaultAssetsRepositoryTest {
     }
 
     @Test
-    fun `unreachable default list falls back to the bundled one instead of showing every token`() = runBlocking<Unit> {
+    fun `a failed fetch applies nothing and stays retriable`() = runBlocking<Unit> {
         alreadyApplied(false)
         `when`(chainAssetDao.hasAnyAsset()).thenReturn(false)
         `when`(chainFetcher.getDefaultAssets()).thenThrow(RuntimeException("no network"))
-        bundledReturnsDefaults()
 
-        val enabling = repository().initialAssetEnabling()
+        val repository = repository()
+
+        // Callers retry this, so failing is the whole point - what matters is that nothing was
+        // marked as applied, leaving the next attempt free to apply the real list.
+        assertTrue(runCatching { repository.initialAssetEnabling() }.isFailure)
+        verify(preferences, never()).putBoolean(anyString(), anyBoolean())
+    }
+
+    @Test
+    fun `an empty config counts as broken rather than as hide everything`() = runBlocking<Unit> {
+        alreadyApplied(false)
+        `when`(chainAssetDao.hasAnyAsset()).thenReturn(false)
+        `when`(chainFetcher.getDefaultAssets()).thenReturn(DefaultAssetsRemote(defaultAssets = emptyList()))
+
+        val repository = repository()
+
+        assertTrue(runCatching { repository.initialAssetEnabling() }.isFailure)
+        verify(preferences, never()).putBoolean(anyString(), anyBoolean())
+    }
+
+    @Test
+    fun `a retried attempt applies the list once it arrives`() = runBlocking<Unit> {
+        alreadyApplied(false)
+        `when`(chainAssetDao.hasAnyAsset()).thenReturn(false)
+        `when`(chainFetcher.getDefaultAssets())
+            .thenThrow(RuntimeException("no network"))
+            .thenReturn(defaults())
+
+        val repository = repository()
+        runCatching { repository.initialAssetEnabling() }
+
+        val enabling = repository.initialAssetEnabling()
 
         assertTrue(enabling.isEnabled(IN_DEFAULTS))
         assertFalse(enabling.isEnabled(NOT_IN_DEFAULTS))
@@ -102,37 +121,10 @@ class DefaultAssetsRepositoryTest {
     }
 
     @Test
-    fun `an empty config is treated as broken rather than as hide everything`() = runBlocking<Unit> {
-        alreadyApplied(false)
-        `when`(chainAssetDao.hasAnyAsset()).thenReturn(false)
-        `when`(chainFetcher.getDefaultAssets()).thenReturn(DefaultAssetsRemote(defaultAssets = emptyList()))
-        bundledReturnsDefaults()
-
-        val enabling = repository().initialAssetEnabling()
-
-        assertTrue(enabling.isEnabled(IN_DEFAULTS))
-        assertFalse(enabling.isEnabled(NOT_IN_DEFAULTS))
-    }
-
-    @Test
-    fun `only a broken build leaves a wallet with every token`() = runBlocking<Unit> {
-        alreadyApplied(false)
-        `when`(chainAssetDao.hasAnyAsset()).thenReturn(false)
-        `when`(chainFetcher.getDefaultAssets()).thenThrow(RuntimeException("no network"))
-        `when`(bundledDefaultAssets.read()).thenThrow(RuntimeException("asset missing from the apk"))
-
-        val enabling = repository().initialAssetEnabling()
-
-        assertTrue(enabling.isEnabled(NOT_IN_DEFAULTS))
-        // Nothing was applied, so the next launch gets another chance at the real list.
-        verify(preferences, never()).putBoolean(anyString(), anyBoolean())
-    }
-
-    @Test
     fun `every sync service in one launch sees the same decision`() = runBlocking<Unit> {
         alreadyApplied(false)
         `when`(chainAssetDao.hasAnyAsset()).thenReturn(false)
-        remoteReturnsDefaults()
+        `when`(chainFetcher.getDefaultAssets()).thenReturn(defaults())
 
         val repository = repository()
         val first = repository.initialAssetEnabling()
@@ -141,6 +133,15 @@ class DefaultAssetsRepositoryTest {
         assertEquals(first, second)
         // The first service to sync writes assets, which would otherwise flip the answer
         // for the one running right after it.
+        verify(chainFetcher, times(1)).getDefaultAssets()
+    }
+
+    @Test
+    fun `the manage screen does not wait for a config it only decorates with`() = runBlocking<Unit> {
+        `when`(chainFetcher.getDefaultAssets()).thenThrow(RuntimeException("no network"))
+
+        // No retry loop here: a missing config costs a section header, not correctness
+        assertTrue(repository().defaultAssetIds().isEmpty())
         verify(chainFetcher, times(1)).getDefaultAssets()
     }
 }

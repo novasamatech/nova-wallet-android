@@ -113,9 +113,9 @@ class ChainSyncServiceTest {
 
     @Before
     fun setup() = runBlocking {
-        // These cases predate the default token list; Unavailable keeps them on the behaviour
-        // they were written against - every synced asset starts enabled.
-        lenient().`when`(defaultAssetsRepository.initialAssetEnabling()).thenReturn(InitialAssetEnabling.Unavailable)
+        // These cases predate the default token list and only care about which rows are written,
+        // not about their enabled state, so the decision is stubbed as the already-applied one.
+        lenient().`when`(defaultAssetsRepository.initialAssetEnabling()).thenReturn(InitialAssetEnabling.AlreadyApplied)
 
         chainSyncService = ChainSyncService(dao, chainFetcher, defaultAssetsRepository, gson)
     }
