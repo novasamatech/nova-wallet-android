@@ -82,4 +82,5 @@ dependencies {
     implementation retrofitDep
 
     testImplementation jUnitDep
+    testImplementation mockitoDep
 }

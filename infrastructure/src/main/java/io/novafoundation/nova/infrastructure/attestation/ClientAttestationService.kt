@@ -37,6 +37,15 @@ interface ClientAttestationService {
      * attestation is disabled. Registers the client on first use.
      */
     suspend fun signedHeaders(body: ByteArray): Map<String, String>?
+
+    /**
+     * Throws away [clientId] and its key, so the next [signedHeaders] registers a fresh identity.
+     *
+     * Called when the backend stops accepting a client it once registered - its binding was lost,
+     * or no longer matches our key. Ignored when the identity has already moved on, so a burst of
+     * rejected requests triggers one recovery rather than one each.
+     */
+    suspend fun invalidate(clientId: String)
 }
 
 class RealClientAttestationService(
@@ -68,6 +77,17 @@ class RealClientAttestationService(
             HEADER_CHALLENGE to challenge,
             HEADER_SIGNATURE to Base64.encodeToString(signature, Base64.NO_WRAP)
         )
+    }
+
+    override suspend fun invalidate(clientId: String) {
+        if (mode == AttestationMode.UNATTESTED) return
+
+        registrationMutex.withLock {
+            if (identity.clientId() != clientId) return@withLock
+
+            identity.reset()
+            keyPairStore.delete(clientId)
+        }
     }
 
     private suspend fun ensureAttested() {

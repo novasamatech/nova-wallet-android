@@ -2,6 +2,7 @@ package io.novafoundation.nova.infrastructure.attestation
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -23,6 +24,17 @@ class AttestationIdentityTest {
 
         assertEquals(first, identity.clientId())
         assertEquals(first, RealAttestationIdentity(preferences).clientId())
+    }
+
+    @Test
+    fun `reset mints a new client id and forgets the attestation`() {
+        val original = identity.clientId()
+        identity.markAttested()
+
+        identity.reset()
+
+        assertNotEquals(original, identity.clientId())
+        assertFalse(identity.isAttested())
     }
 
     @Test

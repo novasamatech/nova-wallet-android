@@ -13,6 +13,14 @@ interface AttestationIdentity {
     fun isAttested(): Boolean
 
     fun markAttested()
+
+    /**
+     * Forgets the current client id so the next [clientId] mints a new one.
+     *
+     * Re-registering under the same id is not an option: the backend refuses to rebind an id to a
+     * different key, so recovering from a lost or mismatched binding means a new identity.
+     */
+    fun reset()
 }
 
 class RealAttestationIdentity(
@@ -30,4 +38,9 @@ class RealAttestationIdentity(
     override fun isAttested(): Boolean = preferences.getString(PREFS_ATTESTED_CLIENT_ID) == clientId()
 
     override fun markAttested() = preferences.putString(PREFS_ATTESTED_CLIENT_ID, clientId())
+
+    override fun reset() {
+        preferences.removeField(PREFS_ATTESTED_CLIENT_ID)
+        preferences.removeField(PREFS_CLIENT_ID)
+    }
 }
