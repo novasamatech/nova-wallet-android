@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.AssetGetOptionsUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -60,6 +61,8 @@ interface WalletFeatureApi {
     val balanceLocksRepository: BalanceLocksRepository
 
     val chainAssetRepository: ChainAssetRepository
+
+    val showReceivedAssetUseCase: ShowReceivedAssetUseCase
 
     val erc20Standard: Erc20Standard
 

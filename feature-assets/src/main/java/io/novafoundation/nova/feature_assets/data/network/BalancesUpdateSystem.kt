@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_assets.data.network
 
 import android.util.Log
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.mergeIfMultiple
 import io.novafoundation.nova.common.utils.transformLatestDiffed
@@ -11,6 +12,11 @@ import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateS
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetEnabledUpdate
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.subscribe
 import io.novafoundation.nova.runtime.ext.isDisabled
@@ -25,6 +31,10 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transform
+import java.math.BigDecimal
 import kotlin.coroutines.coroutineContext
 
 class BalancesUpdateSystem(
@@ -34,14 +44,49 @@ class BalancesUpdateSystem(
     private val pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
     private val accountUpdateScope: AccountUpdateScope,
     private val storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+    private val walletRepository: WalletRepository,
+    private val chainAssetRepository: ChainAssetRepository,
+    private val autoEnableTokensRepository: AutoEnableTokensRepository,
 ) : UpdateSystem {
 
     override fun start(): Flow<Updater.SideEffect> {
         return accountUpdateScope.invalidationFlow().flatMapLatest { metaAccount ->
-            chainRegistry.currentChains.transformLatestDiffed { chain ->
-                emitAll(balancesSync(chain, metaAccount))
-            }
+            merge(
+                chainRegistry.currentChains.transformLatestDiffed { chain ->
+                    emitAll(balancesSync(chain, metaAccount))
+                },
+                autoEnableTokensWithBalance(metaAccount)
+            )
         }.flowOn(Dispatchers.Default)
+    }
+
+    /**
+     * Shows tokens the wallet turns out to hold. Runs here rather than inside the payment updater
+     * because a balance is only known once it has been written to the cache, and it has to see
+     * assets across every chain to react to the ones that are still hidden.
+     */
+    private fun autoEnableTokensWithBalance(metaAccount: MetaAccount): Flow<Updater.SideEffect> {
+        return autoEnableTokensRepository.autoEnableTokensFlow()
+            .flatMapLatest { autoEnable ->
+                if (autoEnable) walletRepository.syncedAssetsFlow(metaAccount.id) else emptyFlow()
+            }
+            .onEach(::enableAssetsWithPositiveBalance)
+            .transform { }
+    }
+
+    private suspend fun enableAssetsWithPositiveBalance(assets: List<Asset>) {
+        val toEnable = assets.filter { asset ->
+            val chainAsset = asset.token.configuration
+
+            // enabledOverriddenByUser is what keeps this from undoing a token the user hid on purpose
+            !chainAsset.enabled && !chainAsset.enabledOverriddenByUser && asset.total > BigDecimal.ZERO
+        }
+
+        if (toEnable.isEmpty()) return
+
+        val updates = toEnable.map { AssetEnabledUpdate.automatic(it.token.configuration.fullId, enabled = true) }
+
+        chainAssetRepository.setAssetsEnabled(updates)
     }
 
     private suspend fun balancesSync(chain: Chain, metaAccount: MetaAccount): Flow<Updater.SideEffect> {

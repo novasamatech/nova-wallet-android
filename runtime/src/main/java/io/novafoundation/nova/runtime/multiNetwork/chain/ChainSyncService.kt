@@ -7,7 +7,6 @@ import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.FullAssetIdLocal
 import io.novafoundation.nova.core_db.ext.fullId
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
@@ -23,6 +22,7 @@ import kotlinx.coroutines.withContext
 class ChainSyncService(
     private val chainDao: ChainDao,
     private val chainFetcher: ChainFetcher,
+    private val defaultAssetsRepository: DefaultAssetsRepository,
     private val gson: Gson
 ) {
 
@@ -39,13 +39,14 @@ class ChainSyncService(
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
+        val initialAssetEnabling = defaultAssetsRepository.initialAssetEnabling()
 
         val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], source = ChainLocal.Source.DEFAULT, gson) }
         val newAssets = remoteChains.flatMap { chain ->
             chain.assets.map {
                 val fullAssetId = FullAssetIdLocal(chain.chainId, it.assetId)
                 val oldAsset = associatedOldAssets[fullAssetId]
-                mapRemoteAssetToLocal(chain, it, gson, oldAsset?.enabled ?: ENABLED_DEFAULT_BOOL)
+                mapRemoteAssetToLocal(chain, it, gson, oldAsset?.enabled ?: initialAssetEnabling.isEnabled(fullAssetId))
             }
         }
         val newNodes = remoteChains.flatMap(::mapRemoteNodesToLocal)

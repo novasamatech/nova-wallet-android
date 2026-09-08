@@ -59,6 +59,7 @@ import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddChainForeignKeyForProxy_63_64
 import io.novafoundation.nova.core_db.migrations.AddConnectionStateToChains_53_54
 import io.novafoundation.nova.core_db.migrations.AddAnalyticsEvents_73_74
+import io.novafoundation.nova.core_db.migrations.AddAssetEnabledOverride_74_75
 import io.novafoundation.nova.core_db.migrations.AddFieldsToContributions
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
@@ -169,7 +170,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 74,
+    version = 75,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -275,6 +276,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
                     .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70, AddMultisigSupportFlag_70_71)
                     .addMigrations(AddGifts_71_72, AddFieldsToContributions, AddAnalyticsEvents_73_74)
+                    .addMigrations(AddAssetEnabledOverride_74_75)
                     .build()
             }
             return instance!!

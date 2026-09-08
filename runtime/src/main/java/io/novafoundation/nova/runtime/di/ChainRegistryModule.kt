@@ -1,5 +1,6 @@
 package io.novafoundation.nova.runtime.di
 
+import android.content.Context
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -16,6 +17,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
+import io.novafoundation.nova.runtime.multiNetwork.chain.BundledDefaultAssets
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnectionFactory
@@ -50,12 +53,26 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
+    fun provideBundledDefaultAssets(context: Context, gson: Gson) = BundledDefaultAssets(context, gson)
+
+    @Provides
+    @ApplicationScope
+    fun provideDefaultAssetsRepository(
+        chainAssetDao: ChainAssetDao,
+        chainFetcher: ChainFetcher,
+        bundledDefaultAssets: BundledDefaultAssets,
+        preferences: Preferences
+    ) = DefaultAssetsRepository(chainAssetDao, chainFetcher, bundledDefaultAssets, preferences)
+
+    @Provides
+    @ApplicationScope
     fun provideChainSyncService(
         dao: ChainDao,
         chainAssetDao: ChainAssetDao,
         chainFetcher: ChainFetcher,
+        defaultAssetsRepository: DefaultAssetsRepository,
         gson: Gson
-    ) = ChainSyncService(dao, chainFetcher, gson)
+    ) = ChainSyncService(dao, chainFetcher, defaultAssetsRepository, gson)
 
     @Provides
     @ApplicationScope
@@ -67,8 +84,9 @@ class ChainRegistryModule {
         chainAssetDao: ChainAssetDao,
         chainDao: ChainDao,
         assetFetcher: AssetFetcher,
+        defaultAssetsRepository: DefaultAssetsRepository,
         gson: Gson
-    ) = EvmAssetsSyncService(chainDao, chainAssetDao, assetFetcher, gson)
+    ) = EvmAssetsSyncService(chainDao, chainAssetDao, assetFetcher, defaultAssetsRepository, gson)
 
     @Provides
     @ApplicationScope

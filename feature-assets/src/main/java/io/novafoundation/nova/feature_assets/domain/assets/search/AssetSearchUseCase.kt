@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_assets.domain.common.searchTokens
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.onlyEnabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.ChainsById
 import io.novafoundation.nova.runtime.multiNetwork.asset
@@ -27,10 +28,12 @@ class AssetSearchUseCase(
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 
         return combine(assetsFlow, filterFlow) { assets, filter ->
+            val enabled = assets.onlyEnabled()
+
             if (filter == null) {
-                assets
+                enabled
             } else {
-                assets.filter { filter(it) }
+                enabled.filter { filter(it) }
             }
         }
     }

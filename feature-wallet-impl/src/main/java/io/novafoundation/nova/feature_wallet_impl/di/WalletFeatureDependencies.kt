@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
@@ -115,6 +116,8 @@ interface WalletFeatureDependencies {
     val multiChainRuntimeCallsApi: MultiChainRuntimeCallsApi
 
     fun preferences(): Preferences
+
+    fun autoEnableTokensRepository(): AutoEnableTokensRepository
 
     fun encryptedPreferences(): EncryptedPreferences
 

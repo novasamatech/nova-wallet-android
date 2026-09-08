@@ -45,6 +45,8 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
 
@@ -55,6 +57,7 @@ class SwapInteractor(
     private val swapUpdateSystemFactory: SwapUpdateSystemFactory,
     private val assetsValidationContextFactory: AssetsValidationContext.Factory,
     private val canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
+    private val showReceivedAssetUseCase: ShowReceivedAssetUseCase,
 ) {
 
     suspend fun getAllFeeTokens(swapFee: SwapFee): Map<FullChainAssetId, Token> {
@@ -113,9 +116,23 @@ class SwapInteractor(
         return swapService.quote(quoteArgs, computationalScope)
     }
 
-    suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> = swapService.swap(calculatedFee)
+    suspend fun executeSwap(calculatedFee: SwapFee): Flow<SwapProgress> {
+        return swapService.swap(calculatedFee)
+            .onEach { progress -> if (progress is SwapProgress.Done) showAssetOut(calculatedFee) }
+    }
 
-    suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult> = swapService.submitFirstSwapStep(calculatedFee)
+    suspend fun submitFirstSwapStep(calculatedFee: SwapFee): Result<SwapSubmissionResult> {
+        return swapService.submitFirstSwapStep(calculatedFee)
+            .onSuccess { showAssetOut(calculatedFee) }
+    }
+
+    /**
+     * A swap always delivers to the user's own account, so the token being bought has to be visible
+     * afterwards - including when it is one the user had hidden before deciding to buy it.
+     */
+    private suspend fun showAssetOut(calculatedFee: SwapFee) {
+        showReceivedAssetUseCase.onOwnFundsReceived(calculatedFee.segments.last().operation.assetOut)
+    }
 
     suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {
         swapService.warmUpCommonChains(computationalScope)

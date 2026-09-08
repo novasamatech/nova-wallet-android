@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -23,8 +24,6 @@ import io.novafoundation.nova.feature_assets.data.repository.NovaCardStateReposi
 import io.novafoundation.nova.feature_assets.data.repository.RealNovaCardStateRepository
 import io.novafoundation.nova.feature_assets.data.repository.RealTransactionHistoryRepository
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
-import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
-import io.novafoundation.nova.feature_assets.data.repository.assetFilters.PreferencesAssetFiltersRepository
 import io.novafoundation.nova.feature_assets.di.modules.AddTokenModule
 import io.novafoundation.nova.feature_assets.di.modules.ManageTokensCommonModule
 import io.novafoundation.nova.feature_assets.di.modules.SendModule
@@ -72,6 +71,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -136,16 +136,9 @@ class AssetsFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideAssetFiltersRepository(preferences: Preferences): AssetFiltersRepository {
-        return PreferencesAssetFiltersRepository(preferences)
-    }
-
-    @Provides
-    @FeatureScope
     fun provideWalletInteractor(
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
-        assetFiltersRepository: AssetFiltersRepository,
         chainRegistry: ChainRegistry,
         nftRepository: NftRepository,
         transactionHistoryRepository: TransactionHistoryRepository,
@@ -153,7 +146,6 @@ class AssetsFeatureModule {
     ): WalletInteractor = WalletInteractorImpl(
         walletRepository = walletRepository,
         accountRepository = accountRepository,
-        assetFiltersRepository = assetFiltersRepository,
         chainRegistry = chainRegistry,
         nftRepository = nftRepository,
         transactionHistoryRepository = transactionHistoryRepository,
@@ -191,6 +183,9 @@ class AssetsFeatureModule {
         pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
         accountUpdateScope: AccountUpdateScope,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
+        walletRepository: WalletRepository,
+        chainAssetRepository: ChainAssetRepository,
+        autoEnableTokensRepository: AutoEnableTokensRepository,
     ): BalancesUpdateSystem {
         return BalancesUpdateSystem(
             chainRegistry = chainRegistry,
@@ -198,7 +193,10 @@ class AssetsFeatureModule {
             balanceLocksUpdater = balanceLocksUpdater,
             pooledBalanceUpdaterFactory = pooledBalanceUpdaterFactory,
             accountUpdateScope = accountUpdateScope,
-            storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory
+            storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
+            walletRepository = walletRepository,
+            chainAssetRepository = chainAssetRepository,
+            autoEnableTokensRepository = autoEnableTokensRepository
         )
     }
 

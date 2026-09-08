@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.balances.BalanceSyncUpdate
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.enabledAssets
 import io.novafoundation.nova.runtime.ext.localId
@@ -29,6 +30,7 @@ import kotlinx.coroutines.flow.onEach
 internal class FullSyncPaymentUpdater(
     private val operationDao: OperationDao,
     private val assetSourceRegistry: AssetSourceRegistry,
+    private val autoEnableTokensRepository: AutoEnableTokensRepository,
     override val scope: AccountUpdateScope,
     private val chain: Chain,
 ) : Updater<MetaAccount> {
@@ -41,11 +43,20 @@ internal class FullSyncPaymentUpdater(
     ): Flow<Updater.SideEffect> {
         val accountId = scopeValue.requireAccountIdIn(chain)
 
-        return chain.enabledAssets().mapNotNull { chainAsset ->
+        return assetsToSync().mapNotNull { chainAsset ->
             syncAsset(chainAsset, scopeValue, accountId, storageSubscriptionBuilder)
         }
             .mergeIfMultiple()
             .noSideAffects()
+    }
+
+    /**
+     * A hidden asset is normally not worth a subscription. While tokens are added by balance it is,
+     * because that balance is the only way to notice the asset should be shown at all - and the
+     * chain already holds one shared subscription, so this adds storage keys rather than connections.
+     */
+    private suspend fun assetsToSync(): List<Chain.Asset> {
+        return if (autoEnableTokensRepository.autoEnableTokens()) chain.assets else chain.enabledAssets()
     }
 
     private suspend fun syncAsset(

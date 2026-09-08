@@ -29,6 +29,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito.lenient
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.junit.MockitoJUnitRunner
@@ -105,11 +106,18 @@ class ChainSyncServiceTest {
     @Mock
     lateinit var chainFetcher: ChainFetcher
 
+    @Mock
+    lateinit var defaultAssetsRepository: DefaultAssetsRepository
+
     lateinit var chainSyncService: ChainSyncService
 
     @Before
-    fun setup() {
-        chainSyncService = ChainSyncService(dao, chainFetcher, gson)
+    fun setup() = runBlocking {
+        // These cases predate the default token list; Unavailable keeps them on the behaviour
+        // they were written against - every synced asset starts enabled.
+        lenient().`when`(defaultAssetsRepository.initialAssetEnabling()).thenReturn(InitialAssetEnabling.Unavailable)
+
+        chainSyncService = ChainSyncService(dao, chainFetcher, defaultAssetsRepository, gson)
     }
 
     @Test

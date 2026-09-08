@@ -33,7 +33,9 @@ fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote, gson: Gson): 
             buyProviders = gson.toJson(it.buyProviders),
             sellProviders = gson.toJson(it.sellProviders),
             typeExtras = gson.toJson(typeExtras),
-            enabled = true
+            // Both are placeholders: EvmAssetsSyncService decides the real enabled state
+            enabled = true,
+            enabledOverriddenByUser = false
         )
     }
 }

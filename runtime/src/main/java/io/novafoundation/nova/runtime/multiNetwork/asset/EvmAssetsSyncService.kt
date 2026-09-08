@@ -7,8 +7,8 @@ import io.novafoundation.nova.core_db.dao.ChainAssetDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.ext.fullId
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapEVMAssetRemoteToLocalAssets
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -17,6 +17,7 @@ class EvmAssetsSyncService(
     private val chainDao: ChainDao,
     private val chainAssetDao: ChainAssetDao,
     private val chainFetcher: AssetFetcher,
+    private val defaultAssetsRepository: DefaultAssetsRepository,
     private val gson: Gson,
 ) {
 
@@ -29,6 +30,7 @@ class EvmAssetsSyncService(
 
         val oldAssets = chainAssetDao.getAssetsBySource(AssetSourceLocal.ERC20)
         val associatedOldAssets = oldAssets.associateBy { it.fullId() }
+        val initialAssetEnabling = defaultAssetsRepository.initialAssetEnabling()
 
         val newAssets = retryUntilDone { chainFetcher.getEVMAssets() }
             .flatMap { mapEVMAssetRemoteToLocalAssets(it, gson) }
@@ -37,7 +39,7 @@ class EvmAssetsSyncService(
                 if (new.chainId !in availableChainIds) return@mapNotNull null
 
                 val old = associatedOldAssets[new.fullId()]
-                new.copy(enabled = old?.enabled ?: ENABLED_DEFAULT_BOOL)
+                new.copy(enabled = old?.enabled ?: initialAssetEnabling.isEnabled(new.fullId()))
             }
 
         val diff = CollectionDiffer.findDiff(newAssets, oldAssets, forceUseNewItems = false)

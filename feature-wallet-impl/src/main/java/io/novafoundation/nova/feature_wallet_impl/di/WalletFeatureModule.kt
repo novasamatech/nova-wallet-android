@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.interfaces.FileCache
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -48,6 +49,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCas
 import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -214,13 +216,15 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
         chainRegistry: ChainRegistry,
-        assetCache: AssetCache
+        assetCache: AssetCache,
+        autoEnableTokensRepository: AutoEnableTokensRepository,
     ): PaymentUpdaterFactory = RealPaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
         accountUpdateScope,
         chainRegistry,
-        assetCache
+        assetCache,
+        autoEnableTokensRepository
     )
 
     @Provides
@@ -379,6 +383,12 @@ class WalletFeatureModule {
         chainAssetDao: ChainAssetDao,
         gson: Gson
     ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson)
+
+    @Provides
+    @FeatureScope
+    fun provideShowReceivedAssetUseCase(
+        chainAssetRepository: ChainAssetRepository
+    ) = ShowReceivedAssetUseCase(chainAssetRepository)
 
     @Provides
     @FeatureScope

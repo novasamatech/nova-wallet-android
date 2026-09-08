@@ -31,9 +31,11 @@ import io.novafoundation.nova.common.data.providers.deviceid.AndroidDeviceIdProv
 import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.repository.RealAssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.RealAssetsViewModeRepository
+import io.novafoundation.nova.common.data.repository.RealAutoEnableTokensRepository
 import io.novafoundation.nova.common.data.repository.RealBannerVisibilityRepository
 import io.novafoundation.nova.common.data.repository.RealToggleFeatureRepository
 import io.novafoundation.nova.common.data.legal.LegalConsentRepository
@@ -414,6 +416,10 @@ class CommonModule {
     @Provides
     @ApplicationScope
     fun provideAssetsViewModeRepository(preferences: Preferences): AssetsViewModeRepository = RealAssetsViewModeRepository(preferences)
+
+    @Provides
+    @ApplicationScope
+    fun provideAutoEnableTokensRepository(preferences: Preferences): AutoEnableTokensRepository = RealAutoEnableTokensRepository(preferences)
 
     @Provides
     @ApplicationScope

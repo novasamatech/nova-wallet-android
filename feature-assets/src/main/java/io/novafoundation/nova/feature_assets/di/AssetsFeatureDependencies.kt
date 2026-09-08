@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
@@ -89,6 +90,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceReposi
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -112,6 +114,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -169,6 +172,8 @@ interface AssetsFeatureDependencies {
     val balanceLocksRepository: BalanceLocksRepository
 
     val chainAssetRepository: ChainAssetRepository
+
+    fun showReceivedAssetUseCase(): ShowReceivedAssetUseCase
 
     val erc20Standard: Erc20Standard
 
@@ -322,6 +327,8 @@ interface AssetsFeatureDependencies {
 
     fun chainRegistry(): ChainRegistry
 
+    fun defaultAssetsRepository(): DefaultAssetsRepository
+
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource
 
@@ -353,6 +360,8 @@ interface AssetsFeatureDependencies {
     fun coingeckoApi(): CoingeckoApi
 
     fun assetsViewModeRepository(): AssetsViewModeRepository
+
+    fun autoEnableTokensRepository(): AutoEnableTokensRepository
 
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
 

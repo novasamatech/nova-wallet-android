@@ -21,6 +21,7 @@ import io.novafoundation.nova.common.data.network.rpc.SocketSingleRequestExecuto
 import io.novafoundation.nova.common.data.providers.deviceid.DeviceIdProvider
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
+import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.repository.ToggleFeatureRepository
 import io.novafoundation.nova.common.data.secrets.v1.SecretStoreV1
@@ -242,6 +243,8 @@ interface CommonApi {
     fun buildTypeProvider(): BuildTypeProvider
 
     fun assetsViewModeRepository(): AssetsViewModeRepository
+
+    fun autoEnableTokensRepository(): AutoEnableTokensRepository
 
     fun assetsIconModeService(): AssetsIconModeRepository
 

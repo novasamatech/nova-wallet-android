@@ -61,16 +61,13 @@ class RealAssetListMixin(
     override val assetsFlow = walletInteractor.assetsFlow()
         .shareInBackground()
 
-    private val filteredAssetsFlow = walletInteractor.filterAssets(assetsFlow)
-        .shareInBackground()
-
     override val externalBalancesFlow = externalBalancesInteractor.observeExternalBalances()
         .shareInBackground()
 
     override val assetsViewModeFlow = assetsListInteractor.assetsViewModeFlow()
         .shareInBackground()
 
-    private val throttledBalance = combineToPair(filteredAssetsFlow, externalBalancesFlow)
+    private val throttledBalance = combineToPair(assetsFlow, externalBalancesFlow)
         .throttleLast(300.milliseconds)
 
     private val assetsByViewMode = combine(

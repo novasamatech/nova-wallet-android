@@ -301,7 +301,8 @@ fun mapChainAssetLocalToAsset(local: ChainAssetLocal, gson: Gson): Chain.Asset {
         staking = mapStakingTypeFromLocal(local.staking),
         type = mapChainAssetTypeFromRaw(local.type, typeExtrasParsed),
         source = mapAssetSourceFromLocal(local.source),
-        enabled = local.enabled
+        enabled = local.enabled,
+        enabledOverriddenByUser = local.enabledOverriddenByUser
     )
 }
 

@@ -71,8 +71,6 @@ import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSw
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
@@ -396,13 +394,6 @@ class Navigator(
 
     override fun openManageTokens() {
         navigationBuilder().action(R.id.action_mainFragment_to_manageTokensGraph)
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun openManageChainTokens(payload: ManageChainTokensPayload) {
-        val args = ManageChainTokensFragment.getBundle(payload)
-        navigationBuilder().action(R.id.action_manageTokensFragment_to_manageChainTokensFragment)
-            .setArgs(args)
             .navigateInFirstAttachedContext()
     }
 

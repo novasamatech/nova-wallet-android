@@ -89,7 +89,9 @@ class RealAddTokensInteractor(
             type = Chain.Asset.Type.EvmErc20(customErc20Token.contract),
             source = Chain.Asset.Source.MANUAL,
             name = customErc20Token.symbol,
-            enabled = true
+            enabled = true,
+            // The user typed this contract in by hand, which is as deliberate as a choice gets
+            enabledOverriddenByUser = true
         )
 
         chainAssetRepository.insertCustomAsset(asset)

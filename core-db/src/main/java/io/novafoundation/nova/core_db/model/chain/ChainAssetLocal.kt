@@ -39,6 +39,12 @@ data class ChainAssetLocal(
     val typeExtras: String?,
     @ColumnInfo(defaultValue = ENABLED_DEFAULT_STR)
     val enabled: Boolean,
+    /**
+     * Set when the user's own choice for [enabled] differs from what automatic enabling by
+     * balance would have produced. While it is set, automatic enabling leaves this asset alone.
+     */
+    @ColumnInfo(defaultValue = ENABLED_OVERRIDDEN_DEFAULT_STR)
+    val enabledOverriddenByUser: Boolean,
 ) : Identifiable {
 
     companion object {
@@ -46,6 +52,8 @@ data class ChainAssetLocal(
         const val SOURCE_DEFAULT = "DEFAULT"
         const val ENABLED_DEFAULT_STR = "1"
         const val ENABLED_DEFAULT_BOOL = true
+        const val ENABLED_OVERRIDDEN_DEFAULT_STR = "0"
+        const val ENABLED_OVERRIDDEN_DEFAULT_BOOL = false
     }
 
     @Ignore

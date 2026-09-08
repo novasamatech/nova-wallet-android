@@ -8,6 +8,8 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMInstanceRemote
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
+import io.novafoundation.nova.runtime.multiNetwork.chain.InitialAssetEnabling
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapEVMAssetRemoteToLocalAssets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -57,11 +59,18 @@ class EvmErc20AssetSyncServiceTest {
     @Mock
     lateinit var assetFetcher: AssetFetcher
 
+    @Mock
+    lateinit var defaultAssetsRepository: DefaultAssetsRepository
+
     lateinit var evmAssetSyncService: EvmAssetsSyncService
 
     @Before
-    fun setup() {
-        evmAssetSyncService = EvmAssetsSyncService(chaindao, dao, assetFetcher, gson)
+    fun setup() = runBlocking {
+        // These cases predate the default token list; Unavailable keeps them on the behaviour
+        // they were written against - every synced asset starts enabled.
+        lenient().`when`(defaultAssetsRepository.initialAssetEnabling()).thenReturn(InitialAssetEnabling.Unavailable)
+
+        evmAssetSyncService = EvmAssetsSyncService(chaindao, dao, assetFetcher, defaultAssetsRepository, gson)
     }
 
     @Test

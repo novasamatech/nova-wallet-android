@@ -2,12 +2,10 @@ package io.novafoundation.nova.feature_assets.domain
 
 import io.novafoundation.nova.common.data.model.DataPage
 import io.novafoundation.nova.common.data.model.PageOffset
-import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_assets.data.repository.TransactionHistoryRepository
-import io.novafoundation.nova.feature_assets.data.repository.assetFilters.AssetFiltersRepository
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithNetwork
 import io.novafoundation.nova.feature_assets.domain.common.NetworkAssetGroup
 import io.novafoundation.nova.feature_assets.domain.common.AssetWithOffChainBalance
@@ -21,6 +19,7 @@ import io.novafoundation.nova.feature_nft_api.data.repository.NftSyncTrigger
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
+import io.novafoundation.nova.feature_wallet_api.domain.model.onlyEnabled
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
@@ -44,23 +43,11 @@ import kotlinx.coroutines.withContext
 class WalletInteractorImpl(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
-    private val assetFiltersRepository: AssetFiltersRepository,
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
     private val transactionHistoryRepository: TransactionHistoryRepository,
     private val currencyRepository: CurrencyRepository
 ) : WalletInteractor {
-
-    override fun isFiltersEnabledFlow(): Flow<Boolean> {
-        return assetFiltersRepository.assetFiltersFlow()
-            .map { it.isNotEmpty() }
-    }
-
-    override fun filterAssets(assetsFlow: Flow<List<Asset>>): Flow<List<Asset>> {
-        return combine(assetsFlow, assetFiltersRepository.assetFiltersFlow()) { assets, filters ->
-            assets.applyFilters(filters)
-        }
-    }
 
     override fun assetsFlow(): Flow<List<Asset>> {
         val assetsFlow = accountRepository.selectedMetaAccountFlow()
@@ -69,7 +56,8 @@ class WalletInteractorImpl(
         val enabledChains = chainRegistry.enabledChainByIdFlow()
 
         return combine(assetsFlow, enabledChains) { assets, chainsById ->
-            assets.filter { chainsById.containsKey(it.token.configuration.chainId) }
+            assets.onlyEnabled()
+                .filter { chainsById.containsKey(it.token.configuration.chainId) }
         }
     }
 

@@ -171,7 +171,8 @@ fun mapRemoteAssetToLocal(
         sellProviders = gson.toJson(assetRemote.sellProviders),
         typeExtras = gson.toJson(assetRemote.typeExtras),
         icon = assetRemote.icon,
-        enabled = isEnabled
+        enabled = isEnabled,
+        enabledOverriddenByUser = ChainAssetLocal.ENABLED_OVERRIDDEN_DEFAULT_BOOL
     )
 }
 
