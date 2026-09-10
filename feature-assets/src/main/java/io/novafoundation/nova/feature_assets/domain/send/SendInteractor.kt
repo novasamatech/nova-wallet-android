@@ -88,15 +88,16 @@ class SendInteractor(
     }
 
     /**
-     * Sending to your own account is the one transfer that changes what this wallet holds, so the
-     * destination token has to be visible - including when it is a token the user had hidden.
+     * Sending to an account of your own is the one transfer that changes what a wallet holds, so
+     * the destination token has to be visible - including when it is a token the user had hidden.
+     *
+     * The token is shown in the wallet that receives it, which is not necessarily the one sending:
+     * moving funds to another of your own wallets has to reveal it over there.
      */
     private suspend fun showDestinationAssetIfSentToSelf(transfer: AssetTransfer) {
-        val ownAccount = accountRepository.findMetaAccount(transfer.recipientAccountId.value, transfer.destinationChain.id)
+        val ownAccount = accountRepository.findMetaAccount(transfer.recipientAccountId.value, transfer.destinationChain.id) ?: return
 
-        if (ownAccount != null) {
-            showReceivedAssetUseCase.onOwnFundsReceived(transfer.destinationChainAsset.fullId)
-        }
+        showReceivedAssetUseCase.onOwnFundsReceived(ownAccount.id, transfer.destinationChainAsset.fullId)
     }
 
     fun validationSystemFor(transfer: AssetTransfer, coroutineScope: CoroutineScope) = if (transfer.isCrossChain) {

@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
-import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
 import io.novafoundation.nova.common.domain.usecase.MaskingModeUseCase
@@ -24,6 +23,8 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetVisibilityDao
+import io.novafoundation.nova.core_db.dao.MetaAccountSettingsDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
 import io.novafoundation.nova.core_db.dao.CurrencyDao
@@ -55,6 +56,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -76,6 +78,10 @@ interface WalletFeatureDependencies {
     val evmTransactionService: EvmTransactionService
 
     val chainAssetDao: ChainAssetDao
+
+    fun chainAssetVisibilityDao(): ChainAssetVisibilityDao
+
+    fun metaAccountSettingsDao(): MetaAccountSettingsDao
 
     val storageStorageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory
 
@@ -117,7 +123,6 @@ interface WalletFeatureDependencies {
 
     fun preferences(): Preferences
 
-    fun autoEnableTokensRepository(): AutoEnableTokensRepository
 
     fun encryptedPreferences(): EncryptedPreferences
 
@@ -172,6 +177,8 @@ interface WalletFeatureDependencies {
     fun addressDisplayUseCase(): AddressDisplayUseCase
 
     fun chainRegistry(): ChainRegistry
+
+    fun defaultAssetsRepository(): DefaultAssetsRepository
 
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource

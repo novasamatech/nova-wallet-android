@@ -6,7 +6,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import androidx.room.Update
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
 import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
@@ -34,20 +33,9 @@ abstract class ChainAssetDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertAssets(assets: List<ChainAssetLocal>)
 
-    @Query("UPDATE chain_assets SET enabled = :enabled WHERE chainId = :chainId AND id = :assetId")
-    protected abstract suspend fun setAssetEnabled(enabled: Boolean, chainId: String, assetId: Int)
-
     @Query("SELECT EXISTS(SELECT 1 FROM chain_assets)")
     abstract suspend fun hasAnyAsset(): Boolean
-
-    @Query("SELECT * FROM chain_assets WHERE enabled=1")
-    abstract suspend fun getEnabledAssets(): List<ChainAssetLocal>
-
-    @Update(entity = ChainAssetLocal::class)
-    abstract suspend fun setAssetsEnabled(params: List<SetAssetEnabledParams>)
 
     @Delete
     protected abstract suspend fun deleteChainAssets(assets: List<ChainAssetLocal>)
 }
-
-class SetAssetEnabledParams(val enabled: Boolean, val enabledOverriddenByUser: Boolean, val chainId: String, val id: Int)

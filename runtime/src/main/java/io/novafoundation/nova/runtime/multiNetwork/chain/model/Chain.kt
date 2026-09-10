@@ -85,12 +85,6 @@ data class Chain(
         val type: Type,
         val source: Source,
         val name: String,
-        val enabled: Boolean,
-        /**
-         * See ChainAssetLocal.enabledOverriddenByUser - while set, automatic enabling by
-         * balance leaves this asset as the user left it.
-         */
-        val enabledOverriddenByUser: Boolean,
     ) : Identifiable, Serializable {
 
         enum class Source {

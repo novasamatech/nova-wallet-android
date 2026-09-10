@@ -8,8 +8,6 @@ import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMAssetRemote
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.model.EVMInstanceRemote
-import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
-import io.novafoundation.nova.runtime.multiNetwork.chain.InitialAssetEnabling
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.mapEVMAssetRemoteToLocalAssets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -59,18 +57,13 @@ class EvmErc20AssetSyncServiceTest {
     @Mock
     lateinit var assetFetcher: AssetFetcher
 
-    @Mock
-    lateinit var defaultAssetsRepository: DefaultAssetsRepository
 
     lateinit var evmAssetSyncService: EvmAssetsSyncService
 
     @Before
     fun setup() = runBlocking {
-        // These cases predate the default token list and only care about which rows are written,
-        // not about their enabled state, so the decision is stubbed as the already-applied one.
-        lenient().`when`(defaultAssetsRepository.initialAssetEnabling()).thenReturn(InitialAssetEnabling.AlreadyApplied)
 
-        evmAssetSyncService = EvmAssetsSyncService(chaindao, dao, assetFetcher, defaultAssetsRepository, gson)
+        evmAssetSyncService = EvmAssetsSyncService(chaindao, dao, assetFetcher, gson)
     }
 
     @Test
@@ -127,21 +120,6 @@ class EvmErc20AssetSyncServiceTest {
 
             verify(dao).updateAssets(
                 removeAsset(chainId, assetId),
-            )
-        }
-    }
-
-    @Test
-    fun `should not overwrite enabled state`() {
-        runBlocking {
-            localHasChains(chainId)
-            localReturnsERC20(LOCAL_ASSETS.map { it.copy(enabled = false) })
-            remoteReturns(listOf(REMOTE_ASSET))
-
-            evmAssetSyncService.syncUp()
-
-            verify(dao).updateAssets(
-                emptyDiff(),
             )
         }
     }

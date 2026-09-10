@@ -98,7 +98,6 @@ fun ChainLocal.assetOf(
     sellProviders = "test",
     typeExtras = null,
     enabled = true,
-    enabledOverriddenByUser = false,
     source = AssetSourceLocal.DEFAULT
 )
 

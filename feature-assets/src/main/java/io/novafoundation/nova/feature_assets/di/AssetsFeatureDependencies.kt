@@ -13,7 +13,6 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.repository.AssetsIconModeRepository
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
-import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.data.repository.BannerVisibilityRepository
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.data.storage.encrypt.EncryptedPreferences
@@ -89,6 +88,9 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AutoEnableTokensRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
@@ -172,6 +174,10 @@ interface AssetsFeatureDependencies {
     val balanceLocksRepository: BalanceLocksRepository
 
     val chainAssetRepository: ChainAssetRepository
+
+    fun assetVisibilityRepository(): AssetVisibilityRepository
+
+    fun assetVisibilityUseCase(): AssetVisibilityUseCase
 
     fun showReceivedAssetUseCase(): ShowReceivedAssetUseCase
 

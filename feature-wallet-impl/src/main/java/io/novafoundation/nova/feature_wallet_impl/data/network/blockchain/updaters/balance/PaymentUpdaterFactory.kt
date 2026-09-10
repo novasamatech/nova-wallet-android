@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.updaters.balance
 
-import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -17,14 +16,12 @@ class RealPaymentUpdaterFactory(
     private val scope: AccountUpdateScope,
     private val chainRegistry: ChainRegistry,
     private val assetCache: AssetCache,
-    private val autoEnableTokensRepository: AutoEnableTokensRepository,
 ) : PaymentUpdaterFactory {
 
     override fun createFullSync(chain: Chain): Updater<MetaAccount> {
         return FullSyncPaymentUpdater(
             operationDao = operationDao,
             assetSourceRegistry = assetSourceRegistry,
-            autoEnableTokensRepository = autoEnableTokensRepository,
             scope = scope,
             chain = chain,
         )

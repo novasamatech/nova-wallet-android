@@ -7,7 +7,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
-import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AutoEnableTokensRepository
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_assets.domain.tokens.manage.ManageTokenInteractor
@@ -31,6 +32,7 @@ class ManageTokensModule {
         interactor: ManageTokenInteractor,
         mapper: ManageAssetsMapper,
         autoEnableTokensRepository: AutoEnableTokensRepository,
+        accountRepository: AccountRepository,
         assetsViewModeRepository: AssetsViewModeRepository,
     ): ViewModel {
         return ManageTokensViewModel(
@@ -38,6 +40,7 @@ class ManageTokensModule {
             interactor = interactor,
             mapper = mapper,
             autoEnableTokensRepository = autoEnableTokensRepository,
+            accountRepository = accountRepository,
             assetsViewModeRepository = assetsViewModeRepository
         )
     }

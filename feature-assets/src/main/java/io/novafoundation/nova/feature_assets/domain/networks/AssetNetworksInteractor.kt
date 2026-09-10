@@ -40,7 +40,13 @@ class AssetNetworksInteractor(
     ): Flow<List<AssetWithNetwork>> {
         val filter = { asset: Asset -> tradeTokenRegistry.hasProvider(asset.token.configuration, tradeType) }
 
-        return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filter = filter)
+        // Buying delivers a token you do not have yet, so the destination list is not filtered
+        return searchAssetsByTokenSymbolInternalFlow(
+            tokenSymbol,
+            externalBalancesFlow,
+            filter = filter,
+            onlyVisible = tradeType != TradeTokenRegistry.TradeType.BUY
+        )
     }
 
     fun sendAssetFlow(
@@ -65,14 +71,22 @@ class AssetNetworksInteractor(
         coroutineScope: CoroutineScope
     ): Flow<List<AssetWithNetwork>> {
         val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAssetId, coroutineScope).mapToAssetSearchFilter()
-        return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filterFlow = filterFlow)
+
+        // A null source means this is the "swap from" picker; anything else is the destination
+        return searchAssetsByTokenSymbolInternalFlow(
+            tokenSymbol,
+            externalBalancesFlow,
+            filterFlow = filterFlow,
+            onlyVisible = forAssetId == null
+        )
     }
 
     fun receiveAssetFlow(
         tokenSymbol: TokenSymbol,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<List<AssetWithNetwork>> {
-        return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filter = null)
+        // Receiving is the whole point of picking a token you do not hold yet
+        return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, filter = null, onlyVisible = false)
     }
 
     fun giftsAssetFlow(
@@ -96,8 +110,9 @@ class AssetNetworksInteractor(
         assetGroupComparator: Comparator<TokenAssetGroup> = getTokenAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithNetwork> = getTokenAssetBaseComparator(),
         filterFlow: Flow<AssetSearchFilter?>,
+        onlyVisible: Boolean = true,
     ): Flow<List<AssetWithNetwork>> {
-        val assetsFlow = assetSearchUseCase.filteredAssetFlow(filterFlow)
+        val assetsFlow = assetSearchUseCase.filteredAssetFlow(filterFlow, onlyVisible)
             .filterList { it.token.configuration.symbol.normalize() == tokenSymbol }
 
         val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
@@ -121,8 +136,9 @@ private fun AssetNetworksInteractor.searchAssetsByTokenSymbolInternalFlow(
     assetGroupComparator: Comparator<TokenAssetGroup> = getTokenAssetGroupBaseComparator(),
     assetsComparator: Comparator<AssetWithNetwork> = getTokenAssetBaseComparator(),
     filter: AssetSearchFilter?,
+    onlyVisible: Boolean = true,
 ): Flow<List<AssetWithNetwork>> {
     val filterFlow = flowOf(filter)
 
-    return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
+    return searchAssetsByTokenSymbolInternalFlow(tokenSymbol, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow, onlyVisible)
 }

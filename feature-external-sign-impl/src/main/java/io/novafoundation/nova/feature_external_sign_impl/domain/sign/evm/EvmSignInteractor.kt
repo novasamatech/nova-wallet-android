@@ -316,10 +316,7 @@ class EvmSignInteractor(
             staking = emptyList(),
             type = Chain.Asset.Type.EvmNative,
             name = chainCurrency.name,
-            source = Chain.Asset.Source.ERC20,
-            // Built on the fly for a dApp-supplied chain and never stored, so nothing to override
-            enabled = true,
-            enabledOverriddenByUser = false
+            source = Chain.Asset.Source.ERC20
         )
     }
 

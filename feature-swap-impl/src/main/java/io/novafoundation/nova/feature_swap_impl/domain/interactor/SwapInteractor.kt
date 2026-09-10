@@ -131,7 +131,7 @@ class SwapInteractor(
      * afterwards - including when it is one the user had hidden before deciding to buy it.
      */
     private suspend fun showAssetOut(calculatedFee: SwapFee) {
-        showReceivedAssetUseCase.onOwnFundsReceived(calculatedFee.segments.last().operation.assetOut)
+        showReceivedAssetUseCase.onOwnFundsReceivedBySelectedWallet(calculatedFee.segments.last().operation.assetOut)
     }
 
     suspend fun warmUpSwapCommonlyUsedChains(computationalScope: CoroutineScope) {

@@ -18,8 +18,9 @@ import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_nft_api.data.repository.NftSyncTrigger
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TransactionFilter
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.onlyVisible
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.onlyEnabled
 import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.feature_wallet_api.domain.model.OperationsPageChange
@@ -46,7 +47,8 @@ class WalletInteractorImpl(
     private val chainRegistry: ChainRegistry,
     private val nftRepository: NftRepository,
     private val transactionHistoryRepository: TransactionHistoryRepository,
-    private val currencyRepository: CurrencyRepository
+    private val currencyRepository: CurrencyRepository,
+    private val assetVisibilityUseCase: AssetVisibilityUseCase
 ) : WalletInteractor {
 
     override fun assetsFlow(): Flow<List<Asset>> {
@@ -55,9 +57,12 @@ class WalletInteractorImpl(
 
         val enabledChains = chainRegistry.enabledChainByIdFlow()
 
-        return combine(assetsFlow, enabledChains) { assets, chainsById ->
-            assets.onlyEnabled()
-                .filter { chainsById.containsKey(it.token.configuration.chainId) }
+        // The curated set and this wallet's own choices decide what is shown; `enabled` still
+        // decides what is synced, and is applied here only because an unsynced asset has no
+        // balance to show anyway.
+        return combine(assetsFlow, enabledChains, assetVisibilityUseCase.visibilityFlow()) { assets, chainsById, visibility ->
+            assets.filter { chainsById.containsKey(it.token.configuration.chainId) }
+                .onlyVisible(visibility)
         }
     }
 

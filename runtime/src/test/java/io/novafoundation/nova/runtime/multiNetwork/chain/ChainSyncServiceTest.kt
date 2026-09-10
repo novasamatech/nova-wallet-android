@@ -106,18 +106,13 @@ class ChainSyncServiceTest {
     @Mock
     lateinit var chainFetcher: ChainFetcher
 
-    @Mock
-    lateinit var defaultAssetsRepository: DefaultAssetsRepository
 
     lateinit var chainSyncService: ChainSyncService
 
     @Before
     fun setup() = runBlocking {
-        // These cases predate the default token list and only care about which rows are written,
-        // not about their enabled state, so the decision is stubbed as the already-applied one.
-        lenient().`when`(defaultAssetsRepository.initialAssetEnabling()).thenReturn(InitialAssetEnabling.AlreadyApplied)
 
-        chainSyncService = ChainSyncService(dao, chainFetcher, defaultAssetsRepository, gson)
+        chainSyncService = ChainSyncService(dao, chainFetcher, gson)
     }
 
     @Test
@@ -344,7 +339,7 @@ class ChainSyncServiceTest {
             autoBalanceEnabled = true,
             selectedNodeUrl = null
         )
-        val assets = remote.assets.map { mapRemoteAssetToLocal(remote, it, gson, true) }
+        val assets = remote.assets.map { mapRemoteAssetToLocal(remote, it, gson) }
         val nodes = mapRemoteNodesToLocal(remote)
         val explorers = mapRemoteExplorersToLocal(remote)
         val transferHistoryApis = mapExternalApisToLocal(remote)

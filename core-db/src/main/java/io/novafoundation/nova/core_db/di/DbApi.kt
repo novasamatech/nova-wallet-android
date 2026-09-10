@@ -8,6 +8,8 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetVisibilityDao
+import io.novafoundation.nova.core_db.dao.MetaAccountSettingsDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -79,6 +81,10 @@ interface DbApi {
     fun chainDao(): ChainDao
 
     fun chainAssetDao(): ChainAssetDao
+
+    fun chainAssetVisibilityDao(): ChainAssetVisibilityDao
+
+    fun metaAccountSettingsDao(): MetaAccountSettingsDao
 
     fun metaAccountDao(): MetaAccountDao
 

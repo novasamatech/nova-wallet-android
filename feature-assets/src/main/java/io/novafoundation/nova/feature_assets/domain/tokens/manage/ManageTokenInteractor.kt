@@ -4,10 +4,8 @@ import io.novafoundation.nova.common.data.model.AssetViewMode
 import io.novafoundation.nova.common.utils.isSubsetOf
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.common.searchTokens
-import io.novafoundation.nova.feature_assets.domain.tokens.AssetsDataCleaner
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetEnabledUpdate
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.runtime.ext.defaultComparator
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.normalizeSymbol
@@ -24,21 +22,19 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.math.BigDecimal
 
 interface ManageTokenInteractor {
 
     fun assetGroupsFlow(queryFlow: Flow<String>, viewModeFlow: Flow<AssetViewMode>): Flow<List<ManageAssetGroup>>
 
-    suspend fun updateEnabledState(enabled: Boolean, assetIds: List<FullChainAssetId>)
+    suspend fun updateVisibility(visible: Boolean, assetIds: List<FullChainAssetId>)
 }
 
 class RealManageTokenInteractor(
     private val chainRegistry: ChainRegistry,
-    private val chainAssetRepository: ChainAssetRepository,
-    private val assetsDataCleaner: AssetsDataCleaner,
+    private val assetVisibilityRepository: AssetVisibilityRepository,
+    private val assetVisibilityUseCase: AssetVisibilityUseCase,
     private val accountRepository: AccountRepository,
-    private val walletRepository: WalletRepository,
     private val defaultAssetsRepository: DefaultAssetsRepository,
 ) : ManageTokenInteractor {
 
@@ -48,7 +44,14 @@ class RealManageTokenInteractor(
         queryFlow: Flow<String>,
         viewModeFlow: Flow<AssetViewMode>
     ): Flow<List<ManageAssetGroup>> {
-        return combine(chainRegistry.enabledChainsFlow(), queryFlow, viewModeFlow) { chains, query, viewMode ->
+        // Visibility comes in as a flow rather than a snapshot: flipping a switch on this very screen
+        // is what changes it, and the list has to answer for that without being reloaded.
+        return combine(
+            chainRegistry.enabledChainsFlow(),
+            queryFlow,
+            viewModeFlow,
+            assetVisibilityUseCase.visibilityFlow()
+        ) { chains, query, viewMode, visibility ->
             val defaultAssetOrder = defaultAssetsRepository.defaultAssetIds()
                 .withIndex()
                 .associate { (index, assetId) -> assetId to index }
@@ -58,8 +61,10 @@ class RealManageTokenInteractor(
             }
 
             // Switchability is decided against every asset, not just the ones matching the query -
-            // otherwise searching could make the last enabled token look safe to turn off.
-            val enabledAssetIds = allAssets.filter { it.asset.enabled }.map { it.asset.fullId }
+            // otherwise searching could make the last visible token look safe to turn off.
+            val isVisible = { chainWithAsset: ChainWithAsset -> visibility.isVisible(chainWithAsset.asset.fullId) }
+
+            val visibleAssetIds = allAssets.filter(isVisible).map { it.asset.fullId }
 
             val matching = allAssets.searchTokens(
                 query = query,
@@ -69,8 +74,8 @@ class RealManageTokenInteractor(
             )
 
             val groups = when (viewMode) {
-                AssetViewMode.TOKENS -> groupByToken(matching, enabledAssetIds, defaultAssetOrder)
-                AssetViewMode.NETWORKS -> groupByNetwork(matching, enabledAssetIds, defaultAssetOrder)
+                AssetViewMode.TOKENS -> groupByToken(matching, allAssets.tokenGroupKeys(), visibleAssetIds, defaultAssetOrder, isVisible)
+                AssetViewMode.NETWORKS -> groupByNetwork(matching, visibleAssetIds, defaultAssetOrder, isVisible)
             }
 
             groups.sortedByDefaultsFirst(defaultAssetOrder)
@@ -91,68 +96,71 @@ class RealManageTokenInteractor(
         return items.mapNotNull { defaultAssetOrder[it.id] }.minOrNull()
     }
 
-    override suspend fun updateEnabledState(enabled: Boolean, assetIds: List<FullChainAssetId>) = withContext(Dispatchers.IO) {
+    /**
+     * Always writes the decision down, both ways. A hide has to be recorded even when the token was
+     * not on screen anyway, otherwise balance discovery would show it again on the next sync.
+     */
+    override suspend fun updateVisibility(visible: Boolean, assetIds: List<FullChainAssetId>) = withContext(Dispatchers.IO) {
         changeTokensMutex.withLock {
-            if (!enabled && canNotDisableAssets(assetIds)) {
-                return@withLock
-            }
+            val metaId = accountRepository.getSelectedMetaAccount().id
 
-            // Read before the data is cleared below - afterwards every balance looks like zero,
-            // and a token the user deliberately hid despite holding it would not be remembered.
-            val withPositiveBalance = assetIdsWithPositiveBalance()
-
-            val updates = assetIds.map { assetId ->
-                AssetEnabledUpdate.byUser(assetId, enabled, hasPositiveBalance = assetId in withPositiveBalance)
-            }
-
-            chainAssetRepository.setAssetsEnabled(updates)
-
-            if (!enabled) {
-                assetsDataCleaner.clearAssetsData(assetIds)
-            }
+            assetVisibilityRepository.setVisibility(metaId, assetIds.associateWith { visible })
         }
     }
 
-    private suspend fun assetIdsWithPositiveBalance(): Set<FullChainAssetId> {
-        val metaAccount = accountRepository.getSelectedMetaAccount()
+    /**
+     * Bridged variants name the bridge in their symbol - ETH-Snowbridge, SOL-Wormhole - and the
+     * design puts them under the row of the token they stand for rather than on rows of their own.
+     *
+     * The suffix is only dropped when the plain symbol is itself a token in the list, so a token
+     * that merely happens to contain a dash keeps its own group. Keys are computed over every asset
+     * rather than the ones matching the search, otherwise searching for the variant alone would
+     * hide the parent and split the group back apart.
+     */
+    private fun List<ChainWithAsset>.tokenGroupKeys(): Map<FullChainAssetId, String> {
+        val symbols = mapTo(mutableSetOf()) { it.asset.normalizeSymbol() }
 
-        return walletRepository.getSyncedAssets(metaAccount.id)
-            .filter { it.total > BigDecimal.ZERO }
-            .mapTo(mutableSetOf()) { it.token.configuration.fullId }
-    }
-
-    private suspend fun canNotDisableAssets(assetIds: List<FullChainAssetId>): Boolean {
-        val enabledAssets = chainAssetRepository.getEnabledAssets()
-            .map { it.fullId }
-        return assetIds.containsAll(enabledAssets)
+        return associate { chainWithAsset ->
+            chainWithAsset.asset.fullId to tokenGroupKey(chainWithAsset.asset.normalizeSymbol(), symbols)
+        }
     }
 
     private fun groupByToken(
         assets: List<ChainWithAsset>,
-        enabledAssetIds: List<FullChainAssetId>,
-        defaultAssetOrder: Map<FullChainAssetId, Int>
+        groupKeys: Map<FullChainAssetId, String>,
+        visibleAssetIds: List<FullChainAssetId>,
+        defaultAssetOrder: Map<FullChainAssetId, Int>,
+        isVisible: (ChainWithAsset) -> Boolean
     ): List<ManageAssetGroup> {
-        return assets.groupBy { (_, asset) -> asset.normalizeSymbol() }
+        return assets.groupBy { groupKeys.getValue(it.asset.fullId) }
             .map { (symbol, chainsWithAssets) ->
+                // The group speaks for the parent token, so it takes the parent's icon where one is
+                // present instead of whichever variant happened to sort first.
+                val face = chainsWithAssets.firstOrNull { it.asset.normalizeSymbol() == symbol } ?: chainsWithAssets.first()
+
                 buildGroup(
                     id = symbol,
                     title = symbol,
-                    iconUrl = chainsWithAssets.first().asset.icon,
+                    iconUrl = face.asset.icon,
                     kind = ManageAssetGroup.Kind.TOKEN,
                     members = chainsWithAssets,
-                    enabledAssetIds = enabledAssetIds,
+                    visibleAssetIds = visibleAssetIds,
                     defaultAssetOrder = defaultAssetOrder,
                     itemTitle = { it.chain.name },
-                    itemSubtitle = { null },
-                    itemIconUrl = { it.chain.icon }
+                    // Named only for a variant, where the network alone would not say which of the
+                    // group's tokens the row switches - and two variants can share a network.
+                    itemSubtitle = { it.asset.symbol.value.takeIf { _ -> it.asset.normalizeSymbol() != symbol } },
+                    itemIconUrl = { it.chain.icon },
+                    isVisible = isVisible
                 )
             }
     }
 
     private fun groupByNetwork(
         assets: List<ChainWithAsset>,
-        enabledAssetIds: List<FullChainAssetId>,
-        defaultAssetOrder: Map<FullChainAssetId, Int>
+        visibleAssetIds: List<FullChainAssetId>,
+        defaultAssetOrder: Map<FullChainAssetId, Int>,
+        isVisible: (ChainWithAsset) -> Boolean
     ): List<ManageAssetGroup> {
         return assets.groupBy { (chain, _) -> chain.id }
             .map { (_, chainsWithAssets) ->
@@ -164,11 +172,12 @@ class RealManageTokenInteractor(
                     iconUrl = chain.icon,
                     kind = ManageAssetGroup.Kind.NETWORK,
                     members = chainsWithAssets,
-                    enabledAssetIds = enabledAssetIds,
+                    visibleAssetIds = visibleAssetIds,
                     defaultAssetOrder = defaultAssetOrder,
                     itemTitle = { it.asset.symbol.value },
                     itemSubtitle = { it.asset.name },
-                    itemIconUrl = { it.asset.icon }
+                    itemIconUrl = { it.asset.icon },
+                    isVisible = isVisible
                 )
             }
     }
@@ -179,18 +188,19 @@ class RealManageTokenInteractor(
         iconUrl: String?,
         kind: ManageAssetGroup.Kind,
         members: List<ChainWithAsset>,
-        enabledAssetIds: List<FullChainAssetId>,
+        visibleAssetIds: List<FullChainAssetId>,
         defaultAssetOrder: Map<FullChainAssetId, Int>,
         itemTitle: (ChainWithAsset) -> String,
         itemSubtitle: (ChainWithAsset) -> String?,
-        itemIconUrl: (ChainWithAsset) -> String?
+        itemIconUrl: (ChainWithAsset) -> String?,
+        isVisible: (ChainWithAsset) -> Boolean
     ): ManageAssetGroup {
-        val enabledInGroup = members.filter { it.asset.enabled }.map { it.asset.fullId }
+        val visibleInGroup = members.filter(isVisible).map { it.asset.fullId }
 
         // The wallet must keep at least one visible asset, so the group that holds every remaining
-        // enabled asset cannot be turned off, and neither can its last enabled member.
-        val holdsAllEnabledAssets = enabledAssetIds.isSubsetOf(enabledInGroup)
-        val holdsTheLastEnabledAsset = holdsAllEnabledAssets && enabledInGroup.size == 1
+        // visible asset cannot be turned off, and neither can its last visible member.
+        val holdsAllVisibleAssets = visibleAssetIds.isSubsetOf(visibleInGroup)
+        val holdsTheLastVisibleAsset = holdsAllVisibleAssets && visibleInGroup.size == 1
 
         return ManageAssetGroup(
             id = id,
@@ -198,18 +208,32 @@ class RealManageTokenInteractor(
             iconUrl = iconUrl,
             kind = kind,
             isDefault = members.any { it.asset.fullId in defaultAssetOrder },
-            isEnabled = enabledInGroup.isNotEmpty(),
-            isSwitchable = !holdsAllEnabledAssets,
+            isEnabled = visibleInGroup.isNotEmpty(),
+            isSwitchable = !holdsAllVisibleAssets,
             items = members.map { member ->
                 ManageAssetItem(
                     id = member.asset.fullId,
                     title = itemTitle(member),
                     subtitle = itemSubtitle(member),
                     iconUrl = itemIconUrl(member),
-                    isEnabled = member.asset.enabled,
-                    isSwitchable = !member.asset.enabled || !holdsTheLastEnabledAsset
+                    isEnabled = isVisible(member),
+                    isSwitchable = !isVisible(member) || !holdsTheLastVisibleAsset
                 )
             }
         )
     }
+}
+
+private const val BRIDGED_SYMBOL_SEPARATOR = '-'
+
+/**
+ * The row a token belongs under: its own symbol, or the parent it is a bridged variant of.
+ *
+ * @param allSymbols every symbol the list has, so a variant only folds into a parent that is
+ * actually there to fold into
+ */
+fun tokenGroupKey(symbol: String, allSymbols: Set<String>): String {
+    val parent = symbol.substringBefore(BRIDGED_SYMBOL_SEPARATOR)
+
+    return if (parent != symbol && parent in allSymbols) parent else symbol
 }

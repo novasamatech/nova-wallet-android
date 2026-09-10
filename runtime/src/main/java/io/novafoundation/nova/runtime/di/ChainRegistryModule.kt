@@ -51,11 +51,7 @@ class ChainRegistryModule {
 
     @Provides
     @ApplicationScope
-    fun provideDefaultAssetsRepository(
-        chainAssetDao: ChainAssetDao,
-        chainFetcher: ChainFetcher,
-        preferences: Preferences
-    ) = DefaultAssetsRepository(chainAssetDao, chainFetcher, preferences)
+    fun provideDefaultAssetsRepository(chainFetcher: ChainFetcher) = DefaultAssetsRepository(chainFetcher)
 
     @Provides
     @ApplicationScope
@@ -63,9 +59,8 @@ class ChainRegistryModule {
         dao: ChainDao,
         chainAssetDao: ChainAssetDao,
         chainFetcher: ChainFetcher,
-        defaultAssetsRepository: DefaultAssetsRepository,
         gson: Gson
-    ) = ChainSyncService(dao, chainFetcher, defaultAssetsRepository, gson)
+    ) = ChainSyncService(dao, chainFetcher, gson)
 
     @Provides
     @ApplicationScope
@@ -77,9 +72,8 @@ class ChainRegistryModule {
         chainAssetDao: ChainAssetDao,
         chainDao: ChainDao,
         assetFetcher: AssetFetcher,
-        defaultAssetsRepository: DefaultAssetsRepository,
         gson: Gson
-    ) = EvmAssetsSyncService(chainDao, chainAssetDao, assetFetcher, defaultAssetsRepository, gson)
+    ) = EvmAssetsSyncService(chainDao, chainAssetDao, assetFetcher, gson)
 
     @Provides
     @ApplicationScope

@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.model.MaskingMode
 import io.novafoundation.nova.common.data.repository.AssetsViewModeRepository
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.common.data.repository.AutoEnableTokensRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -30,6 +29,7 @@ import io.novafoundation.nova.feature_assets.di.modules.SendModule
 import io.novafoundation.nova.feature_assets.di.modules.deeplinks.DeepLinkModule
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.WalletInteractorImpl
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.RealExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.search.AssetSearchInteractorFactory
@@ -71,7 +71,8 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.PaymentUpdaterFactory
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AutoEnableTokensRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -101,12 +102,14 @@ class AssetsFeatureModule {
         walletRepository: WalletRepository,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        swapService: SwapService
+        swapService: SwapService,
+        assetVisibilityUseCase: AssetVisibilityUseCase
     ) = AssetSearchUseCase(
         walletRepository = walletRepository,
         accountRepository = accountRepository,
         chainRegistry = chainRegistry,
-        swapService = swapService
+        swapService = swapService,
+        assetVisibilityUseCase = assetVisibilityUseCase
     )
 
     @Provides
@@ -142,14 +145,16 @@ class AssetsFeatureModule {
         chainRegistry: ChainRegistry,
         nftRepository: NftRepository,
         transactionHistoryRepository: TransactionHistoryRepository,
-        currencyRepository: CurrencyRepository
+        currencyRepository: CurrencyRepository,
+        assetVisibilityUseCase: AssetVisibilityUseCase
     ): WalletInteractor = WalletInteractorImpl(
         walletRepository = walletRepository,
         accountRepository = accountRepository,
         chainRegistry = chainRegistry,
         nftRepository = nftRepository,
         transactionHistoryRepository = transactionHistoryRepository,
-        currencyRepository = currencyRepository
+        currencyRepository = currencyRepository,
+        assetVisibilityUseCase = assetVisibilityUseCase
     )
 
     @Provides
@@ -184,7 +189,7 @@ class AssetsFeatureModule {
         accountUpdateScope: AccountUpdateScope,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         walletRepository: WalletRepository,
-        chainAssetRepository: ChainAssetRepository,
+        assetVisibilityRepository: AssetVisibilityRepository,
         autoEnableTokensRepository: AutoEnableTokensRepository,
     ): BalancesUpdateSystem {
         return BalancesUpdateSystem(
@@ -195,7 +200,7 @@ class AssetsFeatureModule {
             accountUpdateScope = accountUpdateScope,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             walletRepository = walletRepository,
-            chainAssetRepository = chainAssetRepository,
+            assetVisibilityRepository = assetVisibilityRepository,
             autoEnableTokensRepository = autoEnableTokensRepository
         )
     }

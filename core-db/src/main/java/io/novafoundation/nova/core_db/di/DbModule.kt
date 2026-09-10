@@ -11,6 +11,8 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetVisibilityDao
+import io.novafoundation.nova.core_db.dao.MetaAccountSettingsDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -125,6 +127,18 @@ class DbModule {
     @ApplicationScope
     fun provideChainAssetDao(appDatabase: AppDatabase): ChainAssetDao {
         return appDatabase.chainAssetDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideChainAssetVisibilityDao(appDatabase: AppDatabase): ChainAssetVisibilityDao {
+        return appDatabase.chainAssetVisibilityDao()
+    }
+
+    @Provides
+    @ApplicationScope
+    fun provideMetaAccountSettingsDao(appDatabase: AppDatabase): MetaAccountSettingsDao {
+        return appDatabase.metaAccountSettingsDao()
     }
 
     @Provides

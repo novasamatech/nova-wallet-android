@@ -56,10 +56,6 @@ class ManageTokensFragment :
 
         binder.manageTokensSearch.requestFocus()
         binder.manageTokensSearch.content.showSoftKeyboard()
-
-        binder.manageTokensSwitchAutoEnable.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.autoEnableTokensChanged(isChecked)
-        }
     }
 
     override fun inject() {
@@ -72,7 +68,11 @@ class ManageTokensFragment :
     override fun subscribe(viewModel: ManageTokensViewModel) {
         binder.manageTokensSearch.content.bindTo(viewModel.query, lifecycleScope)
 
-        viewModel.autoEnableTokens.observe { binder.manageTokensSwitchAutoEnable.isChecked = it }
+        // bindTo, not observe: it tracks the last value it set itself, so setting the switch from
+        // storage cannot come back as a user decision
+        binder.manageTokensSwitchAutoEnable.bindTo(viewModel.autoEnableTokens, lifecycleScope) { enabled ->
+            viewModel.autoEnableTokensChanged(enabled)
+        }
 
         viewModel.listItems.observe { data ->
             binder.manageTokensPlaceholder.setVisible(data.isEmpty())

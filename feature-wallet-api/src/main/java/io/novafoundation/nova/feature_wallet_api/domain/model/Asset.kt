@@ -89,10 +89,3 @@ fun Asset.transferableReplacingFrozen(newFrozen: Balance): Balance {
 fun Asset.regularTransferableBalance(): Balance {
     return TransferableMode.REGULAR.calculateTransferable(freeInPlanks, frozenInPlanks, reservedInPlanks)
 }
-
-/**
- * Balances are synced for assets the user has hidden too - that is how a token gets discovered by
- * its balance - so anything the user is meant to look at or pick from must be filtered explicitly.
- * Relying on an asset simply not having been synced is not a display rule.
- */
-fun List<Asset>.onlyEnabled(): List<Asset> = filter { it.token.configuration.enabled }

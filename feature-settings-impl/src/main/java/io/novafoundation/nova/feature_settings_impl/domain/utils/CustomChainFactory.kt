@@ -90,9 +90,6 @@ class CustomChainFactory(
         val asset = Chain.Asset(
             id = 0,
             name = payload.chainName,
-            enabled = true,
-            // The user added this network by hand, so its asset is their explicit choice
-            enabledOverriddenByUser = true,
             icon = prefilledUtilityAsset?.icon,
             priceId = priceId,
             chainId = chainId,
