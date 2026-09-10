@@ -9,7 +9,7 @@ android {
 
         buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/chains/v22/chains_dev.json\""
         // Points at the open nova-utils PR branch (novasamatech/nova-utils#4395) until it merges - switch both back to master then
-        buildConfigField "String", "DEFAULT_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/feat/master/chains/v22/default_assets_dev.json\""
+        buildConfigField "String", "DEFAULT_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/chains/v22/default_assets_dev.json\""
         buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v3/assets_dev.json\""
         buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/chains_dev.json\""
         buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/detailsDev\""
@@ -30,7 +30,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
             buildConfigField "String", "CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/chains.json\""
-            buildConfigField "String", "DEFAULT_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/feat/master/chains/v22/default_assets.json\""
+            buildConfigField "String", "DEFAULT_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/refs/heads/master/chains/v22/default_assets.json\""
             buildConfigField "String", "EVM_ASSETS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/assets/evm/v3/assets.json\""
             buildConfigField "String", "PRE_CONFIGURED_CHAINS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/chains.json\""
             buildConfigField "String", "PRE_CONFIGURED_CHAIN_DETAILS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/chains/v22/preConfigured/details\""
