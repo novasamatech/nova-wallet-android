@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -41,7 +42,8 @@ class NominationPoolsSetupUnbondModule {
         hintsFactory: NominationPoolsUnbondHintsFactory,
         maxActionProviderFactory: MaxActionProviderFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return NominationPoolsSetupUnbondViewModel(
             router = router,
@@ -55,7 +57,8 @@ class NominationPoolsSetupUnbondModule {
             amountChooserMixinFactory = amountChooserMixinFactory,
             maxActionProviderFactory = maxActionProviderFactory,
             stakingSharedState = stakingSharedState,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.confirm
 
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Retriable
@@ -23,6 +26,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbon
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_DIRECT
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsFailureReason
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.details.parachain
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.collators.collatorAddressModel
@@ -33,6 +38,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.unbond.parachainStakingUnbondValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.mapFeeFromParcel
@@ -66,7 +72,8 @@ class ParachainStakingUnbondConfirmViewModel(
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
     hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -165,13 +172,39 @@ class ParachainStakingUnbondConfirmViewModel(
             amount = amountInPlanks,
             collator = payload.collator.accountIdHex.fromHex()
         )
-            .onFailure(::showError)
+            .onFailure { error ->
+                showError(error)
+
+                trackUnstakeFailed(error)
+            }
             .onSuccess {
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
+
+                trackUnstakeCompleted(token)
 
                 startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
 
         _showNextProgress.value = false
+    }
+
+    private suspend fun trackUnstakeCompleted(token: Token) {
+        analyticsService.track(
+            AnalyticsEvent.UnstakeCompleted(
+                stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
+                network = selectedAssetState.chain().name,
+                amountBucket = AmountBucket.from(token.amountToFiat(payload.amount))
+            )
+        )
+    }
+
+    private suspend fun trackUnstakeFailed(error: Throwable) {
+        analyticsService.track(
+            AnalyticsEvent.UnstakeFailed(
+                stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
+                network = selectedAssetState.chain().name,
+                reason = error.toAnalyticsFailureReason()
+            )
+        )
     }
 }

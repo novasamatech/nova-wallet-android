@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_buy_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -21,6 +22,7 @@ class BuyFeatureHolder @Inject constructor(
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .build()
 
         return DaggerBuyFeatureComponent.factory()

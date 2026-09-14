@@ -1,0 +1,205 @@
+{
+  "profile": 2,
+  "fixture_notice": "Synthetic Nova contract data only; key scalar 1 is a public test value. No live provider verdict or existing mobile implementation is asserted.",
+  "android_public_key_base64": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaxfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/m47n60p8D54WK84zV2sxXs7LtkBoN79R9Q==",
+  "vectors": [
+    {
+      "name": "android_registration",
+      "profile": 2,
+      "purpose": "register",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "api.example.test",
+        "port": "443",
+        "path": "/v1/attestation/register",
+        "content_type": "application/json"
+      },
+      "public_route": true,
+      "body_base64": "",
+      "body_sha256": "060fe3f81863c650b22f1be3fdbeb7c0420cde1143b5c998678ef350967d3604",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000002010000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f5354000000056874747073000000106170692e6578616d706c652e7465737400000003343433000000182f76312f6174746573746174696f6e2f7265676973746572000000106170706c69636174696f6e2f6a736f6e060fe3f81863c650b22f1be3fdbeb7c0420cde1143b5c998678ef350967d3604",
+      "context_sha256": "e1d137a06eafc44bc218426c07a3a4b9e076db1ab567034a1738c0b5e2ff1b9c",
+      "context_base64url": "4dE3oG6vxEvCGEJsB6OkueB22xq1ZwNKFzjAteL_G5w",
+      "binding": {
+        "platform": "android",
+        "app_id": "com.example.nova",
+        "attestation_type": "play_integrity",
+        "key_reference": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEaxfR8uEsQkf4vOblY6RA8ncDfYEt6zOg9KE5RdiYwpZP40Li/hp/m47n60p8D54WK84zV2sxXs7LtkBoN79R9Q==",
+        "app_attest_environment": ""
+      },
+      "registration_preimage_hex": "4e4f56412d524547495354524154494f4e00000200000007616e64726f696400000010636f6d2e6578616d706c652e6e6f76610000000e706c61795f696e746567726974790000007c4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a304441516344516741456178665238754573516b6634764f626c59365241386e634466594574367a4f67394b45355264695977705a5034304c692f68702f6d34376e36307038443534574b38347a563273785873374c746b426f4e37395239513d3d00000000",
+      "ecdsa_message_sha256": "8dde6d71c55a1b367c041b01faf991e31d6ee573ee2aa4c2fb1eafa2bf790239",
+      "signature_base64": "MEYCIQCnMN628KZrX3htiAe24NCpW9xz0Au2CX45PHE8Aip9ugIhAPa+xexjTjIMMLKTuPXf55DmqokrOlTalfFPTeB9iHhv",
+      "unsigned_query": "",
+      "synthetic_integrity_token": "synthetic-play-integrity-token"
+    },
+    {
+      "name": "protected_empty",
+      "profile": 2,
+      "purpose": "request",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "GET",
+        "scheme": "https",
+        "authority": "api.example.test",
+        "port": "443",
+        "path": "/v1/bittensor/subnets",
+        "content_type": ""
+      },
+      "public_route": true,
+      "body_base64": "",
+      "body_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000002020000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000003474554000000056874747073000000106170692e6578616d706c652e7465737400000003343433000000152f76312f62697474656e736f722f7375626e65747300000000e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "context_sha256": "f24d577ce7fdb0adf08aad08baef56a0e461910d40d8c984525b666af136e2c1",
+      "context_base64url": "8k1XfOf9sK3wiq0Iuu9WoORhkQ1A2MmEUltmavE24sE",
+      "ecdsa_message_sha256": "f5a5479c2f4f93b15b66d2b3271b5479fbf184d27b31e4a3e05a7df921fab8a6",
+      "signature_base64": "MEQCIF7HHAw2TRFN2ezmTnnqV1LnHNFWlUIeAH1Z+27C/HhnAiBQV5v+SrMpLTY905PQ++cpZzkGlYiQv8cGTvPja/VpsQ==",
+      "unsigned_query": ""
+    },
+    {
+      "name": "protected_json",
+      "profile": 2,
+      "purpose": "request",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "api.example.test",
+        "port": "443",
+        "path": "/v1/bittensor/rewards/search",
+        "content_type": "application/json"
+      },
+      "public_route": true,
+      "body_base64": "eyJhY2NvdW50U3ViamVjdCI6InN5bnRoZXRpYy1hY2NvdW50LXN1YmplY3QiLCJwYWdlIjoxfQ==",
+      "body_sha256": "f956f5619420dccf364938a43327d70a3adee8d523098d172322681d38fec6c6",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000002020000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f5354000000056874747073000000106170692e6578616d706c652e74657374000000033434330000001c2f76312f62697474656e736f722f726577617264732f736561726368000000106170706c69636174696f6e2f6a736f6ef956f5619420dccf364938a43327d70a3adee8d523098d172322681d38fec6c6",
+      "context_sha256": "5e607f549c641af7569414c81f5b25986b4f868c95d823d8eb00b3c8fb7303dc",
+      "context_base64url": "XmB_VJxkGvdWlBTIH1slmGtPhoyV2CPY6wCzyPtzA9w",
+      "ecdsa_message_sha256": "92cc2c799882e77362407b26deff251a0dd036f8b924571a03c75b6eb88fe076",
+      "signature_base64": "MEQCICIDmeWRuyI+/f29+0ENYXIz9dhW+HChIja0c3Hpb/68AiAF71ibgih2GP9Y1v+tm95LskoEwaVrGzmDoo30Iu1TZg==",
+      "unsigned_query": ""
+    },
+    {
+      "name": "binary_query_context",
+      "profile": 2,
+      "purpose": "request",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "api.example.test",
+        "port": "443",
+        "path": "/v1/example/echo",
+        "content_type": "application/octet-stream"
+      },
+      "public_route": false,
+      "body_base64": "AP8NCmhlbGxv",
+      "body_sha256": "93d9a3265ee7db144d3f9c9ba4e74f6e7e00b146e32cb2076050375f38fd818d",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000002020000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f5354000000056874747073000000106170692e6578616d706c652e7465737400000003343433000000102f76312f6578616d706c652f6563686f000000186170706c69636174696f6e2f6f637465742d73747265616d93d9a3265ee7db144d3f9c9ba4e74f6e7e00b146e32cb2076050375f38fd818d",
+      "context_sha256": "a70a279a0b3c1f2a3983efc764888a19a0d21d778212d6903275c02574c454eb",
+      "context_base64url": "pwonmgs8Hyo5g-_HZIiKGaDSHXeCEtaQMnXAJXTEVOs",
+      "ecdsa_message_sha256": "51f369196c2cd94cc5861fd5c6e5873f38f1adcbfa516e493e9fa1a888d316e0",
+      "signature_base64": "MEUCIAC0ZFV75ZlD0ywbeQRRoEQqcLZH+6TL4L1ykqs2BOfKAiEA/SCG5boEOnDFOTwhvNCQhppnUXjaGPzkD4FiyerVhFc=",
+      "unsigned_query": "a=1&a=2&q=a+b&q=a%20b&unicode=%D0%BD&slash=%2f"
+    },
+    {
+      "name": "ios_registration_context",
+      "profile": 2,
+      "purpose": "register",
+      "context": {
+        "challenge": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8",
+        "client_id": "6f2c1e4a-0000-4000-8000-000000000001",
+        "method": "POST",
+        "scheme": "https",
+        "authority": "api.example.test",
+        "port": "443",
+        "path": "/v1/attestation/register",
+        "content_type": "application/json"
+      },
+      "public_route": true,
+      "body_base64": "",
+      "body_sha256": "73fc118ba082842ad62d2aa2df5fa8e8c6075b3eb3b191b8bda6524cb43c3b93",
+      "preimage_hex": "4e4f56412d4154544553544154494f4e000002010000002b41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868380000002436663263316534612d303030302d343030302d383030302d30303030303030303030303100000004504f5354000000056874747073000000106170692e6578616d706c652e7465737400000003343433000000182f76312f6174746573746174696f6e2f7265676973746572000000106170706c69636174696f6e2f6a736f6e73fc118ba082842ad62d2aa2df5fa8e8c6075b3eb3b191b8bda6524cb43c3b93",
+      "context_sha256": "390441df44cb759b6d79b6e8bd4d1caacc3085bc41140cd5943e3cdf4e932bb1",
+      "context_base64url": "OQRB30TLdZttebbovU0cqswwhbxBFAzVlD48306TK7E",
+      "binding": {
+        "platform": "ios",
+        "app_id": "ABCDEFGHIJ.com.example.nova",
+        "attestation_type": "app_attest",
+        "key_reference": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=",
+        "app_attest_environment": "development"
+      },
+      "registration_preimage_hex": "4e4f56412d524547495354524154494f4e00000200000003696f730000001b4142434445464748494a2e636f6d2e6578616d706c652e6e6f76610000000a6170705f6174746573740000002c41414543417751464267634943516f4c4441304f4478415245684d554652595847426b61477877644868383d0000000b646576656c6f706d656e74",
+      "unsigned_query": ""
+    }
+  ],
+  "ingress_path_normalization": [
+    {
+      "input": "/v%31/bittensor/subnets",
+      "canonical": "/v1/bittensor/subnets"
+    },
+    {
+      "input": "/v1/%62ittensor/subnets?q=%2f",
+      "canonical": "/v1/bittensor/subnets?q=%2f"
+    },
+    {
+      "input": "/v1/example/%7eecho",
+      "canonical": "/v1/example/~echo"
+    }
+  ],
+  "invalid_targets": [
+    "/v1//bittensor/subnets",
+    "/v1/./bittensor/subnets",
+    "/v1/x/../bittensor/subnets",
+    "/v1/bittensor%2Fsubnets",
+    "/v1/%252e/bittensor/subnets",
+    "/v1/%D0%BD/subnets",
+    "/v1/example/echo?q=with space",
+    "/v1/example/echo#fragment",
+    "/v1/example/echo?q=н"
+  ],
+  "query_pairs_with_equal_preimages": [
+    [
+      "a=1&a=2",
+      "a=2&a=1"
+    ],
+    [
+      "q=a+b",
+      "q=a%20b"
+    ],
+    [
+      "q=%2f",
+      "q=%2F"
+    ],
+    [
+      "q=%C3%A9",
+      "q=e%CC%81"
+    ],
+    [
+      "",
+      "x="
+    ],
+    [
+      "page=1&pageSize=100",
+      "page=2&pageSize=1"
+    ],
+    [
+      "a=1;b=2",
+      "a=1&b=2"
+    ],
+    [
+      "q=%FF",
+      "q=%00"
+    ],
+    [
+      "q=%",
+      "q=%GG"
+    ]
+  ]
+}

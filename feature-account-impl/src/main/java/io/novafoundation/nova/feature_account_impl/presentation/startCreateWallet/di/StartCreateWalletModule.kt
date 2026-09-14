@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
@@ -28,7 +29,8 @@ class StartCreateWalletModule {
         startCreateWalletInteractor: StartCreateWalletInteractor,
         actionBottomSheetLauncherFactory: ActionBottomSheetLauncherFactory,
         customDialogProvider: CustomDialogDisplayer.Presentation,
-        payload: StartCreateWalletPayload
+        payload: StartCreateWalletPayload,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return StartCreateWalletViewModel(
             accountRouter,
@@ -36,6 +38,7 @@ class StartCreateWalletModule {
             startCreateWalletInteractor,
             actionBottomSheetLauncherFactory,
             payload,
+            analyticsService,
             customDialogProvider
         )
     }

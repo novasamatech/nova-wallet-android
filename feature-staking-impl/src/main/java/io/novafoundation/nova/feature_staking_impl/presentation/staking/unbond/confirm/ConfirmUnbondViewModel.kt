@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -22,6 +25,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondI
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_DIRECT
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsFailureReason
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.unbondValidationFailure
 import io.novafoundation.nova.feature_wallet_api.data.mappers.mapFeeToFeeModel
@@ -50,6 +55,7 @@ class ConfirmUnbondViewModel(
     private val payload: ConfirmUnbondPayload,
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+    private val analyticsService: AnalyticsService,
     unbondHintsMixinFactory: UnbondHintsMixinFactory,
     walletUiUseCase: WalletUiUseCase,
     private val amountFormatter: AmountFormatter
@@ -143,10 +149,38 @@ class ConfirmUnbondViewModel(
             .onSuccess {
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
+                trackUnstakeCompleted(validPayload)
+
                 startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
-            .onFailure(::showError)
+            .onFailure { error ->
+                showError(error)
+
+                trackUnstakeFailed(validPayload, error)
+            }
 
         _showNextProgress.value = false
+    }
+
+    private fun trackUnstakeCompleted(validPayload: UnbondValidationPayload) {
+        val fiatAmount = validPayload.asset.token.amountToFiat(payload.amount)
+
+        analyticsService.track(
+            AnalyticsEvent.UnstakeCompleted(
+                stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
+                network = validPayload.stash.chain.name,
+                amountBucket = AmountBucket.from(fiatAmount)
+            )
+        )
+    }
+
+    private fun trackUnstakeFailed(validPayload: UnbondValidationPayload, error: Throwable) {
+        analyticsService.track(
+            AnalyticsEvent.UnstakeFailed(
+                stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
+                network = validPayload.stash.chain.name,
+                reason = error.toAnalyticsFailureReason()
+            )
+        )
     }
 }

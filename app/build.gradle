@@ -191,6 +191,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':core-db')
     implementation project(':common')
+    implementation project(':infrastructure')
+    implementation project(':analytics')
     implementation project(':feature-splash')
 
     implementation project(':feature-onboarding-api')

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_connect_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.caip.di.CaipApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
@@ -24,6 +25,7 @@ class WalletConnectFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val deps = DaggerWalletConnectFeatureComponent_WalletConnectFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))

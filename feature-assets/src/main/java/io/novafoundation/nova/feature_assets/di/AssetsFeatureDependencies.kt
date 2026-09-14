@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_assets.di
 import android.content.ContentResolver
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -87,7 +88,11 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRep
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.ExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryTokenUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AutoEnableTokensRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -111,6 +116,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.qr.MultiChainQrSharingFactory
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
@@ -124,6 +130,8 @@ import okhttp3.OkHttpClient
 import javax.inject.Named
 
 interface AssetsFeatureDependencies {
+
+    val analyticsService: AnalyticsService
 
     val maskingModeUseCase: MaskingModeUseCase
 
@@ -166,6 +174,12 @@ interface AssetsFeatureDependencies {
     val balanceLocksRepository: BalanceLocksRepository
 
     val chainAssetRepository: ChainAssetRepository
+
+    fun assetVisibilityRepository(): AssetVisibilityRepository
+
+    fun assetVisibilityUseCase(): AssetVisibilityUseCase
+
+    fun showReceivedAssetUseCase(): ShowReceivedAssetUseCase
 
     val erc20Standard: Erc20Standard
 
@@ -319,6 +333,8 @@ interface AssetsFeatureDependencies {
 
     fun chainRegistry(): ChainRegistry
 
+    fun defaultAssetsRepository(): DefaultAssetsRepository
+
     @Named(REMOTE_STORAGE_SOURCE)
     fun remoteStorageSource(): StorageDataSource
 
@@ -350,6 +366,8 @@ interface AssetsFeatureDependencies {
     fun coingeckoApi(): CoingeckoApi
 
     fun assetsViewModeRepository(): AssetsViewModeRepository
+
+    fun autoEnableTokensRepository(): AutoEnableTokensRepository
 
     fun walletConnectSessionsUseCase(): WalletConnectSessionsUseCase
 

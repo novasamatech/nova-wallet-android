@@ -90,7 +90,6 @@ class CustomChainFactory(
         val asset = Chain.Asset(
             id = 0,
             name = payload.chainName,
-            enabled = true,
             icon = prefilledUtilityAsset?.icon,
             priceId = priceId,
             chainId = chainId,

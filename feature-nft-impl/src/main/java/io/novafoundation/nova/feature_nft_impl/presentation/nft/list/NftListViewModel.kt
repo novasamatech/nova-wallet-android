@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_nft_impl.presentation.nft.list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -26,7 +28,8 @@ class NftListViewModel(
     private val router: NftRouter,
     private val resourceManager: ResourceManager,
     private val interactor: NftListInteractor,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel() {
 
     private val nftsFlow = interactor.userNftsFlow()
@@ -42,6 +45,14 @@ class NftListViewModel(
 
     private val _hideRefreshEvent = MutableLiveData<Event<Unit>>()
     val hideRefreshEvent: LiveData<Event<Unit>> = _hideRefreshEvent
+
+    init {
+        launch {
+            val nfts = nftsFlow.first()
+
+            analyticsService.track(AnalyticsEvent.NftSectionOpened(nfts.size))
+        }
+    }
 
     fun syncNfts() {
         viewModelScope.launch {

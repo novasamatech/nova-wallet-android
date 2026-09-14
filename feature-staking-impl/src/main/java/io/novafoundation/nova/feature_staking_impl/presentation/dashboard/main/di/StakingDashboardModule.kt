@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
@@ -43,7 +44,8 @@ class StakingDashboardModule {
         valueFormatterProvider: MaskableValueFormatterProvider,
         amountFormatter: AmountFormatter,
         assetIconProvider: AssetIconProvider,
-        stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
+        stakingAnnouncementsUseCase: StakingAnnouncementsUseCase,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return StakingDashboardViewModel(
             interactor = interactor,
@@ -58,7 +60,8 @@ class StakingDashboardModule {
             maskableValueFormatterProvider = valueFormatterProvider,
             amountFormatter = amountFormatter,
             assetIconProvider = assetIconProvider,
-            stakingAnnouncementsUseCase = stakingAnnouncementsUseCase
+            stakingAnnouncementsUseCase = stakingAnnouncementsUseCase,
+            analyticsService = analyticsService
         )
     }
 

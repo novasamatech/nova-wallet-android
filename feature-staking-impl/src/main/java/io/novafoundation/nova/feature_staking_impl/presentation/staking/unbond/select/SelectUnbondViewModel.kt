@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -14,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.unbond.UnbondI
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.validations.unbond.UnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_DIRECT
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.unbondValidationFailure
@@ -43,6 +47,7 @@ class SelectUnbondViewModel(
     private val validationSystem: UnbondValidationSystem,
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     unbondHintsMixinFactory: UnbondHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory
@@ -135,11 +140,25 @@ class SelectUnbondViewModel(
     }
 
     private fun openConfirm(validationPayload: UnbondValidationPayload) {
+        trackUnstakeInitiated(validationPayload)
+
         val confirmUnbondPayload = ConfirmUnbondPayload(
             amount = validationPayload.amount,
             fee = mapFeeToParcel(validationPayload.fee)
         )
 
         router.openConfirmUnbond(confirmUnbondPayload)
+    }
+
+    private fun trackUnstakeInitiated(validationPayload: UnbondValidationPayload) {
+        val fiatAmount = validationPayload.asset.token.amountToFiat(validationPayload.amount)
+
+        analyticsService.track(
+            AnalyticsEvent.UnstakeInitiated(
+                stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
+                network = validationPayload.stash.chain.name,
+                amountBucket = AmountBucket.from(fiatAmount)
+            )
+        )
     }
 }

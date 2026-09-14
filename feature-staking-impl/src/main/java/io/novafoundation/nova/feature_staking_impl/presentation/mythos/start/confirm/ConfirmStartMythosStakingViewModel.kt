@@ -1,6 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.confirm
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AddressModel
 import io.novafoundation.nova.common.data.memory.ComputationalScope
@@ -31,6 +35,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.a
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.pauseDetection
 import io.novafoundation.nova.feature_staking_impl.presentation.MythosStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_MYTHOS
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsFailureReason
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.startConfirm.ConfirmStartSingleTargetStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.collatorAddressModel
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.common.validations.MythosStakingValidationFailureFormatter
@@ -46,10 +52,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.state.AnySelectedAssetOptionSharedState
+import io.novafoundation.nova.runtime.state.chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 
 class ConfirmStartMythosStakingViewModel(
     private val mythosRouter: MythosStakingRouter,
@@ -70,6 +78,7 @@ class ConfirmStartMythosStakingViewModel(
     private val interactor: StartMythosStakingInteractor,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
     mythosSharedComputation: MythosSharedComputation,
     walletUiUseCase: WalletUiUseCase,
 ) : ConfirmStartSingleTargetStakingViewModel<MythosConfirmStartStakingState>(
@@ -98,6 +107,21 @@ class ConfirmStartMythosStakingViewModel(
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
 
     override val hintsMixin = NoHintsMixin()
+
+    /**
+     * Whether staking was successfully submitted. Used to detect flow abandoning in [onCleared]
+     */
+    private var flowCompleted = false
+
+    /**
+     * Cached synchronously-readable snapshot of whether this is a new stake (as opposed to bond more).
+     * Needed since [onCleared] cannot suspend
+     */
+    private var isStartStakingFlow = true
+
+    init {
+        launch { isStartStakingFlow = state.currentDelegatorStateFlow.first().isNotStarted() }
+    }
 
     override suspend fun confirmClicked(fee: Fee, amount: Balance, asset: Asset) {
         val payload = StartMythosStakingValidationPayload(
@@ -129,6 +153,13 @@ class ConfirmStartMythosStakingViewModel(
         collator: MythosCollator,
         currentState: MythosDelegatorState,
     ) = launchUnit {
+        val isStartStaking = currentState.isNotStarted()
+        isStartStakingFlow = isStartStaking
+
+        if (isStartStaking) {
+            trackStakingEvent(amountInPlanks, AnalyticsEvent::StakingConfirmed)
+        }
+
         stakingStartedDetectionService.pauseDetection(viewModelScope)
 
         interactor.stake(
@@ -139,15 +170,58 @@ class ConfirmStartMythosStakingViewModel(
             .onFailure {
                 showError(it)
 
+                if (isStartStaking) {
+                    trackStakingFailed(it)
+                }
+
                 stakingStartedDetectionService.activateDetection(viewModelScope)
             }
             .onSuccess {
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
+                flowCompleted = true
+
+                if (isStartStaking) {
+                    trackStakingEvent(amountInPlanks, AnalyticsEvent::StakingCompleted)
+                }
+
                 startNavigation(it.submissionHierarchy) { finishFlow(currentState) }
             }
 
         _showNextProgress.value = false
+    }
+
+    private suspend fun trackStakingEvent(
+        amount: Balance,
+        eventConstructor: (String, String, AmountBucket) -> AnalyticsEvent
+    ) {
+        val asset = assetUseCase.currentAssetFlow().first()
+
+        analyticsService.track(
+            eventConstructor(
+                ANALYTICS_STAKING_TYPE_MYTHOS,
+                selectedAssetState.chain().name,
+                AmountBucket.from(asset.token.planksToFiat(amount))
+            )
+        )
+    }
+
+    private suspend fun trackStakingFailed(error: Throwable) {
+        analyticsService.track(
+            AnalyticsEvent.StakingFailed(
+                stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
+                network = selectedAssetState.chain().name,
+                reason = error.toAnalyticsFailureReason()
+            )
+        )
+    }
+
+    override fun onCleared() {
+        if (!flowCompleted && isStartStakingFlow) {
+            analyticsService.track(AnalyticsEvent.StakingAbandoned(StakingStage.CONFIRM))
+        }
+
+        super.onCleared()
     }
 
     private fun finishFlow(previousState: MythosDelegatorState) {

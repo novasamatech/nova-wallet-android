@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -38,7 +39,8 @@ class SelectUnbondModule {
         maxActionProviderFactory: MaxActionProviderFactory,
         unbondHintsMixinFactory: UnbondHintsMixinFactory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return SelectUnbondViewModel(
             router = router,
@@ -51,7 +53,8 @@ class SelectUnbondModule {
             maxActionProviderFactory = maxActionProviderFactory,
             unbondHintsMixinFactory = unbondHintsMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

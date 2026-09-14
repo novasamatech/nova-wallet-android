@@ -2,11 +2,14 @@ package io.novafoundation.nova.core_db.di
 
 import io.novafoundation.nova.core_db.AppDatabase
 import io.novafoundation.nova.core_db.dao.AccountDao
+import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
 import io.novafoundation.nova.core_db.dao.AccountStakingDao
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetVisibilityDao
+import io.novafoundation.nova.core_db.dao.MetaAccountSettingsDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -34,6 +37,8 @@ import io.novafoundation.nova.core_db.dao.TokenDao
 import io.novafoundation.nova.core_db.dao.WalletConnectSessionsDao
 
 interface DbApi {
+
+    val analyticsEventsDao: AnalyticsEventsDao
 
     val phishingSitesDao: PhishingSitesDao
 
@@ -76,6 +81,10 @@ interface DbApi {
     fun chainDao(): ChainDao
 
     fun chainAssetDao(): ChainAssetDao
+
+    fun chainAssetVisibilityDao(): ChainAssetVisibilityDao
+
+    fun metaAccountSettingsDao(): MetaAccountSettingsDao
 
     fun metaAccountDao(): MetaAccountDao
 

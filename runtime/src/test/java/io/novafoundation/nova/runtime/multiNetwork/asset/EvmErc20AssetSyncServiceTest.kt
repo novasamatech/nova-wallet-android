@@ -57,10 +57,12 @@ class EvmErc20AssetSyncServiceTest {
     @Mock
     lateinit var assetFetcher: AssetFetcher
 
+
     lateinit var evmAssetSyncService: EvmAssetsSyncService
 
     @Before
-    fun setup() {
+    fun setup() = runBlocking {
+
         evmAssetSyncService = EvmAssetsSyncService(chaindao, dao, assetFetcher, gson)
     }
 
@@ -118,21 +120,6 @@ class EvmErc20AssetSyncServiceTest {
 
             verify(dao).updateAssets(
                 removeAsset(chainId, assetId),
-            )
-        }
-    }
-
-    @Test
-    fun `should not overwrite enabled state`() {
-        runBlocking {
-            localHasChains(chainId)
-            localReturnsERC20(LOCAL_ASSETS.map { it.copy(enabled = false) })
-            remoteReturns(listOf(REMOTE_ASSET))
-
-            evmAssetSyncService.syncUp()
-
-            verify(dao).updateAssets(
-                emptyDiff(),
             )
         }
     }

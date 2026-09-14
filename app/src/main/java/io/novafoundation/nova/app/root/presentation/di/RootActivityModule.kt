@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.app.root.analytics.FeatureNavigationTracker
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.app.root.domain.RootInteractor
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.RootViewModel
@@ -65,7 +67,9 @@ class RootActivityModule {
         toastMessageManager: ToastMessageManager,
         dialogMessageManager: DialogMessageManager,
         multisigPushNotificationsAlertMixinFactory: MultisigPushNotificationsAlertMixinFactory,
-        deviceNetworkStateObserver: DeviceNetworkStateObserver
+        deviceNetworkStateObserver: DeviceNetworkStateObserver,
+        analyticsService: AnalyticsService,
+        featureNavigationTracker: FeatureNavigationTracker
     ): ViewModel {
         return RootViewModel(
             interactor,
@@ -89,7 +93,9 @@ class RootActivityModule {
             toastMessageManager,
             dialogMessageManager,
             multisigPushNotificationsAlertMixinFactory,
-            deviceNetworkStateObserver
+            deviceNetworkStateObserver,
+            analyticsService,
+            featureNavigationTracker
         )
     }
 

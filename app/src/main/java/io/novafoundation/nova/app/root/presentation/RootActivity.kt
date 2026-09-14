@@ -68,6 +68,10 @@ class RootActivity : BaseActivity<RootViewModel, ActivityRootBinding>(), SplashB
 
         rootNavigationHolder.attach(rootNavController)
 
+        rootNavController.addOnDestinationChangedListener { _, destination, _ ->
+            viewModel.onRootDestinationChanged(destination.id)
+        }
+
         contextManager.attachActivity(this)
 
         binder.rootNetworkBar.setOnApplyWindowInsetsListener { view, insets ->

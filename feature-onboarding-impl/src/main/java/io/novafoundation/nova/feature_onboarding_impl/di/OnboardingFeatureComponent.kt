@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_onboarding_impl.di
 
 import dagger.BindsInstance
 import dagger.Component
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.CommonApi
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
@@ -39,6 +40,7 @@ interface OnboardingFeatureComponent : OnboardingFeatureApi {
 
     @Component(
         dependencies = [
+            AnalyticsFeatureApi::class,
             CommonApi::class,
             AccountFeatureApi::class,
             VersionsFeatureApi::class,

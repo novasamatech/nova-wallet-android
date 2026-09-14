@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_nft_impl.di
 
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.HttpExceptionHandler
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -21,6 +22,8 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface NftFeatureDependencies {
+
+    fun analyticsService(): AnalyticsService
 
     val amountFormatter: AmountFormatter
 

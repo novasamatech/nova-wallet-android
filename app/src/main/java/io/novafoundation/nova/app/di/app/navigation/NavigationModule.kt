@@ -1,6 +1,8 @@
 package io.novafoundation.nova.app.di.app.navigation
 
 import dagger.Module
+import io.novafoundation.nova.analytics.AnalyticsPromptState
+import io.novafoundation.nova.common.data.storage.Preferences
 import dagger.Provides
 import io.novafoundation.nova.app.di.app.navigation.staking.StakingNavigationModule
 import io.novafoundation.nova.app.root.navigation.holders.RootNavigationHolder
@@ -71,8 +73,9 @@ class NavigationModule {
     @Provides
     fun provideNavigator(
         navigationHoldersRegistry: NavigationHoldersRegistry,
-        walletConnectRouter: WalletConnectRouter
-    ): Navigator = Navigator(navigationHoldersRegistry, walletConnectRouter)
+        walletConnectRouter: WalletConnectRouter,
+        preferences: Preferences
+    ): Navigator = Navigator(navigationHoldersRegistry, walletConnectRouter, AnalyticsPromptState(preferences))
 
     @Provides
     @ApplicationScope

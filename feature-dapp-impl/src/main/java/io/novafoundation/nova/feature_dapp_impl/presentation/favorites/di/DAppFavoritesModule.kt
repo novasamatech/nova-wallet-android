@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -28,11 +29,13 @@ class DAppFavoritesModule {
         router: DAppRouter,
         interactor: DappInteractor,
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
+        analyticsService: AnalyticsService,
     ): ViewModel {
         return DAppFavoritesViewModel(
             router,
             interactor,
-            actionAwaitableMixinFactory
+            actionAwaitableMixinFactory,
+            analyticsService
         )
     }
 }

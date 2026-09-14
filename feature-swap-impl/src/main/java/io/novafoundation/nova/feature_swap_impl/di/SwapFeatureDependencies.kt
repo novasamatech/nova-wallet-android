@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.di
 
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -40,6 +41,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.context.AssetsValidationContext
@@ -61,6 +63,8 @@ import javax.inject.Named
 
 interface SwapFeatureDependencies {
 
+    fun analyticsService(): AnalyticsService
+
     val amountFormatter: AmountFormatter
 
     val validationExecutor: ValidationExecutor
@@ -80,6 +84,8 @@ interface SwapFeatureDependencies {
     val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory
 
     val tokenRepository: TokenRepository
+
+    fun showReceivedAssetUseCase(): ShowReceivedAssetUseCase
 
     val accountRepository: AccountRepository
 

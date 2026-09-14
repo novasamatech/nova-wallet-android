@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -54,7 +55,8 @@ class SetupStartMythosStakingModule {
         validationSystem: StartMythosStakingValidationSystem,
         blockNumberUseCase: StakingBlockNumberUseCase,
         validationFailureFormatter: MythosStakingValidationFailureFormatter,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return SetupStartMythosStakingViewModel(
             router = router,
@@ -75,7 +77,8 @@ class SetupStartMythosStakingModule {
             validationSystem = validationSystem,
             mythosStakingValidationFailureFormatter = validationFailureFormatter,
             stakingBlockNumberUseCase = blockNumberUseCase,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

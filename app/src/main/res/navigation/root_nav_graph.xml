@@ -60,6 +60,14 @@
         app:popUpToInclusive="true" />
 
     <action
+        android:id="@+id/action_open_analyticsConsent"
+        app:destination="@id/analyticsConsentFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/open_pincode_check"
         app:destination="@+id/pincodeFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -215,6 +223,12 @@
         android:name="io.novafoundation.nova.feature_account_impl.presentation.pincode.PincodeFragment"
         android:label="fragment_pincode"
         tools:layout="@layout/fragment_pincode" />
+
+    <fragment
+        android:id="@+id/analyticsConsentFragment"
+        android:name="io.novafoundation.nova.app.root.presentation.analytics.AnalyticsConsentFragment"
+        android:label="AnalyticsConsentFragment"
+        tools:layout="@layout/fragment_analytics_consent" />
 
     <fragment
         android:id="@+id/pincodeFragmentOverlay"

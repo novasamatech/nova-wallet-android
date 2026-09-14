@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_dapp_impl.di
 import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -42,6 +43,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.RuntimeVersionsRepository
 
 interface DAppFeatureDependencies {
+
+    fun analyticsService(): AnalyticsService
 
     val amountFormatter: AmountFormatter
 

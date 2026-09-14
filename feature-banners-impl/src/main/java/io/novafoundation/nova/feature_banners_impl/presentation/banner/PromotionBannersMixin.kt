@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import coil.ImageLoader
 import coil.request.ImageRequest
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.utils.launchDeepLink
 import io.novafoundation.nova.feature_banners_api.domain.PromotionBanner
 import io.novafoundation.nova.common.utils.scopeAsync
@@ -15,13 +17,15 @@ import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersM
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannersMixinFactory
 import io.novafoundation.nova.feature_banners_api.presentation.source.BannersSource
 import io.novafoundation.nova.feature_banners_impl.domain.PromotionBannersInteractor
+import io.novafoundation.nova.feature_banners_impl.presentation.banner.source.RealBannersSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
 class RealPromotionBannersMixinFactory(
     private val imageLoader: ImageLoader,
     private val context: Context,
-    private val promotionBannersInteractor: PromotionBannersInteractor
+    private val promotionBannersInteractor: PromotionBannersInteractor,
+    private val analyticsService: AnalyticsService
 ) : PromotionBannersMixinFactory {
 
     override fun create(source: BannersSource, coroutineScope: CoroutineScope): PromotionBannersMixin {
@@ -30,6 +34,7 @@ class RealPromotionBannersMixinFactory(
             imageLoader,
             context,
             source,
+            analyticsService,
             coroutineScope
         )
     }
@@ -40,6 +45,7 @@ class RealPromotionBannersMixin(
     private val imageLoader: ImageLoader,
     private val context: Context,
     private val bannersSource: BannersSource,
+    private val analyticsService: AnalyticsService,
     coroutineScope: CoroutineScope
 ) : PromotionBannersMixin, CoroutineScope by coroutineScope {
 
@@ -57,7 +63,17 @@ class RealPromotionBannersMixin(
     override fun startBannerAction(page: BannerPageModel) {
         val url = page.actionUrl ?: return
 
+        analyticsService.track(AnalyticsEvent.BannerClicked(bannerId = page.id, bannerTitle = page.title, screen = sourceScreen()))
+
         context.launchDeepLink(url)
+    }
+
+    private fun sourceScreen(): String {
+        val bannersUrl = (bannersSource as? RealBannersSource)?.bannersUrl ?: return "unknown"
+
+        return bannersUrl.substringAfter("/content/", missingDelimiterValue = "")
+            .substringBefore("/")
+            .ifEmpty { "unknown" }
     }
 
     private suspend fun loadResources(banners: List<PromotionBanner>): Map<String, Drawable> {

@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup
 
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalScope
@@ -25,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.start.validations.StartParachainStakingValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_DIRECT
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.SelectStakeTargetModel
 import io.novafoundation.nova.feature_staking_impl.presentation.common.singleSelect.start.StartSingleSelectStakingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenRequester
@@ -32,6 +37,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorParcelModelToCollator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapSelectedCollatorToSelectCollatorModel
+import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.common.StartParachainStakingMode
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.hints.ConfirmStartParachainStakingHintsMixinFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.confirm.model.ConfirmStartParachainStakingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.start.setup.rewards.ParachainStakingRewardsComponentFactory
@@ -73,6 +79,7 @@ class StartParachainStakingViewModel(
     private val collatorRecommendatorFactory: CollatorRecommendatorFactory,
     private val selectedAssetState: StakingSharedState,
     private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<Collator, StartParachainStakingViewModel.ParachainLogic>(
@@ -103,6 +110,13 @@ class StartParachainStakingViewModel(
 ) {
 
     override val hintsMixin = hintsMixinFactory.create(coroutineScope = this, payload.flowMode)
+
+    private val isStartStakingFlow = payload.flowMode == StartParachainStakingMode.START
+
+    /**
+     * Whether user moved further in the start staking flow. Used to detect flow abandoning in [onCleared]
+     */
+    private var flowContinued = false
 
     override suspend fun openSelectNewTarget() {
         val delegatorState = logic.currentDelegatorStateFlow.first()
@@ -148,6 +162,10 @@ class StartParachainStakingViewModel(
         amount: BigDecimal,
         collator: Collator,
     ) = launch {
+        trackStakingInitiated(amount)
+
+        flowContinued = true
+
         val payload = withContext(Dispatchers.Default) {
             ConfirmStartParachainStakingPayload(
                 collator = mapCollatorToCollatorParcelModel(collator),
@@ -158,6 +176,28 @@ class StartParachainStakingViewModel(
         }
 
         router.openConfirmStartStaking(payload)
+    }
+
+    private suspend fun trackStakingInitiated(amount: BigDecimal) {
+        if (!isStartStakingFlow) return
+
+        val asset = assetFlow.first()
+
+        analyticsService.track(
+            AnalyticsEvent.StakingInitiated(
+                stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
+                network = selectedAssetState.chain().name,
+                amountBucket = AmountBucket.from(asset.token.amountToFiat(amount))
+            )
+        )
+    }
+
+    override fun onCleared() {
+        if (!flowContinued && isStartStakingFlow) {
+            analyticsService.track(AnalyticsEvent.StakingAbandoned(StakingStage.SETUP))
+        }
+
+        super.onCleared()
     }
 
     class ParachainLogic(

@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.parachainStakin
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -27,6 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbon
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.parachainStaking.unbond.validations.flow.ParachainStakingUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.ParachainStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_DIRECT
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.select.model.mapCollatorToCollatorParcelModel
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.common.selectCollators.mapCollatorToSelectCollatorModel
@@ -72,7 +76,8 @@ class ParachainStakingUnbondViewModel(
     private val maxActionProviderFactory: MaxActionProviderFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor {
@@ -260,6 +265,8 @@ class ParachainStakingUnbondViewModel(
         amount: BigDecimal,
         collator: Collator,
     ) = launch {
+        trackUnstakeInitiated(amount)
+
         val payload = withContext(Dispatchers.Default) {
             ParachainStakingUnbondConfirmPayload(
                 collator = mapCollatorToCollatorParcelModel(collator),
@@ -269,5 +276,17 @@ class ParachainStakingUnbondViewModel(
         }
 
         router.openConfirmUnbond(payload)
+    }
+
+    private suspend fun trackUnstakeInitiated(amount: BigDecimal) {
+        val fiatAmount = selectedAsset.first().token.amountToFiat(amount)
+
+        analyticsService.track(
+            AnalyticsEvent.UnstakeInitiated(
+                stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
+                network = currentDelegatorStateFlow.first().chain.name,
+                amountBucket = AmountBucket.from(fiatAmount)
+            )
+        )
     }
 }

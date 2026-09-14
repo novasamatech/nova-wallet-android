@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -50,7 +51,8 @@ class ParachainStakingUnbondConfirmModule {
         walletUiUseCase: WalletUiUseCase,
         hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return ParachainStakingUnbondConfirmViewModel(
             router = router,
@@ -69,7 +71,8 @@ class ParachainStakingUnbondConfirmModule {
             hintsMixinFactory = hintsMixinFactory,
             collatorsUseCase = collatorsUseCase,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 

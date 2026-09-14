@@ -16,6 +16,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.asset.EvmAssetsSyncService
 import io.novafoundation.nova.runtime.multiNetwork.asset.remote.AssetFetcher
 import io.novafoundation.nova.runtime.multiNetwork.chain.ChainSyncService
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.remote.ChainFetcher
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnection
 import io.novafoundation.nova.runtime.multiNetwork.connection.ChainConnectionFactory
@@ -47,6 +48,10 @@ class ChainRegistryModule {
     @Provides
     @ApplicationScope
     fun provideChainFetcher(apiCreator: NetworkApiCreator) = apiCreator.create(ChainFetcher::class.java)
+
+    @Provides
+    @ApplicationScope
+    fun provideDefaultAssetsRepository(chainFetcher: ChainFetcher) = DefaultAssetsRepository(chainFetcher)
 
     @Provides
     @ApplicationScope

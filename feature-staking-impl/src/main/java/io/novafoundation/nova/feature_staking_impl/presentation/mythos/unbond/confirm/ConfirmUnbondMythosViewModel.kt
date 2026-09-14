@@ -1,6 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.confirm
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_MYTHOS
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsFailureReason
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -58,7 +63,8 @@ class ConfirmUnbondMythosViewModel(
     selectedAccountUseCase: SelectedAccountUseCase,
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions,
@@ -135,13 +141,41 @@ class ConfirmUnbondMythosViewModel(
 
     private fun sendTransaction(validPayload: UnbondMythosStakingValidationPayload) = launch {
         interactor.unbond(validPayload.delegatorState, validPayload.collator.accountId)
-            .onFailure(::showError)
+            .onFailure { error ->
+                trackUnstakeFailed(error)
+                showError(error)
+            }
             .onSuccess {
+                trackUnstakeCompleted()
+
                 showToast(resourceManager.getString(R.string.common_transaction_submitted))
 
                 startNavigation(it.submissionHierarchy) { router.returnToStakingMain() }
             }
 
         _showNextProgress.value = false
+    }
+
+    private fun trackUnstakeCompleted() = launch {
+        val asset = assetFlow.first()
+        val fiatAmount = asset.token.planksToFiat(payload.amount)
+
+        analyticsService.track(
+            AnalyticsEvent.UnstakeCompleted(
+                stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
+                network = selectedAssetState.chain().name,
+                amountBucket = AmountBucket.from(fiatAmount)
+            )
+        )
+    }
+
+    private fun trackUnstakeFailed(error: Throwable) = launch {
+        analyticsService.track(
+            AnalyticsEvent.UnstakeFailed(
+                stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
+                network = selectedAssetState.chain().name,
+                reason = error.toAnalyticsFailureReason()
+            )
+        )
     }
 }

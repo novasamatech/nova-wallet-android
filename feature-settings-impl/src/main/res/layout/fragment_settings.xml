@@ -117,6 +117,13 @@
                 app:icon="@drawable/ic_settings_appearance"
                 app:title="@string/appearance_title" />
 
+            <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+                android:id="@+id/settingsAnalytics"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_planet_outline"
+                app:title="@string/settings_analytics_title" />
+
         </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
         <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView

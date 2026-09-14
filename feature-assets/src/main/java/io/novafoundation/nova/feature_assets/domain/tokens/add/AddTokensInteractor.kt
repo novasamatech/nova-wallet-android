@@ -88,8 +88,7 @@ class RealAddTokensInteractor(
             staking = emptyList(),
             type = Chain.Asset.Type.EvmErc20(customErc20Token.contract),
             source = Chain.Asset.Source.MANUAL,
-            name = customErc20Token.symbol,
-            enabled = true
+            name = customErc20Token.symbol
         )
 
         chainAssetRepository.insertCustomAsset(asset)

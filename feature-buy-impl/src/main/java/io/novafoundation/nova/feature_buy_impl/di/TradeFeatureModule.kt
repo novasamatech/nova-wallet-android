@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.utils.ip.IpAddressReceiver
 import io.novafoundation.nova.common.utils.webView.InterceptingWebViewClientFactory
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_buy_impl.presentation.trade.providers.tran
 import io.novafoundation.nova.feature_buy_impl.presentation.mixin.TradeMixinFactory
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo.RealMercuryoBuyRequestInterceptorFactory
 import io.novafoundation.nova.feature_buy_impl.presentation.trade.interceptors.mercuryo.RealMercuryoSellRequestInterceptorFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import okhttp3.OkHttpClient
 
 @Module(includes = [DeepLinkModule::class])
@@ -118,8 +120,12 @@ class BuyFeatureModule {
     @Provides
     @FeatureScope
     fun provideBuyMixinFactory(
-        buyTokenRegistry: TradeTokenRegistry
+        buyTokenRegistry: TradeTokenRegistry,
+        analyticsService: AnalyticsService,
+        chainRegistry: ChainRegistry
     ): TradeMixin.Factory = TradeMixinFactory(
-        buyTokenRegistry = buyTokenRegistry
+        buyTokenRegistry = buyTokenRegistry,
+        analyticsService = analyticsService,
+        chainRegistry = chainRegistry
     )
 }

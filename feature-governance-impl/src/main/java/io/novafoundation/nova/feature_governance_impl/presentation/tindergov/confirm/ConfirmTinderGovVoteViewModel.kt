@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_governance_impl.presentation.tindergov.confirm
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
@@ -18,12 +21,15 @@ import io.novafoundation.nova.feature_governance_api.data.model.accountVote
 import io.novafoundation.nova.feature_governance_api.domain.referendum.vote.VoteReferendumInteractor
 import io.novafoundation.nova.feature_governance_impl.R
 import io.novafoundation.nova.feature_governance_impl.data.GovernanceSharedState
+import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovBasketInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.tindergov.TinderGovInteractor
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationPayload
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.VoteTinderGovValidationSystem
 import io.novafoundation.nova.feature_governance_impl.domain.referendum.vote.validations.tindergov.handleVoteTinderGovValidationFailure
 import io.novafoundation.nova.feature_governance_impl.presentation.GovernanceRouter
+import io.novafoundation.nova.feature_governance_impl.presentation.common.analytics.toAnalyticsConvictionLevel
+import io.novafoundation.nova.feature_governance_impl.presentation.common.analytics.toAnalyticsVoteDirection
 import io.novafoundation.nova.feature_governance_impl.presentation.common.confirmVote.ConfirmVoteViewModel
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.common.LocksChangeFormatter
 import io.novafoundation.nova.feature_governance_impl.presentation.referenda.vote.hints.ReferendumVoteHintsMixinFactory
@@ -63,7 +69,8 @@ class ConfirmTinderGovVoteViewModel(
     private val tinderGovBasketInteractor: TinderGovBasketInteractor,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -150,11 +157,29 @@ class ConfirmTinderGovVoteViewModel(
         partialRetriableMixin.handleMultiResult(
             multiResult = result,
             onSuccess = {
+                trackVotesCast(payload.basket)
+
                 startNavigation(it.submissionHierarchy()) { onVoteSuccess(payload.basket) }
             },
             progressConsumer = _showNextProgress.progressConsumer(),
             onRetryCancelled = { router.back() }
         )
+    }
+
+    private suspend fun trackVotesCast(basket: List<TinderGovBasketItem>) {
+        val chain = governanceSharedState.chain()
+        val asset = assetFlow.first()
+
+        basket.forEach { item ->
+            analyticsService.track(
+                AnalyticsEvent.GovernanceVoteCast(
+                    voteDirection = item.voteType.toAnalyticsVoteDirection(),
+                    network = chain.name,
+                    amountBucket = AmountBucket.from(asset.token.planksToFiat(item.amount)),
+                    convictionLevel = item.conviction.toAnalyticsConvictionLevel()
+                )
+            )
+        }
     }
 
     private suspend fun onVoteSuccess(basket: List<TinderGovBasketItem>) {

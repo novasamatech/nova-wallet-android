@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_onboarding_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -19,6 +20,7 @@ class OnboardingFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val onboardingFeatureDependencies = DaggerOnboardingFeatureComponent_OnboardingFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .versionsFeatureApi(getFeature(VersionsFeatureApi::class.java))
             .accountFeatureApi(getFeature(AccountFeatureApi::class.java))
             .cloudBackupFeatureApi(getFeature(CloudBackupFeatureApi::class.java))

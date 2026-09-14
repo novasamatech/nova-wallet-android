@@ -7,6 +7,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -57,7 +58,8 @@ class ConfirmStartParachainStakingModule {
         delegatorStateUseCase: DelegatorStateUseCase,
         stakingStartedDetectionService: StakingStartedDetectionService,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return ConfirmStartParachainStakingViewModel(
             parachainStakingRouter = router,
@@ -79,7 +81,8 @@ class ConfirmStartParachainStakingModule {
             startStakingRouter = startStakingRouter,
             stakingStartedDetectionService = stakingStartedDetectionService,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService
         )
     }
 
