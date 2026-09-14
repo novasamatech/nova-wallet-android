@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_assets.presentation.send.TransferDraft
 import io.novafoundation.nova.feature_assets.presentation.send.amount.SendPayload
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.webInterface.TradeWebPayload
 import io.novafoundation.nova.feature_assets.presentation.transaction.filter.TransactionHistoryFilterPayload
 import io.novafoundation.nova.feature_swap_api.presentation.model.SwapSettingsPayload
@@ -50,8 +49,6 @@ interface AssetsRouter {
     fun openAssetSearch()
 
     fun openManageTokens()
-
-    fun openManageChainTokens(payload: ManageChainTokensPayload)
 
     fun openAddTokenEnterInfo(payload: AddTokenEnterInfoPayload)
 

@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_assets.presentation.balance.list.model.ite
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.AssetsHeaderHolder
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.ManageAssetsAdapter
+import io.novafoundation.nova.feature_assets.presentation.balance.list.view.MissingTokenAdapter
 import io.novafoundation.nova.feature_assets.presentation.balance.list.view.ManageAssetsHolder
 import io.novafoundation.nova.feature_banners_api.presentation.BannerHolder
 import io.novafoundation.nova.feature_banners_api.presentation.PromotionBannerAdapter
@@ -42,7 +43,8 @@ class BalanceListFragment :
     BaseFragment<BalanceListViewModel, FragmentBalanceListBinding>(),
     BalanceListAdapter.ItemAssetHandler,
     AssetsHeaderAdapter.Handler,
-    ManageAssetsAdapter.Handler {
+    ManageAssetsAdapter.Handler,
+    MissingTokenAdapter.Handler {
 
     override fun createBinding() = FragmentBalanceListBinding.inflate(layoutInflater)
 
@@ -74,8 +76,12 @@ class BalanceListFragment :
         BalanceListAdapter(imageLoader, this)
     }
 
+    private val missingTokenAdapter by lazy(LazyThreadSafetyMode.NONE) {
+        MissingTokenAdapter(this)
+    }
+
     private val adapter by lazy(LazyThreadSafetyMode.NONE) {
-        ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter)
+        ConcatAdapter(headerAdapter, bannerAdapter, manageAssetsAdapter, emptyAssetsPlaceholder, assetsAdapter, missingTokenAdapter)
     }
 
     override fun applyInsets(rootView: View) {
@@ -159,7 +165,6 @@ class BalanceListFragment :
         viewModel.balanceTitleFlow.observe(headerAdapter::setTitleForTotalBalance)
         viewModel.walletConnectAccountSessionsUI.observe(headerAdapter::setWalletConnectModel)
         viewModel.pendingOperationsCountModel.observe(headerAdapter::setPendingOperationsCountModel)
-        viewModel.filtersIndicatorIcon.observe(headerAdapter::setFilterIconRes)
         viewModel.assetViewModeModelFlow.observe { manageAssetsAdapter.setAssetViewModeModel(it) }
     }
 
@@ -183,6 +188,10 @@ class BalanceListFragment :
     }
 
     override fun manageClicked() {
+        viewModel.manageClicked()
+    }
+
+    override fun manageTokensClicked() {
         viewModel.manageClicked()
     }
 

@@ -58,7 +58,7 @@ class RealPooledBalanceUpdaterFactory(
             chain = chain,
             remoteStorageSource = remoteStorageSource,
             poolAccountDerivation = poolAccountDerivation,
-            externalBalanceDao = externalBalanceDao
+            externalBalanceDao = externalBalanceDao,
         )
     }
 }
@@ -79,7 +79,7 @@ class PooledBalanceUpdater(
         storageSubscriptionBuilder: SharedRequestsBuilder,
         scopeValue: MetaAccount,
     ): Flow<Updater.SideEffect> {
-        return if (chainAsset.enabled && StakingType.NOMINATION_POOLS in chainAsset.staking) {
+        return if (StakingType.NOMINATION_POOLS in chainAsset.staking) {
             sync(storageSubscriptionBuilder, metaAccount = scopeValue)
         } else {
             emptyFlow()

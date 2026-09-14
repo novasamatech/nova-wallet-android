@@ -14,24 +14,36 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import io.novafoundation.nova.feature_wallet_api.domain.model.onlyVisible
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 
 class AssetSearchUseCase(
     private val walletRepository: WalletRepository,
     private val accountRepository: AccountRepository,
     private val chainRegistry: ChainRegistry,
-    private val swapService: SwapService
+    private val swapService: SwapService,
+    private val assetVisibilityUseCase: AssetVisibilityUseCase
 ) {
 
-    fun filteredAssetFlow(filterFlow: Flow<AssetSearchFilter?>): Flow<List<Asset>> {
+    /**
+     * @param onlyVisible whether the wallet's own show/hide choices apply. Pickers that ask what
+     * to *spend* respect them; pickers that ask what to *receive* must not, or a token could never
+     * be chosen as a destination until it was already held.
+     */
+    fun filteredAssetFlow(filterFlow: Flow<AssetSearchFilter?>, onlyVisible: Boolean): Flow<List<Asset>> {
         val assetsFlow = accountRepository.selectedMetaAccountFlow()
             .flatMapLatest { walletRepository.syncedAssetsFlow(it.id) }
 
-        return combine(assetsFlow, filterFlow) { assets, filter ->
-            if (filter == null) {
-                assets
-            } else {
-                assets.filter { filter(it) }
-            }
+        val visibilityFlow = if (onlyVisible) assetVisibilityUseCase.visibilityFlow() else flowOf(null)
+
+        return combine(assetsFlow, filterFlow, visibilityFlow) { assets, filter, visibility ->
+            var result = assets
+
+            if (visibility != null) result = result.onlyVisible(visibility)
+            if (filter != null) result = result.filter { filter(it) }
+
+            result
         }
     }
 

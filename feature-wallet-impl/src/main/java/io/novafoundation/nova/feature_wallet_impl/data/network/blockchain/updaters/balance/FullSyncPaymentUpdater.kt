@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.b
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.realtime.RealtimeHistoryUpdate
 import io.novafoundation.nova.runtime.ext.addressOf
-import io.novafoundation.nova.runtime.ext.enabledAssets
 import io.novafoundation.nova.runtime.ext.localId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -40,8 +39,7 @@ internal class FullSyncPaymentUpdater(
         scopeValue: MetaAccount,
     ): Flow<Updater.SideEffect> {
         val accountId = scopeValue.requireAccountIdIn(chain)
-
-        return chain.enabledAssets().mapNotNull { chainAsset ->
+        return chain.assets.mapNotNull { chainAsset ->
             syncAsset(chainAsset, scopeValue, accountId, storageSubscriptionBuilder)
         }
             .mergeIfMultiple()

@@ -33,7 +33,8 @@ fun mapEVMAssetRemoteToLocalAssets(evmAssetRemote: EVMAssetRemote, gson: Gson): 
             buyProviders = gson.toJson(it.buyProviders),
             sellProviders = gson.toJson(it.sellProviders),
             typeExtras = gson.toJson(typeExtras),
-            enabled = true
+            // A placeholder: EvmAssetsSyncService decides the real enabled state
+            enabled = ChainAssetLocal.ENABLED_DEFAULT_BOOL
         )
     }
 }

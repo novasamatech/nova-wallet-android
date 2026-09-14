@@ -37,6 +37,18 @@ data class ChainAssetLocal(
     val buyProviders: String?,
     val sellProviders: String?,
     val typeExtras: String?,
+    /**
+     * TODO unused - drop the column.
+     *
+     * Show/hide moved to `chain_asset_visibility`, which is per wallet, and syncing no longer
+     * consults anything here. Nothing reads or carries this value any more; it is always written as
+     * [ENABLED_DEFAULT_BOOL].
+     *
+     * Removing it needs `chain_assets` recreated: SQLite gained ALTER TABLE DROP COLUMN in 3.35, but
+     * minSdk 24 runs system SQLite as old as 3.9. That recreation has to move seven child tables'
+     * foreign keys with it, so it belongs in its own migration verified on a device - and until it
+     * lands the field must stay declared, or Room's schema check fails at open.
+     */
     @ColumnInfo(defaultValue = ENABLED_DEFAULT_STR)
     val enabled: Boolean,
 ) : Identifiable {

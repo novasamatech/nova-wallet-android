@@ -38,13 +38,13 @@
             app:layout_constraintTop_toBottomOf="@id/manageTokensToolbar" />
 
         <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/manageTokensSwitchZeroBalances"
+            android:id="@+id/manageTokensSwitchAutoEnable"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
             android:paddingHorizontal="16dp"
-            android:text="@string/wallet_filter_hide_zero_balance"
+            android:text="@string/assets_manage_tokens_auto_enable"
             android:textColor="@color/text_secondary" />
 
         <View
@@ -78,6 +78,6 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/manageTokensToolbarContainer"
-        tools:listitem="@layout/item_manage_token_multichain" />
+        tools:listitem="@layout/item_manage_asset_group" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

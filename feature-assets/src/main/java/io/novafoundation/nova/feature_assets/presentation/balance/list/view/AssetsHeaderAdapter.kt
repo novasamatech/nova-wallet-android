@@ -49,7 +49,6 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
         fun watchOnlyLearnMore()
     }
 
-    private var filterIconRes: Int? = null
     private var walletConnectModel: WalletConnectSessionsModel? = null
     private var maskingEnabled: Boolean? = null
     private var totalBalance: TotalBalanceModel? = null
@@ -62,10 +61,6 @@ class AssetsHeaderAdapter(private val handler: Handler) : RecyclerView.Adapter<A
 
     override fun getItemViewType(position: Int): Int {
         return AssetsHeaderHolder.viewType
-    }
-
-    fun setFilterIconRes(filterIconRes: Int) {
-        this.filterIconRes = filterIconRes
     }
 
     fun setNftCountLabel(nftCount: MaskableModel<String>?) {

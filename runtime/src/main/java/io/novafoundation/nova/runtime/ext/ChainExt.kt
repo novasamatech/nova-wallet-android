@@ -260,9 +260,6 @@ fun Chain.Nodes.hasHttpNodes(): Boolean {
     return nodes.any { it.isHttps }
 }
 
-val Chain.Asset.disabled: Boolean
-    get() = !enabled
-
 val Chain.genesisHash: String?
     get() = id.takeIf {
         runCatching { it.fromHex() }.isSuccess
@@ -546,10 +543,6 @@ fun Type.Orml.currencyId(runtime: RuntimeSnapshot): Any? {
 
 val Chain.Asset.fullId: FullChainAssetId
     get() = FullChainAssetId(chainId, id)
-
-fun Chain.enabledAssets(): List<Chain.Asset> = assets.filter { it.enabled }
-
-fun Chain.disabledAssets(): List<Chain.Asset> = assets.filterNot { it.enabled }
 
 fun evmChainIdFrom(chainId: Int) = "$EIP_155_PREFIX:$chainId"
 

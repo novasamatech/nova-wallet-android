@@ -23,6 +23,8 @@ import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.BrowserHostSettingsDao
 import io.novafoundation.nova.core_db.dao.BrowserTabsDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetVisibilityDao
+import io.novafoundation.nova.core_db.dao.MetaAccountSettingsDao
 import io.novafoundation.nova.core_db.dao.ChainDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ContributionDao
@@ -59,6 +61,7 @@ import io.novafoundation.nova.core_db.migrations.AddChainColor_4_5
 import io.novafoundation.nova.core_db.migrations.AddChainForeignKeyForProxy_63_64
 import io.novafoundation.nova.core_db.migrations.AddConnectionStateToChains_53_54
 import io.novafoundation.nova.core_db.migrations.AddAnalyticsEvents_73_74
+import io.novafoundation.nova.core_db.migrations.PerWalletTokenState_74_75
 import io.novafoundation.nova.core_db.migrations.AddFieldsToContributions
 import io.novafoundation.nova.core_db.migrations.AddContributions_23_24
 import io.novafoundation.nova.core_db.migrations.AddCurrencies_18_19
@@ -126,6 +129,8 @@ import io.novafoundation.nova.core_db.model.AccountLocal
 import io.novafoundation.nova.core_db.model.AccountStakingLocal
 import io.novafoundation.nova.core_db.model.AssetLocal
 import io.novafoundation.nova.core_db.model.BalanceHoldLocal
+import io.novafoundation.nova.core_db.model.ChainAssetVisibilityLocal
+import io.novafoundation.nova.core_db.model.MetaAccountSettingsLocal
 import io.novafoundation.nova.core_db.model.BalanceLockLocal
 import io.novafoundation.nova.core_db.model.BrowserHostSettingsLocal
 import io.novafoundation.nova.core_db.model.BrowserTabLocal
@@ -169,7 +174,7 @@ import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 
 @Database(
-    version = 74,
+    version = 75,
     entities = [
         AccountLocal::class,
         NodeLocal::class,
@@ -209,6 +214,8 @@ import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
         ExternalBalanceLocal::class,
         ProxyAccountLocal::class,
         BalanceHoldLocal::class,
+        ChainAssetVisibilityLocal::class,
+        MetaAccountSettingsLocal::class,
         NodeSelectionPreferencesLocal::class,
         TinderGovBasketItemLocal::class,
         TinderGovVotingPowerLocal::class,
@@ -275,6 +282,7 @@ abstract class AppDatabase : RoomDatabase() {
                     .addMigrations(AddFavoriteDAppsOrdering_65_66, AddLegacyAddressPrefix_66_67, AddSellProviders_67_68)
                     .addMigrations(AddTypeExtrasToMetaAccount_68_69, AddMultisigCalls_69_70, AddMultisigSupportFlag_70_71)
                     .addMigrations(AddGifts_71_72, AddFieldsToContributions, AddAnalyticsEvents_73_74)
+                    .addMigrations(PerWalletTokenState_74_75)
                     .build()
             }
             return instance!!
@@ -300,6 +308,10 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun stakingTotalRewardDao(): StakingTotalRewardDao
 
     abstract fun chainDao(): ChainDao
+
+    abstract fun chainAssetVisibilityDao(): ChainAssetVisibilityDao
+
+    abstract fun metaAccountSettingsDao(): MetaAccountSettingsDao
 
     abstract fun chainAssetDao(): ChainAssetDao
 

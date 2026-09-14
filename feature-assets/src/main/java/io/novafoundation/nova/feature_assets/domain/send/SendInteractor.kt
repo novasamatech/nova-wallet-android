@@ -20,6 +20,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.CrossChainTran
 import io.novafoundation.nova.feature_wallet_api.domain.model.xcm.transferConfiguration
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
+import io.novafoundation.nova.runtime.ext.fullId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,7 +35,9 @@ class SendInteractor(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val extrinsicService: ExtrinsicService,
     private val sendUseCase: SendUseCase,
-    private val crossChainValidationProvider: CrossChainValidationSystemProvider
+    private val crossChainValidationProvider: CrossChainValidationSystemProvider,
+    private val accountRepository: AccountRepository,
+    private val showReceivedAssetUseCase: ShowReceivedAssetUseCase,
 ) {
 
     suspend fun getFee(transfer: AssetTransfer, coroutineScope: CoroutineScope): TransferFee = withContext(Dispatchers.Default) {
@@ -69,7 +74,7 @@ class SendInteractor(
         crossChainFee: FeeBase?,
         coroutineScope: CoroutineScope
     ): Result<ExtrinsicSubmission> = withContext(Dispatchers.Default) {
-        if (transfer.isCrossChain) {
+        val submission = if (transfer.isCrossChain) {
             val config = crossChainTransfersRepository.getConfiguration().configurationFor(transfer)!!
 
             with(extrinsicService) {
@@ -78,6 +83,21 @@ class SendInteractor(
         } else {
             sendUseCase.performOnChainTransfer(transfer, originFee.submissionFee, coroutineScope)
         }
+
+        submission.onSuccess { showDestinationAssetIfSentToSelf(transfer) }
+    }
+
+    /**
+     * Sending to an account of your own is the one transfer that changes what a wallet holds, so
+     * the destination token has to be visible - including when it is a token the user had hidden.
+     *
+     * The token is shown in the wallet that receives it, which is not necessarily the one sending:
+     * moving funds to another of your own wallets has to reveal it over there.
+     */
+    private suspend fun showDestinationAssetIfSentToSelf(transfer: AssetTransfer) {
+        val ownAccount = accountRepository.findMetaAccount(transfer.recipientAccountId.value, transfer.destinationChain.id) ?: return
+
+        showReceivedAssetUseCase.onOwnFundsReceived(ownAccount.id, transfer.destinationChainAsset.fullId)
     }
 
     fun validationSystemFor(transfer: AssetTransfer, coroutineScope: CoroutineScope) = if (transfer.isCrossChain) {

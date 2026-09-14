@@ -10,10 +10,6 @@
         android:label="ManageTokensFragment">
 
         <action
-            android:id="@+id/action_manageTokensFragment_to_manageChainTokensFragment"
-            app:destination="@id/manageChainTokensFragment" />
-
-        <action
             android:id="@+id/action_manageTokensFragment_to_addTokenSelectChainFragment"
             app:destination="@id/addTokenSelectChainFragment"
             app:enterAnim="@anim/fragment_open_enter"
@@ -21,11 +17,6 @@
             app:popEnterAnim="@anim/fragment_close_enter"
             app:popExitAnim="@anim/fragment_close_exit" />
     </fragment>
-
-    <dialog
-        android:id="@+id/manageChainTokensFragment"
-        android:name="io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment"
-        android:label="ManageChainTokensFragment" />
 
     <fragment
         android:id="@+id/addTokenSelectChainFragment"

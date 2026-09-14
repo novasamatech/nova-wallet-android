@@ -53,13 +53,7 @@ class ContributionsUpdater(
         storageSubscriptionBuilder: SharedRequestsBuilder,
         scopeValue: ScopeValue,
     ): Flow<Updater.SideEffect> {
-        return flowOfAll {
-            if (scopeValue.asset.token.configuration.enabled) {
-                sync(scopeValue)
-            } else {
-                emptyFlow()
-            }
-        }.noSideAffects()
+        return flowOfAll { sync(scopeValue) }.noSideAffects()
     }
 
     private suspend fun sync(scopeValue: ScopeValue): Flow<Any> {

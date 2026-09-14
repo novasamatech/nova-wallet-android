@@ -32,7 +32,6 @@ import io.novafoundation.nova.feature_assets.presentation.swap.asset.di.AssetSwa
 import io.novafoundation.nova.feature_assets.presentation.swap.network.di.NetworkSwapFlowComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.di.AddTokenEnterInfoComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.selectChain.di.AddTokenSelectChainComponent
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.di.ManageChainTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.tokens.manage.di.ManageTokensComponent
 import io.novafoundation.nova.feature_assets.presentation.topup.TopUpAddressCommunicator
 import io.novafoundation.nova.feature_assets.presentation.trade.sell.flow.asset.di.AssetSellFlowComponent
@@ -95,8 +94,6 @@ interface AssetsFeatureComponent : AssetsFeatureApi {
     fun assetSearchComponentFactory(): AssetSearchComponent.Factory
 
     fun manageTokensComponentFactory(): ManageTokensComponent.Factory
-
-    fun manageChainTokensComponentFactory(): ManageChainTokensComponent.Factory
 
     fun addTokenSelectChainComponentFactory(): AddTokenSelectChainComponent.Factory
 

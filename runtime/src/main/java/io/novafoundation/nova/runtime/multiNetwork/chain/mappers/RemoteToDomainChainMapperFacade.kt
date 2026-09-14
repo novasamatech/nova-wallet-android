@@ -16,7 +16,7 @@ class RemoteToDomainChainMapperFacade(
             Chain.Source.CUSTOM -> ChainLocal.Source.CUSTOM
         }
         val chainLocal = mapRemoteChainToLocal(chainRemote, null, localSource, gson)
-        val assetsLocal = chainRemote.assets.map { mapRemoteAssetToLocal(chainRemote, it, gson, isEnabled = true) }
+        val assetsLocal = chainRemote.assets.map { mapRemoteAssetToLocal(chainRemote, it, gson) }
         val nodesLocal = mapRemoteNodesToLocal(chainRemote)
         val explorersLocal = mapRemoteExplorersToLocal(chainRemote)
         val externalApisLocal = mapExternalApisToLocal(chainRemote)

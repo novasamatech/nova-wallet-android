@@ -14,6 +14,8 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.core_db.dao.AssetDao
 import io.novafoundation.nova.core_db.dao.ChainAssetDao
+import io.novafoundation.nova.core_db.dao.ChainAssetVisibilityDao
+import io.novafoundation.nova.core_db.dao.MetaAccountSettingsDao
 import io.novafoundation.nova.core_db.dao.CoinPriceDao
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
 import io.novafoundation.nova.core_db.dao.HoldsDao
@@ -48,6 +50,10 @@ import io.novafoundation.nova.feature_wallet_api.domain.RealArbitraryAssetUseCas
 import io.novafoundation.nova.feature_wallet_api.domain.SendUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.fee.FeeInteractor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AutoEnableTokensRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -89,6 +95,8 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.CoinPriceRepos
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealBalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealChainAssetRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealAssetVisibilityRepository
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealAutoEnableTokensRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChainTransfersRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
@@ -108,6 +116,7 @@ import io.novafoundation.nova.feature_wallet_impl.presentation.formatters.RealAs
 import io.novafoundation.nova.feature_wallet_impl.presentation.getAsset.RealGetAssetOptionsMixinFactory
 import io.novafoundation.nova.runtime.extrinsic.visitor.extrinsic.api.ExtrinsicWalk
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.DefaultAssetsRepository
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.EventsRepository
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.ParachainInfoRepository
@@ -164,7 +173,7 @@ class WalletFeatureModule {
     fun provideAssetCache(
         tokenDao: TokenDao,
         assetDao: AssetDao,
-        accountRepository: AccountRepository,
+        accountRepository: AccountRepository
     ): AssetCache {
         return AssetCache(tokenDao, accountRepository, assetDao)
     }
@@ -214,7 +223,7 @@ class WalletFeatureModule {
         assetSourceRegistry: AssetSourceRegistry,
         accountUpdateScope: AccountUpdateScope,
         chainRegistry: ChainRegistry,
-        assetCache: AssetCache
+        assetCache: AssetCache,
     ): PaymentUpdaterFactory = RealPaymentUpdaterFactory(
         operationDao,
         assetSourceRegistry,
@@ -379,6 +388,33 @@ class WalletFeatureModule {
         chainAssetDao: ChainAssetDao,
         gson: Gson
     ): ChainAssetRepository = RealChainAssetRepository(chainAssetDao, gson)
+
+    @Provides
+    @FeatureScope
+    fun provideAutoEnableTokensRepository(
+        metaAccountSettingsDao: MetaAccountSettingsDao
+    ): AutoEnableTokensRepository = RealAutoEnableTokensRepository(metaAccountSettingsDao)
+
+    @Provides
+    @FeatureScope
+    fun provideAssetVisibilityRepository(
+        chainAssetVisibilityDao: ChainAssetVisibilityDao
+    ): AssetVisibilityRepository = RealAssetVisibilityRepository(chainAssetVisibilityDao)
+
+    @Provides
+    @FeatureScope
+    fun provideAssetVisibilityUseCase(
+        accountRepository: AccountRepository,
+        assetVisibilityRepository: AssetVisibilityRepository,
+        defaultAssetsRepository: DefaultAssetsRepository
+    ) = AssetVisibilityUseCase(accountRepository, assetVisibilityRepository, defaultAssetsRepository)
+
+    @Provides
+    @FeatureScope
+    fun provideShowReceivedAssetUseCase(
+        accountRepository: AccountRepository,
+        assetVisibilityRepository: AssetVisibilityRepository
+    ) = ShowReceivedAssetUseCase(accountRepository, assetVisibilityRepository)
 
     @Provides
     @FeatureScope

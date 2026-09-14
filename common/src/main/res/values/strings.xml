@@ -1746,6 +1746,16 @@
 
     <string name="assets_manage_tokens_title">Manage tokens</string>
     <string name="assets_manage_tokens_all_networks">All networks</string>
+    <string name="assets_manage_tokens_all_tokens">All tokens</string>
+    <string name="assets_manage_tokens_section_default">Default</string>
+    <string name="assets_manage_tokens_section_other">Others</string>
+    <plurals name="assets_manage_tokens_search_results">
+        <item quantity="one">%d result</item>
+        <item quantity="other">%d results</item>
+    </plurals>
+    <string name="assets_manage_tokens_auto_enable">Add tokens with positive balance</string>
+    <string name="assets_missing_token">Missing a token?</string>
+    <string name="assets_missing_token_action">Manage tokens</string>
 
     <string name="common_no_app_to_handle_import_intent">File import application not found on device. Please install it and try again</string>
 
