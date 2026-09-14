@@ -123,7 +123,6 @@ interface WalletFeatureDependencies {
 
     fun preferences(): Preferences
 
-
     fun encryptedPreferences(): EncryptedPreferences
 
     fun resourceManager(): ResourceManager

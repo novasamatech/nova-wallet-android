@@ -42,5 +42,17 @@ val PerWalletTokenState_74_75 = object : Migration(74, 75) {
             WHERE a.`enabled` = 0
             """.trimIndent()
         )
+
+        // Everything else a wallet could see before the update stays visible, zero balances included.
+        // The curated default list is for wallets that start fresh; imposing it on an existing one would
+        // silently take away tokens its owner is used to seeing. Only wallets that exist right now get
+        // these rows - a wallet created after the update starts from the curated list like a new install.
+        db.execSQL(
+            """
+            INSERT OR IGNORE INTO `chain_asset_visibility` (`metaId`, `chainId`, `assetId`, `visible`)
+            SELECT m.`id`, a.`chainId`, a.`id`, 1 FROM `chain_assets` AS a CROSS JOIN `meta_accounts` AS m
+            WHERE a.`enabled` = 1
+            """.trimIndent()
+        )
     }
 }

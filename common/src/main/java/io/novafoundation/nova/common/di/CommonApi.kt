@@ -243,7 +243,6 @@ interface CommonApi {
 
     fun assetsViewModeRepository(): AssetsViewModeRepository
 
-
     fun assetsIconModeService(): AssetsIconModeRepository
 
     fun assetIconProvider(): AssetIconProvider
