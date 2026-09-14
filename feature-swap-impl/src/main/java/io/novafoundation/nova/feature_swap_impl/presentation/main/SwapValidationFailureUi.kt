@@ -8,7 +8,9 @@ import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.asDefault
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure
+import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.AmountExceedsPoolTradeLimit
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.AmountOutIsTooLowToStayAboveED
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InsufficientBalance
 import io.novafoundation.nova.feature_swap_impl.domain.validation.SwapValidationFailure.InvalidSlippage
@@ -33,7 +35,8 @@ fun mapSwapValidationFailureToUI(
     status: ValidationStatus.NotValid<SwapValidationFailure>,
     actions: ValidationFlowActions<*>,
     amountInSwapMaxAction: () -> Unit,
-    amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit
+    amountOutSwapMinAction: (Chain.Asset, Balance) -> Unit,
+    amountInSetAction: (Chain.Asset, Balance) -> Unit,
 ): TransformedFailure {
     return when (val reason = status.reason) {
         is NotEnoughFunds.ToPayFeeAndStayAboveED -> handleInsufficientBalanceCommission(reason, resourceManager).asDefault()
@@ -60,6 +63,8 @@ fun mapSwapValidationFailureToUI(
         NonPositiveAmount -> handleNonPositiveAmount(resourceManager).asDefault()
 
         NotEnoughLiquidity -> TitleAndMessage(resourceManager.getString(R.string.swap_not_enought_liquidity_failure), second = null).asDefault()
+
+        is AmountExceedsPoolTradeLimit -> handlePoolTradeLimit(reason, resourceManager, amountInSetAction, amountOutSwapMinAction)
 
         is AmountOutIsTooLowToStayAboveED -> handleErrorToSwapMin(reason, resourceManager, amountOutSwapMinAction)
 
@@ -133,6 +138,53 @@ fun mapSwapValidationFailureToUI(
         ).asDefault()
     }
 }
+
+private fun handlePoolTradeLimit(
+    reason: AmountExceedsPoolTradeLimit,
+    resourceManager: ResourceManager,
+    amountInSetAction: (Chain.Asset, Balance) -> Unit,
+    amountOutSetAction: (Chain.Asset, Balance) -> Unit
+): TransformedFailure {
+    val title = resourceManager.getString(R.string.swap_failure_pool_trade_limit_title)
+
+    if (!reason.isUserInputAdjustable) {
+        // The limit is violated by an intermediate hop - its cap cannot be directly applied to the user's input
+        return TitleAndMessage(
+            title,
+            resourceManager.getString(
+                R.string.swap_failure_pool_trade_limit_route_message,
+                reason.limitedAsset.symbol.value,
+                reason.maxAmount.formatPlanks(reason.limitedAsset)
+            )
+        ).asDefault()
+    }
+
+    val setMaxAllowedAmount = when (reason.direction) {
+        SwapDirection.SPECIFIED_IN -> amountInSetAction
+        SwapDirection.SPECIFIED_OUT -> amountOutSetAction
+    }
+
+    // The cap is computed from live pool reserves which drift between the tap, the re-validation
+    // and the on-chain execution (thin pools are actively arbitraged). Suggesting the exact cap
+    // would re-trigger this dialog or revert on-chain on any adverse reserve move, so undershoot
+    // it to leave headroom. The validation threshold itself stays the exact runtime mirror.
+    // The dialog shows the same value the button fills in, so the two never diverge
+    val safeMaxAmount = (reason.maxAmount.toBigDecimal() * POOL_LIMIT_HEADROOM_SIZE).toBigInteger()
+
+    return handleInsufficientBalance(
+        title = title,
+        message = resourceManager.getString(
+            R.string.swap_failure_pool_trade_limit_message,
+            reason.limitedAsset.symbol.value,
+            safeMaxAmount.formatPlanks(reason.limitedAsset)
+        ),
+        resourceManager = resourceManager,
+        positiveButtonClick = { setMaxAllowedAmount(reason.limitedAsset, safeMaxAmount) }
+    )
+}
+
+// 5% headroom below the pool trade cap
+private val POOL_LIMIT_HEADROOM_SIZE = 0.95f.toBigDecimal()
 
 fun handleInsufficientBalance(
     title: String,

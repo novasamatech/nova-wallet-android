@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_swap_impl.domain.validation.utils.SharedQu
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapCanPayExtraFeesValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapDoNotLooseAssetInDustValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapEnoughLiquidityValidation
+import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapPoolTradeLimitsValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapPriceImpactValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapRateChangesValidation
 import io.novafoundation.nova.feature_swap_impl.domain.validation.validations.SwapSlippageRangeValidation
@@ -71,6 +72,12 @@ fun SwapValidationSystemBuilder.enoughLiquidity(
     sharedQuoteValidationRetriever: SharedQuoteValidationRetriever
 ) = validate(
     SwapEnoughLiquidityValidation(sharedQuoteValidationRetriever)
+)
+
+fun SwapValidationSystemBuilder.poolTradeLimits(
+    assetsValidationContext: AssetsValidationContext
+) = validate(
+    SwapPoolTradeLimitsValidation(assetsValidationContext)
 )
 
 fun SwapValidationSystemBuilder.canPayAllFees(

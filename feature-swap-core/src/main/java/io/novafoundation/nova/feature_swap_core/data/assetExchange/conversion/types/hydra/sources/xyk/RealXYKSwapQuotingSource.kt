@@ -22,6 +22,8 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.XYKPoolAsset
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.XYKPoolInfo
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.XYKPools
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.maxInRatioConstant
+import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.maxOutRatioConstant
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.xyk.model.poolFeesConstant
 import io.novafoundation.nova.feature_swap_core_api.data.network.HydraDxAssetIdConverter
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.SwapQuoting
@@ -115,12 +117,18 @@ private class RealXYKSwapQuotingSource(
             }
         }.combine()
 
-        val fees = remoteStorageSource.query(chain.id) {
-            runtime.metadata.xyk().poolFeesConstant(runtime)
+        val (fees, maxInRatio, maxOutRatio) = remoteStorageSource.query(chain.id) {
+            val xykModule = runtime.metadata.xyk()
+
+            Triple(
+                xykModule.poolFeesConstant(runtime),
+                xykModule.maxInRatioConstant(runtime),
+                xykModule.maxOutRatioConstant(runtime)
+            )
         }
 
         poolsSubscription.map { pools ->
-            val built = XYKPools(fees, pools)
+            val built = XYKPools(fees, maxInRatio, maxOutRatio, pools)
             xykPools.emit(built)
         }
     }
@@ -200,6 +208,14 @@ private class RealXYKSwapQuotingSource(
 
             return allPools.quote(poolAddress, fromAsset.first, toAsset.first, amount, direction)
                 ?: throw SwapQuoteException.NotEnoughLiquidity
+        }
+
+        override suspend fun maxAllowedAmountIn(): BigInteger? {
+            return xykPools.first().maxAllowedAmountIn(poolAddress, fromAsset.first, toAsset.first)
+        }
+
+        override suspend fun maxAllowedAmountOut(): BigInteger? {
+            return xykPools.first().maxAllowedAmountOut(poolAddress, fromAsset.first, toAsset.first)
         }
     }
 }

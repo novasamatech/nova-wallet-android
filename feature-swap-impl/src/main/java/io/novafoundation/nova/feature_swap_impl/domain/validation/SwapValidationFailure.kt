@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.domain.validation
 
 import io.novafoundation.nova.common.utils.Fraction
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.model.ChainAssetWithAmount
 import io.novafoundation.nova.feature_wallet_api.domain.validation.InsufficientBalanceToStayAboveEDError
@@ -24,6 +25,22 @@ sealed class SwapValidationFailure {
     ) : SwapValidationFailure()
 
     object NotEnoughLiquidity : SwapValidationFailure()
+
+    /**
+     * A single trade through one of the route's pools exceeds the pool's trade size limit,
+     * e.g. XYK.MaxInRatio / XYK.MaxOutRatio on Hydration
+     *
+     * [limitedAsset] and [maxAmount] describe the capped amount: the input of the limiting hop
+     * for [SwapDirection.SPECIFIED_IN] and its output for [SwapDirection.SPECIFIED_OUT].
+     * [isUserInputAdjustable] tells whether [maxAmount] directly caps the amount the user entered -
+     * true when the limiting hop is the user-facing one (first for sell, last for buy)
+     */
+    class AmountExceedsPoolTradeLimit(
+        val limitedAsset: Chain.Asset,
+        val maxAmount: Balance,
+        val direction: SwapDirection,
+        val isUserInputAdjustable: Boolean
+    ) : SwapValidationFailure()
 
     sealed class NotEnoughFunds : SwapValidationFailure() {
 

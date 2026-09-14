@@ -396,7 +396,8 @@ class SwapConfirmationViewModel(
             status,
             actions,
             amountInSwapMaxAction = ::setMaxAmountIn,
-            amountOutSwapMinAction = { _, amount -> setMinAmountOut(amount) }
+            amountOutSwapMinAction = { _, amount -> setMinAmountOut(amount) },
+            amountInSetAction = { _, amount -> setAmountIn(amount) }
         )
     }
 
@@ -415,6 +416,19 @@ class SwapConfirmationViewModel(
             confirmationState.swapQuoteArgs.copy(
                 amount = amount,
                 swapDirection = SwapDirection.SPECIFIED_OUT
+            )
+        )
+    }
+
+    private fun setAmountIn(amount: Balance) = launchUnit {
+        maxActionFlow.value = MaxAction.DISABLED
+
+        val confirmationState = confirmationStateFlow.first()
+
+        calculateQuote(
+            confirmationState.swapQuoteArgs.copy(
+                amount = amount,
+                swapDirection = SwapDirection.SPECIFIED_IN
             )
         )
     }
