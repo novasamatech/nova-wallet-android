@@ -2785,7 +2785,14 @@
     <string name="legal_consent_accept">Accept and Continue</string>
     <string name="settings_analytics_title">Share Anonymous Usage Data</string>
     <string name="analytics_prompt_title">Help Improve Nova Wallet</string>
-    <string name="analytics_prompt_message">Share anonymous usage data to help us build a better wallet.\n\n• No personal data collected\n• No wallet addresses tracked\n• You can change this anytime in Settings</string>
-    <string name="analytics_prompt_enable">Enable Analytics</string>
-    <string name="analytics_prompt_decline">No Thanks</string>
+    <string name="analytics_consent_body">Share anonymous usage data to help us understand which features are used and make Nova Wallet better. Details in our %1$s.</string>
+    <string name="analytics_consent_privacy_notice">Privacy Notice</string>
+    <string name="analytics_consent_disclosure_title">What we never collect</string>
+    <string name="analytics_consent_never_addresses">Never addresses, tx hashes or amounts</string>
+    <string name="analytics_consent_never_ids">No IDs that link data to you</string>
+    <string name="analytics_consent_ip_country">IP used only for country, then deleted</string>
+    <string name="analytics_consent_change_anytime">Change anytime in Settings</string>
+    <string name="analytics_consent_learn_more">Learn more in the Privacy Notice</string>
+    <string name="analytics_consent_agree">Agree</string>
+    <string name="analytics_consent_decline">Don\'t Agree</string>
 </resources>

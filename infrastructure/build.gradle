@@ -1,22 +1,20 @@
 apply from: '../scripts/secrets.gradle'
 
-// Attestation strength is a property of how the build is distributed, not of a flag someone
-// remembers to pass. Play-distributed releases prove themselves with Play Integrity; local
-// debug builds cannot (emulators fail device integrity) and use the development HMAC; every
-// other build type attests nothing because it also collects nothing.
+// The backend accepts only Play Integrity for Android (profile 2), so a build either attests for
+// real or not at all - there is no development shortcut. Debug builds therefore need a physical
+// device with Google Play and a dev backend that allows the debug package: an emulator never
+// meets device integrity. Build types without a host attest nothing because they collect nothing.
 android {
 
     defaultConfig {
         buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
         buildConfigField "String", "ATTESTATION_MODE", "\"none\""
-        buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"\""
     }
 
     buildTypes {
         debug {
             buildConfigField "String", "INFRASTRUCTURE_HOST", readStringSecretOrNull("DEBUG_NOVA_BACKEND_HOST") ?: "\"\""
-            buildConfigField "String", "ATTESTATION_MODE", "\"shared_secret\""
-            buildConfigField "String", "ATTESTATION_SHARED_SECRET", readStringSecretOrNull("DEBUG_ATTESTATION_SHARED_SECRET") ?: "\"\""
+            buildConfigField "String", "ATTESTATION_MODE", "\"play_integrity\""
         }
 
         debugLocal {
@@ -51,7 +49,6 @@ android {
             matchingFallbacks = ['debug']
             buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
             buildConfigField "String", "ATTESTATION_MODE", "\"none\""
-            buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"\""
         }
 
         instrumentialTest {
@@ -59,12 +56,16 @@ android {
             matchingFallbacks = ['debug']
             buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
             buildConfigField "String", "ATTESTATION_MODE", "\"none\""
-            buildConfigField "String", "ATTESTATION_SHARED_SECRET", "\"\""
         }
     }
 
     buildFeatures {
         buildConfig = true
+    }
+
+    // Attestation logs through android.util.Log in debug builds; JVM tests exercise those paths
+    testOptions {
+        unitTests.returnDefaultValues = true
     }
 
     namespace 'io.novafoundation.nova.infrastructure'
@@ -83,4 +84,5 @@ dependencies {
 
     testImplementation jUnitDep
     testImplementation mockitoDep
+    testImplementation gsonDep
 }

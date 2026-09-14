@@ -27,8 +27,9 @@ class RealAnalyticsOptOutManager(
     companion object {
         private const val PREF_ANALYTICS_ENABLED = "analytics_enabled"
         private const val DEFAULT_ANALYTICS_ENABLED = false
-        private const val PREF_HAS_SEEN_ANALYTICS_PROMPT = "hasSeenAnalyticsPrompt"
     }
+
+    private val promptState = AnalyticsPromptState(preferences)
 
     private val analyticsEnabledFlow = MutableStateFlow(getPersistedState())
 
@@ -54,13 +55,9 @@ class RealAnalyticsOptOutManager(
         return analyticsEnabledFlow
     }
 
-    override fun hasSeenAnalyticsPrompt(): Boolean {
-        return preferences.getBoolean(PREF_HAS_SEEN_ANALYTICS_PROMPT, false)
-    }
+    override fun hasSeenAnalyticsPrompt(): Boolean = promptState.hasBeenAnswered()
 
-    override fun setAnalyticsPromptSeen() {
-        preferences.putBoolean(PREF_HAS_SEEN_ANALYTICS_PROMPT, true)
-    }
+    override fun setAnalyticsPromptSeen() = promptState.markAnswered()
 
     private fun getPersistedState(): Boolean {
         return preferences.getBoolean(PREF_ANALYTICS_ENABLED, DEFAULT_ANALYTICS_ENABLED)

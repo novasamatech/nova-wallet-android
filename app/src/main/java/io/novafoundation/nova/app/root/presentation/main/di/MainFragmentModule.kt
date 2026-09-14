@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
 import io.novafoundation.nova.analytics.AnalyticsService
@@ -37,8 +36,7 @@ class MainFragmentModule {
         legalConsentRepository: LegalConsentRepository,
         accountRepository: AccountRepository,
         rootRouter: RootRouter,
-        analyticsService: AnalyticsService,
-        analyticsOptOutManager: AnalyticsOptOutManager
+        analyticsService: AnalyticsService
     ): ViewModel {
         return MainViewModel(
             updateNotificationsInteractor,
@@ -48,8 +46,7 @@ class MainFragmentModule {
             accountRepository,
             rootRouter,
             chainMigrationDetailsSelectToShowUseCase,
-            analyticsService,
-            analyticsOptOutManager
+            analyticsService
         )
     }
 

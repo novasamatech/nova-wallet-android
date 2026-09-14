@@ -10,6 +10,7 @@ import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.NoOpAnalyticsService
 import io.novafoundation.nova.analytics.BuildConfig
 import io.novafoundation.nova.analytics.RealAnalyticsOptOutManager
+import io.novafoundation.nova.analytics.analyticsLog
 import io.novafoundation.nova.analytics.transport.AnalyticsApi
 import io.novafoundation.nova.analytics.transport.AnalyticsEventQueue
 import io.novafoundation.nova.analytics.transport.AnalyticsIdentity
@@ -75,7 +76,12 @@ class AnalyticsFeatureModule {
         uploader: Lazy<AnalyticsUploader>,
         identity: AnalyticsIdentity
     ): AnalyticsService {
-        if (BuildConfig.ANALYTICS_HOST.isBlank()) return NoOpAnalyticsService()
+        if (BuildConfig.ANALYTICS_HOST.isBlank()) {
+            analyticsLog("no ANALYTICS_HOST in this build - NoOpAnalyticsService installed, nothing is collected")
+            return NoOpAnalyticsService()
+        }
+
+        analyticsLog("RealAnalyticsService installed, host=${BuildConfig.ANALYTICS_HOST} batch=$ANALYTICS_BATCH_SIZE")
 
         return RealAnalyticsService(rootScope, queue, uploader.get(), identity, ANALYTICS_BATCH_SIZE)
     }

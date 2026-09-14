@@ -14,6 +14,9 @@ interface AttestationIdentity {
 
     fun markAttested()
 
+    /** Forgets that the current id is registered while keeping the id itself - the next use registers it again. */
+    fun clearAttested()
+
     /**
      * Forgets the current client id so the next [clientId] mints a new one.
      *
@@ -38,6 +41,8 @@ class RealAttestationIdentity(
     override fun isAttested(): Boolean = preferences.getString(PREFS_ATTESTED_CLIENT_ID) == clientId()
 
     override fun markAttested() = preferences.putString(PREFS_ATTESTED_CLIENT_ID, clientId())
+
+    override fun clearAttested() = preferences.removeField(PREFS_ATTESTED_CLIENT_ID)
 
     override fun reset() {
         preferences.removeField(PREFS_ATTESTED_CLIENT_ID)

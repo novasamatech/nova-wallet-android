@@ -11,6 +11,11 @@ import io.novafoundation.nova.infrastructure.BuildConfig
 import io.novafoundation.nova.infrastructure.attestation.AttestationApi
 import io.novafoundation.nova.infrastructure.attestation.AttestationIdentity
 import io.novafoundation.nova.infrastructure.attestation.AttestationInterceptor
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import io.novafoundation.nova.infrastructure.attestation.REGISTER_PATH
+import io.novafoundation.nova.infrastructure.attestation.IntegrityTokenSource
+import io.novafoundation.nova.infrastructure.attestation.ExactJsonContentTypeInterceptor
+import io.novafoundation.nova.infrastructure.attestation.attestationLog
 import io.novafoundation.nova.infrastructure.attestation.AttestationKeyPairStore
 import io.novafoundation.nova.infrastructure.attestation.AttestationMode
 import io.novafoundation.nova.infrastructure.attestation.ClientAttestationService
@@ -40,8 +45,17 @@ class AttestationModule {
 
     @Provides
     @ApplicationScope
-    fun provideAttestationApi(networkApiCreator: NetworkApiCreator): AttestationApi {
-        return networkApiCreator.create(AttestationApi::class.java, BuildConfig.INFRASTRUCTURE_HOST)
+    fun provideAttestationApi(okHttpClient: OkHttpClient): AttestationApi {
+        val bootstrapClient = okHttpClient.newBuilder()
+            // Registration bodies carry the integrity token and signature, which must never reach a log
+            .apply { interceptors().removeAll { it.javaClass.name == HTTP_LOGGING_INTERCEPTOR } }
+            .addInterceptor(ExactJsonContentTypeInterceptor())
+            // A spent challenge is never replayed: a retry needs a fresh one, which only the service can get
+            .retryOnConnectionFailure(false)
+            .followRedirects(false)
+            .build()
+
+        return NetworkApiCreator(bootstrapClient, "https://placeholder.com").create(AttestationApi::class.java, BuildConfig.INFRASTRUCTURE_HOST)
     }
 
     @Provides
@@ -54,14 +68,20 @@ class AttestationModule {
         integrityService: IntegrityService
     ): ClientAttestationService {
         // The build type decided this, not a runtime guess: see infrastructure/build.gradle.
-        val mode = AttestationMode.fromWireName(BuildConfig.ATTESTATION_MODE)
-        val sharedSecret = BuildConfig.ATTESTATION_SHARED_SECRET.takeIf { it.isNotBlank() }
+        val registerUrl = BuildConfig.INFRASTRUCTURE_HOST.toHttpUrlOrNull()?.resolve(REGISTER_PATH)
+        val mode = if (registerUrl == null) AttestationMode.UNATTESTED else AttestationMode.fromWireName(BuildConfig.ATTESTATION_MODE)
 
-        require(mode != AttestationMode.SHARED_SECRET || sharedSecret != null) {
-            "shared_secret attestation needs DEBUG_ATTESTATION_SHARED_SECRET in local.properties"
-        }
+        attestationLog("configured mode=${mode.wireName} host=${BuildConfig.INFRASTRUCTURE_HOST.ifBlank { "<none>" }}")
 
-        return RealClientAttestationService(api, identity, keyPairStore, integrityService, context.packageName, mode, sharedSecret)
+        return RealClientAttestationService(
+            api = api,
+            identity = identity,
+            keyPairStore = keyPairStore,
+            integrityTokens = IntegrityTokenSource { integrityService.getIntegrityToken(it) },
+            appPackage = context.packageName,
+            registerUrl = registerUrl,
+            mode = mode
+        )
     }
 
     @Provides
@@ -73,8 +93,13 @@ class AttestationModule {
     ): NetworkApiCreator {
         val attestedClient = okHttpClient.newBuilder()
             .addInterceptor(AttestationInterceptor(attestationService))
+            // Each proof spends its challenge: OkHttp replaying a request would only earn a 401
+            .retryOnConnectionFailure(false)
+            .followRedirects(false)
             .build()
 
         return NetworkApiCreator(attestedClient, "https://placeholder.com")
     }
 }
+
+private const val HTTP_LOGGING_INTERCEPTOR = "okhttp3.logging.HttpLoggingInterceptor"

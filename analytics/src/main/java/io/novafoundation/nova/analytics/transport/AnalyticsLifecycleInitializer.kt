@@ -7,6 +7,7 @@ import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.DurationBucket
+import io.novafoundation.nova.analytics.analyticsLog
 import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,12 +35,14 @@ class AnalyticsLifecycleInitializer(
     private var flushTicker: Job? = null
 
     override fun initialize() {
+        analyticsLog("initialize: consent prompt seen=${optOutManager.hasSeenAnalyticsPrompt()}, enabled=${optOutManager.isAnalyticsEnabled}")
         analyticsService.isEnabled = optOutManager.isAnalyticsEnabled
 
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
 
     override fun onStart(owner: LifecycleOwner) {
+        analyticsLog("foreground: session started, flushing every ${FLUSH_INTERVAL_MILLIS / 1000}s")
         sessionStartedAt = System.currentTimeMillis()
         analyticsService.track(AnalyticsEvent.SessionStarted)
 
@@ -60,6 +63,7 @@ class AnalyticsLifecycleInitializer(
         flushTicker?.cancel()
         flushTicker = null
 
+        analyticsLog("background: session ended, flushing once")
         scope.launch(Dispatchers.IO) { analyticsService.flush() }
     }
 }

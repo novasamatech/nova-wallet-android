@@ -1,75 +1,128 @@
 package io.novafoundation.nova.infrastructure.attestation
 
+import com.google.gson.JsonObject
+import com.google.gson.JsonParser
+import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.Purpose
+import okio.ByteString.Companion.decodeBase64
+import okio.ByteString.Companion.toByteString
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.security.KeyFactory
+import java.security.Signature
+import java.security.spec.X509EncodedKeySpec
 
-private const val CHALLENGE = "TEST_CHALLENGE_abc123"
-private const val CLIENT_ID = "6f2c1e4a-0000-4000-8000-000000000001"
-private const val PUBLIC_KEY_B64 =
-    "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEexampleexampleexampleexampleexampleexampleexampleexampleexampleAA=="
-
-private val BODY = """{"v":1,"platform":"android","app_version":"10.9.1"}""".toByteArray(Charsets.UTF_8)
-
+/**
+ * Checked against the backend's own vectors: nova-infrastructure attestation/contracts/profile-2-vectors.json,
+ * copied verbatim into test resources. Refresh the copy whenever the backend changes it.
+ */
 class AttestationSigningTest {
 
+    private val fixture: JsonObject = JsonParser()
+        .parse(javaClass.classLoader!!.getResource("profile-2-vectors.json")!!.readText())
+        .asJsonObject
+
+    private val vectors = fixture.getAsJsonArray("vectors").map { it.asJsonObject }
+
     @Test
-    fun `body digest matches backend vector`() {
-        assertEquals(
-            "2c3d64eac83fc3f8bc8fe383d202bf4cc4b5b3c88328c87cc6695f8ecb49f4e7",
-            AttestationSigning.bodyDigestHex(BODY)
-        )
+    fun `registration bindings match the backend`() {
+        val withBinding = vectors.filter { it.has("binding") }
+        assertTrue(withBinding.isNotEmpty())
+
+        withBinding.forEach { vector ->
+            assertEquals(vector.name(), vector.str("registration_preimage_hex"), vector.registrationPreimage().hex())
+        }
     }
 
     @Test
-    fun `empty body digest matches backend vector`() {
-        assertEquals(
-            "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-            AttestationSigning.bodyDigestHex(ByteArray(0))
-        )
+    fun `every preimage matches the backend byte for byte`() {
+        vectors.forEach { vector ->
+            assertEquals(vector.name(), vector.str("body_sha256"), vector.bodyDigest().hex())
+            assertEquals(vector.name(), vector.str("preimage_hex"), vector.preimage().hex())
+        }
     }
 
     @Test
-    fun `signing payload matches backend vector`() {
-        assertEquals(
-            "4469fb60ce2ad38af216bc5ac89188071392af288cfaa99eb62532843d9c5c92",
-            AttestationSigning.signingPayload(CHALLENGE, CLIENT_ID, BODY).toHexString()
-        )
+    fun `the digest and the Play Integrity request hash match the backend`() {
+        vectors.forEach { vector ->
+            val digest = vector.digest()
+
+            assertEquals(vector.name(), vector.str("context_sha256"), digest.hex())
+            assertEquals(vector.name(), vector.str("context_base64url"), AttestationSigning.requestHash(digest))
+        }
     }
 
     @Test
-    fun `shared secret token matches backend vector`() {
-        val payload = AttestationSigning.attestationPayload(CHALLENGE, CLIENT_ID, PUBLIC_KEY_B64)
+    fun `the backend's signatures verify over our digest with SHA256withECDSA`() {
+        // Proves both halves at once: we compute the same D, and signing D itself - not a hash of it -
+        // with Android's SHA256withECDSA is what the backend verifies
+        val publicKey = KeyFactory.getInstance("EC")
+            .generatePublic(X509EncodedKeySpec(fixture.str("android_public_key_base64").decodeBase64()!!.toByteArray()))
 
-        assertEquals(
-            "5d50e394f8b0abd605d0774569109bc2d5b01530b36f481e03ca6573c04040d2",
-            AttestationSigning.sharedSecretToken("test-secret-0123456789abcdef", payload).toHexString()
-        )
+        val signed = vectors.filter { it.has("signature_base64") }
+        assertTrue(signed.isNotEmpty())
+
+        signed.forEach { vector ->
+            val verified = Signature.getInstance("SHA256withECDSA").run {
+                initVerify(publicKey)
+                update(vector.digest())
+                verify(vector.str("signature_base64").decodeBase64()!!.toByteArray())
+            }
+
+            assertTrue(vector.name(), verified)
+        }
     }
 
     @Test
-    fun `attestation payload matches backend vector`() {
-        assertEquals(
-            "8a3c4750a6533bfec06bf0aee6f0311facd3da7ce0788cdede02f249f060b70e",
-            AttestationSigning.attestationPayload(CHALLENGE, CLIENT_ID, PUBLIC_KEY_B64).toHexString()
+    fun `a public key encodes as the contract's key reference`() {
+        val key = fixture.str("android_public_key_base64")
+
+        assertEquals(key, AttestationSigning.base64(key.decodeBase64()!!.toByteArray()))
+        // Base64 of a P-256 SubjectPublicKeyInfo is exactly the backend's key_reference limit
+        assertEquals(124, key.length)
+    }
+
+    private fun JsonObject.str(name: String): String = get(name).asString
+
+    private fun JsonObject.name() = str("name")
+
+    private fun JsonObject.purpose() = Purpose.entries.first { it.wireName == str("purpose") }
+
+    private fun JsonObject.context(): AttestationSigning.RequestContext = getAsJsonObject("context").let {
+        AttestationSigning.RequestContext(
+            method = it.str("method"),
+            scheme = it.str("scheme"),
+            authority = it.str("authority"),
+            port = it.str("port"),
+            path = it.str("path"),
+            contentType = it.str("content_type")
         )
     }
 
-    @Test
-    fun `different challenge produces different payload`() {
-        assertNotEquals(
-            AttestationSigning.signingPayload(CHALLENGE, CLIENT_ID, BODY).toHexString(),
-            AttestationSigning.signingPayload("other", CLIENT_ID, BODY).toHexString()
+    private fun JsonObject.registrationPreimage(): ByteArray = getAsJsonObject("binding").let {
+        AttestationSigning.registrationPreimage(
+            platform = it.str("platform"),
+            appId = it.str("app_id"),
+            attestationType = it.str("attestation_type"),
+            keyReference = it.str("key_reference"),
+            appAttestEnvironment = it.str("app_attest_environment")
         )
     }
 
-    @Test
-    fun `different body produces different payload`() {
-        assertNotEquals(
-            AttestationSigning.signingPayload(CHALLENGE, CLIENT_ID, BODY).toHexString(),
-            AttestationSigning.signingPayload(CHALLENGE, CLIENT_ID, BODY + '!'.code.toByte()).toHexString()
-        )
+    // A registration hashes its binding in place of the body
+    private fun JsonObject.bodyDigest(): ByteArray {
+        val signedBytes = if (has("binding")) registrationPreimage() else str("body_base64").decodeBase64()!!.toByteArray()
+
+        return AttestationSigning.sha256(signedBytes)
     }
 
-    private fun ByteArray.toHexString() = joinToString("") { "%02x".format(it) }
+    private fun JsonObject.preimage(): ByteArray {
+        val context = getAsJsonObject("context")
+
+        return AttestationSigning.requestPreimage(purpose(), context.str("challenge"), context.str("client_id"), context(), bodyDigest())
+    }
+
+    private fun JsonObject.digest(): ByteArray = AttestationSigning.sha256(preimage())
+
+    private fun ByteArray.hex(): String = toByteString().hex()
 }
