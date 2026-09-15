@@ -1,33 +1,6 @@
-apply from: '../scripts/secrets.gradle'
-
-// Analytics ships only where we can attest the traffic. Every other build type leaves
-// ANALYTICS_HOST empty, which makes the DI graph install NoOpAnalyticsService and collect
-// nothing at all. Build type names mirror the app so variants match exactly instead of
-// falling back and picking up the wrong configuration.
+// Nothing about delivery is configured per build here: every build collects (subject to the user's
+// consent) and attests with Play Integrity, and the host comes from the global remote config (infraUrl).
 android {
-
-    defaultConfig {
-        buildConfigField "String", "ANALYTICS_HOST", "\"\""
-    }
-
-    buildTypes {
-        debug {
-            buildConfigField "String", "ANALYTICS_HOST", readStringSecretOrNull("DEBUG_NOVA_BACKEND_HOST") ?: "\"\""
-        }
-
-        release {
-            buildConfigField "String", "ANALYTICS_HOST", readStringSecretOrNull("RELEASE_NOVA_BACKEND_HOST") ?: "\"\""
-        }
-
-        // Sideloaded from GitHub, so Play Integrity cannot recognise it and its traffic
-        // could never be attested. Declared explicitly because the release fallback would
-        // otherwise hand it the production host.
-        releaseGithub {
-            initWith buildTypes.release
-            matchingFallbacks = ['release']
-            buildConfigField "String", "ANALYTICS_HOST", "\"\""
-        }
-    }
 
     buildFeatures {
         buildConfig = true

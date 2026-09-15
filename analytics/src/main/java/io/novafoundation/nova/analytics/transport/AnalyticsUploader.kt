@@ -2,7 +2,9 @@ package io.novafoundation.nova.analytics.transport
 
 import io.novafoundation.nova.analytics.analyticsLog
 import io.novafoundation.nova.analytics.analyticsWarn
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.infrastructure.attestation.AttestationFailedException
+import io.novafoundation.nova.infrastructure.resolve
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -17,6 +19,7 @@ private const val ISO_8601 = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 
 class AnalyticsUploader(
     private val api: AnalyticsApi,
+    private val urls: InfrastructureUrls,
     private val identity: AnalyticsIdentity,
     private val queue: AnalyticsEventQueue,
     private val appVersion: String,
@@ -33,7 +36,7 @@ class AnalyticsUploader(
                 }
 
                 analyticsLog("sending ${batch.size} events: ${batch.joinToString { it.name }}")
-                api.sendEvents(createEnvelope(batch))
+                api.sendEvents(urls.resolve(EVENTS_PATH).toString(), createEnvelope(batch))
                 queue.drop(batch.size)
                 analyticsLog("delivered ${batch.size} events")
             }

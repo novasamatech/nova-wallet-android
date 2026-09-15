@@ -7,11 +7,10 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.analytics.AnalyticsService
-import io.novafoundation.nova.analytics.NoOpAnalyticsService
-import io.novafoundation.nova.analytics.BuildConfig
 import io.novafoundation.nova.analytics.RealAnalyticsOptOutManager
 import io.novafoundation.nova.analytics.analyticsLog
 import io.novafoundation.nova.analytics.transport.AnalyticsApi
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.analytics.transport.AnalyticsEventQueue
 import io.novafoundation.nova.analytics.transport.AnalyticsIdentity
 import io.novafoundation.nova.analytics.transport.AnalyticsUploader
@@ -35,7 +34,7 @@ class AnalyticsFeatureModule {
     @Provides
     @ApplicationScope
     fun provideAnalyticsApi(@Attested networkApiCreator: NetworkApiCreator): AnalyticsApi {
-        return networkApiCreator.create(AnalyticsApi::class.java, BuildConfig.ANALYTICS_HOST)
+        return networkApiCreator.create(AnalyticsApi::class.java)
     }
 
     @Provides
@@ -55,11 +54,13 @@ class AnalyticsFeatureModule {
     fun provideAnalyticsUploader(
         context: Context,
         api: AnalyticsApi,
+        infrastructureUrls: InfrastructureUrls,
         identity: AnalyticsIdentity,
         queue: AnalyticsEventQueue
     ): AnalyticsUploader {
         return AnalyticsUploader(
             api = api,
+            urls = infrastructureUrls,
             identity = identity,
             queue = queue,
             appVersion = context.appVersionName(),
@@ -76,12 +77,7 @@ class AnalyticsFeatureModule {
         uploader: Lazy<AnalyticsUploader>,
         identity: AnalyticsIdentity
     ): AnalyticsService {
-        if (BuildConfig.ANALYTICS_HOST.isBlank()) {
-            analyticsLog("no ANALYTICS_HOST in this build - NoOpAnalyticsService installed, nothing is collected")
-            return NoOpAnalyticsService()
-        }
-
-        analyticsLog("RealAnalyticsService installed, host=${BuildConfig.ANALYTICS_HOST} batch=$ANALYTICS_BATCH_SIZE")
+        analyticsLog("RealAnalyticsService installed, batch=$ANALYTICS_BATCH_SIZE")
 
         return RealAnalyticsService(rootScope, queue, uploader.get(), identity, ANALYTICS_BATCH_SIZE)
     }

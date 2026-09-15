@@ -45,7 +45,7 @@ private class RecordingAttestationService : ClientAttestationService {
 
 private class FailingAttestationService(private val failure: Exception) : ClientAttestationService {
 
-    override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String>? = throw failure
+    override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String> = throw failure
 
     override suspend fun forgetRegistration(clientId: String) = Unit
 }
