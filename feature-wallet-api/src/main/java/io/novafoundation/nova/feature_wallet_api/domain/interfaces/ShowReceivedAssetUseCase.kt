@@ -1,7 +1,9 @@
 package io.novafoundation.nova.feature_wallet_api.domain.interfaces
 
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import io.novasama.substrate_sdk_android.runtime.AccountId
 
 /**
  * Shows a token one of the user's wallets has just received their own funds into.
@@ -16,17 +18,24 @@ class ShowReceivedAssetUseCase(
 ) {
 
     /**
-     * @param metaId the wallet the funds landed in, which is not always the one sending them -
-     * a transfer to another of the user's own wallets has to show the token over there.
+     * Shows the token in every wallet that holds [recipientAccountId] on [chain]. The receiver is not
+     * always the sending wallet - a transfer to another of the user's own wallets has to show the token
+     * over there - and the same account can be imported into several wallets at once.
      */
-    suspend fun onOwnFundsReceived(metaId: Long, assetId: FullChainAssetId) {
-        assetVisibilityRepository.setVisibility(metaId, mapOf(assetId to true))
+    suspend fun onOwnFundsReceived(recipientAccountId: AccountId, chain: Chain, assetId: FullChainAssetId) {
+        accountRepository.getActiveMetaAccounts()
+            .filter { it.accountIdIn(chain)?.contentEquals(recipientAccountId) == true }
+            .forEach { show(it.id, assetId) }
     }
 
     /**
      * For operations that can only ever deliver into the wallet performing them, such as a swap.
      */
     suspend fun onOwnFundsReceivedBySelectedWallet(assetId: FullChainAssetId) {
-        onOwnFundsReceived(accountRepository.getSelectedMetaAccount().id, assetId)
+        show(accountRepository.getSelectedMetaAccount().id, assetId)
+    }
+
+    private suspend fun show(metaId: Long, assetId: FullChainAssetId) {
+        assetVisibilityRepository.setVisibility(metaId, mapOf(assetId to true))
     }
 }

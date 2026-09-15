@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.di.CustomNodeComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
+import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -86,7 +87,8 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
             WalletConnectFeatureApi::class,
             VersionsFeatureApi::class,
             PushNotificationsFeatureApi::class,
-            CloudBackupFeatureApi::class
+            CloudBackupFeatureApi::class,
+            WalletFeatureApi::class
         ]
     )
     interface SettingsFeatureDependenciesComponent : SettingsFeatureDependencies

@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.utils.asPrecision
 import io.novafoundation.nova.common.utils.asTokenSymbol
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.AddEvmTokenValidationSystem
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.evmAssetNotExists
@@ -12,12 +13,14 @@ import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.valid
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validErc20Contract
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.validTokenDecimals
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ethereum.contract.base.querySingle
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Queries
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
 import io.novafoundation.nova.runtime.ext.defaultComparator
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getCallEthereumApiOrThrow
 import io.novafoundation.nova.runtime.multiNetwork.chain.mappers.chainAssetIdOfErc20Token
@@ -49,7 +52,9 @@ class RealAddTokensInteractor(
     private val ethereumAddressFormat: EthereumAddressFormat,
     private val currencyRepository: CurrencyRepository,
     private val walletRepository: WalletRepository,
-    private val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
+    private val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory,
+    private val accountRepository: AccountRepository,
+    private val assetVisibilityRepository: AssetVisibilityRepository
 ) : AddTokensInteractor {
 
     override fun availableChainsToAddTokenFlow(): Flow<List<Chain>> {
@@ -92,6 +97,7 @@ class RealAddTokensInteractor(
         )
 
         chainAssetRepository.insertCustomAsset(asset)
+        showAddedAsset(asset)
 
         syncTokenPrice(asset)
     }
@@ -117,6 +123,19 @@ class RealAddTokensInteractor(
     }
 
     private suspend fun <R> executeOrNull(action: suspend () -> R): R? = runCatching { action() }.getOrNull()
+
+    /**
+     * A manually added token is never in the curated default list, so without an explicit decision it would
+     * stay hidden right after the user added it. Shown in the wallet the user added it from - other wallets
+     * still pick it up through balance discovery once they hold it.
+     *
+     * Has to run after the asset is inserted: the visibility row references it.
+     */
+    private suspend fun showAddedAsset(asset: Chain.Asset) {
+        val selectedMetaId = accountRepository.getSelectedMetaAccount().id
+
+        assetVisibilityRepository.setVisibility(selectedMetaId, mapOf(asset.fullId to true))
+    }
 
     private suspend fun syncTokenPrice(asset: Chain.Asset) {
         val currency = currencyRepository.getSelectedCurrency()
