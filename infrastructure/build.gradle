@@ -13,7 +13,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField "String", "INFRASTRUCTURE_HOST", readStringSecretOrNull("DEBUG_NOVA_BACKEND_HOST") ?: "\"\""
+            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"https://nova-infra-dev.novasama-tech.org/\""
             buildConfigField "String", "ATTESTATION_MODE", "\"play_integrity\""
         }
 
@@ -23,7 +23,7 @@ android {
         }
 
         release {
-            buildConfigField "String", "INFRASTRUCTURE_HOST", readStringSecretOrNull("RELEASE_NOVA_BACKEND_HOST") ?: "\"\""
+            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"https://nova-infra.novasama-tech.org/\""
             buildConfigField "String", "ATTESTATION_MODE", "\"play_integrity\""
         }
 
