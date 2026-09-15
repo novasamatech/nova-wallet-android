@@ -31,21 +31,18 @@ class RealAnnouncementsRepository(
     @Volatile
     private var cache: AnnouncementsRemote? = null
 
+    // Announcements are supplementary content, so consumers must never wait for the network to render.
+    // The first value is always available synchronously and is replaced once the fresh one arrives
     private val remoteAnnouncements = flow {
-        val cached = cache
-        if (cached != null) emit(cached)
+        emit(cache ?: emptyMap())
 
         val fresh = runCatching { announcementsApi.getAnnouncements() }
             .onFailure { Log.e(LOG_TAG, "Failed to load announcements", it) }
             .getOrNull()
 
-        when {
-            fresh != null -> {
-                cache = fresh
-                emit(fresh)
-            }
-
-            cached == null -> emit(emptyMap())
+        if (fresh != null) {
+            cache = fresh
+            emit(fresh)
         }
     }.shareIn(rootScope, SharingStarted.WhileSubscribed(), replay = 1)
 
