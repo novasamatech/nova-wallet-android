@@ -7,6 +7,7 @@ import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.DurationBucket
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.format
@@ -249,11 +250,14 @@ class SwapExecutionViewModel(
     }
 
     private fun SwapProgress.Failure.formatThrowable(): String? {
-        if (error !is SwapOperationSubmissionException) return null
-
-        // For some reason smart-cast does not work here
-        return when (error as SwapOperationSubmissionException) {
+        return when (val error = error) {
             is SwapOperationSubmissionException.SimulationFailed -> resourceManager.getString(R.string.swap_dry_run_failed_inline_message)
+
+            // Surface on-chain dispatch errors as Pallet.ErrorName (e.g. XYK.MaxInRatioExceeded)
+            // instead of dropping the reason entirely
+            is DispatchError.Module -> error.toString()
+
+            else -> null
         }
     }
 

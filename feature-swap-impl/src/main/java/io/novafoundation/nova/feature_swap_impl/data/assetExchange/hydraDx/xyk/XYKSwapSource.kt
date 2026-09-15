@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.ty
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.QuotableEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapPoolId
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxPoolId
+import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.TradeAmountLimitedEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSourceEdge
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxSwapSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -43,7 +44,7 @@ private class XYKSwapSource(
 
     inner class XYKSwapEdge(
         private val delegate: XYKSwapQuotingSource.Edge
-    ) : HydraDxSourceEdge, QuotableEdge by delegate {
+    ) : HydraDxSourceEdge, QuotableEdge by delegate, TradeAmountLimitedEdge by delegate {
 
         override fun routerPoolArgument(): DictEnum.Entry<*> {
             return DictEnum.Entry("XYK", null)

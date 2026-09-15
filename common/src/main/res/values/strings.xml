@@ -1174,6 +1174,9 @@
     <string name="swap_rate_was_updated_failure_title">Swap rate was updated</string>
     <string name="swap_rate_was_updated_failure_message">Old rate: %1$s ≈ %2$s.\nNew rate: %1$s ≈ %3$s</string>
     <string name="swap_not_enought_liquidity_failure">Pool doesn’t have enough liquidity to swap</string>
+    <string name="swap_failure_pool_trade_limit_title">Amount exceeds pool limit</string>
+    <string name="swap_failure_pool_trade_limit_message">The %1$s liquidity pool limits the size of a single swap. The maximum you can swap right now is %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Your swap is routed through a %1$s liquidity pool that allows at most %2$s per single swap. Try a smaller amount.</string>
     <string name="swap_failure_too_small_remaining_balance_title">Too small amount remains on your balance</string>
     <string name="swap_failure_too_small_remaining_balance_message">You should leave at least %1$s on your balance. Do you want to perform full swap by adding remaining %2$s as well?</string>
     <string name="swap_failure_too_small_remaining_balance_with_buy_ed_message">You should keep at least %1$s after paying %2$s network fee and converting %3$s to %4$s to meet %5$s minimum balance.\n\nDo you want to fully swap by adding remaining %6$s as well?</string>
