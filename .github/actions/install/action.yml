@@ -23,7 +23,7 @@ runs:
   using: "composite"
   steps:
     - name: 🔐 Fetch secrets from Scaleway
-      uses: scaleway/action-scw-secret@v0
+      uses: stepanLav/action-scw-secret@f82d97e369067fac558961a5bb128c9a90416f63 # fork of scaleway/action-scw-secret#148 — fetch secrets by path (accessSecretVersionByPath); revert to upstream after release
       with:
         secret-names: |
           CI_MARKET_KEYSTORE_PASS,/dev/android/GPLAY_KEYSTORE_PASSWORD
