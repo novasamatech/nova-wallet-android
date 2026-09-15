@@ -2,14 +2,12 @@ package io.novafoundation.nova.runtime.network.updaters
 
 import android.util.Log
 import io.novafoundation.nova.common.data.holders.ChainIdHolder
-import io.novafoundation.nova.common.data.network.runtime.binding.BlockHash
 import io.novafoundation.nova.common.data.network.runtime.binding.BlockNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.utils.LOG_TAG
 import io.novafoundation.nova.common.utils.decodeValue
 import io.novafoundation.nova.common.utils.system
 import io.novafoundation.nova.common.utils.timestamp
-import io.novafoundation.nova.common.utils.zipWithPrevious
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core.updater.Updater
@@ -22,22 +20,19 @@ import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import io.novasama.substrate_sdk_android.runtime.metadata.storageKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.math.BigInteger
 
-data class SampledBlockTime(
-    val sampleSize: BigInteger,
-    val averageBlockTime: BigInteger,
-)
-
-private data class BlockTimeUpdate(
-    val at: BlockHash,
+private data class BlockObservation(
     val blockNumber: BlockNumber,
     val timestamp: BigInteger,
 )
 
+/**
+ * Samples the real block time of a chain by observing `(block number, timestamp)` pairs, see [observing] for the algorithm.
+ * The result is persisted in [SampledBlockTimeStorage] and blended with chain constants in `ChainStateRepository.predictedBlockTime`.
+ */
 class BlockTimeUpdater(
     private val chainIdHolder: ChainIdHolder,
     private val chainRegistry: ChainRegistry,
@@ -63,35 +58,22 @@ class BlockTimeUpdater(
 
                 val blockNumber = bindNumber(storage.decodeValue(it.value, runtime))
 
-                BlockTimeUpdate(at = it.block, blockNumber = blockNumber, timestamp = timestamp)
+                BlockObservation(blockNumber = blockNumber, timestamp = timestamp)
             }
-            .zipWithPrevious()
-            .filter { (previous, current) ->
-                previous != null && current.blockNumber - previous.blockNumber == BigInteger.ONE
-            }
-            .onEach { (previousUpdate, currentUpdate) ->
-                val blockTime = currentUpdate.timestamp - previousUpdate!!.timestamp
-
-                updateSampledBlockTime(chainId, blockTime)
-            }.noSideAffects()
+            .onEach { observation -> observe(chainId, observation) }
+            .noSideAffects()
     }
 
-    // TODO: ASSET HUB WARNING: We don't use Block Time Updater directly for Asset Hub chains but have to change this method if we start using it.
-    //  Description:
-    //  Asset Hub chains may emmit multiple blocks with 0 delta time. Because of this SampledBlockTimeStorage may save averageBlockTime = 0 and sampleSize > 0
-    //  This state may potentially lead us to crashes in MortalityConstructor.
-    private suspend fun updateSampledBlockTime(chainId: ChainId, newSampledTime: BigInteger) {
+    private suspend fun observe(chainId: ChainId, observation: BlockObservation) {
         val current = sampledBlockTimeStorage.get(chainId)
+        val updated = current.observing(block = observation.blockNumber, timestampMillis = observation.timestamp)
 
-        val adjustedSampleSize = current.sampleSize + BigInteger.ONE
-        val adjustedAverage = (current.averageBlockTime * current.sampleSize + newSampledTime) / adjustedSampleSize
-        val adjustedSampledBlockTime = SampledBlockTime(
-            sampleSize = adjustedSampleSize,
-            averageBlockTime = adjustedAverage
-        )
+        if (updated == current) return
 
-        Log.d(LOG_TAG, "New block time update on chain $chainId: $newSampledTime, adjustedAverage: $adjustedSampledBlockTime")
+        if (updated.sampleSize != current.sampleSize) {
+            Log.d(LOG_TAG, "New block time sample on chain $chainId at block ${observation.blockNumber}: ${updated.averageBlockTime} ms")
+        }
 
-        sampledBlockTimeStorage.put(chainId, adjustedSampledBlockTime)
+        sampledBlockTimeStorage.put(chainId, updated)
     }
 }
