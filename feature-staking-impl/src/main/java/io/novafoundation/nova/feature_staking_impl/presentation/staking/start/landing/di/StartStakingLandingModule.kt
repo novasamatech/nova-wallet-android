@@ -26,6 +26,7 @@ import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFacto
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 
 @Module(includes = [ViewModelModule::class])
 class StartStakingLandingModule {
@@ -48,6 +49,7 @@ class StartStakingLandingModule {
     @ViewModelKey(StartStakingLandingViewModel::class)
     fun provideViewModel(
         router: StartMultiStakingRouter,
+        stakingRouter: StakingRouter,
         resourceManager: ResourceManager,
         updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
         stakingTypeDetailsCompoundInteractorFactory: StakingTypeDetailsCompoundInteractorFactory,
@@ -65,6 +67,7 @@ class StartStakingLandingModule {
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
+            stakingRouter = stakingRouter,
             resourceManager = resourceManager,
             updateSystemFactory = updateSystemFactory,
             stakingTypeDetailsCompoundInteractorFactory = stakingTypeDetailsCompoundInteractorFactory,

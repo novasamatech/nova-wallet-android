@@ -8,10 +8,12 @@ import io.novafoundation.nova.common.utils.inflateChild
 import io.novafoundation.nova.common.view.AlertView
 import io.novafoundation.nova.feature_staking_impl.R
 
-class AnnouncementsAdapter : BaseListAdapter<AnnouncementModel, AnnouncementHolder>(DiffCallback) {
+class AnnouncementsAdapter(
+    private val onLinkClicked: (url: String) -> Unit
+) : BaseListAdapter<AnnouncementModel, AnnouncementHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AnnouncementHolder {
-        return AnnouncementHolder(parent.inflateChild(R.layout.item_announcement) as AlertView)
+        return AnnouncementHolder(parent.inflateChild(R.layout.item_announcement) as AlertView, onLinkClicked)
     }
 
     override fun onBindViewHolder(holder: AnnouncementHolder, position: Int) {
@@ -30,10 +32,12 @@ private object DiffCallback : DiffUtil.ItemCallback<AnnouncementModel>() {
     }
 }
 
-class AnnouncementHolder(private val alertView: AlertView) : BaseViewHolder(alertView) {
+class AnnouncementHolder(
+    private val alertView: AlertView,
+    private val onLinkClicked: (url: String) -> Unit
+) : BaseViewHolder(alertView) {
 
-    fun bind(model: AnnouncementModel) = with(alertView) {
-        setStylePreset(model.stylePreset)
-        setMessage(model.description)
+    fun bind(model: AnnouncementModel) {
+        alertView.setAnnouncement(model, onLinkClicked)
     }
 }

@@ -31,7 +31,7 @@ class StakingDashboardFragment :
     override fun createBinding() = FragmentStakingDashboardBinding.inflate(layoutInflater)
 
     private val headerAdapter = DashboardHeaderAdapter(this)
-    private val announcementsAdapter = AnnouncementsAdapter()
+    private val announcementsAdapter = AnnouncementsAdapter(onLinkClicked = { viewModel.announcementLinkClicked(it) })
     private val hasStakeLoadingAdapter = DashboardLoadingAdapter(initialNumberOfItems = 1, layout = R.layout.item_dashboard_has_stake_loading)
     private val hasStakeAdapter = DashboardHasStakeAdapter(this)
     private val sectionAdapter = DashboardSectionAdapter(R.string.staking_dashboard_no_stake_header)
