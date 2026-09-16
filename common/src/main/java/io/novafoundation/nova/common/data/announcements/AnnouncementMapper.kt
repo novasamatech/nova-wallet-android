@@ -17,8 +17,16 @@ private fun mapAnnouncementFromRemote(remote: AnnouncementRemote?, languageCode:
     return Announcement(
         chainId = remote.chainId,
         style = mapStyleFromRemote(remote.style),
-        description = description
+        description = description,
+        link = mapLinkFromRemote(remote.link, languageCode)
     )
+}
+
+private fun mapLinkFromRemote(remote: AnnouncementLinkRemote?, languageCode: String): Announcement.Link? {
+    val url = remote?.url?.takeIf { it.isNotBlank() } ?: return null
+    val title = remote.title?.localizedOrDefault(languageCode) ?: return null
+
+    return Announcement.Link(url = url, title = title)
 }
 
 private fun mapStyleFromRemote(style: String?): Announcement.Style {

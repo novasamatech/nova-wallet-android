@@ -84,6 +84,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.math.BigInteger
 import kotlin.time.Duration
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 
 class StartStakingInfoModel(
     val title: CharSequence,
@@ -96,6 +97,7 @@ typealias AcknowledgeStakingStartedTitle = String
 
 class StartStakingLandingViewModel(
     private val router: StartMultiStakingRouter,
+    private val stakingRouter: StakingRouter,
     private val resourceManager: ResourceManager,
     private val updateSystemFactory: StakingLandingInfoUpdateSystemFactory,
     private val stakingTypeDetailsCompoundInteractorFactory: StakingTypeDetailsCompoundInteractorFactory,
@@ -182,6 +184,10 @@ class StartStakingLandingViewModel(
 
     fun back() {
         router.back()
+    }
+
+    fun announcementLinkClicked(url: String) {
+        stakingRouter.openDAppBrowser(url)
     }
 
     fun continueClicked() = launch {
