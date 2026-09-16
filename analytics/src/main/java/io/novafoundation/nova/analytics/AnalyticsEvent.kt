@@ -378,10 +378,10 @@ sealed class AnalyticsEvent(
 
     // NFT
 
-    class NftSectionOpened(nftCount: Int) : AnalyticsEvent(
+    class NftSectionOpened(nftCountBucket: NftCountBucket) : AnalyticsEvent(
         name = "nft_section_opened",
         properties = mapOf(
-            "nft_count" to nftCount
+            "nft_count_bucket" to nftCountBucket.value
         )
     )
 

@@ -26,7 +26,7 @@ import io.novafoundation.nova.infrastructure.di.Attested
 
 private const val ANALYTICS_QUEUE_MAX_SIZE = 500
 
-private const val ANALYTICS_BATCH_SIZE = 300
+private const val ANALYTICS_BATCH_SIZE = 50
 
 @Module
 class AnalyticsFeatureModule {

@@ -9,7 +9,10 @@ enum class AmountBucket(val value: String) {
     FROM_100_TO_1K("100_to_1k"),
     FROM_1K_TO_10K("1k_to_10k"),
     FROM_10K_TO_100K("10k_to_100k"),
-    OVER_100K("over_100k");
+    OVER_100K("over_100k"),
+
+    // No USD price for the token: without it the amount cannot be placed in any range
+    UNKNOWN("unknown");
 
     companion object {
         fun from(usdAmount: BigDecimal): AmountBucket = when {
@@ -23,6 +26,24 @@ enum class AmountBucket(val value: String) {
         }
 
         fun from(usdValue: Double): AmountBucket = from(BigDecimal.valueOf(usdValue))
+
+        fun fromOrUnknown(usdAmount: BigDecimal?): AmountBucket = usdAmount?.let(::from) ?: UNKNOWN
+    }
+}
+
+enum class NftCountBucket(val value: String) {
+    NONE("0"),
+    FROM_1_TO_10("1_to_10"),
+    FROM_10_TO_100("10_to_100"),
+    OVER_100("over_100");
+
+    companion object {
+        fun from(count: Int): NftCountBucket = when {
+            count < 1 -> NONE
+            count < 10 -> FROM_1_TO_10
+            count < 100 -> FROM_10_TO_100
+            else -> OVER_100
+        }
     }
 }
 
