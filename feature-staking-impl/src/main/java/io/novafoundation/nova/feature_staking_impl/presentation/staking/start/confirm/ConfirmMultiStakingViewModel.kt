@@ -50,6 +50,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class ConfirmMultiStakingViewModel(
     private val router: StartMultiStakingRouter,
@@ -67,7 +69,8 @@ class ConfirmMultiStakingViewModel(
     private val stakingStartedDetectionService: StakingStartedDetectionService,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val amountFormatter: AmountFormatter,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -200,13 +203,13 @@ class ConfirmMultiStakingViewModel(
     private suspend fun trackStakingEvent(eventConstructor: (String, String, AmountBucket) -> AnalyticsEvent) {
         val selection = currentSelectionFlow.first().selection
         val stakingOption = selection.stakingOption
-        val usdAmount = assetFlow.first().token.planksToFiat(selection.stake)
+        val usdAmount = usdRateRepository.planksToUsd(assetFlow.first().token.configuration, selection.stake)
 
         analyticsService.track(
             eventConstructor(
                 stakingOption.stakingType.toAnalyticsStakingType(),
                 stakingOption.chain.name,
-                AmountBucket.from(usdAmount)
+                AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }

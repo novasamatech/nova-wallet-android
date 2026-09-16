@@ -360,11 +360,10 @@ sealed class AnalyticsEvent(
 
     // Banner
 
-    class BannerClicked(bannerId: String, bannerTitle: String, screen: String) : AnalyticsEvent(
+    class BannerClicked(bannerId: String, screen: String) : AnalyticsEvent(
         name = "banner_clicked",
         properties = mapOf(
             "banner_id" to bannerId,
-            "banner_title" to bannerTitle,
             "screen" to screen
         )
     )

@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValida
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SwapMainSettingsModule {
@@ -99,6 +100,7 @@ class SwapMainSettingsModule {
         enoughAmountValidatorFactory: EnoughAmountValidatorFactory,
         getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
         analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository,
     ): ViewModel {
         return SwapMainSettingsViewModel(
             swapRouter = swapRouter,
@@ -124,7 +126,8 @@ class SwapMainSettingsModule {
             maxActionProviderFactory = maxActionProviderFactory,
             swapRouteFormatter = swapRouteFormatter,
             swapFlowScopeAggregator = swapFlowScopeAggregator,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

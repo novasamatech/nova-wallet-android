@@ -60,10 +60,13 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface SwapFeatureDependencies {
 
     fun analyticsService(): AnalyticsService
+
+    fun usdRateRepository(): UsdRateRepository
 
     val amountFormatter: AmountFormatter
 

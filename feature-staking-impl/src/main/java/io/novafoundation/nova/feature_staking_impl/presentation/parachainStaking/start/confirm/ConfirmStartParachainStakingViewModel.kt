@@ -63,6 +63,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class ConfirmStartParachainStakingViewModel(
     private val parachainStakingRouter: ParachainStakingRouter,
@@ -85,6 +87,7 @@ class ConfirmStartParachainStakingViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val amountFormatter: AmountFormatter,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
 ) : ConfirmStartSingleTargetStakingViewModel<ParachainConfirmStartStakingState>(
     stateFactory = { computationalScope ->
@@ -194,7 +197,7 @@ class ConfirmStartParachainStakingViewModel(
             eventConstructor(
                 ANALYTICS_STAKING_TYPE_DIRECT,
                 selectedAssetState.chain().name,
-                AmountBucket.from(asset.token.planksToFiat(amount))
+                AmountBucket.fromOrUnknown(usdRateRepository.planksToUsd(asset.token.configuration, amount))
             )
         )
     }

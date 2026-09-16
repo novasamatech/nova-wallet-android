@@ -57,6 +57,8 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.Payload as SelectCollatorPayload
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class SetupUnbondMythosViewModel(
     private val router: MythosStakingRouter,
@@ -74,6 +76,7 @@ class SetupUnbondMythosViewModel(
     private val stakingSharedState: StakingSharedState,
     private val amountFormatter: AmountFormatter,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -235,13 +238,13 @@ class SetupUnbondMythosViewModel(
 
     private suspend fun trackUnstakeInitiated() {
         val asset = assetFlow.first()
-        val fiatAmount = asset.token.amountFromPlanks(stakedAmount.first()).let(asset.token::amountToFiat)
+        val usdAmount = usdRateRepository.planksToUsd(asset.token.configuration, stakedAmount.first())
 
         analyticsService.track(
             AnalyticsEvent.UnstakeInitiated(
                 stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
                 network = stakingSharedState.chain().name,
-                amountBucket = AmountBucket.from(fiatAmount)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }
