@@ -17,7 +17,7 @@ fun SystemAccountMatcher.Companion.default(): SystemAccountMatcher {
         PrefixSystemAccountMatcher("para"),
         // Relaychain sovereign account on parachains
         PrefixSystemAccountMatcher("Parent"),
-        // Sibling parachain soveregin accounts
+        // Sibling parachain sovereign accounts
         PrefixSystemAccountMatcher("sibl")
     )
 }
