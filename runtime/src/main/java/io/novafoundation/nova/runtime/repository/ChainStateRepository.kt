@@ -37,7 +37,14 @@ private val FALLBACK_BLOCK_TIME_MILLIS_PARACHAIN = 2.toBigInteger() * FALLBACK_B
 
 private val PERIOD_VALIDITY_THRESHOLD = 100.toBigInteger()
 
-private val REQUIRED_SAMPLED_BLOCKS = 10.toBigInteger()
+private val REQUIRED_SAMPLES = 10.toBigInteger()
+
+/**
+ * Sampled block time is trusted only while it stays within this factor of the block time declared in the chain config.
+ * The config is maintained remotely, whereas a sampling flaw (or a stale sample persisted before a runtime upgrade)
+ * needs an app release to fix, so the config wins when the two disagree by this much.
+ */
+private val CONFIGURED_BLOCK_TIME_TOLERANCE_FACTOR = 2.toBigInteger()
 
 class ChainStateRepository(
     private val localStorage: StorageDataSource,
@@ -60,7 +67,7 @@ class ChainStateRepository(
         val blockTimeFromConstants = blockTimeFromConstants(chain, runtime)
         val sampledBlockTime = sampledBlockTimeStorage.get(chainId)
 
-        return weightedAverageBlockTime(sampledBlockTime, blockTimeFromConstants)
+        return predictBlockTime(sampledBlockTime, blockTimeFromConstants, chain.configuredBlockTime())
     }
 
     fun predictedBlockTimeFlow(chainId: ChainId): Flow<BigInteger> {
@@ -71,24 +78,15 @@ class ChainStateRepository(
             val blockTimeFromConstants = blockTimeFromConstants(chain, runtime)
 
             sampledBlockTimeStorage.observe(chainId).map {
-                weightedAverageBlockTime(it, blockTimeFromConstants)
+                predictBlockTime(it, blockTimeFromConstants, chain.configuredBlockTime())
             }
         }
     }
 
-    private fun weightedAverageBlockTime(
-        sampledBlockTime: SampledBlockTime,
-        blockTimeFromConstants: BigInteger
-    ): BigInteger {
-        val cappedSampleSize = sampledBlockTime.sampleSize.min(REQUIRED_SAMPLED_BLOCKS)
-        val sampledPart = cappedSampleSize * sampledBlockTime.averageBlockTime
-        val constantsPart = (REQUIRED_SAMPLED_BLOCKS - cappedSampleSize) * blockTimeFromConstants
-
-        return (sampledPart + constantsPart) / REQUIRED_SAMPLED_BLOCKS
-    }
+    private fun Chain.configuredBlockTime(): BigInteger? = additional?.defaultBlockTimeMillis?.toBigInteger()
 
     private fun blockTimeFromConstants(chain: Chain, runtime: RuntimeSnapshot): BigInteger {
-        return chain.additional?.defaultBlockTimeMillis?.toBigInteger()
+        return chain.configuredBlockTime()
             ?: runtime.metadata.babeOrNull()?.numberConstant("ExpectedBlockTime", runtime)
             // Some chains incorrectly use these, i.e. it is set to values such as 0 or even 2
             // Use a low minimum validity threshold to check these against
@@ -162,4 +160,34 @@ suspend fun ChainStateRepository.currentRemoteBlockNumberFlow(
 
 suspend fun ChainStateRepository.expectedBlockTime(chainId: ChainId): Duration {
     return expectedBlockTimeInMillis(chainId).toLong().milliseconds
+}
+
+/**
+ * Blends on-device [sampledBlockTime] with [blockTimeFromConstants]: the more windows were sampled (up to [REQUIRED_SAMPLES])
+ * the more weight the samples get. When the chain config declares [configuredBlockTime], samples that are implausible against it
+ * are discarded entirely and the configured value is used.
+ */
+internal fun predictBlockTime(
+    sampledBlockTime: SampledBlockTime,
+    blockTimeFromConstants: BigInteger,
+    configuredBlockTime: BigInteger?,
+): BigInteger {
+    if (sampledBlockTime.sampleSize == BigInteger.ZERO) return blockTimeFromConstants
+
+    if (configuredBlockTime != null && !sampledBlockTime.averageBlockTime.isPlausibleAgainst(configuredBlockTime)) {
+        return configuredBlockTime
+    }
+
+    val cappedSampleSize = sampledBlockTime.sampleSize.min(REQUIRED_SAMPLES)
+    val sampledPart = cappedSampleSize * sampledBlockTime.averageBlockTime
+    val constantsPart = (REQUIRED_SAMPLES - cappedSampleSize) * blockTimeFromConstants
+
+    return (sampledPart + constantsPart) / REQUIRED_SAMPLES
+}
+
+private fun BigInteger.isPlausibleAgainst(configured: BigInteger): Boolean {
+    val lowerBound = configured / CONFIGURED_BLOCK_TIME_TOLERANCE_FACTOR
+    val upperBound = configured * CONFIGURED_BLOCK_TIME_TOLERANCE_FACTOR
+
+    return this in lowerBound..upperBound
 }
