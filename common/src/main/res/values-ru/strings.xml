@@ -2083,4 +2083,27 @@
     <string name="swap_network_fees_label">Сетевые комиссии</string>
     <string name="swap_nova_fee_disclaimer">Включает комиссию Nova в размере %s%%.</string>
     <string name="swap_rate_includes_fee_description">Лучший найденный курс, включая комиссию Nova Wallet в размере %s%%.</string>
+    <string name="analytics_consent_agree">Согласиться</string>
+    <string name="analytics_consent_body">Делитесь анонимными данными об использовании, чтобы помочь нам понять, какие функции используются, и сделать Nova Wallet лучше. Подробнее в нашем %1$s.</string>
+    <string name="analytics_consent_change_anytime">Изменить в любое время в настройках</string>
+    <string name="analytics_consent_decline">Не соглашаться</string>
+    <string name="analytics_consent_disclosure_title">Что мы никогда не собираем</string>
+    <string name="analytics_consent_ip_country">IP-адрес используется только для определения страны, затем удаляется</string>
+    <string name="analytics_consent_learn_more">Подробнее в уведомлении о конфиденциальности</string>
+    <string name="analytics_consent_never_addresses">Никогда не собираем адреса, хэши транзакций или суммы</string>
+    <string name="analytics_consent_never_ids">Никаких идентификаторов, связывающих данные с вами</string>
+    <string name="analytics_consent_privacy_notice">Уведомление о конфиденциальности</string>
+    <string name="analytics_prompt_title">Помогите улучшить Nova Wallet</string>
+    <string name="assets_manage_tokens_all_tokens">Все токены</string>
+    <string name="assets_manage_tokens_auto_enable">Добавлять токены с положительным балансом</string>
+    <string name="assets_manage_tokens_section_default">По умолчанию</string>
+    <string name="assets_manage_tokens_section_other">Другие</string>
+    <string name="assets_missing_token">Не нашли нужный токен?</string>
+    <string name="assets_missing_token_action">Управление токенами</string>
+    <string name="price_chart_load_failed">Не удалось загрузить данные графика</string>
+    <string name="price_chart_no_data">Нет данных за этот период</string>
+    <string name="settings_analytics_title">Делиться анонимными данными об использовании</string>
+    <string name="swap_failure_pool_trade_limit_message">Пул ликвидности %1$s ограничивает размер одного обмена. Максимальная сумма, которую вы можете обменять сейчас, — %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Ваш обмен проходит через пул ликвидности %1$s, который допускает не более %2$s за один обмен. Попробуйте меньшую сумму.</string>
+    <string name="swap_failure_pool_trade_limit_title">Сумма превышает лимит пула</string>
 </resources>

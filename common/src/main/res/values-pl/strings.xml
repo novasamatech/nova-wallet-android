@@ -2083,4 +2083,27 @@
     <string name="swap_network_fees_label">Opłaty sieciowe</string>
     <string name="swap_nova_fee_disclaimer">Zawiera opłatę Nova w wysokości %s%%.</string>
     <string name="swap_rate_includes_fee_description">Najlepszy znaleziony kurs, uwzględniający opłatę Nova Wallet w wysokości %s%%.</string>
+    <string name="analytics_consent_agree">Zgadzam się</string>
+    <string name="analytics_consent_body">Udostępniaj anonimowe dane o użytkowaniu, aby pomóc nam zrozumieć, z których funkcji korzystasz, i ulepszać Nova Wallet. Szczegóły znajdziesz w naszym %1$s.</string>
+    <string name="analytics_consent_change_anytime">Zmień w dowolnym momencie w Ustawieniach</string>
+    <string name="analytics_consent_decline">Nie zgadzam się</string>
+    <string name="analytics_consent_disclosure_title">Czego nigdy nie zbieramy</string>
+    <string name="analytics_consent_ip_country">Adres IP jest używany wyłącznie do określenia kraju, a następnie usuwany</string>
+    <string name="analytics_consent_learn_more">Dowiedz się więcej w Informacji o prywatności</string>
+    <string name="analytics_consent_never_addresses">Nigdy adresów, hashy transakcji ani kwot</string>
+    <string name="analytics_consent_never_ids">Żadnych identyfikatorów łączących dane z Tobą</string>
+    <string name="analytics_consent_privacy_notice">Informacja o prywatności</string>
+    <string name="analytics_prompt_title">Pomóż ulepszyć Nova Wallet</string>
+    <string name="assets_manage_tokens_all_tokens">Wszystkie tokeny</string>
+    <string name="assets_manage_tokens_auto_enable">Dodaj tokeny z dodatnim saldem</string>
+    <string name="assets_manage_tokens_section_default">Domyślne</string>
+    <string name="assets_manage_tokens_section_other">Inne</string>
+    <string name="assets_missing_token">Brakuje tokena?</string>
+    <string name="assets_missing_token_action">Zarządzaj tokenami</string>
+    <string name="price_chart_load_failed">Nie udało się załadować danych wykresu</string>
+    <string name="price_chart_no_data">Brak danych dla tego okresu</string>
+    <string name="settings_analytics_title">Udostępniaj anonimowe dane o użytkowaniu</string>
+    <string name="swap_failure_pool_trade_limit_message">Pula płynności %1$s ogranicza rozmiar pojedynczego swapu. Maksymalna kwota, którą możesz teraz wymienić, to %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Twój swap jest realizowany przez pulę płynności %1$s, która pozwala na wymianę maksymalnie %2$s w ramach pojedynczego swapu. Spróbuj mniejszej kwoty.</string>
+    <string name="swap_failure_pool_trade_limit_title">Kwota przekracza limit puli</string>
 </resources>

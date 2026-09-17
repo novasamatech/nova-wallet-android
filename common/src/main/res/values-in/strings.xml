@@ -2041,4 +2041,27 @@
     <string name="swap_network_fees_label">Biaya jaringan</string>
     <string name="swap_nova_fee_disclaimer">Termasuk biaya Nova sebesar %s%%.</string>
     <string name="swap_rate_includes_fee_description">Nilai tukar terbaik yang ditemukan, termasuk biaya Nova Wallet sebesar %s%%.</string>
+    <string name="analytics_consent_agree">Setuju</string>
+    <string name="analytics_consent_body">Bagikan data penggunaan anonim untuk membantu kami memahami fitur mana yang digunakan dan meningkatkan Nova Wallet. Detailnya ada di %1$s kami.</string>
+    <string name="analytics_consent_change_anytime">Ubah kapan saja di Pengaturan</string>
+    <string name="analytics_consent_decline">Tidak setuju</string>
+    <string name="analytics_consent_disclosure_title">Yang tidak pernah kami kumpulkan</string>
+    <string name="analytics_consent_ip_country">IP hanya digunakan untuk menentukan negara, lalu dihapus</string>
+    <string name="analytics_consent_learn_more">Pelajari selengkapnya di Pemberitahuan Privasi</string>
+    <string name="analytics_consent_never_addresses">Tidak pernah mengumpulkan alamat, hash transaksi, atau jumlah</string>
+    <string name="analytics_consent_never_ids">Tidak ada ID yang mengaitkan data dengan Anda</string>
+    <string name="analytics_consent_privacy_notice">Pemberitahuan Privasi</string>
+    <string name="analytics_prompt_title">Bantu Tingkatkan Nova Wallet</string>
+    <string name="assets_manage_tokens_all_tokens">Semua token</string>
+    <string name="assets_manage_tokens_auto_enable">Tambahkan token dengan saldo positif</string>
+    <string name="assets_manage_tokens_section_default">Default</string>
+    <string name="assets_manage_tokens_section_other">Lainnya</string>
+    <string name="assets_missing_token">Tidak menemukan token?</string>
+    <string name="assets_missing_token_action">Kelola token</string>
+    <string name="price_chart_load_failed">Tidak dapat memuat data grafik</string>
+    <string name="price_chart_no_data">Tidak ada data untuk periode ini</string>
+    <string name="settings_analytics_title">Bagikan data penggunaan anonim</string>
+    <string name="swap_failure_pool_trade_limit_message">Pool likuiditas %1$s membatasi ukuran satu swap. Jumlah maksimum yang dapat Anda swap saat ini adalah %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Swap Anda dirutekan melalui pool likuiditas %1$s yang mengizinkan maksimal %2$s per swap. Coba jumlah yang lebih kecil.</string>
+    <string name="swap_failure_pool_trade_limit_title">Jumlah melebihi batas pool</string>
 </resources>

@@ -2055,4 +2055,27 @@
     <string name="swap_network_fees_label">Comisiones de red</string>
     <string name="swap_nova_fee_disclaimer">Incluye una comisión de Nova del %s%%.</string>
     <string name="swap_rate_includes_fee_description">La mejor tasa encontrada, incluida una comisión de Nova Wallet del %s%%.</string>
+    <string name="analytics_consent_agree">Aceptar</string>
+    <string name="analytics_consent_body">Comparte datos de uso anónimos para ayudarnos a entender qué funciones se utilizan y mejorar Nova Wallet. Consulta los detalles en nuestro %1$s.</string>
+    <string name="analytics_consent_change_anytime">Cámbialo en cualquier momento en Ajustes</string>
+    <string name="analytics_consent_decline">No aceptar</string>
+    <string name="analytics_consent_disclosure_title">Lo que nunca recopilamos</string>
+    <string name="analytics_consent_ip_country">La IP se utiliza únicamente para determinar el país y luego se elimina</string>
+    <string name="analytics_consent_learn_more">Obtén más información en el Aviso de privacidad</string>
+    <string name="analytics_consent_never_addresses">Nunca recopilamos direcciones, hashes de transacciones ni importes</string>
+    <string name="analytics_consent_never_ids">No recopilamos identificadores que vinculen los datos contigo</string>
+    <string name="analytics_consent_privacy_notice">Aviso de privacidad</string>
+    <string name="analytics_prompt_title">Ayuda a mejorar Nova Wallet</string>
+    <string name="assets_manage_tokens_all_tokens">Todos los tokens</string>
+    <string name="assets_manage_tokens_auto_enable">Añadir tokens con saldo positivo</string>
+    <string name="assets_manage_tokens_section_default">Predeterminados</string>
+    <string name="assets_manage_tokens_section_other">Otros</string>
+    <string name="assets_missing_token">¿Falta algún token?</string>
+    <string name="assets_missing_token_action">Gestionar tokens</string>
+    <string name="price_chart_load_failed">No se han podido cargar los datos del gráfico</string>
+    <string name="price_chart_no_data">No hay datos para este periodo</string>
+    <string name="settings_analytics_title">Compartir datos de uso anónimos</string>
+    <string name="swap_failure_pool_trade_limit_message">El pool de liquidez de %1$s limita el tamaño de un solo swap. El máximo que puedes intercambiar ahora es %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Tu swap se enruta a través de un pool de liquidez de %1$s que permite como máximo %2$s por swap. Prueba con un importe menor.</string>
+    <string name="swap_failure_pool_trade_limit_title">El importe supera el límite del pool</string>
 </resources>

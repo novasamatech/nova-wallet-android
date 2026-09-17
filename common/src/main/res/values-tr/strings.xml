@@ -2055,4 +2055,27 @@
     <string name="swap_network_fees_label">Ağ ücretleri</string>
     <string name="swap_nova_fee_disclaimer">%s%% Nova ücretini içerir.</string>
     <string name="swap_rate_includes_fee_description">%s%% Nova Wallet ücreti dâhil olmak üzere bulunan en iyi kur.</string>
+    <string name="analytics_consent_agree">Kabul et</string>
+    <string name="analytics_consent_body">Hangi özelliklerin kullanıldığını anlamamıza ve Nova Wallet\'ı geliştirmemize yardımcı olmak için anonim kullanım verilerini paylaşın. Ayrıntılar %1$s bölümümüzde.</string>
+    <string name="analytics_consent_change_anytime">Ayarlar\'dan istediğiniz zaman değiştirebilirsiniz</string>
+    <string name="analytics_consent_decline">Kabul etme</string>
+    <string name="analytics_consent_disclosure_title">Asla toplamadıklarımız</string>
+    <string name="analytics_consent_ip_country">IP yalnızca ülkeyi belirlemek için kullanılır, ardından silinir</string>
+    <string name="analytics_consent_learn_more">Gizlilik Bildirimi\'nde daha fazla bilgi edinin</string>
+    <string name="analytics_consent_never_addresses">Adresler, işlem hash\'leri veya tutarlar asla toplanmaz</string>
+    <string name="analytics_consent_never_ids">Verileri sizinle ilişkilendiren hiçbir kimlik bilgisi yoktur</string>
+    <string name="analytics_consent_privacy_notice">Gizlilik Bildirimi</string>
+    <string name="analytics_prompt_title">Nova Wallet\'ın Geliştirilmesine Yardım Edin</string>
+    <string name="assets_manage_tokens_all_tokens">Tüm token\'lar</string>
+    <string name="assets_manage_tokens_auto_enable">Pozitif bakiyeye sahip token\'ları ekle</string>
+    <string name="assets_manage_tokens_section_default">Varsayılan</string>
+    <string name="assets_manage_tokens_section_other">Diğerleri</string>
+    <string name="assets_missing_token">Aradığınız token\'ı bulamıyor musunuz?</string>
+    <string name="assets_missing_token_action">Token\'ları yönet</string>
+    <string name="price_chart_load_failed">Grafik verileri yüklenemedi</string>
+    <string name="price_chart_no_data">Bu dönem için veri yok</string>
+    <string name="settings_analytics_title">Anonim kullanım verilerini paylaş</string>
+    <string name="swap_failure_pool_trade_limit_message">%1$s likidite havuzu, tek bir swap işleminin boyutunu sınırlar. Şu anda swap edebileceğiniz maksimum miktar %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Swap işleminiz, tek bir swap işleminde en fazla %2$s miktara izin veren %1$s likidite havuzu üzerinden yönlendiriliyor. Daha küçük bir miktar deneyin.</string>
+    <string name="swap_failure_pool_trade_limit_title">Miktar havuz limitini aşıyor</string>
 </resources>

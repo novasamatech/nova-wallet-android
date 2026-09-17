@@ -2055,4 +2055,27 @@
     <string name="swap_network_fees_label">Taxas de rede</string>
     <string name="swap_nova_fee_disclaimer">Inclui uma taxa da Nova de %s%%.</string>
     <string name="swap_rate_includes_fee_description">A melhor taxa encontrada, incluindo uma taxa da Nova Wallet de %s%%.</string>
+    <string name="analytics_consent_agree">Concordar</string>
+    <string name="analytics_consent_body">Compartilhe dados de uso anônimos para nos ajudar a entender quais recursos são usados e melhorar a Nova Wallet. Detalhes em nosso %1$s.</string>
+    <string name="analytics_consent_change_anytime">Altere a qualquer momento em Configurações</string>
+    <string name="analytics_consent_decline">Não concordo</string>
+    <string name="analytics_consent_disclosure_title">O que nunca coletamos</string>
+    <string name="analytics_consent_ip_country">IP usado apenas para identificar o país e depois excluído</string>
+    <string name="analytics_consent_learn_more">Saiba mais no Aviso de Privacidade</string>
+    <string name="analytics_consent_never_addresses">Nunca coletamos endereços, hashes de transações ou valores</string>
+    <string name="analytics_consent_never_ids">Nenhum ID que vincule os dados a você</string>
+    <string name="analytics_consent_privacy_notice">Aviso de Privacidade</string>
+    <string name="analytics_prompt_title">Ajude a melhorar a Nova Wallet</string>
+    <string name="assets_manage_tokens_all_tokens">Todos os tokens</string>
+    <string name="assets_manage_tokens_auto_enable">Adicionar tokens com saldo positivo</string>
+    <string name="assets_manage_tokens_section_default">Padrão</string>
+    <string name="assets_manage_tokens_section_other">Outros</string>
+    <string name="assets_missing_token">Está faltando um token?</string>
+    <string name="assets_missing_token_action">Gerenciar tokens</string>
+    <string name="price_chart_load_failed">Não foi possível carregar os dados do gráfico</string>
+    <string name="price_chart_no_data">Não há dados para este período</string>
+    <string name="settings_analytics_title">Compartilhar dados de uso anônimos</string>
+    <string name="swap_failure_pool_trade_limit_message">O pool de liquidez %1$s limita o tamanho de uma única troca. O máximo que você pode trocar agora é %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Sua troca é roteada por um pool de liquidez %1$s que permite no máximo %2$s por troca. Tente um valor menor.</string>
+    <string name="swap_failure_pool_trade_limit_title">O valor excede o limite do pool</string>
 </resources>

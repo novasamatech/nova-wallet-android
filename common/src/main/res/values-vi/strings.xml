@@ -2041,4 +2041,27 @@
     <string name="swap_network_fees_label">Phí mạng</string>
     <string name="swap_nova_fee_disclaimer">Đã bao gồm phí Nova %s%%.</string>
     <string name="swap_rate_includes_fee_description">Tỷ giá tốt nhất được tìm thấy, đã bao gồm phí Nova Wallet %s%%.</string>
+    <string name="analytics_consent_agree">Đồng ý</string>
+    <string name="analytics_consent_body">Chia sẻ dữ liệu sử dụng ẩn danh để giúp chúng tôi hiểu những tính năng nào được sử dụng và cải thiện Nova Wallet. Xem chi tiết trong %1$s của chúng tôi.</string>
+    <string name="analytics_consent_change_anytime">Thay đổi bất cứ lúc nào trong phần Cài đặt</string>
+    <string name="analytics_consent_decline">Không đồng ý</string>
+    <string name="analytics_consent_disclosure_title">Những gì chúng tôi không bao giờ thu thập</string>
+    <string name="analytics_consent_ip_country">Địa chỉ IP chỉ được sử dụng để xác định quốc gia, sau đó sẽ bị xóa</string>
+    <string name="analytics_consent_learn_more">Tìm hiểu thêm trong Thông báo về quyền riêng tư</string>
+    <string name="analytics_consent_never_addresses">Không bao giờ thu thập địa chỉ, mã băm giao dịch hoặc số tiền</string>
+    <string name="analytics_consent_never_ids">Không có mã nhận dạng nào liên kết dữ liệu với bạn</string>
+    <string name="analytics_consent_privacy_notice">Thông báo về quyền riêng tư</string>
+    <string name="analytics_prompt_title">Giúp cải thiện Nova Wallet</string>
+    <string name="assets_manage_tokens_all_tokens">Tất cả token</string>
+    <string name="assets_manage_tokens_auto_enable">Thêm token có số dư dương</string>
+    <string name="assets_manage_tokens_section_default">Mặc định</string>
+    <string name="assets_manage_tokens_section_other">Khác</string>
+    <string name="assets_missing_token">Không tìm thấy token cần tìm?</string>
+    <string name="assets_missing_token_action">Quản lý token</string>
+    <string name="price_chart_load_failed">Không thể tải dữ liệu biểu đồ</string>
+    <string name="price_chart_no_data">Không có dữ liệu trong khoảng thời gian này</string>
+    <string name="settings_analytics_title">Chia sẻ dữ liệu sử dụng ẩn danh</string>
+    <string name="swap_failure_pool_trade_limit_message">Pool thanh khoản %1$s giới hạn quy mô của một lần swap. Số tiền tối đa bạn có thể swap lúc này là %2$s.</string>
+    <string name="swap_failure_pool_trade_limit_route_message">Giao dịch swap của bạn đi qua pool thanh khoản %1$s, nơi chỉ cho phép tối đa %2$s trong mỗi lần swap. Hãy thử số tiền nhỏ hơn.</string>
+    <string name="swap_failure_pool_trade_limit_title">Số tiền vượt quá giới hạn của pool</string>
 </resources>
