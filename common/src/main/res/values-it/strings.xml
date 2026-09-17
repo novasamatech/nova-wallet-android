@@ -2078,4 +2078,7 @@
     <string name="analytics_consent_ip_country">Il tuo IP viene utilizzato una sola volta per indicare il tuo Paese, poi viene eliminato — non raggiunge mai il nostro provider di analisi</string>
     <string name="analytics_consent_never_addresses">Mai gli indirizzi del tuo wallet, gli hash delle transazioni o gli importi esatti</string>
     <string name="analytics_consent_never_ids">Nessun identificatore persistente — nulla collega i dati a te</string>
+    <string name="privacy_analytics_description">Ci aiuta a capire quali funzionalità vengono utilizzate e a migliorare Nova Wallet.</string>
+    <string name="privacy_analytics_enabled_toast">Grazie per aiutarci a migliorare Nova Wallet</string>
+    <string name="settings_privacy_title">Privacy</string>
 </resources>

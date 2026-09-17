@@ -2106,4 +2106,7 @@
     <string name="analytics_consent_ip_country">Ваш IP-адрес используется один раз, чтобы определить вашу страну, а затем удаляется — он никогда не передаётся нашему поставщику аналитики</string>
     <string name="analytics_consent_never_addresses">Никогда не используются адреса вашего кошелька, хэши транзакций или точные суммы</string>
     <string name="analytics_consent_never_ids">Никаких постоянных идентификаторов — ничто не связывает эти данные с вами</string>
+    <string name="privacy_analytics_description">Помогает нам понять, какие функции используются, и сделать Nova Wallet лучше.</string>
+    <string name="privacy_analytics_enabled_toast">Спасибо, что помогаете улучшать Nova Wallet</string>
+    <string name="settings_privacy_title">Конфиденциальность</string>
 </resources>

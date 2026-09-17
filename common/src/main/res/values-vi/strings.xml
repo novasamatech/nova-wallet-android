@@ -2064,4 +2064,7 @@
     <string name="analytics_consent_ip_country">Địa chỉ IP của bạn chỉ được sử dụng một lần để ghi nhận quốc gia, sau đó sẽ bị xóa — thông tin này không bao giờ được chuyển đến nhà cung cấp dịch vụ phân tích của chúng tôi</string>
     <string name="analytics_consent_never_addresses">Không bao giờ sử dụng địa chỉ ví, mã băm giao dịch hoặc số tiền chính xác của bạn</string>
     <string name="analytics_consent_never_ids">Không có mã định danh cố định — không có gì liên kết dữ liệu với bạn</string>
+    <string name="privacy_analytics_description">Giúp chúng tôi hiểu những tính năng nào được sử dụng và làm cho Nova Wallet tốt hơn.</string>
+    <string name="privacy_analytics_enabled_toast">Cảm ơn bạn đã giúp cải thiện Nova Wallet</string>
+    <string name="settings_privacy_title">Quyền riêng tư</string>
 </resources>

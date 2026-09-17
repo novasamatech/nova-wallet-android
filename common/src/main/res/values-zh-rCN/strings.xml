@@ -2064,4 +2064,7 @@
     <string name="analytics_consent_ip_country">您的 IP 地址仅使用一次以记录您所在的国家/地区，随后将被删除——它绝不会传送给我们的分析服务提供商</string>
     <string name="analytics_consent_never_addresses">绝不会使用您的钱包地址、交易哈希或精确金额</string>
     <string name="analytics_consent_never_ids">不会使用任何持久性标识符——没有任何信息会将这些数据与您关联</string>
+    <string name="privacy_analytics_description">帮助我们了解哪些功能被使用，并改进 Nova Wallet。</string>
+    <string name="privacy_analytics_enabled_toast">感谢您帮助改进 Nova Wallet</string>
+    <string name="settings_privacy_title">隐私</string>
 </resources>

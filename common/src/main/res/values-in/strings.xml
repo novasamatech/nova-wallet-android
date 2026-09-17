@@ -2064,4 +2064,7 @@
     <string name="analytics_consent_ip_country">Alamat IP Anda digunakan sekali untuk mencatat negara Anda, lalu dihapus — alamat tersebut tidak pernah sampai ke penyedia analitik kami</string>
     <string name="analytics_consent_never_addresses">Tidak pernah berupa alamat dompet, hash transaksi, atau jumlah persis Anda</string>
     <string name="analytics_consent_never_ids">Tidak ada pengenal persisten — tidak ada yang mengaitkan data tersebut dengan Anda</string>
+    <string name="privacy_analytics_description">Membantu kami memahami fitur mana yang digunakan dan menjadikan Nova Wallet lebih baik.</string>
+    <string name="privacy_analytics_enabled_toast">Terima kasih telah membantu meningkatkan Nova Wallet</string>
+    <string name="settings_privacy_title">Privasi</string>
 </resources>

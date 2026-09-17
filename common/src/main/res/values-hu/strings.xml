@@ -2078,4 +2078,7 @@
     <string name="analytics_consent_ip_country">IP-címét egyszer használjuk fel országa megállapítására, majd töröljük — soha nem jut el analitikai szolgáltatónkhoz</string>
     <string name="analytics_consent_never_addresses">Soha nem használjuk a tárcacímeit, a tranzakció-hash-eket vagy a pontos összegeket</string>
     <string name="analytics_consent_never_ids">Nincsenek állandó azonosítók — semmi sem kapcsolja az adatokat Önhöz</string>
+    <string name="privacy_analytics_description">Segít megérteni, mely funkciókat használják, és jobbá tenni a Nova Walletet.</string>
+    <string name="privacy_analytics_enabled_toast">Köszönjük, hogy segítesz a Nova Wallet fejlesztésében</string>
+    <string name="settings_privacy_title">Adatvédelem</string>
 </resources>

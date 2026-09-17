@@ -2078,4 +2078,7 @@
     <string name="analytics_consent_ip_country">Seu IP é usado uma única vez para registrar seu país e depois é excluído — ele nunca chega ao nosso provedor de análises</string>
     <string name="analytics_consent_never_addresses">Nunca seus endereços de carteira, hashes de transação ou valores exatos</string>
     <string name="analytics_consent_never_ids">Nenhum identificador persistente — nada vincula os dados a você</string>
+    <string name="privacy_analytics_description">Ajuda-nos a entender quais recursos são usados e a melhorar a Nova Wallet.</string>
+    <string name="privacy_analytics_enabled_toast">Agradecemos por ajudar a melhorar a Nova Wallet</string>
+    <string name="settings_privacy_title">Privacidade</string>
 </resources>

@@ -2078,4 +2078,7 @@
     <string name="analytics_consent_ip_country">IP adresiniz ülkenizi belirtmek için bir kez kullanılır ve ardından silinir — analiz hizmeti sağlayıcımıza hiçbir zaman ulaşmaz</string>
     <string name="analytics_consent_never_addresses">Cüzdan adresleriniz, işlem hash\'leriniz veya kesin tutarlarınız asla kullanılmaz</string>
     <string name="analytics_consent_never_ids">Kalıcı tanımlayıcılar yoktur — verileri sizinle ilişkilendiren hiçbir şey bulunmaz</string>
+    <string name="privacy_analytics_description">Hangi özelliklerin kullanıldığını anlamamıza ve Nova Wallet\'ı geliştirmemize yardımcı olur.</string>
+    <string name="privacy_analytics_enabled_toast">Nova Wallet\'ı geliştirmemize yardımcı olduğunuz için teşekkürler</string>
+    <string name="settings_privacy_title">Gizlilik</string>
 </resources>

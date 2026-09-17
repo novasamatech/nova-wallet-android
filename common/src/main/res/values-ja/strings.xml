@@ -2064,4 +2064,7 @@
     <string name="analytics_consent_ip_country">IPアドレスは国を記録するために一度だけ使用され、その後削除されます — 分析プロバイダーに送信されることはありません</string>
     <string name="analytics_consent_never_addresses">ウォレットアドレス、トランザクションハッシュ、正確な金額が送信されることは決してありません</string>
     <string name="analytics_consent_never_ids">永続的な識別子はありません — データがあなたと結び付けられることはありません</string>
+    <string name="privacy_analytics_description">使用されている機能を把握し、Nova Walletの改善に役立てます。</string>
+    <string name="privacy_analytics_enabled_toast">Nova Walletの改善にご協力いただきありがとうございます</string>
+    <string name="settings_privacy_title">プライバシー</string>
 </resources>
