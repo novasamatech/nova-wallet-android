@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters
 
 import io.novafoundation.nova.common.utils.decodeValue
+import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.storage.insert
@@ -42,7 +43,9 @@ class ScheduledDelegationRequestsUpdater(
 
         val accountId = account.accountIdIn(chain) ?: return emptyFlow()
 
-        val storage = runtime.metadata.parachainStaking().storage("DelegatorState")
+        val parachainStaking = runtime.metadata.parachainStaking()
+        val storageName = if (parachainStaking.hasStorage("NominatorState")) "NominatorState" else "DelegatorState"
+        val storage = parachainStaking.storage(storageName)
         val key = storage.storageKey(runtime, accountId)
 
         return storageSubscriptionBuilder.subscribe(key).map {

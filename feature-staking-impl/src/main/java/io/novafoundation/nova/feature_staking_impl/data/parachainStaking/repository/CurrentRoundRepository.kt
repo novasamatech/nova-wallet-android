@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_account_api.data.model.AccountIdMap
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.RoundIndex
@@ -52,13 +53,17 @@ class RealCurrentRoundRepository(
 
     override fun currentRoundInfoFlow(chainId: ChainId): Flow<RoundInfo> {
         return storageDataSource.subscribe(chainId) {
-            runtime.metadata.parachainStaking().storage("Round").observe(binding = ::bindRoundInfo)
+            val parachainStaking = runtime.metadata.parachainStaking()
+            val roundStorageName = if (parachainStaking.hasStorage("Era")) "Era" else "Round"
+            parachainStaking.storage(roundStorageName).observe(binding = ::bindRoundInfo)
         }
     }
 
     override suspend fun currentRoundInfo(chainId: ChainId): RoundInfo {
         return storageDataSource.query(chainId) {
-            runtime.metadata.parachainStaking().storage("Round").query(binding = ::bindRoundInfo)
+            val parachainStaking = runtime.metadata.parachainStaking()
+            val roundStorageName = if (parachainStaking.hasStorage("Era")) "Era" else "Round"
+            parachainStaking.storage(roundStorageName).query(binding = ::bindRoundInfo)
         }
     }
 

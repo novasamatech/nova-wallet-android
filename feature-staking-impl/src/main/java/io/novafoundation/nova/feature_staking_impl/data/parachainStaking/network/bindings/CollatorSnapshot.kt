@@ -14,10 +14,11 @@ class CollatorSnapshot(
 
 fun bindCollatorSnapshot(instance: Any?): CollatorSnapshot {
     val asStruct = instance.castToStruct()
+    val bonds: Any? = asStruct.mapping["delegations"] ?: asStruct.mapping["nominations"]
 
     return CollatorSnapshot(
         bond = bindNumber(asStruct["bond"]),
-        delegations = bindList(asStruct["delegations"], ::bindBond),
+        delegations = bindList(bonds, ::bindBond),
         total = bindNumber(asStruct["total"])
     )
 }
