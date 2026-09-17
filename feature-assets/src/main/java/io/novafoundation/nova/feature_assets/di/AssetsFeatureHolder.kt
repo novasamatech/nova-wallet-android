@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -35,6 +36,7 @@ class AssetsFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val dependencies = DaggerAssetsFeatureComponent_AssetsFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .nftFeatureApi(getFeature(NftFeatureApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))

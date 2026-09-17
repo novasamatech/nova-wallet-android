@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_governance_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -26,6 +27,7 @@ class GovernanceFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val accountFeatureDependencies = DaggerGovernanceFeatureComponent_GovernanceFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))

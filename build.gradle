@@ -1,8 +1,8 @@
 buildscript {
     ext {
         // App version
-        versionName = '10.9.2'
-        versionCode = 267
+        versionName = '10.10.0'
+        versionCode = 272
 
         applicationId = "io.novafoundation.nova"
         releaseApplicationSuffix = "market"
@@ -121,6 +121,7 @@ buildscript {
         lifecycleDep = "androidx.lifecycle:lifecycle-extensions:$architectureComponentVersion"
         lifecycleCompiler = "androidx.lifecycle:lifecycle-compiler:$architectureComponentVersion"
         lifecycleRuntime = "androidx.lifecycle:lifecycle-runtime-android:$architectureComponentVersion"
+        lifecycleProcessDep = "androidx.lifecycle:lifecycle-process:$architectureComponentVersion"
 
         coroutinesDep = "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
         coroutinesAndroidDep = "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"

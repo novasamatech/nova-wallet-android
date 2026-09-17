@@ -11,5 +11,8 @@ interface CoinPriceRemoteDataSource {
 
     suspend fun getCoinRates(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?>
 
+    /** One request for all [currencies]: the price API is rate limited, so extra currencies must not cost extra calls. */
+    suspend fun getCoinRates(priceIds: Set<String>, currencies: Set<Currency>): Map<Currency, Map<String, CoinRateChange?>>
+
     suspend fun getCoinRate(priceId: String, currency: Currency): CoinRateChange?
 }

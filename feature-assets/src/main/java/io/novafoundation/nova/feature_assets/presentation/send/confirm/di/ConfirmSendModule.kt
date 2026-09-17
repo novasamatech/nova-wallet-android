@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -27,6 +28,7 @@ import io.novafoundation.nova.feature_assets.presentation.send.confirm.hints.Con
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmSendModule {
@@ -60,7 +62,9 @@ class ConfirmSendModule {
         walletUiUseCase: WalletUiUseCase,
         confirmSendHintsMixinFactory: ConfirmSendHintsMixinFactory,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return ConfirmSendViewModel(
             interactor = interactor,
@@ -78,7 +82,9 @@ class ConfirmSendModule {
             transferDraft = transferDraft,
             hintsFactory = confirmSendHintsMixinFactory,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

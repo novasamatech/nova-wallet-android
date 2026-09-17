@@ -57,6 +57,8 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
 
         navController!!.addOnDestinationChangedListener { _, destination, _ ->
             backCallback.isEnabled = !isAtHomeTab(destination)
+
+            viewModel.onDestinationChanged(destination.id)
         }
     }
 
@@ -67,7 +69,9 @@ class MainFragment : BaseFragment<MainViewModel, FragmentMainBinding>() {
             .inject(this)
     }
 
-    override fun subscribe(viewModel: MainViewModel) {}
+    override fun subscribe(viewModel: MainViewModel) {
+        // Nothing to observe: analytics consent is its own screen now
+    }
 
     private fun isAtHomeTab(destination: NavDestination) =
         destination.id == navController!!.graph.startDestination

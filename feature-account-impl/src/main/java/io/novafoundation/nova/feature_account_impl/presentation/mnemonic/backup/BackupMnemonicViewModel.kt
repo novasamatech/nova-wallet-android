@@ -3,6 +3,9 @@ package io.novafoundation.nova.feature_account_impl.presentation.mnemonic.backup
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.WalletCreationStep
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.condition.ConditionMixinFactory
 import io.novafoundation.nova.common.mixin.condition.buttonState
@@ -14,6 +17,7 @@ import io.novafoundation.nova.common.utils.inBackground
 import io.novafoundation.nova.common.utils.invoke
 import io.novafoundation.nova.common.utils.sendEvent
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
+import io.novafoundation.nova.feature_account_api.presenatation.account.add.AddAccountPayload
 import io.novafoundation.nova.feature_account_api.presenatation.account.common.model.toAdvancedEncryptionModel
 import io.novafoundation.nova.feature_account_impl.R
 import io.novafoundation.nova.feature_account_impl.domain.account.advancedEncryption.AdvancedEncryptionInteractor
@@ -38,6 +42,7 @@ class BackupMnemonicViewModel(
     private val advancedEncryptionInteractor: AdvancedEncryptionInteractor,
     private val advancedEncryptionSelectionStoreProvider: AdvancedEncryptionSelectionStoreProvider,
     private val conditionMixinFactory: ConditionMixinFactory,
+    private val analyticsService: AnalyticsService,
 ) : BaseViewModel() {
 
     val conditionMixin = conditionMixinFactory.createConditionMixin(
@@ -71,6 +76,11 @@ class BackupMnemonicViewModel(
             MnemonicWord(id = index, content = word, indexDisplay = index.plus(1).format(), removed = false)
         }
     }.shareInBackground()
+
+    /**
+     * Set once the user navigates to the next step of the flow so that leaving the screen afterwards is not reported as abandoning
+     */
+    private var proceededToNextStep = false
 
     init {
         _showMnemonicWarningDialog.sendEvent()
@@ -110,6 +120,23 @@ class BackupMnemonicViewModel(
             createExtras = createExtras
         )
 
+        proceededToNextStep = true
+
         router.openConfirmMnemonicOnCreate(payload)
+    }
+
+    override fun onCleared() {
+        trackWalletCreationAbandonedIfNeeded()
+
+        super.onCleared()
+    }
+
+    private fun trackWalletCreationAbandonedIfNeeded() {
+        if (proceededToNextStep) return
+
+        val createPayload = payload as? BackupMnemonicPayload.Create ?: return
+        if (createPayload.addAccountPayload !is AddAccountPayload.MetaAccount) return
+
+        analyticsService.track(AnalyticsEvent.WalletCreationAbandoned(WalletCreationStep.BACKUP))
     }
 }

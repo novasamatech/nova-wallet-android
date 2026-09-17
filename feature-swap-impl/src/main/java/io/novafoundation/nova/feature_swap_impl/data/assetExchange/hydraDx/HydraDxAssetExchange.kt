@@ -41,6 +41,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee.SwapSegment.SegmentNetFlow
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapGraphEdge
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapPoolId
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapLimit
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapMaxAdditionalAmountDeduction
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
@@ -262,6 +263,9 @@ internal class HydraDxAssetExchange(
     private inner class HydraDxSwapEdge(
         private val sourceQuotableEdge: HydraDxSourceEdge,
     ) : SwapGraphEdge, HydraDxQuotableEdge by sourceQuotableEdge {
+
+        override val poolId: SwapPoolId
+            get() = sourceQuotableEdge.poolId
 
         override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
             return HydraDxOperation(sourceQuotableEdge, args)

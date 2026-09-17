@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Figma NW-2145: the token row reused as a child, indented 52dp, without the disclosure chevron -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@drawable/bg_primary_list_item"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="72dp"
+    android:paddingEnd="20dp"
+    tools:background="@color/secondary_screen_background">
+
+    <ImageView
+        android:id="@+id/itemManageAssetChildTokenIcon"
+        style="@style/Widget.Nova.AssetIcon.OnColor"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        tools:src="@drawable/ic_token_dot_colored" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/itemManageAssetChildTokenTitle"
+            style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textColor="@color/text_primary"
+            tools:text="DOT" />
+
+        <TextView
+            android:id="@+id/itemManageAssetChildTokenSubtitle"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textColor="@color/text_secondary"
+            tools:text="Polkadot" />
+    </LinearLayout>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/itemManageAssetChildTokenEnabled"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

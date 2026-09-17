@@ -35,7 +35,13 @@ class ByTokensAssetSearchInteractor(
     ): Flow<AssetsByViewModeResult> {
         val filter = { asset: Asset -> tradeTokenRegistry.hasProvider(asset.token.configuration, tradeType) }
 
-        return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = filter)
+        // Buying delivers a token you do not have yet, so the destination list is not filtered
+        return searchAssetsByTokensInternalFlow(
+            queryFlow,
+            externalBalancesFlow,
+            filter = filter,
+            onlyVisible = tradeType != TradeTokenRegistry.TradeType.BUY
+        )
     }
 
     override fun sendAssetSearch(
@@ -60,14 +66,17 @@ class ByTokensAssetSearchInteractor(
         coroutineScope: CoroutineScope
     ): Flow<AssetsByViewModeResult> {
         val filterFlow = assetSearchUseCase.getAvailableSwapAssets(forAsset, coroutineScope).mapToAssetSearchFilter()
-        return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow)
+
+        // A null source means this is the "swap from" picker; anything else is the destination
+        return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filterFlow = filterFlow, onlyVisible = forAsset == null)
     }
 
     override fun searchReceiveAssetsFlow(
         queryFlow: Flow<String>,
         externalBalancesFlow: Flow<List<ExternalBalance>>,
     ): Flow<AssetsByViewModeResult> {
-        return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = null)
+        // Receiving is the whole point of picking a token you do not hold yet
+        return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, filter = null, onlyVisible = false)
     }
 
     override fun giftAssetsSearch(
@@ -92,10 +101,11 @@ class ByTokensAssetSearchInteractor(
         assetGroupComparator: Comparator<TokenAssetGroup> = getTokenAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithNetwork> = getTokenAssetBaseComparator(),
         filter: AssetSearchFilter?,
+        onlyVisible: Boolean = true,
     ): Flow<AssetsByViewModeResult.ByTokens> {
         val filterFlow = flowOf(filter)
 
-        return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow)
+        return searchAssetsByTokensInternalFlow(queryFlow, externalBalancesFlow, assetGroupComparator, assetsComparator, filterFlow, onlyVisible)
     }
 
     private fun searchAssetsByTokensInternalFlow(
@@ -104,8 +114,9 @@ class ByTokensAssetSearchInteractor(
         assetGroupComparator: Comparator<TokenAssetGroup> = getTokenAssetGroupBaseComparator(),
         assetsComparator: Comparator<AssetWithNetwork> = getTokenAssetBaseComparator(),
         filterFlow: Flow<AssetSearchFilter?>,
+        onlyVisible: Boolean = true,
     ): Flow<AssetsByViewModeResult.ByTokens> {
-        val assetsFlow = assetSearchUseCase.filteredAssetFlow(filterFlow)
+        val assetsFlow = assetSearchUseCase.filteredAssetFlow(filterFlow, onlyVisible)
 
         val aggregatedExternalBalances = externalBalancesFlow.map { it.aggregatedBalanceByAsset() }
 

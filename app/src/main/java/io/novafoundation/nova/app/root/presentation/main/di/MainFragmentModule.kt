@@ -8,6 +8,7 @@ import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.main.MainViewModel
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.legal.LegalConsentRepository
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -34,7 +35,8 @@ class MainFragmentModule {
         chainMigrationDetailsSelectToShowUseCase: ChainMigrationDetailsSelectToShowUseCase,
         legalConsentRepository: LegalConsentRepository,
         accountRepository: AccountRepository,
-        rootRouter: RootRouter
+        rootRouter: RootRouter,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return MainViewModel(
             updateNotificationsInteractor,
@@ -43,7 +45,8 @@ class MainFragmentModule {
             legalConsentRepository,
             accountRepository,
             rootRouter,
-            chainMigrationDetailsSelectToShowUseCase
+            chainMigrationDetailsSelectToShowUseCase,
+            analyticsService
         )
     }
 

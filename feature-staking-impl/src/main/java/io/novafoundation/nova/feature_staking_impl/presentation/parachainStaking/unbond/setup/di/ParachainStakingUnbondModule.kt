@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingUnbondModule {
@@ -44,7 +46,9 @@ class ParachainStakingUnbondModule {
         actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return ParachainStakingUnbondViewModel(
             router = router,
@@ -60,7 +64,9 @@ class ParachainStakingUnbondModule {
             actionAwaitableMixinFactory = actionAwaitableMixinFactory,
             amountChooserMixinFactory = amountChooserMixinFactory,
             hintsMixinFactory = hintsMixinFactory,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

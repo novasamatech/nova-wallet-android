@@ -6,7 +6,6 @@ import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.updaters.BalanceLocksUpdaterFactory
-import io.novafoundation.nova.runtime.ext.enabledAssets
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -42,7 +41,7 @@ class BalanceLocksUpdater(
         val accountId = metaAccount.accountIdIn(chain) ?: return emptyFlow()
 
         val flows = buildList {
-            chain.enabledAssets().forEach { chainAsset ->
+            chain.assets.forEach { chainAsset ->
                 val assetSource = assetSourceRegistry.sourceFor(chainAsset)
 
                 val locksFlow = assetSource.balance.startSyncingBalanceLocks(metaAccount, chain, chainAsset, accountId, storageSubscriptionBuilder)

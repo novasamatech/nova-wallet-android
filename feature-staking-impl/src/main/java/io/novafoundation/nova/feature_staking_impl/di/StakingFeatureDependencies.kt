@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.di
 import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -47,6 +48,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepos
 import io.novafoundation.nova.feature_proxy_api.data.common.ProxyDepositCalculator
 import io.novafoundation.nova.feature_proxy_api.data.repository.GetProxyRepository
 import io.novafoundation.nova.feature_proxy_api.data.repository.ProxyConstantsRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
@@ -77,8 +79,15 @@ import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface StakingFeatureDependencies {
+
+    fun analyticsService(): AnalyticsService
+
+    fun usdRateRepository(): UsdRateRepository
+
+    fun assetVisibilityUseCase(): AssetVisibilityUseCase
 
     val maskableValueFormatterFactory: MaskableValueFormatterFactory
 

@@ -1,0 +1,33 @@
+// Every build attests with Play Integrity - the backend accepts nothing else for Android, and there is
+// no development shortcut. Debug builds therefore need a physical device with Google Play and a dev
+// backend that allows the debug package: an emulator never meets device integrity. Where the
+// infrastructure lives comes from the global remote config (infraUrl).
+android {
+
+    buildFeatures {
+        buildConfig = true
+    }
+
+    // Attestation logs through android.util.Log in debug builds; JVM tests exercise those paths
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    namespace 'io.novafoundation.nova.infrastructure'
+}
+
+dependencies {
+    implementation project(':common')
+
+    implementation kotlinDep
+    implementation coroutinesDep
+
+    implementation daggerDep
+    ksp daggerCompiler
+
+    implementation retrofitDep
+
+    testImplementation jUnitDep
+    testImplementation mockitoDep
+    testImplementation gsonDep
+}

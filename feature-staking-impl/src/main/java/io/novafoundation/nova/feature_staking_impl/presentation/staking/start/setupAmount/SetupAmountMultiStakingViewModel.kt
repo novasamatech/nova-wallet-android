@@ -1,6 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.staking.start.setupAmount
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.StakingStage
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -11,6 +15,8 @@ import io.novafoundation.nova.common.utils.orZero
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.chain
+import io.novafoundation.nova.feature_staking_impl.data.stakingType
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StartMultiStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.StartMultiStakingSelectionStoreProvider
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.selection.store.currentSelectionFlow
@@ -18,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.v
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.validations.handleStartMultiStakingValidationFailure
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.setupAmount.selectionType.MultiStakingSelectionTypeProviderFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.toAnalyticsStakingType
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.MultiStakingTargetSelectionFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.toStakingOptionIds
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.ConfirmMultiStakingPayload
@@ -48,6 +55,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 private const val DEBOUNCE_RATE_MILLIS = 500
 
@@ -64,9 +73,16 @@ class SetupAmountMultiStakingViewModel(
     private val payload: SetupAmountMultiStakingPayload,
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
+
+    /**
+     * Whether user moved further in the start staking flow. Used to detect flow abandoning in [onCleared]
+     */
+    private var flowContinued = false
 
     private val multiStakingSelectionTypeProvider = multiStakingSelectionTypeProviderFactory.create(
         scope = viewModelScope,
@@ -203,9 +219,35 @@ class SetupAmountMultiStakingViewModel(
         // payload might've been updated during validations so we should store it again
         selectionStoreProvider.getSelectionStore(viewModelScope).updateSelection(validPayload.recommendableSelection)
 
+        trackStakingInitiated(validPayload)
+
+        flowContinued = true
+
         val confirmPayload = ConfirmMultiStakingPayload(mapFeeToParcel(validPayload.fee), payload.availableStakingOptions)
 
         router.openConfirm(confirmPayload)
+    }
+
+    override fun onCleared() {
+        if (!flowContinued) {
+            analyticsService.track(AnalyticsEvent.StakingAbandoned(StakingStage.SETUP))
+        }
+
+        super.onCleared()
+    }
+
+    private suspend fun trackStakingInitiated(validPayload: StartMultiStakingValidationPayload) {
+        val selection = validPayload.recommendableSelection.selection
+        val stakingOption = selection.stakingOption
+        val usdAmount = usdRateRepository.planksToUsd(validPayload.asset.token.configuration, selection.stake)
+
+        analyticsService.track(
+            AnalyticsEvent.StakingInitiated(
+                stakingType = stakingOption.stakingType.toAnalyticsStakingType(),
+                network = stakingOption.chain.name,
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
+            )
+        )
     }
 
     private fun runFeeUpdates() {

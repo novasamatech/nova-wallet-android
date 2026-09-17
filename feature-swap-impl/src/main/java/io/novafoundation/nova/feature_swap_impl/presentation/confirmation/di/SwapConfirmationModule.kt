@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SwapConfirmationModule {
@@ -54,7 +56,9 @@ class SwapConfirmationModule {
         confirmationDetailsFormatter: SwapConfirmationDetailsFormatter,
         resourceManager: ResourceManager,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
-        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper
+        extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter = swapRouter,
@@ -75,7 +79,9 @@ class SwapConfirmationModule {
             swapConfirmationDetailsFormatter = confirmationDetailsFormatter,
             resourceManager = resourceManager,
             swapFlowScopeAggregator = swapFlowScopeAggregator,
-            extrinsicNavigationWrapper = extrinsicNavigationWrapper
+            extrinsicNavigationWrapper = extrinsicNavigationWrapper,
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

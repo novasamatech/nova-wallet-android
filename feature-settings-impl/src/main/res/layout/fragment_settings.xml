@@ -170,6 +170,13 @@
                 app:icon="@drawable/ic_pin"
                 app:title="@string/profile_pincode_change_title" />
 
+            <io.novafoundation.nova.common.view.settings.SettingsItemView
+                android:id="@+id/settingsPrivacySettings"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/shield_checkmark_outline"
+                app:title="@string/settings_privacy_title" />
+
         </io.novafoundation.nova.common.view.settings.SettingsGroupView>
 
         <io.novafoundation.nova.common.view.settings.SettingsGroupHeaderView

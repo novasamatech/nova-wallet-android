@@ -154,8 +154,7 @@ private fun mapCustomFeeRemoteOptionsToLocal(remoteOptions: Set<String>): String
 fun mapRemoteAssetToLocal(
     chainRemote: ChainRemote,
     assetRemote: ChainAssetRemote,
-    gson: Gson,
-    isEnabled: Boolean
+    gson: Gson
 ): ChainAssetLocal {
     return ChainAssetLocal(
         id = assetRemote.assetId,
@@ -171,7 +170,7 @@ fun mapRemoteAssetToLocal(
         sellProviders = gson.toJson(assetRemote.sellProviders),
         typeExtras = gson.toJson(assetRemote.typeExtras),
         icon = assetRemote.icon,
-        enabled = isEnabled
+        enabled = ChainAssetLocal.ENABLED_DEFAULT_BOOL
     )
 }
 

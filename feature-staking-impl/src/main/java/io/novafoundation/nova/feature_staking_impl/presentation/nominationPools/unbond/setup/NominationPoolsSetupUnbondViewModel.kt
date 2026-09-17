@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.setup
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -15,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.NominationPoolsUnbondValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.nominationPools.unbond.validations.nominationPoolsUnbondValidationFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.NominationPoolsRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_POOL
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.confirm.NominationPoolsConfirmUnbondPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
@@ -34,6 +38,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class NominationPoolsSetupUnbondViewModel(
     private val router: NominationPoolsRouter,
@@ -47,7 +53,9 @@ class NominationPoolsSetupUnbondViewModel(
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
-    private val amountFormatter: AmountFormatter
+    private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
     Validatable by validationExecutor {
 
@@ -149,11 +157,25 @@ class NominationPoolsSetupUnbondViewModel(
     }
 
     private fun openConfirm(validationPayload: NominationPoolsUnbondValidationPayload) = launch {
+        trackUnstakeInitiated(validationPayload)
+
         val confirmPayload = NominationPoolsConfirmUnbondPayload(
             amount = validationPayload.amount,
             fee = mapFeeToParcel(validationPayload.fee)
         )
 
         router.openConfirmUnbond(confirmPayload)
+    }
+
+    private suspend fun trackUnstakeInitiated(validationPayload: NominationPoolsUnbondValidationPayload) {
+        val usdAmount = usdRateRepository.amountToUsd(validationPayload.asset.token.configuration, validationPayload.amount)
+
+        analyticsService.track(
+            AnalyticsEvent.UnstakeInitiated(
+                stakingType = ANALYTICS_STAKING_TYPE_POOL,
+                network = validationPayload.chain.name,
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
+            )
+        )
     }
 }

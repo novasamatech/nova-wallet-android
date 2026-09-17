@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -59,7 +60,8 @@ class StartStakingLandingModule {
         chainRegistry: ChainRegistry,
         contextManager: ContextManager,
         amountFormatter: AmountFormatter,
-        stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
+        stakingAnnouncementsUseCase: StakingAnnouncementsUseCase,
+        analyticsService: AnalyticsService
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -75,7 +77,8 @@ class StartStakingLandingModule {
             chainRegistry = chainRegistry,
             contextManager = contextManager,
             amountFormatter = amountFormatter,
-            stakingAnnouncementsUseCase = stakingAnnouncementsUseCase
+            stakingAnnouncementsUseCase = stakingAnnouncementsUseCase,
+            analyticsService = analyticsService
         )
     }
 

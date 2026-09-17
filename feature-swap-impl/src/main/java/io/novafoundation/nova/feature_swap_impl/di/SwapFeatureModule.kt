@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_swap_impl.di
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -121,6 +122,7 @@ class SwapFeatureModule {
         swapUpdateSystemFactory: SwapUpdateSystemFactory,
         assetsValidationContextFactory: AssetsValidationContext.Factory,
         canReceiveAssetOutValidationFactory: CanReceiveAssetOutValidationFactory,
+        showReceivedAssetUseCase: ShowReceivedAssetUseCase,
     ): SwapInteractor {
         return SwapInteractor(
             priceImpactThresholds = priceImpactThresholds,
@@ -128,7 +130,8 @@ class SwapFeatureModule {
             canReceiveAssetOutValidationFactory = canReceiveAssetOutValidationFactory,
             swapUpdateSystemFactory = swapUpdateSystemFactory,
             assetsValidationContextFactory = assetsValidationContextFactory,
-            tokenRepository = tokenRepository
+            tokenRepository = tokenRepository,
+            showReceivedAssetUseCase = showReceivedAssetUseCase
         )
     }
 

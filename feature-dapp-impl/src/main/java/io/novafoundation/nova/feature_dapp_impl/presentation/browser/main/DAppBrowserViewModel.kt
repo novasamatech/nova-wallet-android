@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.browser.main
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.SignSource
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.actionAwaitable.confirmingAction
@@ -40,6 +43,8 @@ import io.novafoundation.nova.feature_external_sign_api.model.signPayload.Extern
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignRequest
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.ExternalSignWallet
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.SigningDappMetadata
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.evm.EvmSignPayload
+import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.PolkadotSignPayload
 import io.novafoundation.nova.feature_external_sign_api.model.signPayload.polkadot.genesisHash
 import io.novafoundation.nova.feature_external_sign_api.presentation.externalSign.AuthorizeDappBottomSheet
 import io.novafoundation.nova.runtime.ext.isDisabled
@@ -61,6 +66,8 @@ import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+private const val UNKNOWN_CHAIN = "unknown"
+
 enum class ConfirmationState {
     ALLOWED, REJECTED, CANCELLED
 }
@@ -78,7 +85,8 @@ class DAppBrowserViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val chainRegistry: ChainRegistry,
-    private val browserTabService: BrowserTabService
+    private val browserTabService: BrowserTabService,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(), Web3StateMachineHost {
 
     val removeFromFavouritesConfirmation = actionAwaitableMixinFactory.confirmingAction<RemoveFavouritesPayload>()
@@ -155,19 +163,81 @@ class DAppBrowserViewModel(
         val chainId = request.extractChainId()
         val chain = chainRegistry.chainsById()[chainId]
 
+        val analyticsMethod = request.analyticsMethod()
+        val analyticsChain = chain?.name ?: request.analyticsChain()
+
         if (chain != null && chain.isDisabled) {
             return ConfirmTxResponse.ChainIsDisabled(request.id, chain.name)
         }
 
+        trackSignEvent(AnalyticsEvent.SignRequestShown(SignSource.DAPP_BROWSER, analyticsMethod, analyticsChain))
+
         val response = withContext(Dispatchers.Main) {
             signRequester.awaitConfirmation(mapSignExtrinsicRequestToPayload(request))
         }
+
+        trackSignOutcome(response, analyticsMethod, analyticsChain)
 
         return when (response) {
             is ExternalSignCommunicator.Response.Rejected -> ConfirmTxResponse.Rejected(response.requestId)
             is ExternalSignCommunicator.Response.Signed -> ConfirmTxResponse.Signed(response.requestId, response.signature, response.modifiedTransaction)
             is ExternalSignCommunicator.Response.SigningFailed -> ConfirmTxResponse.SigningFailed(response.requestId, response.shouldPresent)
             is ExternalSignCommunicator.Response.Sent -> ConfirmTxResponse.Sent(response.requestId, response.txHash)
+        }
+    }
+
+    private fun trackSignOutcome(response: ExternalSignCommunicator.Response, method: String, chain: String) {
+        val event = when (response) {
+            is ExternalSignCommunicator.Response.Rejected -> AnalyticsEvent.SignRejected(SignSource.DAPP_BROWSER, method, chain)
+
+            is ExternalSignCommunicator.Response.Signed -> AnalyticsEvent.SignApproved(SignSource.DAPP_BROWSER, method, chain)
+
+            is ExternalSignCommunicator.Response.SigningFailed ->
+                AnalyticsEvent.SignFailed(SignSource.DAPP_BROWSER, method, chain, reason = "signing_failed")
+
+            is ExternalSignCommunicator.Response.Sent -> return
+        }
+
+        trackSignEvent(event)
+    }
+
+    private fun trackSignEvent(event: AnalyticsEvent) {
+        analyticsService.track(event)
+    }
+
+    /**
+     * Request method type only - never payload or calldata
+     */
+    private fun ExternalSignRequest.analyticsMethod(): String {
+        return when (this) {
+            is ExternalSignRequest.Polkadot -> when (payload) {
+                is PolkadotSignPayload.Json -> "polkadot_signPayload"
+                is PolkadotSignPayload.Raw -> "polkadot_signRaw"
+            }
+
+            is ExternalSignRequest.Evm -> when (val evmPayload = payload) {
+                is EvmSignPayload.ConfirmTx -> when (evmPayload.action) {
+                    EvmSignPayload.ConfirmTx.Action.SEND -> "eth_sendTransaction"
+                    EvmSignPayload.ConfirmTx.Action.SIGN -> "eth_signTransaction"
+                }
+
+                is EvmSignPayload.SignTypedMessage -> "eth_signTypedData"
+                is EvmSignPayload.PersonalSign -> "personal_sign"
+            }
+        }
+    }
+
+    /**
+     * Fallback chain identifier used when chain is not present in the registry. Caip-like id or "unknown", never an address
+     */
+    private fun ExternalSignRequest.analyticsChain(): String {
+        return when (this) {
+            is ExternalSignRequest.Polkadot -> UNKNOWN_CHAIN
+
+            is ExternalSignRequest.Evm -> when (val evmPayload = payload) {
+                is EvmSignPayload.ConfirmTx -> "eip155:${evmPayload.chainSource.evmChainId}"
+                else -> UNKNOWN_CHAIN
+            }
         }
     }
 

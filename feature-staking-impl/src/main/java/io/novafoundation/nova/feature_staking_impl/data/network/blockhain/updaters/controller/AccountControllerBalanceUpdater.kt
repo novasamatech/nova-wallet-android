@@ -10,7 +10,6 @@ import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.update
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.cache.bindAccountInfoOrDefault
 import io.novafoundation.nova.feature_wallet_api.data.cache.updateAsset
-import io.novafoundation.nova.runtime.ext.disabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
 import io.novafoundation.nova.runtime.state.chainAndAsset
@@ -34,8 +33,6 @@ class AccountControllerBalanceUpdater(
         scopeValue: AccountStakingLocal
     ): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = sharedState.chainAndAsset()
-        if (chainAsset.disabled) return emptyFlow()
-
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val accountStaking = scopeValue

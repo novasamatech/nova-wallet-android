@@ -1,6 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.mythos.unbond.setup
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.common.analytics.ANALYTICS_STAKING_TYPE_MYTHOS
+import io.novafoundation.nova.runtime.state.chain
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -52,6 +57,8 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import io.novafoundation.nova.feature_staking_impl.presentation.common.selectStakeTarget.ChooseStakedStakeTargetsBottomSheet.Payload as SelectCollatorPayload
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class SetupUnbondMythosViewModel(
     private val router: MythosStakingRouter,
@@ -68,6 +75,8 @@ class SetupUnbondMythosViewModel(
     private val mythosValidationFailureFormatter: MythosStakingValidationFailureFormatter,
     private val stakingSharedState: StakingSharedState,
     private val amountFormatter: AmountFormatter,
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -222,6 +231,21 @@ class SetupUnbondMythosViewModel(
             fee = fee.toParcel()
         )
 
+        trackUnstakeInitiated()
+
         router.openUnbondConfirm(nextScreenPayload)
+    }
+
+    private suspend fun trackUnstakeInitiated() {
+        val asset = assetFlow.first()
+        val usdAmount = usdRateRepository.planksToUsd(asset.token.configuration, stakedAmount.first())
+
+        analyticsService.track(
+            AnalyticsEvent.UnstakeInitiated(
+                stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
+                network = stakingSharedState.chain().name,
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
+            )
+        )
     }
 }

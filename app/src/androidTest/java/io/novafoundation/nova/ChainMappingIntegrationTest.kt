@@ -88,7 +88,7 @@ class ChainMappingIntegrationTest {
 
     private fun mapRemoteToLocalToDomain(chainRemote: ChainRemote): Chain {
         val chainLocal = mapRemoteChainToLocal(chainRemote, null, ChainLocal.Source.DEFAULT, gson)
-        val assetsLocal = chainRemote.assets.map { mapRemoteAssetToLocal(chainRemote, it, gson, isEnabled = true) }
+        val assetsLocal = chainRemote.assets.map { mapRemoteAssetToLocal(chainRemote, it, gson) }
         val nodesLocal = mapRemoteNodesToLocal(chainRemote)
         val explorersLocal = mapRemoteExplorersToLocal(chainRemote)
         val externalApisLocal = mapExternalApisToLocal(chainRemote)

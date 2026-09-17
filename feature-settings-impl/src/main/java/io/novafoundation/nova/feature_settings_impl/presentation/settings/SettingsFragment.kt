@@ -58,6 +58,8 @@ class SettingsFragment : BaseFragment<SettingsViewModel, FragmentSettingsBinding
 
         binder.settingsWalletConnect.setOnClickListener { viewModel.walletConnectClicked() }
 
+        binder.settingsPrivacySettings.setOnClickListener { viewModel.privacySettingsClicked() }
+
         binder.settingsAvatar.setOnClickListener { viewModel.selectedWalletClicked() }
     }
 

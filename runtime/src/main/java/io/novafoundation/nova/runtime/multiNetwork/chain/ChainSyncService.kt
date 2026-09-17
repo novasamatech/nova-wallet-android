@@ -4,10 +4,7 @@ import com.google.gson.Gson
 import io.novafoundation.nova.common.utils.CollectionDiffer
 import io.novafoundation.nova.common.utils.retryUntilDone
 import io.novafoundation.nova.core_db.dao.ChainDao
-import io.novafoundation.nova.core_db.dao.FullAssetIdLocal
-import io.novafoundation.nova.core_db.ext.fullId
 import io.novafoundation.nova.core_db.model.chain.AssetSourceLocal
-import io.novafoundation.nova.core_db.model.chain.ChainAssetLocal.Companion.ENABLED_DEFAULT_BOOL
 import io.novafoundation.nova.core_db.model.chain.ChainLocal
 import io.novafoundation.nova.core_db.model.chain.ChainNodeLocal
 import io.novafoundation.nova.core_db.model.chain.NodeSelectionPreferencesLocal
@@ -36,17 +33,12 @@ class ChainSyncService(
         val oldNodeSelectionPreferences = localChainsJoinedInfo.mapNotNull { it.nodeSelectionPreferences }
 
         val oldChainsById = oldChains.associateBy { it.id }
-        val associatedOldAssets = oldAssets.associateBy { it.fullId() }
 
         val remoteChains = retryUntilDone { chainFetcher.getChains() }
 
         val newChains = remoteChains.map { mapRemoteChainToLocal(it, oldChainsById[it.chainId], source = ChainLocal.Source.DEFAULT, gson) }
         val newAssets = remoteChains.flatMap { chain ->
-            chain.assets.map {
-                val fullAssetId = FullAssetIdLocal(chain.chainId, it.assetId)
-                val oldAsset = associatedOldAssets[fullAssetId]
-                mapRemoteAssetToLocal(chain, it, gson, oldAsset?.enabled ?: ENABLED_DEFAULT_BOOL)
-            }
+            chain.assets.map { mapRemoteAssetToLocal(chain, it, gson) }
         }
         val newNodes = remoteChains.flatMap(::mapRemoteNodesToLocal)
         val newExplorers = remoteChains.flatMap(::mapRemoteExplorersToLocal)

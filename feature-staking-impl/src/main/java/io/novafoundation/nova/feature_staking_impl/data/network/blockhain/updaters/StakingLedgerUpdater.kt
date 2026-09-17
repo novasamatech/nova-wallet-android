@@ -18,7 +18,6 @@ import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.bindings.bindStakingLedger
 import io.novafoundation.nova.runtime.network.updaters.multiChain.SharedStateBasedUpdater
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
-import io.novafoundation.nova.runtime.ext.disabled
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.getRuntime
@@ -63,8 +62,6 @@ class StakingLedgerUpdater(
         scopeValue: MetaAccount
     ): Flow<Updater.SideEffect> {
         val (chain, chainAsset) = stakingSharedState.assetWithChain.first()
-        if (chainAsset.disabled) return emptyFlow()
-
         val runtime = chainRegistry.getRuntime(chain.id)
 
         val currentAccountId = scopeValue.accountIdIn(chain) ?: return emptyFlow()

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_swap_impl.di
 
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -22,6 +23,7 @@ class SwapFeatureHolder @Inject constructor(
     override fun initializeDependencies(): Any {
         val accountFeatureDependencies = DaggerSwapFeatureComponent_SwapFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
+            .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .swapCoreApi(getFeature(SwapCoreApi::class.java))
