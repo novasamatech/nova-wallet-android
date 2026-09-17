@@ -2043,13 +2043,9 @@
     <string name="swap_rate_includes_fee_description">%s%%のNova Wallet手数料を含む、見つかった最良のレートです。</string>
     <string name="analytics_consent_agree">同意</string>
     <string name="analytics_consent_body">匿名の利用データを共有して、どの機能が使われているかを把握し、Nova Walletの改善にご協力ください。詳細は%1$sをご覧ください。</string>
-    <string name="analytics_consent_change_anytime">設定からいつでも変更できます</string>
     <string name="analytics_consent_decline">同意しない</string>
     <string name="analytics_consent_disclosure_title">収集しない情報</string>
-    <string name="analytics_consent_ip_country">IPアドレスは国の判定のみに使用し、その後削除します</string>
     <string name="analytics_consent_learn_more">プライバシー通知で詳しく見る</string>
-    <string name="analytics_consent_never_addresses">アドレス、トランザクションハッシュ、金額は一切収集しません</string>
-    <string name="analytics_consent_never_ids">お客様とデータを紐付けるIDは収集しません</string>
     <string name="analytics_consent_privacy_notice">プライバシー通知</string>
     <string name="analytics_prompt_title">Nova Walletの改善にご協力ください</string>
     <string name="assets_manage_tokens_all_tokens">すべてのトークン</string>
@@ -2064,4 +2060,8 @@
     <string name="swap_failure_pool_trade_limit_message">%1$sの流動性プールでは、1回のSwapのサイズに制限があります。現在Swapできる最大額は%2$sです。</string>
     <string name="swap_failure_pool_trade_limit_route_message">Swapは、1回のSwapで最大%2$sまでに制限されている%1$sの流動性プールを経由しています。少ない金額でお試しください。</string>
     <string name="swap_failure_pool_trade_limit_title">金額がプールの上限を超えています</string>
+    <string name="analytics_consent_change_anytime">設定でいつでも選択を変更できます</string>
+    <string name="analytics_consent_ip_country">IPアドレスは国を記録するために一度だけ使用され、その後削除されます — 分析プロバイダーに送信されることはありません</string>
+    <string name="analytics_consent_never_addresses">ウォレットアドレス、トランザクションハッシュ、正確な金額が送信されることは決してありません</string>
+    <string name="analytics_consent_never_ids">永続的な識別子はありません — データがあなたと結び付けられることはありません</string>
 </resources>

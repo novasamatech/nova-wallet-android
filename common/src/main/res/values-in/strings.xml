@@ -2043,13 +2043,9 @@
     <string name="swap_rate_includes_fee_description">Nilai tukar terbaik yang ditemukan, termasuk biaya Nova Wallet sebesar %s%%.</string>
     <string name="analytics_consent_agree">Setuju</string>
     <string name="analytics_consent_body">Bagikan data penggunaan anonim untuk membantu kami memahami fitur mana yang digunakan dan meningkatkan Nova Wallet. Detailnya ada di %1$s kami.</string>
-    <string name="analytics_consent_change_anytime">Ubah kapan saja di Pengaturan</string>
     <string name="analytics_consent_decline">Tidak setuju</string>
     <string name="analytics_consent_disclosure_title">Yang tidak pernah kami kumpulkan</string>
-    <string name="analytics_consent_ip_country">IP hanya digunakan untuk menentukan negara, lalu dihapus</string>
     <string name="analytics_consent_learn_more">Pelajari selengkapnya di Pemberitahuan Privasi</string>
-    <string name="analytics_consent_never_addresses">Tidak pernah mengumpulkan alamat, hash transaksi, atau jumlah</string>
-    <string name="analytics_consent_never_ids">Tidak ada ID yang mengaitkan data dengan Anda</string>
     <string name="analytics_consent_privacy_notice">Pemberitahuan Privasi</string>
     <string name="analytics_prompt_title">Bantu Tingkatkan Nova Wallet</string>
     <string name="assets_manage_tokens_all_tokens">Semua token</string>
@@ -2064,4 +2060,8 @@
     <string name="swap_failure_pool_trade_limit_message">Pool likuiditas %1$s membatasi ukuran satu swap. Jumlah maksimum yang dapat Anda swap saat ini adalah %2$s.</string>
     <string name="swap_failure_pool_trade_limit_route_message">Swap Anda dirutekan melalui pool likuiditas %1$s yang mengizinkan maksimal %2$s per swap. Coba jumlah yang lebih kecil.</string>
     <string name="swap_failure_pool_trade_limit_title">Jumlah melebihi batas pool</string>
+    <string name="analytics_consent_change_anytime">Ubah pilihan Anda kapan saja di Pengaturan</string>
+    <string name="analytics_consent_ip_country">Alamat IP Anda digunakan sekali untuk mencatat negara Anda, lalu dihapus — alamat tersebut tidak pernah sampai ke penyedia analitik kami</string>
+    <string name="analytics_consent_never_addresses">Tidak pernah berupa alamat dompet, hash transaksi, atau jumlah persis Anda</string>
+    <string name="analytics_consent_never_ids">Tidak ada pengenal persisten — tidak ada yang mengaitkan data tersebut dengan Anda</string>
 </resources>

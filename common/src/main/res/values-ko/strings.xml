@@ -2043,13 +2043,9 @@
     <string name="swap_rate_includes_fee_description">%s%% Nova Wallet 수수료를 포함하여 찾은 최적의 환율입니다.</string>
     <string name="analytics_consent_agree">동의</string>
     <string name="analytics_consent_body">익명 사용 데이터를 공유하여 어떤 기능이 사용되는지 파악하고 Nova Wallet을 개선하는 데 도움을 주세요. 자세한 내용은 %1$s에서 확인하세요.</string>
-    <string name="analytics_consent_change_anytime">설정에서 언제든지 변경 가능</string>
     <string name="analytics_consent_decline">동의하지 않음</string>
     <string name="analytics_consent_disclosure_title">수집하지 않는 정보</string>
-    <string name="analytics_consent_ip_country">IP는 국가 확인에만 사용한 후 삭제됩니다</string>
     <string name="analytics_consent_learn_more">개인정보 보호 안내에서 자세히 알아보기</string>
-    <string name="analytics_consent_never_addresses">주소, 트랜잭션 해시 또는 금액은 절대 수집하지 않습니다</string>
-    <string name="analytics_consent_never_ids">사용자와 연결되는 ID는 수집하지 않습니다</string>
     <string name="analytics_consent_privacy_notice">개인정보 보호 안내</string>
     <string name="analytics_prompt_title">Nova Wallet 개선에 도움 주기</string>
     <string name="assets_manage_tokens_all_tokens">모든 토큰</string>
@@ -2064,4 +2060,8 @@
     <string name="swap_failure_pool_trade_limit_message">%1$s 유동성 풀은 단일 스왑의 규모를 제한합니다. 현재 스왑할 수 있는 최대 금액은 %2$s입니다.</string>
     <string name="swap_failure_pool_trade_limit_route_message">스왑이 단일 스왑당 최대 %2$s까지 허용하는 %1$s 유동성 풀을 통해 라우팅됩니다. 더 적은 금액을 시도해 보세요.</string>
     <string name="swap_failure_pool_trade_limit_title">금액이 풀 한도를 초과함</string>
+    <string name="analytics_consent_change_anytime">설정에서 언제든지 선택을 변경할 수 있습니다</string>
+    <string name="analytics_consent_ip_country">IP는 국가를 확인하기 위해 한 번 사용된 후 삭제되며, 분석 제공업체에 절대 전송되지 않습니다</string>
+    <string name="analytics_consent_never_addresses">지갑 주소, 트랜잭션 해시 또는 정확한 금액은 절대 수집하지 않습니다</string>
+    <string name="analytics_consent_never_ids">영구 식별자가 없으므로 데이터가 귀하와 연결되지 않습니다</string>
 </resources>

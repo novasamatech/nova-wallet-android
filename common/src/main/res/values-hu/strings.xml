@@ -2057,13 +2057,9 @@
     <string name="swap_rate_includes_fee_description">A megtalált legjobb árfolyam, amely tartalmazza a Nova Wallet %s%%-os díját.</string>
     <string name="analytics_consent_agree">Elfogadom</string>
     <string name="analytics_consent_body">Ossza meg névtelen használati adatait, hogy segítsen megértenünk, mely funkciókat használják, és jobbá tegyük a Nova Walletet. Részletek az %1$s oldalon.</string>
-    <string name="analytics_consent_change_anytime">Bármikor módosítható a Beállításokban</string>
     <string name="analytics_consent_decline">Nem fogadom el</string>
     <string name="analytics_consent_disclosure_title">Amit soha nem gyűjtünk</string>
-    <string name="analytics_consent_ip_country">Az IP-címet csak az ország meghatározására használjuk, majd töröljük</string>
     <string name="analytics_consent_learn_more">További információ az Adatvédelmi tájékoztatóban</string>
-    <string name="analytics_consent_never_addresses">Soha nem gyűjtünk címeket, tranzakcióazonosító-hash-eket vagy összegeket</string>
-    <string name="analytics_consent_never_ids">Nem gyűjtünk Önhöz köthető azonosítókat</string>
     <string name="analytics_consent_privacy_notice">Adatvédelmi tájékoztató</string>
     <string name="analytics_prompt_title">Segítsen jobbá tenni a Nova Walletet</string>
     <string name="assets_manage_tokens_all_tokens">Összes token</string>
@@ -2078,4 +2074,8 @@
     <string name="swap_failure_pool_trade_limit_message">A(z) %1$s likviditási pool korlátozza egyetlen swap méretét. Jelenleg legfeljebb %2$s összeget válthat át.</string>
     <string name="swap_failure_pool_trade_limit_route_message">A swap egy olyan %1$s likviditási poolon keresztül történik, amely egyetlen swap során legfeljebb %2$s összeget engedélyez. Próbáljon kisebb összeget.</string>
     <string name="swap_failure_pool_trade_limit_title">Az összeg meghaladja a pool korlátját</string>
+    <string name="analytics_consent_change_anytime">Választását bármikor módosíthatja a Beállításokban</string>
+    <string name="analytics_consent_ip_country">IP-címét egyszer használjuk fel országa megállapítására, majd töröljük — soha nem jut el analitikai szolgáltatónkhoz</string>
+    <string name="analytics_consent_never_addresses">Soha nem használjuk a tárcacímeit, a tranzakció-hash-eket vagy a pontos összegeket</string>
+    <string name="analytics_consent_never_ids">Nincsenek állandó azonosítók — semmi sem kapcsolja az adatokat Önhöz</string>
 </resources>
