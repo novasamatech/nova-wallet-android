@@ -41,6 +41,10 @@ private class RecordingAttestationService : ClientAttestationService {
     override suspend fun forgetRegistration(clientId: String) {
         forgotten += clientId
     }
+
+    override fun setClientCreationAllowed(allowed: Boolean) = Unit
+
+    override suspend fun forgetClient() = Unit
 }
 
 private class FailingAttestationService(private val failure: Exception) : ClientAttestationService {
@@ -48,6 +52,10 @@ private class FailingAttestationService(private val failure: Exception) : Client
     override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String> = throw failure
 
     override suspend fun forgetRegistration(clientId: String) = Unit
+
+    override fun setClientCreationAllowed(allowed: Boolean) = Unit
+
+    override suspend fun forgetClient() = Unit
 }
 
 /** Stands in for the network: answers with the queued statuses and records what would have been sent. */

@@ -60,6 +60,19 @@ interface ClientAttestationService {
      * identity has already moved on, so a burst of such answers triggers one recovery.
      */
     suspend fun forgetRegistration(clientId: String)
+
+    /**
+     * Whether a client id may be created and registered. While not allowed, requests that need a new
+     * identity fail with [AttestationUnavailableException] instead of minting one - an opted-out user
+     * must not get a fresh installation registered behind their back by a request already in flight.
+     */
+    fun setClientCreationAllowed(allowed: Boolean)
+
+    /**
+     * Drops the client id and its key, so the next registration happens as a new installation that
+     * cannot be linked to the previous one. Mirrors iOS, which forgets the client on analytics opt-out.
+     */
+    suspend fun forgetClient()
 }
 
 class RealClientAttestationService(
@@ -76,6 +89,9 @@ class RealClientAttestationService(
     @Volatile
     private var rejected = false
 
+    @Volatile
+    private var clientCreationAllowed = true
+
     override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String> {
         val (clientId, challenge) = requestChallenge()
         val digest = requestDigest(Purpose.REQUEST, challenge, clientId, context, sha256(body))
@@ -90,7 +106,22 @@ class RealClientAttestationService(
 
     override suspend fun forgetRegistration(clientId: String) {
         registrationMutex.withLock {
-            if (identity.clientId() == clientId) identity.clearAttested()
+            if (identity.existingClientId() == clientId) identity.clearAttested()
+        }
+    }
+
+    override fun setClientCreationAllowed(allowed: Boolean) {
+        clientCreationAllowed = allowed
+    }
+
+    override suspend fun forgetClient() {
+        // Under the mutex, so a registration in progress finishes before its identity is dropped
+        registrationMutex.withLock {
+            val clientId = identity.existingClientId() ?: return
+
+            identity.reset()
+            keyPairStore.delete(clientId)
+            attestationLog("client forgotten - the next registration starts as a new installation")
         }
     }
 
@@ -141,15 +172,25 @@ class RealClientAttestationService(
             attestationWarn("refusing to sign: attestation was rejected earlier in this process")
             throw AttestationFailedException("Attestation was rejected by the backend")
         }
+        requireClientAllowed()
         if (identity.isAttested()) return
 
         registrationMutex.withLock {
+            requireClientAllowed()
             if (identity.isAttested()) return
 
             register(identity.clientId())
             identity.markAttested()
             attestationLog("registered package=$appPackage")
         }
+    }
+
+    // Checked before touching the identity: reading the client id would mint a new one
+    private fun requireClientAllowed() {
+        if (clientCreationAllowed) return
+
+        attestationLog("refusing to sign: client creation is not allowed right now")
+        throw AttestationUnavailableException("Client creation is not allowed")
     }
 
     private suspend fun register(clientId: String) {

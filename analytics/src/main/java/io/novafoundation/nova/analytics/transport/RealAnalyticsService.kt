@@ -4,6 +4,7 @@ import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsFlushReason
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.analyticsLog
+import io.novafoundation.nova.infrastructure.attestation.ClientAttestationService
 import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,6 +29,7 @@ class RealAnalyticsService(
     private val queue: AnalyticsEventQueue,
     private val uploader: AnalyticsUploader,
     private val identity: AnalyticsIdentity,
+    private val attestation: ClientAttestationService,
     private val flushThreshold: Int,
     private val clock: () -> Long = System::currentTimeMillis
 ) : AnalyticsService {
@@ -41,10 +43,18 @@ class RealAnalyticsService(
     override var isEnabled: Boolean = false
         set(value) {
             field = value
-            analyticsLog("enabled=$value" + if (!value) " - install id reset, queue cleared" else "")
+            analyticsLog("enabled=$value" + if (!value) " - install id and attestation client reset, queue cleared" else "")
+
+            // Set right away, before any coroutine runs: a flush already in flight must not register a new client
+            attestation.setClientCreationAllowed(value)
+
             if (!value) {
                 identity.resetInstallId()
-                scope.launch(Dispatchers.IO) { queue.clear() }
+                scope.launch(Dispatchers.IO) {
+                    queue.clear()
+                    // Same as iOS: after opting out, the X-Client-Id of the old consent is never used again
+                    attestation.forgetClient()
+                }
             }
         }
 

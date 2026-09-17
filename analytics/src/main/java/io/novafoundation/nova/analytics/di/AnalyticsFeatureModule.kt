@@ -23,6 +23,7 @@ import io.novafoundation.nova.common.utils.coroutines.DangerousScope
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
 import io.novafoundation.nova.infrastructure.di.Attested
+import io.novafoundation.nova.infrastructure.attestation.ClientAttestationService
 
 private const val ANALYTICS_QUEUE_MAX_SIZE = 500
 
@@ -75,11 +76,12 @@ class AnalyticsFeatureModule {
         rootScope: RootScope,
         queue: AnalyticsEventQueue,
         uploader: Lazy<AnalyticsUploader>,
-        identity: AnalyticsIdentity
+        identity: AnalyticsIdentity,
+        attestation: ClientAttestationService
     ): AnalyticsService {
         analyticsLog("RealAnalyticsService installed, batch=$ANALYTICS_BATCH_SIZE")
 
-        return RealAnalyticsService(rootScope, queue, uploader.get(), identity, ANALYTICS_BATCH_SIZE)
+        return RealAnalyticsService(rootScope, queue, uploader.get(), identity, attestation, ANALYTICS_BATCH_SIZE)
     }
 
     @Provides
