@@ -10,6 +10,9 @@ interface AttestationIdentity {
 
     fun clientId(): String
 
+    /** The current client id, or null when none was minted yet - unlike [clientId], never creates one. */
+    fun existingClientId(): String?
+
     fun isAttested(): Boolean
 
     fun markAttested()
@@ -37,6 +40,8 @@ class RealAttestationIdentity(
         preferences.putString(PREFS_CLIENT_ID, generated)
         return generated
     }
+
+    override fun existingClientId(): String? = preferences.getString(PREFS_CLIENT_ID)
 
     override fun isAttested(): Boolean = preferences.getString(PREFS_ATTESTED_CLIENT_ID) == clientId()
 

@@ -263,6 +263,46 @@ class ClientAttestationServiceTest {
         assertTrue(identity.isAttested())
     }
 
+    @Test
+    fun `forgetting the client drops the identity and its key`() = runBlocking<Unit> {
+        val service = service()
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        val original = identity.clientId()
+
+        service.forgetClient()
+
+        assertEquals(null, identity.existingClientId())
+        assertEquals(listOf(original), keyPairStore.deleted)
+
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+
+        assertNotEquals(original, api.registrations.last().client_id)
+        assertEquals(2, api.registrations.size)
+    }
+
+    @Test
+    fun `forgetting a client that was never created changes nothing`() = runBlocking<Unit> {
+        service().forgetClient()
+
+        assertEquals(null, identity.existingClientId())
+        assertTrue(keyPairStore.deleted.isEmpty())
+    }
+
+    @Test
+    fun `while client creation is not allowed no identity is minted or registered`() = runBlocking<Unit> {
+        val service = service()
+        service.setClientCreationAllowed(false)
+
+        assertFailsWith<AttestationUnavailableException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+
+        assertEquals(null, identity.existingClientId())
+        assertTrue(api.challengeRequests.isEmpty())
+
+        service.setClientCreationAllowed(true)
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+
+        assertEquals(identity.clientId(), api.registrations.single().client_id)
+    }
 
     private inline fun <reified T : Throwable> assertFailsWith(block: () -> Unit): T {
         try {

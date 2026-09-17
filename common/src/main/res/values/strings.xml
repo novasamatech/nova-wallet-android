@@ -2808,4 +2808,7 @@
     <string name="analytics_consent_learn_more">Learn more in the Privacy Notice</string>
     <string name="analytics_consent_agree">Agree</string>
     <string name="analytics_consent_decline">Don’t Agree</string>
+    <string name="settings_privacy_title">Privacy</string>
+    <string name="privacy_analytics_description">Helps us understand which features are used and make Nova Wallet better.</string>
+    <string name="privacy_analytics_enabled_toast">Thanks for helping improve Nova Wallet</string>
 </resources>
