@@ -15,6 +15,8 @@ sealed class SwapValidationFailure {
 
     class HighPriceImpact(val priceImpact: Fraction) : SwapValidationFailure()
 
+    class TooHighPriceImpact(val priceImpact: Fraction, val maxAllowed: Fraction) : SwapValidationFailure()
+
     class InvalidSlippage(val minSlippage: Fraction, val maxSlippage: Fraction) : SwapValidationFailure()
 
     class NewRateExceededSlippage(
