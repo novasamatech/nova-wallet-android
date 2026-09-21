@@ -13,8 +13,15 @@ class SwapPriceImpactValidation(
 ) : SwapValidation {
 
     override suspend fun validate(value: SwapValidationPayload): ValidationStatus<SwapValidationFailure> {
-        if (value.swapQuote.priceImpact > priceImpactThresholds.mediumPriceImpact) {
-            return SwapValidationFailure.HighPriceImpact(value.swapQuote.priceImpact).validationError()
+        val priceImpact = value.swapQuote.priceImpact
+
+        // An error rather than a warning: the user cannot confirm past it
+        if (priceImpact >= priceImpactThresholds.maxAllowedPriceImpact) {
+            return SwapValidationFailure.TooHighPriceImpact(priceImpact, priceImpactThresholds.maxAllowedPriceImpact).validationError()
+        }
+
+        if (priceImpact > priceImpactThresholds.mediumPriceImpact) {
+            return SwapValidationFailure.HighPriceImpact(priceImpact).validationError()
         }
 
         return valid()
