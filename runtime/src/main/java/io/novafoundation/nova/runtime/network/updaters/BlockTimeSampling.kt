@@ -20,15 +20,22 @@ const val BLOCK_TIME_SAMPLING_WINDOW_BLOCKS = 30L
 const val BLOCK_TIME_MAX_SAMPLES_MEMORY = 10L
 
 data class SampledBlockTime(
-    val sampleSize: BigInteger,
-    val averageBlockTime: BigInteger,
+    val samples: List<BigInteger>,
     val windowStartBlock: BlockNumber? = null,
     val windowStartTimestamp: BigInteger? = null,
+    val lastObservedBlock: BlockNumber? = null,
+    val lastObservedTimestamp: BigInteger? = null,
 ) {
+
+    val sampleSize: BigInteger
+        get() = samples.size.toBigInteger()
+
+    val averageBlockTime: BigInteger
+        get() = if (samples.isEmpty()) BigInteger.ZERO else samples.sumOf { it } / sampleSize
 
     companion object {
 
-        fun initial() = SampledBlockTime(sampleSize = BigInteger.ZERO, averageBlockTime = BigInteger.ZERO)
+        fun initial() = SampledBlockTime(samples = emptyList())
     }
 }
 
@@ -41,30 +48,42 @@ data class SampledBlockTime(
 fun SampledBlockTime.observing(block: BlockNumber, timestampMillis: BigInteger): SampledBlockTime {
     val startBlock = windowStartBlock
     val startTimestamp = windowStartTimestamp
+    val lastBlock = lastObservedBlock
+    val lastTimestamp = lastObservedTimestamp
 
-    if (startBlock == null || startTimestamp == null || block <= startBlock || timestampMillis < startTimestamp) {
+    if (
+        startBlock == null || startTimestamp == null ||
+        lastBlock == null || lastTimestamp == null ||
+        block <= lastBlock || timestampMillis < lastTimestamp
+    ) {
         return restartingWindow(block, timestampMillis)
     }
 
     val blockSpan = block - startBlock
-    if (blockSpan < BLOCK_TIME_SAMPLING_WINDOW_BLOCKS.toBigInteger()) return this
+    if (blockSpan < BLOCK_TIME_SAMPLING_WINDOW_BLOCKS.toBigInteger()) {
+        return copy(lastObservedBlock = block, lastObservedTimestamp = timestampMillis)
+    }
 
     val timestampSpan = timestampMillis - startTimestamp
     if (timestampSpan <= BigInteger.ZERO) return restartingWindow(block, timestampMillis)
 
     val sample = timestampSpan / blockSpan
-    val maxMemory = BLOCK_TIME_MAX_SAMPLES_MEMORY.toBigInteger()
-    val rememberedSamples = sampleSize.min(maxMemory)
-    val newAverage = (averageBlockTime * rememberedSamples + sample) / (rememberedSamples + BigInteger.ONE)
+    val recentSamples = (samples + sample).takeLast(BLOCK_TIME_MAX_SAMPLES_MEMORY.toInt())
 
     return SampledBlockTime(
-        sampleSize = (sampleSize + BigInteger.ONE).min(maxMemory),
-        averageBlockTime = newAverage,
+        samples = recentSamples,
         windowStartBlock = block,
         windowStartTimestamp = timestampMillis,
+        lastObservedBlock = block,
+        lastObservedTimestamp = timestampMillis,
     )
 }
 
 private fun SampledBlockTime.restartingWindow(block: BlockNumber, timestampMillis: BigInteger): SampledBlockTime {
-    return copy(windowStartBlock = block, windowStartTimestamp = timestampMillis)
+    return copy(
+        windowStartBlock = block,
+        windowStartTimestamp = timestampMillis,
+        lastObservedBlock = block,
+        lastObservedTimestamp = timestampMillis,
+    )
 }

@@ -2,7 +2,6 @@ package io.novafoundation.nova.runtime.network.updaters
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import java.math.BigInteger
 
@@ -53,13 +52,13 @@ class BlockTimeSamplingTest {
     fun `window restarts when block number goes backwards`() {
         val observations = listOf(
             100L to 600_000L,
-            90L to 540_000L, // reorg / different node
             120L to 720_000L,
+            118L to 1_000_000L, // reorg / different node, still ahead of the window start
+            148L to 1_180_000L,
         )
 
         val result = SampledBlockTime.initial().feed(observations)
 
-        // Without a restart the window would be 100..120 (20 blocks) and produce nothing
         assertEquals(6000, result.averageBlockTime.toInt())
         assertEquals(1, result.sampleSize.toInt())
     }
@@ -75,15 +74,16 @@ class BlockTimeSamplingTest {
     }
 
     @Test
-    fun `old samples do not dominate after the chain changes its block time`() {
-        val legacyState = SampledBlockTime(sampleSize = 1000.toBigInteger(), averageBlockTime = 6000.toBigInteger())
-        val windows = 30
+    fun `only the latest windows contribute to the average`() {
+        val oldSamples = List(BLOCK_TIME_MAX_SAMPLES_MEMORY.toInt()) { 6000.toBigInteger() }
+        val legacyState = SampledBlockTime(samples = oldSamples)
+        val windows = BLOCK_TIME_MAX_SAMPLES_MEMORY.toInt()
         val observations = (0L..(windows * BLOCK_TIME_SAMPLING_WINDOW_BLOCKS)).map { block -> block to block * 2000L }
 
         val result = legacyState.feed(observations)
 
-        assertTrue("expected average close to 2000 but was ${result.averageBlockTime}", result.averageBlockTime < 2300.toBigInteger())
-        assertTrue(result.sampleSize <= BLOCK_TIME_MAX_SAMPLES_MEMORY.toBigInteger())
+        assertEquals(List(windows) { 2000.toBigInteger() }, result.samples)
+        assertEquals(2000, result.averageBlockTime.toInt())
     }
 
     @Test
@@ -93,6 +93,8 @@ class BlockTimeSamplingTest {
         assertEquals(BigInteger.ZERO, initial.sampleSize)
         assertNull(initial.windowStartBlock)
         assertNull(initial.windowStartTimestamp)
+        assertNull(initial.lastObservedBlock)
+        assertNull(initial.lastObservedTimestamp)
     }
 
     private fun SampledBlockTime.feed(observations: List<Pair<Long, Long>>): SampledBlockTime {

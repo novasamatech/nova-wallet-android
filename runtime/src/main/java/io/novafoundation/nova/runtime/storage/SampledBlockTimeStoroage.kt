@@ -17,8 +17,8 @@ interface SampledBlockTimeStorage {
     suspend fun put(chainId: ChainId, sampledBlockTime: SampledBlockTime)
 }
 
-// v2: samples are collected over block windows instead of consecutive deltas, older persisted values are not comparable
-private const val KEY = "SampledBlockTime:v2"
+// v3: stores the exact recent-window samples and the last observation, older persisted values are not comparable
+private const val KEY = "SampledBlockTime:v3"
 
 internal class PrefsSampledBlockTimeStorage(
     private val gson: Gson,

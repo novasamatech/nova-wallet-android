@@ -60,8 +60,5 @@ class BlockTimePredictionTest {
         assertEquals(2000, predicted.toInt())
     }
 
-    private fun sampled(size: Int, average: Int) = SampledBlockTime(
-        sampleSize = size.toBigInteger(),
-        averageBlockTime = average.toBigInteger(),
-    )
+    private fun sampled(size: Int, average: Int) = SampledBlockTime(samples = List(size) { average.toBigInteger() })
 }
