@@ -134,6 +134,10 @@ class StakingViewModel(
         router.back()
     }
 
+    fun announcementLinkClicked(url: String) {
+        router.openDAppBrowser(url)
+    }
+
     fun closeMigrationAlert() {
         launch {
             val chainAsset = selectedAssetFlow.first().token.configuration

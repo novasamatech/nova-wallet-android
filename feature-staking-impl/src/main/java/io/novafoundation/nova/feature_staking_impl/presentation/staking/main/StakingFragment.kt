@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.com
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.yourPool.setupYourPoolComponent
 
 import javax.inject.Inject
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.setAnnouncement
 
 class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>() {
 
@@ -61,8 +62,7 @@ class StakingFragment : BaseFragment<StakingViewModel, FragmentStakingBinding>()
 
         viewModel.announcementFlow.observe { announcement ->
             binder.stakingAnnouncement.letOrHide(announcement) {
-                binder.stakingAnnouncement.setStylePreset(it.stylePreset)
-                binder.stakingAnnouncement.setMessage(it.description)
+                binder.stakingAnnouncement.setAnnouncement(it, viewModel::announcementLinkClicked)
             }
         }
 
