@@ -7,7 +7,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.network.updaters.SampledBlockTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.math.BigInteger
 
 interface SampledBlockTimeStorage {
 
@@ -18,7 +17,8 @@ interface SampledBlockTimeStorage {
     suspend fun put(chainId: ChainId, sampledBlockTime: SampledBlockTime)
 }
 
-private const val KEY = "SampledBlockTime"
+// v3: stores the exact recent-window samples and the last observation, older persisted values are not comparable
+private const val KEY = "SampledBlockTime:v3"
 
 internal class PrefsSampledBlockTimeStorage(
     private val gson: Gson,
@@ -45,5 +45,5 @@ internal class PrefsSampledBlockTimeStorage(
 
     private fun key(chainId: ChainId) = "$KEY::$chainId"
 
-    private fun initial() = SampledBlockTime(sampleSize = BigInteger.ZERO, averageBlockTime = BigInteger.ZERO)
+    private fun initial() = SampledBlockTime.initial()
 }
