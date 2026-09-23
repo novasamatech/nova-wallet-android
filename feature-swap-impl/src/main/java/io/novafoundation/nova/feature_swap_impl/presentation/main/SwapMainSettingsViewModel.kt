@@ -208,7 +208,6 @@ class SwapMainSettingsViewModel(
         chainAssetIn = swapSettings.mapNotNull { it.assetIn },
         interactor = swapInteractor,
         configuration = Configuration(
-            showRetryDialog = false,
             initialState = Configuration.InitialState(
                 paymentCurrencySelectionMode = PaymentCurrencySelectionMode.AUTOMATIC_ONLY
             )

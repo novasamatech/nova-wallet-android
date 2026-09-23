@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.HydrationSystemAccou
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.runtime.ext.accountIdOrNull
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.assetConversionSupported
 import io.novafoundation.nova.runtime.ext.hydraDxSupported
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -43,6 +44,18 @@ class RealSwapTransferFilterFactory @Inject constructor(
         }
 
         return IgnoreTransfersInvolvingSystemAccount(CompoundSystemAccountMatcher(systemAccounts), chain)
+    }
+
+    override fun commissionBeneficiaryAddresses(chain: Chain): Set<String> {
+        return buildSet {
+            if (chain.swap.hydraDxSupported()) {
+                add(chain.addressOf(novaSwapCommission.hydrationFeeAccountId))
+            }
+
+            if (chain.swap.assetConversionSupported()) {
+                novaSwapCommission.assetHubFeeAccountId(chain.id)?.let { add(chain.addressOf(it)) }
+            }
+        }
     }
 
     private class IgnoreTransfersInvolvingSystemAccount(

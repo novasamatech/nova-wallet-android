@@ -426,7 +426,11 @@ private class AssetConversionExchange(
             sendTo: AccountId,
             commission: PreparedCommission?,
         ) {
-            executeSwap(swapLimit, sendTo)
+            val protectedSwapLimit = commission?.let {
+                novaSwapCommission.protectMinimumOutput(swapLimit, it.amount)
+            } ?: swapLimit
+
+            executeSwap(protectedSwapLimit, sendTo)
             if (commission != null) {
                 appendNovaCommissionCall(commission)
             }

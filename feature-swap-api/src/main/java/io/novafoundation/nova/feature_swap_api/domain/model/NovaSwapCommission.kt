@@ -29,6 +29,25 @@ class NovaSwapCommission {
         return commissionIncludedIn(swapLimit.estimatedAmountOut).max(BigInteger.ZERO)
     }
 
+    fun minimumAmountOutAfterCommission(swapLimit: SwapLimit, commissionAmount: Balance): Balance {
+        val grossAmountOut = swapLimit.estimatedAmountOut
+        if (grossAmountOut <= BigInteger.ZERO) return swapLimit.amountOutMin
+
+        val netAmountOut = (grossAmountOut - commissionAmount).max(BigInteger.ZERO)
+        return swapLimit.amountOutMin * netAmountOut / grossAmountOut
+    }
+
+    /**
+     * The commission is a separate transfer after the swap. Raise the swap's gross on-chain floor
+     * so that deducting that fixed transfer cannot leave less than the net minimum shown to the user.
+     */
+    fun protectMinimumOutput(swapLimit: SwapLimit, commissionAmount: Balance): SwapLimit {
+        if (swapLimit !is SwapLimit.SpecifiedIn || commissionAmount <= BigInteger.ZERO) return swapLimit
+
+        val netMinimum = minimumAmountOutAfterCommission(swapLimit, commissionAmount)
+        return swapLimit.copy(amountOutMin = netMinimum + commissionAmount)
+    }
+
     companion object {
 
         val FEE_NUMERATOR: BigInteger = BigInteger.valueOf(85)

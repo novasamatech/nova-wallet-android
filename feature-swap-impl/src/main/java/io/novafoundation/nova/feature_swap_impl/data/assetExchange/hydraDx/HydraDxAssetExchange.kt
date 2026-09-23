@@ -448,7 +448,11 @@ internal class HydraDxAssetExchange(
         }
 
         private suspend fun ExtrinsicBuilder.appendSwapCalls(swapLimit: SwapLimit, commissionAmount: Balance?) {
-            executeSwap(swapLimit)
+            val protectedSwapLimit = commissionAmount?.let {
+                novaSwapCommission.protectMinimumOutput(swapLimit, it)
+            } ?: swapLimit
+
+            executeSwap(protectedSwapLimit)
             if (commissionAmount != null) {
                 appendNovaCommissionCall(commissionAmount)
             }
