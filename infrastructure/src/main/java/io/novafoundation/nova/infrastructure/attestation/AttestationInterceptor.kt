@@ -42,10 +42,6 @@ class AttestationInterceptor(
         val context = signedContext(request.method, request.url, contentType?.toString().orEmpty())
 
         val headers = attest(target) { attestationService.proofHeaders(context, bodyBytes) }
-        if (headers == null) {
-            attestationLog("$target: attestation disabled in this build, sent unsigned")
-            return chain.proceed(request)
-        }
 
         val response = chain.proceed(request.signedWith(headers))
         attestationLog("$target: ${response.describe()}")
@@ -71,7 +67,6 @@ class AttestationInterceptor(
         response.close()
 
         val retryHeaders = attest(target) { attestationService.proofHeaders(context, bodyBytes) }
-            ?: return chain.proceed(request)
 
         return chain.proceed(request.signedWith(retryHeaders)).also {
             attestationLog("$target: retry ${it.describe()}")

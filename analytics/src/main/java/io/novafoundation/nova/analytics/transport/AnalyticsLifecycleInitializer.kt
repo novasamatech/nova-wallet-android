@@ -4,6 +4,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsFlushReason
 import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.DurationBucket
@@ -11,18 +12,7 @@ import io.novafoundation.nova.analytics.analyticsLog
 import io.novafoundation.nova.common.interfaces.ExternalServiceInitializer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-
-/**
- * Uploads run on a timer, the same shape the backend delivery worker uses: events
- * leave on a fixed cadence instead of waiting for the queue to fill. The ticker only
- * runs while the app is in the foreground — a background app has nothing to report
- * and should not hold a wakeup — and backgrounding flushes once on the way out.
- */
-private const val FLUSH_INTERVAL_MILLIS = 60 * 1000L
 
 class AnalyticsLifecycleInitializer(
     private val scope: CoroutineScope,
@@ -32,7 +22,8 @@ class AnalyticsLifecycleInitializer(
 
     private var sessionStartedAt: Long = 0L
 
-    private var flushTicker: Job? = null
+    // Events left over from the previous run go out on the first foreground, like on iOS
+    private var launchFlushPending = true
 
     override fun initialize() {
         analyticsLog("initialize: consent prompt seen=${optOutManager.hasSeenAnalyticsPrompt()}, enabled=${optOutManager.isAnalyticsEnabled}")
@@ -42,15 +33,13 @@ class AnalyticsLifecycleInitializer(
     }
 
     override fun onStart(owner: LifecycleOwner) {
-        analyticsLog("foreground: session started, flushing every ${FLUSH_INTERVAL_MILLIS / 1000}s")
+        analyticsLog("foreground: session started")
         sessionStartedAt = System.currentTimeMillis()
         analyticsService.track(AnalyticsEvent.SessionStarted)
 
-        flushTicker = scope.launch(Dispatchers.IO) {
-            while (isActive) {
-                delay(FLUSH_INTERVAL_MILLIS)
-                analyticsService.flush()
-            }
+        if (launchFlushPending) {
+            launchFlushPending = false
+            scope.launch(Dispatchers.IO) { analyticsService.flush(AnalyticsFlushReason.LAUNCH) }
         }
     }
 
@@ -60,10 +49,7 @@ class AnalyticsLifecycleInitializer(
             analyticsService.track(AnalyticsEvent.SessionEnded(DurationBucket.from(duration)))
         }
 
-        flushTicker?.cancel()
-        flushTicker = null
-
         analyticsLog("background: session ended, flushing once")
-        scope.launch(Dispatchers.IO) { analyticsService.flush() }
+        scope.launch(Dispatchers.IO) { analyticsService.flush(AnalyticsFlushReason.BACKGROUND) }
     }
 }

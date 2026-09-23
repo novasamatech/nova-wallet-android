@@ -49,6 +49,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigInteger
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class ConfirmTinderGovVoteViewModel(
     private val router: GovernanceRouter,
@@ -70,7 +72,8 @@ class ConfirmTinderGovVoteViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     partialRetriableMixinFactory: PartialRetriableMixin.Factory,
     private val amountFormatter: AmountFormatter,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : ConfirmVoteViewModel(
     router,
     feeLoaderMixinFactory,
@@ -175,7 +178,7 @@ class ConfirmTinderGovVoteViewModel(
                 AnalyticsEvent.GovernanceVoteCast(
                     voteDirection = item.voteType.toAnalyticsVoteDirection(),
                     network = chain.name,
-                    amountBucket = AmountBucket.from(asset.token.planksToFiat(item.amount)),
+                    amountBucket = AmountBucket.fromOrUnknown(usdRateRepository.planksToUsd(asset.token.configuration, item.amount)),
                     convictionLevel = item.conviction.toAnalyticsConvictionLevel()
                 )
             )

@@ -6,5 +6,9 @@ interface AnalyticsService {
 
     fun track(event: AnalyticsEvent)
 
-    suspend fun flush()
+    suspend fun flush(reason: AnalyticsFlushReason)
+}
+
+enum class AnalyticsFlushReason {
+    THRESHOLD, INTERVAL, LAUNCH, BACKGROUND
 }

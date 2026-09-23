@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SetupUnbondMythosModule {
@@ -48,7 +49,8 @@ class SetupUnbondMythosModule {
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         stakingSharedState: StakingSharedState,
         amountFormatter: AmountFormatter,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return SetupUnbondMythosViewModel(
             router = router,
@@ -66,7 +68,8 @@ class SetupUnbondMythosModule {
             amountChooserMixinFactory = amountChooserMixinFactory,
             stakingSharedState = stakingSharedState,
             amountFormatter = amountFormatter,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

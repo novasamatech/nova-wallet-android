@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
-import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -52,8 +51,7 @@ class SettingsModule {
         twoFactorVerificationService: TwoFactorVerificationService,
         biometricService: BiometricService,
         pushNotificationsInteractor: PushNotificationsInteractor,
-        maskingModeUseCase: MaskingModeUseCase,
-        analyticsOptOutManager: AnalyticsOptOutManager
+        maskingModeUseCase: MaskingModeUseCase
     ): ViewModel {
         return SettingsViewModel(
             languageUseCase,
@@ -69,8 +67,7 @@ class SettingsModule {
             twoFactorVerificationService,
             biometricService,
             pushNotificationsInteractor,
-            maskingModeUseCase,
-            analyticsOptOutManager
+            maskingModeUseCase
         )
     }
 

@@ -54,6 +54,15 @@ abstract class TokenDao {
     @Query("SELECT * FROM tokens")
     abstract suspend fun getTokens(): List<TokenLocal>
 
+    @Query(
+        """
+        SELECT token.* FROM tokens AS token
+        INNER JOIN currencies AS currency ON token.currencyId = currency.id
+        WHERE currency.coingeckoId = :coingeckoId AND token.tokenSymbol = :symbol
+        """
+    )
+    abstract suspend fun getToken(symbol: String, coingeckoId: String): TokenLocal?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertTokens(tokens: List<TokenLocal>)
 

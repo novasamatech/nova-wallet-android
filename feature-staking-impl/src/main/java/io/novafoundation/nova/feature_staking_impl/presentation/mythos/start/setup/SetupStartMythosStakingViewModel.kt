@@ -56,6 +56,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class SetupStartMythosStakingViewModel(
     private val router: MythosStakingRouter,
@@ -77,6 +79,7 @@ class SetupStartMythosStakingViewModel(
     private val selectCollatorInterScreenRequester: SelectMythosInterScreenRequester,
     private val amountFormatter: AmountFormatter,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<MythosCollator, SetupStartMythosStakingViewModel.MythosLogic>(
     logicFactory = { scope ->
@@ -184,7 +187,7 @@ class SetupStartMythosStakingViewModel(
             AnalyticsEvent.StakingInitiated(
                 stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
                 network = selectedAssetState.chain().name,
-                amountBucket = AmountBucket.from(asset.token.planksToFiat(amount))
+                amountBucket = AmountBucket.fromOrUnknown(usdRateRepository.planksToUsd(asset.token.configuration, amount))
             )
         )
     }

@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
 import io.novafoundation.nova.feature_settings_impl.domain.AddNetworkInteractor
 import io.novafoundation.nova.feature_settings_impl.domain.AppearanceInteractor
@@ -160,7 +161,9 @@ class SettingsFeatureModule {
         coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory,
         coinGeckoLinkParser: CoinGeckoLinkParser,
         nodeConnectionFactory: NodeConnectionFactory,
-        customChainFactory: CustomChainFactory
+        customChainFactory: CustomChainFactory,
+        accountRepository: AccountRepository,
+        assetVisibilityRepository: AssetVisibilityRepository
     ): AddNetworkInteractor {
         return RealAddNetworkInteractor(
             chainRepository,
@@ -169,7 +172,9 @@ class SettingsFeatureModule {
             coinGeckoLinkValidationFactory,
             coinGeckoLinkParser,
             nodeConnectionFactory,
-            customChainFactory
+            customChainFactory,
+            accountRepository,
+            assetVisibilityRepository
         )
     }
 

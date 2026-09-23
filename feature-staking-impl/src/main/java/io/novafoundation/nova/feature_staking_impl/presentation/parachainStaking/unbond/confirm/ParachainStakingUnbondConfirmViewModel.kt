@@ -54,6 +54,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class ParachainStakingUnbondConfirmViewModel(
     private val router: ParachainStakingRouter,
@@ -73,7 +75,8 @@ class ParachainStakingUnbondConfirmViewModel(
     walletUiUseCase: WalletUiUseCase,
     hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
     private val amountFormatter: AmountFormatter,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor,
@@ -193,7 +196,7 @@ class ParachainStakingUnbondConfirmViewModel(
             AnalyticsEvent.UnstakeCompleted(
                 stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
                 network = selectedAssetState.chain().name,
-                amountBucket = AmountBucket.from(token.amountToFiat(payload.amount))
+                amountBucket = AmountBucket.fromOrUnknown(usdRateRepository.amountToUsd(token.configuration, payload.amount))
             )
         )
     }

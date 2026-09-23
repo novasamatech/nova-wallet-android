@@ -85,7 +85,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountFieldValidator
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
@@ -133,6 +132,8 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SwapMainSettingsViewModel(
@@ -157,6 +158,7 @@ class SwapMainSettingsViewModel(
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -413,7 +415,7 @@ class SwapMainSettingsViewModel(
         val quote = (quotingState.value as? QuotingState.Loaded)?.quote ?: return@launch
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
-        val fiatIn = assetInFlow.first()?.token?.planksToFiatOrNull(quote.planksIn) ?: return@launch
+        val usdAmount = usdRateRepository.planksToUsd(quote.assetIn, quote.planksIn)
 
         val assetInSymbol = quote.assetIn.symbol.value
         val assetOutSymbol = quote.assetOut.symbol.value
@@ -427,7 +429,7 @@ class SwapMainSettingsViewModel(
                 assetOut = assetOutSymbol,
                 networkIn = chainRegistry.getChain(quote.assetIn.chainId).name,
                 networkOut = chainRegistry.getChain(quote.assetOut.chainId).name,
-                amountBucket = AmountBucket.from(fiatIn)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }

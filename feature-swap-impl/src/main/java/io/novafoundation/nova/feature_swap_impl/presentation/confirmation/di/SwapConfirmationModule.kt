@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SwapConfirmationModule {
@@ -56,7 +57,8 @@ class SwapConfirmationModule {
         resourceManager: ResourceManager,
         swapFlowScopeAggregator: SwapFlowScopeAggregator,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return SwapConfirmationViewModel(
             swapRouter = swapRouter,
@@ -78,7 +80,8 @@ class SwapConfirmationModule {
             resourceManager = resourceManager,
             swapFlowScopeAggregator = swapFlowScopeAggregator,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

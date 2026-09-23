@@ -14,4 +14,7 @@ interface CurrencyRepository {
     suspend fun selectCurrency(currencyId: Int)
 
     suspend fun getSelectedCurrency(): Currency
+
+    /** Null when the synced currency list has no currency with this [coingeckoId]. */
+    suspend fun getCurrency(coingeckoId: String): Currency?
 }

@@ -14,6 +14,7 @@ import io.novafoundation.nova.feature_currency_api.di.CurrencyFeatureApi
 import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
+import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -40,6 +41,7 @@ class SettingsFeatureHolder @Inject constructor(
             .walletConnectFeatureApi(getFeature(WalletConnectFeatureApi::class.java))
             .pushNotificationsFeatureApi(getFeature(PushNotificationsFeatureApi::class.java))
             .cloudBackupFeatureApi(getFeature(CloudBackupFeatureApi::class.java))
+            .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
             .build()
 
         return DaggerSettingsFeatureComponent.factory()

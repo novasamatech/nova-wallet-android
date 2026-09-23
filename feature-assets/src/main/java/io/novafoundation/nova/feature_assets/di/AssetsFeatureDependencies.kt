@@ -128,10 +128,13 @@ import io.novasama.substrate_sdk_android.icon.IconGenerator
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import okhttp3.OkHttpClient
 import javax.inject.Named
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface AssetsFeatureDependencies {
 
     val analyticsService: AnalyticsService
+
+    val usdRateRepository: UsdRateRepository
 
     val maskingModeUseCase: MaskingModeUseCase
 

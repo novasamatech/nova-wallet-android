@@ -23,6 +23,7 @@ import io.novafoundation.nova.core_db.dao.LockDao
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.dao.PhishingAddressDao
 import io.novafoundation.nova.core_db.dao.TokenDao
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
@@ -56,6 +57,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibili
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
@@ -101,6 +103,7 @@ import io.novafoundation.nova.feature_wallet_impl.data.repository.RealCrossChain
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RealExternalBalanceRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.RuntimeWalletConstants
 import io.novafoundation.nova.feature_wallet_impl.data.repository.TokenRepositoryImpl
+import io.novafoundation.nova.feature_wallet_impl.data.repository.RealUsdRateRepository
 import io.novafoundation.nova.feature_wallet_impl.data.repository.WalletRepositoryImpl
 import io.novafoundation.nova.feature_wallet_impl.data.source.RealCoinPriceDataSource
 import io.novafoundation.nova.feature_wallet_impl.data.storage.TransferCursorStorage
@@ -205,7 +208,8 @@ class WalletFeatureModule {
         assetCache: AssetCache,
         accountRepository: AccountRepository,
         chainRegistry: ChainRegistry,
-        coinPriceRemoteDataSource: CoinPriceRemoteDataSource
+        coinPriceRemoteDataSource: CoinPriceRemoteDataSource,
+        currencyRepository: CurrencyRepository
     ): WalletRepository = WalletRepositoryImpl(
         operationsDao,
         phishingApi,
@@ -214,7 +218,12 @@ class WalletFeatureModule {
         phishingAddressDao,
         coinPriceRemoteDataSource,
         chainRegistry,
+        currencyRepository,
     )
+
+    @Provides
+    @FeatureScope
+    fun provideUsdRateRepository(tokenDao: TokenDao): UsdRateRepository = RealUsdRateRepository(tokenDao)
 
     @Provides
     @FeatureScope

@@ -61,6 +61,8 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class ParachainStakingUnbondViewModel(
     private val router: ParachainStakingRouter,
@@ -77,7 +79,8 @@ class ParachainStakingUnbondViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
     private val amountFormatter: AmountFormatter,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
     Retriable,
     Validatable by validationExecutor {
@@ -279,13 +282,13 @@ class ParachainStakingUnbondViewModel(
     }
 
     private suspend fun trackUnstakeInitiated(amount: BigDecimal) {
-        val fiatAmount = selectedAsset.first().token.amountToFiat(amount)
+        val usdAmount = usdRateRepository.amountToUsd(selectedAsset.first().token.configuration, amount)
 
         analyticsService.track(
             AnalyticsEvent.UnstakeInitiated(
                 stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
                 network = currentDelegatorStateFlow.first().chain.name,
-                amountBucket = AmountBucket.from(fiatAmount)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }
