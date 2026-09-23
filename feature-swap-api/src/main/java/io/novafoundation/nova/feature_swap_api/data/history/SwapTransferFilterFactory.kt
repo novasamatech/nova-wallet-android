@@ -5,11 +5,12 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Operation
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 
 /**
- * Produces a transfer-history filter that hides Nova-commission and Hydration-router
- * legs of a swap, so the user only sees the swap entry itself. Returns null when the
- * chain doesn't support Hydration swaps.
+ * Produces a transfer-history filter that hides internal swap transfers, such as the Nova commission
+ * and Hydration router legs. Returns null when the chain has no supported swap implementation.
  */
-interface HydrationSwapTransferFilterFactory {
+interface SwapTransferFilterFactory {
 
     fun create(chain: Chain): Filter<Operation>?
+
+    fun commissionBeneficiaryAddresses(chain: Chain): Set<String>
 }

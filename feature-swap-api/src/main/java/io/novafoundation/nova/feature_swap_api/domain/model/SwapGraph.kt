@@ -72,4 +72,10 @@ interface SwapGraphEdge : QuotableEdge {
     suspend fun canTransferOutWholeAccountBalance(): Boolean
 }
 
+/**
+ * Marks swap edges whose operation charges the Nova service commission.
+ * Used by presentation code to show the fee disclaimer without coupling it to a concrete exchange.
+ */
+interface NovaFeeChargingSwapEdge
+
 typealias SwapGraph = Graph<FullChainAssetId, SwapGraphEdge>

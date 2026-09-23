@@ -49,9 +49,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.coroutines.cancellation.CancellationException
-import kotlin.coroutines.resume
 
 internal class FeeLoaderV2Provider<F, D>(
     private val chainRegistry: ChainRegistry,
@@ -123,6 +122,8 @@ internal class FeeLoaderV2Provider<F, D>(
 
     private var latestLoadFeeJob: Job? = null
     private var latestFeeConstructor: FeeConstructor<F>? = null
+    private val retryDialogPending = AtomicBoolean(false)
+    private val retryDialogSuppressed = AtomicBoolean(false)
 
     init {
         observeSelectedAssetChanges()
@@ -138,19 +139,19 @@ internal class FeeLoaderV2Provider<F, D>(
 
             runCatching { feeConstructor(feePaymentCurrency) }
                 .mapCatching { onFeeLoaded(it, feePaymentCurrency, feeConstructor) }
-                .onFailure { onFeeError(it, feeConstructor) }
+                .onFailure { onFeeError(it) }
         }
     }
 
-    private suspend fun onFeeError(error: Throwable, feeConstructor: FeeConstructor<F>) {
+    private suspend fun onFeeError(error: Throwable) {
         if (error !is CancellationException) {
             Log.e(LOG_TAG, "Failed to sync fee", error)
 
             fee.emit(FeeStatus.Error)
 
-            awaitFeeRetry()
-
-            loadFee(feeConstructor)
+            if (configuration.showRetryDialog && !retryDialogSuppressed.get() && retryDialogPending.compareAndSet(false, true)) {
+                showFeeRetry()
+            }
         }
     }
 
@@ -159,6 +160,8 @@ internal class FeeLoaderV2Provider<F, D>(
         requestedFeePaymentCurrency: FeePaymentCurrency,
         feeConstructor: FeeConstructor<F>
     ) {
+        retryDialogSuppressed.set(false)
+
         if (newFee != null) {
             setLoadedFee(newFee, requestedFeePaymentCurrency, feeConstructor)
         } else {
@@ -166,19 +169,25 @@ internal class FeeLoaderV2Provider<F, D>(
         }
     }
 
-    private suspend fun awaitFeeRetry() {
-        return suspendCancellableCoroutine { continuation ->
-            retryEvent.postValue(
-                Event(
-                    RetryPayload(
-                        title = resourceManager.getString(R.string.choose_amount_network_error),
-                        message = resourceManager.getString(R.string.choose_amount_error_fee),
-                        onRetry = { continuation.resume(Unit) },
-                        onCancel = { continuation.cancel() }
-                    )
+    private fun showFeeRetry() {
+        retryEvent.postValue(
+            Event(
+                RetryPayload(
+                    title = resourceManager.getString(R.string.choose_amount_network_error),
+                    message = resourceManager.getString(R.string.choose_amount_error_fee),
+                    onRetry = {
+                        retryDialogPending.set(false)
+                        retryDialogSuppressed.set(false)
+                        reloadFeeWithLatestConstructor()
+                    },
+                    onCancel = {
+                        retryDialogPending.set(false)
+                        retryDialogSuppressed.set(true)
+                        configuration.onRetryCancelled()
+                    }
                 )
             )
-        }
+        )
     }
 
     override suspend fun feeAsset(): Asset {

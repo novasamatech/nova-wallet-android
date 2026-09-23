@@ -8,6 +8,8 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
 import io.novafoundation.nova.core_db.model.operation.OperationLocal
+import io.novafoundation.nova.core_db.model.operation.OperationTypeLocal.OperationForeignKey
+import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
@@ -81,8 +83,10 @@ internal class FullSyncPaymentUpdater(
                 .onSuccess { blockOperations ->
                     val localOperations = blockOperations
                         .filter { it.type.relates(accountId) }
-                        .withoutTransfersFromSwapExtrinsics()
-                        .map { operation -> createOperationLocal(chainAsset, operation, accountId) }
+                        .mapIndexed { index, operation ->
+                            val local = createOperationLocal(chainAsset, operation, accountId)
+                            local.withSeparateTransferId(index)
+                        }
 
                     operationDao.insertAll(localOperations)
                 }.onFailure {
@@ -98,11 +102,21 @@ internal class FullSyncPaymentUpdater(
         }
     }
 
-    private fun List<RealtimeHistoryUpdate>.withoutTransfersFromSwapExtrinsics(): List<RealtimeHistoryUpdate> {
-        val swapHashes = filter { it.type is RealtimeHistoryUpdate.Type.Swap }
-            .mapTo(mutableSetOf()) { it.txHash }
-
-        return filterNot { it.type is RealtimeHistoryUpdate.Type.Transfer && it.txHash in swapHashes }
+    // A batch can contain a swap and multiple transfers with the same transaction hash.
+    // They must not share a primary key or acquire each other's operation types.
+    private fun OperationLocal.withSeparateTransferId(index: Int): OperationLocal {
+        val transfer = type as? TransferTypeLocal ?: return this
+        val transferBase = base.copy(id = "${base.id}:transfer:$index")
+        return OperationLocal(
+            base = transferBase,
+            type = TransferTypeLocal(
+                foreignKey = OperationForeignKey(transferBase.id, transferBase.address, transferBase.assetId),
+                amount = transfer.amount,
+                sender = transfer.sender,
+                receiver = transfer.receiver,
+                fee = transfer.fee,
+            )
+        )
     }
 
     private suspend fun createOperationLocal(

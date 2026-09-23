@@ -39,7 +39,7 @@ import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.des
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSlippageDescription
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.launchSwapRateDescription
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
-import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
+import io.novafoundation.nova.feature_swap_impl.domain.swap.includesNovaFee
 import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_core_api.data.paths.model.quotedAmount
 import io.novafoundation.nova.feature_swap_core_api.data.primitive.model.SwapDirection
@@ -171,7 +171,7 @@ class SwapConfirmationViewModel(
     }
 
     val showNovaFeeDisclaimer: Flow<Boolean> = confirmationStateFlow.map {
-        it.swapQuote.involvesHydraSwap()
+        it.swapQuote.includesNovaFee()
     }
         .distinctUntilChanged()
         .shareInBackground()

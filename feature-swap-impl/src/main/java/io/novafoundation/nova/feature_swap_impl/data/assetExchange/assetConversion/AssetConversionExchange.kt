@@ -14,12 +14,17 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOutcomeOk
+import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
+import io.novafoundation.nova.feature_account_api.data.model.FeeBase
+import io.novafoundation.nova.feature_account_api.data.model.SubstrateFeeBase
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicOperationDisplayData
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaFeeChargingSwapEdge
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapFee.SwapSegment.SegmentNetFlow
@@ -38,7 +43,10 @@ import io.novafoundation.nova.feature_swap_impl.data.assetExchange.FeePaymentPro
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.ParentQuoterArgs
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
 import io.novafoundation.nova.feature_swap_impl.domain.swap.BaseSwapGraphEdge
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
+import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverter
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
@@ -49,8 +57,10 @@ import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetect
 import io.novafoundation.nova.feature_xcm_api.versions.orDefault
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.emptyAccountId
 import io.novafoundation.nova.runtime.ext.fullId
+import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
@@ -60,13 +70,16 @@ import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
+import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
+import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.call
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlin.time.Duration
 
 class AssetConversionExchangeFactory(
@@ -76,6 +89,10 @@ class AssetConversionExchangeFactory(
     private val chainStateRepository: ChainStateRepository,
     private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
     private val xcmVersionDetector: XcmVersionDetector,
+    private val assetSourceRegistry: AssetSourceRegistry,
+    private val accountInfoRepository: AccountInfoRepository,
+    private val novaSwapCommission: NovaSwapCommission,
+    private val commissionResolver: AssetHubCommissionResolver,
 ) : AssetExchange.SingleChainFactory {
 
     override suspend fun create(
@@ -92,7 +109,11 @@ class AssetConversionExchangeFactory(
             chainStateRepository = chainStateRepository,
             swapHost = swapHost,
             deductionUseCase = deductionUseCase,
-            xcmVersionDetector = xcmVersionDetector
+            xcmVersionDetector = xcmVersionDetector,
+            assetSourceRegistry = assetSourceRegistry,
+            accountInfoRepository = accountInfoRepository,
+            novaSwapCommission = novaSwapCommission,
+            commissionResolver = commissionResolver,
         )
     }
 }
@@ -106,7 +127,13 @@ private class AssetConversionExchange(
     private val swapHost: AssetExchange.SwapHost,
     private val deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
     private val xcmVersionDetector: XcmVersionDetector,
+    private val assetSourceRegistry: AssetSourceRegistry,
+    private val accountInfoRepository: AccountInfoRepository,
+    private val novaSwapCommission: NovaSwapCommission,
+    private val commissionResolver: AssetHubCommissionResolver,
 ) : AssetExchange {
+
+    private val commissionRecipient = novaSwapCommission.assetHubFeeAccountId(chain.id)
 
     override suspend fun sync() {
         // nothing to sync
@@ -136,9 +163,17 @@ private class AssetConversionExchange(
                 val firstAsset = multiLocationConverter.toChainAsset(firstLocation) ?: return@forEach
                 val secondAsset = multiLocationConverter.toChainAsset(secondLocation) ?: return@forEach
 
-                add(AssetConversionEdge(firstAsset, secondAsset))
-                add(AssetConversionEdge(secondAsset, firstAsset))
+                add(assetConversionEdge(firstAsset, secondAsset))
+                add(assetConversionEdge(secondAsset, firstAsset))
             }
+        }
+    }
+
+    private fun assetConversionEdge(fromAsset: Chain.Asset, toAsset: Chain.Asset): AssetConversionEdge {
+        return if (commissionRecipient != null) {
+            CommissionedAssetConversionEdge(fromAsset, toAsset)
+        } else {
+            AssetConversionEdge(fromAsset, toAsset)
         }
     }
 
@@ -176,10 +211,14 @@ private class AssetConversionExchange(
         )
     }
 
-    private inner class AssetConversionEdge(fromAsset: Chain.Asset, toAsset: Chain.Asset) : BaseSwapGraphEdge(fromAsset, toAsset) {
+    private open inner class AssetConversionEdge(
+        fromAsset: Chain.Asset,
+        toAsset: Chain.Asset,
+        private val chargesNovaCommission: Boolean = false,
+    ) : BaseSwapGraphEdge(fromAsset, toAsset) {
 
         override suspend fun beginOperation(args: AtomicSwapOperationArgs): AtomicSwapOperation {
-            return AssetConversionOperation(args, fromAsset, toAsset)
+            return AssetConversionOperation(args, fromAsset, toAsset, chargesNovaCommission)
         }
 
         override suspend fun appendToOperation(currentTransaction: AtomicSwapOperation, args: AtomicSwapOperationArgs): AtomicSwapOperation? {
@@ -187,7 +226,7 @@ private class AssetConversionExchange(
         }
 
         override suspend fun beginOperationPrototype(): AtomicSwapOperationPrototype {
-            return AssetConversionOperationPrototype(fromAsset.chainId)
+            return AssetConversionOperationPrototype(fromAsset.chainId, chargesNovaCommission)
         }
 
         override suspend fun appendToOperationPrototype(currentTransaction: AtomicSwapOperationPrototype): AtomicSwapOperationPrototype? {
@@ -229,7 +268,14 @@ private class AssetConversionExchange(
         }
     }
 
-    inner class AssetConversionOperationPrototype(override val fromChain: ChainId) : AtomicSwapOperationPrototype {
+    private inner class CommissionedAssetConversionEdge(fromAsset: Chain.Asset, toAsset: Chain.Asset) :
+        AssetConversionEdge(fromAsset, toAsset, chargesNovaCommission = true),
+        NovaFeeChargingSwapEdge
+
+    inner class AssetConversionOperationPrototype(
+        override val fromChain: ChainId,
+        override val chargesServiceFee: Boolean,
+    ) : AtomicSwapOperationPrototype {
 
         override suspend fun roughlyEstimateNativeFee(usdConverter: UsdConverter): BigDecimal {
             // in DOT
@@ -239,12 +285,21 @@ private class AssetConversionExchange(
         override suspend fun maximumExecutionTime(): Duration {
             return chainStateRepository.expectedBlockTime(chain.id)
         }
+
+        override fun serviceCommissionToAddOnTop(net: Balance): Balance {
+            return novaSwapCommission.commissionToAddOnTop(net)
+        }
+
+        override fun serviceCommissionIncludedIn(gross: Balance): Balance {
+            return novaSwapCommission.commissionIncludedIn(gross)
+        }
     }
 
     inner class AssetConversionOperation(
         private val transactionArgs: AtomicSwapOperationArgs,
         private val fromAsset: Chain.Asset,
-        private val toAsset: Chain.Asset
+        private val toAsset: Chain.Asset,
+        override val chargesServiceCommission: Boolean,
     ) : AtomicSwapOperation {
 
         override val estimatedSwapLimit: SwapLimit = transactionArgs.estimatedSwapLimit
@@ -261,17 +316,31 @@ private class AssetConversionExchange(
         }
 
         override suspend fun estimateFee(isServiceCommissionOperation: Boolean): AtomicSwapOperationFee {
+            val preparedCommission = prepareCommissionIfNeeded(
+                isServiceCommissionOperation = isServiceCommissionOperation,
+                swapLimit = estimatedSwapLimit,
+                prepare = ::prepareRequiredCommission,
+            )
+
             val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
-                    feePaymentCurrency = transactionArgs.feePaymentCurrency
+                    batchMode = BatchMode.BATCH_ALL,
+                    feePaymentCurrency = transactionArgs.feePaymentCurrency,
                 )
             ) {
-                executeSwap(swapLimit = estimatedSwapLimit, sendTo = chain.emptyAccountId())
+                appendSwapCalls(
+                    swapLimit = estimatedSwapLimit,
+                    sendTo = chain.emptyAccountId(),
+                    commission = preparedCommission,
+                )
             }
 
-            return SubmissionOnlyAtomicSwapOperationFee(submissionFee)
+            return SubmissionOnlyAtomicSwapOperationFee(
+                submissionFee = submissionFee,
+                serviceCommission = preparedCommission?.asFee(),
+            )
         }
 
         override suspend fun requiredAmountInToGetAmountOut(extraOutAmount: Balance): Balance {
@@ -292,30 +361,151 @@ private class AssetConversionExchange(
         }
 
         override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
-            return submitInternal(args)
+            val preparedCommission = try {
+                prepareCommissionIfNeeded(
+                    isServiceCommissionOperation = args.isServiceCommissionOperation,
+                    swapLimit = args.actualSwapLimit,
+                    prepare = ::prepareCommissionOrWaive,
+                )
+            } catch (exception: Exception) {
+                return Result.failure(exception)
+            }
+
+            return submitInternal(args, preparedCommission)
                 .mapCatching {
+                    val grossReceived = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
+                    val netReceived = if (preparedCommission != null) {
+                        (grossReceived - preparedCommission.amount).max(BigInteger.ZERO)
+                    } else {
+                        grossReceived
+                    }
                     SwapExecutionCorrection(
-                        actualReceivedAmount = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
+                        actualReceivedAmount = netReceived
                     )
                 }
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
-            return submitInternal(args)
+            val preparedCommission = try {
+                prepareCommissionIfNeeded(
+                    isServiceCommissionOperation = args.isServiceCommissionOperation,
+                    swapLimit = args.actualSwapLimit,
+                    prepare = ::prepareRequiredCommission,
+                )
+            } catch (exception: Exception) {
+                return Result.failure(exception)
+            }
+
+            return submitInternal(args, preparedCommission)
                 .map { SwapSubmissionResult(it.submissionHierarchy) }
         }
 
-        private suspend fun submitInternal(args: AtomicSwapOperationSubmissionArgs): Result<ExtrinsicExecutionResult> {
+        private suspend fun submitInternal(
+            args: AtomicSwapOperationSubmissionArgs,
+            commission: PreparedCommission?,
+        ): Result<ExtrinsicExecutionResult> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
                 submissionOptions = ExtrinsicService.SubmissionOptions(
-                    feePaymentCurrency = transactionArgs.feePaymentCurrency
+                    batchMode = BatchMode.BATCH_ALL,
+                    feePaymentCurrency = transactionArgs.feePaymentCurrency,
                 )
             ) { buildingContext ->
                 // Send swapped funds to the executingAccount since it the account doing the swap
-                executeSwap(swapLimit = args.actualSwapLimit, sendTo = buildingContext.submissionOrigin.executingAccount)
+                appendSwapCalls(
+                    swapLimit = args.actualSwapLimit,
+                    sendTo = buildingContext.submissionOrigin.executingAccount,
+                    commission = commission,
+                )
             }.requireOk()
+        }
+
+        private suspend fun ExtrinsicBuilder.appendSwapCalls(
+            swapLimit: SwapLimit,
+            sendTo: AccountId,
+            commission: PreparedCommission?,
+        ) {
+            val protectedSwapLimit = commission?.let {
+                novaSwapCommission.protectMinimumOutput(swapLimit, it.amount)
+            } ?: swapLimit
+
+            executeSwap(protectedSwapLimit, sendTo)
+            if (commission != null) {
+                appendNovaCommissionCall(commission)
+            }
+        }
+
+        private suspend fun prepareRequiredCommission(swapLimit: SwapLimit): PreparedCommission? {
+            return prepareCommission(swapLimit) { minimumBalance ->
+                commissionResolver.resolveRequired(swapLimit, minimumBalance)
+            }
+        }
+
+        private suspend fun prepareCommissionIfNeeded(
+            isServiceCommissionOperation: Boolean,
+            swapLimit: SwapLimit,
+            prepare: suspend (SwapLimit) -> PreparedCommission?,
+        ): PreparedCommission? {
+            return if (isServiceCommissionOperation) prepare(swapLimit) else null
+        }
+
+        private suspend fun prepareCommissionOrWaive(swapLimit: SwapLimit): PreparedCommission? {
+            return prepareCommission(swapLimit) { minimumBalance ->
+                commissionResolver.resolveOrWaive(swapLimit, minimumBalance)
+            }
+        }
+
+        private suspend fun prepareCommission(
+            swapLimit: SwapLimit,
+            resolveAmount: (minimumBalance: Balance) -> Balance?,
+        ): PreparedCommission? {
+            val recipient = commissionRecipient ?: return null
+            val outputBalance = assetSourceRegistry.sourceFor(toAsset).balance
+            val minimumBalance = outputBalance.existentialDeposit(toAsset)
+            val amount = resolveAmount(minimumBalance) ?: return null
+
+            ensureCommissionRecipientReady(recipient)
+
+            return PreparedCommission(recipient, amount)
+        }
+
+        private suspend fun ensureCommissionRecipientReady(recipient: AccountId) {
+            val utilityAsset = chain.utilityAsset
+            val utilityBalance = assetSourceRegistry.sourceFor(utilityAsset).balance
+            val utilityMinimumBalance = utilityBalance.existentialDeposit(utilityAsset)
+            val accountInfo = accountInfoRepository.getAccountInfo(chain.id, recipient)
+
+            val systemAccountReady = accountInfo.providers > BigInteger.ZERO &&
+                accountInfo.data.free >= utilityMinimumBalance
+            val assetAccountReady = assetSourceRegistry.sourceFor(toAsset).balance.canReceive(chain, toAsset, recipient)
+
+            if (!systemAccountReady || !assetAccountReady) {
+                error("Asset Hub commission recipient cannot receive the asset")
+            }
+        }
+
+        private suspend fun ExtrinsicBuilder.appendNovaCommissionCall(commission: PreparedCommission) {
+            val transferBase = AssetTransferBase(
+                recipient = chain.addressOf(commission.recipient),
+                originChain = chain,
+                originChainAsset = toAsset,
+                destinationChain = chain,
+                destinationChainAsset = toAsset,
+                feePaymentCurrency = FeePaymentCurrency.Native,
+                amountPlanks = commission.amount,
+            )
+            val commissionCall: GenericCall.Instance = assetSourceRegistry.sourceFor(toAsset).transfers
+                .constructTransferCall(transferBase)
+            call(commissionCall)
+        }
+
+        private inner class PreparedCommission(
+            val recipient: AccountId,
+            val amount: Balance,
+        ) {
+
+            fun asFee(): FeeBase = SubstrateFeeBase(amount, toAsset)
         }
 
         private fun List<GenericEvent.Instance>.determineActualSwappedAmount(): Balance {
