@@ -35,3 +35,10 @@ class SwapOperationJoin(
         )
     }
 }
+
+class TransferOperationJoin(
+    @Embedded(prefix = "o_")
+    val base: OperationBaseLocal,
+    @Embedded(prefix = "t_")
+    val transfer: TransferTypeJoin,
+)

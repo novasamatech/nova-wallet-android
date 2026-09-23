@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.utils.Modules
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.CallFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.AnyOfCallFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.EverythingFilter
+import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.UtilityCallFilter
 import io.novafoundation.nova.feature_account_impl.data.signer.proxy.callFilter.WhiteListFilter
 import io.novafoundation.nova.feature_proxy_api.domain.model.ProxyType
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
@@ -11,7 +12,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 class ProxyCallFilterFactory {
 
     fun getCallFilterFor(proxyType: ProxyType): CallFilter {
-        return when (proxyType) {
+        val directCallFilter = when (proxyType) {
             ProxyType.Any,
             is ProxyType.Other -> EverythingFilter()
 
@@ -84,6 +85,8 @@ class ProxyCallFilterFactory {
                 WhiteListFilter(Modules.SLOTS)
             )
         }
+
+        return UtilityCallFilter(directCallFilter)
     }
 }
 

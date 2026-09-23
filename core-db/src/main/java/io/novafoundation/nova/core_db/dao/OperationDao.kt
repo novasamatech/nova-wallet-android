@@ -16,6 +16,7 @@ import io.novafoundation.nova.core_db.model.operation.PoolRewardTypeLocal
 import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
 import io.novafoundation.nova.core_db.model.operation.SwapOperationJoin
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
+import io.novafoundation.nova.core_db.model.operation.TransferOperationJoin
 import kotlinx.coroutines.flow.Flow
 
 private const val ID_FILTER = "address = :address AND chainId = :chainId AND assetId = :chainAssetId"
@@ -113,6 +114,20 @@ abstract class OperationDao {
         """
     )
     abstract fun observeSwapOperations(address: String, chainId: String): Flow<List<SwapOperationJoin>>
+
+    @Query(
+        """
+        SELECT
+        o.assetId as o_assetId, o.chainId o_chainId, o.id as o_id, o.address as o_address, o.time o_time,
+        o.status as o_status, o.source o_source, o.hash as o_hash,
+        t.amount as t_amount, t.fee as t_fee, t.sender as t_sender, t.receiver as t_receiver
+        FROM operations AS o
+        INNER JOIN operation_transfers AS t
+            ON t.operationId = o.id AND t.assetId = o.assetId AND t.chainId = o.chainId AND t.address = o.address
+        WHERE o.address = :address AND o.chainId = :chainId
+        """
+    )
+    abstract fun observeTransferOperations(address: String, chainId: String): Flow<List<TransferOperationJoin>>
 
     @Query(
         """
