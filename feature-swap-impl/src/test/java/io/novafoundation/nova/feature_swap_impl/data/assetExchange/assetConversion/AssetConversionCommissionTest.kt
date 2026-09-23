@@ -24,9 +24,19 @@ class AssetConversionCommissionTest {
     }
 
     @Test
-    fun `commission is waived when updated output would fall below minimum balance`() {
+    fun `commission is kept when protected net minimum stays above minimum balance`() {
         val amount = resolver.resolveOrWaive(
             swapLimit = specifiedIn(grossOutput = 1_000, minimumOutput = 105),
+            minimumBalance = BigInteger.valueOf(100),
+        )
+
+        assertEquals(BigInteger.valueOf(8), amount)
+    }
+
+    @Test
+    fun `commission is waived when protected net minimum falls below minimum balance`() {
+        val amount = resolver.resolveOrWaive(
+            swapLimit = specifiedIn(grossOutput = 1_000, minimumOutput = 100),
             minimumBalance = BigInteger.valueOf(100),
         )
 
@@ -37,7 +47,7 @@ class AssetConversionCommissionTest {
     fun `initial quote rejects commission below minimum balance`() {
         val result = runCatching {
             resolver.resolveRequired(
-                swapLimit = specifiedIn(grossOutput = 1_000, minimumOutput = 105),
+                swapLimit = specifiedIn(grossOutput = 1_000, minimumOutput = 100),
                 minimumBalance = BigInteger.valueOf(100),
             )
         }

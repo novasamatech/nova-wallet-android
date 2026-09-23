@@ -27,6 +27,7 @@ class RealSwapTransferFilterFactoryTest {
         val feeAccountId = requireNotNull(commission.assetHubFeeAccountId(chain.id))
 
         assertFalse(filter.shouldInclude(transfer(chain, receiver = chain.addressOf(feeAccountId))))
+        assertTrue(chain.addressOf(feeAccountId) in factory.commissionBeneficiaryAddresses(chain))
     }
 
     @Test
@@ -43,6 +44,7 @@ class RealSwapTransferFilterFactoryTest {
         val filter = requireNotNull(factory.create(chain))
 
         assertFalse(filter.shouldInclude(transfer(chain, receiver = chain.addressOf(hydrationAccounts.routerAccountId))))
+        assertTrue(chain.addressOf(commission.hydrationFeeAccountId) in factory.commissionBeneficiaryAddresses(chain))
     }
 
     @Test

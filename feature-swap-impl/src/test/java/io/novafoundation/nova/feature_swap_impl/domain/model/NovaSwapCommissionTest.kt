@@ -36,6 +36,32 @@ class NovaSwapCommissionTest {
     }
 
     @Test
+    fun `protected minimum guarantees displayed minimum after fixed commission`() {
+        val swapLimit = SwapLimit.SpecifiedIn(
+            amountIn = BigInteger.valueOf(20_000),
+            amountOutQuote = BigInteger.valueOf(10_085),
+            amountOutMin = BigInteger.valueOf(10_000),
+        )
+
+        val protected = commission.protectMinimumOutput(swapLimit, BigInteger.valueOf(85)) as SwapLimit.SpecifiedIn
+        val displayedMinimum = commission.minimumAmountOutAfterCommission(swapLimit, BigInteger.valueOf(85))
+
+        assertEquals(displayedMinimum + BigInteger.valueOf(85), protected.amountOutMin)
+        assertEquals(displayedMinimum, protected.amountOutMin - BigInteger.valueOf(85))
+    }
+
+    @Test
+    fun `specified out limit is unchanged by minimum protection`() {
+        val swapLimit = SwapLimit.SpecifiedOut(
+            amountOut = BigInteger.valueOf(10_085),
+            amountInQuote = BigInteger.valueOf(20_000),
+            amountInMax = BigInteger.valueOf(21_000),
+        )
+
+        assertEquals(swapLimit, commission.protectMinimumOutput(swapLimit, BigInteger.valueOf(85)))
+    }
+
+    @Test
     fun `asset hub beneficiary is configured only for polkadot asset hub`() {
         assertArrayEquals(
             NovaSwapCommission.POLKADOT_ASSET_HUB_FEE_ACCOUNT_HEX.hexToBytes(),
