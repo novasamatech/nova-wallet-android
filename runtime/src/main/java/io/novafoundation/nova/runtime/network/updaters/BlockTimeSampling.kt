@@ -51,13 +51,13 @@ fun SampledBlockTime.observing(block: BlockNumber, timestampMillis: BigInteger):
     val lastBlock = lastObservedBlock
     val lastTimestamp = lastObservedTimestamp
 
-    if (
-        startBlock == null || startTimestamp == null ||
-        lastBlock == null || lastTimestamp == null ||
-        block <= lastBlock || timestampMillis < lastTimestamp
-    ) {
+    if (startBlock == null || startTimestamp == null || lastBlock == null || lastTimestamp == null) {
         return restartingWindow(block, timestampMillis)
     }
+
+    if (block == lastBlock) return this
+
+    if (block < lastBlock || timestampMillis < lastTimestamp) return restartingWindow(block, timestampMillis)
 
     val blockSpan = block - startBlock
     if (blockSpan < BLOCK_TIME_SAMPLING_WINDOW_BLOCKS.toBigInteger()) {

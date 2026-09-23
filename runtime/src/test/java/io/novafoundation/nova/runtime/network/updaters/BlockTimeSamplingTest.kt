@@ -64,6 +64,21 @@ class BlockTimeSamplingTest {
     }
 
     @Test
+    fun `duplicate block does not restart the window`() {
+        val observations = listOf(
+            100L to 600_000L,
+            120L to 720_000L,
+            120L to 720_000L,
+            130L to 780_000L,
+        )
+
+        val result = SampledBlockTime.initial().feed(observations)
+
+        assertEquals(6000, result.averageBlockTime.toInt())
+        assertEquals(1, result.sampleSize.toInt())
+    }
+
+    @Test
     fun `window restarts without sampling when timestamps do not advance`() {
         val observations = (0L..30L).map { block -> block to 1_000_000L }
 
