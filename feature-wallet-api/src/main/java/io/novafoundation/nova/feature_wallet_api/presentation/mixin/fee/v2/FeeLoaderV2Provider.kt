@@ -148,9 +148,11 @@ internal class FeeLoaderV2Provider<F, D>(
 
             fee.emit(FeeStatus.Error)
 
-            awaitFeeRetry()
+            if (configuration.showRetryDialog) {
+                awaitFeeRetry()
 
-            loadFee(feeConstructor)
+                loadFee(feeConstructor)
+            }
         }
     }
 

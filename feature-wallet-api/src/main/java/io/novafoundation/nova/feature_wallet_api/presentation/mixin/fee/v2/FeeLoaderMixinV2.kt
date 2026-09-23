@@ -26,6 +26,7 @@ interface FeeLoaderMixinV2<F, D> : Retriable {
 
     class Configuration<F, D>(
         val showZeroFiat: Boolean = true,
+        val showRetryDialog: Boolean = true,
         val initialState: InitialState<F, D> = InitialState(),
         val onRetryCancelled: () -> Unit = {}
     ) {

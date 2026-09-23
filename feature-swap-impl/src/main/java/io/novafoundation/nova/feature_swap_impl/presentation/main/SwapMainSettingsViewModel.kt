@@ -48,7 +48,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuoteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.toExecuteArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
-import io.novafoundation.nova.feature_swap_impl.domain.swap.involvesHydraSwap
+import io.novafoundation.nova.feature_swap_impl.domain.swap.includesNovaFee
 import io.novafoundation.nova.feature_swap_impl.domain.swap.swapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.presentation.view.bottomSheet.description.SwapRateDescriptionMode
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
@@ -208,6 +208,7 @@ class SwapMainSettingsViewModel(
         chainAssetIn = swapSettings.mapNotNull { it.assetIn },
         interactor = swapInteractor,
         configuration = Configuration(
+            showRetryDialog = false,
             initialState = Configuration.InitialState(
                 paymentCurrencySelectionMode = PaymentCurrencySelectionMode.AUTOMATIC_ONLY
             )
@@ -254,7 +255,7 @@ class SwapMainSettingsViewModel(
 
     val showNovaFeeDisclaimer: Flow<Boolean> = quotingState.mapNotNull {
         when (it) {
-            is QuotingState.Loaded -> it.quote.involvesHydraSwap()
+            is QuotingState.Loaded -> it.quote.includesNovaFee()
             is QuotingState.Default,
             is QuotingState.Error -> false
 

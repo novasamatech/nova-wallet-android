@@ -75,6 +75,24 @@ class StatemineAssetBalance(
         return ChainAssetBalance.default(chainAsset, accountBalance)
     }
 
+    override suspend fun canReceive(chain: Chain, chainAsset: Chain.Asset, accountId: AccountId): Boolean {
+        val details = queryAssetDetails(chainAsset)
+        if (details.status != StatemineAssetDetails.Status.Live) return false
+
+        val statemineType = chainAsset.requireStatemine()
+        val assetAccount = remoteStorage.query(chain.id) {
+            val encodableId = statemineType.prepareIdForEncoding(runtime)
+
+            runtime.metadata.statemineModule(statemineType).storage("Account").query(
+                encodableId,
+                accountId,
+                binding = ::bindAssetAccountOrEmpty
+            )
+        }
+
+        return assetAccount.canAcceptFunds && assetAccount.balance >= details.minimumBalance
+    }
+
     override suspend fun subscribeAccountBalanceUpdatePoint(
         chain: Chain,
         chainAsset: Chain.Asset,

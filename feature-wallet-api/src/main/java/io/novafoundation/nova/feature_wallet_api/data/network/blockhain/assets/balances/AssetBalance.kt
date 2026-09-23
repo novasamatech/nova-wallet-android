@@ -50,6 +50,16 @@ interface AssetBalance {
         accountId: AccountId
     ): ChainAssetBalance
 
+    /**
+     * Checks whether an account can currently receive this asset. Implementations should include
+     * asset-specific account status and minimum-balance requirements when applicable.
+     */
+    suspend fun canReceive(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        accountId: AccountId
+    ): Boolean = true
+
     suspend fun subscribeAccountBalanceUpdatePoint(
         chain: Chain,
         chainAsset: Chain.Asset,

@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.poolRewardAccountMatcher
-import io.novafoundation.nova.feature_swap_api.data.history.HydrationSwapTransferFilterFactory
+import io.novafoundation.nova.feature_swap_api.data.history.SwapTransferFilterFactory
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.history.AssetHistory
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
@@ -68,7 +68,7 @@ class RealTransactionHistoryRepository(
     private val operationDao: OperationDao,
     private val poolAccountDerivation: PoolAccountDerivation,
     private val mythosMainPotMatcherFactory: MythosMainPotMatcherFactory,
-    private val hydrationSwapTransferFilterFactory: HydrationSwapTransferFilterFactory,
+    private val swapTransferFilterFactory: SwapTransferFilterFactory,
     private val coinPriceRepository: CoinPriceRepository,
 ) : TransactionHistoryRepository {
 
@@ -189,7 +189,7 @@ class RealTransactionHistoryRepository(
             IgnoreUnsafeOperations(this),
             systemAccountFilterCreator(poolAccountDerivation.poolRewardAccountMatcher(chain.id)),
             systemAccountFilterCreator(mythosMainPotMatcherFactory.create(chainAsset)),
-            hydrationSwapTransferFilterFactory.create(chain),
+            swapTransferFilterFactory.create(chain),
         )
     }
 
