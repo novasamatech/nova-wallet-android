@@ -11,4 +11,6 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 interface SwapTransferFilterFactory {
 
     fun create(chain: Chain): Filter<Operation>?
+
+    fun commissionBeneficiaryAddresses(chain: Chain): Set<String>
 }
