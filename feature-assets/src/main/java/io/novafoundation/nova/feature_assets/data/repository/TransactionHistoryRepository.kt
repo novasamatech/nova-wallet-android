@@ -36,6 +36,7 @@ import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.withContext
@@ -93,7 +94,9 @@ class RealTransactionHistoryRepository(
         val accountAddress = chain.addressOf(accountId)
 
         val dataPageResult = runCatching {
-            historySource.getFilteredOperations(
+            // Persist gross swap amounts and their transfers together. Commission is deducted only
+            // when presenting history, otherwise a later database emission can deduct it twice.
+            historySource.getOperations(
                 pageSize,
                 PageOffset.Loadable.FirstPage,
                 filters,
@@ -107,7 +110,8 @@ class RealTransactionHistoryRepository(
 
         val dataPage = dataPageResult.getOrThrow()
 
-        val localOperations = dataPage.map { mapOperationToOperationLocalDb(it, OperationBaseLocal.Source.REMOTE) }
+        val reconciled = dataPage.replaceKnownCommissionOperations(accountId, chain, chainAsset)
+        val localOperations = reconciled.map { mapOperationToOperationLocalDb(it, OperationBaseLocal.Source.REMOTE) }
 
         operationDao.insertFromRemote(accountAddress, chain.id, chainAsset.id, localOperations)
     }
@@ -142,6 +146,8 @@ class RealTransactionHistoryRepository(
     ): Flow<DataPage<Operation>> {
         val accountAddress = chain.addressOf(accountId)
         val historySource = historySourceFor(chainAsset)
+        // Operations in the database were already accepted by the history source. Applying the
+        // remote safety filters again would hide the outer Utility.batchAll of a commissioned swap.
         val localFilters = listOfNotNull(swapTransferFilterFactory.create(chain))
         val operationsFlow = operationDao.observe(accountAddress, chain.id, chainAsset.id)
         val swapOperationsFlow = operationDao.observeSwapOperations(accountAddress, chain.id)
@@ -195,6 +201,7 @@ class RealTransactionHistoryRepository(
         commissionAmounts: Map<CommissionTransferKey, BigInteger>,
     ): SwapOperationJoin {
         val hash = base.hash ?: return this
+        if (base.status != OperationBaseLocal.Status.COMPLETED) return this
         val commission = commissionAmounts[CommissionTransferKey(hash, swap.assetOut.assetId)] ?: return this
         val netAmount = (swap.assetOut.amount - commission).max(BigInteger.ZERO)
 
@@ -215,6 +222,7 @@ class RealTransactionHistoryRepository(
         return mapNotNull { operation ->
             val hash = operation.base.hash ?: return@mapNotNull null
             val transfer = operation.transfer
+            if (operation.base.status != OperationBaseLocal.Status.COMPLETED) return@mapNotNull null
             if (transfer.sender != operation.base.address || transfer.receiver !in beneficiaries) return@mapNotNull null
 
             CommissionTransferKey(hash, operation.base.assetId) to transfer.amount
@@ -225,7 +233,10 @@ class RealTransactionHistoryRepository(
     private fun OperationJoin.replaceTechnicalSwapBatch(swapOperationsByHash: Map<String, SwapOperationJoin>): OperationJoin {
         if (swap == null && !isUtilityBatchAll()) return this
 
-        return base.hash?.let(swapOperationsByHash::get)?.asOperationJoin() ?: this
+        val knownSwap = base.hash?.let(swapOperationsByHash::get) ?: return this
+        if (base.assetId != knownSwap.swap.assetIn.assetId && base.assetId != knownSwap.swap.assetOut.assetId) return this
+
+        return SwapOperationJoin(base, knownSwap.swap).asOperationJoin()
     }
 
     private fun OperationJoin.isUtilityBatchAll(): Boolean {
@@ -247,9 +258,48 @@ class RealTransactionHistoryRepository(
         val nonFiltered = getOperations(pageSize, pageOffset, filters, accountId, chain, chainAsset, currency)
 
         val pageFilters = createTransactionFilters(chain, chainAsset)
-        val filtered = nonFiltered.withNetSwapAmounts(chain).applyFilters(pageFilters)
+        val reconciled = nonFiltered.replaceKnownCommissionOperations(accountId, chain, chainAsset)
+        val filtered = reconciled.withNetSwapAmounts(chain).applyFilters(pageFilters)
 
         return DataPage(nonFiltered.nextOffset, items = filtered)
+    }
+
+    private suspend fun List<Operation>.replaceKnownCommissionOperations(
+        accountId: AccountId,
+        chain: Chain,
+        chainAsset: Chain.Asset,
+    ): List<Operation> {
+        val knownSwaps = operationDao.observeSwapOperations(chain.addressOf(accountId), chain.id).first()
+            .associateByHash(emptyMap())
+        val commissionBeneficiaries = swapTransferFilterFactory.commissionBeneficiaryAddresses(chain)
+
+        return map { operation ->
+            val swap = operation.extrinsicHash?.let(knownSwaps::get) ?: return@map operation
+            val assetId = AssetAndChainId(chainAsset.chainId, chainAsset.id)
+            if (assetId != swap.swap.assetIn.assetId && assetId != swap.swap.assetOut.assetId) return@map operation
+            if (!operation.isTechnicalCommissionOperation(commissionBeneficiaries)) return@map operation
+
+            val mapped = mapOperationLocalToOperation(swap.asOperationJoin(), chainAsset, chain, null) ?: return@map operation
+            operation.copy(type = mapped.type)
+        }.distinctBy { operation ->
+            if (operation.type is Operation.Type.Swap) operation.extrinsicHash ?: operation.id else operation.id
+        }
+    }
+
+    private fun Operation.isTechnicalCommissionOperation(commissionBeneficiaries: Set<String>): Boolean {
+        return when (val operationType = type) {
+            is Operation.Type.Extrinsic -> {
+                val call = operationType.content as? Operation.Type.Extrinsic.Content.SubstrateCall ?: return false
+                call.module.equals("utility", ignoreCase = true) &&
+                    (call.call.equals("batchAll", ignoreCase = true) || call.call.equals("batch_all", ignoreCase = true))
+            }
+
+            is Operation.Type.Transfer -> {
+                operationType.sender == address && operationType.receiver in commissionBeneficiaries
+            }
+
+            else -> false
+        }
     }
 
     private fun List<Operation>.withNetSwapAmounts(chain: Chain): List<Operation> {
@@ -259,6 +309,7 @@ class RealTransactionHistoryRepository(
         val commissions = mapNotNull { operation ->
             val hash = operation.extrinsicHash ?: return@mapNotNull null
             val transfer = operation.type as? Operation.Type.Transfer ?: return@mapNotNull null
+            if (operation.status != Operation.Status.COMPLETED) return@mapNotNull null
             if (transfer.sender != operation.address || transfer.receiver !in beneficiaries) return@mapNotNull null
 
             CommissionTransferKey(hash, AssetAndChainId(operation.chainAsset.chainId, operation.chainAsset.id)) to transfer.amount
@@ -268,6 +319,7 @@ class RealTransactionHistoryRepository(
         return map { operation ->
             val hash = operation.extrinsicHash ?: return@map operation
             val swap = operation.type as? Operation.Type.Swap ?: return@map operation
+            if (operation.status != Operation.Status.COMPLETED) return@map operation
             val output = swap.amountOut
             val outputId = AssetAndChainId(output.chainAsset.chainId, output.chainAsset.id)
             val commission = commissions[CommissionTransferKey(hash, outputId)] ?: return@map operation
