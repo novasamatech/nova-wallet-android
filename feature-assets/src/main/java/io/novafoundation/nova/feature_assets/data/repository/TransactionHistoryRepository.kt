@@ -7,6 +7,7 @@ import io.novafoundation.nova.common.utils.applyFilters
 import io.novafoundation.nova.core_db.dao.OperationDao
 import io.novafoundation.nova.core_db.model.operation.OperationBaseLocal
 import io.novafoundation.nova.core_db.model.operation.OperationJoin
+import io.novafoundation.nova.core_db.model.operation.SwapOperationJoin
 import io.novafoundation.nova.feature_account_api.domain.account.system.SystemAccountMatcher
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationLocalToOperation
 import io.novafoundation.nova.feature_assets.data.mappers.mapOperationToOperationLocalDb
@@ -29,6 +30,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.withContext
@@ -133,13 +135,20 @@ class RealTransactionHistoryRepository(
     ): Flow<DataPage<Operation>> {
         val accountAddress = chain.addressOf(accountId)
         val historySource = historySourceFor(chainAsset)
+        val localFilters = listOfNotNull(swapTransferFilterFactory.create(chain))
+        val operationsFlow = operationDao.observe(accountAddress, chain.id, chainAsset.id)
+        val swapOperationsFlow = operationDao.observeSwapOperations(accountAddress, chain.id)
 
-        return operationDao.observe(accountAddress, chain.id, chainAsset.id)
-            .transform { operations ->
-                emit(mapOperations(operations, chainAsset, chain, emptyList()))
+        return combine(operationsFlow, swapOperationsFlow) { operations, swapOperations ->
+            operations to swapOperations.associateByHash()
+        }
+            .transform { (operations, swapOperationsByHash) ->
+                emit(mapOperations(operations, chainAsset, chain, emptyList(), swapOperationsByHash).applyFilters(localFilters))
 
                 runCatching { coinPriceRepository.getAllCoinPriceHistory(chainAsset.priceId!!, currency) }
-                    .onSuccess { emit(mapOperations(operations, chainAsset, chain, it)) }
+                    .onSuccess {
+                        emit(mapOperations(operations, chainAsset, chain, it, swapOperationsByHash).applyFilters(localFilters))
+                    }
             }
             .mapLatest { operations ->
                 val pageOffset = historySource.getSyncedPageOffset(accountId, chain, chainAsset)
@@ -153,15 +162,34 @@ class RealTransactionHistoryRepository(
         chainAsset: Chain.Asset,
         chain: Chain,
         coinPrices: List<HistoricalCoinRate>,
+        swapOperationsByHash: Map<String, SwapOperationJoin> = emptyMap(),
     ): List<Operation> {
         return operations.mapNotNull { operation ->
             val operationTimestamp = operation.base.time.milliseconds.inWholeSeconds
             val coinPrice = coinPrices.findNearestCoinRate(operationTimestamp)
-            mapOperationLocalToOperation(operation, chainAsset, chain, coinPrice)
+            val displayOperation = operation.replaceTechnicalSwapBatch(swapOperationsByHash)
+            mapOperationLocalToOperation(displayOperation, chainAsset, chain, coinPrice)
         }
     }
 
     private fun historySourceFor(chainAsset: Chain.Asset): AssetHistory = assetSourceRegistry.sourceFor(chainAsset).history
+
+    private fun List<SwapOperationJoin>.associateByHash(): Map<String, SwapOperationJoin> {
+        return mapNotNull { swap -> swap.base.hash?.let { it to swap } }.toMap()
+    }
+
+    private fun OperationJoin.replaceTechnicalSwapBatch(swapOperationsByHash: Map<String, SwapOperationJoin>): OperationJoin {
+        if (!isUtilityBatchAll()) return this
+
+        return base.hash?.let(swapOperationsByHash::get)?.asOperationJoin() ?: this
+    }
+
+    private fun OperationJoin.isUtilityBatchAll(): Boolean {
+        val extrinsic = extrinsic ?: return false
+
+        return extrinsic.module.equals("utility", ignoreCase = true) &&
+            (extrinsic.call.equals("batchAll", ignoreCase = true) || extrinsic.call.equals("batch_all", ignoreCase = true))
+    }
 
     private suspend fun AssetHistory.getFilteredOperations(
         pageSize: Int,

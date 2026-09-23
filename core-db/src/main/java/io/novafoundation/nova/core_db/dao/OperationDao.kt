@@ -14,6 +14,7 @@ import io.novafoundation.nova.core_db.model.operation.OperationLocal
 import io.novafoundation.nova.core_db.model.operation.OperationTypeLocal
 import io.novafoundation.nova.core_db.model.operation.PoolRewardTypeLocal
 import io.novafoundation.nova.core_db.model.operation.SwapTypeLocal
+import io.novafoundation.nova.core_db.model.operation.SwapOperationJoin
 import io.novafoundation.nova.core_db.model.operation.TransferTypeLocal
 import kotlinx.coroutines.flow.Flow
 
@@ -96,6 +97,22 @@ abstract class OperationDao {
         chainAssetId: Int,
         statusUp: OperationBaseLocal.Status = OperationBaseLocal.Status.PENDING
     ): Flow<List<OperationJoin>>
+
+    @Query(
+        """
+        SELECT
+        o.assetId as o_assetId, o.chainId o_chainId, o.id as o_id, o.address as o_address, o.time o_time,
+        o.status as o_status, o.source o_source, o.hash as o_hash,
+        s.fee_chainId as s_fee_chainId, s.fee_assetId as s_fee_assetId, s.fee_amount as s_fee_amount,
+        s.assetIn_chainId as s_assetIn_chainId, s.assetIn_assetId as s_assetIn_assetId, s.assetIn_amount as s_assetIn_amount,
+        s.assetOut_chainId as s_assetOut_chainId, s.assetOut_assetId as s_assetOut_assetId, s.assetOut_amount as s_assetOut_amount
+        FROM operations AS o
+        INNER JOIN operation_swaps AS s
+            ON s.operationId = o.id AND s.assetId = o.assetId AND s.chainId = o.chainId AND s.address = o.address
+        WHERE o.address = :address AND o.chainId = :chainId
+        """
+    )
+    abstract fun observeSwapOperations(address: String, chainId: String): Flow<List<SwapOperationJoin>>
 
     @Query(
         """
