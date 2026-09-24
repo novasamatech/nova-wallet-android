@@ -2067,4 +2067,6 @@
     <string name="privacy_analytics_description">Giúp chúng tôi hiểu những tính năng nào được sử dụng và làm cho Nova Wallet tốt hơn.</string>
     <string name="privacy_analytics_enabled_toast">Cảm ơn bạn đã giúp cải thiện Nova Wallet</string>
     <string name="settings_privacy_title">Quyền riêng tư</string>
+    <string name="swap_price_impact_too_high_message">Các giao dịch hoán đổi có mức ảnh hưởng đến giá từ %s trở lên sẽ bị chặn để bảo vệ tiền của bạn. Hãy giảm số tiền hoặc thử một cặp khác.</string>
+    <string name="swap_price_impact_too_high_title">Mức ảnh hưởng đến giá quá cao (%s)</string>
 </resources>

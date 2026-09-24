@@ -2081,4 +2081,6 @@
     <string name="privacy_analytics_description">Nous aide à comprendre quelles fonctionnalités sont utilisées et à améliorer Nova Wallet.</string>
     <string name="privacy_analytics_enabled_toast">Merci de contribuer à l’amélioration de Nova Wallet</string>
     <string name="settings_privacy_title">Confidentialité</string>
+    <string name="swap_price_impact_too_high_message">Les swaps avec un impact sur le prix de %s ou plus sont bloqués pour protéger vos fonds. Réduisez le montant ou essayez une autre paire.</string>
+    <string name="swap_price_impact_too_high_title">L’impact sur le prix est trop élevé (%s)</string>
 </resources>
