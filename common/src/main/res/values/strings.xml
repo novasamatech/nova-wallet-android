@@ -457,8 +457,6 @@
 
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 
-    <string name="swap_price_impact_too_high_title">Price impact is too high (%s)</string>
-    <string name="swap_price_impact_too_high_message">Swaps with a price impact of %s or more are blocked to protect your funds. Reduce the amount or try a different pair.</string>
 
     <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size of splitting your trade into multiple transactions.</string>
 
