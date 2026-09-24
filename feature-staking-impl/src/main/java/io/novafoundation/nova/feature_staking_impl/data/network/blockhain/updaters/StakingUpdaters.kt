@@ -10,6 +10,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN_AVN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
@@ -57,6 +58,7 @@ class StakingUpdaters(
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainUpdaters.updaters
             PARACHAIN -> parachainUpdaters.updaters
             TURING -> parachainUpdaters.updaters + turingExtraUpdaters.updaters
+            PARACHAIN_AVN -> parachainUpdaters.updaters
             NOMINATION_POOLS -> nominationPoolsUpdaters.updaters
             MYTHOS -> mythosUpdaters.updaters
             UNSUPPORTED -> emptyList()
