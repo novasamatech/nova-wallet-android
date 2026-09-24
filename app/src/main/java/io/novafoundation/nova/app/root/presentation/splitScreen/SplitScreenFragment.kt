@@ -55,6 +55,10 @@ class SplitScreenFragment : BaseFragment<SplitScreenViewModel, FragmentSplitScre
 
         splitScreenNavigationHolder.attach(mainNavController)
 
+        mainNavController.addOnDestinationChangedListener { _, destination, _ ->
+            viewModel.onDestinationChanged(destination.id)
+        }
+
         viewModel.onNavigationAttached()
     }
 

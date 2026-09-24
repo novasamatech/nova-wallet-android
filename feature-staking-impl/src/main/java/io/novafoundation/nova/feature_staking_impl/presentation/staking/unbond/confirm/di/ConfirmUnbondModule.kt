@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.c
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.confirm.ConfirmUnbondViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.unbond.hints.UnbondHintsMixinFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class ConfirmUnbondModule {
@@ -44,7 +46,9 @@ class ConfirmUnbondModule {
         unbondHintsMixinFactory: UnbondHintsMixinFactory,
         walletUiUseCase: WalletUiUseCase,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return ConfirmUnbondViewModel(
             router = router,
@@ -60,7 +64,9 @@ class ConfirmUnbondModule {
             unbondHintsMixinFactory = unbondHintsMixinFactory,
             walletUiUseCase = walletUiUseCase,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

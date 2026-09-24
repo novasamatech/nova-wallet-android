@@ -1749,6 +1749,16 @@
 
     <string name="assets_manage_tokens_title">Manage tokens</string>
     <string name="assets_manage_tokens_all_networks">All networks</string>
+    <string name="assets_manage_tokens_all_tokens">All tokens</string>
+    <string name="assets_manage_tokens_section_default">Default</string>
+    <string name="assets_manage_tokens_section_other">Others</string>
+    <plurals name="assets_manage_tokens_search_results">
+        <item quantity="one">%d result</item>
+        <item quantity="other">%d results</item>
+    </plurals>
+    <string name="assets_manage_tokens_auto_enable">Add tokens with positive balance</string>
+    <string name="assets_missing_token">Missing a token?</string>
+    <string name="assets_missing_token_action">Manage tokens</string>
 
     <string name="common_no_app_to_handle_import_intent">File import application not found on device. Please install it and try again</string>
 
@@ -2786,4 +2796,19 @@
     <string name="legal_consent_title">Updated Terms</string>
     <string name="legal_consent_subtitle">We’ve updated our Terms of Service and Privacy Notice. Please review and accept the updated documents to continue using Nova Wallet.</string>
     <string name="legal_consent_accept">Accept and Continue</string>
+    <string name="settings_analytics_title">Share anonymous usage data</string>
+    <string name="analytics_prompt_title">Help Improve Nova Wallet</string>
+    <string name="analytics_consent_body">Share anonymous usage data to help us understand which features are used and make Nova Wallet better. Details in our %1$s.</string>
+    <string name="analytics_consent_privacy_notice">Privacy Notice</string>
+    <string name="analytics_consent_disclosure_title">What we never collect</string>
+    <string name="analytics_consent_never_addresses">Never your wallet addresses, transaction hashes, or exact amounts</string>
+    <string name="analytics_consent_never_ids">No persistent identifiers — nothing links the data to you</string>
+    <string name="analytics_consent_ip_country">Your IP is used once to note your country, then deleted — it never reaches our analytics provider</string>
+    <string name="analytics_consent_change_anytime">Change your choice anytime in Settings</string>
+    <string name="analytics_consent_learn_more">Learn more in the Privacy Notice</string>
+    <string name="analytics_consent_agree">Agree</string>
+    <string name="analytics_consent_decline">Don’t Agree</string>
+    <string name="settings_privacy_title">Privacy</string>
+    <string name="privacy_analytics_description">Helps us understand which features are used and make Nova Wallet better.</string>
+    <string name="privacy_analytics_enabled_toast">Thanks for helping improve Nova Wallet</string>
 </resources>

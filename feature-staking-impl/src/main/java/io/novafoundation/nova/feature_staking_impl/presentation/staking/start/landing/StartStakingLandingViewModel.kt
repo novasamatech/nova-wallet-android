@@ -4,6 +4,9 @@ import android.graphics.Color
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.StakingStage
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.domain.isLoading
@@ -105,10 +108,15 @@ class StartStakingLandingViewModel(
     private val chainRegistry: ChainRegistry,
     private val contextManager: ContextManager,
     private val amountFormatter: AmountFormatter,
-    private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase
+    private val stakingAnnouncementsUseCase: StakingAnnouncementsUseCase,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(),
     Browserable,
     Validatable by validationExecutor {
+
+    /** Set when the user moves past the landing screen into an actual setup flow. */
+    @Volatile
+    private var flowContinued = false
 
     private val durationFormatter: DurationFormatter = createBaseDurationFormatter()
 
@@ -230,8 +238,18 @@ class StartStakingLandingViewModel(
         router.returnToStakingDashboard()
     }
 
+    override fun onCleared() {
+        if (!flowContinued) {
+            analyticsService.track(AnalyticsEvent.StakingAbandoned(StakingStage.LANDING))
+        }
+
+        super.onCleared()
+    }
+
     // TODO this should be provided by a particular staking implementation
     private fun openStartStaking() {
+        flowContinued = true
+
         val firstStakingType = availableStakingOptionsPayload.stakingTypes.first()
 
         when (firstStakingType.group()) {

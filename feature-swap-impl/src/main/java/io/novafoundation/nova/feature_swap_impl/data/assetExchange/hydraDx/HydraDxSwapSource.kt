@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx
 import io.novafoundation.nova.common.utils.Identifiable
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.SwapPoolId
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.sources.HydraDxQuotableEdge
 import io.novafoundation.nova.feature_swap_core_api.data.types.hydra.HydraDxQuotingSource
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
@@ -23,6 +24,11 @@ interface StandaloneHydraSwap {
 interface HydraDxSourceEdge : HydraDxQuotableEdge {
 
     fun routerPoolArgument(): DictEnum.Entry<*>
+
+    /**
+     * The pool this edge trades through
+     */
+    val poolId: SwapPoolId
 
     /**
      * Whether hydra swap source is able to perform optimized standalone swap without using Router

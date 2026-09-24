@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?><!-- Figma NW-2087 analytics consent: 20dp side padding, 14dp between blocks, 52dp buttons -->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/analyticsConsentContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background">
+
+    <ScrollView
+        android:id="@+id/analyticsConsentScroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:fillViewport="true"
+        android:paddingTop="8dp"
+        app:layout_constraintBottom_toTopOf="@id/analyticsConsentButtons"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp">
+
+            <ImageView
+                android:id="@+id/analyticsConsentIcon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/shield_checkmark_outline"
+                app:tint="@color/icon_accent" />
+
+            <TextView
+                android:id="@+id/analyticsConsentTitle"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:text="@string/analytics_prompt_title"
+                android:textColor="@color/text_primary" />
+
+            <TextView
+                android:id="@+id/analyticsConsentBody"
+                style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:textColor="@color/text_secondary"
+                tools:text="@string/analytics_consent_body" />
+
+            <LinearLayout
+                android:id="@+id/analyticsConsentDisclosure"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:background="@drawable/bg_block_12"
+                android:orientation="vertical"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="8dp">
+
+                <LinearLayout
+                    android:id="@+id/analyticsConsentDisclosureHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/shield_checkmark_outline"
+                        app:tint="@color/icon_accent" />
+
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="8dp"
+                        android:layout_weight="1"
+                        android:text="@string/analytics_consent_disclosure_title"
+                        android:textColor="@color/text_primary" />
+
+                    <ImageView
+                        android:id="@+id/analyticsConsentDisclosureChevron"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_up"
+                        app:tint="@color/icon_secondary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/analyticsConsentDisclosureList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="vertical">
+
+                    <include
+                        android:id="@+id/analyticsConsentNeverAddresses"
+                        layout="@layout/view_analytics_consent_check_row" />
+
+                    <include
+                        android:id="@+id/analyticsConsentNeverIds"
+                        layout="@layout/view_analytics_consent_check_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" />
+
+                    <include
+                        android:id="@+id/analyticsConsentIpCountry"
+                        layout="@layout/view_analytics_consent_check_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" />
+
+                    <include
+                        android:id="@+id/analyticsConsentChangeAnytime"
+                        layout="@layout/view_analytics_consent_check_row"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/analyticsConsentLearnMore"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:gravity="center"
+                android:text="@string/analytics_consent_learn_more"
+                android:textColor="@color/button_text_accent" />
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/analyticsConsentButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/secondary_screen_background"
+        android:orientation="vertical"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/analyticsConsentAgree"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/analytics_consent_agree"
+            app:appearance="primary" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/analyticsConsentDecline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/analytics_consent_decline"
+            app:appearance="secondary" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

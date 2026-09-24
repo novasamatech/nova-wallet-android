@@ -7,6 +7,7 @@ import io.novafoundation.nova.app.root.navigation.holders.SplitScreenNavigationH
 import io.novafoundation.nova.app.root.navigation.navigators.staking.StakingDashboardNavigator
 import io.novafoundation.nova.app.root.presentation.RootRouter
 import io.novafoundation.nova.app.root.presentation.di.RootActivityComponent
+import io.novafoundation.nova.app.root.presentation.analytics.di.AnalyticsConsentComponent
 import io.novafoundation.nova.app.root.presentation.legal.di.LegalConsentComponent
 import io.novafoundation.nova.app.root.presentation.main.di.MainFragmentComponent
 import io.novafoundation.nova.app.root.presentation.splitScreen.di.SplitScreenFragmentComponent
@@ -37,6 +38,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
 @Component(
@@ -57,6 +59,8 @@ interface RootComponent {
     fun mainFragmentComponentFactory(): MainFragmentComponent.Factory
 
     fun legalConsentComponentFactory(): LegalConsentComponent.Factory
+
+    fun analyticsConsentComponentFactory(): AnalyticsConsentComponent.Factory
 
     @Component.Factory
     interface Factory {
@@ -88,6 +92,7 @@ interface RootComponent {
             DAppFeatureApi::class,
             DbApi::class,
             CommonApi::class,
+            AnalyticsFeatureApi::class,
             RuntimeApi::class,
             VersionsFeatureApi::class,
             WalletConnectFeatureApi::class,

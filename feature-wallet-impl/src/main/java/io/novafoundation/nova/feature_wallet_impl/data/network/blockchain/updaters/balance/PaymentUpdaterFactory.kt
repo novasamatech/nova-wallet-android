@@ -15,7 +15,7 @@ class RealPaymentUpdaterFactory(
     private val assetSourceRegistry: AssetSourceRegistry,
     private val scope: AccountUpdateScope,
     private val chainRegistry: ChainRegistry,
-    private val assetCache: AssetCache
+    private val assetCache: AssetCache,
 ) : PaymentUpdaterFactory {
 
     override fun createFullSync(chain: Chain): Updater<MetaAccount> {

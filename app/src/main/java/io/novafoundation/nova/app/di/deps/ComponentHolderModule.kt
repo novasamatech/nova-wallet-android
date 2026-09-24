@@ -12,7 +12,11 @@ import io.novafoundation.nova.caip.di.CaipFeatureHolder
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
+import io.novafoundation.nova.analytics.di.AnalyticsFeatureHolder
 import io.novafoundation.nova.core_db.di.DbApi
+import io.novafoundation.nova.infrastructure.di.InfrastructureApi
+import io.novafoundation.nova.infrastructure.di.InfrastructureHolder
 import io.novafoundation.nova.core_db.di.DbHolder
 import io.novafoundation.nova.feature_account_api.di.AccountFeatureApi
 import io.novafoundation.nova.feature_account_impl.di.AccountFeatureHolder
@@ -99,6 +103,18 @@ interface ComponentHolderModule {
     @ClassKey(DbApi::class)
     @IntoMap
     fun provideDbFeature(dbHolder: DbHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(InfrastructureApi::class)
+    @IntoMap
+    fun provideInfrastructureFeature(holder: InfrastructureHolder): FeatureApiHolder
+
+    @ApplicationScope
+    @Binds
+    @ClassKey(AnalyticsFeatureApi::class)
+    @IntoMap
+    fun provideAnalyticsFeature(holder: AnalyticsFeatureHolder): FeatureApiHolder
 
     @ApplicationScope
     @Binds

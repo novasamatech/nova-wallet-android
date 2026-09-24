@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -24,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class, NominationPoolsCommonUnbondModule::class])
 class NominationPoolsConfirmUnbondModule {
@@ -45,7 +47,9 @@ class NominationPoolsConfirmUnbondModule {
         assetUseCase: AssetUseCase,
         hintsFactory: NominationPoolsUnbondHintsFactory,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return NominationPoolsConfirmUnbondViewModel(
             router = router,
@@ -61,7 +65,9 @@ class NominationPoolsConfirmUnbondModule {
             assetUseCase = assetUseCase,
             hintsFactory = hintsFactory,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

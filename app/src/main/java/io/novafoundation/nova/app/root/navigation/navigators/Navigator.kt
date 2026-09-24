@@ -4,7 +4,9 @@ import android.os.Bundle
 import androidx.lifecycle.asFlow
 import androidx.navigation.NavOptions
 import io.novafoundation.nova.app.R
+import io.novafoundation.nova.analytics.AnalyticsPromptState
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.BackDelayedNavigation
+import io.novafoundation.nova.app.root.presentation.analytics.AnalyticsConsentFragment
 import io.novafoundation.nova.app.root.navigation.delayedNavigation.NavComponentDelayedNavigation
 import io.novafoundation.nova.app.root.navigation.openSplitScreenWithInstantAction
 import io.novafoundation.nova.app.root.presentation.RootRouter
@@ -71,8 +73,6 @@ import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSw
 import io.novafoundation.nova.feature_assets.presentation.swap.network.NetworkSwapFlowPayload
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoFragment
 import io.novafoundation.nova.feature_assets.presentation.tokens.add.enterInfo.AddTokenEnterInfoPayload
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensFragment
-import io.novafoundation.nova.feature_assets.presentation.tokens.manage.chain.ManageChainTokensPayload
 import io.novafoundation.nova.feature_assets.presentation.trade.common.TradeProviderFlowType
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListFragment
 import io.novafoundation.nova.feature_assets.presentation.trade.provider.TradeProviderListPayload
@@ -118,7 +118,8 @@ import kotlinx.coroutines.flow.Flow
 
 class Navigator(
     navigationHoldersRegistry: NavigationHoldersRegistry,
-    private val walletConnectDelegate: WalletConnectRouter
+    private val walletConnectDelegate: WalletConnectRouter,
+    private val analyticsPromptState: AnalyticsPromptState
 ) : BaseNavigator(navigationHoldersRegistry),
     SplashRouter,
     OnboardingRouter,
@@ -156,24 +157,49 @@ class Navigator(
     }
 
     override fun openAfterPinCode(delayedNavigation: DelayedNavigation) {
+        // Asked once, right after the PIN and before Main - updated users included. Only on the way
+        // into Main: a PIN check guarding something inside the app must return straight to it.
+        if (delayedNavigation.opensMain() && !analyticsPromptState.hasBeenAnswered()) {
+            navigationBuilder().action(R.id.action_open_analyticsConsent)
+                .setArgs(AnalyticsConsentFragment.bundle(next = delayedNavigation))
+                .setNavOptions(replacingNavOptions(popUpTo = R.id.pincodeFragment))
+                .navigateInFirstAttachedContext()
+
+            return
+        }
+
+        runDelayedNavigationReplacing(delayedNavigation, current = R.id.pincodeFragment)
+    }
+
+    override fun finishAnalyticsConsent(next: DelayedNavigation) {
+        runDelayedNavigationReplacing(next, current = R.id.analyticsConsentFragment)
+    }
+
+    private fun runDelayedNavigationReplacing(delayedNavigation: DelayedNavigation, current: Int) {
         when (delayedNavigation) {
             is NavComponentDelayedNavigation -> {
-                val navOptions = NavOptions.Builder()
-                    .setPopUpTo(R.id.pincodeFragment, true)
-                    .setEnterAnim(R.anim.fragment_open_enter)
-                    .setExitAnim(R.anim.fragment_open_exit)
-                    .setPopEnterAnim(R.anim.fragment_close_enter)
-                    .setPopExitAnim(R.anim.fragment_close_exit)
-                    .build()
-
                 navigationBuilder().action(delayedNavigation.globalActionId)
                     .setArgs(delayedNavigation.extras)
-                    .setNavOptions(navOptions)
+                    .setNavOptions(replacingNavOptions(popUpTo = current))
                     .navigateInFirstAttachedContext()
             }
 
             is BackDelayedNavigation -> back()
         }
+    }
+
+    private fun replacingNavOptions(popUpTo: Int): NavOptions {
+        return NavOptions.Builder()
+            .setPopUpTo(popUpTo, true)
+            .setEnterAnim(R.anim.fragment_open_enter)
+            .setExitAnim(R.anim.fragment_open_exit)
+            .setPopEnterAnim(R.anim.fragment_close_enter)
+            .setPopExitAnim(R.anim.fragment_close_exit)
+            .build()
+    }
+
+    private fun DelayedNavigation.opensMain(): Boolean {
+        return this is NavComponentDelayedNavigation && globalActionId == R.id.action_open_split_screen
     }
 
     override fun openCreatePincode() {
@@ -396,13 +422,6 @@ class Navigator(
 
     override fun openManageTokens() {
         navigationBuilder().action(R.id.action_mainFragment_to_manageTokensGraph)
-            .navigateInFirstAttachedContext()
-    }
-
-    override fun openManageChainTokens(payload: ManageChainTokensPayload) {
-        val args = ManageChainTokensFragment.getBundle(payload)
-        navigationBuilder().action(R.id.action_manageTokensFragment_to_manageChainTokensFragment)
-            .setArgs(args)
             .navigateInFirstAttachedContext()
     }
 

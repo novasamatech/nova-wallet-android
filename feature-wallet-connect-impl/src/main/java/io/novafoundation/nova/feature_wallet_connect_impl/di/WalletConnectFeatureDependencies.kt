@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_wallet_connect_impl.di
 import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.caip.caip2.Caip2Parser
 import io.novafoundation.nova.caip.caip2.Caip2Resolver
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -20,6 +21,8 @@ import io.novafoundation.nova.feature_external_sign_api.domain.sign.evm.EvmTyped
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 interface WalletConnectFeatureDependencies {
+
+    fun analyticsService(): AnalyticsService
 
     val accountRepository: AccountRepository
 

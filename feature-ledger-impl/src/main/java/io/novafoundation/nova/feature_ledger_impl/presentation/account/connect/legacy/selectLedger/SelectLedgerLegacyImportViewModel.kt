@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_ledger_impl.presentation.account.connect.legacy.selectLedger
 
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.analytics.WalletCreationStep
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.bluetooth.BluetoothManager
 import io.novafoundation.nova.common.utils.event
@@ -21,6 +24,7 @@ class SelectLedgerLegacyImportViewModel(
     private val selectLedgerPayload: SelectLedgerLegacyPayload,
     private val router: LedgerRouter,
     private val messageCommandFormatter: MessageCommandFormatter,
+    private val analyticsService: AnalyticsService,
     discoveryService: LedgerDeviceDiscoveryService,
     permissionsAsker: PermissionsAsker.Presentation,
     bluetoothManager: BluetoothManager,
@@ -41,6 +45,8 @@ class SelectLedgerLegacyImportViewModel(
     payload = selectLedgerPayload
 ) {
 
+    private var proceededToNextStep = false
+
     override suspend fun verifyConnection(device: LedgerDevice) {
         ledgerMessageCommands.value = messageCommandFormatter.hideCommand().event()
 
@@ -50,6 +56,21 @@ class SelectLedgerLegacyImportViewModel(
         app.getSubstrateAccount(device, selectLedgerPayload.chainId, accountIndex = 0, confirmAddress = false)
 
         val selectAddressPayload = SelectLedgerAddressPayload(device.id, selectLedgerPayload.chainId)
+
+        proceededToNextStep = true
+
         router.openSelectImportAddress(selectAddressPayload)
+    }
+
+    override fun onCleared() {
+        trackWalletCreationAbandonedIfNeeded()
+
+        super.onCleared()
+    }
+
+    private fun trackWalletCreationAbandonedIfNeeded() {
+        if (proceededToNextStep) return
+
+        analyticsService.track(AnalyticsEvent.WalletCreationAbandoned(WalletCreationStep.LEDGER_CONNECT))
     }
 }

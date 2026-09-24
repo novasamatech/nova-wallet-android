@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_governance_impl.di
 import android.content.Context
 import coil.ImageLoader
 import com.google.gson.Gson
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -57,8 +58,13 @@ import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface GovernanceFeatureDependencies {
+
+    val analyticsService: AnalyticsService
+
+    val usdRateRepository: UsdRateRepository
 
     val maskableValueFormatterFactory: MaskableValueFormatterFactory
 

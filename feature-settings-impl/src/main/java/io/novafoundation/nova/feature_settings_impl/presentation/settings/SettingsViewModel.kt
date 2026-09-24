@@ -206,6 +206,10 @@ class SettingsViewModel(
         maskingModeUseCase.toggleHideBalancesOnLaunch()
     }
 
+    fun privacySettingsClicked() {
+        router.openPrivacy()
+    }
+
     fun changePinCodeClicked() {
         router.openChangePinCode()
     }

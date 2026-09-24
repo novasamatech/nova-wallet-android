@@ -42,4 +42,8 @@ class RealCurrencyRepository(
         val selectedCurrency = currencyDao.getSelectedCurrency()?.let { mapCurrencyFromLocal(it) }
         return selectedCurrency ?: throw IllegalArgumentException("No currency selected")
     }
+
+    override suspend fun getCurrency(coingeckoId: String): Currency? {
+        return currencyDao.getCurrencyByCoingeckoId(coingeckoId)?.let { mapCurrencyFromLocal(it) }
+    }
 }

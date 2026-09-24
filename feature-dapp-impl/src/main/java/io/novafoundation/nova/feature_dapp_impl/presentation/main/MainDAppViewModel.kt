@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_dapp_impl.presentation.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import android.net.Uri
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
 import io.novafoundation.nova.common.mixin.api.Browserable
@@ -33,7 +36,8 @@ class MainDAppViewModel(
     private val selectedAccountUseCase: SelectedAccountUseCase,
     private val actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     private val dappInteractor: DappInteractor,
-    private val resourceManager: ResourceManager
+    private val resourceManager: ResourceManager,
+    private val analyticsService: AnalyticsService
 ) : BaseViewModel(), Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -89,7 +93,21 @@ class MainDAppViewModel(
     }
 
     fun dappClicked(dapp: DappModel) {
+        trackDappOpened(dapp.url)
+
         router.openDAppBrowser(DAppBrowserPayload.Address(dapp.url))
+    }
+
+    private fun trackDappOpened(url: String) = launch {
+        val isKnownDapp = runCatching { dappInteractor.getDAppInfo(url).metadata != null }.getOrDefault(false)
+
+        analyticsService.track(
+            AnalyticsEvent.DappOpened(
+                dappHost = Uri.parse(url).host.orEmpty(),
+                source = "catalog",
+                isKnownDapp = isKnownDapp
+            )
+        )
     }
 
     fun searchClicked() {

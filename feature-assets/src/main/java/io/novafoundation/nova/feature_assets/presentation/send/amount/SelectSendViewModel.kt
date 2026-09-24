@@ -1,6 +1,10 @@
 package io.novafoundation.nova.feature_assets.presentation.send.amount
 
 import androidx.lifecycle.viewModelScope
+import io.novafoundation.nova.analytics.AssetCategoryClassifier
+import io.novafoundation.nova.analytics.AmountBucket
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.list.headers.TextHeader
@@ -74,6 +78,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class SelectSendViewModel(
     private val chainRegistry: ChainRegistry,
@@ -88,6 +94,8 @@ class SelectSendViewModel(
     private val crossChainTransfersUseCase: CrossChainTransfersUseCase,
     private val accountRepository: AccountRepository,
     private val maxActionProviderFactory: MaxActionProviderFactory,
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -365,6 +373,8 @@ class SelectSendViewModel(
     }
 
     private fun openConfirmScreen(validPayload: AssetTransferPayload) = launch {
+        trackSendInitiated(validPayload)
+
         val transferDraft = TransferDraft(
             amount = validPayload.transfer.amount,
             transferringMaxAmount = validPayload.transfer.transferringMaxAmount,
@@ -382,6 +392,22 @@ class SelectSendViewModel(
         )
 
         router.openConfirmTransfer(transferDraft)
+    }
+
+    private suspend fun trackSendInitiated(validPayload: AssetTransferPayload) {
+        val transfer = validPayload.transfer
+        val isCrossChain = transfer.originChain.id != transfer.destinationChain.id
+
+        analyticsService.track(
+            AnalyticsEvent.SendInitiated(
+                asset = transfer.originChainAsset.symbol.value,
+                network = transfer.originChain.name,
+                destinationNetwork = transfer.destinationChain.name.takeIf { isCrossChain },
+                assetCategory = AssetCategoryClassifier.classify(transfer.originChainAsset.symbol.value),
+                amountBucket = AmountBucket.fromOrUnknown(usdRateRepository.amountToUsd(validPayload.originUsedAsset.token.configuration, transfer.amount)),
+                isCrossChain = isCrossChain
+            )
+        )
     }
 
     private suspend fun buildTransfer(

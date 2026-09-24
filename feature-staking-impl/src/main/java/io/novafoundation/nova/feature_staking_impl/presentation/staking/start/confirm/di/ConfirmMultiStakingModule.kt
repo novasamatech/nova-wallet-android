@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
@@ -30,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.confirm.types.RealConfirmMultiStakingTypeFactory
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class, CommonMultiStakingModule::class])
 class ConfirmMultiStakingModule {
@@ -68,7 +70,9 @@ class ConfirmMultiStakingModule {
         selectionTypeProviderFactory: MultiStakingSelectionTypeProviderFactory,
         stakingStartedDetectionService: StakingStartedDetectionService,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return ConfirmMultiStakingViewModel(
             router = router,
@@ -85,7 +89,9 @@ class ConfirmMultiStakingModule {
             selectionTypeProviderFactory = selectionTypeProviderFactory,
             stakingStartedDetectionService = stakingStartedDetectionService,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

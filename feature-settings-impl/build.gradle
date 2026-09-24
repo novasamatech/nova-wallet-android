@@ -18,6 +18,7 @@ android {
 
 dependencies {
     implementation project(':common')
+    implementation project(':analytics')
     implementation project(':runtime')
     implementation project(':feature-account-api')
     implementation project(':feature-currency-api')
@@ -25,6 +26,7 @@ dependencies {
     implementation project(':feature-versions-api')
     implementation project(':feature-push-notifications')
     implementation project(':feature-assets')
+    implementation project(':feature-wallet-api')
     implementation project(':caip')
 
     implementation project(':feature-settings-api')

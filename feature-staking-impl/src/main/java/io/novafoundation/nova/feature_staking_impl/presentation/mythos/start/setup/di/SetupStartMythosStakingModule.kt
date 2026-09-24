@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.mixin.actionAwaitable.ActionAwaitableMixin
@@ -28,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SetupStartMythosStakingModule {
@@ -54,7 +56,9 @@ class SetupStartMythosStakingModule {
         validationSystem: StartMythosStakingValidationSystem,
         blockNumberUseCase: StakingBlockNumberUseCase,
         validationFailureFormatter: MythosStakingValidationFailureFormatter,
-        amountFormatter: AmountFormatter
+        amountFormatter: AmountFormatter,
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return SetupStartMythosStakingViewModel(
             router = router,
@@ -75,7 +79,9 @@ class SetupStartMythosStakingModule {
             validationSystem = validationSystem,
             mythosStakingValidationFailureFormatter = validationFailureFormatter,
             stakingBlockNumberUseCase = blockNumberUseCase,
-            amountFormatter = amountFormatter
+            amountFormatter = amountFormatter,
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

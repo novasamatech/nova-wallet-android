@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_ledger_impl.di
 
 import coil.ImageLoader
+import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.format.AddressSchemeFormatter
 import io.novafoundation.nova.common.data.network.AppLinksProvider
@@ -31,6 +32,8 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 
 interface LedgerFeatureDependencies {
+
+    fun analyticsService(): AnalyticsService
 
     val amountFormatter: AmountFormatter
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_settings_impl.di
 
 import android.content.Context
 import coil.ImageLoader
+import io.novafoundation.nova.analytics.AnalyticsOptOutManager
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
@@ -32,6 +33,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -44,6 +46,8 @@ import io.novafoundation.nova.runtime.repository.PreConfiguredChainsRepository
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 
 interface SettingsFeatureDependencies {
+
+    val analyticsOptOutManager: AnalyticsOptOutManager
 
     val maskingModeUseCase: MaskingModeUseCase
 
@@ -76,6 +80,8 @@ interface SettingsFeatureDependencies {
     val assetsIconModeRepository: AssetsIconModeRepository
 
     val accountRepository: AccountRepository
+
+    val assetVisibilityRepository: AssetVisibilityRepository
 
     val accountInteractor: AccountInteractor
 

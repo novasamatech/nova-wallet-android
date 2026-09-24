@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp"
+    tools:background="@color/secondary_screen_background">
+
+    <ImageView
+        android:id="@+id/itemMissingTokenIcon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_search"
+        app:tint="@color/icon_secondary" />
+
+    <TextView
+        android:id="@+id/itemMissingTokenLabel"
+        style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="@string/assets_missing_token"
+        android:textColor="@color/text_secondary" />
+
+    <TextView
+        android:id="@+id/itemMissingTokenAction"
+        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text="@string/assets_missing_token_action"
+        android:textColor="@color/button_text_accent" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_weight="1" />
+
+    <ImageView
+        android:id="@+id/itemMissingTokenChevron"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_chevron_right"
+        app:tint="@color/icon_secondary" />
+
+</LinearLayout>
