@@ -2081,4 +2081,6 @@
     <string name="privacy_analytics_description">Hangi özelliklerin kullanıldığını anlamamıza ve Nova Wallet\'ı geliştirmemize yardımcı olur.</string>
     <string name="privacy_analytics_enabled_toast">Nova Wallet\'ı geliştirmemize yardımcı olduğunuz için teşekkürler</string>
     <string name="settings_privacy_title">Gizlilik</string>
+    <string name="swap_price_impact_too_high_message">Fon fiyat etkisi %s veya daha yüksek olan takaslar, fonlarınızı korumak için engellenir. Miktarı azaltın veya farklı bir çift deneyin.</string>
+    <string name="swap_price_impact_too_high_title">Fiyat etkisi çok yüksek (%s)</string>
 </resources>

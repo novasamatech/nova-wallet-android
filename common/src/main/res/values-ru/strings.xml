@@ -2109,4 +2109,6 @@
     <string name="privacy_analytics_description">Помогает нам понять, какие функции используются, и сделать Nova Wallet лучше.</string>
     <string name="privacy_analytics_enabled_toast">Спасибо, что помогаете улучшать Nova Wallet</string>
     <string name="settings_privacy_title">Конфиденциальность</string>
+    <string name="swap_price_impact_too_high_message">Обмены с влиянием на цену в размере %s или выше заблокированы для защиты ваших средств. Уменьшите сумму или попробуйте другую пару.</string>
+    <string name="swap_price_impact_too_high_title">Слишком большое влияние на цену (%s)</string>
 </resources>

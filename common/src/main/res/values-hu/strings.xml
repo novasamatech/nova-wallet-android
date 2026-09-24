@@ -2081,4 +2081,6 @@
     <string name="privacy_analytics_description">Segít megérteni, mely funkciókat használják, és jobbá tenni a Nova Walletet.</string>
     <string name="privacy_analytics_enabled_toast">Köszönjük, hogy segítesz a Nova Wallet fejlesztésében</string>
     <string name="settings_privacy_title">Adatvédelem</string>
+    <string name="swap_price_impact_too_high_message">A %s-os vagy annál nagyobb árfolyamhatással járó csereügyletek blokkolva vannak pénzeszközei védelme érdekében. Csökkentse az összeget, vagy próbáljon ki egy másik párt.</string>
+    <string name="swap_price_impact_too_high_title">Túl magas árfolyamhatás (%s)</string>
 </resources>
