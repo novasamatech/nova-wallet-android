@@ -141,7 +141,6 @@ class SwapFeatureModule {
         lowPriceImpact = 1.percents,
         mediumPriceImpact = 5.percents,
         highPriceImpact = 15.percents,
-        maxAllowedPriceImpact = 30.percents
     )
 
     @Provides

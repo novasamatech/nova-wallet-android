@@ -50,11 +50,6 @@ fun mapSwapValidationFailureToUI(
 
         is SwapValidationFailure.HighPriceImpact -> highPriceImpact(reason, resourceManager, actions)
 
-        is SwapValidationFailure.TooHighPriceImpact -> TitleAndMessage(
-            resourceManager.getString(R.string.swap_price_impact_too_high_title, reason.priceImpact.formatPercents()),
-            resourceManager.getString(R.string.swap_price_impact_too_high_message, reason.maxAllowed.formatPercents())
-        ).asDefault()
-
         is NewRateExceededSlippage -> TitleAndMessage(
             resourceManager.getString(R.string.swap_rate_was_updated_failure_title),
             resourceManager.getString(
