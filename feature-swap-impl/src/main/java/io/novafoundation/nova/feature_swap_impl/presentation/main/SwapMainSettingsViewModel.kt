@@ -111,6 +111,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -132,8 +133,12 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
 import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
+
+private val BACKGROUND_FEE_REFRESH_INTERVAL = 10.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SwapMainSettingsViewModel(
@@ -530,6 +535,8 @@ class SwapMainSettingsViewModel(
     }
 
     private fun FeeLoaderMixinV2.Presentation<SwapFee, FeeDisplay>.setupFees() {
+        var lastFeeLoadStartedAt = TimeSource.Monotonic.markNow() - BACKGROUND_FEE_REFRESH_INTERVAL
+
         quotingState
             .onEach {
                 when (it) {
@@ -544,8 +551,19 @@ class SwapMainSettingsViewModel(
             .mapNotNull { (previous, current) ->
                 current.takeIf {
                     // allow same value in case user quickly switched from this value to another and back without waiting for fee loading
-                    previous != current || feeMixin.fee.value !is FeeStatus.Loaded
+                    previous?.hasSameQuoteAs(current) != true || feeMixin.fee.value !is FeeStatus.Loaded
                 }
+            }
+            .transformLatest { quoteState ->
+                if (quoteState.origin == QuoteRefreshOrigin.SUBSCRIPTION) {
+                    val remainingDelay = BACKGROUND_FEE_REFRESH_INTERVAL - lastFeeLoadStartedAt.elapsedNow()
+                    if (remainingDelay.isPositive()) {
+                        delay(remainingDelay)
+                    }
+                }
+
+                lastFeeLoadStartedAt = TimeSource.Monotonic.markNow()
+                emit(quoteState)
             }
             .onEach { quoteState ->
                 loadFee { feePaymentCurrency ->
@@ -628,7 +646,9 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupPerSwapSettingQuoting() {
-        swapSettings.mapLatest { performQuote(it, shouldShowLoading = true) }
+        swapSettings.mapLatest {
+            performQuote(it, shouldShowLoading = true, origin = QuoteRefreshOrigin.USER_INPUT)
+        }
             .launchIn(viewModelScope)
     }
 
@@ -639,11 +659,11 @@ class SwapMainSettingsViewModel(
         }.onEach {
             val currentSwapSettings = swapSettings.first()
 
-            performQuote(currentSwapSettings, shouldShowLoading = false)
+            performQuote(currentSwapSettings, shouldShowLoading = false, origin = QuoteRefreshOrigin.SUBSCRIPTION)
         }.launchIn(viewModelScope)
     }
 
-    private fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean) {
+    private fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean, origin: QuoteRefreshOrigin) {
         quotingJob?.cancel()
         quotingJob = launch {
             val swapQuoteArgs = swapSettings.toQuoteArgs(
@@ -658,7 +678,7 @@ class SwapMainSettingsViewModel(
             val quote = swapInteractor.quote(swapQuoteArgs, swapFlowScope)
 
             quotingState.value = quote.fold(
-                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs) },
+                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin) },
                 onFailure = {
                     if (it is CancellationException) {
                         QuotingState.Loading
@@ -670,6 +690,10 @@ class SwapMainSettingsViewModel(
 
             handleNewQuote(quote, swapSettings)
         }
+    }
+
+    private fun QuotingState.Loaded.hasSameQuoteAs(other: QuotingState.Loaded): Boolean {
+        return quote == other.quote && quoteArgs == other.quoteArgs
     }
 
     private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {
