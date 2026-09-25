@@ -325,11 +325,12 @@ class SwapConfirmationViewModel(
             }
     }
 
-    private fun trackSwapConfirmed() = launchUnit {
+    // Tracked inline, not launched: navigation right after pops this screen and cancels viewModelScope
+    private suspend fun trackSwapConfirmed() {
         val quote = confirmationStateFlow.first().swapQuote
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
-        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return@launchUnit
+        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return
 
         analyticsService.track(
             AnalyticsEvent.SwapConfirmed(
@@ -343,12 +344,12 @@ class SwapConfirmationViewModel(
         )
     }
 
-    private fun trackSwapCompleted() = launchUnit {
-        val confirmedAt = confirmedAt ?: return@launchUnit
+    private suspend fun trackSwapCompleted() {
+        val confirmedAt = confirmedAt ?: return
         val quote = confirmationStateFlow.first().swapQuote
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
-        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return@launchUnit
+        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return
 
         analyticsService.track(
             AnalyticsEvent.SwapCompleted(
