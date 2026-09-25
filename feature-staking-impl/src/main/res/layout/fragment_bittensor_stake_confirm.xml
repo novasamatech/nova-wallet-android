@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/bittensorStakeConfirmToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/bittensor_stake_to_root" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+        android:id="@+id/bittensorStakeConfirmAmount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp" />
+
+    <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
+        android:id="@+id/bittensorStakeConfirmExtrinsicInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp" />
+
+    <io.novafoundation.nova.common.view.TableView
+        android:id="@+id/bittensorStakeConfirmStakingDetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:childrenPaddingBottom="0dp"
+        app:childrenPaddingEnd="16dp"
+        app:childrenPaddingStart="16dp"
+        app:childrenPaddingTop="0dp"
+        app:drawDividers="true">
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/bittensorStakeConfirmStakingType"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            app:title="@string/staking_staking_type"
+            tools:primaryValue="Root staking" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/bittensorStakeConfirmValidator"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            app:primaryValueEndIcon="@drawable/ic_info"
+            app:title="@string/bittensor_validator"
+            tools:primaryValue="Nova Wallet" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/bittensorStakeConfirmApy"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            app:primaryValueStyle="positive"
+            app:shouldDrawDivider="false"
+            app:title="@string/bittensor_apy"
+            tools:primaryValue="7% · paid in TAO" />
+    </io.novafoundation.nova.common.view.TableView>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/bittensorStakeConfirmButton"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/common_confirm" />
+</LinearLayout>

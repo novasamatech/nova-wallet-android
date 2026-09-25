@@ -13,11 +13,10 @@ import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 
 abstract class NavStackInterScreenCommunicator<I : Parcelable, O : Parcelable>(
-    private val navigationHoldersRegistry: NavigationHoldersRegistry
+    private val navigationHoldersRegistry: NavigationHoldersRegistry,
+    private val responseKey: String = UUID.randomUUID().toString(),
+    private val requestKey: String = UUID.randomUUID().toString()
 ) : InterScreenCommunicator<I, O> {
-
-    private val responseKey = UUID.randomUUID().toString()
-    private val requestKey = UUID.randomUUID().toString()
 
     protected val navController: NavController
         get() = navigationHoldersRegistry.firstAttachedNavController!!

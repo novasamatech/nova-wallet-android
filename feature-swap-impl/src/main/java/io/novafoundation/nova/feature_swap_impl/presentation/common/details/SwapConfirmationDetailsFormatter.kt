@@ -10,8 +10,8 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapQuote
 import io.novafoundation.nova.feature_swap_api.domain.model.totalTime
 import io.novafoundation.nova.feature_swap_api.domain.model.swapRate
 import io.novafoundation.nova.feature_swap_api.presentation.formatters.SwapRateFormatter
-import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetView
-import io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+import io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetView
+import io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetsView
 import io.novafoundation.nova.feature_swap_impl.presentation.common.PriceImpactFormatter
 import io.novafoundation.nova.feature_swap_impl.presentation.common.details.model.SwapConfirmationDetailsModel
 import io.novafoundation.nova.feature_swap_impl.presentation.common.route.SwapRouteFormatter

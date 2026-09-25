@@ -89,7 +89,8 @@ class RewardCalculatorFactory(
             }
 
             ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = assetWithChain.asset)
-            NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING, MYTHOS -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+            NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING, MYTHOS, Chain.Asset.StakingType.BITTENSOR_ROOT ->
+                throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
     }
 

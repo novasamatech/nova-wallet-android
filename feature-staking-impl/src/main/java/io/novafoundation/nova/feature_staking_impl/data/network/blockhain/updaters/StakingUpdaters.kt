@@ -59,7 +59,7 @@ class StakingUpdaters(
             TURING -> parachainUpdaters.updaters + turingExtraUpdaters.updaters
             NOMINATION_POOLS -> nominationPoolsUpdaters.updaters
             MYTHOS -> mythosUpdaters.updaters
-            UNSUPPORTED -> emptyList()
+            UNSUPPORTED, StakingType.BITTENSOR_ROOT -> emptyList()
         }
 
         return byTypeUpdaters.groupBySyncingChain(stakingChain)

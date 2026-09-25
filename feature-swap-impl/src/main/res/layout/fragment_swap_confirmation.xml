@@ -23,7 +23,7 @@
         android:orientation="vertical"
         app:layout_constraintTop_toBottomOf="@+id/swapConfirmationToolbar">
 
-        <io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetsView
             android:id="@+id/swapConfirmationAssets"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

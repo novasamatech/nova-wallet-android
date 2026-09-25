@@ -7,6 +7,12 @@ class CompoundNumberFormatterTest {
     private val formatter = defaultNumberFormatter()
 
     @Test
+    fun `should shorten subnet prices without hiding small positive amounts`() {
+        testFormatter(formatter, "0.00657", "0.006571125")
+        testFormatter(formatter, "0.000000001", "0.000000001")
+    }
+
+    @Test
     fun `should format all cases`() {
         testFormatter(formatter, "0.00000001", "0.000000011676979")
         testFormatter(formatter, "0.00002", "0.000021676979")

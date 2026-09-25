@@ -5,6 +5,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 fun mapStakingTypeToSubQueryId(stakingType: Chain.Asset.StakingType): String? {
     return when (stakingType) {
         Chain.Asset.StakingType.UNSUPPORTED -> null
+        Chain.Asset.StakingType.BITTENSOR_ROOT -> null
         Chain.Asset.StakingType.RELAYCHAIN -> "relaychain"
         Chain.Asset.StakingType.PARACHAIN -> "parachain"
         Chain.Asset.StakingType.RELAYCHAIN_AURA -> "aura-relaychain"

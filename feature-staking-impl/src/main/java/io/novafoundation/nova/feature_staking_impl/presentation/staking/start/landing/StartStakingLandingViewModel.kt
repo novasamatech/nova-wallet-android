@@ -265,6 +265,7 @@ class StartStakingLandingViewModel(
             StakingTypeGroup.NOMINATION_POOL -> router.openStartMultiStaking(SetupAmountMultiStakingPayload(availableStakingOptionsPayload))
 
             StakingTypeGroup.MYTHOS -> router.openStartMythosStaking()
+            StakingTypeGroup.BITTENSOR -> router.openBittensorRootStaking()
 
             StakingTypeGroup.UNSUPPORTED -> Unit
         }

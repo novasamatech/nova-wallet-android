@@ -5,6 +5,7 @@ import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.announcements.Announcement
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -37,6 +38,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.co
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
@@ -126,6 +128,11 @@ class StakingDashboardViewModel(
         val chain = withoutStakeItem.chain
         val chainAsset = withoutStakeItem.token.configuration
 
+        if (stakingTypes.singleOrNull() == Chain.Asset.StakingType.BITTENSOR_ROOT) {
+            router.openBittensorRootStaking()
+            return@launch
+        }
+
         stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
 
         analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = "dashboard"))
@@ -168,6 +175,7 @@ class StakingDashboardViewModel(
         val stats = hasStake.stakingState.stats
         val isSyncingPrimary = hasStake.syncingStage.isSyncingPrimary()
         val isSyncingSecondary = hasStake.syncingStage.isSyncingSecondary()
+        val isBittensor = hasStake.stakingState.stakingType == Chain.Asset.StakingType.BITTENSOR_ROOT
 
         val stakingTypBadge = if (hasStake.stakingState.showStakingType) {
             formatters.presentationMapper.mapStakingTypeToUi(hasStake.stakingState.stakingType)
@@ -178,16 +186,34 @@ class StakingDashboardViewModel(
         return StakingDashboardModel.HasStakeItem(
             assetLabel = resourceManager.getString(R.string.staking_rewards, hasStake.token.configuration.name).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.fullId,
-            rewards = stats.map {
-                formatters.maskableValueFormatter.format {
-                    amountFormatter.formatAmountToAmountModel(it.rewards, hasStake.token)
-                }.syncingIf(isSyncingSecondary)
+            rewards = if (isBittensor) {
+                ExtendedLoadingState.Loaded(formatters.maskableValueFormatter.format { AmountModel("—", null) }.syncingIf(false))
+            } else {
+                stats.map {
+                    formatters.maskableValueFormatter.format {
+                        amountFormatter.formatAmountToAmountModel(it.rewards, hasStake.token)
+                    }.syncingIf(isSyncingSecondary)
+                }
             },
             stake = formatters.maskableValueFormatter.format {
-                amountFormatter.formatAmountToAmountModel(hasStake.stakingState.stake, hasStake.token)
-            }.syncingIf(isSyncingSecondary),
-            status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) },
-            earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) },
+                hasStake.stakingState.stake?.let { amountFormatter.formatAmountToAmountModel(it, hasStake.token) } ?: AmountModel("—", null)
+            }.syncingIf(if (isBittensor) isSyncingPrimary else isSyncingSecondary),
+            status = if (isBittensor) {
+                ExtendedLoadingState.Loaded(
+                    StakeStatusModel(
+                        indicatorRes = R.drawable.ic_indicator_inactive_pulse,
+                        text = resourceManager.getString(R.string.bittensor_staking),
+                        textColorRes = R.color.text_primary
+                    ).syncingIf(false)
+                )
+            } else {
+                stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) }
+            },
+            earnings = if (isBittensor) {
+                ExtendedLoadingState.Loaded("—".syncingIf(false))
+            } else {
+                stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) }
+            },
             stakingTypeBadge = stakingTypBadge,
             assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary),
             announcement = chainAnnouncements[hasStake.chain.id]?.let(::mapAnnouncementToUi)
@@ -221,6 +247,10 @@ class StakingDashboardViewModel(
         chainAsset: Chain.Asset,
         stakingType: Chain.Asset.StakingType
     ) {
+        if (stakingType == Chain.Asset.StakingType.BITTENSOR_ROOT) {
+            router.openBittensorPortfolio()
+            return
+        }
         stakingSharedState.setSelectedOption(
             chain = chain,
             chainAsset = chainAsset,

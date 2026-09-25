@@ -30,9 +30,14 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboard
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di.RebagComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.di.BittensorStakeAmountComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.di.BittensorStakeConfirmComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di.BittensorDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.claimRewards.di.MythosClaimRewardsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.currentCollators.di.MythosCurrentCollatorsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.redeem.di.MythosRedeemComponent
@@ -121,6 +126,14 @@ import io.novafoundation.nova.runtime.di.RuntimeApi
 )
 @FeatureScope
 interface StakingFeatureComponent : StakingFeatureApi {
+
+    fun bittensorStakeAmountComponentFactory(): BittensorStakeAmountComponent.Factory
+
+    fun bittensorStakeConfirmComponentFactory(): BittensorStakeConfirmComponent.Factory
+
+    fun bittensorDetailsComponentFactory(): BittensorDetailsComponent.Factory
+
+    fun bittensorSubnetComponentFactory(): BittensorSubnetComponent.Factory
 
     fun dashboardComponentFactory(): StakingDashboardComponent.Factory
 
@@ -270,6 +283,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
     interface Factory {
 
         fun create(
+            @BindsInstance bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
             @BindsInstance router: StakingRouter,
 
             @BindsInstance parachainStaking: ParachainStakingRouter,
@@ -293,6 +307,7 @@ interface StakingFeatureComponent : StakingFeatureApi {
     @Component(
         dependencies = [
             AnalyticsFeatureApi::class,
+            io.novafoundation.nova.infrastructure.di.InfrastructureApi::class,
             CommonApi::class,
             DbApi::class,
             RuntimeApi::class,

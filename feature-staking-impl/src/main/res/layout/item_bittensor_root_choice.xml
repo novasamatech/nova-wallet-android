@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto" android:id="@+id/rootStaking" android:layout_width="match_parent" android:layout_height="64dp"
+        android:layout_marginBottom="8dp" android:gravity="center_vertical"
+        android:background="@drawable/bg_primary_list_item_corner_12_solid" android:paddingHorizontal="16dp"
+        android:orientation="horizontal">
+        <ImageView android:id="@+id/rootIcon" android:layout_width="32dp" android:layout_height="32dp"
+            android:padding="4dp" android:scaleType="fitCenter" />
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:layout_marginHorizontal="12dp" android:orientation="vertical">
+            <TextView style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/bittensor_root_staking" />
+            <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp"
+                android:text="@string/bittensor_root_row_description" android:textColor="@color/text_secondary" />
+        </LinearLayout>
+        <ImageView android:layout_width="20dp" android:layout_height="20dp"
+            android:src="@drawable/ic_chevron_right" app:tint="@color/icon_secondary" />
+    </LinearLayout>

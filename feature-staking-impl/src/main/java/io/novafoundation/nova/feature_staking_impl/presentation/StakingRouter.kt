@@ -102,4 +102,20 @@ interface StakingRouter {
     fun openDAppBrowser(url: String)
 
     fun openStakingDashboard()
+
+    fun openBittensorRootStaking()
+
+    fun openBittensorPortfolio()
+
+    fun openBittensorRootDetails()
+
+    fun openBittensorStakeConfirm()
+
+    fun openBittensorChooseSubnet()
+
+    fun openBittensorSubnetDetails(subnetId: Int)
+
+    fun openBittensorSubnetAmount(subnetId: Int, validatorAddress: String)
+
+    fun openBittensorSubnetReview(subnetId: Int, amount: String, metaId: Long, validatorAddress: String)
 }

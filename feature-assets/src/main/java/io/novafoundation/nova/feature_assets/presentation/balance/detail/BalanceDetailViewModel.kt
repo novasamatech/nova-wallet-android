@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartTextInjectors
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -26,8 +27,8 @@ import io.novafoundation.nova.feature_assets.R
 import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
-import io.novafoundation.nova.feature_assets.domain.price.AssetPriceChart
-import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.price.AssetPriceChart
+import io.novafoundation.nova.feature_wallet_api.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -41,10 +42,10 @@ import io.novafoundation.nova.feature_assets.presentation.transaction.filter.Tra
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.TransactionHistoryBannerModel
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryMixin
 import io.novafoundation.nova.feature_assets.presentation.transaction.history.mixin.TransactionHistoryUi
-import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.PriceChartModel
-import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealDateChartTextInjector
-import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPriceChangeTextInjector
-import io.novafoundation.nova.feature_assets.presentation.views.priceCharts.formatters.RealPricePriceTextInjector
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPriceChangeTextInjector
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPricePriceTextInjector
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_gift_api.domain.AvailableGiftAssetsUseCase
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor

@@ -34,6 +34,9 @@ annotation class Attested
 class AttestationModule {
 
     @Provides
+    fun provideInfrastructureBaseUrl(): String = BuildConfig.INFRASTRUCTURE_HOST
+
+    @Provides
     @ApplicationScope
     fun provideAttestationIdentity(preferences: Preferences): AttestationIdentity {
         return RealAttestationIdentity(preferences)

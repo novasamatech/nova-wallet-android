@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
 import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
+import io.novafoundation.nova.infrastructure.di.InfrastructureApi
 import io.novafoundation.nova.common.di.FeatureApiHolder
 import io.novafoundation.nova.common.di.FeatureContainer
 import io.novafoundation.nova.common.di.scope.ApplicationScope
@@ -23,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 
 @ApplicationScope
 class StakingFeatureHolder @Inject constructor(
@@ -38,12 +40,14 @@ class StakingFeatureHolder @Inject constructor(
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
     private val selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
     private val selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
+    private val bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
     override fun initializeDependencies(): Any {
         val dependencies = DaggerStakingFeatureComponent_StakingFeatureDependenciesComponent.builder()
             .commonApi(commonApi())
             .analyticsFeatureApi(getFeature(AnalyticsFeatureApi::class.java))
+            .infrastructureApi(getFeature(InfrastructureApi::class.java))
             .runtimeApi(getFeature(RuntimeApi::class.java))
             .dbApi(getFeature(DbApi::class.java))
             .walletFeatureApi(getFeature(WalletFeatureApi::class.java))
@@ -66,6 +70,7 @@ class StakingFeatureHolder @Inject constructor(
                 stakingDashboardRouter = stakingDashboardRouter,
                 selectMythosCollatorInterScreenCommunicator = selectMythosCollatorInterScreenCommunicator,
                 selectMythosCollatorSettingsInterScreenCommunicator = selectMythosCollatorSettingsInterScreenCommunicator,
+                bittensorValidatorCommunicator = bittensorValidatorCommunicator,
                 deps = dependencies
             )
     }

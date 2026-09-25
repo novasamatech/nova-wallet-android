@@ -131,7 +131,8 @@ data class Chain(
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO, // relaychain like
             PARACHAIN, TURING, // parachain-staking like
             NOMINATION_POOLS,
-            MYTHOS
+            MYTHOS,
+            BITTENSOR_ROOT
         }
 
         override val identifier = "$chainId:$id"

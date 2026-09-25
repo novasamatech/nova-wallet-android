@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -59,6 +61,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
@@ -81,6 +84,13 @@ import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
 interface StakingFeatureDependencies {
+
+    val infrastructureBaseUrl: String
+
+    @get:Attested
+    val attestedNetworkApiCreator: NetworkApiCreator
+
+    val coinPriceRepository: io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 
     fun analyticsService(): AnalyticsService
 
@@ -155,6 +165,10 @@ interface StakingFeatureDependencies {
     val balanceHoldsRepository: BalanceHoldsRepository
 
     val amountFormatter: AmountFormatter
+
+    val tokenFormatter: TokenFormatter
+
+    fun logger(): Logger
 
     val chainMigrationInfoUseCase: ChainMigrationInfoUseCase
 

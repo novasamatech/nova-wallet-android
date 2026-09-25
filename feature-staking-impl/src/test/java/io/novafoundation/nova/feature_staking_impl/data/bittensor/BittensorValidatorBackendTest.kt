@@ -1,0 +1,78 @@
+package io.novafoundation.nova.feature_staking_impl.data.bittensor
+
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
+import kotlinx.coroutines.runBlocking
+import okhttp3.Headers
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import retrofit2.Response
+import java.math.BigDecimal
+import java.math.BigInteger
+
+class BittensorValidatorBackendTest {
+
+    @Test
+    fun `uses gateway paths and reuses only HTTP fresh responses`() = runBlocking {
+        val api = Api("max-age=60")
+        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        backend.validators(64)
+        backend.validators(64)
+        backend.gates()
+        backend.gates()
+        assertEquals(
+            listOf("https://infra.test/v1/bittensor/subnets/64/validators", "https://infra.test/v1/bittensor/recommendations/subnets"),
+            api.requests
+        )
+    }
+
+    @Test
+    fun `no store responses and missing infrastructure URL are not silently cached or sent unsigned`() = runBlocking {
+        val api = Api("no-store")
+        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        backend.validators(1)
+        backend.validators(1)
+        assertEquals(2, api.requests.size)
+        assertTrue(runCatching { BittensorValidatorBackend(api, "").validators(1) }.isFailure)
+        assertEquals(2, api.requests.size)
+    }
+
+    @Test
+    fun `missing or stale server policy cannot enable validator selection`() {
+        assertTrue(runCatching { bindBittensorValidatorGates(BittensorRecommendationsRemote(null)) }.isFailure)
+        assertTrue(runCatching { bindBittensorValidatorGates(policy("STALE")) }.isFailure)
+        assertEquals(BigDecimal("0.18"), bindBittensorValidatorGates(policy("FRESH")).maxTake)
+        assertTrue(runCatching { BittensorValidatorGates(BigDecimal("1.01"), true, true) }.isFailure)
+    }
+
+    @Test
+    fun `take limit uses exact integers instead of a rounded percentage`() {
+        val gates = BittensorValidatorGates(BigDecimal("0.18"), true, true)
+        assertTrue(gates.allowsTake(BigInteger.valueOf(11796)))
+        assertFalse(gates.allowsTake(BigInteger.valueOf(11797)))
+        assertTrue(runCatching { gates.allowsTake(BigInteger.valueOf(65536)) }.isFailure)
+    }
+
+    private class Api(private val cacheControl: String) : BittensorValidatorsApi {
+        val requests = mutableListOf<String>()
+        override suspend fun validators(url: String): Response<BittensorValidatorsRemote> {
+            requests += url
+            return Response.success(BittensorValidatorsRemote(emptyList()), headers())
+        }
+        override suspend fun recommendations(url: String): Response<BittensorRecommendationsRemote> {
+            requests += url
+            return Response.success(policy("FRESH"), headers())
+        }
+        private fun headers() = Headers.Builder().add("Cache-Control", cacheControl).build()
+    }
+
+    companion object {
+        private fun policy(freshness: String) = BittensorRecommendationsRemote(
+            BittensorRecommendationsRemote.Meta(
+                BittensorRecommendationsRemote.Gates("0.18", true, true),
+                BittensorRecommendationsRemote.Components(BittensorRecommendationsRemote.Component("AVAILABLE", freshness))
+            )
+        )
+    }
+}

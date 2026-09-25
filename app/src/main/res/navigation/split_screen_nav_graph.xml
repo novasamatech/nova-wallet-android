@@ -5,6 +5,42 @@
     android:id="@+id/split_screen_nav_graph"
     app:startDestination="@id/mainFragment">
 
+    <fragment android:id="@+id/bittensorChooseSubnet"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment" />
+    <fragment android:id="@+id/bittensorSelectValidator"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorFragment" />
+    <action android:id="@+id/action_open_bittensor_select_validator" app:destination="@id/bittensorSelectValidator"
+        app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
+    <fragment android:id="@+id/bittensorSubnetDetails"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsFragment">
+        <argument android:name="subnetId" app:argType="integer" />
+    </fragment>
+    <fragment android:id="@+id/bittensorSubnetAmount"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountFragment">
+        <argument android:name="subnetId" app:argType="integer" />
+        <argument android:name="validatorAddress" app:argType="string" />
+    </fragment>
+    <fragment android:id="@+id/bittensorSubnetReview"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewFragment">
+        <argument android:name="subnetId" app:argType="integer" />
+        <argument android:name="amount" app:argType="string" />
+        <argument android:name="metaId" app:argType="long" />
+        <argument android:name="validatorAddress" app:argType="string" />
+    </fragment>
+    <action android:id="@+id/action_open_bittensor_choose_subnet" app:destination="@id/bittensorChooseSubnet"
+        app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
+    <action android:id="@+id/action_open_bittensor_subnet_amount" app:destination="@id/bittensorSubnetAmount"
+        app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
+    <action android:id="@+id/action_open_bittensor_subnet_details" app:destination="@id/bittensorSubnetDetails"
+        app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
+    <action android:id="@+id/action_open_bittensor_subnet_review" app:destination="@id/bittensorSubnetReview"
+        app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
+
     <include app:graph="@navigation/import_nav_graph" />
 
     <include app:graph="@navigation/onboarding_nav_graph" />
@@ -35,6 +71,24 @@
 
     <include app:graph="@navigation/staking_main_graph" />
 
+    <include app:graph="@navigation/bittensor_root_staking_graph" />
+
+    <fragment android:id="@+id/bittensorPortfolioFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment"
+        tools:layout="@layout/fragment_bittensor_portfolio" />
+
+    <fragment android:id="@+id/bittensorRootDetailsFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsFragment"
+        tools:layout="@layout/fragment_bittensor_root_details" />
+
+    <action android:id="@+id/action_open_bittensor_portfolio" app:destination="@id/bittensorPortfolioFragment"
+        app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action android:id="@+id/action_open_bittensor_root_details" app:destination="@id/bittensorRootDetailsFragment"
+        app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
+
     <include app:graph="@navigation/push_settings_graph" />
 
     <include app:graph="@navigation/cloud_backup_settings_graph" />
@@ -62,6 +116,14 @@
     <include app:graph="@navigation/multisig_operation_details_graph" />
 
     <include app:graph="@navigation/gifts_nav_graph" />
+
+    <action
+        android:id="@+id/action_open_bittensor_root_staking"
+        app:destination="@id/bittensor_root_staking_graph"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
         android:id="@+id/action_returnToMainScreen"

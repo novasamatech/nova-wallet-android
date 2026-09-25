@@ -63,6 +63,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import io.novafoundation.nova.common.utils.extrinsicHash
 
 class RealExtrinsicService(
     private val rpcCalls: RpcCalls,
@@ -84,6 +85,7 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<ExtrinsicSubmission> = runCatching {
         val (extrinsic, submissionOrigin, _, callExecutionType, signingHierarchy) = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+        submissionOptions.onSigned?.invoke(extrinsic.extrinsicHex.extrinsicHash())
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
 
         ExtrinsicSubmission(hash, submissionOrigin, callExecutionType, signingHierarchy)
@@ -119,6 +121,7 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> = runCatching {
         val singleSubmission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+        submissionOptions.onSigned?.invoke(singleSubmission.extrinsic.extrinsicHex.extrinsicHash())
 
         rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic)
             .map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }

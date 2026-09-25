@@ -6,6 +6,9 @@ import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
@@ -71,13 +74,19 @@ class StakingDashboardModule {
         poolAccountDerivation: PoolAccountDerivation,
         storageCache: StorageCache,
         balanceLocksRepository: BalanceLocksRepository,
+        bittensorPositionSource: BittensorPositionSource,
+        bittensorPositionUpdates: BittensorPositionUpdates,
+        bittensorSwapSource: BittensorSwapSource,
     ) = StakingDashboardUpdaterFactory(
         stakingDashboardCache = stakingDashboardCache,
         remoteStorageSource = remoteStorageSource,
         nominationPoolBalanceRepository = nominationPoolBalanceRepository,
         poolAccountDerivation = poolAccountDerivation,
         storageCache = storageCache,
-        balanceLocksRepository = balanceLocksRepository
+        balanceLocksRepository = balanceLocksRepository,
+        bittensorPositionSource = bittensorPositionSource,
+        bittensorPositionUpdates = bittensorPositionUpdates,
+        bittensorSwapSource = bittensorSwapSource
     )
 
     @Provides

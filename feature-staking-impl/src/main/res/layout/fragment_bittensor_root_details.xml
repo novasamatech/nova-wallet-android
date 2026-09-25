@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:background="@drawable/drawable_background_image">
+
+    <io.novafoundation.nova.common.view.Toolbar android:id="@+id/toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false" app:titleText="@string/bittensor_root_staking" />
+    <androidx.core.widget.NestedScrollView android:layout_width="match_parent" android:layout_height="match_parent"
+        android:clipToPadding="false" android:padding="16dp">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+            <ProgressBar android:id="@+id/loading" android:layout_width="32dp" android:layout_height="32dp" android:layout_gravity="center_horizontal" />
+            <TextView android:id="@+id/warning" style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_secondary" android:visibility="gone" />
+            <TextView android:id="@+id/retry" style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                android:layout_width="wrap_content" android:layout_height="44dp" android:gravity="center_vertical"
+                android:text="@string/common_retry" android:textColor="@color/text_primary" android:visibility="gone" />
+
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:background="@drawable/bg_block_12" android:orientation="vertical" android:padding="12dp">
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <ImageView android:id="@+id/assetIcon" android:layout_width="40dp" android:layout_height="40dp" android:padding="5dp" android:scaleType="fitCenter" />
+                    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                        android:layout_marginStart="12dp" android:orientation="vertical">
+                        <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1" android:layout_width="match_parent"
+                            android:layout_height="wrap_content" android:text="@string/bittensor_staked_to_root" android:textColor="@color/text_secondary" />
+                        <TextView android:id="@+id/stakeAmount" style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                            android:layout_width="match_parent" android:layout_height="wrap_content" android:text="—" />
+                        <TextView android:id="@+id/stakeFiat" style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                            android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="@color/text_secondary" />
+                    </LinearLayout>
+                    <LinearLayout android:id="@+id/activeStatus" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:background="@drawable/bg_bittensor_active_status" android:gravity="center_vertical"
+                        android:paddingStart="6dp" android:paddingEnd="8dp" android:paddingVertical="4dp" android:visibility="gone">
+                        <ImageView android:layout_width="7dp" android:layout_height="7dp" android:src="@drawable/ic_status_indicator" app:tint="@color/icon_positive" />
+                        <TextView style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2" android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:layout_marginStart="5dp" android:text="@string/common_active"
+                            android:textAllCaps="true" android:textColor="@color/text_positive" />
+                    </LinearLayout>
+                </LinearLayout>
+                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider"
+                    android:layout_marginTop="10dp" android:layout_marginBottom="10dp" />
+                <io.novafoundation.nova.common.view.TableCellView android:id="@+id/rewards" android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:minHeight="36dp" app:title="@string/staking_your_rewards" app:primaryValue="—"
+                    app:dividerVisible="false" app:titleValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    app:primaryValueTextAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                    app:secondaryValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1" />
+            </LinearLayout>
+
+            <io.novafoundation.nova.common.view.TableView android:layout_width="match_parent" android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" app:drawDividers="true" app:childrenPaddingTop="4dp" app:childrenPaddingBottom="4dp"
+                app:childrenPaddingStart="0dp" app:childrenPaddingEnd="0dp">
+                <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+                    android:id="@+id/addStake" android:layout_width="match_parent" android:layout_height="44dp"
+                    app:label="@string/bittensor_add_stake" app:icon="@drawable/ic_add_circle_outline" />
+                <io.novafoundation.nova.feature_staking_impl.presentation.staking.main.view.ManageStakingActionView
+                    android:id="@+id/unstake" android:layout_width="match_parent" android:layout_height="44dp"
+                    android:enabled="false" android:alpha="0.48" app:label="@string/staking_unbond_v1_9_0" app:icon="@drawable/ic_minus_circle_outline" />
+            </io.novafoundation.nova.common.view.TableView>
+            <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/bittensor_unstake_unavailable"
+                android:textColor="@color/text_secondary" />
+            <androidx.recyclerview.widget.RecyclerView android:id="@+id/validators" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="16dp" android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/bittensor_statistics_unavailable"
+                android:textColor="@color/text_secondary" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

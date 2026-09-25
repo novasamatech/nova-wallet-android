@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
@@ -22,6 +25,9 @@ class StakingDashboardUpdaterFactory(
     private val poolAccountDerivation: PoolAccountDerivation,
     private val storageCache: StorageCache,
     private val balanceLocksRepository: BalanceLocksRepository,
+    private val bittensorPositionSource: BittensorPositionSource,
+    private val bittensorPositionUpdates: BittensorPositionUpdates,
+    private val bittensorSwapSource: BittensorSwapSource,
 ) {
 
     fun createUpdater(
@@ -35,6 +41,15 @@ class StakingDashboardUpdaterFactory(
             StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.NOMINATION_POOL -> nominationPools(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.MYTHOS -> mythos(chain, stakingType, metaAccount, stakingStatsFlow)
+            StakingTypeGroup.BITTENSOR -> StakingDashboardBittensorUpdater(
+                chain,
+                chain.utilityAsset,
+                metaAccount,
+                bittensorPositionSource,
+                stakingDashboardCache,
+                bittensorPositionUpdates,
+                bittensorSwapSource
+            )
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }

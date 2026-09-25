@@ -217,7 +217,7 @@ class RealClientAttestationService(
     private fun registrationFailure(exception: HttpException, clientId: String, step: String): IOException {
         val error = exception.backendError()
         val code = error.code
-        val status = "$error on $step"
+        val status = "$error on $step with message: ${exception.message()}"
 
         return when {
             code == ERROR_CLIENT_ALREADY_REGISTERED -> {
@@ -238,7 +238,7 @@ class RealClientAttestationService(
                 // attestation_failed, app_not_allowed, invalid_request...: repeating it would only burn the
                 // backend's daily Play Integrity budget
                 rejected = true
-                attestationWarn("registration rejected with $status - signing is off until restart")
+                attestationWarn("registration rejected with \"$status\" - signing is off until restart")
                 AttestationFailedException("Attestation rejected: $status")
             }
         }

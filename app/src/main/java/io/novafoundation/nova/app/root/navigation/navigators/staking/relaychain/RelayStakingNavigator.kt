@@ -1,5 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
+import androidx.core.os.bundleOf
+
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
@@ -289,5 +291,43 @@ class RelayStakingNavigator(
         }
 
         stakingDashboardRouter.openStakingDashboard()
+    }
+
+    override fun openBittensorRootStaking() {
+        navigationBuilder().action(R.id.action_open_bittensor_root_staking)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorChooseSubnet() {
+        navigationBuilder().action(R.id.action_open_bittensor_choose_subnet).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorSubnetDetails(subnetId: Int) {
+        navigationBuilder().action(R.id.action_open_bittensor_subnet_details)
+            .setArgs(bundleOf("subnetId" to subnetId)).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorSubnetAmount(subnetId: Int, validatorAddress: String) {
+        navigationBuilder().action(R.id.action_open_bittensor_subnet_amount)
+            .setArgs(bundleOf("subnetId" to subnetId, "validatorAddress" to validatorAddress)).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorSubnetReview(subnetId: Int, amount: String, metaId: Long, validatorAddress: String) {
+        navigationBuilder().action(R.id.action_open_bittensor_subnet_review)
+            .setArgs(bundleOf("subnetId" to subnetId, "amount" to amount, "metaId" to metaId, "validatorAddress" to validatorAddress))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorPortfolio() {
+        navigationBuilder().action(R.id.action_open_bittensor_portfolio).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorRootDetails() {
+        navigationBuilder().action(R.id.action_open_bittensor_root_details).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorStakeConfirm() {
+        navigationBuilder().action(R.id.action_bittensorStakeAmount_to_bittensorStakeConfirm)
+            .navigateInFirstAttachedContext()
     }
 }
