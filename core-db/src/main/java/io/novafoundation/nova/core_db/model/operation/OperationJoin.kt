@@ -16,3 +16,29 @@ class OperationJoin(
     @Embedded(prefix = "e_")
     val extrinsic: ExtrinsicTypeJoin?,
 )
+
+class SwapOperationJoin(
+    @Embedded(prefix = "o_")
+    val base: OperationBaseLocal,
+    @Embedded(prefix = "s_")
+    val swap: SwapTypeJoin,
+) {
+
+    fun asOperationJoin(): OperationJoin {
+        return OperationJoin(
+            base = base,
+            transfer = null,
+            directReward = null,
+            poolReward = null,
+            swap = swap,
+            extrinsic = null,
+        )
+    }
+}
+
+class TransferOperationJoin(
+    @Embedded(prefix = "o_")
+    val base: OperationBaseLocal,
+    @Embedded(prefix = "t_")
+    val transfer: TransferTypeJoin,
+)

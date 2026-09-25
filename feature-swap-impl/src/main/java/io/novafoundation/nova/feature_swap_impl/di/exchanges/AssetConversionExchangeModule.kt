@@ -3,8 +3,12 @@ package io.novafoundation.nova.feature_swap_impl.di.exchanges
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetHubCommissionResolver
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_impl.domain.AssetInAdditionalSwapDeductionUseCase
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.AccountInfoRepository
 import io.novafoundation.nova.feature_xcm_api.converter.MultiLocationConverterFactory
 import io.novafoundation.nova.feature_xcm_api.versions.detector.XcmVersionDetector
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -18,13 +22,25 @@ class AssetConversionExchangeModule {
 
     @Provides
     @FeatureScope
+    internal fun provideAssetHubCommissionResolver(
+        novaSwapCommission: NovaSwapCommission,
+    ): AssetHubCommissionResolver {
+        return AssetHubCommissionResolver(novaSwapCommission)
+    }
+
+    @Provides
+    @FeatureScope
     fun provideAssetConversionExchangeFactory(
         @Named(REMOTE_STORAGE_SOURCE) remoteStorageSource: StorageDataSource,
         runtimeCallsApi: MultiChainRuntimeCallsApi,
         multiLocationConverterFactory: MultiLocationConverterFactory,
         chainStateRepository: ChainStateRepository,
         deductionUseCase: AssetInAdditionalSwapDeductionUseCase,
-        xcmVersionDetector: XcmVersionDetector
+        xcmVersionDetector: XcmVersionDetector,
+        assetSourceRegistry: AssetSourceRegistry,
+        accountInfoRepository: AccountInfoRepository,
+        novaSwapCommission: NovaSwapCommission,
+        assetHubCommissionResolver: AssetHubCommissionResolver,
     ): AssetConversionExchangeFactory {
         return AssetConversionExchangeFactory(
             chainStateRepository = chainStateRepository,
@@ -32,7 +48,11 @@ class AssetConversionExchangeModule {
             runtimeCallsApi = runtimeCallsApi,
             multiLocationConverterFactory = multiLocationConverterFactory,
             deductionUseCase = deductionUseCase,
-            xcmVersionDetector = xcmVersionDetector
+            xcmVersionDetector = xcmVersionDetector,
+            assetSourceRegistry = assetSourceRegistry,
+            accountInfoRepository = accountInfoRepository,
+            novaSwapCommission = novaSwapCommission,
+            commissionResolver = assetHubCommissionResolver,
         )
     }
 }

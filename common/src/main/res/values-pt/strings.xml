@@ -2081,4 +2081,6 @@
     <string name="privacy_analytics_description">Ajuda-nos a entender quais recursos são usados e a melhorar a Nova Wallet.</string>
     <string name="privacy_analytics_enabled_toast">Agradecemos por ajudar a melhorar a Nova Wallet</string>
     <string name="settings_privacy_title">Privacidade</string>
+    <string name="swap_price_impact_too_high_message">Swaps com impacto no preço de %s ou mais estão bloqueados para proteger seus fundos. Reduza o valor ou tente outro par.</string>
+    <string name="swap_price_impact_too_high_title">O impacto no preço é muito alto (%s)</string>
 </resources>

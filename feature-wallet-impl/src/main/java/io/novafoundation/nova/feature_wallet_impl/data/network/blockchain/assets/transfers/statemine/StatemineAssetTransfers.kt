@@ -3,9 +3,11 @@ package io.novafoundation.nova.feature_wallet_impl.data.network.blockchain.asset
 import io.novafoundation.nova.common.address.intoKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdentifier
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
+import io.novafoundation.nova.common.utils.composeCall
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
+import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransferBase
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.amountInPlanks
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.model.TransferParsedFromCall
 import io.novafoundation.nova.feature_wallet_api.domain.model.withAmount
@@ -84,6 +86,24 @@ class StatemineAssetTransfers(
         return TransferParsedFromCall(
             amount = chainAsset.withAmount(amount),
             destination = destination
+        )
+    }
+
+    override suspend fun constructTransferCall(transfer: AssetTransferBase): GenericCall.Instance {
+        val runtime = chainRegistry.getRuntime(transfer.originChain.id)
+        val assetType = transfer.originChainAsset.requireStatemine()
+
+        return runtime.composeCall(
+            moduleName = assetType.palletNameOrDefault(),
+            callName = "transfer_keep_alive",
+            arguments = mapOf(
+                "id" to assetType.prepareIdForEncoding(runtime),
+                "target" to AddressInstanceConstructor.constructInstance(
+                    runtime.typeRegistry,
+                    transfer.recipientAccountId.value,
+                ),
+                "amount" to transfer.amountPlanks,
+            )
         )
     }
 

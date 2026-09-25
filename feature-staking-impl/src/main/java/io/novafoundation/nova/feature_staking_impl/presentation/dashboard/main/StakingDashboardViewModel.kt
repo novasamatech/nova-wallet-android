@@ -145,6 +145,10 @@ class StakingDashboardViewModel(
         router.openSwitchWallet()
     }
 
+    fun announcementLinkClicked(url: String) {
+        router.openDAppBrowser(url)
+    }
+
     private fun mapDashboardToUi(
         dashboard: StakingDashboard,
         formatters: DashboardFormatters,

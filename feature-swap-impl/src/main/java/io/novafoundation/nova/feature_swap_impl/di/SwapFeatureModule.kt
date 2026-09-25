@@ -14,7 +14,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_swap_api.data.history.HydrationSwapTransferFilterFactory
+import io.novafoundation.nova.feature_swap_api.data.history.SwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_api.domain.interactor.SwapAvailabilityInteractor
 import io.novafoundation.nova.feature_swap_api.domain.model.HydrationSystemAccounts
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_swap_core_api.data.paths.PathQuoter
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.assetConversion.AssetConversionExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.crossChain.CrossChainTransferAssetExchangeFactory
 import io.novafoundation.nova.feature_swap_impl.data.assetExchange.hydraDx.HydraDxExchangeFactory
-import io.novafoundation.nova.feature_swap_impl.data.history.RealHydrationSwapTransferFilterFactory
+import io.novafoundation.nova.feature_swap_impl.data.history.RealSwapTransferFilterFactory
 import io.novafoundation.nova.feature_swap_impl.data.network.blockhain.updaters.SwapUpdateSystemFactory
 import io.novafoundation.nova.feature_swap_impl.data.repository.RealSwapTransactionHistoryRepository
 import io.novafoundation.nova.feature_swap_impl.data.repository.SwapTransactionHistoryRepository
@@ -140,7 +140,7 @@ class SwapFeatureModule {
     fun providePriceImpactThresholds() = PriceImpactThresholds(
         lowPriceImpact = 1.percents,
         mediumPriceImpact = 5.percents,
-        highPriceImpact = 15.percents
+        highPriceImpact = 15.percents,
     )
 
     @Provides
@@ -255,9 +255,9 @@ class SwapFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideHydrationSwapTransferFilterFactory(
-        real: RealHydrationSwapTransferFilterFactory,
-    ): HydrationSwapTransferFilterFactory = real
+    fun provideSwapTransferFilterFactory(
+        real: RealSwapTransferFilterFactory,
+    ): SwapTransferFilterFactory = real
 
     @Provides
     @FeatureScope

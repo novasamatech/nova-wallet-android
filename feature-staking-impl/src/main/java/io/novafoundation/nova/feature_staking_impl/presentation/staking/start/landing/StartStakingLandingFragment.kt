@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentStartStakingLandingBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.announcements.setAnnouncement
 
 class StartStakingLandingFragment :
     BaseFragment<StartStakingLandingViewModel, FragmentStartStakingLandingBinding>(),
@@ -70,8 +71,7 @@ class StartStakingLandingFragment :
 
         viewModel.announcementFlow.observe { announcement ->
             binder.startStakingLandingAnnouncement.letOrHide(announcement) {
-                binder.startStakingLandingAnnouncement.setStylePreset(it.stylePreset)
-                binder.startStakingLandingAnnouncement.setMessage(it.description)
+                binder.startStakingLandingAnnouncement.setAnnouncement(it, viewModel::announcementLinkClicked)
             }
         }
 

@@ -457,6 +457,7 @@
 
     <string name="high_price_impact_detacted_title">High price impact detected (%s)</string>
 
+
     <string name="high_price_impact_detacted_message">Executing this swap will result in significant slippage and financial losses. Consider reducing your trade size of splitting your trade into multiple transactions.</string>
 
     <string name="popular_dapps_title">Popular</string>

@@ -3,8 +3,9 @@
 > **Status.** The implementation lives on `feature/swap-nova-fee` (PR #2274). This document was merged
 > separately, so the files it references exist only once that branch lands.
 
-Nova charges **0.85 % on Hydration swaps**. AssetHub (AssetConversion) swaps and cross-chain transfers charge
-nothing. The commission is a separate transfer batched with the swap, not a pool fee.
+Nova charges **0.85 % on Hydration and Polkadot Asset Hub (AssetConversion) swaps**. Other AssetConversion
+chains and cross-chain transfers charge nothing. The commission is a separate transfer batched with the swap,
+not a pool fee.
 
 ## Product rules
 
@@ -39,7 +40,7 @@ quotedTrade.path.constructAtomicOperationPrototypes().lastOrNull { it.chargesSer
 `lastOrNull` matters: on a route like `xcm → hydra → hydra → xcm` the commission belongs to the **last
 Hydration operation**, which is not the last route segment. `RealSwapService` stays source-agnostic —
 `chargesServiceFee` / `serviceCommissionToAddOnTop` / `serviceCommissionIncludedIn` are declared on
-`AtomicSwapOperationPrototype` (default: no fee) and overridden by Hydra only.
+`AtomicSwapOperationPrototype` (default: no fee) and overridden by the Hydration and AssetConversion operations.
 
 - `SPECIFIED_OUT` re-quotes the whole path for `entered + commissionToAddOnTop(entered)` so `amountIn` is
   accurate, then reports `amountOut = entered`.
@@ -78,16 +79,22 @@ Everything downstream reads `segment.netFlow` and nothing recomputes the commiss
 
 ## On-chain shape
 
-`HydraDxOperation` submits `batchAll(swap, commissionTransfer)`. The commission amount is
-`commissionIncludedIn(estimatedSwapLimit.estimatedAmountOut)`, computed inside the operation, so `estimateFee`
-and `submit` build identical calls (`appendSwapCalls(limit, chargesCommission)`) and the fee estimate includes
-the transfer's weight.
+`HydraDxOperation` and `AssetConversionOperation` submit `batchAll(swap, commissionTransfer)`. Both use
+`NovaSwapCommission.commissionIncludedIn(swapLimit)`: fee estimation uses the estimated limit, while execution
+uses the latest actual limit. The fee estimate therefore includes the transfer's weight without freezing the
+commission at the original quote.
 
 The transfer call is not hardcoded — it comes from
 `assetSourceRegistry.sourceFor(assetOut).transfers.constructTransferCall(...)`, so it depends on the asset out:
 
 - native asset → `balances.transferKeepAlive` (`NativeAssetTransfers`)
 - ORML asset → `currencies`/`tokens` `transfer` (`OrmlAssetTransfers`)
+- Asset Hub asset → `assets.transfer_keep_alive` (`StatemineAssetTransfers`)
+
+Polkadot Asset Hub uses its own configured fee beneficiary. Before adding the transfer, the client checks that
+the beneficiary's system account is alive and that it can receive the output asset. If a multi-hop execution
+changes the actual output so the commission no longer fits, that execution waives the commission instead of
+failing the user's swap.
 
 On the native path `transferKeepAlive` reverts the whole `batchAll` if the sender would drop below the
 existential deposit — which is exactly why the ED validations must use `netFlow.amountOutMin`, not the gross
@@ -101,11 +108,11 @@ floor. The worst case is a small swap into a native asset the wallet does not ho
   "Swap rate was updated" slippage warning for any slippage below 0.85 %.
 - **ED checks on downstream segments.** Before the net flow chain existed, only the charging segment
   subtracted its commission; segments *after* it validated against gross amounts that would never arrive.
-- **Detecting "route involves a Hydra swap"** must go by edge type (`HydraDxQuotableEdge`), not chain id —
-  chain-id matching also catches cross-chain transfer edges to/from Hydration, which are not swaps
-  (`SwapQuoteNovaFee.involvesHydraSwap`).
+- **Detecting "route includes a Nova fee"** must go by the `NovaFeeChargingSwapEdge` marker, not chain id —
+  chain-id matching also catches cross-chain transfer edges to/from supported chains, which are not swaps
+  (`SwapQuoteNovaFee.includesNovaFee`).
 - **History noise.** The commission transfer and the Hydration router account (`modlrouterex`) show up as
-  separate transfers in indexed history; `RealHydrationSwapTransferFilterFactory` filters both so the user
+  separate transfers in indexed history; `RealSwapTransferFilterFactory` filters both so the user
   sees only the swap.
 
 ## File map
@@ -117,6 +124,7 @@ floor. The worst case is a small swap into a native asset the wallet does not ho
 | `feature-swap-api/.../domain/model/AtomicSwapOperation.kt` | `chargesServiceCommission`, `constructDisplayData(netFlow)` |
 | `feature-swap-api/.../domain/model/SwapFee.kt` | `SegmentNetFlow`, `buildSwapSegments` |
 | `feature-swap-impl/.../domain/swap/RealSwapService.kt` | `applyServiceFee`, price impact, segment assembly |
-| `feature-swap-impl/.../domain/swap/SwapQuoteNovaFee.kt` | Hydra-in-route detection, rate disclaimer mode |
-| `feature-swap-impl/.../assetExchange/hydraDx/HydraDxAssetExchange.kt` | `batchAll` + commission transfer |
-| `feature-swap-impl/.../data/history/RealHydrationSwapTransferFilterFactory.kt` | Hides fee/router transfers |
+| `feature-swap-impl/.../domain/swap/SwapQuoteNovaFee.kt` | Fee-charging edge detection, rate disclaimer mode |
+| `feature-swap-impl/.../assetExchange/hydraDx/HydraDxAssetExchange.kt` | Hydration `batchAll` + commission transfer |
+| `feature-swap-impl/.../assetExchange/assetConversion/AssetConversionExchange.kt` | Asset Hub `batchAll` + commission transfer |
+| `feature-swap-impl/.../data/history/RealSwapTransferFilterFactory.kt` | Hides fee/router transfers |

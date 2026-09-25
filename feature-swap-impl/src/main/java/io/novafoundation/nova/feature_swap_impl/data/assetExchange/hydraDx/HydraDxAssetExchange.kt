@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperation
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationArgs
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationPrototype
 import io.novafoundation.nova.feature_swap_api.domain.model.AtomicSwapOperationSubmissionArgs
+import io.novafoundation.nova.feature_swap_api.domain.model.NovaFeeChargingSwapEdge
 import io.novafoundation.nova.feature_swap_api.domain.model.NovaSwapCommission
 import io.novafoundation.nova.feature_swap_api.domain.model.ReQuoteTrigger
 import io.novafoundation.nova.feature_swap_api.domain.model.SwapExecutionCorrection
@@ -48,7 +49,6 @@ import io.novafoundation.nova.feature_swap_api.domain.model.SwapSubmissionResult
 import io.novafoundation.nova.feature_swap_api.domain.model.UsdConverter
 import io.novafoundation.nova.feature_swap_api.domain.model.amountOutMin
 import io.novafoundation.nova.feature_swap_api.domain.model.createAggregated
-import io.novafoundation.nova.feature_swap_api.domain.model.estimatedAmountOut
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.AtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_api.domain.model.fee.SubmissionOnlyAtomicSwapOperationFee
 import io.novafoundation.nova.feature_swap_core.data.assetExchange.conversion.types.hydra.accountCurrencyMap
@@ -262,7 +262,7 @@ internal class HydraDxAssetExchange(
 
     private inner class HydraDxSwapEdge(
         private val sourceQuotableEdge: HydraDxSourceEdge,
-    ) : SwapGraphEdge, HydraDxQuotableEdge by sourceQuotableEdge {
+    ) : SwapGraphEdge, HydraDxQuotableEdge by sourceQuotableEdge, NovaFeeChargingSwapEdge {
 
         override val poolId: SwapPoolId
             get() = sourceQuotableEdge.poolId
@@ -360,6 +360,11 @@ internal class HydraDxAssetExchange(
         }
 
         override suspend fun estimateFee(isServiceCommissionOperation: Boolean): AtomicSwapOperationFee {
+            val commissionAmount = if (isServiceCommissionOperation) {
+                novaCommissionAmount(estimatedSwapLimit)
+            } else {
+                null
+            }
             val submissionFee = swapHost.extrinsicService().estimateFee(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
@@ -368,12 +373,12 @@ internal class HydraDxAssetExchange(
                     feePaymentCurrency = feePaymentCurrency
                 )
             ) {
-                appendSwapCalls(estimatedSwapLimit, chargesCommission = isServiceCommissionOperation)
+                appendSwapCalls(estimatedSwapLimit, commissionAmount)
             }
 
             return SubmissionOnlyAtomicSwapOperationFee(
                 submissionFee = submissionFee,
-                serviceCommission = if (isServiceCommissionOperation) novaCommissionFee() else null,
+                serviceCommission = commissionAmount?.let(::novaCommissionFee),
             )
         }
 
@@ -407,11 +412,13 @@ internal class HydraDxAssetExchange(
         }
 
         override suspend fun execute(args: AtomicSwapOperationSubmissionArgs): Result<SwapExecutionCorrection> {
-            return submitInternal(args)
+            val commissionAmount = commissionAmount(args)
+
+            return submitInternal(args, commissionAmount)
                 .mapCatching {
                     val grossReceived = it.requireOutcomeOk().emittedEvents.determineActualSwappedAmount()
-                    val netReceived = if (args.isServiceCommissionOperation) {
-                        (grossReceived - novaCommissionAmount()).atLeastZero()
+                    val netReceived = if (commissionAmount != null) {
+                        (grossReceived - commissionAmount).atLeastZero()
                     } else {
                         grossReceived
                     }
@@ -420,11 +427,14 @@ internal class HydraDxAssetExchange(
         }
 
         override suspend fun submit(args: AtomicSwapOperationSubmissionArgs): Result<SwapSubmissionResult> {
-            return submitInternal(args)
+            return submitInternal(args, commissionAmount(args))
                 .map { SwapSubmissionResult(it.submissionHierarchy) }
         }
 
-        private suspend fun submitInternal(args: AtomicSwapOperationSubmissionArgs): Result<ExtrinsicExecutionResult> {
+        private suspend fun submitInternal(
+            args: AtomicSwapOperationSubmissionArgs,
+            commissionAmount: Balance?,
+        ): Result<ExtrinsicExecutionResult> {
             return swapHost.extrinsicService().submitExtrinsicAndAwaitExecution(
                 chain = chain,
                 origin = TransactionOrigin.SelectedWallet,
@@ -433,34 +443,41 @@ internal class HydraDxAssetExchange(
                     feePaymentCurrency = feePaymentCurrency
                 )
             ) {
-                appendSwapCalls(args.actualSwapLimit, chargesCommission = args.isServiceCommissionOperation)
+                appendSwapCalls(args.actualSwapLimit, commissionAmount)
             }.requireOk()
         }
 
-        private suspend fun ExtrinsicBuilder.appendSwapCalls(swapLimit: SwapLimit, chargesCommission: Boolean) {
-            executeSwap(swapLimit)
-            if (chargesCommission) {
-                appendNovaCommissionCall()
+        private suspend fun ExtrinsicBuilder.appendSwapCalls(swapLimit: SwapLimit, commissionAmount: Balance?) {
+            val protectedSwapLimit = commissionAmount?.let {
+                novaSwapCommission.protectMinimumOutput(swapLimit, it)
+            } ?: swapLimit
+
+            executeSwap(protectedSwapLimit)
+            if (commissionAmount != null) {
+                appendNovaCommissionCall(commissionAmount)
             }
         }
 
-        private fun novaCommissionAmount(): Balance {
-            return novaSwapCommission.commissionIncludedIn(estimatedSwapLimit.estimatedAmountOut).atLeastZero()
+        private fun commissionAmount(args: AtomicSwapOperationSubmissionArgs): Balance? {
+            return if (args.isServiceCommissionOperation) novaCommissionAmount(args.actualSwapLimit) else null
         }
 
-        private fun novaCommissionFee(): FeeBase {
+        private fun novaCommissionAmount(swapLimit: SwapLimit): Balance {
+            return novaSwapCommission.commissionIncludedIn(swapLimit)
+        }
+
+        private fun novaCommissionFee(commissionAmount: Balance): FeeBase {
             val assetOutAsset = chain.assetsById.getValue(assetOut.assetId)
-            return SubstrateFeeBase(novaCommissionAmount(), assetOutAsset)
+            return SubstrateFeeBase(commissionAmount, assetOutAsset)
         }
 
-        private suspend fun ExtrinsicBuilder.appendNovaCommissionCall() {
+        private suspend fun ExtrinsicBuilder.appendNovaCommissionCall(commissionAmount: Balance) {
             val assetOutId = this@HydraDxOperation.assetOut.assetId
             val assetOut = chain.assetsById[assetOutId] ?: return
-            val commissionAmount = novaCommissionAmount()
             if (commissionAmount <= BigInteger.ZERO) return
 
             val transferBase = AssetTransferBase(
-                recipient = chain.addressOf(novaSwapCommission.feeAccountId),
+                recipient = chain.addressOf(novaSwapCommission.hydrationFeeAccountId),
                 originChain = chain,
                 originChainAsset = assetOut,
                 destinationChain = chain,

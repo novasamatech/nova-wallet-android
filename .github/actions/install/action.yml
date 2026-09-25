@@ -60,6 +60,9 @@ runs:
       uses: android-actions/setup-android@v3
       with:
         cmdline-tools-version: 12266719
+        # The action installs "tools platform-tools" by default, but Google stopped serving the deprecated
+        # "tools" package on 2026-09-15 and sdkmanager now fails on it (android-actions/setup-android#537).
+        packages: platform-tools
 
     - name: Install NDK
       if: inputs.minimal_mode != 'true'

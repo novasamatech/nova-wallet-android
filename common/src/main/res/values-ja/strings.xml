@@ -2067,4 +2067,6 @@
     <string name="privacy_analytics_description">使用されている機能を把握し、Nova Walletの改善に役立てます。</string>
     <string name="privacy_analytics_enabled_toast">Nova Walletの改善にご協力いただきありがとうございます</string>
     <string name="settings_privacy_title">プライバシー</string>
+    <string name="swap_price_impact_too_high_message">価格インパクトが%s以上のスワップは、資金を保護するためブロックされます。金額を減らすか、別のペアをお試しください。</string>
+    <string name="swap_price_impact_too_high_title">価格インパクトが高すぎます（%s）</string>
 </resources>

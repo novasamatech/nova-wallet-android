@@ -2067,4 +2067,6 @@
     <string name="privacy_analytics_description">사용 중인 기능을 파악하고 Nova Wallet을 개선하는 데 도움이 됩니다.</string>
     <string name="privacy_analytics_enabled_toast">Nova Wallet 개선에 도움을 주셔서 감사합니다</string>
     <string name="settings_privacy_title">개인정보 보호</string>
+    <string name="swap_price_impact_too_high_message">자산을 보호하기 위해 가격 영향이 %s 이상인 스왑은 차단됩니다. 금액을 줄이거나 다른 페어를 시도하세요.</string>
+    <string name="swap_price_impact_too_high_title">가격 영향이 너무 높습니다(%s)</string>
 </resources>
