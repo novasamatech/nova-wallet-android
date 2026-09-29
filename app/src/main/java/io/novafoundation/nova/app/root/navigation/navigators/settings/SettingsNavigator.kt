@@ -103,6 +103,11 @@ class SettingsNavigator(
             .navigateInFirstAttachedContext()
     }
 
+    override fun openPrivacy() {
+        navigationBuilder().action(R.id.action_mainFragment_to_privacyFragment)
+            .navigateInFirstAttachedContext()
+    }
+
     override fun openChangePinCode() {
         navigationBuilder().action(R.id.action_change_pin_code)
             .setArgs(PincodeFragment.getPinCodeBundle(PinCodeAction.Change))

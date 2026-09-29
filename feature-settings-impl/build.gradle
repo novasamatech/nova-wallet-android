@@ -26,6 +26,7 @@ dependencies {
     implementation project(':feature-versions-api')
     implementation project(':feature-push-notifications')
     implementation project(':feature-assets')
+    implementation project(':feature-wallet-api')
     implementation project(':caip')
 
     implementation project(':feature-settings-api')

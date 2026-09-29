@@ -4,12 +4,14 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.format.EthereumAddressFormat
 import io.novafoundation.nova.common.di.scope.FeatureScope
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.tokens.add.AddTokensInteractor
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.feature_assets.domain.tokens.add.RealAddTokensInteractor
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ethereum.contract.erc20.Erc20Standard
@@ -36,7 +38,9 @@ class AddTokenModule {
         ethereumAddressFormat: EthereumAddressFormat,
         currencyRepository: CurrencyRepository,
         walletRepository: WalletRepository,
-        coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory
+        coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory,
+        accountRepository: AccountRepository,
+        assetVisibilityRepository: AssetVisibilityRepository
     ): AddTokensInteractor {
         return RealAddTokensInteractor(
             chainRegistry,
@@ -46,7 +50,9 @@ class AddTokenModule {
             ethereumAddressFormat,
             currencyRepository,
             walletRepository,
-            coinGeckoLinkValidationFactory
+            coinGeckoLinkValidationFactory,
+            accountRepository,
+            assetVisibilityRepository
         )
     }
 }

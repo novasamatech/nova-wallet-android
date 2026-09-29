@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.NftCountBucket
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.LoadingState
@@ -50,7 +51,7 @@ class NftListViewModel(
         launch {
             val nfts = nftsFlow.first()
 
-            analyticsService.track(AnalyticsEvent.NftSectionOpened(nfts.size))
+            analyticsService.track(AnalyticsEvent.NftSectionOpened(NftCountBucket.from(nfts.size)))
         }
     }
 

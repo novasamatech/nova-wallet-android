@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingUnbondModule {
@@ -46,7 +47,8 @@ class ParachainStakingUnbondModule {
         amountChooserMixinFactory: AmountChooserMixin.Factory,
         hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
         amountFormatter: AmountFormatter,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return ParachainStakingUnbondViewModel(
             router = router,
@@ -63,7 +65,8 @@ class ParachainStakingUnbondModule {
             amountChooserMixinFactory = amountChooserMixinFactory,
             hintsMixinFactory = hintsMixinFactory,
             amountFormatter = amountFormatter,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

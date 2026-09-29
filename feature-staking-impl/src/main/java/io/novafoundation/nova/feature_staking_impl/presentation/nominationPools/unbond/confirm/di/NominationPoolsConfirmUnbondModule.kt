@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.unbond.hints.NominationPoolsUnbondHintsFactory
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class, NominationPoolsCommonUnbondModule::class])
 class NominationPoolsConfirmUnbondModule {
@@ -47,7 +48,8 @@ class NominationPoolsConfirmUnbondModule {
         hintsFactory: NominationPoolsUnbondHintsFactory,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
         amountFormatter: AmountFormatter,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return NominationPoolsConfirmUnbondViewModel(
             router = router,
@@ -64,7 +66,8 @@ class NominationPoolsConfirmUnbondModule {
             hintsFactory = hintsFactory,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
             amountFormatter = amountFormatter,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

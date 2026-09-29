@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_swap_impl.presentation.execution.SwapExecu
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SwapExecutionModule {
@@ -41,6 +42,7 @@ class SwapExecutionModule {
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
         tokenRepository: TokenRepository,
         analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository,
     ): ViewModel {
         return SwapExecutionViewModel(
             swapStateStoreProvider = swapStateStoreProvider,
@@ -54,7 +56,8 @@ class SwapExecutionModule {
             swapFlowScopeAggregator = swapFlowScopeAggregator,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
             tokenRepository = tokenRepository,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

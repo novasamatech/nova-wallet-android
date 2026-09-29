@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.findMetaAccountOrThrow
 import io.novafoundation.nova.feature_account_api.domain.model.requireAddressIn
+import io.novafoundation.nova.feature_currency_api.domain.interfaces.CurrencyRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.tranfers.AssetTransfer
@@ -19,7 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.t
 import io.novafoundation.nova.feature_wallet_api.data.source.CoinPriceRemoteDataSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
-import io.novafoundation.nova.feature_wallet_api.domain.model.CoinRateChange
+import io.novafoundation.nova.feature_wallet_api.data.repository.USD_COINGECKO_ID
 import io.novafoundation.nova.feature_wallet_impl.data.mappers.mapAssetLocalToAsset
 import io.novafoundation.nova.feature_wallet_impl.data.network.phishing.PhishingApi
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -47,6 +48,7 @@ class WalletRepositoryImpl(
     private val phishingAddressDao: PhishingAddressDao,
     private val coinPriceRemoteDataSource: CoinPriceRemoteDataSource,
     private val chainRegistry: ChainRegistry,
+    private val currencyRepository: CurrencyRepository,
 ) : WalletRepository {
 
     override fun syncedAssetsFlow(metaId: Long): Flow<List<Asset>> {
@@ -101,14 +103,18 @@ class WalletRepositoryImpl(
             )
 
         if (syncingPriceIdsToSymbols.isNotEmpty()) {
-            val coinPriceChanges = getAssetPrices(syncingPriceIdsToSymbols.keys, currency)
+            val currencies = withUsd(currency)
+            val coinPriceChanges = coinPriceRemoteDataSource.getCoinRates(syncingPriceIdsToSymbols.keys, currencies)
 
-            val newTokens = coinPriceChanges.flatMap { (priceId, coinPriceChange) ->
-                syncingPriceIdsToSymbols[priceId]?.let { symbols ->
-                    symbols.map { symbol ->
-                        TokenLocal(symbol.value, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
-                    }
-                } ?: emptyList()
+            // Rows for every synced currency, so the diff below keeps the USD rates instead of deleting them
+            val newTokens = coinPriceChanges.flatMap { (syncedCurrency, changes) ->
+                changes.flatMap { (priceId, coinPriceChange) ->
+                    syncingPriceIdsToSymbols[priceId]?.let { symbols ->
+                        symbols.map { symbol ->
+                            TokenLocal(symbol.value, coinPriceChange?.rate, syncedCurrency.id, coinPriceChange?.recentRateChange)
+                        }
+                    } ?: emptyList()
+                }
             }
 
             assetCache.updateTokens(newTokens)
@@ -120,11 +126,23 @@ class WalletRepositoryImpl(
     override suspend fun syncAssetRates(asset: Chain.Asset, currency: Currency) {
         val priceId = asset.priceId ?: return
 
-        val coinPriceChange = getAssetPrice(priceId, currency)
+        val coinPriceChanges = coinPriceRemoteDataSource.getCoinRates(setOf(priceId), withUsd(currency))
 
-        val token = TokenLocal(asset.symbol.value, coinPriceChange?.rate, currency.id, coinPriceChange?.recentRateChange)
+        coinPriceChanges.forEach { (syncedCurrency, changes) ->
+            val coinPriceChange = changes.values.firstOrNull()
+            val token = TokenLocal(asset.symbol.value, coinPriceChange?.rate, syncedCurrency.id, coinPriceChange?.recentRateChange)
 
-        assetCache.insertToken(token)
+            assetCache.insertToken(token)
+        }
+    }
+
+    // Analytics buckets amounts in USD whatever currency the user picked, see UsdRateRepository
+    private suspend fun withUsd(currency: Currency): Set<Currency> {
+        if (currency.coingeckoId == USD_COINGECKO_ID) return setOf(currency)
+
+        val usd = currencyRepository.getCurrency(USD_COINGECKO_ID)
+
+        return setOfNotNull(currency, usd)
     }
 
     override fun assetFlow(accountId: AccountId, chainAsset: Chain.Asset): Flow<Asset> {
@@ -226,14 +244,6 @@ class WalletRepositoryImpl(
             status = OperationBaseLocal.Status.PENDING,
             source = OperationBaseLocal.Source.APP
         )
-    }
-
-    private suspend fun getAssetPrices(priceIds: Set<String>, currency: Currency): Map<String, CoinRateChange?> {
-        return coinPriceRemoteDataSource.getCoinRates(priceIds, currency)
-    }
-
-    private suspend fun getAssetPrice(priceId: String, currency: Currency): CoinRateChange? {
-        return coinPriceRemoteDataSource.getCoinRate(priceId, currency)
     }
 
     private suspend fun getAsset(accountId: AccountId, chainId: String, assetId: Int) = withContext(Dispatchers.Default) {

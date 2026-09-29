@@ -6,6 +6,8 @@ import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.utils.coroutines.RootScope
 import io.novafoundation.nova.core_db.dao.AnalyticsEventsDao
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.infrastructure.attestation.ClientAttestationService
 import io.novafoundation.nova.infrastructure.di.Attested
 
 interface AnalyticsFeatureDependencies {
@@ -22,4 +24,8 @@ interface AnalyticsFeatureDependencies {
     fun attestedNetworkApiCreator(): NetworkApiCreator
 
     fun analyticsEventsDao(): AnalyticsEventsDao
+
+    fun infrastructureUrls(): InfrastructureUrls
+
+    fun clientAttestationService(): ClientAttestationService
 }

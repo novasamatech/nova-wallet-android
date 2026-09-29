@@ -25,6 +25,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class, CommonMultiStakingModule::class])
 class SetupAmountMultiStakingModule {
@@ -46,7 +47,8 @@ class SetupAmountMultiStakingModule {
         maxActionProviderFactory: MaxActionProviderFactory,
         validationExecutor: ValidationExecutor,
         amountFormatter: AmountFormatter,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return SetupAmountMultiStakingViewModel(
             multiStakingTargetSelectionFormatter = multiStakingTargetSelectionFormatter,
@@ -62,7 +64,8 @@ class SetupAmountMultiStakingModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             maxActionProviderFactory = maxActionProviderFactory,
             amountFormatter = amountFormatter,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

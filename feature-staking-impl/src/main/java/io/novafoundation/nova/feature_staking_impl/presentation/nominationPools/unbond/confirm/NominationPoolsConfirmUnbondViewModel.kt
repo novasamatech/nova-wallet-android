@@ -40,6 +40,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class NominationPoolsConfirmUnbondViewModel(
     private val router: NominationPoolsRouter,
@@ -56,7 +58,8 @@ class NominationPoolsConfirmUnbondViewModel(
     assetUseCase: AssetUseCase,
     hintsFactory: NominationPoolsUnbondHintsFactory,
     private val amountFormatter: AmountFormatter,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -156,14 +159,14 @@ class NominationPoolsConfirmUnbondViewModel(
         _showNextProgress.value = false
     }
 
-    private fun trackUnstakeCompleted(validationPayload: NominationPoolsUnbondValidationPayload) {
-        val fiatAmount = validationPayload.asset.token.amountToFiat(payload.amount)
+    private suspend fun trackUnstakeCompleted(validationPayload: NominationPoolsUnbondValidationPayload) {
+        val usdAmount = usdRateRepository.amountToUsd(validationPayload.asset.token.configuration, payload.amount)
 
         analyticsService.track(
             AnalyticsEvent.UnstakeCompleted(
                 stakingType = ANALYTICS_STAKING_TYPE_POOL,
                 network = validationPayload.chain.name,
-                amountBucket = AmountBucket.from(fiatAmount)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }

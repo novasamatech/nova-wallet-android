@@ -28,6 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLo
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SelectSendModule {
@@ -55,7 +56,8 @@ class SelectSendModule {
         selectAddressMixinFactory: SelectAddressMixin.Factory,
         maxActionProviderFactory: MaxActionProviderFactory,
         amountFormatter: AmountFormatter,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return SelectSendViewModel(
             chainRegistry = chainRegistry,
@@ -77,7 +79,8 @@ class SelectSendModule {
             selectAddressMixinFactory = selectAddressMixinFactory,
             maxActionProviderFactory = maxActionProviderFactory,
             amountFormatter = amountFormatter,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

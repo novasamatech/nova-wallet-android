@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_assets.di.modules
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
@@ -29,7 +28,6 @@ class SendModule {
         sendUseCase: SendUseCase,
         crossChainTransfersUseCase: CrossChainTransfersUseCase,
         crossChainValidationProvider: CrossChainValidationSystemProvider,
-        accountRepository: AccountRepository,
         showReceivedAssetUseCase: ShowReceivedAssetUseCase,
     ) = SendInteractor(
         assetSourceRegistry,
@@ -40,7 +38,6 @@ class SendModule {
         extrinsicService,
         sendUseCase,
         crossChainValidationProvider,
-        accountRepository,
         showReceivedAssetUseCase
     )
 }

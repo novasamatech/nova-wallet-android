@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/privacyToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:dividerVisible="false"
+        app:titleText="@string/settings_privacy_title" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="16dp">
+
+            <io.novafoundation.nova.common.view.settings.SettingsGroupView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <io.novafoundation.nova.common.view.settings.SettingsSwitcherView
+                    android:id="@+id/privacyAnalytics"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:icon="@drawable/shield_checkmark_outline"
+                    app:title="@string/settings_analytics_title" />
+
+            </io.novafoundation.nova.common.view.settings.SettingsGroupView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_block_12"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
+
+                <TextView
+                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/privacy_analytics_description"
+                    android:textColor="@color/text_secondary" />
+
+                <include
+                    android:id="@+id/privacyNeverAddresses"
+                    layout="@layout/view_privacy_check_row" />
+
+                <include
+                    android:id="@+id/privacyNeverIds"
+                    layout="@layout/view_privacy_check_row" />
+
+                <include
+                    android:id="@+id/privacyIpCountry"
+                    layout="@layout/view_privacy_check_row" />
+
+                <include
+                    android:id="@+id/privacyChangeAnytime"
+                    layout="@layout/view_privacy_check_row" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/privacyNotice"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="4dp"
+                android:text="@string/common_privacy_notice"
+                android:textColor="@color/button_text_accent" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -3,6 +3,7 @@ package io.novafoundation.nova.infrastructure.attestation
 import androidx.annotation.Keep
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Url
 
 const val CHALLENGES_PATH = "v1/attestation/challenges"
 const val REGISTER_PATH = "v1/attestation/register"
@@ -34,9 +35,10 @@ class AttestationRegisterRequest(
 
 interface AttestationApi {
 
-    @POST(CHALLENGES_PATH)
-    suspend fun challenge(@Body request: AttestationChallengeRequest): AttestationChallengeResponse
+    // Full URLs: the host comes from the global config at request time, see InfrastructureUrls
+    @POST
+    suspend fun challenge(@Url url: String, @Body request: AttestationChallengeRequest): AttestationChallengeResponse
 
-    @POST(REGISTER_PATH)
-    suspend fun register(@Body request: AttestationRegisterRequest)
+    @POST
+    suspend fun register(@Url url: String, @Body request: AttestationRegisterRequest)
 }

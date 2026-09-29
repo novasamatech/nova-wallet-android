@@ -12,7 +12,16 @@ sealed class QuotingState {
 
     data class Error(val error: Throwable) : QuotingState()
 
-    data class Loaded(val quote: SwapQuote, val quoteArgs: SwapQuoteArgs) : QuotingState()
+    data class Loaded(
+        val quote: SwapQuote,
+        val quoteArgs: SwapQuoteArgs,
+        val origin: QuoteRefreshOrigin,
+    ) : QuotingState()
+}
+
+enum class QuoteRefreshOrigin {
+    USER_INPUT,
+    SUBSCRIPTION,
 }
 
 inline fun <T> QuotingState.toLoadingState(onLoaded: (SwapQuote) -> T?): ExtendedLoadingState<T?> {

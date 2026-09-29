@@ -64,6 +64,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class ConfirmSendChainsModel(
     val origin: ChainUi,
@@ -86,6 +88,7 @@ class ConfirmSendViewModel(
     private val hintsFactory: ConfirmSendHintsMixinFactory,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val transferDraft: TransferDraft,
     private val amountFormatter: AmountFormatter
@@ -279,7 +282,7 @@ class ConfirmSendViewModel(
             AnalyticsEvent.SendCompleted(
                 asset = asset.token.configuration.symbol.value,
                 network = originChain().name,
-                amountBucket = AmountBucket.from(asset.token.amountToFiat(transferDraft.amount)),
+                amountBucket = AmountBucket.fromOrUnknown(usdRateRepository.amountToUsd(asset.token.configuration, transferDraft.amount)),
                 destinationNetwork = destinationChain().name.takeIf { isCrossChain }
             )
         )

@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class ParachainStakingUnbondConfirmModule {
@@ -52,7 +53,8 @@ class ParachainStakingUnbondConfirmModule {
         hintsMixinFactory: ParachainStakingUnbondHintsMixinFactory,
         extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
         amountFormatter: AmountFormatter,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return ParachainStakingUnbondConfirmViewModel(
             router = router,
@@ -72,7 +74,8 @@ class ParachainStakingUnbondConfirmModule {
             collatorsUseCase = collatorsUseCase,
             extrinsicNavigationWrapper = extrinsicNavigationWrapper,
             amountFormatter = amountFormatter,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

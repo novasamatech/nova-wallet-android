@@ -1,63 +1,8 @@
-apply from: '../scripts/secrets.gradle'
-
-// The backend accepts only Play Integrity for Android (profile 2), so a build either attests for
-// real or not at all - there is no development shortcut. Debug builds therefore need a physical
-// device with Google Play and a dev backend that allows the debug package: an emulator never
-// meets device integrity. Build types without a host attest nothing because they collect nothing.
+// Every build attests with Play Integrity - the backend accepts nothing else for Android, and there is
+// no development shortcut. Debug builds therefore need a physical device with Google Play and a dev
+// backend that allows the debug package: an emulator never meets device integrity. Where the
+// infrastructure lives comes from the global remote config (infraUrl).
 android {
-
-    defaultConfig {
-        buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
-        buildConfigField "String", "ATTESTATION_MODE", "\"none\""
-    }
-
-    buildTypes {
-        debug {
-            buildConfigField "String", "INFRASTRUCTURE_HOST", readStringSecretOrNull("DEBUG_NOVA_BACKEND_HOST") ?: "\"\""
-            buildConfigField "String", "ATTESTATION_MODE", "\"play_integrity\""
-        }
-
-        debugLocal {
-            initWith buildTypes.debug
-            matchingFallbacks = ['debug']
-        }
-
-        release {
-            buildConfigField "String", "INFRASTRUCTURE_HOST", readStringSecretOrNull("RELEASE_NOVA_BACKEND_HOST") ?: "\"\""
-            buildConfigField "String", "ATTESTATION_MODE", "\"play_integrity\""
-        }
-
-        releaseMarket {
-            initWith buildTypes.release
-            matchingFallbacks = ['release']
-        }
-
-        releaseGithub {
-            initWith buildTypes.release
-            matchingFallbacks = ['release']
-        }
-
-        releaseTest {
-            initWith buildTypes.release
-            matchingFallbacks = ['release']
-            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
-            buildConfigField "String", "ATTESTATION_MODE", "\"none\""
-        }
-
-        develop {
-            initWith buildTypes.debug
-            matchingFallbacks = ['debug']
-            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
-            buildConfigField "String", "ATTESTATION_MODE", "\"none\""
-        }
-
-        instrumentialTest {
-            initWith buildTypes.debug
-            matchingFallbacks = ['debug']
-            buildConfigField "String", "INFRASTRUCTURE_HOST", "\"\""
-            buildConfigField "String", "ATTESTATION_MODE", "\"none\""
-        }
-    }
 
     buildFeatures {
         buildConfig = true

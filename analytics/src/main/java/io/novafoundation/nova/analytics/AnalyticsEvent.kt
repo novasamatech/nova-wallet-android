@@ -360,11 +360,10 @@ sealed class AnalyticsEvent(
 
     // Banner
 
-    class BannerClicked(bannerId: String, bannerTitle: String, screen: String) : AnalyticsEvent(
+    class BannerClicked(bannerId: String, screen: String) : AnalyticsEvent(
         name = "banner_clicked",
         properties = mapOf(
             "banner_id" to bannerId,
-            "banner_title" to bannerTitle,
             "screen" to screen
         )
     )
@@ -378,10 +377,10 @@ sealed class AnalyticsEvent(
 
     // NFT
 
-    class NftSectionOpened(nftCount: Int) : AnalyticsEvent(
+    class NftSectionOpened(nftCountBucket: NftCountBucket) : AnalyticsEvent(
         name = "nft_section_opened",
         properties = mapOf(
-            "nft_count" to nftCount
+            "nft_count_bucket" to nftCountBucket.value
         )
     )
 
