@@ -39,6 +39,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossCh
 import io.novafoundation.nova.feature_wallet_api.data.network.crosschain.CrossChainWeigher
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.ProxyPriceApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.PRICE_API_BASE_URL
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
@@ -144,13 +145,13 @@ class WalletFeatureModule {
     @Provides
     @FeatureScope
     fun provideProxyPriceApi(networkApiCreator: NetworkApiCreator): ProxyPriceApi {
-        return networkApiCreator.create(ProxyPriceApi::class.java, ProxyPriceApi.BASE_URL)
+        return networkApiCreator.create(ProxyPriceApi::class.java, PRICE_API_BASE_URL)
     }
 
     @Provides
     @FeatureScope
     fun provideCoingeckoApi(networkApiCreator: NetworkApiCreator): CoingeckoApi {
-        return networkApiCreator.create(CoingeckoApi::class.java, CoingeckoApi.BASE_URL)
+        return networkApiCreator.create(CoingeckoApi::class.java, PRICE_API_BASE_URL)
     }
 
     @Provides
