@@ -94,9 +94,11 @@ class BittensorStakeConfirmViewModel(
     }.onStart { emit(DescriptiveButtonState.Loading) }.shareInBackground()
 
     init {
-        if (!interactor.hasDraft()) launchUnit {
-            showError(resourceManager.getString(R.string.bittensor_draft_expired))
-            router.back()
+        if (!interactor.hasDraft()) {
+            launchUnit {
+                showError(resourceManager.getString(R.string.bittensor_draft_expired))
+                router.back()
+            }
         }
     }
 
@@ -164,9 +166,16 @@ class BittensorStakeConfirmViewModel(
     }
 
     private suspend fun mapValidator(draft: BittensorRootStakeDraft): BittensorValidatorUi {
-        return BittensorValidatorUi(draft.validator.name, Icon.FromDrawable(iconGenerator.createAddressIcon(
-            draft.validator.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT
-        )))
+        return BittensorValidatorUi(
+            draft.validator.name,
+            Icon.FromDrawable(
+                iconGenerator.createAddressIcon(
+                    draft.validator.hotkey.value,
+                    AddressIconGenerator.SIZE_MEDIUM,
+                    AddressIconGenerator.BACKGROUND_TRANSPARENT
+                )
+            )
+        )
     }
 
     private fun formatApy(details: BittensorRootStakingDetails): String {

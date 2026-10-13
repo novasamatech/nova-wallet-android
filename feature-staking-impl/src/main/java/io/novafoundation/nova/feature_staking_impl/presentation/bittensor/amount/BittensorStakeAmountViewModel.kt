@@ -101,9 +101,18 @@ class BittensorStakeAmountViewModel(
     }.shareInBackground()
 
     val validator = stakingDetails
-        .map { BittensorValidatorUi(it.validator.name, Icon.FromDrawable(iconGenerator.createAddressIcon(
-            it.validator.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT
-        ))) }
+        .map {
+            BittensorValidatorUi(
+                it.validator.name,
+                Icon.FromDrawable(
+                    iconGenerator.createAddressIcon(
+                        it.validator.hotkey.value,
+                        AddressIconGenerator.SIZE_MEDIUM,
+                        AddressIconGenerator.BACKGROUND_TRANSPARENT
+                    )
+                )
+            )
+        }
         .shareInBackground()
 
     val apy = stakingDetails
