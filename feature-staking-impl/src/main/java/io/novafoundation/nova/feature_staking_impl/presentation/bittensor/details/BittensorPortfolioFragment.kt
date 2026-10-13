@@ -33,7 +33,6 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
 
     override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
-        viewModel.priceChartTitle.observe(priceChart::setTitle)
         viewModel.priceChartFormatters.observe { priceChart.setTextInjectors(it.price, it.priceChange, it.date) }
         viewModel.priceChartModels.observe(priceChart::setCharts)
         viewModel.chartAxisFormatter.observe(priceChart::setAxisLabelFormatter)

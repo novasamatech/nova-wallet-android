@@ -54,7 +54,10 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStaki
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RemoteBittensorRootValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEarnConfigApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistoryApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistoryRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioHistoryRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
@@ -284,6 +287,14 @@ class StakingFeatureModule {
         @Attested apiCreator: NetworkApiCreator,
         infrastructureBaseUrl: String
     ) = BittensorValidatorBackend(apiCreator.create(BittensorValidatorsApi::class.java), infrastructureBaseUrl)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorPortfolioHistoryRepository(
+        @Attested apiCreator: NetworkApiCreator,
+        infrastructureBaseUrl: String
+    ): BittensorPortfolioHistoryRepository =
+        RealBittensorPortfolioHistoryRepository(apiCreator.create(BittensorPortfolioHistoryApi::class.java), infrastructureBaseUrl)
 
     @Provides
     @FeatureScope

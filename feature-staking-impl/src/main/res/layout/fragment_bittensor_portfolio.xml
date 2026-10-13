@@ -39,9 +39,6 @@
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
                     android:id="@+id/priceChart" android:layout_width="match_parent" android:layout_height="wrap_content"
                     android:layout_marginTop="12dp" />
-                <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1" android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="@string/bittensor_chart_price_disclaimer"
-                    android:textColor="@color/text_secondary" />
                 <TextView android:id="@+id/chartRetry" style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
                     android:layout_width="wrap_content" android:layout_height="44dp" android:gravity="center_vertical"
                     android:text="@string/common_retry" android:textColor="@color/text_primary" android:visibility="gone" />
