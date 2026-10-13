@@ -51,7 +51,28 @@ class CrossChainJunctionsMapperTest {
 
     @Test(expected = IllegalArgumentException::class)
     fun `rejects unknown junction key`() {
-        val remote = mapOf("parents" to 2.0)
+        val remote = mapOf("foo" to 2.0)
+
+        remote.toAbsoluteLocation()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `rejects parents in absolute location`() {
+        val remote = mapOf("parents" to 2.0, "globalConsensus" to mapOf("ethereum" to mapOf("chainId" to 1.0)))
+
+        remote.toAbsoluteLocation()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `rejects accountKey20 of wrong length`() {
+        val remote = mapOf("accountKey20" to "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2ff")
+
+        remote.toAbsoluteLocation()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun `rejects accountKey20 that is not hex`() {
+        val remote = mapOf("accountKey20" to "0xnot-a-contract")
 
         remote.toAbsoluteLocation()
     }
