@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 
 import okhttp3.CacheControl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.http.GET
@@ -54,11 +53,7 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         bindBittensorValidatorGates(cached.data)
     }
 
-    private fun url(path: String): String {
-        val base = requireNotNull(baseUrl.toHttpUrlOrNull()) { "Infrastructure URL is not configured" }
-        require(base.isHttps) { "Infrastructure requires HTTPS" }
-        return requireNotNull(base.resolve("/v1/bittensor/$path")).toString()
-    }
+    private fun url(path: String): String = bittensorBackendUrl(baseUrl, path)
 
     private fun <T> cache(response: Response<T>): Cached<T> {
         if (!response.isSuccessful) throw HttpException(response)
