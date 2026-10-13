@@ -104,6 +104,8 @@ class BittensorPortfolioRepositoryTest {
             }.take(2).toList()
         }
         assertEquals(2L, states[1].metaId)
+        assertEquals(1.toByte(), states[0].coldkey.value[0])
+        assertEquals(2.toByte(), states[1].coldkey.value[0])
         assertTrue(states[1].dataStatus is BittensorDataStatus.Stale)
         assertNull(states[1].positions)
     }

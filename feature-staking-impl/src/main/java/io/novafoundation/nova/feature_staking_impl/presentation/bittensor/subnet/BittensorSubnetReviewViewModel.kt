@@ -129,9 +129,11 @@ class BittensorSubnetReviewViewModel(
         }
     }.shareInBackground()
     val slippage = interactor.slippage.fraction.multiply(BigDecimal(100)).toStripTrailingZerosString() + "%"
-    val validatorIcon = draft.map { prepared -> prepared?.validator?.let {
-        iconGenerator.createAddressIcon(it.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT)
-    } }.shareInBackground()
+    val validatorIcon = draft.map { prepared ->
+        prepared?.validator?.let {
+            iconGenerator.createAddressIcon(it.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT)
+        }
+    }.shareInBackground()
 
     val confirmButtonState = combine(draft, walletChanged, executing, completed, hasError) { draft, changed, executing, completed, failed ->
         val label = resources.getString(R.string.common_confirm)

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -45,15 +46,16 @@ class RealBittensorPortfolioRepository(
 ) : BittensorPortfolioRepository {
 
     override fun observeAsset(): Flow<Asset> = flowOfAll {
-        val chain = withTimeout(20_000L) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
+        val chain = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
         accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
             walletRepository.assetFlow(account.id, chain.utilityAsset)
         }
     }
 
     override fun observePortfolio(): Flow<BittensorPortfolio> = flowOfAll {
-        val chain = withTimeout(20_000L) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
+        val chain = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
         accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
+            val coldkey = AccountIdKey(account.requireAccountIdIn(chain))
             // The cache belongs to this wallet's collector, never to the selected wallet globally.
             combine(
                 walletRepository.assetFlow(account.id, chain.utilityAsset),
@@ -68,8 +70,8 @@ class RealBittensorPortfolioRepository(
                     }
                     merge(positionUpdates.updates.map { Unit }, periodic).conflate().collect {
                         val state = try {
-                            cached = withTimeout(20_000L) {
-                                fetchPositions(chain.id, account.requireAccountIdIn(chain))
+                            cached = withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
+                                fetchPositions(chain.id, coldkey.value)
                             }
                             BittensorDataStatus.Fresh
                         } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
@@ -85,7 +87,7 @@ class RealBittensorPortfolioRepository(
                     }
                 }
             ) { asset, (positions, status) ->
-                BittensorPortfolio(account.id, chain, asset, positions, status)
+                BittensorPortfolio(account.id, chain, coldkey, asset, positions, status)
             }
         }
     }

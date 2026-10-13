@@ -3,9 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.filterLoaded
-import io.novafoundation.nova.common.domain.mapLoading
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -23,10 +20,10 @@ import io.novafoundation.nova.feature_currency_api.presentation.formatters.forma
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryChart
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPriceChartInteractor
-import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
-import io.novafoundation.nova.feature_wallet_api.domain.price.AssetPriceChart
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartTextInjectors
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
@@ -41,8 +38,6 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.flatMapLatest
@@ -62,6 +57,8 @@ data class BittensorPositionUi(
     val iconSizeDp: Int = 40
 )
 
+class BittensorChartUi(val injectors: PriceChartTextInjectors, val models: List<PriceChartModel>)
+
 sealed interface BittensorPositionAction {
     data object RootDetails : BittensorPositionAction
     data class ValidatorDetails(val address: String) : BittensorPositionAction
@@ -77,7 +74,7 @@ class BittensorDetailsViewModel(
     private val assetIconProvider: AssetIconProvider,
     private val iconGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
-    private val priceChartInteractor: BittensorPriceChartInteractor,
+    private val historyInteractor: BittensorPortfolioHistoryInteractor,
     private val logger: Logger,
     private val subnetRepository: BittensorSubnetRepository
 ) : BaseViewModel(), ExternalActions by externalActions {
@@ -121,31 +118,18 @@ class BittensorDetailsViewModel(
         .onStart { emit(false) }.shareInBackground()
     val empty = portfolio.map { it.positions?.let { p -> p.root.isEmpty() && p.subnets.isEmpty() } == true }.shareInBackground()
 
-    private val chartPeriod = MutableStateFlow(PricePeriod.MONTH)
-    val selectedChartIndex = chartPeriod.map { PricePeriod.entries.indexOf(it) }.shareInBackground()
+    private val periods = BittensorPortfolioHistoryPeriod.entries
+    private val chartPeriod = MutableStateFlow(BittensorPortfolioHistoryPeriod.THIRTY_DAYS)
+    val selectedChartIndex = chartPeriod.map { periods.indexOf(it) }.shareInBackground()
     private val chartReload = MutableStateFlow(0L)
-    private val chartAssetState = chartReload.flatMapLatest {
-        interactor.observeAsset()
-            .map<Asset, ExtendedLoadingState<Asset>> { ExtendedLoadingState.Loaded(it) }
-            .onStart { emit(ExtendedLoadingState.Loading) }
-            .catch {
-                logger.log("[BittensorChart] Failed to load TAO asset")
-                logger.log(it)
-                emit(ExtendedLoadingState.Error(it))
-            }
-    }.shareInBackground()
-    private val chartAsset = chartAssetState.filterLoaded()
-    private val periods = PricePeriod.entries
     private val chartButtonTexts = listOf(
         R.string.price_chart_day,
         R.string.bittensor_chart_week,
         R.string.bittensor_chart_month,
-        R.string.price_chart_year,
-        R.string.common_all
+        R.string.bittensor_chart_three_months
     ).map(resources::getString)
 
-    val priceChartTitle = chartAsset.map { resources.getString(R.string.price_chart_title, it.token.configuration.symbol.value) }
-        .shareInBackground()
+    private val chartAsset = portfolio.map { it.asset }
 
     val chartAxisFormatter = chartAsset.map { asset ->
         val currency = asset.token.currency
@@ -153,63 +137,63 @@ class BittensorDetailsViewModel(
         formatter
     }.shareInBackground()
 
-    val priceChartFormatters = combine(chartAsset, chartPeriod) { asset, period ->
+    private val chartData = combine(chartReload, chartPeriod) { _, period -> period }
+        .flatMapLatest { period ->
+            historyInteractor.observe(portfolio, period)
+                .onStart { emit(BittensorPortfolioHistoryChart(period, ExtendedLoadingState.Loading)) }
+                .catch {
+                    logger.log("[BittensorChart] Portfolio history stream failed")
+                    logger.log(it)
+                    emit(BittensorPortfolioHistoryChart(period, ExtendedLoadingState.Error(it)))
+                }
+        }.shareInBackground()
+
+    val chartFailed = combine(chartData, failed) { data, failed -> failed || data.series is ExtendedLoadingState.Error }.shareInBackground()
+
+    /**
+     * Injectors and models travel together: the chart view formats the header change synchronously when it receives
+     * new entries, so the `covered` flag must already be installed. Two separate flows would race at Loading -> Loaded.
+     */
+    val chartUi = combine(chartAsset, chartData, failed) { asset, data, failed ->
         val token = asset.token
-        PriceChartTextInjectors(
+        val covered = (data.series as? ExtendedLoadingState.Loaded)?.data?.changeCovered ?: false
+        val injectors = PriceChartTextInjectors(
             RealPricePriceTextInjector(token.currency, token.coinRate?.rate),
-            BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(period)]),
+            BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(data.period)], covered),
             RealDateChartTextInjector(resources)
         )
+        BittensorChartUi(injectors, chartModels(data, failed))
     }.shareInBackground()
 
-    private val chartData = combine(
-        chartAssetState.mapLoading { it.token.configuration.priceId to it.token.currency }.distinctUntilChanged(),
-        chartPeriod
-    ) { identity, period -> identity to period }
-        .flatMapLatest { (identity, period) ->
-            when (identity) {
-                is ExtendedLoadingState.Loading -> flowOf(AssetPriceChart(period, ExtendedLoadingState.Loading))
-                is ExtendedLoadingState.Error -> flowOf(AssetPriceChart(period, identity))
-                is ExtendedLoadingState.Loaded -> {
-                    val (priceId, currency) = identity.data
-                    if (priceId == null) {
-                        flowOf(AssetPriceChart(period, ExtendedLoadingState.Loaded(emptyList())))
-                    } else {
-                        priceChartInteractor.observe(priceId, currency, period)
-                    }
-                }
-            }
-        }.onStart { emit(AssetPriceChart(PricePeriod.MONTH, ExtendedLoadingState.Loading)) }.shareInBackground()
-
-    val chartFailed = chartData.map { it.chart is ExtendedLoadingState.Error }.shareInBackground()
-
-    val priceChartModels = chartData.map { data ->
-        periods.mapIndexed { index, period ->
+    private fun chartModels(data: BittensorPortfolioHistoryChart, failed: Boolean): List<PriceChartModel> {
+        val loadFailed = PriceChartModel.Empty(chartButtonTexts[periods.indexOf(data.period)], resources.getString(R.string.price_chart_load_failed))
+        return periods.mapIndexed { index, period ->
             val button = chartButtonTexts[index]
-            if (period != data.range) return@mapIndexed PriceChartModel.Loading(button)
-            when (val state = data.chart) {
-                is ExtendedLoadingState.Loading -> PriceChartModel.Loading(button)
-                is ExtendedLoadingState.Error -> PriceChartModel.Empty(button, resources.getString(R.string.price_chart_load_failed))
-                is ExtendedLoadingState.Loaded -> if (state.data.isEmpty()) {
+            if (period != data.period) return@mapIndexed PriceChartModel.Loading(button)
+            when (val state = data.series) {
+                is ExtendedLoadingState.Loading -> if (failed) loadFailed else PriceChartModel.Loading(button)
+                is ExtendedLoadingState.Error -> loadFailed
+                is ExtendedLoadingState.Loaded -> if (state.data.points.isEmpty()) {
                     PriceChartModel.Empty(button, resources.getString(R.string.price_chart_no_data))
                 } else {
                     PriceChartModel.Chart(
                         button,
                         button,
-                        period != PricePeriod.YEAR && period != PricePeriod.MAX,
-                        state.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
+                        supportTimeShowing = true,
+                        state.data.points.map { PriceChartModel.Chart.Price(it.timestamp, it.fiatValue) }
                     )
                 }
             }
         }
-    }.shareInBackground()
+    }
 
     fun selectChartPeriod(index: Int) {
         periods.getOrNull(index)?.let { chartPeriod.value = it }
     }
 
     fun retryChart() {
-        chartReload.update { it + 1 }
+        // A chart failure caused by a failed portfolio stream is only fixed by reloading the portfolio itself
+        if (failed.value) retry() else chartReload.update { it + 1 }
     }
 
     private val subnetMetadata = reload.flatMapLatest {

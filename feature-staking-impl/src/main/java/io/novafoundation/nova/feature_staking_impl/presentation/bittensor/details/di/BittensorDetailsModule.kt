@@ -15,7 +15,9 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPriceChartInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistoryRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryInteractor
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
@@ -25,8 +27,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 class BittensorDetailsModule {
 
     @Provides
-    fun providePriceChartInteractor(prices: CoinPriceRepository, logger: Logger) =
-        BittensorPriceChartInteractor(prices, logger)
+    fun provideHistoryInteractor(
+        repository: BittensorPortfolioHistoryRepository,
+        prices: CoinPriceRepository,
+        positionUpdates: BittensorPositionUpdates,
+        logger: Logger
+    ) = BittensorPortfolioHistoryInteractor(repository, prices, positionUpdates, logger)
 
     @Provides
     @IntoMap
@@ -39,7 +45,7 @@ class BittensorDetailsModule {
         assetIconProvider: AssetIconProvider,
         iconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
-        priceCharts: BittensorPriceChartInteractor,
+        historyInteractor: BittensorPortfolioHistoryInteractor,
         logger: Logger,
         subnetRepository: BittensorSubnetRepository
     ): ViewModel = BittensorDetailsViewModel(
@@ -50,7 +56,7 @@ class BittensorDetailsModule {
         assetIconProvider = assetIconProvider,
         iconGenerator = iconGenerator,
         externalActions = externalActions,
-        priceChartInteractor = priceCharts,
+        historyInteractor = historyInteractor,
         logger = logger,
         subnetRepository = subnetRepository
     )
