@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_xcm_api.multiLocation
 
 import io.novafoundation.nova.common.data.network.runtime.binding.ParaId
 import io.novafoundation.nova.common.utils.collectionIndexOrNull
+import io.novafoundation.nova.feature_xcm_api.multiLocation.MultiLocation.Junction
 
 class AbsoluteMultiLocation(
     interior: Interior,
@@ -25,6 +26,12 @@ class AbsoluteMultiLocation(
      *   to determine how many "up" hops are needed to reach common ancestor
      */
     fun fromPointOfViewOf(pov: AbsoluteMultiLocation): RelativeMultiLocation {
+        if (isForeignConsensus() && !pov.isForeignConsensus()) {
+            // Location is rooted in another consensus system (e.g. Snowbridge assets under GlobalConsensus(Ethereum)):
+            // go up to the relay (one hop per pov junction) plus one more hop to the universal level, keep the full path
+            return RelativeMultiLocation(parents = pov.junctions.size + 1, interior = interior)
+        }
+
         val lastCommonIndex = findLastCommonJunctionIndex(pov)
         val firstDistinctIndex = lastCommonIndex?.let { it + 1 } ?: 0
 
@@ -33,6 +40,9 @@ class AbsoluteMultiLocation(
 
         return RelativeMultiLocation(parents, junctions.toInterior())
     }
+
+    // Chains of the local consensus never carry a GlobalConsensus junction in their absolute location
+    private fun isForeignConsensus(): Boolean = junctions.firstOrNull() is Junction.GlobalConsensus
 
     private fun findLastCommonJunctionIndex(other: AbsoluteMultiLocation): Int? {
         return junctions.zip(other.junctions).indexOfLast { (selfJunction, otherJunction) ->
