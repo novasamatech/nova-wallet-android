@@ -7,6 +7,7 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import retrofit2.HttpException
 
+/** Stake-value history of one coldkey from the Nova Bittensor service; throws on HTTP errors and contract violations. */
 interface BittensorPortfolioHistoryRepository {
 
     suspend fun history(chain: Chain, coldkey: AccountIdKey, period: BittensorPortfolioHistoryPeriod): BittensorPortfolioStakeHistory

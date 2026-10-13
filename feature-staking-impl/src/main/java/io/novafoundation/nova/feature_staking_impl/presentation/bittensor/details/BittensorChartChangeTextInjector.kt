@@ -8,6 +8,7 @@ import java.text.NumberFormat
 import java.util.Locale
 
 private const val HIDDEN_CHANGE = "\u2014"
+private const val SEPARATOR = " \u00b7 "
 
 /** Change of the portfolio value between the first and the selected point; hidden when the history does not cover the period. */
 class BittensorChartChangeTextInjector(private val period: String, private val covered: Boolean) : PriceChangeTextInjector {
@@ -26,11 +27,11 @@ class BittensorChartChangeTextInjector(private val period: String, private val c
 }
 
 internal fun bittensorChartChangeText(fromValue: Float, toValue: Float, period: String, covered: Boolean, locale: Locale = Locale.getDefault()): String {
-    if (!covered || fromValue <= 0f) return "$HIDDEN_CHANGE \u00b7 $period"
+    if (!covered || fromValue <= 0f) return "$HIDDEN_CHANGE$SEPARATOR$period"
 
     val change = (toValue - fromValue) / fromValue * 100
     val number = NumberFormat.getNumberInstance(locale).apply { maximumFractionDigits = 1 }.format(change)
     val signed = if (change > 0f) "+$number" else number
 
-    return "$signed% \u00b7 $period"
+    return "$signed%$SEPARATOR$period"
 }

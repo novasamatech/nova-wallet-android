@@ -15,7 +15,7 @@ interface BittensorSubnetRepository {
 
 class RealBittensorSubnetRepository(private val runtimeCalls: MultiChainRuntimeCallsApi) : BittensorSubnetRepository {
 
-    override suspend fun subnets(): List<BittensorSubnet> = withTimeout(20_000L) {
+    override suspend fun subnets(): List<BittensorSubnet> = withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
         runtimeCalls.forChain(ChainGeneses.BITTENSOR).call(
             section = "SubnetInfoRuntimeApi",
             method = "get_all_dynamic_info",

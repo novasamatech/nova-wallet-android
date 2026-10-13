@@ -19,10 +19,15 @@ class BittensorPortfolioHistoryBindingTest {
     private fun remote(
         period: String? = "SEVEN_DAYS",
         window: BittensorPortfolioHistoryRemote.Window? = BittensorPortfolioHistoryRemote.Window("2026-08-26T14:00:00Z", "2026-09-02T14:00:00Z"),
-        points: List<BittensorPortfolioHistoryRemote.Point>? = listOf(point(), point("2026-09-02T14:00:00Z", "13", "4100", completed = false)),
+        points: List<BittensorPortfolioHistoryRemote.Point?>? = listOf(point(), point("2026-09-02T14:00:00Z", "13", "4100", completed = false)),
         historyScope: String? = "TAO_APP_PARTIAL",
         completeness: String? = "COMPLETE"
     ) = BittensorPortfolioHistoryRemote(period, window, points, historyScope, BittensorPortfolioHistoryRemote.Meta(completeness))
+
+    private fun instant(epochSeconds: Long): String =
+        java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
+            .apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
+            .format(java.util.Date(epochSeconds * 1000))
 
     private fun rejected(remote: BittensorPortfolioHistoryRemote) {
         try {
@@ -77,8 +82,8 @@ class BittensorPortfolioHistoryBindingTest {
 
     @Test
     fun `more than 512 points is rejected`() {
-        val points = (0 until 513).map { point("2026-08-26T%02d:%02d:00Z".format(14 + it / 60 % 10, it % 60)) }
-        rejected(remote(points = points))
+        val windowStart = 1787752800L // 2026-08-26T14:00:00Z
+        rejected(remote(points = (0 until 513).map { point(instant(windowStart + it * 60L)) }))
     }
 
     @Test
@@ -103,6 +108,9 @@ class BittensorPortfolioHistoryBindingTest {
         rejected(remote(points = listOf(point(usd = null))))
         rejected(remote(points = listOf(point(tao = "NaN"))))
     }
+
+    @Test
+    fun `null point element is rejected like any other violation`() = rejected(remote(points = listOf(point(), null)))
 
     @Test
     fun `missing completed flag is rejected`() = rejected(remote(points = listOf(point(completed = null))))

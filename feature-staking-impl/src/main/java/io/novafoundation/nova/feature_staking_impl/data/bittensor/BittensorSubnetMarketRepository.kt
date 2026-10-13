@@ -27,7 +27,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
 
     suspend fun priceId(subnetId: BittensorSubnetId): String? = mutex.withLock {
         if (System.nanoTime() - loadedAt > 300_000_000_000L || loadedAt == 0L) {
-            val markets = withTimeout(20_000L) {
+            val markets = withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
                 buildList {
                     for (page in 1..4) {
                         val rows = api.markets(page = page)

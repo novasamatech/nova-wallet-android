@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
 import kotlinx.coroutines.withTimeout
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -46,7 +47,7 @@ class BittensorSubnetQuoteInteractor(
         subnetId: BittensorSubnetId,
         totalTaoInPlanks: BigInteger,
         slippage: BittensorSlippage
-    ): BittensorSubnetBuyQuote = withTimeout(20_000L) {
+    ): BittensorSubnetBuyQuote = withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
         val serviceFee = commission.feeFor(totalTaoInPlanks)
         val stakeAmount = totalTaoInPlanks - serviceFee
         coroutineScope {

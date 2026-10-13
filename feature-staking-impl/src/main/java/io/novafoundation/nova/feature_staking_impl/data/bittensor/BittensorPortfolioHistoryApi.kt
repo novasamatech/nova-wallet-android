@@ -8,8 +8,6 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Url
 import java.math.BigDecimal
-import java.util.GregorianCalendar
-import java.util.TimeZone
 
 interface BittensorPortfolioHistoryApi {
 
@@ -23,7 +21,7 @@ class BittensorPortfolioHistoryRequest(val accountSubject: String, val period: S
 class BittensorPortfolioHistoryRemote(
     val period: String?,
     val window: Window?,
-    val points: List<Point>?,
+    val points: List<Point?>?,
     val historyScope: String?,
     val meta: Meta?
 ) {
@@ -58,8 +56,9 @@ internal fun bindBittensorPortfolioHistory(
     require(points.size <= BITTENSOR_PORTFOLIO_HISTORY_MAX_POINTS) { "points" }
 
     var previous: Long? = null
-    val bound = points.mapIndexed { index, point ->
+    val bound = points.mapIndexed { index, nullablePoint ->
         val field = "points[$index]"
+        val point = requireNotNull(nullablePoint) { field }
         val timestamp = requireNotNull(parseBittensorInstant(point.timestamp)) { "$field.timestamp" }
         require(timestamp in start..end && previous.let { it == null || it < timestamp }) { "$field.timestamp" }
         previous = timestamp
@@ -75,31 +74,9 @@ internal fun bindBittensorPortfolioHistory(
     return BittensorPortfolioStakeHistory(period, start, end, bound)
 }
 
-private val INSTANT_PATTERN = Regex("""(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,9})?Z""")
-
-/** RFC 3339 UTC instant (`2026-09-02T13:00:00Z`, optional fraction) to epoch seconds, or null when malformed. */
-internal fun parseBittensorInstant(text: String?): Long? {
-    val match = text?.let(INSTANT_PATTERN::matchEntire) ?: return null
-    val (year, month, day, hour, minute, second) = match.destructured.toList().map(String::toInt)
-
-    val calendar = GregorianCalendar(TimeZone.getTimeZone("UTC")).apply {
-        isLenient = false
-        clear()
-        set(year, month - 1, day, hour, minute, second)
-    }
-
-    return try {
-        calendar.timeInMillis / 1000
-    } catch (e: IllegalArgumentException) {
-        null
-    }
-}
-
 private val REPORTED_DECIMAL_PATTERN = Regex("""-?[0-9]+(\.[0-9]+)?""")
 
 private fun bittensorReportedDecimal(text: String?, field: String): BigDecimal {
     val normalized = text?.trim()?.takeIf(REPORTED_DECIMAL_PATTERN::matches)
     return requireNotNull(normalized) { field }.toBigDecimal()
 }
-
-private operator fun <T> List<T>.component6(): T = this[5]

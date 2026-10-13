@@ -46,14 +46,14 @@ class RealBittensorPortfolioRepository(
 ) : BittensorPortfolioRepository {
 
     override fun observeAsset(): Flow<Asset> = flowOfAll {
-        val chain = withTimeout(20_000L) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
+        val chain = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
         accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
             walletRepository.assetFlow(account.id, chain.utilityAsset)
         }
     }
 
     override fun observePortfolio(): Flow<BittensorPortfolio> = flowOfAll {
-        val chain = withTimeout(20_000L) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
+        val chain = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
         accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
             val coldkey = AccountIdKey(account.requireAccountIdIn(chain))
             // The cache belongs to this wallet's collector, never to the selected wallet globally.
@@ -70,7 +70,7 @@ class RealBittensorPortfolioRepository(
                     }
                     merge(positionUpdates.updates.map { Unit }, periodic).conflate().collect {
                         val state = try {
-                            cached = withTimeout(20_000L) {
+                            cached = withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
                                 fetchPositions(chain.id, coldkey.value)
                             }
                             BittensorDataStatus.Fresh

@@ -23,7 +23,11 @@ enum class BittensorPortfolioHistoryPeriod(
 
     /** A series whose first sample sits later than this after the window start does not cover the period. */
     val coverageTolerance: Duration
-        get() = step * 2
+        get() = step * COVERAGE_STEPS
+
+    private companion object {
+        const val COVERAGE_STEPS = 2
+    }
 }
 
 /** One server-sampled bucket; [timestamp] in epoch seconds, values as reported by tao.app. */

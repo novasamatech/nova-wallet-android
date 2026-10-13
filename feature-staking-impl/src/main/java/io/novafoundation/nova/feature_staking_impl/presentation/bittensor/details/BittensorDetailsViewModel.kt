@@ -57,6 +57,8 @@ data class BittensorPositionUi(
     val iconSizeDp: Int = 40
 )
 
+class BittensorChartUi(val injectors: PriceChartTextInjectors, val models: List<PriceChartModel>)
+
 sealed interface BittensorPositionAction {
     data object RootDetails : BittensorPositionAction
     data class ValidatorDetails(val address: String) : BittensorPositionAction
@@ -146,21 +148,26 @@ class BittensorDetailsViewModel(
                 }
         }.shareInBackground()
 
-    val priceChartFormatters = combine(chartAsset, chartData) { asset, data ->
+    val chartFailed = combine(chartData, failed) { data, failed -> failed || data.series is ExtendedLoadingState.Error }.shareInBackground()
+
+    /**
+     * Injectors and models travel together: the chart view formats the header change synchronously when it receives
+     * new entries, so the `covered` flag must already be installed. Two separate flows would race at Loading -> Loaded.
+     */
+    val chartUi = combine(chartAsset, chartData, failed) { asset, data, failed ->
         val token = asset.token
         val covered = (data.series as? ExtendedLoadingState.Loaded)?.data?.changeCovered ?: false
-        PriceChartTextInjectors(
+        val injectors = PriceChartTextInjectors(
             RealPricePriceTextInjector(token.currency, token.coinRate?.rate),
             BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(data.period)], covered),
             RealDateChartTextInjector(resources)
         )
+        BittensorChartUi(injectors, chartModels(data, failed))
     }.shareInBackground()
 
-    val chartFailed = combine(chartData, failed) { data, failed -> failed || data.series is ExtendedLoadingState.Error }.shareInBackground()
-
-    val priceChartModels = combine(chartData, failed) { data, failed ->
+    private fun chartModels(data: BittensorPortfolioHistoryChart, failed: Boolean): List<PriceChartModel> {
         val loadFailed = PriceChartModel.Empty(chartButtonTexts[periods.indexOf(data.period)], resources.getString(R.string.price_chart_load_failed))
-        periods.mapIndexed { index, period ->
+        return periods.mapIndexed { index, period ->
             val button = chartButtonTexts[index]
             if (period != data.period) return@mapIndexed PriceChartModel.Loading(button)
             when (val state = data.series) {
@@ -178,14 +185,15 @@ class BittensorDetailsViewModel(
                 }
             }
         }
-    }.shareInBackground()
+    }
 
     fun selectChartPeriod(index: Int) {
         periods.getOrNull(index)?.let { chartPeriod.value = it }
     }
 
     fun retryChart() {
-        chartReload.update { it + 1 }
+        // A chart failure caused by a failed portfolio stream is only fixed by reloading the portfolio itself
+        if (failed.value) retry() else chartReload.update { it + 1 }
     }
 
     private val subnetMetadata = reload.flatMapLatest {

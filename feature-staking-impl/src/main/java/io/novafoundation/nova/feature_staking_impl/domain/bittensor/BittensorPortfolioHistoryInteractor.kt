@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistoryRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
@@ -24,8 +25,8 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
+/** One chart emission: the preset it belongs to and the series state, so a stale preset is never drawn under a new button. */
 class BittensorPortfolioHistoryChart(
     val period: BittensorPortfolioHistoryPeriod,
     val series: ExtendedLoadingState<BittensorPortfolioValueSeries>
@@ -43,7 +44,7 @@ class BittensorPortfolioHistoryInteractor(
     private val clock: () -> Long = { System.currentTimeMillis() / 1000 },
     // The server keeps a series fresh for 5 minutes inside its hour-aligned window
     private val refreshInterval: Duration = 5.minutes,
-    private val fetchTimeout: Duration = 20.seconds
+    private val fetchTimeout: Duration = BITTENSOR_REQUEST_TIMEOUT
 ) {
 
     private class Fetched(val history: BittensorPortfolioStakeHistory, val taoFiatGrid: List<HistoricalCoinRate>)
@@ -51,6 +52,9 @@ class BittensorPortfolioHistoryInteractor(
     /**
      * Refetches on every [BittensorPositionUpdates] revision (a confirmed operation) and every [refreshInterval];
      * a new [portfolio] emission only re-prices the live point. Loading is emitted once per wallet.
+     *
+     * [portfolio] is collected twice (wallet identity and live point) and is expected to be a shared flow;
+     * a cold flow would do its work twice.
      */
     fun observe(portfolio: Flow<BittensorPortfolio>, period: BittensorPortfolioHistoryPeriod): Flow<BittensorPortfolioHistoryChart> {
         return portfolio.distinctUntilChangedBy { it.metaId to it.chain.id }.flatMapLatest { identity ->
@@ -98,6 +102,8 @@ class BittensorPortfolioHistoryInteractor(
         Fetched(history, grid.await())
     }
 
+    // A Stale portfolio still yields a live point from its last successful positions, as on iOS: a slightly old
+    // valuation at the right end beats a curve that ends an hour ago.
     private fun livePointOf(portfolio: BittensorPortfolio): BittensorPortfolioLivePoint? {
         val token = portfolio.asset.token
         val totalStake = portfolio.positions?.totalStake ?: return null
