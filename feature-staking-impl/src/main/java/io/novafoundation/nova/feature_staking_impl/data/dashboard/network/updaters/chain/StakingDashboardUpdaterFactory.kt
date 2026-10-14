@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -15,6 +14,7 @@ import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import kotlinx.coroutines.flow.Flow
 
@@ -26,7 +26,7 @@ class StakingDashboardUpdaterFactory(
     private val storageCache: StorageCache,
     private val balanceLocksRepository: BalanceLocksRepository,
     private val bittensorPositionSource: BittensorPositionSource,
-    private val bittensorPositionUpdates: BittensorPositionUpdates,
+    private val chainStateRepository: ChainStateRepository,
     private val bittensorSwapSource: BittensorSwapSource,
 ) {
 
@@ -47,7 +47,7 @@ class StakingDashboardUpdaterFactory(
                 metaAccount,
                 bittensorPositionSource,
                 stakingDashboardCache,
-                bittensorPositionUpdates,
+                chainStateRepository,
                 bittensorSwapSource
             )
             StakingTypeGroup.UNSUPPORTED -> null

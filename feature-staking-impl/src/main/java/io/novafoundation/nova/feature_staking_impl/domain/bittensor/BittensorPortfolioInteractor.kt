@@ -7,6 +7,4 @@ class BittensorPortfolioInteractor(private val repository: BittensorPortfolioRep
     fun observeAsset() = repository.observeAsset()
 
     fun observePortfolio() = repository.observePortfolio()
-
-    fun refresh() = repository.refresh()
 }

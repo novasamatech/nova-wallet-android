@@ -41,7 +41,6 @@ class BittensorWalletIsolationTest {
     )
     private val repository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(details)
-        override fun refreshPosition() = Unit
     }
 
     @Test

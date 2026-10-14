@@ -7,7 +7,6 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.Extri
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetStakeOperation
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -34,7 +33,6 @@ class BittensorSubnetStakingInteractor(
     private val wallets: WalletRepository,
     private val validators: BittensorSubnetValidatorRepository,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
-    private val portfolio: BittensorPortfolioRepository,
     private val extrinsics: ExtrinsicService,
     private val beneficiaryAddress: String
 ) {
@@ -82,7 +80,6 @@ class BittensorSubnetStakingInteractor(
         return extrinsics.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.WalletWithId(draft.metaId), options) {
             draft.operation.build(this)
         }.requireOk()
-            .onSuccess { portfolio.refresh() }
     }
 
     private suspend fun requireSelectedWallet(metaId: Long) {

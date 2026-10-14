@@ -92,7 +92,6 @@ class BittensorStakingInteractor(
             addBittensorRootStake(draft.validator.hotkey.value, draft.amountInPlanks)
         }.requireOk()
             .onSuccess {
-                repository.refreshPosition()
                 flowState.clear()
             }
     }

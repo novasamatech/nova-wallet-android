@@ -49,7 +49,6 @@ import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.PRICE_API
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPositionSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorStakingRepository
@@ -239,10 +238,6 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorPositionUpdates() = BittensorPositionUpdates()
-
-    @Provides
-    @FeatureScope
     fun provideBittensorSubnetRepository(runtimeCalls: MultiChainRuntimeCallsApi, configRepository: BittensorConfigRepository): BittensorSubnetRepository =
         RealBittensorSubnetRepository(runtimeCalls, configRepository)
 
@@ -310,7 +305,6 @@ class StakingFeatureModule {
         wallets: WalletRepository,
         validators: BittensorSubnetValidatorRepository,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
-        portfolio: BittensorPortfolioRepository,
         extrinsics: ExtrinsicService
     ) = BittensorSubnetStakingInteractor(
         chainRegistry,
@@ -318,7 +312,6 @@ class StakingFeatureModule {
         wallets,
         validators,
         bittensorSubnetInteractor,
-        portfolio,
         extrinsics,
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq"
     )
@@ -336,7 +329,7 @@ class StakingFeatureModule {
         walletRepository: WalletRepository,
         positionSource: BittensorPositionSource,
         swapSource: BittensorSwapSource,
-        positionUpdates: BittensorPositionUpdates,
+        chainStateRepository: ChainStateRepository,
         logger: Logger
     ): BittensorPortfolioRepository = RealBittensorPortfolioRepository(
         chainRegistry,
@@ -344,7 +337,7 @@ class StakingFeatureModule {
         walletRepository,
         positionSource,
         swapSource,
-        positionUpdates,
+        chainStateRepository,
         logger
     )
 
@@ -360,7 +353,7 @@ class StakingFeatureModule {
         accountRepository: AccountRepository,
         positionSource: BittensorPositionSource,
         validatorSource: BittensorRootValidatorSource,
-        positionUpdates: BittensorPositionUpdates,
+        chainStateRepository: ChainStateRepository,
         logger: Logger
     ): BittensorStakingRepository = RealBittensorStakingRepository(
         chainRegistry = chainRegistry,
@@ -368,7 +361,7 @@ class StakingFeatureModule {
         accountRepository = accountRepository,
         positionSource = positionSource,
         validatorSource = validatorSource,
-        positionUpdates = positionUpdates,
+        chainStateRepository = chainStateRepository,
         logger = logger
     )
 

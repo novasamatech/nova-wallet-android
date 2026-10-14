@@ -12,17 +12,17 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.withTimeout
 
 interface BittensorPortfolioRepository {
@@ -30,8 +30,6 @@ interface BittensorPortfolioRepository {
     fun observeAsset(): Flow<Asset>
 
     fun observePortfolio(): Flow<BittensorPortfolio>
-
-    fun refresh()
 }
 
 class RealBittensorPortfolioRepository(
@@ -40,57 +38,50 @@ class RealBittensorPortfolioRepository(
     private val walletRepository: WalletRepository,
     private val positionSource: BittensorPositionSource,
     private val swapSource: BittensorSwapSource,
-    private val positionUpdates: BittensorPositionUpdates,
+    private val chainStateRepository: ChainStateRepository,
     private val logger: Logger
 ) : BittensorPortfolioRepository {
 
     override fun observeAsset(): Flow<Asset> = flowOfAll {
-        val chain = withTimeout(20_000L) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
             walletRepository.assetFlow(account.id, chain.utilityAsset)
         }
     }
 
     override fun observePortfolio(): Flow<BittensorPortfolio> = flowOfAll {
-        val chain = withTimeout(20_000L) { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
-            // The cache belongs to this wallet's collector, never to the selected wallet globally.
             combine(
                 walletRepository.assetFlow(account.id, chain.utilityAsset),
-                flow {
-                    var cached: BittensorPortfolioPositions? = null
-                    emit(cached to BittensorDataStatus.Loading)
-                    val periodic = flow {
-                        while (true) {
-                            delay(30_000L)
-                            emit(Unit)
-                        }
-                    }
-                    merge(positionUpdates.updates.map { Unit }, periodic).conflate().collect {
-                        val state = try {
-                            cached = withTimeout(20_000L) {
-                                fetchPositions(chain.id, account.requireAccountIdIn(chain))
-                            }
-                            BittensorDataStatus.Fresh
-                        } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
-                            logRefreshFailure(e)
-                            BittensorDataStatus.Stale(e)
-                        } catch (e: CancellationException) {
-                            throw e
-                        } catch (e: Exception) {
-                            logRefreshFailure(e)
-                            BittensorDataStatus.Stale(e)
-                        }
-                        emit(cached to state)
-                    }
-                }
+                observePositions(chain, account.requireAccountIdIn(chain))
             ) { asset, (positions, status) ->
                 BittensorPortfolio(account.id, chain, asset, positions, status)
             }
         }
     }
 
-    override fun refresh() = positionUpdates.refresh()
+    private fun observePositions(chain: Chain, coldkey: ByteArray): Flow<Pair<BittensorPortfolioPositions?, BittensorDataStatus>> = flow {
+        // Keep cached positions within this collector and wallet.
+        var cachedPositions: BittensorPortfolioPositions? = null
+        emit(cachedPositions to BittensorDataStatus.Loading)
+
+        chainStateRepository.currentRemoteBlockNumberFlow(chain.id).conflate().collect {
+            val status = try {
+                cachedPositions = withTimeout(20_000L) { fetchPositions(chain.id, coldkey) }
+                BittensorDataStatus.Fresh
+            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+                logRefreshFailure(e)
+                BittensorDataStatus.Stale(e)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logRefreshFailure(e)
+                BittensorDataStatus.Stale(e)
+            }
+            emit(cachedPositions to status)
+        }
+    }
 
     private suspend fun fetchPositions(chainId: String, coldkey: ByteArray): BittensorPortfolioPositions = coroutineScope {
         val root = async { positionSource.rootPositions(chainId, coldkey) }

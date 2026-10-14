@@ -301,7 +301,6 @@ class BittensorDetailsViewModel(
 
     fun retry() {
         reload.update { it + 1 }
-        bittensorPortfolioInteractor.refresh()
     }
 
     fun positionClicked(position: BittensorPositionUi) {

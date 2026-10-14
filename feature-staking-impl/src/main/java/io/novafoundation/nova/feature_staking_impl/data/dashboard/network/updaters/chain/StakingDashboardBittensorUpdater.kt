@@ -6,17 +6,15 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.flow.conflate
 import java.math.BigInteger
 
@@ -26,25 +24,20 @@ class StakingDashboardBittensorUpdater(
     metaAccount: MetaAccount,
     private val positionSource: BittensorPositionSource,
     private val cache: StakingDashboardCache,
-    private val positionUpdates: BittensorPositionUpdates,
+    private val chainStateRepository: ChainStateRepository,
     private val swapSource: BittensorSwapSource
 ) : BaseStakingDashboardUpdater(chain, chainAsset, Chain.Asset.StakingType.BITTENSOR_ROOT, metaAccount) {
 
-    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> = flow {
+    override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
         val coldkey = metaAccount.accountIdIn(chain)
         if (coldkey == null) {
-            savePosition(BigInteger.ZERO, false, null)
-            emit(primarySynced())
-            return@flow
-        }
-
-        val periodicRefreshes = flow {
-            while (true) {
-                delay(REFRESH_INTERVAL_MILLIS)
-                emit(Unit)
+            return flow {
+                savePosition(BigInteger.ZERO, false, null)
+                emit(primarySynced())
             }
         }
-        merge(periodicRefreshes, positionUpdates.updates.map { Unit }).conflate().collect {
+
+        return chainStateRepository.currentRemoteBlockNumberFlow(chain.id, storageSubscriptionBuilder).conflate().transform {
             try {
                 val root = positionSource.rootPositions(chain.id, coldkey)
                 val subnets = positionSource.subnetPositions(chain.id, coldkey)
@@ -87,9 +80,5 @@ class StakingDashboardBittensorUpdater(
         } else {
             StakingDashboardItemLocal.notStaking(chain.id, chainAsset.id, stakingTypeLocal, metaAccount.id, previous?.estimatedEarnings)
         }
-    }
-
-    private companion object {
-        const val REFRESH_INTERVAL_MILLIS = 30_000L
     }
 }

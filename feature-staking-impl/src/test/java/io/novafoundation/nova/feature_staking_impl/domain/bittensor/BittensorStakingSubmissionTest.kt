@@ -11,7 +11,6 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetStakeOperation
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
@@ -33,7 +32,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import org.mockito.Mockito.`when`
@@ -77,16 +75,10 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val amount = BigInteger.valueOf(1000)
 
-    private var rootRefreshes = 0
-
     private val rootDetails = BittensorRootStakingDetails(1L, chain, asset, validator, null, null, BittensorDataStatus.Fresh)
 
     private val rootRepository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(rootDetails)
-
-        override fun refreshPosition() {
-            rootRefreshes++
-        }
     }
 
     private val rootValidators = mock(BittensorSubnetValidatorRepository::class.java)
@@ -97,15 +89,12 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
 
-    private val portfolioRepository = mock(BittensorPortfolioRepository::class.java)
-
     private val subnetStakingInteractor = BittensorSubnetStakingInteractor(
         chainRegistry,
         accounts,
         wallets,
         subnetValidators,
         subnetInteractor,
-        portfolioRepository,
         extrinsicService,
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq"
     )
@@ -152,7 +141,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     @Test
-    fun `successful execution uses standard submission and refreshes positions`() = runBlocking {
+    fun `successful execution uses standard submission and clears the root draft`() = runBlocking {
         assertSame(successfulExecution, execute().getOrThrow())
         assertEquals(1, extrinsicService.submissions)
         assertEquals(1L, (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId)
@@ -160,10 +149,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         assertSame(chain, extrinsicService.submissionChain)
         if (stakingType == StakingType.ROOT) {
             verify(rootValidators).validateRoot(chain, validator)
-            assertEquals(1, rootRefreshes)
             assertFalse(rootInteractor.hasDraft())
         } else {
-            verify(portfolioRepository).refresh()
             verify(subnetValidators).validate(chain, subnetId, validator)
             assertSame(extrinsicService.feeOptions, extrinsicService.submissionOptions)
             verifyNoInteractions(subnetInteractor)
@@ -177,7 +164,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         assertSame(failure, execute().exceptionOrNull())
         assertEquals(1, extrinsicService.submissions)
-        assertNoRefresh()
+        assertDraftPreserved()
 
         extrinsicService.result = Result.success(successfulExecution)
         assertSame(successfulExecution, execute().getOrThrow())
@@ -190,16 +177,16 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         assertTrue(execute().isFailure)
         assertEquals(1, extrinsicService.submissions)
-        assertNoRefresh()
+        assertDraftPreserved()
     }
 
     @Test
-    fun `on chain failure is propagated without refreshing positions`() = runBlocking {
+    fun `on chain failure is propagated without clearing the draft`() = runBlocking {
         extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Failed(DispatchError.Token)))
 
         assertSame(DispatchError.Token, execute().exceptionOrNull())
         assertEquals(1, extrinsicService.submissions)
-        assertNoRefresh()
+        assertDraftPreserved()
     }
 
     @Test
@@ -208,7 +195,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         assertTrue(runCatching { execute().getOrThrow() }.exceptionOrNull() is IllegalStateException)
         assertEquals(0, extrinsicService.submissions)
-        assertNoRefresh()
+        assertDraftPreserved()
     }
 
     @Test
@@ -217,7 +204,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         assertTrue(runCatching { execute().getOrThrow() }.exceptionOrNull() is IllegalArgumentException)
         assertEquals(0, extrinsicService.submissions)
-        assertNoRefresh()
+        assertDraftPreserved()
     }
 
     private suspend fun execute(): Result<ExtrinsicExecutionResult> = when (stakingType) {
@@ -225,9 +212,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         StakingType.SUBNET -> subnetStakingInteractor.execute(subnetDraft)
     }
 
-    private fun assertNoRefresh() {
-        assertEquals(0, rootRefreshes)
-        verify(portfolioRepository, never()).refresh()
+    private fun assertDraftPreserved() {
         if (stakingType == StakingType.ROOT) assertTrue(rootInteractor.hasDraft())
     }
 

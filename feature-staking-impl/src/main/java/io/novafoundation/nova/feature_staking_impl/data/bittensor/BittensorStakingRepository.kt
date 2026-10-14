@@ -12,10 +12,12 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
@@ -23,8 +25,6 @@ import kotlinx.coroutines.CancellationException
 interface BittensorStakingRepository {
 
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails>
-
-    fun refreshPosition()
 }
 
 interface BittensorRootValidatorSource {
@@ -40,7 +40,7 @@ class RealBittensorStakingRepository(
     private val accountRepository: AccountRepository,
     private val positionSource: BittensorPositionSource,
     private val validatorSource: BittensorRootValidatorSource,
-    private val positionUpdates: BittensorPositionUpdates,
+    private val chainStateRepository: ChainStateRepository,
     private val logger: Logger
 ) : BittensorStakingRepository {
 
@@ -65,13 +65,9 @@ class RealBittensorStakingRepository(
         }
     }
 
-    override fun refreshPosition() {
-        positionUpdates.refresh()
-    }
-
-    private fun observePosition(chain: Chain, coldkey: ByteArray): Flow<PositionState> {
+    private fun observePosition(chain: Chain, coldkey: ByteArray): Flow<PositionState> = flowOfAll {
         var cachedPositions: List<BittensorRootPosition>? = null
-        return positionUpdates.updates.mapLatest {
+        chainStateRepository.currentRemoteBlockNumberFlow(chain.id).conflate().map {
             val status = try {
                 cachedPositions = positionSource.rootPositions(chain.id, coldkey)
                 BittensorDataStatus.Fresh
