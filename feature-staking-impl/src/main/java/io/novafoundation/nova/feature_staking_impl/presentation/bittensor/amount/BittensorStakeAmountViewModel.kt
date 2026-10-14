@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amoun
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.filterLoaded
+import io.novafoundation.nova.common.domain.isError
+import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -10,6 +13,7 @@ import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
@@ -28,7 +32,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.debounce
@@ -47,21 +50,24 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 class BittensorStakeAmountViewModel(
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
-    private val interactor: BittensorStakingInteractor,
+    private val bittensorStakingInteractor: BittensorStakingInteractor,
     private val assetIconProvider: AssetIconProvider,
     private val iconGenerator: AddressIconGenerator
 ) : BaseViewModel() {
 
-    private val loadingFailed = MutableStateFlow(false)
-    private val stakingDetails = interactor.observeRootStakingDetails()
-        .catch {
-            loadingFailed.value = true
-            showError(it)
-        }
+    private val stakingDetailsState = bittensorStakingInteractor.observeRootStakingDetails()
+        .withSafeLoading()
+        .onError { showError(it) }
         .shareInBackground()
 
+    private val stakingDetails = stakingDetailsState.filterLoaded().shareInBackground()
+
+    private val loadingFailed = stakingDetailsState.map { it.isError() }.shareInBackground()
+
     private val _amount = MutableStateFlow("")
+
     val amount: StateFlow<String> = _amount.asStateFlow()
+
     private val preparing = MutableStateFlow(false)
 
     private val amountInPlanks = combine(stakingDetails, amount) { details, amount ->
@@ -73,7 +79,7 @@ class BittensorStakeAmountViewModel(
         .mapLatest { amount ->
             amount?.takeIf { it.isPositive() }?.let {
                 val result = try {
-                    Result.success(interactor.estimateRootStakeFee(it))
+                    Result.success(bittensorStakingInteractor.estimateRootStakeFee(it))
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
@@ -101,9 +107,18 @@ class BittensorStakeAmountViewModel(
     }.shareInBackground()
 
     val validator = stakingDetails
-        .map { BittensorValidatorUi(it.validator.name, Icon.FromDrawable(iconGenerator.createAddressIcon(
-            it.validator.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT
-        ))) }
+        .map {
+            BittensorValidatorUi(
+                it.validator.name,
+                Icon.FromDrawable(
+                    iconGenerator.createAddressIcon(
+                        it.validator.hotkey.value,
+                        AddressIconGenerator.SIZE_MEDIUM,
+                        AddressIconGenerator.BACKGROUND_TRANSPARENT
+                    )
+                )
+            )
+        }
         .shareInBackground()
 
     val apy = stakingDetails
@@ -132,7 +147,7 @@ class BittensorStakeAmountViewModel(
     }
 
     fun back() {
-        interactor.clearDraft()
+        bittensorStakingInteractor.clearDraft()
         router.back()
     }
 
@@ -153,11 +168,11 @@ class BittensorStakeAmountViewModel(
     fun validatorClicked() = Unit
 
     fun continueClicked() = launchUnit {
-        if (preparing.value || loadingFailed.value) return@launchUnit
+        if (preparing.value || loadingFailed.replayCache.firstOrNull() == true) return@launchUnit
         preparing.value = true
         try {
             val amount = requireNotNull(amountInPlanks.replayCache.firstOrNull())
-            interactor.prepareRootStake(amount)
+            bittensorStakingInteractor.prepareRootStake(amount)
             router.openBittensorStakeConfirm()
         } catch (e: CancellationException) {
             throw e
@@ -236,6 +251,7 @@ class BittensorStakeAmountViewModel(
 
     private companion object {
         const val FEE_DEBOUNCE_MILLIS = 350L
+
         val SUGGESTED_AMOUNT: BigDecimal = BigDecimal("5")
     }
 }

@@ -59,6 +59,7 @@ class BittensorSubnetListAdapter(
 
         fun bind(item: BittensorSubnetListItem.Root) = with(binding) {
             rootIcon.setIcon(item.icon, imageLoader)
+            description.text = root.context.getString(R.string.bittensor_root_row_description, item.tokenSymbol.value)
             root.setOnClickListener { onRootClick() }
         }
     }

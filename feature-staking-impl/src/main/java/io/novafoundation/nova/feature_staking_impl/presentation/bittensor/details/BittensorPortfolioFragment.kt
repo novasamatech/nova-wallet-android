@@ -10,6 +10,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorPortfolioBinding>() {
 
     private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::positionClicked) }
 
     override fun createBinding() = FragmentBittensorPortfolioBinding.inflate(layoutInflater)
@@ -33,6 +34,7 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
 
     override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
+        viewModel.priceChartDisclaimer.observe { chartDisclaimer.text = it }
         viewModel.priceChartTitle.observe(priceChart::setTitle)
         viewModel.priceChartFormatters.observe { priceChart.setTextInjectors(it.price, it.priceChange, it.date) }
         viewModel.priceChartModels.observe(priceChart::setCharts)

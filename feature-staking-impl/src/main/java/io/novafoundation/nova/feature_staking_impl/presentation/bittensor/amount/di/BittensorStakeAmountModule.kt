@@ -24,14 +24,14 @@ class BittensorStakeAmountModule {
     fun provideViewModel(
         resourceManager: ResourceManager,
         router: StakingRouter,
-        interactor: BittensorStakingInteractor,
+        bittensorStakingInteractor: BittensorStakingInteractor,
         assetIconProvider: AssetIconProvider,
         iconGenerator: AddressIconGenerator
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             resourceManager = resourceManager,
             router = router,
-            interactor = interactor,
+            bittensorStakingInteractor = bittensorStakingInteractor,
             assetIconProvider = assetIconProvider,
             iconGenerator = iconGenerator
         )

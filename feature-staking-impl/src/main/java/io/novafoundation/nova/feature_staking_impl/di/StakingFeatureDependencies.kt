@@ -62,6 +62,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterFactory
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.feature_ahm_api.domain.ChainMigrationInfoUseCase
@@ -167,6 +168,8 @@ interface StakingFeatureDependencies {
     val amountFormatter: AmountFormatter
 
     val tokenFormatter: TokenFormatter
+
+    val fiatFormatter: FiatFormatter
 
     fun logger(): Logger
 

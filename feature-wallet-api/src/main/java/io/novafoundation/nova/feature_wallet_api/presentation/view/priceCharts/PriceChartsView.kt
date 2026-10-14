@@ -18,6 +18,7 @@ import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_wallet_api.databinding.LayoutPriceChartButtonBinding
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewPriceChartsBinding
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.DateChartTextInjector
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.PriceChangeTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.PriceTextInjector
 import java.math.BigDecimal
@@ -86,7 +87,7 @@ class PriceChartsView @JvmOverloads constructor(
         binder.priceChart.layoutParams = binder.priceChart.layoutParams.apply { height = heightDp.dpF.toInt() }
     }
 
-    fun setAxisLabelFormatter(format: (Float) -> String) = controller.setAxisLabelFormatter(format)
+    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = controller.setAxisLabelFormatter(formatter)
 
     private val horizontalScrollDetector = HorizontalScrollDetector(5.dpF)
 

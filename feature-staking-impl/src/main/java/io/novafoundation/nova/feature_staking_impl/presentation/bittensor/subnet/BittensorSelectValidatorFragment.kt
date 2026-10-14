@@ -34,8 +34,8 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
         viewModel.buttonLabel.observe { confirm.text = it }
         viewModel.isLoading.observe {
             progress.isVisible = it
-            empty.isVisible = !it && viewModel.rows.value.isEmpty()
         }
+        viewModel.isEmpty.observe { empty.isVisible = it }
     }
 
     override fun onDestroyView() {

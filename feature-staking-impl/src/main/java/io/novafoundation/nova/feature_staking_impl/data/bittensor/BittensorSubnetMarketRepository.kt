@@ -22,7 +22,9 @@ data class BittensorSubnetMarketRemote(val id: String?, val symbol: String?)
 /** CoinGecko uses sn<N> market symbols; names and alpha symbols are not reliable identifiers. */
 class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi) {
     private val mutex = Mutex()
+
     private var cached = emptyMap<BittensorSubnetId, String>()
+
     private var loadedAt = 0L
 
     suspend fun priceId(subnetId: BittensorSubnetId): String? = mutex.withLock {

@@ -31,7 +31,7 @@ class BittensorStakeConfirmModule {
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
-        interactor: BittensorStakingInteractor,
+        bittensorStakingInteractor: BittensorStakingInteractor,
         iconGenerator: AddressIconGenerator
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
@@ -41,7 +41,7 @@ class BittensorStakeConfirmModule {
             chainRegistry = chainRegistry,
             walletUiUseCase = walletUiUseCase,
             selectedAccountUseCase = selectedAccountUseCase,
-            interactor = interactor,
+            bittensorStakingInteractor = bittensorStakingInteractor,
             iconGenerator = iconGenerator
         )
     }

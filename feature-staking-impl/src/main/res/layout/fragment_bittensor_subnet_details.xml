@@ -13,7 +13,7 @@
                 <TextView android:id="@+id/priceTitle" style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                     android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:textColor="@color/text_secondary" />
                 <TextView android:id="@+id/tao" style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                    android:layout_width="56dp" android:layout_height="32dp" android:gravity="center" android:text="TAO"
+                    android:layout_width="56dp" android:layout_height="32dp" android:gravity="center"
                     android:textColor="@color/bittensor_price_unit_text"
                     android:background="@drawable/background_chart_button" />
                 <TextView android:id="@+id/fiat" style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -45,15 +45,15 @@
                     <TextView android:id="@+id/preset1" style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
                         android:textColor="@color/bittensor_price_unit_text"
                         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center"
-                        android:text="1 TAO" android:background="@drawable/bg_bittensor_amount_preset" />
+                        android:background="@drawable/bg_bittensor_amount_preset" />
                     <TextView android:id="@+id/preset5" style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
                         android:textColor="@color/bittensor_price_unit_text"
                         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center"
-                        android:layout_marginStart="8dp" android:text="5 TAO" android:background="@drawable/bg_bittensor_amount_preset" />
+                        android:layout_marginStart="8dp" android:background="@drawable/bg_bittensor_amount_preset" />
                     <TextView android:id="@+id/preset10" style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
                         android:textColor="@color/bittensor_price_unit_text"
                         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center"
-                        android:layout_marginStart="8dp" android:text="10 TAO" android:background="@drawable/bg_bittensor_amount_preset" />
+                        android:layout_marginStart="8dp" android:background="@drawable/bg_bittensor_amount_preset" />
                     <TextView android:id="@+id/presetMax" style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
                         android:textColor="@color/bittensor_price_unit_text"
                         android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center"

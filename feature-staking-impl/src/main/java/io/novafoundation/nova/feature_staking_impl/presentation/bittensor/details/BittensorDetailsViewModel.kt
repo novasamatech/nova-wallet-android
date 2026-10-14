@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
-import io.novafoundation.nova.feature_currency_api.presentation.formatters.formatAsCurrency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
@@ -35,6 +34,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -70,29 +70,35 @@ sealed interface BittensorPositionAction {
 }
 
 class BittensorDetailsViewModel(
-    private val interactor: BittensorPortfolioInteractor,
+    private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
     private val router: StakingRouter,
     private val resources: ResourceManager,
     private val amountFormatter: AmountFormatter,
     private val assetIconProvider: AssetIconProvider,
     private val iconGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
-    private val priceChartInteractor: BittensorPriceChartInteractor,
+    private val bittensorPriceChartInteractor: BittensorPriceChartInteractor,
     private val logger: Logger,
-    private val subnetRepository: BittensorSubnetRepository
+    private val subnetRepository: BittensorSubnetRepository,
+    private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory
 ) : BaseViewModel(), ExternalActions by externalActions {
 
-    private val failed = MutableStateFlow(false)
     private val reload = MutableStateFlow(0L)
-    private val portfolio = reload.flatMapLatest {
-        interactor.observePortfolio()
-            .onStart { failed.value = false }
+
+    private val portfolioState = reload.flatMapLatest {
+        bittensorPortfolioInteractor.observePortfolio()
+            .map<BittensorPortfolio, ExtendedLoadingState<BittensorPortfolio>> { ExtendedLoadingState.Loaded(it) }
+            .onStart { emit(ExtendedLoadingState.Loading) }
             .catch {
                 logger.log("[BittensorPortfolio] Portfolio stream failed")
                 logger.log(it)
-                failed.value = true
+                emit(ExtendedLoadingState.Error(it))
             }
     }.shareInBackground()
+
+    private val portfolio = portfolioState.filterLoaded().shareInBackground()
+
+    private val failed = portfolioState.map { it is ExtendedLoadingState.Error }.shareInBackground()
 
     val isLoading = combine(portfolio.map { it.dataStatus is BittensorDataStatus.Loading }.onStart { emit(true) }, failed) { loading, failed ->
         loading && !failed
@@ -114,28 +120,39 @@ class BittensorDetailsViewModel(
     }.shareInBackground()
 
     val totalStake = portfolio.map { data -> format(data.positions?.totalStake, data) }.shareInBackground()
+
     val rootStake = portfolio.map { data -> format(data.positions?.rootStake, data) }.shareInBackground()
+
     val hasRootStake = portfolio.map { it.positions?.rootStake?.signum() == 1 }.shareInBackground()
+
     val assetIcon = portfolio.map { assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration) }.shareInBackground()
+
     val canAddStake = combine(portfolio, failed) { data, failed -> !failed && data.dataStatus is BittensorDataStatus.Fresh }
         .onStart { emit(false) }.shareInBackground()
+
     val empty = portfolio.map { it.positions?.let { p -> p.root.isEmpty() && p.subnets.isEmpty() } == true }.shareInBackground()
 
     private val chartPeriod = MutableStateFlow(PricePeriod.MONTH)
+
     val selectedChartIndex = chartPeriod.map { PricePeriod.entries.indexOf(it) }.shareInBackground()
+
     private val chartReload = MutableStateFlow(0L)
+
     private val chartAssetState = chartReload.flatMapLatest {
-        interactor.observeAsset()
+        bittensorPortfolioInteractor.observeAsset()
             .map<Asset, ExtendedLoadingState<Asset>> { ExtendedLoadingState.Loaded(it) }
             .onStart { emit(ExtendedLoadingState.Loading) }
             .catch {
-                logger.log("[BittensorChart] Failed to load TAO asset")
+                logger.log("[BittensorChart] Failed to load native asset")
                 logger.log(it)
                 emit(ExtendedLoadingState.Error(it))
             }
     }.shareInBackground()
+
     private val chartAsset = chartAssetState.filterLoaded()
+
     private val periods = PricePeriod.entries
+
     private val chartButtonTexts = listOf(
         R.string.price_chart_day,
         R.string.bittensor_chart_week,
@@ -147,10 +164,12 @@ class BittensorDetailsViewModel(
     val priceChartTitle = chartAsset.map { resources.getString(R.string.price_chart_title, it.token.configuration.symbol.value) }
         .shareInBackground()
 
+    val priceChartDisclaimer = chartAsset.map {
+        resources.getString(R.string.bittensor_chart_price_disclaimer, it.token.configuration.symbol.value)
+    }.shareInBackground()
+
     val chartAxisFormatter = chartAsset.map { asset ->
-        val currency = asset.token.currency
-        val formatter: (Float) -> String = { it.toBigDecimal().formatAsCurrency(currency) }
-        formatter
+        chartAxisFormatterFactory.create(asset.token, isFiatMode = true)
     }.shareInBackground()
 
     val priceChartFormatters = combine(chartAsset, chartPeriod) { asset, period ->
@@ -175,7 +194,7 @@ class BittensorDetailsViewModel(
                     if (priceId == null) {
                         flowOf(AssetPriceChart(period, ExtendedLoadingState.Loaded(emptyList())))
                     } else {
-                        priceChartInteractor.observe(priceId, currency, period)
+                        bittensorPriceChartInteractor.observe(priceId, currency, period)
                     }
                 }
             }
@@ -281,7 +300,7 @@ class BittensorDetailsViewModel(
 
     fun retry() {
         reload.update { it + 1 }
-        interactor.refresh()
+        bittensorPortfolioInteractor.refresh()
     }
 
     fun positionClicked(position: BittensorPositionUi) {

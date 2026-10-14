@@ -46,7 +46,7 @@
             android:layout_marginBottom="32dp"
             android:gravity="center"
             android:textColor="@color/text_secondary"
-            tools:text="Staking 20 TAO to root · usually a few seconds" />
+            tools:text="Staking 20 TOKEN to root · usually a few seconds" />
     </LinearLayout>
 
     <LinearLayout
@@ -72,7 +72,7 @@
             android:layout_marginTop="24dp"
             android:gravity="center"
             android:textColor="@color/text_primary"
-            tools:text="You staked 20 TAO to root" />
+            tools:text="You staked 20 TOKEN to root" />
 
         <TextView
             android:id="@+id/bittensorStakeResultSuccessDescription"
@@ -107,7 +107,7 @@
                 android:layout_height="44dp"
                 app:shouldDrawDivider="false"
                 app:title="@string/network_fee"
-                tools:primaryValue="0.0015 TAO"
+                tools:primaryValue="0.0015 TOKEN"
                 tools:secondaryValue="$0.51" />
         </io.novafoundation.nova.common.view.TableView>
 

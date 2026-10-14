@@ -21,6 +21,7 @@ data class BittensorSubnetBuyQuote(
     val limitPrice: BigInteger
 ) {
     val stakeTaoInPlanks: BigInteger get() = totalTaoInPlanks - serviceFeeTaoInPlanks
+
     val alphaOutInPlanks: BigInteger get() = simulation.amountOut
 }
 
@@ -31,7 +32,7 @@ class BittensorSubnetCommission(val fraction: BigDecimal) {
     }
 
     fun feeFor(taoAmount: BigInteger): BigInteger {
-        require(taoAmount.signum() > 0 && taoAmount.bitLength() <= 64) { "TAO amount must be a positive u64" }
+        require(taoAmount.signum() > 0 && taoAmount.bitLength() <= 64) { "Native-token amount must be a positive u64" }
         return taoAmount.toBigDecimal().multiply(fraction).setScale(0, RoundingMode.DOWN).toBigIntegerExact()
     }
 }

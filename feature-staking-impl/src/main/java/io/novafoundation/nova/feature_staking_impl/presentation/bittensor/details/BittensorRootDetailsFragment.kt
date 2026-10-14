@@ -12,6 +12,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 class BittensorRootDetailsFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorRootDetailsBinding>() {
 
     private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::positionClicked) }
 
     override fun createBinding() = FragmentBittensorRootDetailsBinding.inflate(layoutInflater)

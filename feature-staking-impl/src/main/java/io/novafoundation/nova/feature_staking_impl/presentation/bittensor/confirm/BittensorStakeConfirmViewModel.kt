@@ -51,18 +51,22 @@ class BittensorStakeConfirmViewModel(
     chainRegistry: ChainRegistry,
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
-    private val interactor: BittensorStakingInteractor,
+    private val bittensorStakingInteractor: BittensorStakingInteractor,
     private val iconGenerator: AddressIconGenerator
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
-    private val stakingDetails = interactor.observeRootStakingDetails()
+
+    private val stakingDetails = bittensorStakingInteractor.observeRootStakingDetails()
         .catch { showError(it) }
         .shareInBackground()
-    private val stakeDraft = interactor.observeStakeDraft().shareInBackground()
+
+    private val stakeDraft = bittensorStakingInteractor.observeStakeDraft().shareInBackground()
 
     val amount = combine(stakingDetails, stakeDraft, ::mapAmount).shareInBackground()
+
     val wallet = walletUiUseCase.selectedWalletUiFlow().shareInBackground()
+
     val account = selectedAccountUseCase.selectedAddressModelFlow(chain::await).shareInBackground()
 
     val fee = combine(stakingDetails, stakeDraft) { details, draft ->
@@ -78,12 +82,19 @@ class BittensorStakeConfirmViewModel(
     }.shareInBackground()
 
     val stakingType = flowOf(resourceManager.getString(R.string.bittensor_root_staking)).shareInBackground()
+
     val validator = stakeDraft.map(::mapValidator).shareInBackground()
+
     val apy = stakingDetails.map(::formatApy).shareInBackground()
+
     private val _resultState = MutableStateFlow<BittensorStakeResultUi?>(null)
+
     val resultState = _resultState.asStateFlow()
+
     private val executing = MutableStateFlow(false)
+
     private val completed = MutableStateFlow(false)
+
     val confirmButtonState = combine(stakingDetails, stakeDraft, executing, completed) { details, draft, executing, completed ->
         val label = resourceManager.getString(R.string.common_confirm)
         if (executing || completed || details.metaId != draft.metaId) {
@@ -94,9 +105,11 @@ class BittensorStakeConfirmViewModel(
     }.onStart { emit(DescriptiveButtonState.Loading) }.shareInBackground()
 
     init {
-        if (!interactor.hasDraft()) launchUnit {
-            showError(resourceManager.getString(R.string.bittensor_draft_expired))
-            router.back()
+        if (!bittensorStakingInteractor.hasDraft()) {
+            launchUnit {
+                showError(resourceManager.getString(R.string.bittensor_draft_expired))
+                router.back()
+            }
         }
     }
 
@@ -118,7 +131,7 @@ class BittensorStakeConfirmViewModel(
             val draft = stakeDraft.first()
             _resultState.value = mapProgress(details, draft)
 
-            when (val result = interactor.executeRootStake()) {
+            when (val result = bittensorStakingInteractor.executeRootStake()) {
                 is BittensorOperationResult.Success -> {
                     completed.value = true
                     _resultState.value = mapSuccess(details, draft)
@@ -164,9 +177,16 @@ class BittensorStakeConfirmViewModel(
     }
 
     private suspend fun mapValidator(draft: BittensorRootStakeDraft): BittensorValidatorUi {
-        return BittensorValidatorUi(draft.validator.name, Icon.FromDrawable(iconGenerator.createAddressIcon(
-            draft.validator.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT
-        )))
+        return BittensorValidatorUi(
+            draft.validator.name,
+            Icon.FromDrawable(
+                iconGenerator.createAddressIcon(
+                    draft.validator.hotkey.value,
+                    AddressIconGenerator.SIZE_MEDIUM,
+                    AddressIconGenerator.BACKGROUND_TRANSPARENT
+                )
+            )
+        )
     }
 
     private fun formatApy(details: BittensorRootStakingDetails): String {

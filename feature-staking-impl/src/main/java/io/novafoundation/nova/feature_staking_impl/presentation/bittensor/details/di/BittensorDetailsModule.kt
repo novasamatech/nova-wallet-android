@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceReposi
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 
 @Module(includes = [ViewModelModule::class])
 class BittensorDetailsModule {
@@ -32,27 +33,29 @@ class BittensorDetailsModule {
     @IntoMap
     @ViewModelKey(BittensorDetailsViewModel::class)
     fun provideViewModel(
-        interactor: BittensorPortfolioInteractor,
+        bittensorPortfolioInteractor: BittensorPortfolioInteractor,
         router: StakingRouter,
         resources: ResourceManager,
         amountFormatter: AmountFormatter,
         assetIconProvider: AssetIconProvider,
         iconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
-        priceCharts: BittensorPriceChartInteractor,
+        bittensorPriceChartInteractor: BittensorPriceChartInteractor,
         logger: Logger,
-        subnetRepository: BittensorSubnetRepository
+        subnetRepository: BittensorSubnetRepository,
+        chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory
     ): ViewModel = BittensorDetailsViewModel(
-        interactor = interactor,
+        bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
         resources = resources,
         amountFormatter = amountFormatter,
         assetIconProvider = assetIconProvider,
         iconGenerator = iconGenerator,
         externalActions = externalActions,
-        priceChartInteractor = priceCharts,
+        bittensorPriceChartInteractor = bittensorPriceChartInteractor,
         logger = logger,
-        subnetRepository = subnetRepository
+        subnetRepository = subnetRepository,
+        chartAxisFormatterFactory = chartAxisFormatterFactory
     )
 
     @Provides

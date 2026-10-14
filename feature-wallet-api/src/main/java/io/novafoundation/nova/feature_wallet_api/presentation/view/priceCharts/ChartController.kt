@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.vibrate
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 
 class ChartController(private val chart: LineChart, private val callback: Callback) : View.OnTouchListener {
 
@@ -50,9 +51,9 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.invalidate()
     }
 
-    fun setAxisLabelFormatter(format: (Float) -> String) {
+    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) {
         chart.axisRight.valueFormatter = object : ValueFormatter() {
-            override fun getFormattedValue(value: Float): String = format(value)
+            override fun getFormattedValue(value: Float): String = formatter.format(value)
         }
         chart.notifyDataSetChanged()
         chart.invalidate()

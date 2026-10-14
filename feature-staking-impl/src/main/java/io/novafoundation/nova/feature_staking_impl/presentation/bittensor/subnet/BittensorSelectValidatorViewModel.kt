@@ -2,9 +2,14 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.navigation.requireLastInput
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -17,15 +22,15 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class BittensorSelectValidatorViewModel(
     private val communicator: BittensorSelectValidatorCommunicator,
-    private val staking: BittensorSubnetStakingInteractor,
+    private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
     private val icons: AddressIconGenerator,
     private val router: StakingRouter,
     private val externalActions: ExternalActions.Presentation,
@@ -35,45 +40,43 @@ class BittensorSelectValidatorViewModel(
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val request = communicator.requireLastInput()
-    private val validators = MutableStateFlow<List<BittensorValidatorUi>>(emptyList())
-    val rows = validators.asStateFlow()
-    private val selected = MutableStateFlow(request.selectedAddress)
-    val selectedAddress = selected.asStateFlow()
-    private val loading = MutableStateFlow(true)
-    val isLoading = loading.asStateFlow()
-    private val selectedRow = combine(rows, selectedAddress) { rows, address ->
+
+    private val validatorsState = flowOf {
+        bittensorSubnetStakingInteractor.validators(BittensorSubnetId(request.subnetId)).map { validator ->
+            val icon = icons.createAddressIcon(
+                validator.validator.hotkey.value,
+                AddressIconGenerator.SIZE_MEDIUM,
+                AddressIconGenerator.BACKGROUND_TRANSPARENT
+            )
+            BittensorValidatorUi(validator, icon)
+        }
+    }.withSafeLoading()
+        .onError { reportFailure(it) }
+        .shareInBackground()
+
+    val rows = validatorsState.map { it.dataOrNull.orEmpty() }.shareInBackground()
+
+    private val selectedValidatorAddress = MutableStateFlow(request.selectedAddress)
+
+    val selectedAddress = selectedValidatorAddress.asStateFlow()
+
+    val isLoading = validatorsState.map { it.isLoading() }.shareInBackground()
+
+    val isEmpty = validatorsState.map { !it.isLoading() && it.dataOrNull.isNullOrEmpty() }.shareInBackground()
+
+    private val selectedValidator = combine(rows, selectedAddress) { rows, address ->
         rows.firstOrNull { it.validator.address == address && it.validator.selectable }
     }.shareInBackground()
-    val buttonState = selectedRow.map { if (it != null) ButtonState.NORMAL else ButtonState.DISABLED }.shareInBackground()
-    val buttonLabel = selectedRow.map { row ->
+
+    val buttonState = selectedValidator.map { if (it != null) ButtonState.NORMAL else ButtonState.DISABLED }.shareInBackground()
+
+    val buttonLabel = selectedValidator.map { row ->
         row?.let { resources.getString(R.string.bittensor_select_named_validator, it.validator.validator.name.ifBlank { it.validator.address }) }
             ?: resources.getString(R.string.bittensor_select_validator)
     }.shareInBackground()
 
-    init {
-        launchUnit {
-            try {
-                validators.value = staking.validators(BittensorSubnetId(request.subnetId)).map { validator ->
-                    val icon = icons.createAddressIcon(
-                        validator.validator.hotkey.value,
-                        AddressIconGenerator.SIZE_MEDIUM,
-                        AddressIconGenerator.BACKGROUND_TRANSPARENT
-                    )
-                    BittensorValidatorUi(validator, icon)
-                }
-            } catch (e: CancellationException) {
-                if (e !is TimeoutCancellationException) throw e
-                reportFailure(e)
-            } catch (e: Exception) {
-                reportFailure(e)
-            } finally {
-                loading.value = false
-            }
-        }
-    }
-
-    fun select(row: BittensorValidatorUi) {
-        if (row.validator.selectable && row in validators.value) selected.value = row.validator.address
+    fun select(row: BittensorValidatorUi) = launchUnit {
+        if (row.validator.selectable && row in rows.first()) selectedValidatorAddress.value = row.validator.address
     }
 
     fun infoClicked(row: BittensorValidatorUi) = launchUnit {
@@ -86,8 +89,8 @@ class BittensorSelectValidatorViewModel(
         }
     }
 
-    fun confirmClicked() {
-        val row = validators.value.firstOrNull { it.validator.address == selected.value && it.validator.selectable } ?: return
+    fun confirmClicked() = launchUnit {
+        val row = selectedValidator.first() ?: return@launchUnit
         communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, row.validator.address))
         router.back()
     }

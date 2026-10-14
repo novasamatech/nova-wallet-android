@@ -19,13 +19,15 @@ data class BittensorSubnet(
 class BittensorSubnetInteractor(
     private val repository: BittensorSubnetRepository,
     private val portfolioRepository: BittensorPortfolioRepository,
-    private val quotes: BittensorSubnetQuoteInteractor,
+    private val bittensorSubnetQuoteInteractor: BittensorSubnetQuoteInteractor,
     private val favorites: BittensorSubnetFavoritesRepository
 ) {
 
     val slippage = BittensorSlippage(BigDecimal("0.005"))
 
     suspend fun subnets() = repository.subnets()
+
+    suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet = repository.subnets().first { it.id == subnetId }
 
     fun observePortfolio() = portfolioRepository.observePortfolio()
 
@@ -36,5 +38,5 @@ class BittensorSubnetInteractor(
     suspend fun toggleFavorite(metaId: Long, subnetId: BittensorSubnetId) = favorites.toggle(metaId, subnetId)
 
     suspend fun quote(subnetId: BittensorSubnetId, amount: BigInteger): BittensorSubnetBuyQuote =
-        quotes.quoteBuy(ChainGeneses.BITTENSOR, subnetId, amount, slippage)
+        bittensorSubnetQuoteInteractor.quoteBuy(ChainGeneses.BITTENSOR, subnetId, amount, slippage)
 }

@@ -36,7 +36,9 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
 
     private class Cached<T>(val data: T, val deadlineNanos: Long)
     private val mutex = Mutex()
+
     private val lists = mutableMapOf<Int, Cached<BittensorValidatorsRemote>>()
+
     private var recommendations: Cached<BittensorRecommendationsRemote>? = null
 
     suspend fun validators(netuid: Int): BittensorValidatorsRemote = mutex.withLock {

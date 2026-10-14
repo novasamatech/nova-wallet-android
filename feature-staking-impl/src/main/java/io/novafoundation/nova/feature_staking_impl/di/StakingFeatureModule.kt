@@ -5,6 +5,9 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
@@ -244,6 +247,10 @@ class StakingFeatureModule {
     fun provideBittensorSubnetCommission() = BittensorSubnetCommission(java.math.BigDecimal("0.003"))
 
     @Provides
+    fun provideBittensorChartAxisFormatterFactory(fiatFormatter: FiatFormatter, tokenFormatter: TokenFormatter) =
+        BittensorChartAxisFormatter.Factory(fiatFormatter, tokenFormatter)
+
+    @Provides
     fun provideBittensorSubnetQuotes(source: BittensorSwapSource, commission: BittensorSubnetCommission) =
         BittensorSubnetQuoteInteractor(source, commission)
 
@@ -251,9 +258,9 @@ class StakingFeatureModule {
     fun provideBittensorSubnetInteractor(
         repository: BittensorSubnetRepository,
         portfolioRepository: BittensorPortfolioRepository,
-        quotes: BittensorSubnetQuoteInteractor,
+        bittensorSubnetQuoteInteractor: BittensorSubnetQuoteInteractor,
         favorites: BittensorSubnetFavoritesRepository
-    ) = BittensorSubnetInteractor(repository, portfolioRepository, quotes, favorites)
+    ) = BittensorSubnetInteractor(repository, portfolioRepository, bittensorSubnetQuoteInteractor, favorites)
 
     @Provides
     fun provideBittensorSubnetValidators(
@@ -300,7 +307,7 @@ class StakingFeatureModule {
         accounts: AccountRepository,
         wallets: WalletRepository,
         validators: BittensorSubnetValidatorRepository,
-        subnets: BittensorSubnetInteractor,
+        bittensorSubnetInteractor: BittensorSubnetInteractor,
         portfolio: BittensorPortfolioRepository,
         extrinsics: ExtrinsicService,
         submission: BittensorSubmissionExecutor
@@ -309,7 +316,7 @@ class StakingFeatureModule {
         accounts,
         wallets,
         validators,
-        subnets,
+        bittensorSubnetInteractor,
         portfolio,
         extrinsics,
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",

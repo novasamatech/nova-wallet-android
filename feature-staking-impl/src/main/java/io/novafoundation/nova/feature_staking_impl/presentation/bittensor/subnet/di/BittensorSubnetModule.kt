@@ -25,6 +25,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import java.math.BigInteger
@@ -37,31 +39,36 @@ class BittensorSubnetModule {
     @Provides
     @IntoMap
     @ViewModelKey(BittensorChooseSubnetViewModel::class)
-    fun chooser(interactor: BittensorSubnetInteractor, router: StakingRouter, icons: AssetIconProvider): ViewModel =
-        BittensorChooseSubnetViewModel(interactor, router, icons)
+    fun chooser(
+        bittensorSubnetInteractor: BittensorSubnetInteractor,
+        router: StakingRouter,
+        icons: AssetIconProvider,
+        logger: Logger,
+        tokenFormatter: TokenFormatter
+    ): ViewModel = BittensorChooseSubnetViewModel(bittensorSubnetInteractor, router, icons, logger, tokenFormatter)
 
     @Provides
     @IntoMap
     @ViewModelKey(BittensorSubnetAmountViewModel::class)
     fun amount(
         fragment: Fragment,
-        interactor: BittensorSubnetInteractor,
+        bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
         resources: ResourceManager,
         icons: AssetIconProvider,
         tokenFormatter: TokenFormatter,
         logger: Logger,
-        staking: BittensorSubnetStakingInteractor
+        bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor
     ): ViewModel = BittensorSubnetAmountViewModel(
         BittensorSubnetId(fragment.requireArguments().getInt("subnetId")),
         requireNotNull(fragment.requireArguments().getString("validatorAddress")),
-        interactor,
+        bittensorSubnetInteractor,
         router,
         resources,
         icons,
         tokenFormatter,
         logger,
-        staking
+        bittensorSubnetStakingInteractor
     )
 
     @Provides
@@ -69,12 +76,12 @@ class BittensorSubnetModule {
     @ViewModelKey(BittensorSubnetReviewViewModel::class)
     fun review(
         fragment: Fragment,
-        interactor: BittensorSubnetInteractor,
+        bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
-        staking: BittensorSubnetStakingInteractor,
+        bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
         resources: ResourceManager,
         icons: AssetIconProvider,
         tokenFormatter: TokenFormatter,
@@ -89,12 +96,12 @@ class BittensorSubnetModule {
             BigInteger(requireNotNull(getString("amount"))),
             getLong("metaId"),
             requireNotNull(getString("validatorAddress")),
-            interactor,
+            bittensorSubnetInteractor,
             router,
             chainRegistry,
             walletUiUseCase,
             selectedAccountUseCase,
-            staking,
+            bittensorSubnetStakingInteractor,
             resources,
             icons,
             tokenFormatter,
@@ -110,18 +117,30 @@ class BittensorSubnetModule {
     @ViewModelKey(BittensorSubnetDetailsViewModel::class)
     fun details(
         fragment: Fragment,
-        interactor: BittensorSubnetInteractor,
-        staking: BittensorSubnetStakingInteractor,
+        bittensorSubnetInteractor: BittensorSubnetInteractor,
+        bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
         router: StakingRouter,
         resources: ResourceManager,
         tokenFormatter: TokenFormatter,
         iconGenerator: AddressIconGenerator,
-        details: BittensorSubnetDetailsInteractor,
+        bittensorSubnetDetailsInteractor: BittensorSubnetDetailsInteractor,
         logger: Logger,
-        validatorCommunicator: BittensorSelectValidatorCommunicator
+        validatorCommunicator: BittensorSelectValidatorCommunicator,
+        fiatFormatter: FiatFormatter,
+        chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory
     ): ViewModel = BittensorSubnetDetailsViewModel(
         BittensorSubnetId(fragment.requireArguments().getInt("subnetId")),
-        interactor, staking, router, resources, tokenFormatter, iconGenerator, details, logger, validatorCommunicator
+        bittensorSubnetInteractor,
+        bittensorSubnetStakingInteractor,
+        router,
+        resources,
+        tokenFormatter,
+        iconGenerator,
+        bittensorSubnetDetailsInteractor,
+        logger,
+        validatorCommunicator,
+        fiatFormatter,
+        chartAxisFormatterFactory
     )
 
     @Provides
@@ -129,14 +148,23 @@ class BittensorSubnetModule {
     @ViewModelKey(BittensorSelectValidatorViewModel::class)
     fun selectValidator(
         communicator: BittensorSelectValidatorCommunicator,
-        staking: BittensorSubnetStakingInteractor,
+        bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
         icons: AddressIconGenerator,
         router: StakingRouter,
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         resources: ResourceManager,
         logger: Logger
-    ): ViewModel = BittensorSelectValidatorViewModel(communicator, staking, icons, router, externalActions, chainRegistry, resources, logger)
+    ): ViewModel = BittensorSelectValidatorViewModel(
+        communicator,
+        bittensorSubnetStakingInteractor,
+        icons,
+        router,
+        externalActions,
+        chainRegistry,
+        resources,
+        logger
+    )
 
     @Provides
     fun selectValidatorVm(fragment: Fragment, factory: ViewModelProvider.Factory): BittensorSelectValidatorViewModel =

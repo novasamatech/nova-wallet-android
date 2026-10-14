@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 class BittensorPositionUpdates {
 
     private val revision = MutableStateFlow(0L)
+
     val updates = revision.asStateFlow()
 
     fun refresh() {

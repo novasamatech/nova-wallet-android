@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
@@ -32,7 +31,7 @@ class BittensorSubnetStakingInteractor(
     private val accounts: AccountRepository,
     private val wallets: WalletRepository,
     private val validators: BittensorSubnetValidatorRepository,
-    private val subnets: BittensorSubnetInteractor,
+    private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val portfolio: BittensorPortfolioRepository,
     private val extrinsics: ExtrinsicService,
     private val beneficiaryAddress: String,
@@ -49,7 +48,7 @@ class BittensorSubnetStakingInteractor(
         requireNotNull(validator) { "Validator is no longer eligible in this subnet" }
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
         maximumBittensorStake(asset.transferableInPlanks) { amount ->
-            val quote = subnets.quote(subnetId, amount)
+            val quote = bittensorSubnetInteractor.quote(subnetId, amount)
             val operation = BittensorSubnetStakeOperation(quote, validator.validator.hotkey, beneficiary)
             extrinsics.estimateFee(chain, TransactionOrigin.WalletWithId(metaId), options) { operation.build(this) }
                 .maxAmountDeductionFor(asset.token.configuration)
@@ -65,7 +64,7 @@ class BittensorSubnetStakingInteractor(
         requireSelectedWallet(metaId)
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         validators.validate(chain, subnetId, validator)
-        val quote = subnets.quote(subnetId, amount)
+        val quote = bittensorSubnetInteractor.quote(subnetId, amount)
         val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, AccountIdKey(chain.accountIdOf(beneficiaryAddress)))
         val fee = extrinsics.estimateFee(chain, TransactionOrigin.WalletWithId(metaId), options) { operation.build(this) }
         requireAffordable(chain, metaId, amount, fee)

@@ -65,7 +65,7 @@
             app:primaryValueStyle="positive"
             app:shouldDrawDivider="false"
             app:title="@string/bittensor_apy"
-            tools:primaryValue="7% · paid in TAO" />
+            tools:primaryValue="7% · paid in TOKEN" />
     </io.novafoundation.nova.common.view.TableView>
 
     <Space

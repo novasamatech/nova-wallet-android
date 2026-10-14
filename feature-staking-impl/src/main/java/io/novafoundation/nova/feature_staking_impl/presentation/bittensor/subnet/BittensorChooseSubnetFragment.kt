@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewModel, FragmentBittensorChooseSubnetBinding>() {
 
     private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+
     private val adapter by lazy {
         BittensorSubnetListAdapter(imageLoader, viewModel::rootStaking, viewModel::select, viewModel::toggleFavorite)
     }

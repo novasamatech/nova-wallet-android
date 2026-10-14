@@ -2847,7 +2847,7 @@
     <string name="bittensor_subnet_number">Subnet %1$d</string>
     <string name="bittensor_choose_subnet">Choose a subnet</string>
     <string name="bittensor_subnet_search_hint">Search by name or number</string>
-    <string name="bittensor_root_row_description">Paid in TAO · no swap</string>
+    <string name="bittensor_root_row_description">Paid in %1$s · no swap</string>
     <string name="bittensor_on_chain_ratio">on-chain ratio</string>
     <string name="bittensor_add_favorite">Add subnet to favourites</string>
     <string name="bittensor_remove_favorite">Remove subnet from favourites</string>
@@ -2889,6 +2889,6 @@
     <string name="bittensor_submission_unknown_title">Transaction status unknown</string>
     <string name="bittensor_submission_unknown_description">The transaction may have been included. Another staking transaction is blocked until the original outcome is verified.</string>
     <string name="bittensor_staking_mock_error">RootStakeLocked — the root stake is still locked after the last stake change. Try again in 2 d 4 h.</string>
-    <string name="bittensor_chart_price_disclaimer">Chart shows TAO price, not historical stake value</string>
+    <string name="bittensor_chart_price_disclaimer">Chart shows %1$s price, not historical stake value</string>
     <string name="bittensor_validator_apr_period">APR · 30 days</string>
 </resources>
