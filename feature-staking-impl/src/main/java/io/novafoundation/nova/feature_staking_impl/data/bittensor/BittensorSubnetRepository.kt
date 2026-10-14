@@ -57,6 +57,7 @@ internal fun bindBittensorSubnets(decoded: Any?): List<BittensorSubnet> = bindLi
     require(subnets.map { it.id }.distinct().size == subnets.size) { "Duplicate subnet ids" }
 }
 
+/** SCALE text decodes as bytes or a Vec<u8>, not a Kotlin String. */
 internal fun bindBittensorText(decoded: Any?): String {
     val bytes = when (decoded) {
         is ByteArray -> decoded

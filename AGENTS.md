@@ -48,6 +48,8 @@ Derive staking and dashboard updates from reactive balance or on-chain state sou
 
 Model known JSON API and configuration contracts with typed remote DTOs returned directly by Retrofit. Keep domain mapping and semantic validation in repositories or mappers; do not traverse `JsonObject`, `JsonElement`, or untyped maps for responses with a known schema. Reserve raw JSON for genuinely dynamic payloads.
 
+Keep Retrofit API interfaces and their remote DTOs in separate files from repository implementations, following the existing API/remote-model/repository structure.
+
 ## Runtime response decoding
 
 Use the SDK's `AccountId` alias for raw Substrate account identifiers in signatures and explicitly typed properties, not `ByteArray`. Preserve meaningful domain names such as `coldKey` when they clarify the account's role; changing the type does not require renaming the identifier. Keep protocol-specific wire field names unchanged. Keep `AccountIdKey` for content-based equality and collection keys, and reserve `ByteArray` for actual binary payloads rather than account IDs.
