@@ -242,7 +242,7 @@ class BittensorSubnetDetailsViewModel(
         if (selected == null) {
             validatorClicked()
         } else if (canContinue.first()) {
-            router.openBittensorSubnetAmount(subnetId.value, selected.address)
+            router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(subnetId.value, selected.address))
         }
     }
 

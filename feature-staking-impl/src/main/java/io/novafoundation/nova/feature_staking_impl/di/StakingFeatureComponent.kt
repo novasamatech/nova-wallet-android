@@ -34,6 +34,9 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.di.BittensorStakeConfirmComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di.BittensorDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetAmountComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetReviewComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.di.StakingDashboardComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.more.di.MoreStakingOptionsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
@@ -134,6 +137,12 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun bittensorDetailsComponentFactory(): BittensorDetailsComponent.Factory
 
     fun bittensorSubnetComponentFactory(): BittensorSubnetComponent.Factory
+
+    fun bittensorSubnetDetailsComponentFactory(): BittensorSubnetDetailsComponent.Factory
+
+    fun bittensorSubnetAmountComponentFactory(): BittensorSubnetAmountComponent.Factory
+
+    fun bittensorSubnetReviewComponentFactory(): BittensorSubnetReviewComponent.Factory
 
     fun dashboardComponentFactory(): StakingDashboardComponent.Factory
 

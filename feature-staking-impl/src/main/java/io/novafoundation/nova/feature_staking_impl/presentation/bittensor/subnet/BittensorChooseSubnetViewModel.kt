@@ -91,7 +91,7 @@ class BittensorChooseSubnetViewModel(
         if (!isLoading.first()) reload.update { it + 1 }
     }
 
-    fun select(row: BittensorSubnetRowUi) = router.openBittensorSubnetDetails(row.subnet.id.value)
+    fun select(row: BittensorSubnetRowUi) = router.openBittensorSubnetDetails(BittensorSubnetDetailsPayload(row.subnet.id.value))
 
     fun toggleFavorite(row: BittensorSubnetRowUi) = launchUnit {
         try {

@@ -1,6 +1,11 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
-import androidx.core.os.bundleOf
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
@@ -302,19 +307,21 @@ class RelayStakingNavigator(
         navigationBuilder().action(R.id.action_open_bittensor_choose_subnet).navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorSubnetDetails(subnetId: Int) {
+    override fun openBittensorSubnetDetails(payload: BittensorSubnetDetailsPayload) {
         navigationBuilder().action(R.id.action_open_bittensor_subnet_details)
-            .setArgs(bundleOf("subnetId" to subnetId)).navigateInFirstAttachedContext()
+            .setArgs(BittensorSubnetDetailsFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorSubnetAmount(subnetId: Int, validatorAddress: String) {
+    override fun openBittensorSubnetAmount(payload: BittensorSubnetAmountPayload) {
         navigationBuilder().action(R.id.action_open_bittensor_subnet_amount)
-            .setArgs(bundleOf("subnetId" to subnetId, "validatorAddress" to validatorAddress)).navigateInFirstAttachedContext()
+            .setArgs(BittensorSubnetAmountFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorSubnetReview(subnetId: Int, amount: String, metaId: Long, validatorAddress: String) {
+    override fun openBittensorSubnetReview(payload: BittensorSubnetReviewPayload) {
         navigationBuilder().action(R.id.action_open_bittensor_subnet_review)
-            .setArgs(bundleOf("subnetId" to subnetId, "amount" to amount, "metaId" to metaId, "validatorAddress" to validatorAddress))
+            .setArgs(BittensorSubnetReviewFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 

@@ -14,19 +14,15 @@
         app:popEnterAnim="@anim/fragment_close_enter" app:popExitAnim="@anim/fragment_close_exit" />
     <fragment android:id="@+id/bittensorSubnetDetails"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsFragment">
-        <argument android:name="subnetId" app:argType="integer" />
+        <argument android:name="payload" app:argType="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload" />
     </fragment>
     <fragment android:id="@+id/bittensorSubnetAmount"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountFragment">
-        <argument android:name="subnetId" app:argType="integer" />
-        <argument android:name="validatorAddress" app:argType="string" />
+        <argument android:name="payload" app:argType="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload" />
     </fragment>
     <fragment android:id="@+id/bittensorSubnetReview"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewFragment">
-        <argument android:name="subnetId" app:argType="integer" />
-        <argument android:name="amount" app:argType="string" />
-        <argument android:name="metaId" app:argType="long" />
-        <argument android:name="validatorAddress" app:argType="string" />
+        <argument android:name="payload" app:argType="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload" />
     </fragment>
     <action android:id="@+id/action_open_bittensor_choose_subnet" app:destination="@id/bittensorChooseSubnet"
         app:enterAnim="@anim/fragment_open_enter" app:exitAnim="@anim/fragment_open_exit"

@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPricePriceTextInjector
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
@@ -307,7 +308,7 @@ class BittensorDetailsViewModel(
         when (val action = position.action) {
             BittensorPositionAction.RootDetails -> router.openBittensorRootDetails()
             is BittensorPositionAction.ValidatorDetails -> validatorClicked(action.address)
-            is BittensorPositionAction.SubnetDetails -> router.openBittensorSubnetDetails(action.subnetId.value)
+            is BittensorPositionAction.SubnetDetails -> router.openBittensorSubnetDetails(BittensorSubnetDetailsPayload(action.subnetId.value))
             BittensorPositionAction.None -> Unit
         }
     }

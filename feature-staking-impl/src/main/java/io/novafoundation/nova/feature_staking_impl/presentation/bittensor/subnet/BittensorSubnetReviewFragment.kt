@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.utils.dp
@@ -17,15 +18,25 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 
+private const val PAYLOAD_KEY = "payload"
+
 class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewModel, FragmentBittensorSubnetReviewBinding>() {
+
+    companion object {
+
+        fun getBundle(payload: BittensorSubnetReviewPayload) = Bundle().apply {
+            putParcelable(PAYLOAD_KEY, payload)
+        }
+    }
 
     private var resultBottomSheet: BittensorStakeResultBottomSheet? = null
 
     override fun createBinding() = FragmentBittensorSubnetReviewBinding.inflate(layoutInflater)
 
     override fun inject() {
+        val payload = argument<BittensorSubnetReviewPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetComponentFactory().create(this).inject(this)
+            .bittensorSubnetReviewComponentFactory().create(this, payload).inject(this)
     }
 
     override fun initViews() {

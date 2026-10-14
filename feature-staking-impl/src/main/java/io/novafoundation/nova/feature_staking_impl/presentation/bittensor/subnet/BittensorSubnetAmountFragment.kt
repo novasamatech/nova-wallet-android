@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import coil.load
@@ -14,13 +15,23 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 
+private const val PAYLOAD_KEY = "payload"
+
 class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewModel, FragmentBittensorSubnetAmountBinding>() {
+
+    companion object {
+
+        fun getBundle(payload: BittensorSubnetAmountPayload) = Bundle().apply {
+            putParcelable(PAYLOAD_KEY, payload)
+        }
+    }
 
     override fun createBinding() = FragmentBittensorSubnetAmountBinding.inflate(layoutInflater)
 
     override fun inject() {
+        val payload = argument<BittensorSubnetAmountPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetComponentFactory().create(this).inject(this)
+            .bittensorSubnetAmountComponentFactory().create(this, payload).inject(this)
     }
 
     override fun initViews() = with(binder) {

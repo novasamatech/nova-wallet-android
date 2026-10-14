@@ -167,7 +167,9 @@ class BittensorSubnetAmountViewModel(
         val request = request.first()
         val quoted = quote.first() ?: return@launchUnit
         if (quoted.request != request || subnet.first() == null || failed.value) return@launchUnit
-        router.openBittensorSubnetReview(requireNotNull(request.subnetId).value, requireNotNull(request.amount).toString(), request.metaId, validatorAddress)
+        router.openBittensorSubnetReview(
+            BittensorSubnetReviewPayload(requireNotNull(request.subnetId).value, requireNotNull(request.amount), request.metaId, validatorAddress)
+        )
     }
 
     private fun reportFailure(cause: Throwable) {

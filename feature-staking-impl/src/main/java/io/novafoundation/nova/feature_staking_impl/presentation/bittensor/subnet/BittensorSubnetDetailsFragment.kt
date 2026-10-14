@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import coil.transform.CircleCropTransformation
@@ -11,12 +12,22 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetDetailsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 
+private const val PAYLOAD_KEY = "payload"
+
 class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewModel, FragmentBittensorSubnetDetailsBinding>() {
+
+    companion object {
+
+        fun getBundle(payload: BittensorSubnetDetailsPayload) = Bundle().apply {
+            putParcelable(PAYLOAD_KEY, payload)
+        }
+    }
     private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
     override fun createBinding() = FragmentBittensorSubnetDetailsBinding.inflate(layoutInflater)
     override fun inject() {
+        val payload = argument<BittensorSubnetDetailsPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetComponentFactory().create(this).inject(this)
+            .bittensorSubnetDetailsComponentFactory().create(this, payload).inject(this)
     }
     override fun initViews() = with(binder) {
         toolbar.setHomeButtonListener { viewModel.back() }
