@@ -71,23 +71,36 @@ class BittensorSubnetStakeOperationTest {
     @Test
     fun `a partial simulation or invalid recipient cannot become an operation`() {
         val quote = quote(BigInteger.valueOf(3))
-        assertTrue(runCatching {
-            BittensorSubnetStakeOperation(quote.copy(serviceFeeTaoInPlanks = BigInteger.valueOf(4)), hotkey, beneficiary)
-        }.isFailure)
-        assertTrue(runCatching {
-            BittensorSubnetStakeOperation(quote, hotkey, AccountIdKey(ByteArray(31)))
-        }.isFailure)
+        assertTrue(
+            runCatching {
+                BittensorSubnetStakeOperation(quote.copy(serviceFeeTaoInPlanks = BigInteger.valueOf(4)), hotkey, beneficiary)
+            }.isFailure
+        )
+        assertTrue(
+            runCatching {
+                BittensorSubnetStakeOperation(quote, hotkey, AccountIdKey(ByteArray(31)))
+            }.isFailure
+        )
     }
 
     private fun quote(fee: BigInteger): BittensorSubnetBuyQuote {
         val subnet = BittensorSubnetId(64)
         return BittensorSubnetBuyQuote(
-            subnet, BigInteger.valueOf(1000), fee,
+            subnet,
+            BigInteger.valueOf(1000),
+            fee,
             BittensorSwapSimulation(
-                subnet, BittensorSwapDirection.TAO_TO_ALPHA, BigInteger.valueOf(1000) - fee, BigInteger.TEN,
-                BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO
+                subnet,
+                BittensorSwapDirection.TAO_TO_ALPHA,
+                BigInteger.valueOf(1000) - fee,
+                BigInteger.TEN,
+                BigInteger.ZERO,
+                BigInteger.ZERO,
+                BigInteger.ZERO,
+                BigInteger.ZERO
             ),
-            BigInteger.valueOf(1005)
+            BigInteger.valueOf(1005),
+            java.math.BigDecimal("0.003")
         )
     }
 
@@ -99,13 +112,20 @@ class BittensorSubnetStakeOperationTest {
         val stake = MetadataFunction(
             "add_stake_limit",
             listOf(
-                FunctionArgument("hotkey", account), FunctionArgument("netuid", u16), FunctionArgument("amount_staked", u64),
-                FunctionArgument("limit_price", u64), FunctionArgument("allow_partial", BooleanType)
+                FunctionArgument("hotkey", account),
+                FunctionArgument("netuid", u16),
+                FunctionArgument("amount_staked", u64),
+                FunctionArgument("limit_price", u64),
+                FunctionArgument("allow_partial", BooleanType)
             ),
-            emptyList(), 7 to 3
+            emptyList(),
+            7 to 3
         )
         val transfer = MetadataFunction(
-            "transfer_keep_alive", listOf(FunctionArgument("dest", account), FunctionArgument("value", u64)), emptyList(), 5 to 3
+            "transfer_keep_alive",
+            listOf(FunctionArgument("dest", account), FunctionArgument("value", u64)),
+            emptyList(),
+            5 to 3
         )
         val modules = listOf(
             Module("SubtensorModule", null, mapOf(stake.name to stake), null, emptyMap(), emptyMap(), BigInteger.valueOf(7)),

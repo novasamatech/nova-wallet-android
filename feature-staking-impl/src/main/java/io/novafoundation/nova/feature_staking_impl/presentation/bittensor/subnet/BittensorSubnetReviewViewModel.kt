@@ -119,6 +119,10 @@ class BittensorSubnetReviewViewModel(
 
     private val quote = draft.map { it?.operation?.quote }.shareInBackground()
 
+    val feeCaption = quote.map { quote ->
+        quote?.serviceFeeRate?.let { resources.getString(R.string.bittensor_subnet_fee_caption, it.movePointRight(2).toStripTrailingZerosString()) }.orEmpty()
+    }.shareInBackground()
+
     val hasError = combine(portfolioState, preparationState) { portfolio, preparation -> portfolio.isError() || preparation.isError() }
         .shareInBackground()
 

@@ -55,6 +55,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetReviewViewModel) = with(binder) {
+        viewModel.feeCaption.observe { feeCaption.text = it }
         setupExternalActions(viewModel)
         viewModel.wallet.observe(wallet::showWallet)
         viewModel.account.observe(account::showAddress)

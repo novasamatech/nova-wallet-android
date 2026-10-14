@@ -6,10 +6,13 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.first
+import org.junit.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -23,6 +26,8 @@ class BittensorWalletIsolationTest {
     private val accounts = mock(AccountRepository::class.java)
     private val extrinsics = mock(ExtrinsicService::class.java)
     private val wallets = mock(WalletRepository::class.java)
+
+    private val validators = mock(BittensorSubnetValidatorRepository::class.java)
     private val state = BittensorStakingFlowState()
     private val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator", null)
     private val details = BittensorRootStakingDetails(
@@ -60,11 +65,39 @@ class BittensorWalletIsolationTest {
         verifyNoInteractions(extrinsics)
     }
 
+    @Test
+    fun `missing root validator does not estimate a fee or prepare a stake`() = runBlocking {
+        val selected = mock(MetaAccount::class.java)
+        `when`(selected.id).thenReturn(1L)
+        `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
+        state.setDetails(details.copy(validator = null))
+
+        assertTrue(runCatching { interactor().prepareRootStake(BigInteger.ONE) }.exceptionOrNull() is IllegalArgumentException)
+        verifyNoInteractions(extrinsics, validators)
+    }
+
+    @Test
+    fun `manual root choice overrides the default only after checking eligibility`() = runBlocking {
+        val selected = mock(MetaAccount::class.java)
+        `when`(selected.id).thenReturn(1L)
+        `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
+        state.setDetails(details.copy(validator = null))
+        val chosenValidator = BittensorValidator(AccountIdKey(ByteArray(32) { 2 }), "Chosen validator", null)
+        val row = BittensorSubnetValidator(chosenValidator, "chosen-address", java.math.BigDecimal.ZERO, true)
+        `when`(validators.rootValidators(details.chain)).thenReturn(listOf(row))
+        val interactor = interactor()
+
+        interactor.selectValidator(row.address)
+
+        assertEquals(chosenValidator, interactor.observeRootStakingDetails().first().validator)
+        verifyNoInteractions(extrinsics)
+    }
+
     private suspend fun selectAnotherWallet() {
         val selected = mock(MetaAccount::class.java)
         `when`(selected.id).thenReturn(2L)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
     }
 
-    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, accounts, wallets)
+    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, accounts, wallets, validators)
 }

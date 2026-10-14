@@ -22,6 +22,10 @@ import java.math.RoundingMode
 
 interface BittensorSubnetValidatorRepository {
 
+    suspend fun rootValidators(chain: Chain): List<BittensorSubnetValidator>
+
+    suspend fun validateRoot(chain: Chain, validator: BittensorValidator)
+
     suspend fun validators(chain: Chain, subnetId: BittensorSubnetId): List<BittensorSubnetValidator>
 
     suspend fun validate(chain: Chain, subnetId: BittensorSubnetId, validator: BittensorValidator)
@@ -33,9 +37,15 @@ class RealBittensorSubnetValidatorRepository(
     private val rpc: RpcCalls
 ) : BittensorSubnetValidatorRepository {
 
-    override suspend fun validators(chain: Chain, subnetId: BittensorSubnetId): List<BittensorSubnetValidator> = withTimeout(45_000L) {
+    override suspend fun rootValidators(chain: Chain): List<BittensorSubnetValidator> = validators(chain, 0)
+
+    override suspend fun validateRoot(chain: Chain, validator: BittensorValidator) = validate(chain, 0, validator)
+
+    override suspend fun validators(chain: Chain, subnetId: BittensorSubnetId): List<BittensorSubnetValidator> = validators(chain, subnetId.value)
+
+    private suspend fun validators(chain: Chain, netuid: Int): List<BittensorSubnetValidator> = withTimeout(45_000L) {
         val gates = backend.gates()
-        val candidates = requireNotNull(backend.validators(subnetId.value).items).filter { it.netuid == subnetId.value }
+        val candidates = requireNotNull(backend.validators(netuid).items).filter { it.netuid == netuid }
             .mapNotNull { row ->
                 val address = row.hotkey ?: return@mapNotNull null
                 val hotkey = runCatching { chain.accountIdOf(address) }.getOrNull() ?: return@mapNotNull null
@@ -46,19 +56,21 @@ class RealBittensorSubnetValidatorRepository(
                     null
                 )
             }.distinctBy { it.hotkey }.take(512)
-        enrich(chain, subnetId, candidates, gates)
+        enrich(chain, netuid, candidates, gates)
             .sortedWith(compareByDescending<BittensorSubnetValidator> { it.selectable }.thenBy { it.validator.name })
     }
 
-    override suspend fun validate(chain: Chain, subnetId: BittensorSubnetId, validator: BittensorValidator) = withTimeout(45_000L) {
+    override suspend fun validate(chain: Chain, subnetId: BittensorSubnetId, validator: BittensorValidator) = validate(chain, subnetId.value, validator)
+
+    private suspend fun validate(chain: Chain, netuid: Int, validator: BittensorValidator) = withTimeout(45_000L) {
         val gates = backend.gates()
-        val row = enrich(chain, subnetId, listOf(validator), gates).singleOrNull()
+        val row = enrich(chain, netuid, listOf(validator), gates).singleOrNull()
         require(row?.selectable == true) { "Validator is no longer eligible in this subnet" }
     }
 
     private suspend fun enrich(
         chain: Chain,
-        subnetId: BittensorSubnetId,
+        subnetId: Int,
         validators: List<BittensorValidator>,
         gates: BittensorValidatorGates
     ): List<BittensorSubnetValidator> {
@@ -66,13 +78,18 @@ class RealBittensorSubnetValidatorRepository(
         val hash = rpc.getBlockHash(chain.id)
         return storage.query(chain.id, at = hash, applyStorageDefault = true) {
             val pallet = runtime.metadata.module("SubtensorModule")
-            val netuid = BigInteger.valueOf(subnetId.value.toLong())
-            val permits = pallet.storage("ValidatorPermit").query(netuid) { bindList(it, ::bindBoolean) }
-            val updates = pallet.storage("LastUpdate").query(netuid) { bindList(it, ::bindNumber) }
-            val block = runtime.metadata.module("System").storage("Number").query(binding = ::bindNumber)
-            val tempo = pallet.storage("Tempo").query(netuid, binding = ::bindNumber)
-            val factor = pallet.storage("ActivityCutoffFactorMilli").query(netuid, binding = ::bindNumber)
-            val cutoff = (tempo * factor / BigInteger.valueOf(1000)).max(BigInteger.ONE)
+            val netuid = BigInteger.valueOf(subnetId.toLong())
+            val isRoot = subnetId == 0
+            val permits = if (!isRoot && gates.requirePermit) pallet.storage("ValidatorPermit").query(netuid) { bindList(it, ::bindBoolean) } else emptyList()
+            val updates = if (!isRoot && gates.requireActive) pallet.storage("LastUpdate").query(netuid) { bindList(it, ::bindNumber) } else emptyList()
+            val activeThreshold = if (!isRoot && gates.requireActive) {
+                val block = runtime.metadata.module("System").storage("Number").query(binding = ::bindNumber)
+                val tempo = pallet.storage("Tempo").query(netuid, binding = ::bindNumber)
+                val factor = pallet.storage("ActivityCutoffFactorMilli").query(netuid, binding = ::bindNumber)
+                block - (tempo * factor / BigInteger.valueOf(1000)).max(BigInteger.ONE)
+            } else {
+                BigInteger.ZERO
+            }
             val uids = pallet.storage("Uids").entries(
                 keysArguments = validators.map { listOf(netuid, it.hotkey.value) },
                 keyExtractor = { key -> AccountIdKey(key.component2()) },
@@ -88,13 +105,13 @@ class RealBittensorSubnetValidatorRepository(
                 val take = takes[validator.hotkey] ?: return@mapNotNull null
                 require(uid in 0..65535)
                 if (!gates.allowsTake(take)) return@mapNotNull null
-                if (gates.requirePermit && permits.getOrNull(uid) != true) return@mapNotNull null
-                val active = updates.getOrNull(uid)?.let { (block - it).max(BigInteger.ZERO) <= cutoff } == true
+                if (!isRoot && gates.requirePermit && permits.getOrNull(uid) != true) return@mapNotNull null
+                val active = isRoot || !gates.requireActive || updates.getOrNull(uid)?.let { it >= activeThreshold } == true
                 BittensorSubnetValidator(
                     validator,
                     chain.addressOf(validator.hotkey),
                     take.toBigDecimal().divide(BigDecimal(65535), 12, RoundingMode.HALF_EVEN),
-                    !gates.requireActive || active
+                    active
                 )
             }
         }

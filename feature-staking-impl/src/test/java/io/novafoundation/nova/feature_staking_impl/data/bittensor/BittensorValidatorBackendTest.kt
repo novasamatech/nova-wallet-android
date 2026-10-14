@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
@@ -17,6 +18,31 @@ import java.math.BigInteger
 
 class BittensorValidatorBackendTest {
 
+    private val gson = Gson()
+
+    @Test
+    fun `recommendations use the attested gateway and preserve class priority for the requested netuid`() = runBlocking {
+        val api = Api("max-age=60")
+        api.recommendationsDocument = recommendations("FRESH")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+
+        assertEquals(listOf("stable-root", "balanced-root", "higher-root"), backend.recommendedHotkeys(0))
+        assertEquals(listOf("subnet-one"), backend.recommendedHotkeys(1))
+        assertEquals(listOf("https://infra.test/v1/bittensor/recommendations"), api.requests)
+    }
+
+    @Test
+    fun `stale recommendations or missing generation cannot select a root validator`() = runBlocking {
+        val api = Api("no-store")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.recommendationsDocument = recommendations("STALE")
+        assertTrue(runCatching { backend.recommendedHotkeys(0) }.isFailure)
+        api.recommendationsDocument = policy("FRESH")
+        assertTrue(runCatching { backend.recommendedHotkeys(0) }.isFailure)
+    }
+
     @Test
     fun `uses gateway paths and reuses only HTTP fresh responses`() = runBlocking {
         val api = Api("max-age=60")
@@ -30,6 +56,20 @@ class BittensorValidatorBackendTest {
             listOf("https://infra.test/v1/bittensor/subnets/64/validators", "https://infra.test/v1/bittensor/recommendations/subnets"),
             api.requests
         )
+    }
+
+    @Test
+    fun `changing infrastructure invalidates cached validator recommendations`() = runBlocking {
+        val api = Api("max-age=60")
+        api.recommendationsDocument = recommendations("FRESH")
+        var baseUrl = "https://infra.test/".toHttpUrl()
+        val urls = InfrastructureUrls { baseUrl }
+        val backend = BittensorValidatorBackend(api, urls)
+        backend.recommendedHotkeys(0)
+        baseUrl = "https://other-infra.test/".toHttpUrl()
+        backend.recommendedHotkeys(0)
+
+        assertEquals(listOf("https://infra.test/v1/bittensor/recommendations", "https://other-infra.test/v1/bittensor/recommendations"), api.requests)
     }
 
     @Test
@@ -106,17 +146,37 @@ class BittensorValidatorBackendTest {
     }
 
     private class Api(private val cacheControl: String) : BittensorValidatorsApi {
+
         val requests = mutableListOf<String>()
+
+        var recommendationsDocument = policy("FRESH")
+
         override suspend fun validators(url: String): Response<BittensorValidatorsRemote> {
             requests += url
             return Response.success(BittensorValidatorsRemote(emptyList()), headers())
         }
         override suspend fun recommendations(url: String): Response<BittensorRecommendationsRemote> {
             requests += url
-            return Response.success(policy("FRESH"), headers())
+            return Response.success(recommendationsDocument, headers())
         }
         private fun headers() = Headers.Builder().add("Cache-Control", cacheControl).build()
     }
+
+    private fun recommendations(freshness: String): BittensorRecommendationsRemote = gson.fromJson(
+        """{
+            "meta":{
+                "components":{"recommendations":{"availability":"AVAILABLE","freshness":"$freshness"}},
+                "generation":{"sourceBlockNumber":123},
+                "clientGates":{"maxTake":"0.18","requirePermit":true,"requireActiveWithinCutoff":true}
+            },
+            "classes":{
+                "stable":[{"netuid":1,"hotkey":"subnet-one"},{"netuid":0,"hotkey":"stable-root"}],
+                "balanced":[{"netuid":0,"hotkey":"balanced-root"}],
+                "higherUpside":[{"netuid":0,"hotkey":"higher-root"}]
+            }
+        }""",
+        BittensorRecommendationsRemote::class.java
+    )
 
     companion object {
         private fun policy(freshness: String) = BittensorRecommendationsRemote(

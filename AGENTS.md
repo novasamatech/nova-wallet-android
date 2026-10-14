@@ -50,6 +50,8 @@ Respect Android minSdk when converting numbers: a passing JVM test does not prov
 
 ## Bittensor validator selection
 
+Use the shared iOS-compatible Bittensor configuration for the commission rate and subnet logos. Root-validator defaults come from eligible existing positions or attested recommendations, not a separate fixed-address configuration.
+
 Load the validator directory and filtering policy through attested infrastructure endpoints, not directly from tao.app. Do not invent local `maxTake` values or fallback eligibility policies when the backend is unavailable. Check UID, permit, take, and activity on-chain at one block hash using batched queries; revalidate the selected validator before submission. Backend names and optional statistics do not replace on-chain eligibility checks.
 
 Generate a validator's icon from its hotkey with `AddressIconGenerator`, as for other addresses in the app. A chain logo or generic placeholder does not replace an address identicon. Explicitly pass the validator selected before amount entry into confirmation. Eligibility revalidation must not silently substitute another validator.

@@ -50,9 +50,9 @@
             <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
                 android:gravity="center" android:text="@string/bittensor_return_disclaimer" android:textColor="@color/text_secondary" />
-            <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            <TextView android:id="@+id/feeCaption" style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp"
-                android:gravity="center" android:text="@string/bittensor_subnet_fee_caption" android:textColor="@color/text_secondary" />
+                android:gravity="center" android:textColor="@color/text_secondary" />
             <TextView android:id="@+id/walletChanged" style="@style/TextAppearance.NovaFoundation.Regular.Body"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="16dp"
                 android:text="@string/bittensor_wallet_changed" android:visibility="gone" />

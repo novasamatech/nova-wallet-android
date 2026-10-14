@@ -64,9 +64,9 @@
 
             </LinearLayout>
 
-            <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+            <TextView android:id="@+id/feeCaption" style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="12dp"
-                android:gravity="center" android:text="@string/bittensor_subnet_fee_caption" android:textColor="@color/text_secondary" />
+                android:gravity="center" android:textColor="@color/text_secondary" />
             <Space android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" />
             <TextView style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
                 android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="24dp"

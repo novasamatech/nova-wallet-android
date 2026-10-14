@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavoritesRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -16,7 +17,14 @@ class BittensorSubnetInteractorTest {
     private val portfolioRepository = mock(BittensorPortfolioRepository::class.java)
     private val bittensorSubnetQuoteInteractor = mock(BittensorSubnetQuoteInteractor::class.java)
     private val favorites = mock(BittensorSubnetFavoritesRepository::class.java)
-    private val bittensorSubnetInteractor = BittensorSubnetInteractor(repository, portfolioRepository, bittensorSubnetQuoteInteractor, favorites)
+    private val configRepository = mock(BittensorConfigRepository::class.java)
+    private val bittensorSubnetInteractor = BittensorSubnetInteractor(
+        repository,
+        portfolioRepository,
+        bittensorSubnetQuoteInteractor,
+        favorites,
+        configRepository
+    )
 
     @Test
     fun `subnet lookup uses the id rather than catalogue order`() = runBlocking {

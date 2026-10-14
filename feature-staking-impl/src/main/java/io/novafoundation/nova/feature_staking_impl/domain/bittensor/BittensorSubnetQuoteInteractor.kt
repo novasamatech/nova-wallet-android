@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeout
@@ -18,7 +19,8 @@ data class BittensorSubnetBuyQuote(
     val totalTaoInPlanks: BigInteger,
     val serviceFeeTaoInPlanks: BigInteger,
     val simulation: BittensorSwapSimulation,
-    val limitPrice: BigInteger
+    val limitPrice: BigInteger,
+    val serviceFeeRate: BigDecimal
 ) {
     val stakeTaoInPlanks: BigInteger get() = totalTaoInPlanks - serviceFeeTaoInPlanks
 
@@ -33,13 +35,14 @@ class BittensorSubnetCommission(val fraction: BigDecimal) {
 
     fun feeFor(taoAmount: BigInteger): BigInteger {
         require(taoAmount.signum() > 0 && taoAmount.bitLength() <= 64) { "Native-token amount must be a positive u64" }
-        return taoAmount.toBigDecimal().multiply(fraction).setScale(0, RoundingMode.DOWN).toBigIntegerExact()
+        // Like iOS: the configured rate applies to the net amount, while the input includes the fee.
+        return taoAmount.toBigDecimal().multiply(fraction).divide(BigDecimal.ONE + fraction, 0, RoundingMode.DOWN).toBigIntegerExact()
     }
 }
 
 class BittensorSubnetQuoteInteractor(
     private val swapSource: BittensorSwapSource,
-    private val commission: BittensorSubnetCommission
+    private val configRepository: BittensorConfigRepository
 ) {
 
     suspend fun quoteBuy(
@@ -48,6 +51,7 @@ class BittensorSubnetQuoteInteractor(
         totalTaoInPlanks: BigInteger,
         slippage: BittensorSlippage
     ): BittensorSubnetBuyQuote = withTimeout(20_000L) {
+        val commission = configRepository.config().commission
         val serviceFee = commission.feeFor(totalTaoInPlanks)
         val stakeAmount = totalTaoInPlanks - serviceFee
         coroutineScope {
@@ -63,7 +67,8 @@ class BittensorSubnetQuoteInteractor(
                 totalTaoInPlanks = totalTaoInPlanks,
                 serviceFeeTaoInPlanks = serviceFee,
                 simulation = simulation,
-                limitPrice = slippage.limitPrice(price.await(), BittensorSwapDirection.TAO_TO_ALPHA)
+                limitPrice = slippage.limitPrice(price.await(), BittensorSwapDirection.TAO_TO_ALPHA),
+                serviceFeeRate = commission.fraction
             )
         }
     }

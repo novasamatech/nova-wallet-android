@@ -54,6 +54,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetAmountViewModel) = with(binder) {
+        viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.amountModel.observe(amount::setChooseAmountModel)
         viewModel.fiatAmount.observe(amount::setFiatAmount)
         viewModel.maxAmount.observe(amount::setMaxAmountDisplay)

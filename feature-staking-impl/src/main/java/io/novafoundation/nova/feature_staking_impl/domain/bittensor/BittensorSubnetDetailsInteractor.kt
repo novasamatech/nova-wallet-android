@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
@@ -23,13 +24,13 @@ enum class BittensorSubnetChartPeriod(val source: PricePeriod, val days: Int) {
 class BittensorSubnetDetailsInteractor(
     private val markets: BittensorSubnetMarketRepository,
     private val prices: CoinPriceRepository,
-    private val commission: BittensorSubnetCommission
+    private val configRepository: BittensorConfigRepository
 ) {
-    fun estimateAlpha(grossTao: BigDecimal, priceInRao: java.math.BigInteger?): BigDecimal? {
+    suspend fun estimateAlpha(grossTao: BigDecimal, priceInRao: java.math.BigInteger?): BigDecimal? {
         val spot = priceInRao?.takeIf { it.signum() > 0 }?.let { BigDecimal(it, 9) } ?: return null
         val planks = grossTao.movePointRight(9).toBigInteger()
         if (planks.signum() <= 0) return null
-        return BigDecimal(planks - commission.feeFor(planks), 9).divide(spot, 9, RoundingMode.DOWN)
+        return BigDecimal(planks - configRepository.config().commission.feeFor(planks), 9).divide(spot, 9, RoundingMode.DOWN)
     }
 
     suspend fun history(

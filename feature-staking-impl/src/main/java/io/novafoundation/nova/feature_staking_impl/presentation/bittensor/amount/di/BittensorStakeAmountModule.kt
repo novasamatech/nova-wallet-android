@@ -14,6 +14,7 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 
 @Module(includes = [ViewModelModule::class])
 class BittensorStakeAmountModule {
@@ -26,14 +27,16 @@ class BittensorStakeAmountModule {
         router: StakingRouter,
         bittensorStakingInteractor: BittensorStakingInteractor,
         assetIconProvider: AssetIconProvider,
-        iconGenerator: AddressIconGenerator
+        iconGenerator: AddressIconGenerator,
+        validatorCommunicator: BittensorSelectValidatorCommunicator
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             resourceManager = resourceManager,
             router = router,
             bittensorStakingInteractor = bittensorStakingInteractor,
             assetIconProvider = assetIconProvider,
-            iconGenerator = iconGenerator
+            iconGenerator = iconGenerator,
+            validatorCommunicator = validatorCommunicator
         )
     }
 

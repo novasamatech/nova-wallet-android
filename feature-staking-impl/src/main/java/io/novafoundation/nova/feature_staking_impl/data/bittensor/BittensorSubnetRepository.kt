@@ -7,21 +7,31 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 interface BittensorSubnetRepository {
 
     suspend fun subnets(): List<BittensorSubnet>
 }
 
-class RealBittensorSubnetRepository(private val runtimeCalls: MultiChainRuntimeCallsApi) : BittensorSubnetRepository {
+class RealBittensorSubnetRepository(
+    private val runtimeCalls: MultiChainRuntimeCallsApi,
+    private val configRepository: BittensorConfigRepository
+) : BittensorSubnetRepository {
 
     override suspend fun subnets(): List<BittensorSubnet> = withTimeout(20_000L) {
-        runtimeCalls.forChain(ChainGeneses.BITTENSOR).call(
-            section = "SubnetInfoRuntimeApi",
-            method = "get_all_dynamic_info",
-            arguments = emptyMap(),
-            returnBinding = ::bindBittensorSubnets
-        )
+        coroutineScope {
+            val config = async { configRepository.config() }
+            val subnets = runtimeCalls.forChain(ChainGeneses.BITTENSOR).call(
+                section = "SubnetInfoRuntimeApi",
+                method = "get_all_dynamic_info",
+                arguments = emptyMap(),
+                returnBinding = ::bindBittensorSubnets
+            )
+            val logos = config.await().subnetLogos
+            subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
+        }
     }
 }
 

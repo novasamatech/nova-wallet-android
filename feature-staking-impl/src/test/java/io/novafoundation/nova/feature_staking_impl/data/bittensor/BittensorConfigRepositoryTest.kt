@@ -1,0 +1,108 @@
+package io.novafoundation.nova.feature_staking_impl.data.bittensor
+
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
+import org.junit.Test
+import org.mockito.Mockito.mock
+import java.io.IOException
+import java.math.BigDecimal
+
+class BittensorConfigRepositoryTest {
+
+    private val gson = Gson()
+
+    private val logger = mock(Logger::class.java)
+
+    @Test
+    fun `canonical iOS config supplies the fee and only valid HTTPS subnet logos`() {
+        val config = bindBittensorConfig(
+            document(
+                """
+            {"swapFee":0.005,"subnets":[
+                {"netuid":1,"logo":"https://logos.test/first.png"},
+                {"netuid":1,"logo":"https://logos.test/duplicate.png"},
+                {"netuid":2,"logo":"http://logos.test/insecure.png"},
+                {"netuid":3,"logo":null},
+                {"netuid":65536,"logo":"https://logos.test/overflow.png"},
+                {"netuid":-1,"logo":"https://logos.test/negative.png"},
+                null, 123, {"netuid":4,"logo":{"url":"https://logos.test/wrong.png"}}
+            ]}
+        """
+            )
+        )
+
+        assertEquals(BigDecimal("0.005"), config.commission.fraction)
+        assertEquals(mapOf(BittensorSubnetId(1) to "https://logos.test/first.png"), config.subnetLogos)
+    }
+
+    @Test
+    fun `missing or invalid fee uses the iOS fallback without losing valid logos`() {
+        for (fee in listOf("null", "-0.1", "1", "2", "{}", "true", "\"invalid\"")) {
+            val config = bindBittensorConfig(document("""{"swapFee":$fee,"subnets":[{"netuid":1,"logo":"https://logos.test/1.png"}]}"""))
+            assertEquals(BigDecimal("0.003"), config.commission.fraction)
+            assertEquals(1, config.subnetLogos.size)
+        }
+        assertEquals(BigDecimal("0.003"), bindBittensorConfig(document("""{"subnets":[]}""")).commission.fraction)
+        assertEquals(BigDecimal.ZERO, bindBittensorConfig(document("""{"swapFee":0,"subnets":[]}""")).commission.fraction)
+    }
+
+    @Test
+    fun `config is fetched once and reused by fee and logo consumers`() = runBlocking {
+        val api = Api(document("""{"swapFee":0.004,"subnets":[]}"""))
+        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+        assertSame(repository.config(), repository.config())
+        assertEquals(listOf("https://config.test/config.json"), api.urls)
+    }
+
+    @Test
+    fun `failed request falls back and can recover on the next load`() = runBlocking {
+        val api = Api(document("""{"swapFee":0.004,"subnets":[]}"""))
+        api.failure = IOException("Unavailable")
+        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+        assertEquals(BigDecimal("0.003"), repository.config().commission.fraction)
+        api.failure = null
+        assertEquals(BigDecimal("0.004"), repository.config().commission.fraction)
+        assertEquals(2, api.urls.size)
+    }
+
+    @Test
+    fun `cancellation is never converted to fallback configuration`() = runBlocking {
+        val api = Api(document("""{"subnets":[]}"""))
+        val cancellation = CancellationException("Screen closed")
+        api.failure = cancellation
+        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+        val failure = runCatching { repository.config() }.exceptionOrNull()
+        assertTrue(failure is CancellationException)
+        assertEquals(cancellation.message, failure?.message)
+    }
+
+    @Test
+    fun `malformed logo catalogue cannot be cached as valid config`() {
+        assertTrue(runCatching { bindBittensorConfig(document("""{"swapFee":0.004}""")) }.isFailure)
+    }
+
+    private fun document(json: String): JsonObject = gson.fromJson(json, JsonObject::class.java)
+
+    private class Api(private val document: JsonObject) : BittensorConfigApi {
+
+        val urls = mutableListOf<String>()
+
+        var failure: Exception? = null
+
+        override suspend fun config(url: String): JsonObject {
+            urls += url
+            failure?.let { throw it }
+            return document
+        }
+    }
+}

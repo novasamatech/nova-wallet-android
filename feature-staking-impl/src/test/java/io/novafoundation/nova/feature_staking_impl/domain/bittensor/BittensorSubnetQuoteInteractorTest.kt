@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfig
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -12,10 +14,19 @@ import java.math.BigInteger
 class BittensorSubnetQuoteInteractorTest {
 
     private val subnet = BittensorSubnetId(64)
+
     private val commission = BittensorSubnetCommission(BigDecimal("0.003"))
+
+    private var configuredCommission = commission
+
+    private val configRepository = BittensorConfigRepository { BittensorConfig(configuredCommission, emptyMap()) }
+
     private var partial = false
+
     private var cancellation = false
+
     private var requestedInput: BigInteger? = null
+
     private val source = object : BittensorSwapSource {
         override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorSubnetId): BigInteger = BigInteger.valueOf(1000)
 
@@ -29,8 +40,14 @@ class BittensorSubnetQuoteInteractorTest {
             requestedInput = amountIn
             val runtimeFee = BigInteger.TEN
             return BittensorSwapSimulation(
-                subnetId, direction, amountIn - runtimeFee - if (partial) BigInteger.ONE else BigInteger.ZERO,
-                BigInteger.valueOf(1234), runtimeFee, BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO
+                subnetId,
+                direction,
+                amountIn - runtimeFee - if (partial) BigInteger.ONE else BigInteger.ZERO,
+                BigInteger.valueOf(1234),
+                runtimeFee,
+                BigInteger.ZERO,
+                BigInteger.ZERO,
+                BigInteger.ZERO
             )
         }
     }
@@ -38,8 +55,8 @@ class BittensorSubnetQuoteInteractorTest {
     @Test
     fun `Nova fee is included in total input and simulation receives only the stake amount`() = runBlocking {
         val quote = interactor().quoteBuy("bittensor", subnet, BigInteger.valueOf(1_000_000_000), slippage())
-        assertEquals(BigInteger.valueOf(3_000_000), quote.serviceFeeTaoInPlanks)
-        assertEquals(BigInteger.valueOf(997_000_000), requestedInput)
+        assertEquals(BigInteger.valueOf(2_991_026), quote.serviceFeeTaoInPlanks)
+        assertEquals(BigInteger.valueOf(997_008_974), requestedInput)
         assertEquals(requestedInput, quote.simulation.amountIn + quote.simulation.taoFee)
         assertEquals(quote.totalTaoInPlanks, quote.stakeTaoInPlanks + quote.serviceFeeTaoInPlanks)
         assertEquals(BigInteger.valueOf(1234), quote.alphaOutInPlanks) // Runtime swap fees must not be subtracted twice.
@@ -49,7 +66,20 @@ class BittensorSubnetQuoteInteractorTest {
     @Test
     fun `tiny commission rounds down rather than charging a whole rao`() {
         assertEquals(BigInteger.ZERO, commission.feeFor(BigInteger.ONE))
-        assertEquals(BigInteger.ONE, commission.feeFor(BigInteger.valueOf(334)))
+        assertEquals(BigInteger.ZERO, commission.feeFor(BigInteger.valueOf(334)))
+        assertEquals(BigInteger.ONE, commission.feeFor(BigInteger.valueOf(335)))
+    }
+
+    @Test
+    fun `quotes capture the configured rate and later config changes do not alter confirmed fees`() = runBlocking {
+        val original = interactor().quoteBuy("bittensor", subnet, BigInteger.valueOf(1_000_000_000), slippage())
+        configuredCommission = BittensorSubnetCommission(BigDecimal("0.02"))
+        val updated = interactor().quoteBuy("bittensor", subnet, BigInteger.valueOf(1_000_000_000), slippage())
+
+        assertEquals(BigDecimal("0.003"), original.serviceFeeRate)
+        assertEquals(BigInteger.valueOf(2_991_026), original.serviceFeeTaoInPlanks)
+        assertEquals(BigDecimal("0.02"), updated.serviceFeeRate)
+        assertEquals(BigInteger.valueOf(19_607_843), updated.serviceFeeTaoInPlanks)
     }
 
     @Test
@@ -75,6 +105,6 @@ class BittensorSubnetQuoteInteractorTest {
         }
     }
 
-    private fun interactor() = BittensorSubnetQuoteInteractor(source, commission)
+    private fun interactor() = BittensorSubnetQuoteInteractor(source, configRepository)
     private fun slippage() = BittensorSlippage(BigDecimal("0.005"))
 }

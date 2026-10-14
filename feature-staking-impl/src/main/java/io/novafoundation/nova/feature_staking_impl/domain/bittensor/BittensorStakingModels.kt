@@ -11,7 +11,7 @@ data class BittensorRootStakingDetails(
     val metaId: Long,
     val chain: Chain,
     val asset: Asset,
-    val validator: BittensorValidator,
+    val validator: BittensorValidator?,
     val annualPercentageYield: BigDecimal?,
     val position: BittensorRootPosition?,
     val dataStatus: BittensorDataStatus

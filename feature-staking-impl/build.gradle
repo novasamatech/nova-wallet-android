@@ -10,7 +10,7 @@ android {
 
         buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config_dev.json\""
         buildConfigField "String", "RECOMMENDED_VALIDATORS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/validators/v1/nova_validators_dev.json\""
-        buildConfigField "String", "BITTENSOR_EARN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/feat/bittensor-earn-dev-config/staking/bittensor/v1/earn_config_dev.json\""
+        buildConfigField "String", "BITTENSOR_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/bittensor/v1/config.json\""
     }
 
     buildTypes {
@@ -20,7 +20,6 @@ android {
 
             buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config.json\""
             buildConfigField "String", "RECOMMENDED_VALIDATORS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/validators/v1/nova_validators.json\""
-            buildConfigField "String", "BITTENSOR_EARN_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/bittensor/v1/earn_config.json\""
         }
     }
     namespace 'io.novafoundation.nova.feature_staking_impl'

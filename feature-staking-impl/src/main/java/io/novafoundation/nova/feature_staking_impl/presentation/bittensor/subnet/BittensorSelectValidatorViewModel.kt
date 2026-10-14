@@ -16,7 +16,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -30,7 +30,7 @@ import kotlinx.coroutines.flow.map
 
 class BittensorSelectValidatorViewModel(
     private val communicator: BittensorSelectValidatorCommunicator,
-    private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
+    private val validatorsRepository: BittensorSubnetValidatorRepository,
     private val icons: AddressIconGenerator,
     private val router: StakingRouter,
     private val externalActions: ExternalActions.Presentation,
@@ -42,7 +42,16 @@ class BittensorSelectValidatorViewModel(
     private val request = communicator.requireLastInput()
 
     private val validatorsState = flowOf {
-        bittensorSubnetStakingInteractor.validators(BittensorSubnetId(request.subnetId)).map { validator ->
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
+        val validators = if (request.subnetId == 0) {
+            validatorsRepository.rootValidators(chain)
+        } else {
+            validatorsRepository.validators(
+                chain,
+                BittensorSubnetId(request.subnetId)
+            )
+        }
+        validators.map { validator ->
             val icon = icons.createAddressIcon(
                 validator.validator.hotkey.value,
                 AddressIconGenerator.SIZE_MEDIUM,

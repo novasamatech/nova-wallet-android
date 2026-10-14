@@ -26,8 +26,11 @@ class BittensorValidatorsRemote(val items: List<Item>?) {
     class Item(val netuid: Int?, val hotkey: String?, val identitySourceName: String?, val stakeSourceName: String?)
 }
 
-class BittensorRecommendationsRemote(val meta: Meta?) {
-    class Meta(val clientGates: Gates?, val components: Components?)
+class BittensorRecommendationsRemote(val meta: Meta?, val classes: Classes? = null) {
+    class Meta(val clientGates: Gates?, val components: Components?, val generation: Generation? = null)
+    class Generation(val sourceBlockNumber: java.math.BigInteger?)
+    class Classes(val stable: List<Item>?, val balanced: List<Item>?, val higherUpside: List<Item>?)
+    class Item(val netuid: Int?, val hotkey: String?)
     class Components(val recommendations: Component?)
     class Component(val availability: String?, val freshness: String?)
     class Gates(val maxTake: String?, val requirePermit: Boolean?, val requireActiveWithinCutoff: Boolean?)
@@ -46,6 +49,8 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
 
     private var recommendations: Cached<BittensorRecommendationsRemote>? = null
 
+    private var validatorRecommendations: Cached<BittensorRecommendationsRemote>? = null
+
     suspend fun validators(netuid: Int): BittensorValidatorsRemote = mutex.withLock {
         val url = url("subnets/$netuid/validators")
         lists[netuid]?.takeIf { System.nanoTime() < it.deadlineNanos }?.let { return@withLock it.data }
@@ -63,12 +68,25 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         bindBittensorValidatorGates(cached.data)
     }
 
+    suspend fun recommendedHotkeys(netuid: Int): List<String> = mutex.withLock {
+        val url = url("recommendations")
+        val cached = validatorRecommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
+            ?: cache(api.recommendations(url)).also { validatorRecommendations = it }
+        bindBittensorValidatorGates(cached.data)
+        val sourceBlock = requireNotNull(cached.data.meta?.generation?.sourceBlockNumber) { "Missing recommendation generation" }
+        require(sourceBlock.signum() >= 0) { "Invalid recommendation block" }
+        val classes = requireNotNull(cached.data.classes) { "Missing validator recommendations" }
+        listOf(classes.stable, classes.balanced, classes.higherUpside).flatMap { it.orEmpty() }
+            .filter { it.netuid == netuid }.mapNotNull { it.hotkey }.distinct()
+    }
+
     private suspend fun url(path: String): String {
         val base = infrastructureUrls.baseUrl() ?: throw InfrastructureUrlMissingException()
         require(base.isHttps) { "Infrastructure requires HTTPS" }
         if (base != cachedBaseUrl) {
             lists.clear()
             recommendations = null
+            validatorRecommendations = null
             cachedBaseUrl = base
         }
         return requireNotNull(base.resolve("/v1/bittensor/$path")).toString()

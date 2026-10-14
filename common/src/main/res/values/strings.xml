@@ -2869,7 +2869,7 @@
     <string name="bittensor_slippage_fixed">Slippage tolerance is 0.5%. The operation is rejected if the price moves beyond this limit; partial staking is not allowed.</string>
     <string name="bittensor_subnet">Subnet</string>
     <string name="bittensor_you_receive">You will get</string>
-    <string name="bittensor_subnet_fee_caption">Includes 0.3% Nova Wallet fee.</string>
+    <string name="bittensor_subnet_fee_caption">Includes %1$s%% Nova Wallet fee.</string>
     <string name="bittensor_subnet_staking_progress">Staking to subnet %1$d…</string>
     <string name="bittensor_subnet_staking_success">Staked to subnet %1$d</string>
     <string name="bittensor_subnet_staking_completed">The staking operation was included successfully.</string>

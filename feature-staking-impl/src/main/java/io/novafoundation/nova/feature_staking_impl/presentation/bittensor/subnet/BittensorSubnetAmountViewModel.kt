@@ -111,6 +111,11 @@ class BittensorSubnetAmountViewModel(
         }
     }.shareInBackground()
 
+    val feeCaption = combine(quote, flowOf { bittensorSubnetInteractor.commissionRate() }) { quote, configuredRate ->
+        val rate = quote?.quote?.serviceFeeRate ?: configuredRate
+        resources.getString(R.string.bittensor_subnet_fee_caption, rate.movePointRight(2).toStripTrailingZerosString())
+    }.shareInBackground()
+
     val alphaAmount = combine(subnet.filterNotNull(), quote) { subnet, quote ->
         quote?.takeIf { it.request.subnetId == subnet.id }?.let {
             "≈ \u200e" + tokenFormatter.formatToken(BigDecimal(it.quote.alphaOutInPlanks, 9), TokenSymbol(subnet.symbol.ifBlank { "—" }))

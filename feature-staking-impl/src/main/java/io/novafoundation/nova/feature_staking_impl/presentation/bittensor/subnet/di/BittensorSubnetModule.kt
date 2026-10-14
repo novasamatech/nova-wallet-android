@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -41,7 +41,7 @@ class BittensorSubnetModule {
     @ViewModelKey(BittensorSelectValidatorViewModel::class)
     fun selectValidator(
         communicator: BittensorSelectValidatorCommunicator,
-        bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
+        validatorsRepository: BittensorSubnetValidatorRepository,
         icons: AddressIconGenerator,
         router: StakingRouter,
         externalActions: ExternalActions.Presentation,
@@ -50,7 +50,7 @@ class BittensorSubnetModule {
         logger: Logger
     ): ViewModel = BittensorSelectValidatorViewModel(
         communicator,
-        bittensorSubnetStakingInteractor,
+        validatorsRepository,
         icons,
         router,
         externalActions,

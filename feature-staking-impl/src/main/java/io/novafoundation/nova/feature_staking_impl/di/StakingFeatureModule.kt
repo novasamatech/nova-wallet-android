@@ -54,7 +54,9 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorP
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RemoteBittensorRootValidatorSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEarnConfigApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RemoteBittensorConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
@@ -69,7 +71,6 @@ import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.common.data.storage.Preferences
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetCommission
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetQuoteInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.BuildConfig
@@ -220,8 +221,16 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorValidatorSource(apiCreator: NetworkApiCreator): BittensorRootValidatorSource =
-        RemoteBittensorRootValidatorSource(apiCreator.create(BittensorEarnConfigApi::class.java), BuildConfig.BITTENSOR_EARN_CONFIG_URL)
+    fun provideBittensorValidatorSource(backend: BittensorValidatorBackend, validators: BittensorSubnetValidatorRepository): BittensorRootValidatorSource =
+        RemoteBittensorRootValidatorSource(backend, validators)
+
+    @Provides
+    fun provideBittensorConfigApi(apiCreator: NetworkApiCreator): BittensorConfigApi = apiCreator.create(BittensorConfigApi::class.java)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorConfigRepository(api: BittensorConfigApi, logger: Logger): BittensorConfigRepository =
+        RemoteBittensorConfigRepository(api, BuildConfig.BITTENSOR_CONFIG_URL, logger)
 
     @Provides
     @FeatureScope
@@ -234,8 +243,8 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorSubnetRepository(runtimeCalls: MultiChainRuntimeCallsApi): BittensorSubnetRepository =
-        RealBittensorSubnetRepository(runtimeCalls)
+    fun provideBittensorSubnetRepository(runtimeCalls: MultiChainRuntimeCallsApi, configRepository: BittensorConfigRepository): BittensorSubnetRepository =
+        RealBittensorSubnetRepository(runtimeCalls, configRepository)
 
     @Provides
     @FeatureScope
@@ -243,23 +252,21 @@ class StakingFeatureModule {
         BittensorSubnetFavoritesRepository(accounts, preferences)
 
     @Provides
-    fun provideBittensorSubnetCommission() = BittensorSubnetCommission(java.math.BigDecimal("0.003"))
-
-    @Provides
     fun provideBittensorChartAxisFormatterFactory(fiatFormatter: FiatFormatter, tokenFormatter: TokenFormatter) =
         BittensorChartAxisFormatter.Factory(fiatFormatter, tokenFormatter)
 
     @Provides
-    fun provideBittensorSubnetQuotes(source: BittensorSwapSource, commission: BittensorSubnetCommission) =
-        BittensorSubnetQuoteInteractor(source, commission)
+    fun provideBittensorSubnetQuotes(source: BittensorSwapSource, configRepository: BittensorConfigRepository) =
+        BittensorSubnetQuoteInteractor(source, configRepository)
 
     @Provides
     fun provideBittensorSubnetInteractor(
         repository: BittensorSubnetRepository,
         portfolioRepository: BittensorPortfolioRepository,
         bittensorSubnetQuoteInteractor: BittensorSubnetQuoteInteractor,
-        favorites: BittensorSubnetFavoritesRepository
-    ) = BittensorSubnetInteractor(repository, portfolioRepository, bittensorSubnetQuoteInteractor, favorites)
+        favorites: BittensorSubnetFavoritesRepository,
+        configRepository: BittensorConfigRepository
+    ) = BittensorSubnetInteractor(repository, portfolioRepository, bittensorSubnetQuoteInteractor, favorites, configRepository)
 
     @Provides
     fun provideBittensorSubnetValidators(
@@ -281,8 +288,8 @@ class StakingFeatureModule {
     fun provideBittensorSubnetDetails(
         markets: BittensorSubnetMarketRepository,
         prices: CoinPriceRepository,
-        commission: BittensorSubnetCommission
-    ) = BittensorSubnetDetailsInteractor(markets, prices, commission)
+        configRepository: BittensorConfigRepository
+    ) = BittensorSubnetDetailsInteractor(markets, prices, configRepository)
 
     @Provides
     @FeatureScope
@@ -353,14 +360,16 @@ class StakingFeatureModule {
         accountRepository: AccountRepository,
         positionSource: BittensorPositionSource,
         validatorSource: BittensorRootValidatorSource,
-        positionUpdates: BittensorPositionUpdates
+        positionUpdates: BittensorPositionUpdates,
+        logger: Logger
     ): BittensorStakingRepository = RealBittensorStakingRepository(
         chainRegistry = chainRegistry,
         walletRepository = walletRepository,
         accountRepository = accountRepository,
         positionSource = positionSource,
         validatorSource = validatorSource,
-        positionUpdates = positionUpdates
+        positionUpdates = positionUpdates,
+        logger = logger
     )
 
     @Provides
@@ -374,8 +383,9 @@ class StakingFeatureModule {
         extrinsicService: ExtrinsicService,
         flowState: BittensorStakingFlowState,
         accountRepository: AccountRepository,
-        walletRepository: WalletRepository
-    ) = BittensorStakingInteractor(repository, extrinsicService, flowState, accountRepository, walletRepository)
+        walletRepository: WalletRepository,
+        validators: BittensorSubnetValidatorRepository
+    ) = BittensorStakingInteractor(repository, extrinsicService, flowState, accountRepository, walletRepository, validators)
 
     @Provides
     @FeatureScope

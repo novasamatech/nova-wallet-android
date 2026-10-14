@@ -89,7 +89,9 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         }
     }
 
-    private val rootInteractor = BittensorStakingInteractor(rootRepository, extrinsicService, flowState, accounts, wallets)
+    private val rootValidators = mock(BittensorSubnetValidatorRepository::class.java)
+
+    private val rootInteractor = BittensorStakingInteractor(rootRepository, extrinsicService, flowState, accounts, wallets, rootValidators)
 
     private val subnetValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
@@ -124,7 +126,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             BigInteger.ZERO,
             BigInteger.ZERO
         ),
-        BigInteger.valueOf(1005)
+        BigInteger.valueOf(1005),
+        java.math.BigDecimal.ZERO
     )
 
     private val beneficiary = AccountIdKey(ByteArray(32) { 2 })
@@ -156,6 +159,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         assertEquals(BatchMode.BATCH_ALL, extrinsicService.submissionOptions?.batchMode)
         assertSame(chain, extrinsicService.submissionChain)
         if (stakingType == StakingType.ROOT) {
+            verify(rootValidators).validateRoot(chain, validator)
             assertEquals(1, rootRefreshes)
             assertFalse(rootInteractor.hasDraft())
         } else {

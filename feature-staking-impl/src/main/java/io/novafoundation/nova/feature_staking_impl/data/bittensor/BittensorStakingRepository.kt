@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import java.math.BigDecimal
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 
 interface BittensorStakingRepository {
@@ -28,7 +29,7 @@ interface BittensorStakingRepository {
 
 interface BittensorRootValidatorSource {
 
-    suspend fun preferredValidator(chain: Chain): BittensorValidator
+    suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator?
 
     suspend fun annualPercentageYield(): BigDecimal?
 }
@@ -39,7 +40,8 @@ class RealBittensorStakingRepository(
     private val accountRepository: AccountRepository,
     private val positionSource: BittensorPositionSource,
     private val validatorSource: BittensorRootValidatorSource,
-    private val positionUpdates: BittensorPositionUpdates
+    private val positionUpdates: BittensorPositionUpdates,
+    private val logger: Logger
 ) : BittensorStakingRepository {
 
     override fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> = flowOfAll {
@@ -54,9 +56,9 @@ class RealBittensorStakingRepository(
                     metaId = metaAccount.id,
                     chain = chain,
                     asset = asset,
-                    validator = validatorSource.preferredValidator(chain),
+                    validator = position.validator,
                     annualPercentageYield = validatorSource.annualPercentageYield(),
-                    position = position.position,
+                    position = position.positions?.firstOrNull { it.validatorHotkey == position.validator?.hotkey },
                     dataStatus = position.status
                 )
             }
@@ -68,20 +70,30 @@ class RealBittensorStakingRepository(
     }
 
     private fun observePosition(chain: Chain, coldkey: ByteArray): Flow<PositionState> {
-        var cachedPosition: BittensorRootPosition? = null
+        var cachedPositions: List<BittensorRootPosition>? = null
         return positionUpdates.updates.mapLatest {
-            try {
-                val validator = validatorSource.preferredValidator(chain)
-                cachedPosition = positionSource.rootPositions(chain.id, coldkey)
-                    .firstOrNull { it.validatorHotkey == validator.hotkey }
-                PositionState(cachedPosition, BittensorDataStatus.Fresh)
+            val status = try {
+                cachedPositions = positionSource.rootPositions(chain.id, coldkey)
+                BittensorDataStatus.Fresh
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                PositionState(cachedPosition, BittensorDataStatus.Stale(e))
+                logger.log("[BittensorRoot] Failed to refresh root positions")
+                logger.log(e)
+                BittensorDataStatus.Stale(e)
             }
+            val validator = try {
+                validatorSource.preferredValidator(chain, cachedPositions.orEmpty())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                logger.log("[BittensorRoot] Failed to select a default validator")
+                logger.log(e)
+                null
+            }
+            PositionState(cachedPositions, status, validator)
         }
     }
 
-    private data class PositionState(val position: BittensorRootPosition?, val status: BittensorDataStatus)
+    private data class PositionState(val positions: List<BittensorRootPosition>?, val status: BittensorDataStatus, val validator: BittensorValidator?)
 }
