@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
@@ -14,7 +15,7 @@ class RemoteBittensorRootValidatorSource(
 
     override suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator? {
         val eligible = validators.rootValidators(chain).filter { it.selectable }
-        val existing = positions.filter { it.stakeInPlanks.signum() > 0 }.maxByOrNull { it.stakeInPlanks }?.validatorHotkey
+        val existing = positions.filter { it.stakeInPlanks.isPositive() }.maxByOrNull { it.stakeInPlanks }?.validatorHotkey
         eligible.firstOrNull { it.validator.hotkey == existing }?.let { return it.validator }
 
         val recommendations = backend.recommendedHotkeys(0)

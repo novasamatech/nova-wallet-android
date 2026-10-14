@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -41,6 +42,8 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
 import java.math.BigDecimal
+import java.math.RoundingMode
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPricePoint
 
 class BittensorSubnetDetailsViewModel(
     private val subnetId: BittensorSubnetId,
@@ -48,7 +51,7 @@ class BittensorSubnetDetailsViewModel(
     private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
     private val router: StakingRouter,
     private val resources: ResourceManager,
-    private val formatter: TokenFormatter,
+    private val tokenFormatter: TokenFormatter,
     private val iconGenerator: AddressIconGenerator,
     private val bittensorSubnetDetailsInteractor: BittensorSubnetDetailsInteractor,
     private val logger: Logger,
@@ -102,7 +105,7 @@ class BittensorSubnetDetailsViewModel(
         BittensorStakeAmountPreset.entries.associateWith { preset ->
             when (preset) {
                 BittensorStakeAmountPreset.MAX -> resources.getString(R.string.bittensor_max)
-                else -> formatter.formatToken(preset.amountFor(asset.transferable), asset.token.configuration.symbol)
+                else -> tokenFormatter.formatToken(preset.amountFor(asset.transferable), asset.token.configuration.symbol)
             }
         }
     }.shareInBackground()
@@ -125,13 +128,13 @@ class BittensorSubnetDetailsViewModel(
     val validatorCount = validators.map { it.size.toString() }.shareInBackground()
 
     val pool = combine(subnet, asset) { subnet, asset ->
-        subnet.taoReserveInPlanks?.let { formatter.formatToken(it, asset) } ?: "—"
+        subnet.taoReserveInPlanks?.let { tokenFormatter.formatToken(it, asset) } ?: "—"
     }
         .shareInBackground()
 
     val estimatedAlpha = combine(subnet, presetAmount) { subnet, amount ->
         bittensorSubnetDetailsInteractor.estimateAlpha(amount, subnet.priceInRao)?.let {
-            resources.getString(R.string.bittensor_estimated_hold, formatter.formatToken(it, TokenSymbol(subnet.symbol.ifBlank { "—" })))
+            resources.getString(R.string.bittensor_estimated_hold, tokenFormatter.formatToken(it, TokenSymbol(subnet.symbol.ifBlank { "—" })))
         } ?: "—"
     }.shareInBackground()
 
@@ -140,7 +143,7 @@ class BittensorSubnetDetailsViewModel(
         if (fiat) {
             price?.let(asset.token::toFiatOrNull)?.let { fiatFormatter.formatFiat(it, asset.token.currency) } ?: "—"
         } else {
-            price?.let { formatter.formatToken(it, asset.token.configuration.symbol) } ?: "—"
+            price?.let { tokenFormatter.formatToken(it, asset.token.configuration.symbol) } ?: "—"
         }
     }.shareInBackground()
 
@@ -167,42 +170,18 @@ class BittensorSubnetDetailsViewModel(
             }
         }.shareInBackground()
 
-    private val periods = BittensorSubnetChartPeriod.entries
+    private val chartPeriods = BittensorSubnetChartPeriod.entries
 
-    private val labels = listOf("1D", "7D", "1M", "3M", "1Y")
+    private val chartPeriodLabels = listOf("1D", "7D", "1M", "3M", "1Y")
 
-    val charts = combine(chartPoints, period, _isFiatMode) { points, selected, fiat ->
-        periods.mapIndexed { index, period ->
-            if (period != selected || points.isEmpty()) {
-                PriceChartModel.Empty(labels[index], "")
-            } else {
-                PriceChartModel.Chart(
-                    labels[index],
-                    labels[index],
-                    true,
-                    points.map {
-                        PriceChartModel.Chart.Price(it.timestamp, if (fiat) it.fiat else it.tao)
-                    }
-                )
-            }
-        }
-    }.shareInBackground()
+    val charts = combine(chartPoints, period, isFiatMode, ::mapCharts).shareInBackground()
 
-    val priceChange = combine(chartPoints, _isFiatMode, period) { points, fiat, period ->
-        if (points.size < 2) {
-            "—"
-        } else {
-            val first = if (fiat) points.first().fiat else points.first().tao
-            val last = if (fiat) points.last().fiat else points.last().tao
-            val percent = (last - first).multiply(BigDecimal(100)).divide(first, 1, java.math.RoundingMode.HALF_EVEN)
-            (if (percent.signum() > 0) "+" else "") + percent.toPlainString() + "% · " + labels[periods.indexOf(period)]
-        }
-    }.shareInBackground()
+    val priceChange = combine(chartPoints, isFiatMode, period, ::formatPriceChange).shareInBackground()
 
     init {
         combine(validatorCommunicator.responseFlow, validatorsState) { response, validators ->
             validators.dataOrNull?.firstOrNull { response.subnetId == subnetId.value && it.address == response.address }
-        }.onEach { row -> row?.let(::validatorSelected) }.launchIn(this)
+        }.mapNotNull { it }.onEach(::validatorSelected).launchIn(this)
     }
 
     fun validatorClicked() = launchUnit {
@@ -224,7 +203,7 @@ class BittensorSubnetDetailsViewModel(
     }
 
     fun selectPeriod(index: Int) {
-        periods.getOrNull(index)?.let { period.value = it }
+        chartPeriods.getOrNull(index)?.let { period.value = it }
     }
 
     fun toggleFavorite() = launchUnit {
@@ -247,6 +226,34 @@ class BittensorSubnetDetailsViewModel(
     }
 
     fun back() = router.back()
+
+    private fun mapCharts(
+        points: List<BittensorSubnetPricePoint>,
+        selectedPeriod: BittensorSubnetChartPeriod,
+        isFiatMode: Boolean
+    ): List<PriceChartModel> {
+        return chartPeriods.mapIndexed { index, period ->
+            if (period != selectedPeriod || points.isEmpty()) {
+                PriceChartModel.Empty(chartPeriodLabels[index], "")
+            } else {
+                PriceChartModel.Chart(
+                    chartPeriodLabels[index],
+                    chartPeriodLabels[index],
+                    true,
+                    points.map { PriceChartModel.Chart.Price(it.timestamp, if (isFiatMode) it.fiat else it.tao) }
+                )
+            }
+        }
+    }
+
+    private fun formatPriceChange(points: List<BittensorSubnetPricePoint>, isFiatMode: Boolean, period: BittensorSubnetChartPeriod): String {
+        if (points.size < 2) return "—"
+        val firstPrice = if (isFiatMode) points.first().fiat else points.first().tao
+        val lastPrice = if (isFiatMode) points.last().fiat else points.last().tao
+        val percent = (lastPrice - firstPrice).multiply(BigDecimal(100)).divide(firstPrice, 1, RoundingMode.HALF_EVEN)
+        val sign = if (percent.isPositive) "+" else ""
+        return "$sign${percent.toPlainString()}% · ${chartPeriodLabels[chartPeriods.indexOf(period)]}"
+    }
 
     private fun reportFailure(step: String, cause: Throwable) {
         logger.log("[BittensorSubnetDetails] Failed to load $step")

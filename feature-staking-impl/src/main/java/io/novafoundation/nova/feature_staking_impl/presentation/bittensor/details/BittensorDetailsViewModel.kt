@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -8,6 +9,7 @@ import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
@@ -35,6 +37,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
@@ -81,7 +84,8 @@ class BittensorDetailsViewModel(
     private val bittensorPriceChartInteractor: BittensorPriceChartInteractor,
     private val logger: Logger,
     private val subnetRepository: BittensorSubnetRepository,
-    private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory
+    private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
+    private val fiatFormatter: FiatFormatter
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val reload = MutableStateFlow(0L)
@@ -124,7 +128,7 @@ class BittensorDetailsViewModel(
 
     val rootStake = portfolio.map { data -> format(data.positions?.rootStake, data) }.shareInBackground()
 
-    val hasRootStake = portfolio.map { it.positions?.rootStake?.signum() == 1 }.shareInBackground()
+    val hasRootStake = portfolio.map { it.positions?.rootStake?.isPositive() == true }.shareInBackground()
 
     val assetIcon = portfolio.map { assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration) }.shareInBackground()
 
@@ -176,7 +180,7 @@ class BittensorDetailsViewModel(
     val priceChartFormatters = combine(chartAsset, chartPeriod) { asset, period ->
         val token = asset.token
         PriceChartTextInjectors(
-            RealPricePriceTextInjector(token.currency, token.coinRate?.rate),
+            RealPricePriceTextInjector(token.currency, token.coinRate?.rate, fiatFormatter),
             BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(period)]),
             RealDateChartTextInjector(resources)
         )
@@ -249,7 +253,7 @@ class BittensorDetailsViewModel(
     val positions = combine(portfolio, subnetMetadata) { data, metadata ->
         val positions = data.positions ?: return@combine emptyList()
         buildList {
-            if (positions.rootStake.signum() > 0) {
+            if (positions.rootStake.isPositive()) {
                 add(
                     BittensorPositionUi(
                         "root",
@@ -283,7 +287,7 @@ class BittensorDetailsViewModel(
             val address = data.chain.addressOf(position.validatorHotkey.value)
             BittensorPositionUi(
                 id = address,
-                title = address.take(6) + "…" + address.takeLast(6),
+                title = address.ellipsizeAddress(),
                 subtitle = resources.getString(R.string.bittensor_validator),
                 amount = AmountModel("—", resources.getString(R.string.bittensor_validator_apr_period)),
                 icon = Icon.FromDrawable(iconGenerator.createAddressIcon(position.validatorHotkey.value, 32)),

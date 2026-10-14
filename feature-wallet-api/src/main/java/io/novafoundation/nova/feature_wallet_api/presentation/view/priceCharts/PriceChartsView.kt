@@ -56,7 +56,9 @@ class PriceChartsView @JvmOverloads constructor(
     private val binder = ViewPriceChartsBinding.inflate(inflater(), this)
 
     private var charts: List<PriceChartModel> = emptyList()
+
     private var selectedChartIndex = 0
+
     private var externalChangeView: TextView? = null
 
     /** A plot-only presentation for screens that already own their amount header. */
@@ -94,7 +96,9 @@ class PriceChartsView @JvmOverloads constructor(
     private val controller: ChartController
 
     private var priceTextInjector: PriceTextInjector? = null
+
     private var priceChangeTextInjector: PriceChangeTextInjector? = null
+
     private var dateTextInjector: DateChartTextInjector? = null
 
     init {

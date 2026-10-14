@@ -64,6 +64,8 @@ Generate a validator's icon from its hotkey with `AddressIconGenerator`, as for 
 
 ## Self-review and refactoring
 
+Use existing numeric sign extensions (`isPositive`, `isNegative`, `isZero`, `isNonNegative`, and `isNonPositive`) instead of inline `signum()` comparisons or local duplicates. Respect their existing property/function syntax for each numeric type. Apply the established project conventions proactively when reviewing nearby code, not only to explicitly reported lines.
+
 Give variables, classes, and functions clear, descriptive names that convey their purpose. Balance name length with the context it provides: avoid ambiguous abbreviations, but do not repeat information already clear from the surrounding scope.
 
 Separate class property declarations with a blank line, following existing ViewModel references. Apply this to both single-line properties and multi-line flow declarations.

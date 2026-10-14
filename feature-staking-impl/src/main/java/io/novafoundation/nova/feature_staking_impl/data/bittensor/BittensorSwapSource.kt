@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.utils.isNonNegative
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
@@ -31,7 +33,7 @@ class RealBittensorSwapSource(
         direction: BittensorSwapDirection,
         amountIn: BigInteger
     ): BittensorSwapSimulation {
-        require(amountIn.signum() > 0 && amountIn.bitLength() <= 64) { "Swap input must be a positive u64" }
+        require(amountIn.isPositive() && amountIn.bitLength() <= 64) { "Swap input must be a positive u64" }
         val buying = direction == BittensorSwapDirection.TAO_TO_ALPHA
 
         return runtimeCallsApi.forChain(chainId).call(
@@ -50,7 +52,7 @@ class RealBittensorSwapSource(
             section = "SwapRuntimeApi",
             method = "current_alpha_price",
             arguments = mapOf("netuid" to BigInteger.valueOf(subnetId.value.toLong())),
-            returnBinding = { bindBittensorU64(it).also { price -> require(price.signum() > 0) { "Subnet has no valid alpha price" } } }
+            returnBinding = { bindBittensorU64(it).also { price -> require(price.isPositive()) { "Subnet has no valid alpha price" } } }
         )
     }
 }
@@ -71,7 +73,7 @@ internal fun bindBittensorSwapSimulation(
     val amountOut = if (buying) alphaAmount else taoAmount
 
     // Runtime reports simulation failures as an all-zero struct, not an RPC error.
-    require(amountIn.signum() > 0 && amountOut.signum() > 0) { "Subnet swap simulation failed" }
+    require(amountIn.isPositive() && amountOut.isPositive()) { "Subnet swap simulation failed" }
     val inputFee = if (buying) taoFee else alphaFee
     require(amountIn + inputFee <= requestedAmount) { "Simulation input including fee exceeds the requested amount" }
 
@@ -88,5 +90,5 @@ internal fun bindBittensorSwapSimulation(
 }
 
 internal fun bindBittensorU64(decoded: Any?): BigInteger = bindNumber(decoded).also {
-    require(it.signum() >= 0 && it.bitLength() <= 64) { "Invalid Bittensor u64 value" }
+    require(it.isNonNegative && it.bitLength() <= 64) { "Invalid Bittensor u64 value" }
 }

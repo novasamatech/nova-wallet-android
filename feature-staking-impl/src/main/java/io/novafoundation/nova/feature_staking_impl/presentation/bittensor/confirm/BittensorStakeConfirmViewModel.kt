@@ -39,7 +39,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
-import java.text.NumberFormat
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import kotlinx.coroutines.CancellationException
 import io.novafoundation.nova.common.utils.TokenSymbol
 
@@ -51,7 +52,9 @@ class BittensorStakeConfirmViewModel(
     walletUiUseCase: WalletUiUseCase,
     selectedAccountUseCase: SelectedAccountUseCase,
     private val bittensorStakingInteractor: BittensorStakingInteractor,
-    private val iconGenerator: AddressIconGenerator
+    private val iconGenerator: AddressIconGenerator,
+    private val fiatFormatter: FiatFormatter,
+    private val tokenFormatter: TokenFormatter
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
@@ -221,13 +224,11 @@ class BittensorStakeConfirmViewModel(
     }
 
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =
-        "${amount.toStripTrailingZerosString()} ${symbol.value}"
+        tokenFormatter.formatToken(amount, symbol).toString()
 
     private fun formatFiatOrDash(amount: BigDecimal?, details: BittensorRootStakingDetails): String {
         if (amount == null) return "—"
 
-        return NumberFormat.getCurrencyInstance().apply {
-            currency = java.util.Currency.getInstance(details.asset.token.currency.code)
-        }.format(amount)
+        return fiatFormatter.formatFiat(amount, details.asset.token.currency).toString()
     }
 }

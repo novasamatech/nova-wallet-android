@@ -26,10 +26,13 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     private val context = chart.context
 
     private val chartUIParams = ChartUIParams.default(context)
+
     private val longClickDetector = LongPressDetector(cancelDistance = 5.dpF(context), timeout = 200, ::onChartsLongClick)
 
     private var currentEntries: List<Entry> = emptyList()
+
     private var useNeutralColor = false
+
     private var filledLine = false
 
     fun useFilledLine() {

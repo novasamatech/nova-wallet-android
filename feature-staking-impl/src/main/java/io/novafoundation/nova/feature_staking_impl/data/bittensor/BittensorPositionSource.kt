@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.utils.isZero
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
@@ -44,7 +46,7 @@ internal fun bindBittensorRootPositions(decoded: Any?): List<BittensorRootPositi
     val netuid = bindNumber(value["netuid"])
     val stake = bindNumber(value["stake"])
 
-    if (netuid.signum() == 0 && stake.signum() > 0) {
+    if (netuid.isZero && stake.isPositive()) {
         BittensorRootPosition(bindAccountIdKey(value["hotkey"]), stake)
     } else {
         null
@@ -56,7 +58,7 @@ internal fun bindBittensorSubnetPositions(decoded: Any?): List<BittensorSubnetPo
     val netuid = bindBittensorU16(value["netuid"])
     val stake = bindBittensorU64(value["stake"])
 
-    if (netuid != 0 && stake.signum() > 0) {
+    if (netuid != 0 && stake.isPositive()) {
         BittensorSubnetPosition(BittensorSubnetId(netuid), bindAccountIdKey(value["hotkey"]), stake)
     } else {
         null

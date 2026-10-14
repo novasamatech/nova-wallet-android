@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.utils.isZero
+import io.novasama.substrate_sdk_android.hash.isPositive
+import java.math.BigInteger
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
@@ -66,6 +69,6 @@ internal fun bindBittensorSubnetPrice(tao: Any?, alpha: Any?): java.math.BigInte
     if (tao == null || alpha == null) return null
     val taoReserve = bindBittensorU64(tao)
     val alphaReserve = bindBittensorU64(alpha)
-    if (taoReserve.signum() == 0 || alphaReserve.signum() == 0) return null
-    return (taoReserve * java.math.BigInteger.TEN.pow(9) / alphaReserve).takeIf { it.signum() > 0 }
+    if (taoReserve.isZero || alphaReserve.isZero) return null
+    return (taoReserve * BigInteger.TEN.pow(9) / alphaReserve).takeIf { it.isPositive() }
 }

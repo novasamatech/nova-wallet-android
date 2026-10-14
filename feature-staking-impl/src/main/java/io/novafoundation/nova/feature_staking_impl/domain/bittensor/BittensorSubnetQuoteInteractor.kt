@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.utils.isNonNegative
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import kotlinx.coroutines.async
@@ -30,11 +32,11 @@ data class BittensorSubnetBuyQuote(
 class BittensorSubnetCommission(val fraction: BigDecimal) {
 
     init {
-        require(fraction >= BigDecimal.ZERO && fraction < BigDecimal.ONE) { "Commission must be in [0, 1)" }
+        require(fraction.isNonNegative && fraction < BigDecimal.ONE) { "Commission must be in [0, 1)" }
     }
 
     fun feeFor(taoAmount: BigInteger): BigInteger {
-        require(taoAmount.signum() > 0 && taoAmount.bitLength() <= 64) { "Native-token amount must be a positive u64" }
+        require(taoAmount.isPositive() && taoAmount.bitLength() <= 64) { "Native-token amount must be a positive u64" }
         // Like iOS: the configured rate applies to the net amount, while the input includes the fee.
         return taoAmount.toBigDecimal().multiply(fraction).divide(BigDecimal.ONE + fraction, 0, RoundingMode.DOWN).toBigIntegerExact()
     }
@@ -60,7 +62,7 @@ class BittensorSubnetQuoteInteractor(
             require(simulation.subnetId == subnetId && simulation.direction == BittensorSwapDirection.TAO_TO_ALPHA) { "Unexpected subnet quote" }
             // amountIn is the runtime's net pool input. The swap fee is paid in the input token.
             require(simulation.amountIn + simulation.taoFee == stakeAmount) { "Partial subnet quotes are not supported" }
-            require(simulation.amountOut.signum() > 0 && simulation.amountOut.bitLength() <= 64) { "Invalid subnet quote output" }
+            require(simulation.amountOut.isPositive() && simulation.amountOut.bitLength() <= 64) { "Invalid subnet quote output" }
 
             BittensorSubnetBuyQuote(
                 subnetId = subnetId,

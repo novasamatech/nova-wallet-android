@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novasama.substrate_sdk_android.hash.isPositive
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.filterLoaded
@@ -47,7 +48,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.text.NumberFormat
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import kotlinx.coroutines.CancellationException
 import io.novafoundation.nova.common.utils.TokenSymbol
 
@@ -57,7 +59,9 @@ class BittensorStakeAmountViewModel(
     private val bittensorStakingInteractor: BittensorStakingInteractor,
     private val assetIconProvider: AssetIconProvider,
     private val iconGenerator: AddressIconGenerator,
-    private val validatorCommunicator: BittensorSelectValidatorCommunicator
+    private val validatorCommunicator: BittensorSelectValidatorCommunicator,
+    private val fiatFormatter: FiatFormatter,
+    private val tokenFormatter: TokenFormatter
 ) : BaseViewModel() {
 
     private val stakingDetailsState = bittensorStakingInteractor.observeRootStakingDetails()
@@ -267,15 +271,11 @@ class BittensorStakeAmountViewModel(
     }
 
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =
-        "${amount.toStripTrailingZerosString()} ${symbol.value}"
+        tokenFormatter.formatToken(amount, symbol).toString()
 
     private fun formatFiat(amount: BigDecimal, details: BittensorRootStakingDetails): String {
-        return NumberFormat.getCurrencyInstance().apply {
-            currency = java.util.Currency.getInstance(details.asset.token.currency.code)
-        }.format(amount)
+        return fiatFormatter.formatFiat(amount, details.asset.token.currency).toString()
     }
-
-    private fun BigInteger.isPositive(): Boolean = signum() > 0
 
     private data class FeeRequest(val metaId: Long, val validatorHotkey: AccountIdKey, val amount: BigInteger)
 

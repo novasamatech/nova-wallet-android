@@ -37,6 +37,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetBuyQuote
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -58,6 +62,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 
 class BittensorSubnetReviewViewModel(
     private val subnetId: BittensorSubnetId,
@@ -103,13 +108,7 @@ class BittensorSubnetReviewViewModel(
     private val preparationRequest = MutableStateFlow(0L)
 
     private val preparationState = preparationRequest.flatMapLatest {
-        flowOf {
-            val subnet = bittensorSubnetInteractor.subnet(subnetId)
-            val selectedValidator = bittensorSubnetStakingInteractor.validators(subnetId).firstOrNull { it.address == validatorAddress && it.selectable }
-            requireNotNull(selectedValidator) { "Validator is no longer eligible in this subnet" }
-            val draft = bittensorSubnetStakingInteractor.prepare(metaId, subnetId, totalInPlanks, selectedValidator.validator)
-            PreparedStake(subnet, draft)
-        }.withSafeLoading()
+        flowOf { prepareStake() }.withSafeLoading()
             .onError { preparationFailed(it) }
     }.shareInBackground()
 
@@ -126,63 +125,15 @@ class BittensorSubnetReviewViewModel(
     val hasError = combine(portfolioState, preparationState) { portfolio, preparation -> portfolio.isError() || preparation.isError() }
         .shareInBackground()
 
-    val fee = combine(preparationState, portfolioState) { preparation, portfolio ->
-        when {
-            preparation.isError() || portfolio.isError() -> FeeStatus.Error
-            else -> preparation.dataOrNull?.draft?.let { draft ->
-                portfolio.dataOrNull?.asset?.token?.let { token ->
-                    val fiat = token.toFiatOrNull(draft.fee.decimalAmount)
-                    val amount = amountFormatter.formatAmountToAmountModel(
-                        PricedAmount(draft.fee.decimalAmount, fiat ?: BigDecimal.ZERO, token.currency),
-                        draft.fee.asset.symbol
-                    )
-                    FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(amount.token, amount.fiat.takeIf { fiat != null })))
-                }
-            } ?: FeeStatus.Loading(true)
-        }
-    }.shareInBackground()
+    val fee = combine(preparationState, portfolioState, ::mapFeeStatus).shareInBackground()
 
     val validator = draft.map { it?.validator?.name ?: resources.getString(R.string.bittensor_select_validator) }.shareInBackground()
 
     val walletChanged = portfolioState.map { it.dataOrNull?.metaId != metaId }.shareInBackground()
 
-    val assets = combine(portfolio, subnet, quote) { portfolio, subnet, quote ->
-        val token = portfolio.asset.token
-        val input = token.amountFromPlanks(totalInPlanks)
-        val output = quote?.let { BigDecimal(it.alphaOutInPlanks, 9) }
-        val outputFiat = output?.let { alpha -> subnet?.priceInRao?.let { alpha * token.amountFromPlanks(it) } }?.let(token::toFiatOrNull)
-        fun amountModel(amount: BigDecimal, symbol: TokenSymbol, fiat: BigDecimal?): AmountModel {
-            return amountFormatter.formatAmountToAmountModel(
-                PricedAmount(amount, fiat ?: BigDecimal.ZERO, token.currency),
-                symbol
-            ).let { it.copy(fiat = it.fiat.takeIf { fiat != null }) }
-        }
-        SwapAssetsView.Model(
-            assetIn = SwapAssetView.Model(
-                assetIcon = icons.getAssetIconOrFallback(token.configuration),
-                amount = amountModel(input, token.configuration.symbol, token.toFiatOrNull(input)),
-                iconSizeDp = 48
-            ),
-            assetOut = SwapAssetView.Model(
-                assetIcon = subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
-                amount = output?.let { amountModel(it, TokenSymbol(subnet?.symbol?.ifBlank { "—" } ?: "—"), outputFiat) }
-                    ?: AmountModel("—", null),
-                iconSizeDp = 48,
-                clipIconToOutline = true
-            )
-        )
-    }.shareInBackground()
+    val assets = combine(portfolio, subnet, quote, ::mapAssets).shareInBackground()
 
-    val rate = combine(subnet, quote, portfolio) { subnet, quote, portfolio ->
-        if (subnet == null || quote == null) {
-            "—"
-        } else {
-            val token = portfolio.asset.token
-            val ratio = BigDecimal(quote.alphaOutInPlanks, 9).divide(token.amountFromPlanks(quote.totalTaoInPlanks), 9, java.math.RoundingMode.DOWN)
-            tokenFormatter.formatToken(BigDecimal.ONE, token.configuration.symbol).toString() + " ≈ \u200e" +
-                tokenFormatter.formatToken(ratio, TokenSymbol(subnet.symbol.ifBlank { "—" }))
-        }
-    }.shareInBackground()
+    val rate = combine(subnet, quote, portfolio, ::formatRate).shareInBackground()
 
     val slippage = bittensorSubnetInteractor.slippage.fraction.multiply(BigDecimal(100)).toStripTrailingZerosString() + "%"
 
@@ -254,6 +205,61 @@ class BittensorSubnetReviewViewModel(
 
     private fun formatFee(draft: BittensorSubnetStakeDraft) =
         tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol).toString()
+
+    private suspend fun prepareStake(): PreparedStake {
+        val subnet = bittensorSubnetInteractor.subnet(subnetId)
+        val selectedValidator = bittensorSubnetStakingInteractor.validators(subnetId)
+            .firstOrNull { it.address == validatorAddress && it.selectable }
+        requireNotNull(selectedValidator) { "Validator is no longer eligible in this subnet" }
+        val draft = bittensorSubnetStakingInteractor.prepare(metaId, subnetId, totalInPlanks, selectedValidator.validator)
+        return PreparedStake(subnet, draft)
+    }
+
+    private fun mapFeeStatus(
+        preparationState: ExtendedLoadingState<PreparedStake>,
+        portfolioState: ExtendedLoadingState<BittensorPortfolio>
+    ): FeeStatus<Unit, FeeDisplay> {
+        if (preparationState.isError() || portfolioState.isError()) return FeeStatus.Error
+        val draft = preparationState.dataOrNull?.draft ?: return FeeStatus.Loading(true)
+        val token = portfolioState.dataOrNull?.asset?.token ?: return FeeStatus.Loading(true)
+        val amount = mapAmount(draft.fee.decimalAmount, draft.fee.asset.symbol, token.toFiatOrNull(draft.fee.decimalAmount), token.currency)
+        return FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(amount.token, amount.fiat)))
+    }
+
+    private fun mapAssets(portfolio: BittensorPortfolio, subnet: BittensorSubnet?, quote: BittensorSubnetBuyQuote?): SwapAssetsView.Model {
+        val token = portfolio.asset.token
+        val input = token.amountFromPlanks(totalInPlanks)
+        val output = quote?.let { BigDecimal(it.alphaOutInPlanks, 9) }
+        val outputFiat = output?.let { alpha -> subnet?.priceInRao?.let { alpha * token.amountFromPlanks(it) } }?.let(token::toFiatOrNull)
+
+        return SwapAssetsView.Model(
+            assetIn = SwapAssetView.Model(
+                assetIcon = icons.getAssetIconOrFallback(token.configuration),
+                amount = mapAmount(input, token.configuration.symbol, token.toFiatOrNull(input), token.currency),
+                iconSizeDp = 48
+            ),
+            assetOut = SwapAssetView.Model(
+                assetIcon = subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
+                amount = output?.let { mapAmount(it, TokenSymbol(subnet?.symbol?.ifBlank { "—" } ?: "—"), outputFiat, token.currency) }
+                    ?: AmountModel("—", null),
+                iconSizeDp = 48,
+                clipIconToOutline = true
+            )
+        )
+    }
+
+    private fun mapAmount(amount: BigDecimal, symbol: TokenSymbol, fiat: BigDecimal?, currency: Currency): AmountModel {
+        val model = amountFormatter.formatAmountToAmountModel(PricedAmount(amount, fiat ?: BigDecimal.ZERO, currency), symbol)
+        return model.copy(fiat = model.fiat.takeIf { fiat != null })
+    }
+
+    private fun formatRate(subnet: BittensorSubnet?, quote: BittensorSubnetBuyQuote?, portfolio: BittensorPortfolio): String {
+        if (subnet == null || quote == null) return "—"
+        val token = portfolio.asset.token
+        val ratio = BigDecimal(quote.alphaOutInPlanks, 9).divide(token.amountFromPlanks(quote.totalTaoInPlanks), 9, RoundingMode.DOWN)
+        return tokenFormatter.formatToken(BigDecimal.ONE, token.configuration.symbol).toString() + " ≈ \u200e" +
+            tokenFormatter.formatToken(ratio, TokenSymbol(subnet.symbol.ifBlank { "—" }))
+    }
 
     fun resultDismissed() {
         result.value = null

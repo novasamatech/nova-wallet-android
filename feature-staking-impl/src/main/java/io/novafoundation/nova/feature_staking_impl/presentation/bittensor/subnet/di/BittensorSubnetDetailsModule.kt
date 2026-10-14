@@ -43,18 +43,18 @@ class BittensorSubnetDetailsModule {
         fiatFormatter: FiatFormatter,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory
     ): ViewModel = BittensorSubnetDetailsViewModel(
-        BittensorSubnetId(payload.subnetId),
-        bittensorSubnetInteractor,
-        bittensorSubnetStakingInteractor,
-        router,
-        resources,
-        tokenFormatter,
-        iconGenerator,
-        bittensorSubnetDetailsInteractor,
-        logger,
-        validatorCommunicator,
-        fiatFormatter,
-        chartAxisFormatterFactory
+        subnetId = BittensorSubnetId(payload.subnetId),
+        bittensorSubnetInteractor = bittensorSubnetInteractor,
+        bittensorSubnetStakingInteractor = bittensorSubnetStakingInteractor,
+        router = router,
+        resources = resources,
+        tokenFormatter = tokenFormatter,
+        iconGenerator = iconGenerator,
+        bittensorSubnetDetailsInteractor = bittensorSubnetDetailsInteractor,
+        logger = logger,
+        validatorCommunicator = validatorCommunicator,
+        fiatFormatter = fiatFormatter,
+        chartAxisFormatterFactory = chartAxisFormatterFactory
     )
 
     @Provides

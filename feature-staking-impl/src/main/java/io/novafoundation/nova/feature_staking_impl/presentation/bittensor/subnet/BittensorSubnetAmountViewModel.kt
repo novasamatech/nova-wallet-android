@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.utils.isPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -39,7 +41,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import java.math.BigDecimal
 import java.math.BigInteger
-import java.text.NumberFormat
+import java.math.RoundingMode
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 
 class BittensorSubnetAmountViewModel(
     private val initialSubnetId: BittensorSubnetId,
@@ -50,7 +53,8 @@ class BittensorSubnetAmountViewModel(
     private val icons: AssetIconProvider,
     private val tokenFormatter: TokenFormatter,
     private val logger: Logger,
-    private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor
+    private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
+    private val fiatFormatter: FiatFormatter
 ) : BaseViewModel() {
 
     private val input = MutableStateFlow("")
@@ -77,9 +81,7 @@ class BittensorSubnetAmountViewModel(
 
     val fiatAmount = combine(portfolio, amount) { portfolio, amount ->
         amount.toBigDecimalOrNull()?.let(portfolio.asset.token::toFiatOrNull)?.let { value ->
-            NumberFormat.getCurrencyInstance().apply {
-                currency = java.util.Currency.getInstance(portfolio.asset.token.currency.code)
-            }.format(value)
+            fiatFormatter.formatFiat(value, portfolio.asset.token.currency)
         }
     }.shareInBackground()
 
@@ -89,9 +91,9 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     private val request = combine(portfolio, amount, subnet) { portfolio, amount, subnet ->
-        val planks = amount.toBigDecimalOrNull()?.takeIf { it.signum() > 0 }
+        val planks = amount.toBigDecimalOrNull()?.takeIf { it.isPositive }
             ?.let(portfolio.asset.token.configuration::planksFromAmount)
-            ?.takeIf { it.signum() > 0 && it.bitLength() <= 64 && it <= portfolio.asset.transferableInPlanks }
+            ?.takeIf { it.isPositive() && it.bitLength() <= 64 && it <= portfolio.asset.transferableInPlanks }
         QuoteRequest(portfolio.metaId, subnet?.id, planks)
     }.distinctUntilChanged().shareInBackground()
 
@@ -127,7 +129,7 @@ class BittensorSubnetAmountViewModel(
             val output = BigDecimal(it.quote.alphaOutInPlanks, 9)
             val input = portfolio.asset.token.amountFromPlanks(it.quote.totalTaoInPlanks)
             tokenFormatter.formatToken(BigDecimal.ONE, portfolio.asset.token.configuration.symbol).toString() + " ≈ \u200e" + tokenFormatter.formatToken(
-                output.divide(input, 9, java.math.RoundingMode.DOWN),
+                output.divide(input, 9, RoundingMode.DOWN),
                 TokenSymbol(subnet.symbol.ifBlank { "—" })
             )
         } ?: "—"
@@ -187,5 +189,6 @@ class BittensorSubnetAmountViewModel(
     fun back() = router.back()
 
     private data class QuoteRequest(val metaId: Long, val subnetId: BittensorSubnetId?, val amount: BigInteger?)
+
     private data class QuoteResult(val request: QuoteRequest, val quote: BittensorSubnetBuyQuote)
 }

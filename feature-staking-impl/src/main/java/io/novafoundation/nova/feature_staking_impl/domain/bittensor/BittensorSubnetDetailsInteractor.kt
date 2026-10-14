@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.utils.isPositive
+import io.novafoundation.nova.common.utils.isNonPositive
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
@@ -9,6 +12,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeout
 import java.math.BigDecimal
+import java.math.BigInteger
 import java.math.RoundingMode
 
 data class BittensorSubnetPricePoint(val timestamp: Long, val fiat: BigDecimal, val tao: BigDecimal)
@@ -26,10 +30,10 @@ class BittensorSubnetDetailsInteractor(
     private val prices: CoinPriceRepository,
     private val configRepository: BittensorConfigRepository
 ) {
-    suspend fun estimateAlpha(grossTao: BigDecimal, priceInRao: java.math.BigInteger?): BigDecimal? {
-        val spot = priceInRao?.takeIf { it.signum() > 0 }?.let { BigDecimal(it, 9) } ?: return null
+    suspend fun estimateAlpha(grossTao: BigDecimal, priceInRao: BigInteger?): BigDecimal? {
+        val spot = priceInRao?.takeIf { it.isPositive() }?.let { BigDecimal(it, 9) } ?: return null
         val planks = grossTao.movePointRight(9).toBigInteger()
-        if (planks.signum() <= 0) return null
+        if (planks.isNonPositive) return null
         return BigDecimal(planks - configRepository.config().commission.feeFor(planks), 9).divide(spot, 9, RoundingMode.DOWN)
     }
 
@@ -46,11 +50,11 @@ class BittensorSubnetDetailsInteractor(
                 val alpha = async { prices.getLastHistoryForPeriod(alphaId, currency, sourcePeriod) }
                 val tao = async { prices.getLastHistoryForPeriod(taoPriceId, currency, sourcePeriod) }
                 val alphaPoints = alpha.await().sortedBy { it.timestamp }
-                val taoPoints = tao.await().filter { it.rate.signum() > 0 }.sortedBy { it.timestamp }
+                val taoPoints = tao.await().filter { it.rate.isPositive }.sortedBy { it.timestamp }
                 if (taoPoints.isEmpty()) return@coroutineScope emptyList()
                 val cutoff = (alphaPoints.lastOrNull()?.timestamp ?: 0L) - period.days * 86_400L
                 var taoIndex = 0
-                alphaPoints.filter { it.timestamp > cutoff && it.rate.signum() > 0 }.mapNotNull { point ->
+                alphaPoints.filter { it.timestamp > cutoff && it.rate.isPositive }.mapNotNull { point ->
                     while (taoIndex + 1 < taoPoints.size && taoPoints[taoIndex + 1].timestamp <= point.timestamp) taoIndex++
                     val match = taoPoints[taoIndex]
                     // Do not divide historical alpha prices by today's TAO price or a distant point.

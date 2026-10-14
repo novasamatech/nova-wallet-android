@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceReposi
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 
 @Module(includes = [ViewModelModule::class])
@@ -43,7 +44,8 @@ class BittensorDetailsModule {
         bittensorPriceChartInteractor: BittensorPriceChartInteractor,
         logger: Logger,
         subnetRepository: BittensorSubnetRepository,
-        chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory
+        chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
+        fiatFormatter: FiatFormatter
     ): ViewModel = BittensorDetailsViewModel(
         bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
@@ -55,7 +57,8 @@ class BittensorDetailsModule {
         bittensorPriceChartInteractor = bittensorPriceChartInteractor,
         logger = logger,
         subnetRepository = subnetRepository,
-        chartAxisFormatterFactory = chartAxisFormatterFactory
+        chartAxisFormatterFactory = chartAxisFormatterFactory,
+        fiatFormatter = fiatFormatter
     )
 
     @Provides

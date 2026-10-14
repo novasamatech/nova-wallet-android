@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -111,6 +112,7 @@ class BalanceDetailModule {
         chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
         giftsAvailableGiftAssetsUseCase: AvailableGiftAssetsUseCase,
         giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
+        fiatFormatter: FiatFormatter,
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -131,7 +133,8 @@ class BalanceDetailModule {
             amountFormatter = amountFormatter,
             chainMigrationInfoUseCase = chainMigrationInfoUseCase,
             giftsRestrictionCheckMixin = giftsRestrictionCheckMixin,
-            giftsAvailableGiftAssetsUseCase = giftsAvailableGiftAssetsUseCase
+            giftsAvailableGiftAssetsUseCase = giftsAvailableGiftAssetsUseCase,
+            fiatFormatter = fiatFormatter
         )
     }
 

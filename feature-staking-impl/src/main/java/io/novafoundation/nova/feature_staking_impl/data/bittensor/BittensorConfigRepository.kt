@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.memory.SingleValueCache
+import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetCommission
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -41,7 +42,7 @@ class RemoteBittensorConfigRepository(
 internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(BigDecimal("0.003")), emptyMap())
 
 internal fun bindBittensorConfig(remote: BittensorConfigRemote): BittensorConfig {
-    val fraction = remote.swapFee?.takeIf { it >= BigDecimal.ZERO && it < BigDecimal.ONE }
+    val fraction = remote.swapFee?.takeIf { it.isNonNegative && it < BigDecimal.ONE }
     val commission = fraction?.let(::BittensorSubnetCommission) ?: fallbackBittensorConfig().commission
     val subnets = requireNotNull(remote.subnets) { "Bittensor subnet logos are missing" }
     val logos = buildMap {

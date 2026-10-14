@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 
 @Module(includes = [ViewModelModule::class])
 class BittensorSubnetAmountModule {
@@ -33,17 +34,19 @@ class BittensorSubnetAmountModule {
         icons: AssetIconProvider,
         tokenFormatter: TokenFormatter,
         logger: Logger,
-        bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor
+        bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
+        fiatFormatter: FiatFormatter
     ): ViewModel = BittensorSubnetAmountViewModel(
-        BittensorSubnetId(payload.subnetId),
-        payload.validatorAddress,
-        bittensorSubnetInteractor,
-        router,
-        resources,
-        icons,
-        tokenFormatter,
-        logger,
-        bittensorSubnetStakingInteractor
+        initialSubnetId = BittensorSubnetId(payload.subnetId),
+        validatorAddress = payload.validatorAddress,
+        bittensorSubnetInteractor = bittensorSubnetInteractor,
+        router = router,
+        resources = resources,
+        icons = icons,
+        tokenFormatter = tokenFormatter,
+        logger = logger,
+        bittensorSubnetStakingInteractor = bittensorSubnetStakingInteractor,
+        fiatFormatter = fiatFormatter
     )
 
     @Provides

@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
-
 import okhttp3.CacheControl
 import okhttp3.HttpUrl
 import retrofit2.HttpException
@@ -74,7 +74,7 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
             ?: cache(api.recommendations(url)).also { validatorRecommendations = it }
         bindBittensorValidatorGates(cached.data)
         val sourceBlock = requireNotNull(cached.data.meta?.generation?.sourceBlockNumber) { "Missing recommendation generation" }
-        require(sourceBlock.signum() >= 0) { "Invalid recommendation block" }
+        require(sourceBlock.isNonNegative) { "Invalid recommendation block" }
         val classes = requireNotNull(cached.data.classes) { "Missing validator recommendations" }
         listOf(classes.stable, classes.balanced, classes.higherUpside).flatMap { it.orEmpty() }
             .filter { it.netuid == netuid }.mapNotNull { it.hotkey }.distinct()

@@ -15,6 +15,7 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -70,7 +71,7 @@ class RealBittensorPortfolioRepository(
             val status = try {
                 cachedPositions = withTimeout(20_000L) { fetchPositions(chain.id, coldkey) }
                 BittensorDataStatus.Fresh
-            } catch (e: kotlinx.coroutines.TimeoutCancellationException) {
+            } catch (e: TimeoutCancellationException) {
                 logRefreshFailure(e)
                 BittensorDataStatus.Stale(e)
             } catch (e: CancellationException) {

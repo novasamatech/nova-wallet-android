@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.common.utils.isNonNegative
+import io.novafoundation.nova.common.utils.isZero
 import java.math.BigInteger
 
 internal suspend fun maximumBittensorStake(
@@ -8,9 +10,9 @@ internal suspend fun maximumBittensorStake(
 ): BigInteger {
     var amount = available.coerceAtLeast(BigInteger.ZERO)
     repeat(8) {
-        if (amount.signum() == 0) return BigInteger.ZERO
+        if (amount.isZero) return BigInteger.ZERO
         val deduction = estimateDeduction(amount)
-        require(deduction.signum() >= 0)
+        require(deduction.isNonNegative)
         if (amount + deduction <= available) return amount
         amount = (available - deduction).coerceAtLeast(BigInteger.ZERO).min(amount)
     }

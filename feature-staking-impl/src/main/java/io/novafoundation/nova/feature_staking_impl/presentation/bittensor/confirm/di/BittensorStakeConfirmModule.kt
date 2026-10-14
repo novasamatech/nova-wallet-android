@@ -17,6 +17,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 
 @Module(includes = [ViewModelModule::class])
 class BittensorStakeConfirmModule {
@@ -32,7 +34,9 @@ class BittensorStakeConfirmModule {
         walletUiUseCase: WalletUiUseCase,
         selectedAccountUseCase: SelectedAccountUseCase,
         bittensorStakingInteractor: BittensorStakingInteractor,
-        iconGenerator: AddressIconGenerator
+        iconGenerator: AddressIconGenerator,
+        fiatFormatter: FiatFormatter,
+        tokenFormatter: TokenFormatter
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
             resourceManager = resourceManager,
@@ -42,7 +46,9 @@ class BittensorStakeConfirmModule {
             walletUiUseCase = walletUiUseCase,
             selectedAccountUseCase = selectedAccountUseCase,
             bittensorStakingInteractor = bittensorStakingInteractor,
-            iconGenerator = iconGenerator
+            iconGenerator = iconGenerator,
+            fiatFormatter = fiatFormatter,
+            tokenFormatter = tokenFormatter
         )
     }
 

@@ -13,6 +13,8 @@ import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavorites
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -63,18 +65,7 @@ class BittensorChooseSubnetViewModel(
 
     private val favorites = bittensorSubnetInteractor.observeFavorites()
 
-    val subnets = combine(catalogue, query, favorites, asset) { subnets, query, favorites, asset ->
-        subnets.filter { query.isBlank() || it.name.contains(query, true) || it.symbol.contains(query, true) || it.id.value.toString() == query }
-            .sortedWith(compareByDescending<BittensorSubnet> { it.id.value in favorites.subnetIds }.thenBy { it.id.value })
-            .map {
-                BittensorSubnetRowUi(
-                    subnet = it,
-                    metaId = favorites.metaId,
-                    favorite = it.id.value in favorites.subnetIds,
-                    price = it.priceInRao?.let { price -> tokenFormatter.formatToken(price, asset).toString() } ?: "—"
-                )
-            }
-    }.shareInBackground()
+    val subnets = combine(catalogue, query, favorites, asset, ::mapSubnetRows).shareInBackground()
 
     val list = combine(rootIcon, subnets, asset) { icon, subnets, asset ->
         bittensorSubnetList(icon, subnets, asset.token.configuration.symbol)
@@ -106,6 +97,25 @@ class BittensorChooseSubnetViewModel(
     fun rootStaking() = router.openBittensorRootStaking()
 
     fun back() = router.back()
+
+    private fun mapSubnetRows(
+        subnets: List<BittensorSubnet>,
+        query: String,
+        favorites: BittensorSubnetFavorites,
+        asset: Asset
+    ): List<BittensorSubnetRowUi> {
+        return subnets
+            .filter { query.isBlank() || it.name.contains(query, true) || it.symbol.contains(query, true) || it.id.value.toString() == query }
+            .sortedWith(compareByDescending<BittensorSubnet> { it.id.value in favorites.subnetIds }.thenBy { it.id.value })
+            .map { subnet ->
+                BittensorSubnetRowUi(
+                    subnet = subnet,
+                    metaId = favorites.metaId,
+                    favorite = subnet.id.value in favorites.subnetIds,
+                    price = subnet.priceInRao?.let { tokenFormatter.formatToken(it, asset).toString() } ?: "—"
+                )
+            }
+    }
 }
 
 data class BittensorSubnetRowUi(val subnet: BittensorSubnet, val metaId: Long, val favorite: Boolean, val price: String)
