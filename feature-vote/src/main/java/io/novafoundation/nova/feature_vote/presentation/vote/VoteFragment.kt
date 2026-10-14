@@ -4,7 +4,6 @@ import android.view.View
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.insets.applyStatusBarInsets
-import io.novafoundation.nova.common.utils.setupWithViewPager2
 import io.novafoundation.nova.feature_vote.databinding.FragmentVoteBinding
 import io.novafoundation.nova.feature_vote.di.VoteFeatureApi
 import io.novafoundation.nova.feature_vote.di.VoteFeatureComponent
@@ -24,9 +23,8 @@ class VoteFragment : BaseFragment<VoteViewModel, FragmentVoteBinding>() {
     }
 
     override fun initViews() {
-        val adapter = VotePagerAdapter(this, router)
-        binder.voteViewPager.adapter = adapter
-        binder.voteTabs.setupWithViewPager2(binder.voteViewPager, adapter::getPageTitle)
+        binder.voteViewPager.adapter = VotePagerAdapter(this, router)
+        binder.voteViewPager.isUserInputEnabled = false
 
         binder.voteAvatar.setOnClickListener { viewModel.avatarClicked() }
     }

@@ -6,7 +6,5 @@ interface VoteRouter {
 
     fun getDemocracyFragment(): Fragment
 
-    fun getCrowdloansFragment(): Fragment
-
     fun openSwitchWallet()
 }
