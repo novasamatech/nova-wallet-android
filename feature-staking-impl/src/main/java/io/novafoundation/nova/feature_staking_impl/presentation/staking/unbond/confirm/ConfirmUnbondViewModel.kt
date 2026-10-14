@@ -42,6 +42,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class ConfirmUnbondViewModel(
     private val router: StakingRouter,
@@ -56,6 +58,7 @@ class ConfirmUnbondViewModel(
     private val selectedAssetState: AnySelectedAssetOptionSharedState,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     unbondHintsMixinFactory: UnbondHintsMixinFactory,
     walletUiUseCase: WalletUiUseCase,
     private val amountFormatter: AmountFormatter
@@ -162,14 +165,14 @@ class ConfirmUnbondViewModel(
         _showNextProgress.value = false
     }
 
-    private fun trackUnstakeCompleted(validPayload: UnbondValidationPayload) {
-        val fiatAmount = validPayload.asset.token.amountToFiat(payload.amount)
+    private suspend fun trackUnstakeCompleted(validPayload: UnbondValidationPayload) {
+        val usdAmount = usdRateRepository.amountToUsd(validPayload.asset.token.configuration, payload.amount)
 
         analyticsService.track(
             AnalyticsEvent.UnstakeCompleted(
                 stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
                 network = validPayload.stash.chain.name,
-                amountBucket = AmountBucket.from(fiatAmount)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }

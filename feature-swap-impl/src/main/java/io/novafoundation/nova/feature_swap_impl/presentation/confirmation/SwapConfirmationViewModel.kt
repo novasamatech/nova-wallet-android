@@ -60,7 +60,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.main.mapSwapValidat
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.awaitFee
@@ -80,6 +79,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 private data class SwapConfirmationState(
     val swapQuoteArgs: SwapQuoteArgs,
@@ -111,7 +112,8 @@ class SwapConfirmationViewModel(
     private val resourceManager: ResourceManager,
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
     ExternalActions by externalActions,
     Validatable by validationExecutor,
@@ -329,11 +331,11 @@ class SwapConfirmationViewModel(
         val quote = confirmationStateFlow.first().swapQuote
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
-        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return@launchUnit
+        val usdAmount = usdRateRepository.planksToUsd(quote.assetIn, quote.planksIn)
 
         analyticsService.track(
             AnalyticsEvent.SwapConfirmed(
-                amountBucket = AmountBucket.from(fiatIn),
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount),
                 slippageBucket = SlippageBucket.from(slippageFlow.first().inPercents),
                 assetIn = quote.assetIn.symbol.value,
                 assetOut = quote.assetOut.symbol.value,
@@ -348,11 +350,11 @@ class SwapConfirmationViewModel(
         val quote = confirmationStateFlow.first().swapQuote
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
-        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return@launchUnit
+        val usdAmount = usdRateRepository.planksToUsd(quote.assetIn, quote.planksIn)
 
         analyticsService.track(
             AnalyticsEvent.SwapCompleted(
-                amountBucket = AmountBucket.from(fiatIn),
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount),
                 durationBucket = DurationBucket.from(System.currentTimeMillis() - confirmedAt),
                 assetIn = quote.assetIn.symbol.value,
                 assetOut = quote.assetOut.symbol.value,

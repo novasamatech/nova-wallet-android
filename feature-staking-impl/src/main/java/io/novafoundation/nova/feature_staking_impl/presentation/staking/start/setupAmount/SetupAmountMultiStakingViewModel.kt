@@ -55,6 +55,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 private const val DEBOUNCE_RATE_MILLIS = 500
 
@@ -72,6 +74,7 @@ class SetupAmountMultiStakingViewModel(
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val amountFormatter: AmountFormatter,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(),
     Validatable by validationExecutor {
@@ -233,16 +236,16 @@ class SetupAmountMultiStakingViewModel(
         super.onCleared()
     }
 
-    private fun trackStakingInitiated(validPayload: StartMultiStakingValidationPayload) {
+    private suspend fun trackStakingInitiated(validPayload: StartMultiStakingValidationPayload) {
         val selection = validPayload.recommendableSelection.selection
         val stakingOption = selection.stakingOption
-        val usdAmount = validPayload.asset.token.planksToFiat(selection.stake)
+        val usdAmount = usdRateRepository.planksToUsd(validPayload.asset.token.configuration, selection.stake)
 
         analyticsService.track(
             AnalyticsEvent.StakingInitiated(
                 stakingType = stakingOption.stakingType.toAnalyticsStakingType(),
                 network = stakingOption.chain.name,
-                amountBucket = AmountBucket.from(usdAmount)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }

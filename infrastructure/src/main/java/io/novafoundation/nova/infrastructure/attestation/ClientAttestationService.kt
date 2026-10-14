@@ -8,7 +8,8 @@ import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.sha2
 import java.io.IOException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import okhttp3.HttpUrl
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.infrastructure.resolve
 import retrofit2.HttpException
 
 const val HEADER_PROFILE = "X-Attestation-Profile"
@@ -29,23 +30,6 @@ private const val NO_APP_ATTEST_ENVIRONMENT = ""
 private const val HTTP_FORBIDDEN = 403
 private const val HTTP_SERVER_ERRORS = 500
 
-/**
- * How a build proves itself. There is deliberately no development shortcut: the backend accepts only
- * Play Integrity for Android, so a build either attests for real or not at all.
- */
-enum class AttestationMode(val wireName: String) {
-    PLAY_INTEGRITY("play_integrity"),
-    UNATTESTED("none");
-
-    companion object {
-
-        /** Resolves the mode a build was configured with, defaulting to no attestation. */
-        fun fromWireName(wireName: String): AttestationMode {
-            return entries.firstOrNull { it.wireName == wireName } ?: UNATTESTED
-        }
-    }
-}
-
 /** The backend rejected this client's attestation; retrying will not help until the app restarts. */
 class AttestationFailedException(message: String) : IOException(message)
 
@@ -65,11 +49,10 @@ fun interface IntegrityTokenSource {
 interface ClientAttestationService {
 
     /**
-     * Proof headers for the one request described by [context] and [body], or null when this build does
-     * not attest. Registers the installation first if needed. Each call spends a fresh challenge - a proof
+     * Proof headers for the one request described by [context] and [body], Registers the installation first if needed. Each call spends a fresh challenge - a proof
      * is good for exactly one request.
      */
-    suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String>?
+    suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String>
 
     /**
      * The backend no longer knows [clientId] - typically its database was reset. The identity and key are
@@ -77,6 +60,19 @@ interface ClientAttestationService {
      * identity has already moved on, so a burst of such answers triggers one recovery.
      */
     suspend fun forgetRegistration(clientId: String)
+
+    /**
+     * Whether a client id may be created and registered. While not allowed, requests that need a new
+     * identity fail with [AttestationUnavailableException] instead of minting one - an opted-out user
+     * must not get a fresh installation registered behind their back by a request already in flight.
+     */
+    fun setClientCreationAllowed(allowed: Boolean)
+
+    /**
+     * Drops the client id and its key, so the next registration happens as a new installation that
+     * cannot be linked to the previous one. Mirrors iOS, which forgets the client on analytics opt-out.
+     */
+    suspend fun forgetClient()
 }
 
 class RealClientAttestationService(
@@ -85,8 +81,7 @@ class RealClientAttestationService(
     private val keyPairStore: AttestationKeyPairStore,
     private val integrityTokens: IntegrityTokenSource,
     private val appPackage: String,
-    private val registerUrl: HttpUrl?,
-    private val mode: AttestationMode
+    private val urls: InfrastructureUrls
 ) : ClientAttestationService {
 
     private val registrationMutex = Mutex()
@@ -94,9 +89,10 @@ class RealClientAttestationService(
     @Volatile
     private var rejected = false
 
-    override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String>? {
-        if (mode == AttestationMode.UNATTESTED) return null
+    @Volatile
+    private var clientCreationAllowed = true
 
+    override suspend fun proofHeaders(context: AttestationSigning.RequestContext, body: ByteArray): Map<String, String> {
         val (clientId, challenge) = requestChallenge()
         val digest = requestDigest(Purpose.REQUEST, challenge, clientId, context, sha256(body))
 
@@ -109,10 +105,23 @@ class RealClientAttestationService(
     }
 
     override suspend fun forgetRegistration(clientId: String) {
-        if (mode == AttestationMode.UNATTESTED) return
-
         registrationMutex.withLock {
-            if (identity.clientId() == clientId) identity.clearAttested()
+            if (identity.existingClientId() == clientId) identity.clearAttested()
+        }
+    }
+
+    override fun setClientCreationAllowed(allowed: Boolean) {
+        clientCreationAllowed = allowed
+    }
+
+    override suspend fun forgetClient() {
+        // Under the mutex, so a registration in progress finishes before its identity is dropped
+        registrationMutex.withLock {
+            val clientId = identity.existingClientId() ?: return
+
+            identity.reset()
+            keyPairStore.delete(clientId)
+            attestationLog("client forgotten - the next registration starts as a new installation")
         }
     }
 
@@ -141,7 +150,9 @@ class RealClientAttestationService(
     }
 
     private suspend fun challenge(clientId: String, purpose: Purpose): String {
-        return api.challenge(AttestationChallengeRequest(client_id = clientId, purpose = purpose.wireName, profile = PROFILE)).challenge
+        val request = AttestationChallengeRequest(client_id = clientId, purpose = purpose.wireName, profile = PROFILE)
+
+        return api.challenge(urls.resolve(CHALLENGES_PATH).toString(), request).challenge
     }
 
     private fun challengeFailure(exception: HttpException, error: BackendError): IOException {
@@ -161,9 +172,11 @@ class RealClientAttestationService(
             attestationWarn("refusing to sign: attestation was rejected earlier in this process")
             throw AttestationFailedException("Attestation was rejected by the backend")
         }
+        requireClientAllowed()
         if (identity.isAttested()) return
 
         registrationMutex.withLock {
+            requireClientAllowed()
             if (identity.isAttested()) return
 
             register(identity.clientId())
@@ -172,8 +185,17 @@ class RealClientAttestationService(
         }
     }
 
+    // Checked before touching the identity: reading the client id would mint a new one
+    private fun requireClientAllowed() {
+        if (clientCreationAllowed) return
+
+        attestationLog("refusing to sign: client creation is not allowed right now")
+        throw AttestationUnavailableException("Client creation is not allowed")
+    }
+
     private suspend fun register(clientId: String) {
-        val url = requireNotNull(registerUrl) { "Attestation is enabled without an infrastructure host" }
+        // The signed context must name exactly the URL the request goes to, so both come from here
+        val url = urls.resolve(REGISTER_PATH)
         val keyReference = base64(keyPairStore.publicKey(clientId))
 
         attestationLog("registering package=$appPackage")
@@ -195,6 +217,7 @@ class RealClientAttestationService(
 
             step = "register"
             api.register(
+                url.toString(),
                 AttestationRegisterRequest(
                     profile = PROFILE,
                     client_id = clientId,

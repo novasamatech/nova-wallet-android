@@ -83,6 +83,7 @@ import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface StakingFeatureDependencies {
 
@@ -94,6 +95,8 @@ interface StakingFeatureDependencies {
     val coinPriceRepository: io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 
     fun analyticsService(): AnalyticsService
+
+    fun usdRateRepository(): UsdRateRepository
 
     fun assetVisibilityUseCase(): AssetVisibilityUseCase
 

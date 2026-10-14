@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_cloud_backup_api.domain.CloudBackupService
 import io.novafoundation.nova.feature_currency_api.domain.CurrencyInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.PushNotificationsInteractor
 import io.novafoundation.nova.feature_push_notifications.domain.interactor.WelcomePushNotificationsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.feature_wallet_connect_api.domain.sessions.WalletConnectSessionsUseCase
 import io.novafoundation.nova.runtime.ethereum.Web3ApiFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -79,6 +80,8 @@ interface SettingsFeatureDependencies {
     val assetsIconModeRepository: AssetsIconModeRepository
 
     val accountRepository: AccountRepository
+
+    val assetVisibilityRepository: AssetVisibilityRepository
 
     val accountInteractor: AccountInteractor
 

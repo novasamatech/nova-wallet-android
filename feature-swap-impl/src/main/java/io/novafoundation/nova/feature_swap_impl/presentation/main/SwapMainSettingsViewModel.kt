@@ -85,7 +85,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountFieldValidator
 import io.novafoundation.nova.feature_wallet_api.presentation.common.fieldValidator.EnoughAmountValidatorFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
@@ -112,6 +111,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -133,6 +133,12 @@ import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.TimeSource
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
+
+private val BACKGROUND_FEE_REFRESH_INTERVAL = 10.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SwapMainSettingsViewModel(
@@ -157,6 +163,7 @@ class SwapMainSettingsViewModel(
     private val swapFlowScopeAggregator: SwapFlowScopeAggregator,
     private val getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     swapAmountInputMixinFactory: SwapAmountInputMixinFactory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     actionAwaitableFactory: ActionAwaitableMixin.Factory,
@@ -413,7 +420,7 @@ class SwapMainSettingsViewModel(
         val quote = (quotingState.value as? QuotingState.Loaded)?.quote ?: return@launch
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
-        val fiatIn = assetInFlow.first()?.token?.planksToFiatOrNull(quote.planksIn) ?: return@launch
+        val usdAmount = usdRateRepository.planksToUsd(quote.assetIn, quote.planksIn)
 
         val assetInSymbol = quote.assetIn.symbol.value
         val assetOutSymbol = quote.assetOut.symbol.value
@@ -427,7 +434,7 @@ class SwapMainSettingsViewModel(
                 assetOut = assetOutSymbol,
                 networkIn = chainRegistry.getChain(quote.assetIn.chainId).name,
                 networkOut = chainRegistry.getChain(quote.assetOut.chainId).name,
-                amountBucket = AmountBucket.from(fiatIn)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }
@@ -528,6 +535,8 @@ class SwapMainSettingsViewModel(
     }
 
     private fun FeeLoaderMixinV2.Presentation<SwapFee, FeeDisplay>.setupFees() {
+        var lastFeeLoadStartedAt = TimeSource.Monotonic.markNow() - BACKGROUND_FEE_REFRESH_INTERVAL
+
         quotingState
             .onEach {
                 when (it) {
@@ -542,8 +551,19 @@ class SwapMainSettingsViewModel(
             .mapNotNull { (previous, current) ->
                 current.takeIf {
                     // allow same value in case user quickly switched from this value to another and back without waiting for fee loading
-                    previous != current || feeMixin.fee.value !is FeeStatus.Loaded
+                    previous?.hasSameQuoteAs(current) != true || feeMixin.fee.value !is FeeStatus.Loaded
                 }
+            }
+            .transformLatest { quoteState ->
+                if (quoteState.origin == QuoteRefreshOrigin.SUBSCRIPTION) {
+                    val remainingDelay = BACKGROUND_FEE_REFRESH_INTERVAL - lastFeeLoadStartedAt.elapsedNow()
+                    if (remainingDelay.isPositive()) {
+                        delay(remainingDelay)
+                    }
+                }
+
+                lastFeeLoadStartedAt = TimeSource.Monotonic.markNow()
+                emit(quoteState)
             }
             .onEach { quoteState ->
                 loadFee { feePaymentCurrency ->
@@ -626,7 +646,9 @@ class SwapMainSettingsViewModel(
     }
 
     private fun setupPerSwapSettingQuoting() {
-        swapSettings.mapLatest { performQuote(it, shouldShowLoading = true) }
+        swapSettings.mapLatest {
+            performQuote(it, shouldShowLoading = true, origin = QuoteRefreshOrigin.USER_INPUT)
+        }
             .launchIn(viewModelScope)
     }
 
@@ -637,11 +659,11 @@ class SwapMainSettingsViewModel(
         }.onEach {
             val currentSwapSettings = swapSettings.first()
 
-            performQuote(currentSwapSettings, shouldShowLoading = false)
+            performQuote(currentSwapSettings, shouldShowLoading = false, origin = QuoteRefreshOrigin.SUBSCRIPTION)
         }.launchIn(viewModelScope)
     }
 
-    private fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean) {
+    private fun performQuote(swapSettings: SwapSettings, shouldShowLoading: Boolean, origin: QuoteRefreshOrigin) {
         quotingJob?.cancel()
         quotingJob = launch {
             val swapQuoteArgs = swapSettings.toQuoteArgs(
@@ -656,7 +678,7 @@ class SwapMainSettingsViewModel(
             val quote = swapInteractor.quote(swapQuoteArgs, swapFlowScope)
 
             quotingState.value = quote.fold(
-                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs) },
+                onSuccess = { QuotingState.Loaded(it, swapQuoteArgs, origin) },
                 onFailure = {
                     if (it is CancellationException) {
                         QuotingState.Loading
@@ -668,6 +690,10 @@ class SwapMainSettingsViewModel(
 
             handleNewQuote(quote, swapSettings)
         }
+    }
+
+    private fun QuotingState.Loaded.hasSameQuoteAs(other: QuotingState.Loaded): Boolean {
+        return quote == other.quote && quoteArgs == other.quoteArgs
     }
 
     private suspend fun QuotingState.toSwapRouteState(): SwapRouteState {

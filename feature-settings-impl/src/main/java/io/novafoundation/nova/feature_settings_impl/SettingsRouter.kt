@@ -23,6 +23,8 @@ interface SettingsRouter : ReturnableRouter {
 
     fun openAppearance()
 
+    fun openPrivacy()
+
     fun openChangePinCode()
 
     fun openWalletDetails(metaId: Long)

@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ChainAssetRep
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.ShowReceivedAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.CrossChainTransfersUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
@@ -122,6 +123,8 @@ interface WalletFeatureApi {
     fun provideWalletRepository(): WalletRepository
 
     fun provideTokenRepository(): TokenRepository
+
+    val usdRateRepository: UsdRateRepository
 
     fun provideAssetCache(): AssetCache
 
