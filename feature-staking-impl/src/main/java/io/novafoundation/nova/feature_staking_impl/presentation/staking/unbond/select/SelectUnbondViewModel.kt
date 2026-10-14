@@ -37,6 +37,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class SelectUnbondViewModel(
     private val router: StakingRouter,
@@ -48,6 +50,7 @@ class SelectUnbondViewModel(
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val amountFormatter: AmountFormatter,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     unbondHintsMixinFactory: UnbondHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory
@@ -139,7 +142,7 @@ class SelectUnbondViewModel(
         }
     }
 
-    private fun openConfirm(validationPayload: UnbondValidationPayload) {
+    private fun openConfirm(validationPayload: UnbondValidationPayload) = launch {
         trackUnstakeInitiated(validationPayload)
 
         val confirmUnbondPayload = ConfirmUnbondPayload(
@@ -150,14 +153,14 @@ class SelectUnbondViewModel(
         router.openConfirmUnbond(confirmUnbondPayload)
     }
 
-    private fun trackUnstakeInitiated(validationPayload: UnbondValidationPayload) {
-        val fiatAmount = validationPayload.asset.token.amountToFiat(validationPayload.amount)
+    private suspend fun trackUnstakeInitiated(validationPayload: UnbondValidationPayload) {
+        val usdAmount = usdRateRepository.amountToUsd(validationPayload.asset.token.configuration, validationPayload.amount)
 
         analyticsService.track(
             AnalyticsEvent.UnstakeInitiated(
                 stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
                 network = validationPayload.stash.chain.name,
-                amountBucket = AmountBucket.from(fiatAmount)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }

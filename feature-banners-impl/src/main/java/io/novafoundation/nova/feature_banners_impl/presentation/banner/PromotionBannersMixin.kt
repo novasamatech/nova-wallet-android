@@ -63,7 +63,7 @@ class RealPromotionBannersMixin(
     override fun startBannerAction(page: BannerPageModel) {
         val url = page.actionUrl ?: return
 
-        analyticsService.track(AnalyticsEvent.BannerClicked(bannerId = page.id, bannerTitle = page.title, screen = sourceScreen()))
+        analyticsService.track(AnalyticsEvent.BannerClicked(bannerId = page.id, screen = sourceScreen()))
 
         context.launchDeepLink(url)
     }

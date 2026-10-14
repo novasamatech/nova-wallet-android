@@ -29,6 +29,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 @Module(includes = [ViewModelModule::class])
 class SetupStartMythosStakingModule {
@@ -56,7 +57,8 @@ class SetupStartMythosStakingModule {
         blockNumberUseCase: StakingBlockNumberUseCase,
         validationFailureFormatter: MythosStakingValidationFailureFormatter,
         amountFormatter: AmountFormatter,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        usdRateRepository: UsdRateRepository
     ): ViewModel {
         return SetupStartMythosStakingViewModel(
             router = router,
@@ -78,7 +80,8 @@ class SetupStartMythosStakingModule {
             mythosStakingValidationFailureFormatter = validationFailureFormatter,
             stakingBlockNumberUseCase = blockNumberUseCase,
             amountFormatter = amountFormatter,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            usdRateRepository = usdRateRepository
         )
     }
 

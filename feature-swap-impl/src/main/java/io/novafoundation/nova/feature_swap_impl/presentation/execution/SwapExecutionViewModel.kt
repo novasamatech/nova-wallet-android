@@ -41,7 +41,6 @@ import io.novafoundation.nova.feature_swap_impl.presentation.common.state.SwapSt
 import io.novafoundation.nova.feature_swap_impl.presentation.common.state.getStateOrThrow
 import io.novafoundation.nova.feature_swap_impl.presentation.execution.model.SwapProgressModel
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.planksToFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.model.toAssetPayload
 import io.novafoundation.nova.runtime.ext.fullId
@@ -53,6 +52,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class SwapExecutionViewModel(
     private val swapStateStoreProvider: SwapStateStoreProvider,
@@ -67,6 +68,7 @@ class SwapExecutionViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val tokenRepository: TokenRepository,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
 ) : BaseViewModel(),
     DescriptionBottomSheetLauncher by descriptionBottomSheetLauncher,
     ExtrinsicNavigationWrapper by extrinsicNavigationWrapper {
@@ -172,11 +174,11 @@ class SwapExecutionViewModel(
         val quote = swapStateFlow.first().quote
 
         // fiat estimation is honestly unavailable without a token rate - skip the event in that case
-        val fiatIn = tokenRepository.getToken(quote.assetIn).planksToFiatOrNull(quote.planksIn) ?: return
+        val usdAmount = usdRateRepository.planksToUsd(quote.assetIn, quote.planksIn)
 
         analyticsService.track(
             AnalyticsEvent.SwapCompleted(
-                amountBucket = AmountBucket.from(fiatIn),
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount),
                 durationBucket = DurationBucket.from(System.currentTimeMillis() - executionStartedAt),
                 assetIn = quote.assetIn.symbol.value,
                 assetOut = quote.assetOut.symbol.value,

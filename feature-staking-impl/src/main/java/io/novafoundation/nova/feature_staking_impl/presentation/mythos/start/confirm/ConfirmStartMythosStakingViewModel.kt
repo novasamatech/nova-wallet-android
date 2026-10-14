@@ -58,6 +58,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class ConfirmStartMythosStakingViewModel(
     private val mythosRouter: MythosStakingRouter,
@@ -79,6 +81,7 @@ class ConfirmStartMythosStakingViewModel(
     private val extrinsicNavigationWrapper: ExtrinsicNavigationWrapper,
     private val amountFormatter: AmountFormatter,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     mythosSharedComputation: MythosSharedComputation,
     walletUiUseCase: WalletUiUseCase,
 ) : ConfirmStartSingleTargetStakingViewModel<MythosConfirmStartStakingState>(
@@ -201,7 +204,7 @@ class ConfirmStartMythosStakingViewModel(
             eventConstructor(
                 ANALYTICS_STAKING_TYPE_MYTHOS,
                 selectedAssetState.chain().name,
-                AmountBucket.from(asset.token.planksToFiat(amount))
+                AmountBucket.fromOrUnknown(usdRateRepository.planksToUsd(asset.token.configuration, amount))
             )
         )
     }
