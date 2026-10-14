@@ -1,8 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
+import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.runBlocking
 import okhttp3.Headers
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -16,7 +20,8 @@ class BittensorValidatorBackendTest {
     @Test
     fun `uses gateway paths and reuses only HTTP fresh responses`() = runBlocking {
         val api = Api("max-age=60")
-        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        val infrastructureUrls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, infrastructureUrls)
         backend.validators(64)
         backend.validators(64)
         backend.gates()
@@ -30,11 +35,57 @@ class BittensorValidatorBackendTest {
     @Test
     fun `no store responses and missing infrastructure URL are not silently cached or sent unsigned`() = runBlocking {
         val api = Api("no-store")
-        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        val infrastructureUrls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, infrastructureUrls)
         backend.validators(1)
         backend.validators(1)
         assertEquals(2, api.requests.size)
-        assertTrue(runCatching { BittensorValidatorBackend(api, "").validators(1) }.isFailure)
+        val missingInfrastructureUrls = InfrastructureUrls { null }
+        val unconfiguredBackend = BittensorValidatorBackend(api, missingInfrastructureUrls)
+        assertTrue(runCatching { unconfiguredBackend.validators(1) }.exceptionOrNull() is InfrastructureUrlMissingException)
+        assertEquals(2, api.requests.size)
+    }
+
+    @Test
+    fun `changed infrastructure URL invalidates validator and policy caches`() = runBlocking {
+        val api = Api("max-age=60")
+        var baseUrl = "https://infra.test/".toHttpUrl()
+        val infrastructureUrls = InfrastructureUrls { baseUrl }
+        val backend = BittensorValidatorBackend(api, infrastructureUrls)
+        backend.validators(1)
+        backend.gates()
+
+        baseUrl = "https://another-infra.test/".toHttpUrl()
+        backend.validators(1)
+        backend.gates()
+
+        assertEquals(
+            listOf(
+                "https://infra.test/v1/bittensor/subnets/1/validators",
+                "https://infra.test/v1/bittensor/recommendations/subnets",
+                "https://another-infra.test/v1/bittensor/subnets/1/validators",
+                "https://another-infra.test/v1/bittensor/recommendations/subnets"
+            ),
+            api.requests
+        )
+    }
+
+    @Test
+    fun `missing or insecure infrastructure cannot reuse cached data`() = runBlocking {
+        val api = Api("max-age=60")
+        var baseUrl: HttpUrl? = "https://infra.test/".toHttpUrl()
+        val infrastructureUrls = InfrastructureUrls { baseUrl }
+        val backend = BittensorValidatorBackend(api, infrastructureUrls)
+        backend.validators(1)
+        backend.gates()
+
+        baseUrl = null
+        assertTrue(runCatching { backend.validators(1) }.exceptionOrNull() is InfrastructureUrlMissingException)
+        assertTrue(runCatching { backend.gates() }.exceptionOrNull() is InfrastructureUrlMissingException)
+
+        baseUrl = "http://infra.test/".toHttpUrl()
+        assertTrue(runCatching { backend.validators(1) }.exceptionOrNull() is IllegalArgumentException)
+        assertTrue(runCatching { backend.gates() }.exceptionOrNull() is IllegalArgumentException)
         assertEquals(2, api.requests.size)
     }
 

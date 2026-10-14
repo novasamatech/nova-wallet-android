@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
+import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 
 import okhttp3.CacheControl
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
+import okhttp3.HttpUrl
 import retrofit2.HttpException
 import retrofit2.Response
 import retrofit2.http.GET
@@ -32,18 +34,22 @@ class BittensorRecommendationsRemote(val meta: Meta?) {
 }
 
 /** Only HTTP-fresh data is reused; stale data never supplies a fallback eligibility policy. */
-class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private val baseUrl: String) {
+class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private val infrastructureUrls: InfrastructureUrls) {
 
     private class Cached<T>(val data: T, val deadlineNanos: Long)
+
     private val mutex = Mutex()
+
+    private var cachedBaseUrl: HttpUrl? = null
 
     private val lists = mutableMapOf<Int, Cached<BittensorValidatorsRemote>>()
 
     private var recommendations: Cached<BittensorRecommendationsRemote>? = null
 
     suspend fun validators(netuid: Int): BittensorValidatorsRemote = mutex.withLock {
+        val url = url("subnets/$netuid/validators")
         lists[netuid]?.takeIf { System.nanoTime() < it.deadlineNanos }?.let { return@withLock it.data }
-        val response = api.validators(url("subnets/$netuid/validators"))
+        val response = api.validators(url)
         val cached = cache(response)
         if (lists.size >= 64) lists.clear()
         lists[netuid] = cached
@@ -51,14 +57,20 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
     }
 
     suspend fun gates(): BittensorValidatorGates = mutex.withLock {
+        val url = url("recommendations/subnets")
         val cached = recommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
-            ?: cache(api.recommendations(url("recommendations/subnets"))).also { recommendations = it }
+            ?: cache(api.recommendations(url)).also { recommendations = it }
         bindBittensorValidatorGates(cached.data)
     }
 
-    private fun url(path: String): String {
-        val base = requireNotNull(baseUrl.toHttpUrlOrNull()) { "Infrastructure URL is not configured" }
+    private suspend fun url(path: String): String {
+        val base = infrastructureUrls.baseUrl() ?: throw InfrastructureUrlMissingException()
         require(base.isHttps) { "Infrastructure requires HTTPS" }
+        if (base != cachedBaseUrl) {
+            lists.clear()
+            recommendations = null
+            cachedBaseUrl = base
+        }
         return requireNotNull(base.resolve("/v1/bittensor/$path")).toString()
     }
 

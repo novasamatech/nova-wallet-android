@@ -47,7 +47,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapS
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketsApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
-import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
+import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.PRICE_API_BASE_URL
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
@@ -68,6 +68,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorS
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorsApi
 import io.novafoundation.nova.infrastructure.di.Attested
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetCommission
@@ -272,7 +273,7 @@ class StakingFeatureModule {
 
     @Provides
     fun provideBittensorSubnetMarketsApi(apiCreator: NetworkApiCreator): BittensorSubnetMarketsApi =
-        apiCreator.create(BittensorSubnetMarketsApi::class.java, CoingeckoApi.BASE_URL)
+        apiCreator.create(BittensorSubnetMarketsApi::class.java, PRICE_API_BASE_URL)
 
     @Provides
     @FeatureScope
@@ -287,10 +288,15 @@ class StakingFeatureModule {
 
     @Provides
     @FeatureScope
+    fun provideBittensorValidatorsApi(@Attested apiCreator: NetworkApiCreator): BittensorValidatorsApi =
+        apiCreator.create(BittensorValidatorsApi::class.java)
+
+    @Provides
+    @FeatureScope
     fun provideBittensorValidatorBackend(
-        @Attested apiCreator: NetworkApiCreator,
-        infrastructureBaseUrl: String
-    ) = BittensorValidatorBackend(apiCreator.create(BittensorValidatorsApi::class.java), infrastructureBaseUrl)
+        api: BittensorValidatorsApi,
+        infrastructureUrls: InfrastructureUrls
+    ) = BittensorValidatorBackend(api, infrastructureUrls)
 
     @Provides
     @FeatureScope

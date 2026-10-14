@@ -6,8 +6,6 @@ import io.novafoundation.nova.infrastructure.attestation.ClientAttestationServic
 
 interface InfrastructureApi {
 
-    val infrastructureBaseUrl: String
-
     val clientAttestationService: ClientAttestationService
 
     val infrastructureUrls: InfrastructureUrls

@@ -6,6 +6,7 @@ import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.infrastructure.di.Attested
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.memory.ComputationalCache
@@ -87,7 +88,7 @@ import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateReposito
 
 interface StakingFeatureDependencies {
 
-    val infrastructureBaseUrl: String
+    val infrastructureUrls: InfrastructureUrls
 
     @get:Attested
     val attestedNetworkApiCreator: NetworkApiCreator
