@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.addBittensorRootStake
@@ -20,8 +22,7 @@ class BittensorStakingInteractor(
     private val extrinsicService: ExtrinsicService,
     private val flowState: BittensorStakingFlowState,
     private val accountRepository: AccountRepository,
-    private val walletRepository: WalletRepository,
-    private val submission: BittensorSubmissionExecutor
+    private val walletRepository: WalletRepository
 ) {
 
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> {
@@ -51,7 +52,7 @@ class BittensorStakingInteractor(
         return BittensorRootStakeDraft(details.metaId, amountInPlanks, details.validator, fee).also(flowState::setDraft)
     }
 
-    suspend fun executeRootStake(): BittensorOperationResult {
+    suspend fun executeRootStake(): Result<ExtrinsicExecutionResult> {
         val details = flowState.latestDetails ?: repository.observeRootStakingDetails().firstAndRemember()
         val draft = requireNotNull(flowState.draft.value) { "Bittensor stake draft is missing" }
 
@@ -65,14 +66,13 @@ class BittensorStakingInteractor(
             "Insufficient transferable balance"
         }
         requireSelectedWallet(draft.metaId)
-        val result = submission.execute(draft.metaId, details.chain) {
+        return extrinsicService.submitExtrinsicAndAwaitExecution(details.chain, TransactionOrigin.WalletWithId(draft.metaId)) {
             addBittensorRootStake(draft.validator.hotkey.value, draft.amountInPlanks)
-        }
-        if (result is BittensorOperationResult.Success) {
-            repository.refreshPosition()
-            flowState.clear()
-        }
-        return result
+        }.requireOk()
+            .onSuccess {
+                repository.refreshPosition()
+                flowState.clear()
+            }
     }
 
     fun clearDraft() {

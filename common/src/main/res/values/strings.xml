@@ -2890,8 +2890,6 @@
     <string name="bittensor_staking_failed_description">The staking operation failed. A network fee may have been charged.</string>
     <string name="bittensor_draft_expired">Please enter the staking amount again. The previous confirmation could not be restored.</string>
     <string name="bittensor_staking">Bittensor staking</string>
-    <string name="bittensor_submission_unknown_title">Transaction status unknown</string>
-    <string name="bittensor_submission_unknown_description">The transaction may have been included. Another staking transaction is blocked until the original outcome is verified.</string>
     <string name="bittensor_staking_mock_error">RootStakeLocked — the root stake is still locked after the last stake change. Try again in 2 d 4 h.</string>
     <string name="bittensor_chart_price_disclaimer">Chart shows %1$s price, not historical stake value</string>
     <string name="bittensor_validator_apr_period">APR · 30 days</string>

@@ -23,7 +23,6 @@ class BittensorWalletIsolationTest {
     private val accounts = mock(AccountRepository::class.java)
     private val extrinsics = mock(ExtrinsicService::class.java)
     private val wallets = mock(WalletRepository::class.java)
-    private val submission = mock(BittensorSubmissionExecutor::class.java)
     private val state = BittensorStakingFlowState()
     private val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator", null)
     private val details = BittensorRootStakingDetails(
@@ -67,5 +66,5 @@ class BittensorWalletIsolationTest {
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
     }
 
-    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, accounts, wallets, submission)
+    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, accounts, wallets)
 }

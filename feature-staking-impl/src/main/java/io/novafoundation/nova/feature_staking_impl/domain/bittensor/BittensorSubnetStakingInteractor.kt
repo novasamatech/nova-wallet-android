@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
@@ -34,8 +36,7 @@ class BittensorSubnetStakingInteractor(
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val portfolio: BittensorPortfolioRepository,
     private val extrinsics: ExtrinsicService,
-    private val beneficiaryAddress: String,
-    private val submission: BittensorSubmissionExecutor
+    private val beneficiaryAddress: String
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
@@ -71,18 +72,17 @@ class BittensorSubnetStakingInteractor(
         BittensorSubnetStakeDraft(metaId, validator, operation, fee)
     }
 
-    suspend fun execute(draft: BittensorSubnetStakeDraft): BittensorOperationResult {
+    suspend fun execute(draft: BittensorSubnetStakeDraft): Result<ExtrinsicExecutionResult> {
         requireSelectedWallet(draft.metaId)
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         validators.validate(chain, draft.operation.quote.subnetId, draft.validator)
         // Recheck affordability, but never replace the user's confirmed price limit or amounts.
         val fee = extrinsics.estimateFee(chain, TransactionOrigin.WalletWithId(draft.metaId), options) { draft.operation.build(this) }
         requireAffordable(chain, draft.metaId, draft.operation.quote.totalTaoInPlanks, fee)
-        val result = submission.execute(draft.metaId, chain) {
+        return extrinsics.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.WalletWithId(draft.metaId), options) {
             draft.operation.build(this)
-        }
-        if (result is BittensorOperationResult.Success) portfolio.refresh()
-        return result
+        }.requireOk()
+            .onSuccess { portfolio.refresh() }
     }
 
     private suspend fun requireSelectedWallet(metaId: Long) {

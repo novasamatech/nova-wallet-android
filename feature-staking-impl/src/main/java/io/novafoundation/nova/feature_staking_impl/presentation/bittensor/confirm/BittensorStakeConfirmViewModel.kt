@@ -15,7 +15,6 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
@@ -131,22 +130,15 @@ class BittensorStakeConfirmViewModel(
             val draft = stakeDraft.first()
             _resultState.value = mapProgress(details, draft)
 
-            when (val result = bittensorStakingInteractor.executeRootStake()) {
-                is BittensorOperationResult.Success -> {
+            bittensorStakingInteractor.executeRootStake()
+                .onSuccess {
                     completed.value = true
                     _resultState.value = mapSuccess(details, draft)
                 }
-                is BittensorOperationResult.Failure -> _resultState.value = mapFailure(result.cause)
-                is BittensorOperationResult.Unknown -> {
-                    completed.value = true
-                    _resultState.value = BittensorStakeResultUi.Failure(
-                        resourceManager.getString(R.string.bittensor_submission_unknown_title),
-                        resourceManager.getString(R.string.bittensor_submission_unknown_description),
-                        result.transactionHash,
-                        canRetry = false
-                    )
+                .onFailure {
+                    if (it is CancellationException) throw it
+                    _resultState.value = mapFailure(it)
                 }
-            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

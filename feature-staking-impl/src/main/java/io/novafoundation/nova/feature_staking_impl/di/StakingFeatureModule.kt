@@ -25,8 +25,6 @@ import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPendingSubmissionRepository
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -299,15 +297,6 @@ class StakingFeatureModule {
     ) = BittensorValidatorBackend(api, infrastructureUrls)
 
     @Provides
-    @FeatureScope
-    fun provideBittensorPendingSubmissions(preferences: Preferences) = BittensorPendingSubmissionRepository(preferences)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService, pending: BittensorPendingSubmissionRepository) =
-        BittensorSubmissionExecutor(extrinsics, pending)
-
-    @Provides
     fun provideBittensorSubnetStaking(
         chainRegistry: ChainRegistry,
         accounts: AccountRepository,
@@ -315,8 +304,7 @@ class StakingFeatureModule {
         validators: BittensorSubnetValidatorRepository,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         portfolio: BittensorPortfolioRepository,
-        extrinsics: ExtrinsicService,
-        submission: BittensorSubmissionExecutor
+        extrinsics: ExtrinsicService
     ) = BittensorSubnetStakingInteractor(
         chainRegistry,
         accounts,
@@ -325,8 +313,7 @@ class StakingFeatureModule {
         bittensorSubnetInteractor,
         portfolio,
         extrinsics,
-        "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
-        submission
+        "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq"
     )
 
     @Provides
@@ -387,9 +374,8 @@ class StakingFeatureModule {
         extrinsicService: ExtrinsicService,
         flowState: BittensorStakingFlowState,
         accountRepository: AccountRepository,
-        walletRepository: WalletRepository,
-        submission: BittensorSubmissionExecutor
-    ) = BittensorStakingInteractor(repository, extrinsicService, flowState, accountRepository, walletRepository, submission)
+        walletRepository: WalletRepository
+    ) = BittensorStakingInteractor(repository, extrinsicService, flowState, accountRepository, walletRepository)
 
     @Provides
     @FeatureScope

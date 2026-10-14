@@ -37,7 +37,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -218,8 +217,8 @@ class BittensorSubnetReviewViewModel(
             resources.getString(R.string.bittensor_subnet_staking_progress, subnetId.value)
         )
         try {
-            when (val execution = bittensorSubnetStakingInteractor.execute(prepared)) {
-                is BittensorOperationResult.Success -> {
+            bittensorSubnetStakingInteractor.execute(prepared)
+                .onSuccess {
                     completed.value = true
                     result.value = BittensorStakeResultUi.Success(
                         resources.getString(R.string.bittensor_subnet_staking_success, subnetId.value),
@@ -228,17 +227,10 @@ class BittensorSubnetReviewViewModel(
                         BittensorFeeUi(formatFee(prepared), "—")
                     )
                 }
-                is BittensorOperationResult.Failure -> showFailure(execution.cause)
-                is BittensorOperationResult.Unknown -> {
-                    completed.value = true
-                    result.value = BittensorStakeResultUi.Failure(
-                        resources.getString(R.string.bittensor_submission_unknown_title),
-                        resources.getString(R.string.bittensor_submission_unknown_description),
-                        execution.transactionHash,
-                        canRetry = false
-                    )
+                .onFailure {
+                    if (it is CancellationException) throw it
+                    showFailure(it)
                 }
-            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

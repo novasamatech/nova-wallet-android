@@ -43,12 +43,3 @@ sealed interface BittensorDataStatus {
 
     data class Stale(val cause: Throwable) : BittensorDataStatus
 }
-
-sealed interface BittensorOperationResult {
-
-    data class Success(val transactionHash: String) : BittensorOperationResult
-
-    data class Failure(val cause: Throwable) : BittensorOperationResult
-
-    data class Unknown(val transactionHash: String) : BittensorOperationResult
-}
