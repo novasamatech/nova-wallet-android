@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRoo
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onEach
@@ -47,7 +48,7 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val cache = RecordingCache()
 
-    private val coldkey = ByteArray(32)
+    private val coldKey: AccountId = ByteArray(32)
 
     @Test
     fun `registers subscription before collection and updates stake from new blocks`() = runBlocking {
@@ -59,7 +60,7 @@ class StakingDashboardBittensorUpdaterTest {
         withTimeout(3_000L) {
             updates.onEach {
                 stakes += cache.item?.stake
-                `when`(positionSource.rootPositions(chain.id, coldkey)).thenReturn(emptyList())
+                `when`(positionSource.rootPositions(chain.id, coldKey)).thenReturn(emptyList())
                 blockNumbers.value += BigInteger.ONE
             }.take(2).toList()
         }
@@ -83,12 +84,12 @@ class StakingDashboardBittensorUpdaterTest {
     private suspend fun prepare() {
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(metaAccount.id).thenReturn(1L)
-        `when`(metaAccount.accountIdIn(chain)).thenReturn(coldkey)
+        `when`(metaAccount.accountIdIn(chain)).thenReturn(coldKey)
         `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id, subscriptionBuilder)).thenReturn(blockNumbers)
-        `when`(positionSource.rootPositions(chain.id, coldkey)).thenReturn(
+        `when`(positionSource.rootPositions(chain.id, coldKey)).thenReturn(
             listOf(BittensorRootPosition(AccountIdKey(ByteArray(32)), BigInteger.TEN))
         )
-        `when`(positionSource.subnetPositions(chain.id, coldkey)).thenReturn(emptyList())
+        `when`(positionSource.subnetPositions(chain.id, coldKey)).thenReturn(emptyList())
     }
 
     private fun updater() = StakingDashboardBittensorUpdater(

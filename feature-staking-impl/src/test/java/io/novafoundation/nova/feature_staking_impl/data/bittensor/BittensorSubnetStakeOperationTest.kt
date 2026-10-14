@@ -12,6 +12,7 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.TypeReference
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.FixedByteArray
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u16
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u64
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -47,7 +48,7 @@ class BittensorSubnetStakeOperationTest {
         assertEquals(false, calls[0].arguments["allow_partial"])
         assertEquals("transfer_keep_alive", calls[1].function.name)
         assertEquals(BigInteger.valueOf(3), calls[1].arguments["value"])
-        assertArrayEquals(beneficiary.value, calls[1].arguments["dest"] as ByteArray)
+        assertArrayEquals(beneficiary.value, calls[1].arguments["dest"] as AccountId)
     }
 
     @Test

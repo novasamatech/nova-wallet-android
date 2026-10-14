@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPor
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -29,8 +30,8 @@ class StakingDashboardBittensorUpdater(
 ) : BaseStakingDashboardUpdater(chain, chainAsset, Chain.Asset.StakingType.BITTENSOR_ROOT, metaAccount) {
 
     override suspend fun listenForUpdates(storageSubscriptionBuilder: SharedRequestsBuilder): Flow<Updater.SideEffect> {
-        val coldkey = metaAccount.accountIdIn(chain)
-        if (coldkey == null) {
+        val coldKey = metaAccount.accountIdIn(chain)
+        if (coldKey == null) {
             return flow {
                 savePosition(BigInteger.ZERO, false, null)
                 emit(primarySynced())
@@ -39,8 +40,8 @@ class StakingDashboardBittensorUpdater(
 
         return chainStateRepository.currentRemoteBlockNumberFlow(chain.id, storageSubscriptionBuilder).conflate().transform {
             try {
-                val root = positionSource.rootPositions(chain.id, coldkey)
-                val subnets = positionSource.subnetPositions(chain.id, coldkey)
+                val root = positionSource.rootPositions(chain.id, coldKey)
+                val subnets = positionSource.subnetPositions(chain.id, coldKey)
                 val prices = subnets.map { it.subnetId }.distinct().mapNotNull { subnetId ->
                     try {
                         subnetId to swapSource.currentAlphaPrice(chain.id, subnetId)
@@ -52,7 +53,7 @@ class StakingDashboardBittensorUpdater(
                     }
                 }.toMap()
                 val positions = BittensorPortfolioPositions(root, subnets, prices)
-                savePosition(positions.totalStake, root.isNotEmpty() || subnets.isNotEmpty(), coldkey)
+                savePosition(positions.totalStake, root.isNotEmpty() || subnets.isNotEmpty(), coldKey)
                 emit(primarySynced())
             } catch (e: CancellationException) {
                 throw e
@@ -62,8 +63,8 @@ class StakingDashboardBittensorUpdater(
         }
     }
 
-    private suspend fun savePosition(stake: BigInteger?, hasStake: Boolean, coldkey: ByteArray?) = cache.update { previous ->
-        if (hasStake && coldkey != null) {
+    private suspend fun savePosition(stake: BigInteger?, hasStake: Boolean, coldKey: AccountId?) = cache.update { previous ->
+        if (hasStake && coldKey != null) {
             StakingDashboardItemLocal(
                 chainId = chain.id,
                 chainAssetId = chainAsset.id,
@@ -71,8 +72,8 @@ class StakingDashboardBittensorUpdater(
                 metaId = metaAccount.id,
                 hasStake = true,
                 stake = stake,
-                stakeStatusAccount = coldkey,
-                rewardsAccount = coldkey,
+                stakeStatusAccount = coldKey,
+                rewardsAccount = coldKey,
                 status = previous?.status,
                 rewards = previous?.rewards,
                 estimatedEarnings = previous?.estimatedEarnings

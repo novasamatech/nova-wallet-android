@@ -30,6 +30,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.math.BigInteger
 
 class BittensorPortfolioRepositoryTest {
@@ -51,13 +52,13 @@ class BittensorPortfolioRepositoryTest {
     private var rootStake = BigInteger.TEN
     private val selected = MutableStateFlow(account(1L))
     private val positions = object : BittensorPositionSource {
-        override suspend fun rootPositions(chainId: String, coldkey: ByteArray): List<BittensorRootPosition> {
+        override suspend fun rootPositions(chainId: String, coldKey: AccountId): List<BittensorRootPosition> {
             positionRequests++
-            check(coldkey[0] == 1.toByte() && !failFirstWallet) { "RPC unavailable" }
+            check(coldKey[0] == 1.toByte() && !failFirstWallet) { "RPC unavailable" }
             return listOf(BittensorRootPosition(AccountIdKey(ByteArray(32)), rootStake))
         }
 
-        override suspend fun subnetPositions(chainId: String, coldkey: ByteArray): List<BittensorSubnetPosition> = emptyList()
+        override suspend fun subnetPositions(chainId: String, coldKey: AccountId): List<BittensorSubnetPosition> = emptyList()
     }
 
     @Test

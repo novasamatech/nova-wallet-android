@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.FixedByteArray
 import io.novasama.substrate_sdk_android.runtime.metadata.encodeInputs
@@ -19,7 +20,7 @@ class BittensorPositionSourceTest {
 
     @Test
     fun `root and subnet requests encode the coldkey_account expected by runtime metadata`() = runBlocking {
-        val coldkey = ByteArray(32) { it.toByte() }
+        val coldKey: AccountId = ByteArray(32) { it.toByte() }
         val calls = PositionRuntimeCalls()
         val source = RealBittensorPositionSource(object : MultiChainRuntimeCallsApi {
             override suspend fun forChain(chainId: String): RuntimeCallsApi {
@@ -30,10 +31,10 @@ class BittensorPositionSourceTest {
             override suspend fun isSupported(chainId: String, section: String, method: String) = true
         })
 
-        assertEquals(BigInteger.TEN, source.rootPositions("bittensor", coldkey).single().stakeInPlanks)
-        assertEquals(BigInteger.TEN, source.subnetPositions("bittensor", coldkey).single().alphaInPlanks)
+        assertEquals(BigInteger.TEN, source.rootPositions("bittensor", coldKey).single().stakeInPlanks)
+        assertEquals(BigInteger.TEN, source.subnetPositions("bittensor", coldKey).single().alphaInPlanks)
         assertEquals(2, calls.encodedInputs.size)
-        assertTrue(calls.encodedInputs.all { it == coldkey.toHexString(withPrefix = true) })
+        assertTrue(calls.encodedInputs.all { it == coldKey.toHexString(withPrefix = true) })
     }
 
     private class PositionRuntimeCalls : RuntimeCallsApi {

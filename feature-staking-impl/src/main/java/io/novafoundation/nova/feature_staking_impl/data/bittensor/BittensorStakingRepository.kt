@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import java.math.BigDecimal
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import kotlinx.coroutines.CancellationException
 
 interface BittensorStakingRepository {
@@ -65,11 +66,11 @@ class RealBittensorStakingRepository(
         }
     }
 
-    private fun observePosition(chain: Chain, coldkey: ByteArray): Flow<PositionState> = flowOfAll {
+    private fun observePosition(chain: Chain, coldKey: AccountId): Flow<PositionState> = flowOfAll {
         var cachedPositions: List<BittensorRootPosition>? = null
         chainStateRepository.currentRemoteBlockNumberFlow(chain.id).conflate().map {
             val status = try {
-                cachedPositions = positionSource.rootPositions(chain.id, coldkey)
+                cachedPositions = positionSource.rootPositions(chain.id, coldKey)
                 BittensorDataStatus.Fresh
             } catch (e: CancellationException) {
                 throw e

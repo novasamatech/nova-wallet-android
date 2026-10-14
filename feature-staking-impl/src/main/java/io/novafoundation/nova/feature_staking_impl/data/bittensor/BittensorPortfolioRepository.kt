@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPor
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -62,14 +63,14 @@ class RealBittensorPortfolioRepository(
         }
     }
 
-    private fun observePositions(chain: Chain, coldkey: ByteArray): Flow<Pair<BittensorPortfolioPositions?, BittensorDataStatus>> = flow {
+    private fun observePositions(chain: Chain, coldKey: AccountId): Flow<Pair<BittensorPortfolioPositions?, BittensorDataStatus>> = flow {
         // Keep cached positions within this collector and wallet.
         var cachedPositions: BittensorPortfolioPositions? = null
         emit(cachedPositions to BittensorDataStatus.Loading)
 
         chainStateRepository.currentRemoteBlockNumberFlow(chain.id).conflate().collect {
             val status = try {
-                cachedPositions = withTimeout(20_000L) { fetchPositions(chain.id, coldkey) }
+                cachedPositions = withTimeout(20_000L) { fetchPositions(chain.id, coldKey) }
                 BittensorDataStatus.Fresh
             } catch (e: TimeoutCancellationException) {
                 logRefreshFailure(e)
@@ -84,9 +85,9 @@ class RealBittensorPortfolioRepository(
         }
     }
 
-    private suspend fun fetchPositions(chainId: String, coldkey: ByteArray): BittensorPortfolioPositions = coroutineScope {
-        val root = async { positionSource.rootPositions(chainId, coldkey) }
-        val subnets = positionSource.subnetPositions(chainId, coldkey)
+    private suspend fun fetchPositions(chainId: String, coldKey: AccountId): BittensorPortfolioPositions = coroutineScope {
+        val root = async { positionSource.rootPositions(chainId, coldKey) }
+        val subnets = positionSource.subnetPositions(chainId, coldKey)
         val prices = subnets.map { it.subnetId }.distinct().mapNotNull { subnetId ->
             try {
                 subnetId to swapSource.currentAlphaPrice(chainId, subnetId)
