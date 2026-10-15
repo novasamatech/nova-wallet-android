@@ -78,6 +78,8 @@ Give variables, classes, and functions clear, descriptive names that convey thei
 
 Make protocol units explicit in names (for example, raw u16 commission versus a decimal commission rate). Use named protocol constants or standard numeric bounds instead of unexplained literals, and keep unit conversions in focused helpers. Preserve wire-field names at the API/storage boundary; use descriptive domain terminology beyond it.
 
+Keep domain invariants in their owning types. Do not repeat constructor range checks in callers; handle construction failures at the input boundary according to the existing error policy, preserving whether invalid entries are skipped or the whole input is rejected.
+
 Separate class property declarations with a blank line, following existing ViewModel references. Apply this to both single-line properties and multi-line flow declarations.
 
 Put each successive call in a method chain on a new line. Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.

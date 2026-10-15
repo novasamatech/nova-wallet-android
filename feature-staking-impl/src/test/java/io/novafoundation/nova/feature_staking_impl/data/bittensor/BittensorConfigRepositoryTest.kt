@@ -29,6 +29,7 @@ class BittensorConfigRepositoryTest {
                 {"netuid":1,"logo":"https://logos.test/duplicate.png"},
                 {"netuid":2,"logo":"http://logos.test/insecure.png"},
                 {"netuid":3,"logo":null},
+                {"netuid":0,"logo":"https://logos.test/root.png"},
                 {"netuid":65536,"logo":"https://logos.test/overflow.png"},
                 {"netuid":-1,"logo":"https://logos.test/negative.png"},
                 null, {"netuid":4}, {"logo":"https://logos.test/missing-id.png"}

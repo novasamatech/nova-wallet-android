@@ -47,9 +47,10 @@ internal fun mapBittensorConfig(remote: BittensorConfigRemote): BittensorConfig 
     val subnets = requireNotNull(remote.subnets) { "Bittensor subnet logos are missing" }
     val logos = buildMap {
         for (subnet in subnets.filterNotNull()) {
-            val netuid = subnet.netuid?.takeIf { it in 1..65535 } ?: continue
+            val netuid = subnet.netuid ?: continue
+            val subnetId = runCatching { BittensorNetuid.Subnet(netuid) }
+                .getOrNull() ?: continue
             val logo = subnet.logo?.toHttpUrlOrNull()?.takeIf { it.isHttps } ?: continue
-            val subnetId = BittensorNetuid.Subnet(netuid)
             if (!containsKey(subnetId)) put(subnetId, logo.toString())
         }
     }
