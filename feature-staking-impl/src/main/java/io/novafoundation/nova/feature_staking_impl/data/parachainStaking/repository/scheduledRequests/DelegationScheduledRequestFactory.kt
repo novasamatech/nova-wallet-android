@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.repository.scheduledRequests
 
+import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.DelegatorState
 import io.novafoundation.nova.feature_staking_api.domain.model.parachain.ScheduledDelegationRequest
+import io.novafoundation.nova.feature_staking_impl.data.parachainAvnStaking.repository.scheduledRequests.AvnNominationScheduledRequestFactory
 import io.novafoundation.nova.runtime.storage.source.StorageEntries
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -12,10 +14,18 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Vec
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
 import kotlinx.coroutines.flow.Flow
 
-class DelegationScheduledRequestFactory {
+class DelegationScheduledRequestFactory(
+    private val avnFactory: AvnNominationScheduledRequestFactory = AvnNominationScheduledRequestFactory(),
+) {
     context(StorageQueryContext)
     fun create(): DelegationScheduledRequestExecutor {
-        val storage = runtime.metadata.parachainStaking().storage("DelegationScheduledRequests")
+        val parachainStaking = runtime.metadata.parachainStaking()
+
+        if (parachainStaking.hasStorage("NominationScheduledRequests")) {
+            return avnFactory.create()
+        }
+
+        val storage = parachainStaking.storage("DelegationScheduledRequests")
         val vec = storage.type.value as Vec
         val alias = vec.typeReference.value as Alias
         val struct = alias.aliasedReference.value as Struct

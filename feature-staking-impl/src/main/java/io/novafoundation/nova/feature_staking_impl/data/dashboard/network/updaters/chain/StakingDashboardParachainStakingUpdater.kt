@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 
 import io.novafoundation.nova.common.address.get
 import io.novafoundation.nova.common.address.intoKey
+import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
@@ -62,7 +63,10 @@ class StakingDashboardParachainStakingUpdater(
     private suspend fun StorageQueryContext.subscribeToStakingState(): Flow<ParachainStakingBaseInfo?> {
         val accountId = metaAccount.accountIdIn(chain) ?: return flowOf(null)
 
-        val delegatorStateFlow = runtime.metadata.parachainStaking().storage("DelegatorState").observe(
+        val parachainStaking = runtime.metadata.parachainStaking()
+        val delegatorStorageName = if (parachainStaking.hasStorage("NominatorState")) "NominatorState" else "DelegatorState"
+
+        val delegatorStateFlow = parachainStaking.storage(delegatorStorageName).observe(
             accountId,
             binding = { bindDelegatorState(it, accountId, chain, chainAsset) }
         )

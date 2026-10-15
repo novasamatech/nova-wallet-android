@@ -22,6 +22,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.Staki
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN_AVN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.RELAYCHAIN_AURA
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.TURING
@@ -89,7 +90,7 @@ class RewardCalculatorFactory(
             }
 
             ALEPH_ZERO -> AlephZeroRewardCalculator(validators, chainAsset = assetWithChain.asset)
-            NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING, MYTHOS -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
+            NOMINATION_POOLS, UNSUPPORTED, PARACHAIN, TURING, MYTHOS, PARACHAIN_AVN -> throw IllegalStateException("Unknown staking type in RelaychainRewardFactory")
         }
     }
 

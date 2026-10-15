@@ -30,6 +30,7 @@
     <color name="critical_update_chip_text">#EBC50A</color>
     <color name="text_negative">#E53450</color>
     <color name="text_positive">#2FC864</color>
+    <color name="color_polkadot_brand">#E6007A</color>
     <color name="progress_bar_text">#2AB0F2</color>
     <color name="major_update_chip_text">#2AB0F2</color>
     <color name="conviction_slider_text_01x">#2AB0F2</color>

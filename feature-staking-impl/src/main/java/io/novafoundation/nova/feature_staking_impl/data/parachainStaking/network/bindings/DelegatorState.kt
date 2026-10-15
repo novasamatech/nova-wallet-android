@@ -30,11 +30,13 @@ private fun bindDelegator(
     chain: Chain,
     chainAsset: Chain.Asset,
 ): DelegatorState.Delegator {
+    val bonds: Any? = struct.mapping["delegations"] ?: struct.mapping["nominations"]
+
     return DelegatorState.Delegator(
         accountId = accountId,
         chain = chain,
         chainAsset = chainAsset,
-        delegations = bindList(struct["delegations"], ::bindBond),
+        delegations = bindList(bonds, ::bindBond),
         total = bindNumber(struct["total"]),
         lessTotal = bindNumber(struct["lessTotal"])
     )

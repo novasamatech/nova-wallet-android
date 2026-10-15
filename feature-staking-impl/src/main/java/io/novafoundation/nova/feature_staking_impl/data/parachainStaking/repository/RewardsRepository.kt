@@ -2,8 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.reposi
 
 import io.novafoundation.nova.common.data.network.runtime.binding.Perbill
 import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbill
+import io.novafoundation.nova.common.data.network.runtime.binding.bindPerbillNumber
 import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.parachainStaking
+import io.novafoundation.nova.feature_staking_impl.data.parachainAvnStaking.network.bindings.bindCommissionSetting
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationDistributionConfig
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.InflationInfo
 import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.bindings.bindInflationDistributionConfig
@@ -12,6 +14,7 @@ import io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
+import java.math.BigDecimal
 
 interface RewardsRepository {
 
@@ -46,7 +49,14 @@ class RealRewardsRepository(
 
     override suspend fun getCollatorCommission(chainId: ChainId): Perbill {
         return storageDataSource.query(chainId) {
-            runtime.metadata.parachainStaking().storage("CollatorCommission").query(binding = ::bindPerbill)
+            val parachainStaking = runtime.metadata.parachainStaking()
+
+            if (parachainStaking.hasStorage("DefaultCollatorCommission")) {
+                val setting = parachainStaking.storage("DefaultCollatorCommission").query(binding = ::bindCommissionSetting)
+                setting?.let { bindPerbillNumber(it.current) } ?: BigDecimal.ZERO
+            } else {
+                parachainStaking.storage("CollatorCommission").query(binding = ::bindPerbill)
+            }
         }
     }
 }

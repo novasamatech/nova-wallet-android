@@ -40,6 +40,33 @@ private fun mapStakingTypeFromLocal(stakingTypesLocal: String): List<Chain.Asset
     return stakingTypesLocal.split(",").mapNotNull { enumValueOfOrNull<Chain.Asset.StakingType>(it) }
 }
 
+// [TEMP-QA-HACK] EWX (Energy Web X) parachain themeColor — iOS dev config
+// uses #A566FF but production nova-utils chains.json doesn't carry it yet.
+// Inject it on read so cached chain rows show the right purple highlight.
+private const val EWX_CHAIN_ID = "5a51e04b88a4784d205091aa7bada002f3e5da3045e5b05655ee4db2589c33b5"
+private const val EWX_THEME_COLOR = "#A566FF"
+
+private fun applyEwxThemeColorOverride(chainId: String, additional: Chain.Additional?): Chain.Additional? {
+    if (chainId != EWX_CHAIN_ID) return additional
+    if (additional?.themeColor != null) return additional
+
+    return (additional ?: Chain.Additional(
+        defaultTip = null,
+        themeColor = null,
+        stakingWiki = null,
+        defaultBlockTimeMillis = null,
+        relaychainAsNative = null,
+        stakingMaxElectingVoters = null,
+        feeViaRuntimeCall = null,
+        supportLedgerGenericApp = null,
+        identityChain = null,
+        disabledCheckMetadataHash = null,
+        sessionLength = null,
+        sessionsPerEra = null,
+        timelineChain = null
+    )).copy(themeColor = EWX_THEME_COLOR)
+}
+
 fun mapAssetSourceFromLocal(source: AssetSourceLocal): Chain.Asset.Source {
     return when (source) {
         AssetSourceLocal.DEFAULT -> Chain.Asset.Source.DEFAULT
@@ -249,9 +276,10 @@ fun mapChainLocalToChain(
         mapExternalApiLocalToExternalApi(it, gson)
     }
 
-    val additional = chainLocal.additional?.let { raw ->
+    val rawAdditional = chainLocal.additional?.let { raw ->
         gson.fromJson<Chain.Additional>(raw)
     }
+    val additional = applyEwxThemeColorOverride(chainLocal.id, rawAdditional)
 
     return with(chainLocal) {
         Chain(

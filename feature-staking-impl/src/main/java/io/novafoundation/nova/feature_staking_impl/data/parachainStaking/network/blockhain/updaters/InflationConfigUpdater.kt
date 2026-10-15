@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.parachainStaking.network.blockhain.updaters
 
+import io.novafoundation.nova.common.utils.hasStorage
 import io.novafoundation.nova.common.utils.parachainStaking
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.GlobalScope
@@ -17,7 +18,9 @@ class InflationConfigUpdater(
     storageCache: StorageCache
 ) : SingleStorageKeyUpdater<Unit>(GlobalScope, stakingSharedState, chainRegistry, storageCache), SharedStateBasedUpdater<Unit> {
 
-    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String {
-        return runtime.metadata.parachainStaking().storage("InflationConfig").storageKey()
+    override suspend fun storageKey(runtime: RuntimeSnapshot, scopeValue: Unit): String? {
+        val parachainStaking = runtime.metadata.parachainStaking()
+        if (!parachainStaking.hasStorage("InflationConfig")) return null
+        return parachainStaking.storage("InflationConfig").storageKey()
     }
 }
