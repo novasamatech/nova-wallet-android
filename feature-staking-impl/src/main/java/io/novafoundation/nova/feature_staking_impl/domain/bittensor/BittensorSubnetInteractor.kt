@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavoritesRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -31,7 +31,9 @@ class BittensorSubnetInteractor(
 
     suspend fun subnets() = repository.subnets()
 
-    suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet = repository.subnets().first { it.id == subnetId }
+    suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet = repository.subnet(subnetId)
+
+    fun observeWallet() = portfolioRepository.observeWallet()
 
     fun observePortfolio() = portfolioRepository.observePortfolio()
 

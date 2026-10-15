@@ -4,6 +4,8 @@ import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.runBlocking
 import okhttp3.Headers
 import okhttp3.HttpUrl
@@ -13,8 +15,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
-import java.math.BigDecimal
-import java.math.BigInteger
 
 class BittensorValidatorBackendTest {
 
@@ -143,6 +143,23 @@ class BittensorValidatorBackendTest {
         assertTrue(gates.allowsTake(BigInteger.valueOf(11796)))
         assertFalse(gates.allowsTake(BigInteger.valueOf(11797)))
         assertTrue(runCatching { gates.allowsTake(BigInteger.valueOf(65536)) }.isFailure)
+    }
+
+    @Test
+    fun `invalid fresh HTTP payloads do not prevent a subsequent recovery`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        api.recommendationsDocument = policy("STALE")
+        assertTrue(runCatching { backend.gates() }.isFailure)
+        api.recommendationsDocument = policy("FRESH")
+        backend.gates()
+
+        api.recommendationsDocument = recommendations("STALE")
+        assertTrue(runCatching { backend.recommendedHotkeys(0) }.isFailure)
+        api.recommendationsDocument = recommendations("FRESH")
+        assertEquals(listOf("stable-root", "balanced-root", "higher-root"), backend.recommendedHotkeys(0))
+        assertEquals(4, api.requests.size)
     }
 
     private class Api(private val cacheControl: String) : BittensorValidatorsApi {

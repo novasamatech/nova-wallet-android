@@ -25,7 +25,7 @@ class BittensorValidatorAdapter(
         val previous = selectedAddress
         selectedAddress = address
         currentList.forEachIndexed { index, row ->
-            if (row.validator.address == previous || row.validator.address == address) notifyItemChanged(index)
+            if (row.eligibility.address == previous || row.eligibility.address == address) notifyItemChanged(index)
         }
     }
 
@@ -34,7 +34,7 @@ class BittensorValidatorAdapter(
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val row = getItem(position)
-        holder.bind(row, row.validator.address == selectedAddress, onSelected, onInfo)
+        holder.bind(row, row.eligibility.address == selectedAddress, onSelected, onInfo)
     }
 
     class Holder(private val binder: ItemBittensorValidatorBinding) : RecyclerView.ViewHolder(binder.root) {
@@ -45,7 +45,7 @@ class BittensorValidatorAdapter(
             onSelected: (BittensorValidatorUi) -> Unit,
             onInfo: (BittensorValidatorUi) -> Unit
         ) = with(binder) {
-            val row = model.validator
+            val row = model.eligibility
             root.alpha = if (row.selectable) 1f else 0.5f
             choice.isChecked = selected
             choice.isEnabled = row.selectable
@@ -72,7 +72,7 @@ class BittensorValidatorAdapter(
     }
 
     private object DiffCallback : DiffUtil.ItemCallback<BittensorValidatorUi>() {
-        override fun areItemsTheSame(old: BittensorValidatorUi, new: BittensorValidatorUi) = old.validator.address == new.validator.address
+        override fun areItemsTheSame(old: BittensorValidatorUi, new: BittensorValidatorUi) = old.eligibility.address == new.eligibility.address
         override fun areContentsTheSame(old: BittensorValidatorUi, new: BittensorValidatorUi) = old == new
     }
 }

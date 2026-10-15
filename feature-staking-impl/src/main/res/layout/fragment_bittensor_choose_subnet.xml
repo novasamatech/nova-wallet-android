@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:background="@color/secondary_screen_background" android:orientation="vertical">
-    <io.novafoundation.nova.common.view.TitledSearchToolbar android:id="@+id/toolbar"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        app:titleText="@string/bittensor_choose_subnet" android:hint="@string/bittensor_subnet_search_hint" />
-    <ProgressBar android:id="@+id/loading" android:layout_width="32dp" android:layout_height="32dp"
-        android:layout_gravity="center_horizontal" android:visibility="gone" />
-    <TextView android:id="@+id/error" style="@style/TextAppearance.NovaFoundation.Regular.Body"
-        android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginHorizontal="16dp"
-        android:text="@string/common_retry_message" android:visibility="gone" />
-    <Button android:id="@+id/retry" android:layout_width="wrap_content" android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal" android:text="@string/common_retry" android:visibility="gone" />
-    <TextView android:id="@+id/empty" style="@style/TextAppearance.NovaFoundation.Regular.Body"
-        android:layout_width="match_parent" android:layout_height="wrap_content" android:gravity="center"
-        android:text="@string/bittensor_no_subnets" android:visibility="gone" />
-    <androidx.recyclerview.widget.RecyclerView android:id="@+id/subnets" android:layout_width="match_parent"
-        android:layout_height="0dp" android:layout_weight="1" android:paddingHorizontal="16dp"
-        android:clipToPadding="false" app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/secondary_screen_background"
+    android:orientation="vertical">
+    <io.novafoundation.nova.common.view.TitledSearchToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:titleText="@string/bittensor_choose_subnet"
+        android:hint="@string/bittensor_subnet_search_hint" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center_horizontal"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/empty"
+        style="@style/TextAppearance.NovaFoundation.Regular.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/bittensor_no_subnets"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/subnets"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="16dp"
+        android:clipToPadding="false"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 </LinearLayout>

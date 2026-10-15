@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorStakeAmountBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
@@ -20,6 +21,7 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
     override fun initViews() {
         binder.bittensorStakeAmountContinue.prepareForProgress(viewLifecycleOwner)
         binder.bittensorStakeAmountToolbar.setHomeButtonListener { viewModel.back() }
+        onBackPressed { viewModel.back() }
         binder.bittensorStakeAmountValidator.setOnClickListener { viewModel.validatorClicked() }
         binder.bittensorStakeAmountContinue.setOnClickListener { viewModel.continueClicked() }
         binder.bittensorStakeAmount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
@@ -39,6 +41,7 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
     }
 
     override fun subscribe(viewModel: BittensorStakeAmountViewModel) {
+        observeBittensorRetries(viewModel.retryEvents)
         viewModel.amountModel.observe(binder.bittensorStakeAmount::setChooseAmountModel)
         viewModel.amount.observe(::showAmount)
         viewModel.fiatAmount.observe(binder.bittensorStakeAmount::setFiatAmount)

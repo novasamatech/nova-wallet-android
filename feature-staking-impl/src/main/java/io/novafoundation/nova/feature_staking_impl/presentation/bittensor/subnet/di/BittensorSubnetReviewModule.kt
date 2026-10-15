@@ -6,24 +6,24 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 
 @Module(includes = [ViewModelModule::class])
 class BittensorSubnetReviewModule {
@@ -41,11 +41,11 @@ class BittensorSubnetReviewModule {
         bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
         resources: ResourceManager,
         icons: AssetIconProvider,
-        tokenFormatter: TokenFormatter,
-        amountFormatter: AmountFormatter,
         externalActions: ExternalActions.Presentation,
-        logger: Logger,
-        iconGenerator: AddressIconGenerator
+        iconGenerator: AddressIconGenerator,
+        retryController: BittensorRetryController,
+        bittensorAmountFormatter: BittensorAmountFormatter,
+        stakeValidationSystem: BittensorStakeValidationSystem
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
             BittensorSubnetId(payload.subnetId),
@@ -60,11 +60,11 @@ class BittensorSubnetReviewModule {
             bittensorSubnetStakingInteractor,
             resources,
             icons,
-            tokenFormatter,
-            amountFormatter,
             externalActions,
-            logger,
-            iconGenerator
+            iconGenerator,
+            retryController = retryController,
+            bittensorAmountFormatter = bittensorAmountFormatter,
+            stakeValidationSystem = stakeValidationSystem
         )
     }
 

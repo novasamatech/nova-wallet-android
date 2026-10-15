@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
@@ -13,15 +14,15 @@ import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigDecimal
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import java.math.BigDecimal
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import io.novasama.substrate_sdk_android.runtime.AccountId
-import kotlinx.coroutines.CancellationException
 
 interface BittensorStakingRepository {
 
@@ -59,7 +60,6 @@ class RealBittensorStakingRepository(
                     asset = asset,
                     validator = position.validator,
                     annualPercentageYield = validatorSource.annualPercentageYield(),
-                    position = position.positions?.firstOrNull { it.validatorHotkey == position.validator?.hotkey },
                     dataStatus = position.status
                 )
             }
@@ -68,9 +68,10 @@ class RealBittensorStakingRepository(
 
     private fun observePosition(chain: Chain, coldKey: AccountId): Flow<PositionState> = flowOfAll {
         var cachedPositions: List<BittensorRootPosition>? = null
+        var defaultValidatorSelection: DefaultValidatorSelection? = null
         chainStateRepository.currentRemoteBlockNumberFlow(chain.id).conflate().map {
             val status = try {
-                cachedPositions = positionSource.rootPositions(chain.id, coldKey)
+                cachedPositions = positionSource.positions(chain.id, coldKey).root
                 BittensorDataStatus.Fresh
             } catch (e: CancellationException) {
                 throw e
@@ -80,7 +81,13 @@ class RealBittensorStakingRepository(
                 BittensorDataStatus.Stale(e)
             }
             val validator = try {
-                validatorSource.preferredValidator(chain, cachedPositions.orEmpty())
+                val positions = cachedPositions.orEmpty()
+                val largestPositionHotkey = positions.maxByOrNull { it.stakeInPlanks }?.validatorHotkey
+                if (defaultValidatorSelection == null || defaultValidatorSelection?.positionHotkey != largestPositionHotkey) {
+                    val validator = validatorSource.preferredValidator(chain, positions)
+                    defaultValidatorSelection = DefaultValidatorSelection(largestPositionHotkey, validator)
+                }
+                defaultValidatorSelection?.validator
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -91,6 +98,8 @@ class RealBittensorStakingRepository(
             PositionState(cachedPositions, status, validator)
         }
     }
+
+    private data class DefaultValidatorSelection(val positionHotkey: AccountIdKey?, val validator: BittensorValidator?)
 
     private data class PositionState(val positions: List<BittensorRootPosition>?, val status: BittensorDataStatus, val validator: BittensorValidator?)
 }

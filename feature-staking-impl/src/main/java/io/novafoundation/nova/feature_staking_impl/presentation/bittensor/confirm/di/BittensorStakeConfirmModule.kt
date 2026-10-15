@@ -6,19 +6,21 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmViewModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class BittensorStakeConfirmModule {
@@ -36,7 +38,9 @@ class BittensorStakeConfirmModule {
         bittensorStakingInteractor: BittensorStakingInteractor,
         iconGenerator: AddressIconGenerator,
         fiatFormatter: FiatFormatter,
-        tokenFormatter: TokenFormatter
+        tokenFormatter: TokenFormatter,
+        bittensorAmountFormatter: BittensorAmountFormatter,
+        retryController: BittensorRetryController
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
             resourceManager = resourceManager,
@@ -48,7 +52,9 @@ class BittensorStakeConfirmModule {
             bittensorStakingInteractor = bittensorStakingInteractor,
             iconGenerator = iconGenerator,
             fiatFormatter = fiatFormatter,
-            tokenFormatter = tokenFormatter
+            tokenFormatter = tokenFormatter,
+            bittensorAmountFormatter = bittensorAmountFormatter,
+            retryController = retryController
         )
     }
 

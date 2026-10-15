@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSelectValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 
 class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorViewModel, FragmentBittensorSelectValidatorBinding>() {
 
@@ -27,6 +28,7 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
     }
 
     override fun subscribe(viewModel: BittensorSelectValidatorViewModel) = with(binder) {
+        observeBittensorRetries(viewModel.retryEvents)
         setupExternalActions(viewModel)
         viewModel.rows.observe(adapter::submitList)
         viewModel.selectedAddress.observe(adapter::select)

@@ -6,17 +6,20 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 
 @Module(includes = [ViewModelModule::class])
 class BittensorStakeAmountModule {
@@ -28,21 +31,27 @@ class BittensorStakeAmountModule {
         resourceManager: ResourceManager,
         router: StakingRouter,
         bittensorStakingInteractor: BittensorStakingInteractor,
-        assetIconProvider: AssetIconProvider,
         iconGenerator: AddressIconGenerator,
         validatorCommunicator: BittensorSelectValidatorCommunicator,
         fiatFormatter: FiatFormatter,
-        tokenFormatter: TokenFormatter
+        tokenFormatter: TokenFormatter,
+        retryController: BittensorRetryController,
+        bittensorAmountFormatter: BittensorAmountFormatter,
+        amountChooserFactory: AmountChooserMixin.Factory,
+        stakeValidationSystem: BittensorStakeValidationSystem
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             resourceManager = resourceManager,
             router = router,
             bittensorStakingInteractor = bittensorStakingInteractor,
-            assetIconProvider = assetIconProvider,
             iconGenerator = iconGenerator,
             validatorCommunicator = validatorCommunicator,
             fiatFormatter = fiatFormatter,
-            tokenFormatter = tokenFormatter
+            tokenFormatter = tokenFormatter,
+            retryController = retryController,
+            bittensorAmountFormatter = bittensorAmountFormatter,
+            amountChooserFactory = amountChooserFactory,
+            stakeValidationSystem = stakeValidationSystem
         )
     }
 

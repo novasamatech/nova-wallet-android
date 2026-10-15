@@ -21,6 +21,9 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
+import java.io.IOException
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -31,12 +34,10 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
-import org.mockito.Mockito.`when`
-import java.io.IOException
-import java.math.BigInteger
 
 @RunWith(Parameterized::class)
 class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
@@ -71,11 +72,11 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val flowState = BittensorStakingFlowState()
 
-    private val validator = BittensorValidator(AccountIdKey(ByteArray(32) { 1 }), "Validator", null)
+    private val validator = BittensorValidator(AccountIdKey(ByteArray(32) { 1 }), "Validator")
 
     private val amount = BigInteger.valueOf(1000)
 
-    private val rootDetails = BittensorRootStakingDetails(1L, chain, asset, validator, null, null, BittensorDataStatus.Fresh)
+    private val rootDetails = BittensorRootStakingDetails(1L, chain, asset, validator, null, BittensorDataStatus.Fresh)
 
     private val rootRepository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(rootDetails)
@@ -116,7 +117,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             BigInteger.ZERO
         ),
         BigInteger.valueOf(1005),
-        java.math.BigDecimal.ZERO
+        BigDecimal.ZERO
     )
 
     private val beneficiary = AccountIdKey(ByteArray(32) { 2 })
@@ -136,7 +137,6 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         `when`(asset.transferableInPlanks).thenReturn(BigInteger.valueOf(10000))
         `when`(wallets.assetFlow(1L, chainAsset)).thenReturn(flowOf(asset))
         `when`(fee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger.TEN)
-        flowState.setDetails(rootDetails)
         flowState.setDraft(BittensorRootStakeDraft(1L, amount, validator, fee))
     }
 
@@ -208,7 +208,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     private suspend fun execute(): Result<ExtrinsicExecutionResult> = when (stakingType) {
-        StakingType.ROOT -> rootInteractor.executeRootStake()
+        StakingType.ROOT -> rootInteractor.executeRootStake(chain, BittensorRootStakeDraft(1L, amount, validator, fee))
         StakingType.SUBNET -> subnetStakingInteractor.execute(subnetDraft)
     }
 

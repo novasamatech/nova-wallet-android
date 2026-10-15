@@ -9,8 +9,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.ImageLoader
 import coil.transform.CircleCropTransformation
-import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorPositionBinding
 
 class BittensorPositionAdapter(
@@ -33,16 +34,15 @@ class BittensorPositionAdapter(
             }
             positionIcon.setIcon(item.icon, imageLoader) {
                 transformations(CircleCropTransformation())
-                error(io.novafoundation.nova.feature_staking_impl.R.drawable.ic_fallback_network_icon)
+                error(R.drawable.ic_fallback_network_icon)
             }
             positionTitle.text = item.title
             positionSubtitle.text = item.subtitle
             positionAmount.text = item.amount.token
             positionFiat.text = item.amount.fiat
             positionFiat.isVisible = item.amount.fiat != null
-            val clickable = item.action != BittensorPositionAction.None
-            positionChevron.isVisible = clickable
-            root.setOnClickListener(if (clickable) android.view.View.OnClickListener { onClick(item) } else null)
+            positionChevron.isVisible = true
+            root.setOnClickListener { onClick(item) }
         }
     }
 

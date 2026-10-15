@@ -8,8 +8,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorRootDetailsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 
-class BittensorRootDetailsFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorRootDetailsBinding>() {
+class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel, FragmentBittensorRootDetailsBinding>() {
 
     private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
 
@@ -28,12 +29,12 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorDetailsViewModel, Fra
         addStake.setOnClickListener { viewModel.addStake() }
         addStake.setBadge(null)
         unstake.setBadge(null)
-        retry.setOnClickListener { viewModel.retry() }
         validators.adapter = adapter
     }
 
-    override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
+    override fun subscribe(viewModel: BittensorRootDetailsViewModel) = with(binder) {
         setupExternalActions(viewModel)
+        observeBittensorRetries(viewModel.retryEvents)
         viewModel.isLoading.observe { loading.isVisible = it }
         viewModel.canAddStake.observe {
             addStake.isEnabled = it
@@ -49,7 +50,6 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorDetailsViewModel, Fra
         viewModel.warning.observe {
             warning.text = it
             warning.isVisible = it != null
-            retry.isVisible = it != null
         }
     }
 }

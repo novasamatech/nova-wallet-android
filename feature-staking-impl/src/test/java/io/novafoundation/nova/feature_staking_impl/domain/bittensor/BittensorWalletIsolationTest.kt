@@ -7,19 +7,20 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import kotlinx.coroutines.flow.flowOf
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.flow.first
-import org.junit.Assert.assertEquals
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verifyNoInteractions
-import org.mockito.Mockito.`when`
-import java.math.BigInteger
 
 class BittensorWalletIsolationTest {
 
@@ -29,14 +30,15 @@ class BittensorWalletIsolationTest {
 
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
     private val state = BittensorStakingFlowState()
-    private val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator", null)
+
+    private val fee = mock(Fee::class.java)
+    private val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator")
     private val details = BittensorRootStakingDetails(
         metaId = 1,
         chain = mock(Chain::class.java),
         asset = mock(Asset::class.java),
         validator = validator,
         annualPercentageYield = null,
-        position = null,
         dataStatus = BittensorDataStatus.Fresh
     )
     private val repository = object : BittensorStakingRepository {
@@ -46,9 +48,8 @@ class BittensorWalletIsolationTest {
     @Test
     fun `preparing after wallet switch does not estimate or submit an extrinsic`() = runBlocking {
         selectAnotherWallet()
-        state.setDetails(details)
 
-        val failure = runCatching { interactor().prepareRootStake(BigInteger.ONE) }.exceptionOrNull()
+        val failure = runCatching { interactor().prepareRootStake(BittensorRootStakeRequest(1L, details.chain, validator, BigInteger.ONE)) }.exceptionOrNull()
         assertTrue(failure is IllegalStateException)
         verifyNoInteractions(extrinsics)
     }
@@ -56,22 +57,21 @@ class BittensorWalletIsolationTest {
     @Test
     fun `execution after wallet switch never signs with the new wallet`() = runBlocking {
         selectAnotherWallet()
-        state.setDetails(details)
-        state.setDraft(BittensorRootStakeDraft(1, BigInteger.ONE, validator, mock(Fee::class.java)))
+        val draft = BittensorRootStakeDraft(1, BigInteger.ONE, validator, fee)
+        state.setDraft(draft)
 
-        val failure = runCatching { interactor().executeRootStake() }.exceptionOrNull()
+        val failure = runCatching { interactor().executeRootStake(details.chain, draft).getOrThrow() }.exceptionOrNull()
         assertTrue(failure is IllegalStateException)
         verifyNoInteractions(extrinsics)
     }
 
     @Test
-    fun `missing root validator does not estimate a fee or prepare a stake`() = runBlocking {
+    fun `fee request after wallet switch does not estimate a fee`() = runBlocking {
         val selected = mock(MetaAccount::class.java)
-        `when`(selected.id).thenReturn(1L)
+        `when`(selected.id).thenReturn(2L)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
-        state.setDetails(details.copy(validator = null))
-
-        assertTrue(runCatching { interactor().prepareRootStake(BigInteger.ONE) }.exceptionOrNull() is IllegalArgumentException)
+        val request = BittensorRootStakeRequest(1L, details.chain, validator, BigInteger.ONE)
+        assertTrue(runCatching { interactor().estimateRootStakeFee(request) }.exceptionOrNull() is IllegalStateException)
         verifyNoInteractions(extrinsics, validators)
     }
 
@@ -80,13 +80,12 @@ class BittensorWalletIsolationTest {
         val selected = mock(MetaAccount::class.java)
         `when`(selected.id).thenReturn(1L)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
-        state.setDetails(details.copy(validator = null))
-        val chosenValidator = BittensorValidator(AccountIdKey(ByteArray(32) { 2 }), "Chosen validator", null)
-        val row = BittensorSubnetValidator(chosenValidator, "chosen-address", java.math.BigDecimal.ZERO, true)
+        val chosenValidator = BittensorValidator(AccountIdKey(ByteArray(32) { 2 }), "Chosen validator")
+        val row = BittensorSubnetValidator(chosenValidator, "chosen-address", BigDecimal.ZERO, true)
         `when`(validators.rootValidators(details.chain)).thenReturn(listOf(row))
         val interactor = interactor()
 
-        interactor.selectValidator(row.address)
+        interactor.selectValidator(details.copy(validator = null), row.address)
 
         assertEquals(chosenValidator, interactor.observeRootStakingDetails().first().validator)
         verifyNoInteractions(extrinsics)

@@ -1,13 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.common.utils.isNonNegative
-import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapDirection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapSimulation
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 
 interface BittensorSwapSource {
@@ -87,8 +85,4 @@ internal fun bindBittensorSwapSimulation(
         taoSlippage = bindBittensorU64(value["taoSlippage"]),
         alphaSlippage = bindBittensorU64(value["alphaSlippage"])
     )
-}
-
-internal fun bindBittensorU64(decoded: Any?): BigInteger = bindNumber(decoded).also {
-    require(it.isNonNegative && it.bitLength() <= 64) { "Invalid Bittensor u64 value" }
 }

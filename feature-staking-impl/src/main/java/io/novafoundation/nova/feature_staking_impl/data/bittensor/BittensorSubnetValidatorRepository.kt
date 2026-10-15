@@ -5,20 +5,17 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.metadata.module
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
-import kotlinx.coroutines.withTimeout
-import java.math.BigDecimal
 import java.math.BigInteger
-import java.math.RoundingMode
+import kotlinx.coroutines.withTimeout
 
 interface BittensorSubnetValidatorRepository {
 
@@ -52,8 +49,7 @@ class RealBittensorSubnetValidatorRepository(
                 BittensorValidator(
                     AccountIdKey(hotkey),
                     row.identitySourceName?.trim()?.takeIf(String::isNotBlank)
-                        ?: row.stakeSourceName?.trim()?.takeIf(String::isNotBlank) ?: address,
-                    null
+                        ?: row.stakeSourceName?.trim()?.takeIf(String::isNotBlank) ?: address
                 )
             }.distinctBy { it.hotkey }.take(512)
         enrich(chain, netuid, candidates, gates)
@@ -100,20 +96,8 @@ class RealBittensorSubnetValidatorRepository(
                 keyExtractor = { key -> AccountIdKey(key.component1()) },
                 binding = { value, _ -> value?.let(::bindNumber) }
             )
-            validators.mapNotNull { validator ->
-                val uid = uids[validator.hotkey] ?: return@mapNotNull null
-                val take = takes[validator.hotkey] ?: return@mapNotNull null
-                require(uid in 0..65535)
-                if (!gates.allowsTake(take)) return@mapNotNull null
-                if (!isRoot && gates.requirePermit && permits.getOrNull(uid) != true) return@mapNotNull null
-                val active = isRoot || !gates.requireActive || updates.getOrNull(uid)?.let { it >= activeThreshold } == true
-                BittensorSubnetValidator(
-                    validator,
-                    chain.addressOf(validator.hotkey),
-                    take.toBigDecimal().divide(BigDecimal(65535), 12, RoundingMode.HALF_EVEN),
-                    active
-                )
-            }
+            val snapshot = BittensorValidatorSnapshot(uids, takes, permits, updates, activeThreshold)
+            mapBittensorValidators(chain, subnetId, validators, gates, snapshot)
         }
     }
 }

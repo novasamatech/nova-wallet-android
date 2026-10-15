@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -14,14 +13,16 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPriceChartInteractor
-import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 @Module(includes = [ViewModelModule::class])
 class BittensorDetailsModule {
@@ -37,13 +38,11 @@ class BittensorDetailsModule {
         bittensorPortfolioInteractor: BittensorPortfolioInteractor,
         router: StakingRouter,
         resources: ResourceManager,
-        amountFormatter: AmountFormatter,
+        amountFormatter: BittensorAmountFormatter,
         assetIconProvider: AssetIconProvider,
-        iconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         bittensorPriceChartInteractor: BittensorPriceChartInteractor,
         logger: Logger,
-        subnetRepository: BittensorSubnetRepository,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
         fiatFormatter: FiatFormatter
     ): ViewModel = BittensorDetailsViewModel(
@@ -52,14 +51,40 @@ class BittensorDetailsModule {
         resources = resources,
         amountFormatter = amountFormatter,
         assetIconProvider = assetIconProvider,
-        iconGenerator = iconGenerator,
         externalActions = externalActions,
         bittensorPriceChartInteractor = bittensorPriceChartInteractor,
         logger = logger,
-        subnetRepository = subnetRepository,
         chartAxisFormatterFactory = chartAxisFormatterFactory,
         fiatFormatter = fiatFormatter
     )
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(BittensorRootDetailsViewModel::class)
+    fun provideRootViewModel(
+        interactor: BittensorPortfolioInteractor,
+        router: StakingRouter,
+        resources: ResourceManager,
+        icons: AssetIconProvider,
+        addressIconGenerator: AddressIconGenerator,
+        externalActions: ExternalActions.Presentation,
+        amountFormatter: BittensorAmountFormatter,
+        retryController: BittensorRetryController
+    ): ViewModel = BittensorRootDetailsViewModel(
+        interactor,
+        router,
+        resources,
+        icons,
+        addressIconGenerator,
+        externalActions,
+        amountFormatter,
+        retryController
+    )
+
+    @Provides
+    fun provideRootViewModelCreator(fragment: Fragment, factory: ViewModelProvider.Factory):
+        BittensorRootDetailsViewModel =
+        ViewModelProvider(fragment, factory)[BittensorRootDetailsViewModel::class.java]
 
     @Provides
     fun provideViewModelCreator(fragment: Fragment, factory: ViewModelProvider.Factory): BittensorDetailsViewModel =

@@ -6,18 +6,18 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.Extri
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.addBittensorRootStake
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.addBittensorRootStake
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigInteger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.combine
-import java.math.BigInteger
+import kotlinx.coroutines.flow.first
 
 class BittensorStakingInteractor(
     private val repository: BittensorStakingRepository,
@@ -25,87 +25,82 @@ class BittensorStakingInteractor(
     private val flowState: BittensorStakingFlowState,
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
-    private val validators: BittensorSubnetValidatorRepository
+    private val validatorRepository: BittensorSubnetValidatorRepository
 ) {
 
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> {
-        return combine(repository.observeRootStakingDetails(), flowState.selectedValidator) { details, selected ->
-            if (selected?.metaId == details.metaId) details.copy(validator = selected.validator) else details
-        }.onEach(flowState::setDetails)
+        return combine(repository.observeRootStakingDetails(), flowState.selectedValidator) { details, selectedValidator ->
+            if (selectedValidator?.metaId == details.metaId) details.copy(validator = selectedValidator.validator) else details
+        }
     }
 
-    suspend fun selectValidator(address: String) {
-        val details = requireNotNull(flowState.latestDetails) { "Root staking details are not loaded" }
+    suspend fun selectValidator(details: BittensorRootStakingDetails, address: String) {
         requireSelectedWallet(details.metaId)
-        val selected = validators.rootValidators(details.chain).firstOrNull { it.address == address && it.selectable }
-        requireNotNull(selected) { "Validator is no longer eligible for root staking" }
+        val selectedValidator = validatorRepository.rootValidators(details.chain)
+            .firstOrNull { it.address == address && it.selectable }
+        requireNotNull(selectedValidator) { "Validator is no longer eligible for root staking" }
         requireSelectedWallet(details.metaId)
-        flowState.selectedValidator.value = BittensorStakingFlowState.SelectedValidator(details.metaId, selected.validator)
+        flowState.selectedValidator.value = BittensorStakingFlowState.SelectedValidator(details.metaId, selectedValidator.validator)
     }
 
-    fun observeStakeDraft(): Flow<BittensorRootStakeDraft> = flowState.draft.filterNotNull()
+    fun observeStakeDraft(): Flow<BittensorRootStakeDraft?> = flowState.draft
 
     fun hasDraft(): Boolean = flowState.draft.value != null
 
-    suspend fun estimateRootStakeFee(amountInPlanks: BigInteger): Fee {
-        val details = flowState.latestDetails ?: repository.observeRootStakingDetails().firstAndRemember()
-        val validator = requireNotNull(details.validator) { "Select a root validator" }
-
-        return estimateRootStakeFee(details, validator, amountInPlanks)
-    }
-
-    private suspend fun estimateRootStakeFee(details: BittensorRootStakingDetails, validator: BittensorValidator, amountInPlanks: BigInteger): Fee {
-        return extrinsicService.estimateFee(details.chain, TransactionOrigin.WalletWithId(details.metaId)) {
-            addBittensorRootStake(validator.hotkey.value, amountInPlanks)
-        }
-    }
-
-    suspend fun prepareRootStake(amountInPlanks: BigInteger): BittensorRootStakeDraft {
-        val details = flowState.latestDetails ?: repository.observeRootStakingDetails().firstAndRemember()
+    suspend fun maximumStake(details: BittensorRootStakingDetails): BigInteger {
         requireSelectedWallet(details.metaId)
         val validator = requireNotNull(details.validator) { "Select a root validator" }
-        validators.validateRoot(details.chain, validator)
-        val fee = estimateRootStakeFee(details, validator, amountInPlanks)
+        val asset = walletRepository.assetFlow(details.metaId, details.chain.utilityAsset).first()
+        val maximum = maximumBittensorStake(asset.transferableInPlanks) { amount ->
+            val request = BittensorRootStakeRequest(details.metaId, details.chain, validator, amount)
+            estimateRootStakeFee(request).maxAmountDeductionFor(asset.token.configuration)
+        }
         requireSelectedWallet(details.metaId)
-
-        val feeDeduction = fee.maxAmountDeductionFor(details.asset.token.configuration)
-        require(amountInPlanks + feeDeduction <= details.asset.transferableInPlanks) { "Insufficient transferable balance" }
-        return BittensorRootStakeDraft(details.metaId, amountInPlanks, validator, fee).also(flowState::setDraft)
+        return maximum
     }
 
-    suspend fun executeRootStake(): Result<ExtrinsicExecutionResult> {
-        val details = flowState.latestDetails ?: repository.observeRootStakingDetails().firstAndRemember()
-        val draft = requireNotNull(flowState.draft.value) { "Bittensor stake draft is missing" }
-
-        require(details.metaId == draft.metaId) { "The staking wallet has changed" }
-        requireSelectedWallet(draft.metaId)
-        validators.validateRoot(details.chain, draft.validator)
-        val asset = walletRepository.assetFlow(draft.metaId, details.chain.utilityAsset).first()
-        val fee = extrinsicService.estimateFee(details.chain, TransactionOrigin.WalletWithId(draft.metaId)) {
-            addBittensorRootStake(draft.validator.hotkey.value, draft.amountInPlanks)
+    suspend fun estimateRootStakeFee(request: BittensorRootStakeRequest): Fee {
+        requireSelectedWallet(request.metaId)
+        return extrinsicService.estimateFee(request.chain, TransactionOrigin.WalletWithId(request.metaId)) {
+            addBittensorRootStake(request.validator.hotkey.value, request.amountInPlanks)
         }
-        require(draft.amountInPlanks + fee.maxAmountDeductionFor(asset.token.configuration) <= asset.transferableInPlanks) {
-            "Insufficient transferable balance"
-        }
-        requireSelectedWallet(draft.metaId)
-        return extrinsicService.submitExtrinsicAndAwaitExecution(details.chain, TransactionOrigin.WalletWithId(draft.metaId)) {
-            addBittensorRootStake(draft.validator.hotkey.value, draft.amountInPlanks)
-        }.requireOk()
-            .onSuccess {
-                flowState.clear()
-            }
     }
 
-    fun clearDraft() {
+    suspend fun prepareRootStake(request: BittensorRootStakeRequest): BittensorRootStakeDraft {
+        requireSelectedWallet(request.metaId)
+        validatorRepository.validateRoot(request.chain, request.validator)
+        val fee = estimateRootStakeFee(request)
+        requireAffordable(request.chain, request.metaId, request.amountInPlanks, fee)
+        val draft = BittensorRootStakeDraft(request.metaId, request.amountInPlanks, request.validator, fee)
+        flowState.setDraft(draft)
+        return draft
+    }
+
+    suspend fun executeRootStake(chain: Chain, draft: BittensorRootStakeDraft): Result<ExtrinsicExecutionResult> = runCatching {
+        requireSelectedWallet(draft.metaId)
+        validatorRepository.validateRoot(chain, draft.validator)
+        val request = BittensorRootStakeRequest(draft.metaId, chain, draft.validator, draft.amountInPlanks)
+        val fee = estimateRootStakeFee(request)
+        requireAffordable(chain, draft.metaId, draft.amountInPlanks, fee)
+        val execution = extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.WalletWithId(draft.metaId)) {
+            addBittensorRootStake(draft.validator.hotkey.value, draft.amountInPlanks)
+        }.requireOk().getOrThrow()
         flowState.clear()
-    }
+        execution
+    }.onFailure { if (it is CancellationException) throw it }
+
+    fun clearDraft() = flowState.clear()
 
     private suspend fun requireSelectedWallet(metaId: Long) {
         check(accountRepository.getSelectedMetaAccount().id == metaId) { "The staking wallet has changed" }
     }
 
-    private suspend fun Flow<BittensorRootStakingDetails>.firstAndRemember(): BittensorRootStakingDetails {
-        return first().also(flowState::setDetails)
+    private suspend fun requireAffordable(chain: Chain, metaId: Long, amount: BigInteger, fee: Fee) {
+        val asset = walletRepository.assetFlow(metaId, chain.utilityAsset).first()
+        require(amount + fee.maxAmountDeductionFor(asset.token.configuration) <= asset.transferableInPlanks) {
+            "Insufficient transferable balance"
+        }
+        requireSelectedWallet(metaId)
     }
 }
 
@@ -117,14 +112,6 @@ class BittensorStakingFlowState {
 
     internal val draft = MutableStateFlow<BittensorRootStakeDraft?>(null)
 
-    @Volatile
-    internal var latestDetails: BittensorRootStakingDetails? = null
-        private set
-
-    fun setDetails(details: BittensorRootStakingDetails) {
-        latestDetails = details
-    }
-
     fun setDraft(draft: BittensorRootStakeDraft) {
         this.draft.value = draft
     }
@@ -132,6 +119,5 @@ class BittensorStakingFlowState {
     fun clear() {
         draft.value = null
         selectedValidator.value = null
-        latestDetails = null
     }
 }

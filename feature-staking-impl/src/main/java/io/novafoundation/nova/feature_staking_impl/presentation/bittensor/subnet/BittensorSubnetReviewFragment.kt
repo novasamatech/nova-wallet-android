@@ -3,20 +3,20 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
-import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.feature_account_api.view.showWallet
-import io.novafoundation.nova.feature_account_api.view.showAddress
-import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
-import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeResultBottomSheet
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
+import io.novafoundation.nova.common.view.setState
+import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
+import io.novafoundation.nova.feature_account_api.view.showAddress
+import io.novafoundation.nova.feature_account_api.view.showWallet
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.bindBittensorStakeResults
 
 private const val PAYLOAD_KEY = "payload"
 
@@ -28,8 +28,6 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             putParcelable(PAYLOAD_KEY, payload)
         }
     }
-
-    private var resultBottomSheet: BittensorStakeResultBottomSheet? = null
 
     override fun createBinding() = FragmentBittensorSubnetReviewBinding.inflate(layoutInflater)
 
@@ -55,6 +53,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetReviewViewModel) = with(binder) {
+        observeBittensorRetries(viewModel.retryEvents)
         viewModel.feeCaption.observe { feeCaption.text = it }
         setupExternalActions(viewModel)
         viewModel.wallet.observe(wallet::showWallet)
@@ -70,32 +69,15 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         viewModel.fee.observe(networkFee::setFeeStatus)
         viewModel.confirmButtonState.observe(confirm::setState)
         viewModel.walletChanged.observe { walletChanged.isVisible = it }
-        viewModel.resultState.observe { it?.let(::showResult) }
+        bindBittensorStakeResults(
+            results = viewModel.resultState,
+            onDismiss = viewModel::resultDismissed,
+            onTryAgain = viewModel::confirmClicked,
+            onViewPosition = viewModel::viewPositionClicked
+        )
     }
 
     private fun showDescription(titleRes: Int, descriptionRes: Int) {
         DescriptionBottomSheet(requireContext(), getString(titleRes), getString(descriptionRes)).show()
-    }
-
-    private fun showResult(state: BittensorStakeResultUi) {
-        val sheet = resultBottomSheet ?: BittensorStakeResultBottomSheet(
-            requireContext(),
-            onClose = { resultBottomSheet?.dismiss() },
-            onTryAgain = { viewModel.confirmClicked() },
-            onDiscoverSubnets = { resultBottomSheet?.dismiss() },
-            onViewPosition = { resultBottomSheet?.dismiss(); viewModel.viewPositionClicked() }
-        ).also {
-            resultBottomSheet = it
-            it.setOnDismissListener { resultBottomSheet = null; viewModel.resultDismissed() }
-            it.show()
-        }
-        sheet.setState(state)
-    }
-
-    override fun onDestroyView() {
-        resultBottomSheet?.setOnDismissListener(null)
-        resultBottomSheet?.dismiss()
-        resultBottomSheet = null
-        super.onDestroyView()
     }
 }

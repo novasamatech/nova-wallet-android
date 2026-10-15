@@ -35,12 +35,12 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     private var filledLine = false
 
-    fun useFilledLine() {
-        filledLine = true
+    fun setFilledLine(enabled: Boolean) {
+        filledLine = enabled
         chart.axisRight.apply {
-            textSize = 12f
-            typeface = Typeface.DEFAULT
-            setLabelCount(3, true)
+            textSize = if (enabled) 12f else 9f
+            typeface = if (enabled) Typeface.DEFAULT else Typeface.MONOSPACE
+            setLabelCount(if (enabled) 3 else chartUIParams.gridLines, true)
         }
         updateChart()
     }

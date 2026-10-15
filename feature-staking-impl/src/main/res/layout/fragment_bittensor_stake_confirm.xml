@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/secondary_screen_background"
     android:orientation="vertical">
-
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/bittensorStakeConfirmToolbar"
         android:layout_width="match_parent"
@@ -42,7 +42,6 @@
         app:childrenPaddingStart="16dp"
         app:childrenPaddingTop="0dp"
         app:drawDividers="true">
-
         <io.novafoundation.nova.common.view.TableCellView
             android:id="@+id/bittensorStakeConfirmStakingType"
             android:layout_width="match_parent"

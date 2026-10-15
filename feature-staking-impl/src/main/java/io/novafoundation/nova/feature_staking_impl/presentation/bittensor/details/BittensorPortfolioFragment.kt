@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorPortfolioBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
 
 class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorPortfolioBinding>() {
 
@@ -26,7 +27,8 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         positions.adapter = adapter
         addPosition.setOnClickListener { viewModel.addPosition() }
         retry.setOnClickListener { viewModel.retry() }
-        priceChart.showPlotOnly(chartChange)
+        priceChart.onContentVisibilityChanged = { chartChange.isVisible = it }
+        priceChart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         priceChart.setPlotHeight(156)
         priceChart.onPeriodSelected = viewModel::selectChartPeriod
         chartRetry.setOnClickListener { viewModel.retryChart() }
@@ -36,7 +38,9 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
         viewModel.priceChartDisclaimer.observe { chartDisclaimer.text = it }
         viewModel.priceChartTitle.observe(priceChart::setTitle)
-        viewModel.priceChartFormatters.observe { priceChart.setTextInjectors(it.price, it.priceChange, it.date) }
+        viewModel.priceChartFormatters.observe { formatters ->
+            priceChart.onPriceChange = { from, to -> formatters.priceChange.format(from, to, chartChange) }
+        }
         viewModel.priceChartModels.observe(priceChart::setCharts)
         viewModel.chartAxisFormatter.observe(priceChart::setAxisLabelFormatter)
         viewModel.chartFailed.observe { chartRetry.isVisible = it }

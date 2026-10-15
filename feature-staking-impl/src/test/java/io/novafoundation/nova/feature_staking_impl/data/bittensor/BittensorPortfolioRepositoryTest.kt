@@ -5,13 +5,16 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novasama.substrate_sdk_android.runtime.AccountId
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigInteger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -25,13 +28,10 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import io.novasama.substrate_sdk_android.runtime.AccountId
-import java.math.BigInteger
 
 class BittensorPortfolioRepositoryTest {
 
@@ -52,13 +52,11 @@ class BittensorPortfolioRepositoryTest {
     private var rootStake = BigInteger.TEN
     private val selected = MutableStateFlow(account(1L))
     private val positions = object : BittensorPositionSource {
-        override suspend fun rootPositions(chainId: String, coldKey: AccountId): List<BittensorRootPosition> {
+        override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions {
             positionRequests++
             check(coldKey[0] == 1.toByte() && !failFirstWallet) { "RPC unavailable" }
-            return listOf(BittensorRootPosition(AccountIdKey(ByteArray(32)), rootStake))
+            return BittensorStakePositions(listOf(BittensorRootPosition(AccountIdKey(ByteArray(32)), rootStake)), emptyList())
         }
-
-        override suspend fun subnetPositions(chainId: String, coldKey: AccountId): List<BittensorSubnetPosition> = emptyList()
     }
 
     @Test
@@ -160,5 +158,7 @@ class BittensorPortfolioRepositoryTest {
         `when`(it.accountIdIn(chain)).thenReturn(ByteArray(32) { id.toByte() })
     }
 
-    private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positions, swapSource, chainStateRepository, logger)
+    private val portfolioLoader = BittensorPortfolioLoader(positions, swapSource, logger)
+
+    private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, portfolioLoader, chainStateRepository, logger)
 }

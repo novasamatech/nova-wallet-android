@@ -79,3 +79,9 @@ Model finite UI choices with enums or sealed types instead of magic integers. Ke
 Refactor to solve a concrete correctness, ownership, consistency, duplication, testability, or complexity problem, not personal stylistic preference. Inspect existing implementations first. Keep authoritative state in one place and derive dependent values; inject dependencies rather than constructing them inside consumers. Distinguish unavailable data from zero or empty data, and do not disguise mocks or incomplete integrations as working functionality.
 
 Prioritize operation correctness, then state and error handling, then architecture and duplication, then readability. For each change, identify the problem, the intended improvement, and the verification. Separate behavior changes from behavior-preserving refactoring. Avoid unrelated cleanup and speculative abstractions in `common`.
+
+Keep read and mapping methods free of hidden workflow state changes. Pass an explicit wallet, validator and amount context into fee estimation and preparation rather than relying on the last observer's cached details. Associate asynchronous results with their originating request and invalidate stale presentation as soon as that request changes.
+
+Prefer named models for meaningful requests and load results over positional `Pair`/`Triple` values. Use scope functions for short transformations; keep validation, mutation and operation sequencing explicit. Do not manufacture zero-valued data merely to call a formatter and erase the result afterwards.
+
+Share decoding and loading when multiple consumers need different parts of the same runtime response. Keep recovery independent for unrelated reads, and keep screen-specific sources out of screens that do not consume them.

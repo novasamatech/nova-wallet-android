@@ -13,14 +13,12 @@ data class BittensorRootStakingDetails(
     val asset: Asset,
     val validator: BittensorValidator?,
     val annualPercentageYield: BigDecimal?,
-    val position: BittensorRootPosition?,
     val dataStatus: BittensorDataStatus
 )
 
 data class BittensorValidator(
     val hotkey: AccountIdKey,
-    val name: String,
-    val iconUrl: String?
+    val name: String
 )
 
 data class BittensorRootPosition(
@@ -33,6 +31,13 @@ data class BittensorRootStakeDraft(
     val amountInPlanks: BigInteger,
     val validator: BittensorValidator,
     val fee: Fee
+)
+
+data class BittensorRootStakeRequest(
+    val metaId: Long,
+    val chain: Chain,
+    val validator: BittensorValidator,
+    val amountInPlanks: BigInteger
 )
 
 sealed interface BittensorDataStatus {

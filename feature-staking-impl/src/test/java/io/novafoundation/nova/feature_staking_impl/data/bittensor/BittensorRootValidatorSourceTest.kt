@@ -6,16 +6,16 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.verifyNoInteractions
-import org.mockito.Mockito.`when`
-import java.math.BigDecimal
-import java.math.BigInteger
 
 class BittensorRootValidatorSourceTest {
 
@@ -77,7 +77,7 @@ class BittensorRootValidatorSourceTest {
     }
 
     private fun validator(seed: Byte): BittensorSubnetValidator {
-        val validator = BittensorValidator(AccountIdKey(ByteArray(32) { seed }), "Validator $seed", null)
+        val validator = BittensorValidator(AccountIdKey(ByteArray(32) { seed }), "Validator $seed")
         return BittensorSubnetValidator(validator, chain.addressOf(validator.hotkey), BigDecimal.ZERO, true)
     }
 }

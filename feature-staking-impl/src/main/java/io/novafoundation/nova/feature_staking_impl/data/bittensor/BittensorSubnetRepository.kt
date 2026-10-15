@@ -1,29 +1,58 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.common.utils.isZero
-import io.novasama.substrate_sdk_android.hash.isPositive
-import java.math.BigInteger
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.ChainGeneses
-import kotlinx.coroutines.withTimeout
+import io.novasama.substrate_sdk_android.hash.isPositive
+import java.math.BigInteger
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withTimeout
 
 interface BittensorSubnetRepository {
 
     suspend fun subnets(): List<BittensorSubnet>
+
+    suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet
 }
 
 class RealBittensorSubnetRepository(
     private val runtimeCalls: MultiChainRuntimeCallsApi,
-    private val configRepository: BittensorConfigRepository
+    private val configRepository: BittensorConfigRepository,
+    private val swapSource: BittensorSwapSource
 ) : BittensorSubnetRepository {
 
-    override suspend fun subnets(): List<BittensorSubnet> = withTimeout(20_000L) {
+    private val mutex = Mutex()
+
+    private var cachedCatalogue: List<BittensorSubnet>? = null
+
+    private var catalogueLoadedAtNanos = 0L
+
+    override suspend fun subnets(): List<BittensorSubnet> = mutex.withLock {
+        val cachedCatalogue = cachedCatalogue
+        if (cachedCatalogue != null && System.nanoTime() - catalogueLoadedAtNanos < CATALOGUE_VALIDITY.inWholeNanoseconds) {
+            return@withLock cachedCatalogue
+        }
+        val catalogue = loadCatalogue()
+        this.cachedCatalogue = catalogue
+        catalogueLoadedAtNanos = System.nanoTime()
+        catalogue
+    }
+
+    override suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet = withTimeout(20_000L) {
+        val subnet = subnets().firstOrNull { it.id == subnetId } ?: throw NoSuchElementException("Subnet ${subnetId.value} is unavailable")
+        val price = swapSource.currentAlphaPrice(ChainGeneses.BITTENSOR, subnetId)
+        subnet.copy(priceInRao = price)
+    }
+
+    private suspend fun loadCatalogue(): List<BittensorSubnet> = withTimeout(20_000L) {
         coroutineScope {
             val config = async { configRepository.config() }
             val subnets = runtimeCalls.forChain(ChainGeneses.BITTENSOR).call(
@@ -35,6 +64,11 @@ class RealBittensorSubnetRepository(
             val logos = config.await().subnetLogos
             subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
         }
+    }
+
+    private companion object {
+
+        val CATALOGUE_VALIDITY = 30.seconds
     }
 }
 
@@ -66,7 +100,7 @@ internal fun bindBittensorText(decoded: Any?): String {
     return bytes.decodeToString(throwOnInvalidSequence = true).trim()
 }
 
-internal fun bindBittensorSubnetPrice(tao: Any?, alpha: Any?): java.math.BigInteger? {
+internal fun bindBittensorSubnetPrice(tao: Any?, alpha: Any?): BigInteger? {
     if (tao == null || alpha == null) return null
     val taoReserve = bindBittensorU64(tao)
     val alphaReserve = bindBittensorU64(alpha)

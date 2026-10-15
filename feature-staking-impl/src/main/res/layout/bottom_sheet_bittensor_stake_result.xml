@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,7 +9,6 @@
     android:orientation="vertical"
     android:paddingStart="16dp"
     android:paddingEnd="16dp">
-
     <View
         style="@style/Widget.Nova.Puller"
         android:layout_marginTop="6dp" />
@@ -19,7 +19,6 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:orientation="vertical">
-
         <TextView
             android:id="@+id/bittensorStakeResultProgressTitle"
             style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
@@ -57,7 +56,6 @@
         android:orientation="vertical"
         android:visibility="gone"
         tools:visibility="visible">
-
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="96dp"
             android:layout_height="96dp"
@@ -93,7 +91,6 @@
             app:childrenPaddingStart="16dp"
             app:childrenPaddingTop="0dp"
             app:drawDividers="true">
-
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/bittensorStakeResultValidator"
                 android:layout_width="match_parent"
@@ -117,7 +114,6 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal">
-
             <io.novafoundation.nova.common.view.PrimaryButton
                 android:id="@+id/bittensorStakeResultDiscoverSubnets"
                 style="@style/Widget.Nova.Button.Secondary"
@@ -146,7 +142,6 @@
         android:orientation="vertical"
         android:visibility="gone"
         tools:visibility="visible">
-
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="96dp"
             android:layout_height="96dp"
@@ -189,7 +184,6 @@
             android:layout_marginTop="24dp"
             android:layout_marginBottom="16dp"
             android:orientation="horizontal">
-
             <io.novafoundation.nova.common.view.PrimaryButton
                 android:id="@+id/bittensorStakeResultClose"
                 style="@style/Widget.Nova.Button.Secondary"

@@ -6,21 +6,21 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.address.AddressIconGenerator
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetViewModel
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 @Module(includes = [ViewModelModule::class])
 class BittensorSubnetModule {
@@ -32,31 +32,37 @@ class BittensorSubnetModule {
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
         icons: AssetIconProvider,
-        logger: Logger,
-        tokenFormatter: TokenFormatter
-    ): ViewModel = BittensorChooseSubnetViewModel(bittensorSubnetInteractor, router, icons, logger, tokenFormatter)
+        tokenFormatter: TokenFormatter,
+        retryController: BittensorRetryController
+    ): ViewModel = BittensorChooseSubnetViewModel(
+        bittensorSubnetInteractor,
+        router,
+        icons,
+        tokenFormatter,
+        retryController = retryController
+    )
 
     @Provides
     @IntoMap
     @ViewModelKey(BittensorSelectValidatorViewModel::class)
     fun selectValidator(
         communicator: BittensorSelectValidatorCommunicator,
-        validatorsRepository: BittensorSubnetValidatorRepository,
+        bittensorValidatorInteractor: BittensorValidatorInteractor,
         icons: AddressIconGenerator,
         router: StakingRouter,
         externalActions: ExternalActions.Presentation,
-        chainRegistry: ChainRegistry,
         resources: ResourceManager,
-        logger: Logger
+        logger: Logger,
+        retryController: BittensorRetryController
     ): ViewModel = BittensorSelectValidatorViewModel(
         communicator,
-        validatorsRepository,
+        bittensorValidatorInteractor,
         icons,
         router,
         externalActions,
-        chainRegistry,
         resources,
-        logger
+        logger,
+        retryController = retryController
     )
 
     @Provides

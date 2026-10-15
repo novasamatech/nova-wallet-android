@@ -1,15 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavoritesRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
 
 class BittensorSubnetInteractorTest {
 
@@ -30,7 +30,7 @@ class BittensorSubnetInteractorTest {
     fun `subnet lookup uses the id rather than catalogue order`() = runBlocking {
         val first = BittensorSubnet(BittensorSubnetId(2), "Second", "B", null)
         val requested = BittensorSubnet(BittensorSubnetId(1), "First", "A", null)
-        `when`(repository.subnets()).thenReturn(listOf(first, requested))
+        `when`(repository.subnet(requested.id)).thenReturn(requested)
 
         assertEquals(requested, bittensorSubnetInteractor.subnet(BittensorSubnetId(1)))
     }
@@ -38,7 +38,7 @@ class BittensorSubnetInteractorTest {
     @Test
     fun `missing subnet does not select a different subnet`() = runBlocking {
         val other = BittensorSubnet(BittensorSubnetId(2), "Second", "B", null)
-        `when`(repository.subnets()).thenReturn(listOf(other))
+        `when`(repository.subnet(BittensorSubnetId(1))).thenThrow(NoSuchElementException("Subnet is unavailable"))
 
         val failure = runCatching { bittensorSubnetInteractor.subnet(BittensorSubnetId(1)) }.exceptionOrNull()
 
