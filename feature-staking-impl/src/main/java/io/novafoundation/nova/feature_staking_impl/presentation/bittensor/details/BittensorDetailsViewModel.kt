@@ -68,17 +68,26 @@ class BittensorDetailsViewModel(
     private val reload = MutableStateFlow(0L)
 
     private val portfolioState = reload.flatMapLatest {
-        bittensorPortfolioInteractor.observePortfolio().withSafeLoading().onError {
-            logger.log("[BittensorPortfolio] Portfolio stream failed")
-            logger.log(it)
-        }
-    }.shareInBackground()
+        bittensorPortfolioInteractor.observePortfolio()
+            .withSafeLoading()
+            .onError {
+                logger.log("[BittensorPortfolio] Portfolio stream failed")
+                logger.log(it)
+            }
+    }
+        .shareInBackground()
 
-    private val portfolio = portfolioState.filterLoaded().shareInBackground()
+    private val portfolio = portfolioState.filterLoaded()
+        .shareInBackground()
 
-    private val failed = portfolioState.map { it is ExtendedLoadingState.Error }.shareInBackground()
+    private val failed = portfolioState.map { it is ExtendedLoadingState.Error }
+        .shareInBackground()
 
-    val isLoading = combine(portfolio.map { it.dataStatus is BittensorDataStatus.Loading }.onStart { emit(true) }, failed) { loading, failed ->
+    val isLoading = combine(
+        portfolio.map { it.dataStatus is BittensorDataStatus.Loading }
+            .onStart { emit(true) },
+        failed
+    ) { loading, failed ->
         loading && !failed
     }
         .shareInBackground()
@@ -91,31 +100,40 @@ class BittensorDetailsViewModel(
             it.positions.totalStake == null -> resources.getString(R.string.bittensor_valuation_unavailable)
             else -> null
         }
-    }.onStart { emit(null) }
+    }
+        .onStart { emit(null) }
 
     val warning = combine(portfolioWarning, failed) { warning, failed ->
         if (failed) resources.getString(R.string.common_retry_message) else warning
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val totalStake = portfolio.map { data -> format(data.positions?.totalStake, data) }.shareInBackground()
+    val totalStake = portfolio.map { data -> formatAmount(data.positions?.totalStake, data) }
+        .shareInBackground()
 
     val canAddStake = combine(portfolio, failed) { data, failed -> !failed && data.dataStatus is BittensorDataStatus.Fresh }
-        .onStart { emit(false) }.shareInBackground()
+        .onStart { emit(false) }
+        .shareInBackground()
 
-    val empty = portfolio.map { it.positions?.let { p -> p.root.isEmpty() && p.subnets.isEmpty() } == true }.shareInBackground()
+    val empty = portfolio.map { it.positions?.let { p -> p.root.isEmpty() && p.subnets.isEmpty() } == true }
+        .shareInBackground()
 
     private val chartPeriod = MutableStateFlow(PricePeriod.MONTH)
 
-    val selectedChartIndex = chartPeriod.map { PricePeriod.entries.indexOf(it) }.shareInBackground()
+    val selectedChartIndex = chartPeriod.map { PricePeriod.entries.indexOf(it) }
+        .shareInBackground()
 
     private val chartReload = MutableStateFlow(0L)
 
     private val chartAssetState = chartReload.flatMapLatest {
-        bittensorPortfolioInteractor.observeAsset().withSafeLoading().onError {
-            logger.log("[BittensorChart] Failed to load native asset")
-            logger.log(it)
-        }
-    }.shareInBackground()
+        bittensorPortfolioInteractor.observeAsset()
+            .withSafeLoading()
+            .onError {
+                logger.log("[BittensorChart] Failed to load native asset")
+                logger.log(it)
+            }
+    }
+        .shareInBackground()
 
     private val chartAsset = chartAssetState.filterLoaded()
 
@@ -127,30 +145,34 @@ class BittensorDetailsViewModel(
         R.string.bittensor_chart_month,
         R.string.price_chart_year,
         R.string.common_all
-    ).map(resources::getString)
+    )
+        .map(resources::getString)
 
     val priceChartTitle = chartAsset.map { resources.getString(R.string.price_chart_title, it.token.configuration.symbol.value) }
         .shareInBackground()
 
     val priceChartDisclaimer = chartAsset.map {
         resources.getString(R.string.bittensor_chart_price_disclaimer, it.token.configuration.symbol.value)
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     val chartAxisFormatter = chartAsset.map { asset ->
         chartAxisFormatterFactory.create(asset.token, isFiatMode = true)
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     val priceChartFormatters = combine(chartAsset, chartPeriod) { asset, period ->
         val token = asset.token
-        PriceChartTextInjectors(
-            RealPricePriceTextInjector(token.currency, token.coinRate?.rate, fiatFormatter),
-            BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(period)]),
-            RealDateChartTextInjector(resources)
-        )
-    }.shareInBackground()
+        val priceTextInjector = RealPricePriceTextInjector(token.currency, token.coinRate?.rate, fiatFormatter)
+        val changeTextInjector = BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(period)])
+        val dateTextInjector = RealDateChartTextInjector(resources)
+        PriceChartTextInjectors(priceTextInjector, changeTextInjector, dateTextInjector)
+    }
+        .shareInBackground()
 
     private val chartData = combine(
-        chartAssetState.mapLoading { it.token.configuration.priceId to it.token.currency }.distinctUntilChanged(),
+        chartAssetState.mapLoading { it.token.configuration.priceId to it.token.currency }
+            .distinctUntilChanged(),
         chartPeriod
     ) { identity, period -> identity to period }
         .flatMapLatest { (identity, period) ->
@@ -166,30 +188,32 @@ class BittensorDetailsViewModel(
                     }
                 }
             }
-        }.onStart { emit(AssetPriceChart(PricePeriod.MONTH, ExtendedLoadingState.Loading)) }.shareInBackground()
+        }
+        .onStart { emit(AssetPriceChart(PricePeriod.MONTH, ExtendedLoadingState.Loading)) }
+        .shareInBackground()
 
-    val chartFailed = chartData.map { it.chart is ExtendedLoadingState.Error }.shareInBackground()
+    val chartFailed = chartData.map { it.chart is ExtendedLoadingState.Error }
+        .shareInBackground()
 
     val priceChartModels = chartData.map { data ->
-        periods.mapIndexed { index, period ->
-            val button = chartButtonTexts[index]
-            if (period != data.range) return@mapIndexed PriceChartModel.Loading(button)
-            when (val state = data.chart) {
-                is ExtendedLoadingState.Loading -> PriceChartModel.Loading(button)
-                is ExtendedLoadingState.Error -> PriceChartModel.Empty(button, resources.getString(R.string.price_chart_load_failed))
-                is ExtendedLoadingState.Loaded -> if (state.data.isEmpty()) {
-                    PriceChartModel.Empty(button, resources.getString(R.string.price_chart_no_data))
-                } else {
-                    PriceChartModel.Chart(
-                        button,
-                        button,
-                        period != PricePeriod.YEAR && period != PricePeriod.MAX,
-                        state.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
-                    )
-                }
+        periods.mapIndexed { index, period -> mapPriceChart(data, period, chartButtonTexts[index]) }
+    }
+        .shareInBackground()
+
+    private fun mapPriceChart(data: AssetPriceChart, period: PricePeriod, button: String): PriceChartModel {
+        if (period != data.range) return PriceChartModel.Loading(button)
+
+        return when (val state = data.chart) {
+            is ExtendedLoadingState.Loading -> PriceChartModel.Loading(button)
+            is ExtendedLoadingState.Error -> PriceChartModel.Empty(button, resources.getString(R.string.price_chart_load_failed))
+            is ExtendedLoadingState.Loaded -> {
+                if (state.data.isEmpty()) return PriceChartModel.Empty(button, resources.getString(R.string.price_chart_no_data))
+
+                val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
+                PriceChartModel.Chart(button, button, period != PricePeriod.YEAR && period != PricePeriod.MAX, prices)
             }
         }
-    }.shareInBackground()
+    }
 
     fun selectChartPeriod(index: Int) {
         periods.getOrNull(index)?.let { chartPeriod.value = it }
@@ -211,39 +235,47 @@ class BittensorDetailsViewModel(
                 logger.log(e)
             }
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val positions = combine(portfolio, subnetMetadata) { data, metadata ->
-        val positions = data.positions ?: return@combine emptyList()
-        buildList {
-            if (positions.rootStake.isPositive()) {
-                add(
-                    BittensorPositionUi(
-                        "root",
-                        resources.getString(R.string.bittensor_root_staking),
-                        resources.getString(R.string.bittensor_apy_unavailable),
-                        format(positions.rootStake, data),
-                        assetIconProvider.getAssetIconOrFallback(data.asset.token.configuration),
-                        BittensorPositionAction.RootDetails
-                    )
-                )
-            }
-            positions.subnets.map { it.subnetId }.distinct().sortedBy { it.value }.forEach { subnetId ->
-                val subnet = metadata[subnetId]
-                val fallback = resources.getString(R.string.bittensor_subnet_number, subnetId.value)
-                add(
-                    BittensorPositionUi(
-                        "subnet-${subnetId.value}",
-                        subnetPositionTitle(subnet, fallback),
-                        if (subnet == null) resources.getString(R.string.bittensor_subnet_metadata_unavailable) else fallback,
-                        format(positions.subnetStake(subnetId), data),
-                        subnet?.logoUrl?.asUrlIcon() ?: Icon.FromDrawableRes(R.drawable.ic_fallback_network_icon),
-                        BittensorPositionAction.SubnetDetails(subnetId)
-                    )
-                )
-            }
+    val positions = combine(portfolio, subnetMetadata, ::mapPositions)
+        .shareInBackground()
+
+    private fun mapPositions(portfolio: BittensorPortfolio, metadata: Map<BittensorNetuid.Subnet, BittensorSubnet>): List<BittensorPositionUi> {
+        val positions = portfolio.positions ?: return emptyList()
+        val subnetIds = positions.subnets
+            .map { it.subnetId }
+            .distinct()
+            .sortedBy { it.value }
+
+        return buildList {
+            if (positions.rootStake.isPositive()) add(mapRootPosition(portfolio, positions.rootStake))
+            subnetIds.forEach { subnetId -> add(mapSubnetPosition(portfolio, subnetId, metadata[subnetId])) }
         }
-    }.shareInBackground()
+    }
+
+    private fun mapRootPosition(portfolio: BittensorPortfolio, stake: BigInteger): BittensorPositionUi = BittensorPositionUi(
+        "root",
+        resources.getString(R.string.bittensor_root_staking),
+        resources.getString(R.string.bittensor_apy_unavailable),
+        formatAmount(stake, portfolio),
+        assetIconProvider.getAssetIconOrFallback(portfolio.asset.token.configuration),
+        BittensorPositionAction.RootDetails
+    )
+
+    private fun mapSubnetPosition(portfolio: BittensorPortfolio, subnetId: BittensorNetuid.Subnet, subnet: BittensorSubnet?): BittensorPositionUi {
+        val fallback = resources.getString(R.string.bittensor_subnet_number, subnetId.value)
+        val subtitle = if (subnet == null) resources.getString(R.string.bittensor_subnet_metadata_unavailable) else fallback
+        val icon = subnet?.logoUrl?.asUrlIcon() ?: Icon.FromDrawableRes(R.drawable.ic_fallback_network_icon)
+        return BittensorPositionUi(
+            "subnet-${subnetId.value}",
+            subnetPositionTitle(subnet, fallback),
+            subtitle,
+            formatAmount(portfolio.positions?.subnetStake(subnetId), portfolio),
+            icon,
+            BittensorPositionAction.SubnetDetails(subnetId)
+        )
+    }
 
     fun back() = router.back()
 
@@ -265,7 +297,7 @@ class BittensorDetailsViewModel(
         externalActions.showAddressActions(address, portfolio.first().chain)
     }
 
-    private fun format(amount: BigInteger?, portfolio: BittensorPortfolio): AmountModel {
+    private fun formatAmount(amount: BigInteger?, portfolio: BittensorPortfolio): AmountModel {
         if (amount == null) return AmountModel("—", null)
         val token = portfolio.asset.token
         val decimalAmount = token.amountFromPlanks(amount)

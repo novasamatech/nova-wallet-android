@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
@@ -24,6 +25,8 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
@@ -56,9 +59,14 @@ class BittensorStakingRepositoryTest {
 
     private var validatorRequests = 0
 
+    private var failPositions = false
+
+    private var failValidatorSelection = false
+
     private val positions = object : BittensorPositionSource {
         override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions {
             positionRequests++
+            check(!failPositions) { "Positions unavailable" }
             val root = BittensorRootPosition(validator.hotkey, BigInteger.valueOf(positionRequests.toLong()))
             return BittensorStakePositions(listOf(root), emptyList())
         }
@@ -67,6 +75,7 @@ class BittensorStakingRepositoryTest {
     private val validatorSource = object : BittensorRootValidatorSource {
         override suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator {
             validatorRequests++
+            check(!failValidatorSelection) { "Validators unavailable" }
             return validator
         }
 
@@ -85,6 +94,60 @@ class BittensorStakingRepositoryTest {
 
     @Test
     fun `balance growth updates root positions without reloading the validator directory on every block`() = runBlocking {
+        prepare()
+
+        withTimeout(3_000L) {
+            repository.observeRootStakingDetails()
+                .onEach { blockNumbers.value += BigInteger.ONE }
+                .take(2)
+                .toList()
+        }
+
+        assertEquals(2, positionRequests)
+        assertEquals(1, validatorRequests)
+    }
+
+    @Test
+    fun `failed refresh keeps the default validator from cached positions`() = runBlocking {
+        prepare()
+
+        val states = withTimeout(3_000L) {
+            repository.observeRootStakingDetails()
+                .onEach {
+                    failPositions = true
+                    blockNumbers.value += BigInteger.ONE
+                }
+                .take(2)
+                .toList()
+        }
+
+        assertTrue(states.first().dataStatus is BittensorDataStatus.Fresh)
+        assertTrue(states.last().dataStatus is BittensorDataStatus.Stale)
+        assertEquals(validator, states.last().validator)
+        assertEquals(1, validatorRequests)
+    }
+
+    @Test
+    fun `failed validator selection retries on the next block`() = runBlocking {
+        prepare()
+        failValidatorSelection = true
+
+        val states = withTimeout(3_000L) {
+            repository.observeRootStakingDetails()
+                .onEach {
+                    failValidatorSelection = false
+                    blockNumbers.value += BigInteger.ONE
+                }
+                .take(2)
+                .toList()
+        }
+
+        assertNull(states.first().validator)
+        assertEquals(validator, states.last().validator)
+        assertEquals(2, validatorRequests)
+    }
+
+    private suspend fun prepare() {
         `when`(chainRegistry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(chain.assets).thenReturn(listOf(chainAsset))
@@ -93,12 +156,5 @@ class BittensorStakingRepositoryTest {
         `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(walletRepository.assetFlow(1L, chainAsset)).thenReturn(flowOf(asset))
         `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blockNumbers)
-
-        withTimeout(3_000L) {
-            repository.observeRootStakingDetails().onEach { blockNumbers.value += BigInteger.ONE }.take(2).toList()
-        }
-
-        assertEquals(2, positionRequests)
-        assertEquals(1, validatorRequests)
     }
 }

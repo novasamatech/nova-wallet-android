@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPricePoint
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -62,18 +63,21 @@ class BittensorSubnetDetailsViewModel(
     private val subnetState = retryController.observe("subnet") { flowOf { bittensorSubnetInteractor.subnet(subnetId) } }
         .shareInBackground()
 
-    val subnet = subnetState.mapNotNull { it.dataOrNull }.shareInBackground()
+    val subnet = subnetState.mapNotNull { it.dataOrNull }
+        .shareInBackground()
 
     private val validatorsState = retryController.observe("validators") { flowOf { bittensorSubnetStakingInteractor.validators(subnetId) } }
         .shareInBackground()
 
-    private val validators = validatorsState.map { it.dataOrNull.orEmpty() }.shareInBackground()
+    private val validators = validatorsState.map { it.dataOrNull.orEmpty() }
+        .shareInBackground()
 
     private val selectedValidatorAddress = MutableStateFlow<String?>(null)
 
     val selectedValidator = combine(validators, selectedValidatorAddress) { validators, address ->
         validators.firstOrNull { it.address == address && it.selectable }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     private val presetSelection = MutableStateFlow(BittensorStakeAmountPreset.FIVE)
 
@@ -85,13 +89,17 @@ class BittensorSubnetDetailsViewModel(
 
     private val period = MutableStateFlow(BittensorSubnetChartPeriod.WEEK)
 
-    val selectedChartIndex = period.map { BittensorSubnetChartPeriod.entries.indexOf(it) }.shareInBackground()
+    val selectedChartIndex = period.map { BittensorSubnetChartPeriod.entries.indexOf(it) }
+        .shareInBackground()
 
-    private val assetState = retryController.observe("asset", bittensorSubnetInteractor::observeAsset).shareInBackground()
+    private val assetState = retryController.observe("asset", bittensorSubnetInteractor::observeAsset)
+        .shareInBackground()
 
-    private val asset = assetState.mapNotNull { it.dataOrNull }.shareInBackground()
+    private val asset = assetState.mapNotNull { it.dataOrNull }
+        .shareInBackground()
 
-    val nativeTokenSymbol = asset.map { it.token.configuration.symbol.value }.shareInBackground()
+    val nativeTokenSymbol = asset.map { it.token.configuration.symbol.value }
+        .shareInBackground()
 
     val presetLabels = asset.map { asset ->
         BittensorStakeAmountPreset.entries.associateWith { preset ->
@@ -100,13 +108,17 @@ class BittensorSubnetDetailsViewModel(
                 else -> tokenFormatter.formatToken(preset.amountFor(asset.transferable), asset.token.configuration.symbol)
             }
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     private val presetAmount = combine(selectedPreset, asset) { preset, asset ->
         preset.amountFor(asset.transferable)
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val favorite = bittensorSubnetInteractor.observeFavorites().map { subnetId.value in it.subnetIds }.shareInBackground()
+    val favorite = bittensorSubnetInteractor.observeFavorites()
+        .map { subnetId.value in it.subnetIds }
+        .shareInBackground()
 
     val canContinue = combine(subnetState, validatorsState, assetState) { subnet, validators, asset ->
         subnet.isLoaded() && validators.isLoaded() && asset.isLoaded()
@@ -117,9 +129,11 @@ class BittensorSubnetDetailsViewModel(
         selected?.let {
             iconGenerator.createAddressIcon(it.validator.hotkey.value, 24, AddressIconGenerator.BACKGROUND_TRANSPARENT)
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val validatorCount = validators.map { it.size.toString() }.shareInBackground()
+    val validatorCount = validators.map { it.size.toString() }
+        .shareInBackground()
 
     val pool = combine(subnet, asset) { subnet, asset ->
         subnet.taoReserveInPlanks?.let { tokenFormatter.formatToken(it, asset) } ?: "—"
@@ -130,22 +144,27 @@ class BittensorSubnetDetailsViewModel(
         bittensorSubnetDetailsInteractor.estimateAlpha(amount, subnet.priceInRao, asset.token.configuration)?.let {
             resources.getString(R.string.bittensor_estimated_hold, tokenFormatter.formatToken(it, TokenSymbol(subnet.symbol.ifBlank { "—" })))
         } ?: "—"
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     val price = combine(subnet, asset, isFiatMode) { subnet, asset, fiat ->
-        val price = subnet.priceInRao?.let(asset.token::amountFromPlanks)
+        val price = subnet.priceInRao?.let(asset.token::amountFromPlanks) ?: return@combine "—"
         if (fiat) {
-            price?.let(asset.token::toFiatOrNull)?.let { fiatFormatter.formatFiat(it, asset.token.currency) } ?: "—"
+            val fiatPrice = asset.token.toFiatOrNull(price) ?: return@combine "—"
+            fiatFormatter.formatFiat(fiatPrice, asset.token.currency)
         } else {
-            price?.let { tokenFormatter.formatToken(it, asset.token.configuration.symbol) } ?: "—"
+            tokenFormatter.formatToken(price, asset.token.configuration.symbol)
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val currencyLabel = asset.map { it.token.currency.code }.shareInBackground()
+    val currencyLabel = asset.map { it.token.currency.code }
+        .shareInBackground()
 
     val axisFormatter = combine(asset, isFiatMode) { asset, isFiatMode ->
         chartAxisFormatterFactory.create(asset.token, isFiatMode)
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     private val chartPeriods = BittensorSubnetChartPeriod.entries
 
@@ -161,27 +180,27 @@ class BittensorSubnetDetailsViewModel(
 
     private val chartData = combine(asset, period) { asset, period ->
         BittensorSubnetChartRequest(asset.token.configuration.priceId, asset.token.currency, period)
-    }.distinctUntilChanged().flatMapLatest { request ->
-        retryController.observe("subnet chart") {
-            flowOf {
-                val priceId = request.nativePriceId
-                if (priceId == null) {
-                    emptyList()
-                } else {
-                    bittensorSubnetDetailsInteractor.history(subnetId, priceId, request.currency, request.period)
-                }
-            }
-        }.map { BittensorSubnetChart(request.period, it) }
-    }.shareInBackground()
+    }
+        .distinctUntilChanged()
+        .flatMapLatest { request ->
+            retryController.observe("subnet chart") { flowOf { loadChartHistory(request) } }
+                .map { BittensorSubnetChart(request.period, it) }
+        }
+        .shareInBackground()
 
-    val charts = combine(chartData, isFiatMode, ::mapCharts).shareInBackground()
+    val charts = combine(chartData, isFiatMode, ::mapCharts)
+        .shareInBackground()
 
-    val priceChangeFormatter = period.map { BittensorChartChangeTextInjector(periodLabel(it)) }.shareInBackground()
+    val priceChangeFormatter = period.map { BittensorChartChangeTextInjector(periodLabel(it)) }
+        .shareInBackground()
 
     init {
         combine(validatorCommunicator.responseFlow, validatorsState) { response, validators ->
             validators.dataOrNull?.firstOrNull { response.subnetId == subnetId.value && it.address == response.address }
-        }.mapNotNull { it }.onEach(::validatorSelected).launchIn(this)
+        }
+            .mapNotNull { it }
+            .onEach(::validatorSelected)
+            .launchIn(this)
     }
 
     fun validatorClicked() = launchUnit {
@@ -208,7 +227,9 @@ class BittensorSubnetDetailsViewModel(
 
     fun toggleFavorite() = launchUnit {
         try {
-            bittensorSubnetInteractor.toggleFavorite(bittensorSubnetInteractor.observeFavorites().first().metaId, subnetId)
+            val favorites = bittensorSubnetInteractor.observeFavorites()
+                .first()
+            bittensorSubnetInteractor.toggleFavorite(favorites.metaId, subnetId)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -227,23 +248,27 @@ class BittensorSubnetDetailsViewModel(
 
     fun back() = router.back()
 
-    private fun mapCharts(data: BittensorSubnetChart, isFiatMode: Boolean): List<PriceChartModel> {
-        return chartPeriods.map { period ->
-            val label = periodLabel(period)
-            if (period != data.period) return@map PriceChartModel.Loading(label)
-            when (val state = data.points) {
-                is ExtendedLoadingState.Loading -> PriceChartModel.Loading(label)
-                is ExtendedLoadingState.Error -> PriceChartModel.Empty(label, "")
-                is ExtendedLoadingState.Loaded -> if (state.data.isEmpty()) {
-                    PriceChartModel.Empty(label, "")
-                } else {
-                    PriceChartModel.Chart(
-                        buttonText = label,
-                        periodName = label,
-                        supportTimeShowing = true,
-                        priceChart = state.data.map { PriceChartModel.Chart.Price(it.timestamp, if (isFiatMode) it.fiat else it.tao) }
-                    )
-                }
+    private suspend fun loadChartHistory(request: BittensorSubnetChartRequest): List<BittensorSubnetPricePoint> {
+        val priceId = request.nativePriceId ?: return emptyList()
+        return bittensorSubnetDetailsInteractor.history(subnetId, priceId, request.currency, request.period)
+    }
+
+    private fun mapCharts(data: BittensorSubnetChart, isFiatMode: Boolean): List<PriceChartModel> = chartPeriods.map { period ->
+        mapChart(data, period, isFiatMode)
+    }
+
+    private fun mapChart(data: BittensorSubnetChart, period: BittensorSubnetChartPeriod, isFiatMode: Boolean): PriceChartModel {
+        val label = periodLabel(period)
+        if (period != data.period) return PriceChartModel.Loading(label)
+
+        return when (val state = data.points) {
+            is ExtendedLoadingState.Loading -> PriceChartModel.Loading(label)
+            is ExtendedLoadingState.Error -> PriceChartModel.Empty(label, "")
+            is ExtendedLoadingState.Loaded -> {
+                if (state.data.isEmpty()) return PriceChartModel.Empty(label, "")
+
+                val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, if (isFiatMode) it.fiat else it.tao) }
+                PriceChartModel.Chart(buttonText = label, periodName = label, supportTimeShowing = true, priceChart = prices)
             }
         }
     }

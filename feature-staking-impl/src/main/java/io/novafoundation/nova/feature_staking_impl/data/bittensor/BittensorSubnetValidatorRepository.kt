@@ -35,29 +35,31 @@ class RealBittensorSubnetValidatorRepository(
     override suspend fun validators(chain: Chain, netuid: BittensorNetuid): List<BittensorSubnetValidator> = withTimeout(45_000L) {
         val gates = backend.gates()
         val response = backend.validators(netuid.value)
-        val candidates = requireNotNull(response.items)
-            .mapNotNull { row ->
-                val address = row.hotkey ?: return@mapNotNull null
-                val hotkey = runCatching { chain.accountIdOf(address) }
-                    .getOrNull() ?: return@mapNotNull null
-                BittensorValidator(
-                    AccountIdKey(hotkey),
-                    row.identitySourceName
-                        ?.trim()
-                        ?.takeIf(String::isNotBlank)
-                        ?: row.stakeSourceName
-                            ?.trim()
-                            ?.takeIf(String::isNotBlank)
-                        ?: address
-                )
-            }
-            .distinctBy { it.hotkey }
-            .take(512)
+        val candidates = mapCandidates(chain, response)
         enrich(chain, netuid, candidates, gates)
             .sortedWith(
                 compareByDescending<BittensorSubnetValidator> { it.selectable }
                     .thenBy { it.validator.name }
             )
+    }
+
+    private fun mapCandidates(chain: Chain, response: BittensorValidatorsRemote): List<BittensorValidator> = requireNotNull(response.items)
+        .mapNotNull { mapValidator(chain, it) }
+        .distinctBy { it.hotkey }
+        .take(512)
+
+    private fun mapValidator(chain: Chain, remote: BittensorValidatorsRemote.Item): BittensorValidator? {
+        val address = remote.hotkey ?: return null
+        val hotkey = runCatching { chain.accountIdOf(address) }
+            .getOrNull() ?: return null
+        val identityName = remote.identitySourceName
+            ?.trim()
+            ?.takeIf(String::isNotBlank)
+        val stakeName = remote.stakeSourceName
+            ?.trim()
+            ?.takeIf(String::isNotBlank)
+
+        return BittensorValidator(AccountIdKey(hotkey), identityName ?: stakeName ?: address)
     }
 
     override suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator) = withTimeout(45_000L) {

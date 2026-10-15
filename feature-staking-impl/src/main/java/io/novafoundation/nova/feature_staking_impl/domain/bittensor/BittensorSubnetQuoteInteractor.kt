@@ -38,7 +38,10 @@ class BittensorSubnetCommission(val fraction: BigDecimal) {
     fun feeFor(taoAmount: BigInteger): BigInteger {
         require(taoAmount.isPositive() && taoAmount.bitLength() <= 64) { "Native-token amount must be a positive u64" }
         // Like iOS: the configured rate applies to the net amount, while the input includes the fee.
-        return taoAmount.toBigDecimal().multiply(fraction).divide(BigDecimal.ONE + fraction, 0, RoundingMode.DOWN).toBigIntegerExact()
+        return taoAmount.toBigDecimal()
+            .multiply(fraction)
+            .divide(BigDecimal.ONE + fraction, 0, RoundingMode.DOWN)
+            .toBigIntegerExact()
     }
 }
 
@@ -59,10 +62,7 @@ class BittensorSubnetQuoteInteractor(
         coroutineScope {
             val price = async { swapSource.currentAlphaPrice(chainId, subnetId) }
             val simulation = swapSource.simulate(chainId, subnetId, BittensorSwapDirection.TAO_TO_ALPHA, stakeAmount)
-            require(simulation.subnetId == subnetId && simulation.direction == BittensorSwapDirection.TAO_TO_ALPHA) { "Unexpected subnet quote" }
-            // amountIn is the runtime's net pool input. The swap fee is paid in the input token.
-            require(simulation.amountIn + simulation.taoFee == stakeAmount) { "Partial subnet quotes are not supported" }
-            require(simulation.amountOut.isPositive() && simulation.amountOut.bitLength() <= 64) { "Invalid subnet quote output" }
+            requireValidBuySimulation(simulation, subnetId, stakeAmount)
 
             BittensorSubnetBuyQuote(
                 subnetId = subnetId,
@@ -73,5 +73,12 @@ class BittensorSubnetQuoteInteractor(
                 serviceFeeRate = commission.fraction
             )
         }
+    }
+
+    private fun requireValidBuySimulation(simulation: BittensorSwapSimulation, subnetId: BittensorNetuid.Subnet, stakeAmount: BigInteger) {
+        require(simulation.subnetId == subnetId && simulation.direction == BittensorSwapDirection.TAO_TO_ALPHA) { "Unexpected subnet quote" }
+        // amountIn is the runtime's net pool input. The swap fee is paid in the input token.
+        require(simulation.amountIn + simulation.taoFee == stakeAmount) { "Partial subnet quotes are not supported" }
+        require(simulation.amountOut.isPositive() && simulation.amountOut.bitLength() <= 64) { "Invalid subnet quote output" }
     }
 }

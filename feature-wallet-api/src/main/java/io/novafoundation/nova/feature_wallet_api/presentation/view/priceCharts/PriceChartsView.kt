@@ -69,12 +69,19 @@ class PriceChartsView @JvmOverloads constructor(
     fun setPresentation(presentation: Presentation) {
         this.presentation = presentation
         controller.setFilledLine(presentation == Presentation.PLOT_ONLY)
-        if (presentation == Presentation.FULL) {
-            fullLayoutConstraints.applyTo(this)
-            binder.priceChartTitle.isGone = false
-            if (charts.isEmpty()) showLoadingState() else selectChart(selectedChartIndex)
-            return
+        when (presentation) {
+            Presentation.FULL -> showFullPresentation()
+            Presentation.PLOT_ONLY -> showPlotOnlyPresentation()
         }
+    }
+
+    private fun showFullPresentation() {
+        fullLayoutConstraints.applyTo(this)
+        binder.priceChartTitle.isGone = false
+        if (charts.isEmpty()) showLoadingState() else selectChart(selectedChartIndex)
+    }
+
+    private fun showPlotOnlyPresentation() {
         binder.priceChartTitle.isGone = true
         binder.priceChartCurrentPrice.isGone = true
         binder.priceChartPriceChange.isGone = true
@@ -127,13 +134,7 @@ class PriceChartsView @JvmOverloads constructor(
         this.charts = charts
 
         if (periodLabelsChanged) {
-            binder.priceChartButtons.removeAllViews()
-            charts.forEachIndexed { index, priceChartModel ->
-                if (index > 0) {
-                    binder.priceChartButtons.addView(createSpace())
-                }
-                binder.priceChartButtons.addView(createButton(priceChartModel.buttonText, index))
-            }
+            updatePeriodButtons(charts)
         }
 
         if (charts.isEmpty()) {
@@ -144,6 +145,14 @@ class PriceChartsView @JvmOverloads constructor(
             }
 
             selectChart(selectedChartIndex)
+        }
+    }
+
+    private fun updatePeriodButtons(charts: List<PriceChartModel>) {
+        binder.priceChartButtons.removeAllViews()
+        charts.forEachIndexed { index, model ->
+            if (index > 0) binder.priceChartButtons.addView(createSpace())
+            binder.priceChartButtons.addView(createButton(model.buttonText, index))
         }
     }
 

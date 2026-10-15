@@ -45,13 +45,14 @@ class BittensorSubnetStakingInteractor(
     suspend fun maximumStake(metaId: Long, subnetId: BittensorNetuid.Subnet, validatorAddress: String): BigInteger = withTimeout(60_000L) {
         requireSelectedWallet(metaId)
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        val asset = wallets.assetFlow(metaId, chain.utilityAsset).first()
+        val asset = wallets.assetFlow(metaId, chain.utilityAsset)
+            .first()
         val validator = requireEligibleValidator(chain, subnetId, validatorAddress)
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
         val maximumStake = maximumBittensorStake(asset.transferableInPlanks) { amount ->
             val quote = bittensorSubnetInteractor.quote(subnetId, amount)
             val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
-            extrinsics.estimateFee(chain, TransactionOrigin.WalletWithId(metaId), options) { operation.build(this) }
+            estimateFee(chain, metaId, operation)
                 .maxAmountDeductionFor(asset.token.configuration)
         }
         requireSelectedWallet(metaId)
@@ -69,10 +70,12 @@ class BittensorSubnetStakingInteractor(
         val subnet = bittensorSubnetInteractor.subnet(subnetId)
         val validator = requireEligibleValidator(chain, subnetId, validatorAddress)
         val quote = bittensorSubnetInteractor.quote(subnetId, amount)
-        val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, AccountIdKey(chain.accountIdOf(beneficiaryAddress)))
-        val fee = extrinsics.estimateFee(chain, TransactionOrigin.WalletWithId(metaId), options) { operation.build(this) }
+        val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
+        val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
+        val fee = estimateFee(chain, metaId, operation)
         requireAffordable(chain, metaId, amount, fee)
-        BittensorPreparedSubnetStake(subnet, BittensorSubnetStakeDraft(metaId, validator, operation, fee))
+        val draft = BittensorSubnetStakeDraft(metaId, validator, operation, fee)
+        BittensorPreparedSubnetStake(subnet, draft)
     }
 
     suspend fun execute(draft: BittensorSubnetStakeDraft): Result<ExtrinsicExecutionResult> = runCatching {
@@ -80,15 +83,25 @@ class BittensorSubnetStakingInteractor(
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         validators.validate(chain, draft.operation.quote.subnetId, draft.validator)
         // Recheck affordability, but never replace the user's confirmed price limit or amounts.
-        val fee = extrinsics.estimateFee(chain, TransactionOrigin.WalletWithId(draft.metaId), options) { draft.operation.build(this) }
+        val fee = estimateFee(chain, draft.metaId, draft.operation)
         requireAffordable(chain, draft.metaId, draft.operation.quote.totalTaoInPlanks, fee)
         extrinsics.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.WalletWithId(draft.metaId), options) {
             draft.operation.build(this)
-        }.requireOk().getOrThrow()
-    }.onFailure { if (it is CancellationException) throw it }
+        }
+            .requireOk()
+            .getOrThrow()
+    }
+        .onFailure { if (it is CancellationException) throw it }
+
+    private suspend fun estimateFee(chain: Chain, metaId: Long, operation: BittensorSubnetStakeOperation): Fee {
+        return extrinsics.estimateFee(chain, TransactionOrigin.WalletWithId(metaId), options) {
+            operation.build(this)
+        }
+    }
 
     private suspend fun requireEligibleValidator(chain: Chain, subnetId: BittensorNetuid.Subnet, address: String): BittensorValidator {
-        val eligibleValidator = validators.validators(chain, subnetId).firstOrNull { it.address == address && it.selectable }
+        val candidates = validators.validators(chain, subnetId)
+        val eligibleValidator = candidates.firstOrNull { it.address == address && it.selectable }
         return requireNotNull(eligibleValidator) { "Validator is no longer eligible in this subnet" }.validator
     }
 
@@ -96,10 +109,14 @@ class BittensorSubnetStakingInteractor(
         check(accounts.getSelectedMetaAccount().id == metaId) { "The staking wallet has changed" }
     }
 
-    suspend fun validators(subnetId: BittensorNetuid.Subnet) = validators.validators(chainRegistry.getChain(ChainGeneses.BITTENSOR), subnetId)
+    suspend fun validators(subnetId: BittensorNetuid.Subnet): List<BittensorSubnetValidator> {
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
+        return validators.validators(chain, subnetId)
+    }
 
     private suspend fun requireAffordable(chain: Chain, metaId: Long, amount: BigInteger, fee: Fee) {
-        val asset = wallets.assetFlow(metaId, chain.utilityAsset).first()
+        val asset = wallets.assetFlow(metaId, chain.utilityAsset)
+            .first()
         require(amount + fee.maxAmountDeductionFor(asset.token.configuration) <= asset.transferableInPlanks) {
             "Insufficient balance for stake and network fee"
         }

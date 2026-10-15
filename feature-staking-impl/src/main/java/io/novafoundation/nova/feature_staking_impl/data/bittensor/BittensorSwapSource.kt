@@ -50,8 +50,14 @@ class RealBittensorSwapSource(
             section = "SwapRuntimeApi",
             method = "current_alpha_price",
             arguments = mapOf("netuid" to BigInteger.valueOf(subnetId.value.toLong())),
-            returnBinding = { bindBittensorU64(it).also { price -> require(price.isPositive()) { "Subnet has no valid alpha price" } } }
+            returnBinding = ::bindAlphaPrice
         )
+    }
+
+    private fun bindAlphaPrice(decoded: Any?): BigInteger {
+        val price = bindBittensorU64(decoded)
+        require(price.isPositive()) { "Subnet has no valid alpha price" }
+        return price
     }
 }
 

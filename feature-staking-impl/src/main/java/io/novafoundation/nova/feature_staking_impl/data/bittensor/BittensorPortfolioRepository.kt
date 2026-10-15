@@ -45,13 +45,16 @@ class RealBittensorPortfolioRepository(
     private val logger: Logger
 ) : BittensorPortfolioRepository {
 
-    override fun observeAsset(): Flow<Asset> = observeWallet().map { it.asset }
+    override fun observeAsset(): Flow<Asset> = observeWallet()
+        .map { it.asset }
 
     override fun observeWallet(): Flow<BittensorWalletContext> = flowOfAll {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
-            walletRepository.assetFlow(account.id, chain.utilityAsset).map { asset -> BittensorWalletContext(account.id, chain, asset) }
-        }
+        accountRepository.selectedMetaAccountFlow()
+            .flatMapLatest { account ->
+                walletRepository.assetFlow(account.id, chain.utilityAsset)
+                    .map { asset -> BittensorWalletContext(account.id, chain, asset) }
+            }
     }
 
     override fun observeRootPortfolio(): Flow<BittensorPortfolio> = observePortfolio(rootOnly = true)
@@ -60,14 +63,15 @@ class RealBittensorPortfolioRepository(
 
     private fun observePortfolio(rootOnly: Boolean): Flow<BittensorPortfolio> = flowOfAll {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
-            combine(
-                walletRepository.assetFlow(account.id, chain.utilityAsset),
-                observePositions(chain, account.requireAccountIdIn(chain), rootOnly)
-            ) { asset, positionState ->
-                BittensorPortfolio(account.id, chain, asset, positionState.positions, positionState.status)
+        accountRepository.selectedMetaAccountFlow()
+            .flatMapLatest { account ->
+                combine(
+                    walletRepository.assetFlow(account.id, chain.utilityAsset),
+                    observePositions(chain, account.requireAccountIdIn(chain), rootOnly)
+                ) { asset, positionState ->
+                    BittensorPortfolio(account.id, chain, asset, positionState.positions, positionState.status)
+                }
             }
-        }
     }
 
     private fun observePositions(chain: Chain, coldKey: AccountId, rootOnly: Boolean): Flow<PositionState> = flow {
@@ -75,27 +79,36 @@ class RealBittensorPortfolioRepository(
         var cachedPositions: BittensorPortfolioPositions? = null
         emit(PositionState(cachedPositions, BittensorDataStatus.Loading))
 
-        chainStateRepository.currentRemoteBlockNumberFlow(chain.id).conflate().collect {
-            val status = try {
-                cachedPositions = portfolioLoader.load(chain.id, coldKey, rootOnly)
-                BittensorDataStatus.Fresh
-            } catch (e: TimeoutCancellationException) {
-                logRefreshFailure(e)
-                BittensorDataStatus.Stale(e)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logRefreshFailure(e)
-                BittensorDataStatus.Stale(e)
+        chainStateRepository.currentRemoteBlockNumberFlow(chain.id)
+            .conflate()
+            .collect {
+                val positionState = loadPositions(chain, coldKey, rootOnly, cachedPositions)
+                cachedPositions = positionState.positions
+                emit(positionState)
             }
-            emit(PositionState(cachedPositions, status))
-        }
+    }
+
+    private suspend fun loadPositions(
+        chain: Chain,
+        coldKey: AccountId,
+        rootOnly: Boolean,
+        cachedPositions: BittensorPortfolioPositions?
+    ): PositionState = try {
+        val positions = portfolioLoader.load(chain.id, coldKey, rootOnly)
+        PositionState(positions, BittensorDataStatus.Fresh)
+    } catch (e: TimeoutCancellationException) {
+        stalePositions(cachedPositions, e)
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        stalePositions(cachedPositions, e)
+    }
+
+    private fun stalePositions(positions: BittensorPortfolioPositions?, cause: Throwable): PositionState {
+        logger.log("[BittensorPortfolio] Failed to refresh positions")
+        logger.log(cause)
+        return PositionState(positions, BittensorDataStatus.Stale(cause))
     }
 
     private data class PositionState(val positions: BittensorPortfolioPositions?, val status: BittensorDataStatus)
-
-    private fun logRefreshFailure(cause: Throwable) {
-        logger.log("[BittensorPortfolio] Failed to refresh positions")
-        logger.log(cause)
-    }
 }

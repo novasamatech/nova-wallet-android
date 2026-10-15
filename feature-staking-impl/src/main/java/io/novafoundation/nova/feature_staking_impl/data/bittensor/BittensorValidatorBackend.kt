@@ -29,7 +29,8 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
     suspend fun validators(netuid: Int): BittensorValidatorsRemote = mutex.withLock {
         val baseUrl = refreshInfrastructure()
         val url = endpoint(baseUrl, "subnets/$netuid/validators")
-        lists[netuid]?.takeIf { System.nanoTime() < it.deadlineNanos }?.let { return@withLock it.data }
+        val freshEntry = lists[netuid]?.takeIf { System.nanoTime() < it.deadlineNanos }
+        if (freshEntry != null) return@withLock freshEntry.data
         val response = api.validators(url)
         val cached = readCacheEntry(response)
         requireNotNull(cached.data.items) { "Missing validator directory" }
@@ -42,7 +43,7 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         val baseUrl = refreshInfrastructure()
         val url = endpoint(baseUrl, "recommendations/subnets")
         val cached = recommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
-            ?: readCacheEntry(api.recommendations(url))
+            ?: loadRecommendations(url)
         val gates = bindBittensorValidatorGates(cached.data)
         recommendations = cached
         gates
@@ -52,15 +53,27 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         val baseUrl = refreshInfrastructure()
         val url = endpoint(baseUrl, "recommendations")
         val cached = validatorRecommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
-            ?: readCacheEntry(api.recommendations(url))
-        requireUsableBittensorRecommendations(cached.data)
-        val sourceBlock = requireNotNull(cached.data.meta?.generation?.sourceBlockNumber) { "Missing recommendation generation" }
-        require(sourceBlock.isNonNegative) { "Invalid recommendation block" }
-        val classes = requireNotNull(cached.data.classes) { "Missing validator recommendations" }
-        val hotkeys = listOf(classes.stable, classes.balanced, classes.higherUpside).flatMap { it.orEmpty() }
-            .filter { it.netuid == netuid }.mapNotNull { it.hotkey }.distinct()
+            ?: loadRecommendations(url)
+        val hotkeys = bindRecommendedHotkeys(cached.data, netuid)
         validatorRecommendations = cached
         hotkeys
+    }
+
+    private suspend fun loadRecommendations(url: String): Cached<BittensorRecommendationsRemote> {
+        val response = api.recommendations(url)
+        return readCacheEntry(response)
+    }
+
+    private fun bindRecommendedHotkeys(response: BittensorRecommendationsRemote, netuid: Int): List<String> {
+        requireUsableBittensorRecommendations(response)
+        val sourceBlock = requireNotNull(response.meta?.generation?.sourceBlockNumber) { "Missing recommendation generation" }
+        require(sourceBlock.isNonNegative) { "Invalid recommendation block" }
+        val classes = requireNotNull(response.classes) { "Missing validator recommendations" }
+        return listOf(classes.stable, classes.balanced, classes.higherUpside)
+            .flatMap { it.orEmpty() }
+            .filter { it.netuid == netuid }
+            .mapNotNull { it.hotkey }
+            .distinct()
     }
 
     private suspend fun refreshInfrastructure(): HttpUrl {
@@ -75,16 +88,24 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         return base
     }
 
-    private fun endpoint(baseUrl: HttpUrl, path: String): String = requireNotNull(baseUrl.resolve("/v1/bittensor/$path")).toString()
+    private fun endpoint(baseUrl: HttpUrl, path: String): String = requireNotNull(baseUrl.resolve("/v1/bittensor/$path"))
+        .toString()
 
     private fun <T> readCacheEntry(response: Response<T>): Cached<T> {
         if (!response.isSuccessful) throw HttpException(response)
-        val control = CacheControl.parse(response.headers())
-        val maxAge = if (control.noStore || control.noCache) 0 else control.maxAgeSeconds.coerceIn(0, 300)
-        val age = response.headers()["Age"]?.toIntOrNull()?.coerceAtLeast(0) ?: 0
+        val lifetimeNanos = cacheLifetimeNanos(response)
         return Cached(
             requireNotNull(response.body()) { "Empty Bittensor response" },
-            System.nanoTime() + (maxAge - age).coerceAtLeast(0) * 1_000_000_000L
+            System.nanoTime() + lifetimeNanos
         )
+    }
+
+    private fun cacheLifetimeNanos(response: Response<*>): Long {
+        val control = CacheControl.parse(response.headers())
+        val maxAge = if (control.noStore || control.noCache) 0 else control.maxAgeSeconds.coerceIn(0, 300)
+        val age = response.headers()["Age"]
+            ?.toIntOrNull()
+            ?.coerceAtLeast(0) ?: 0
+        return (maxAge - age).coerceAtLeast(0) * 1_000_000_000L
     }
 }

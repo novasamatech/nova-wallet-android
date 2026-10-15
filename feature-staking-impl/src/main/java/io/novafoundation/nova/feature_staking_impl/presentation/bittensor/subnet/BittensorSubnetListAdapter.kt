@@ -75,13 +75,17 @@ class BittensorSubnetListAdapter(
             logo.load(subnet.logoUrl, imageLoader) {
                 bittensorSubnetIcon()
             }
-            favorite.setImageResource(if (item.favorite) R.drawable.ic_favorite_heart_filled_20 else R.drawable.ic_favorite_heart_outline_20)
-            if (item.favorite) favorite.imageTintList = null else favorite.setImageTintRes(R.color.icon_secondary)
-            favoriteAction.contentDescription = root.context.getString(
-                if (item.favorite) R.string.bittensor_remove_favorite else R.string.bittensor_add_favorite
-            )
+            bindFavorite(item.favorite)
             favoriteAction.setOnClickListener { onFavorite(item) }
             root.setOnClickListener { onClick(item) }
+        }
+
+        private fun bindFavorite(isFavorite: Boolean) = with(binding) {
+            favorite.setImageResource(if (isFavorite) R.drawable.ic_favorite_heart_filled_20 else R.drawable.ic_favorite_heart_outline_20)
+            if (isFavorite) favorite.imageTintList = null else favorite.setImageTintRes(R.color.icon_secondary)
+            favoriteAction.contentDescription = root.context.getString(
+                if (isFavorite) R.string.bittensor_remove_favorite else R.string.bittensor_add_favorite
+            )
         }
     }
 

@@ -11,12 +11,12 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
-import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
@@ -66,17 +66,23 @@ class BittensorStakeConfirmViewModel(
 
     val retryEvents = retryController.events
 
-    private val stakingDetailsState = retryController.observe("root confirmation", bittensorStakingInteractor::observeRootStakingDetails).shareInBackground()
+    private val stakingDetailsState = retryController.observe("root confirmation", bittensorStakingInteractor::observeRootStakingDetails)
+        .shareInBackground()
 
-    private val stakingDetails = stakingDetailsState.filterLoaded().shareInBackground()
+    private val stakingDetails = stakingDetailsState.filterLoaded()
+        .shareInBackground()
 
-    private val stakeDraft = bittensorStakingInteractor.observeStakeDraft().filterNotNull().shareInBackground()
+    private val stakeDraft = bittensorStakingInteractor.observeStakeDraft().filterNotNull()
+        .shareInBackground()
 
-    val amount = combine(stakingDetails, stakeDraft, ::mapAmount).shareInBackground()
+    val amount = combine(stakingDetails, stakeDraft, ::mapAmount)
+        .shareInBackground()
 
-    val wallet = walletUiUseCase.selectedWalletUiFlow().shareInBackground()
+    val wallet = walletUiUseCase.selectedWalletUiFlow()
+        .shareInBackground()
 
-    val account = selectedAccountUseCase.selectedAddressModelFlow(chain::await).shareInBackground()
+    val account = selectedAccountUseCase.selectedAddressModelFlow(chain::await)
+        .shareInBackground()
 
     val fee = combine(stakingDetails, stakeDraft) { details, draft ->
         FeeStatus.Loaded(
@@ -88,17 +94,21 @@ class BittensorStakeConfirmViewModel(
                 )
             )
         )
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     val stakingType = resourceManager.getString(R.string.bittensor_root_staking)
 
-    val validator = stakeDraft.map(::mapValidator).shareInBackground()
+    val validator = stakeDraft.map(::mapValidator)
+        .shareInBackground()
 
-    val apy = stakingDetails.map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }.shareInBackground()
+    val apy = stakingDetails.map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
+        .shareInBackground()
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
 
-    val resultState = submission.map { it.result }.shareInBackground()
+    val resultState = submission.map { it.result }
+        .shareInBackground()
 
     val confirmButtonState = combine(stakingDetailsState, stakeDraft, submission) { state, draft, submission ->
         val details = state.dataOrNull
@@ -108,7 +118,9 @@ class BittensorStakeConfirmViewModel(
         } else {
             DescriptiveButtonState.Enabled(label)
         }
-    }.onStart { emit(DescriptiveButtonState.Loading) }.shareInBackground()
+    }
+        .onStart { emit(DescriptiveButtonState.Loading) }
+        .shareInBackground()
 
     init {
         if (!bittensorStakingInteractor.hasDraft()) {
@@ -136,13 +148,8 @@ class BittensorStakeConfirmViewModel(
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, draft))
 
             bittensorStakingInteractor.executeRootStake(chain.await(), draft)
-                .onSuccess {
-                    submission.value = BittensorSubmissionState.Completed(mapSuccess(details, draft))
-                }
-                .onFailure {
-                    if (it is CancellationException) throw it
-                    submission.value = BittensorSubmissionState.Failed(mapFailure(it))
-                }
+                .getOrThrow()
+            submission.value = BittensorSubmissionState.Completed(mapSuccess(details, draft))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -214,11 +221,13 @@ class BittensorStakeConfirmViewModel(
     }
 
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =
-        tokenFormatter.formatToken(amount, symbol).toString()
+        tokenFormatter.formatToken(amount, symbol)
+            .toString()
 
     private fun formatFiatOrDash(amount: BigDecimal?, currency: Currency): String {
         if (amount == null) return "—"
 
-        return fiatFormatter.formatFiat(amount, currency).toString()
+        return fiatFormatter.formatFiat(amount, currency)
+            .toString()
     }
 }

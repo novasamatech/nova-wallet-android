@@ -34,31 +34,42 @@ class BittensorChooseSubnetViewModel(
 
     val retryEvents = retryController.events
 
-    private val catalogueState = retryController.observe("subnet catalogue") { flowOf { bittensorSubnetInteractor.subnets() } }.shareInBackground()
+    private val catalogueState = retryController.observe("subnet catalogue") { flowOf { bittensorSubnetInteractor.subnets() } }
+        .shareInBackground()
 
-    private val catalogue = catalogueState.filterLoaded().onStart { emit(emptyList()) }.shareInBackground()
+    private val catalogue = catalogueState.filterLoaded()
+        .onStart { emit(emptyList()) }
+        .shareInBackground()
 
     private val query = MutableStateFlow("")
 
-    private val assetState = retryController.observe("native asset", bittensorSubnetInteractor::observeAsset).shareInBackground()
+    private val assetState = retryController.observe("native asset", bittensorSubnetInteractor::observeAsset)
+        .shareInBackground()
 
-    private val asset = assetState.filterLoaded().shareInBackground()
+    private val asset = assetState.filterLoaded()
+        .shareInBackground()
 
-    val isLoading = combine(catalogueState, assetState) { catalogue, asset -> catalogue.isLoading() || asset.isLoading() }.shareInBackground()
+    val isLoading = combine(catalogueState, assetState) { catalogue, asset -> catalogue.isLoading() || asset.isLoading() }
+        .shareInBackground()
 
-    private val hasError = combine(catalogueState, assetState) { catalogue, asset -> catalogue.isError() || asset.isError() }.shareInBackground()
+    private val hasError = combine(catalogueState, assetState) { catalogue, asset -> catalogue.isError() || asset.isError() }
+        .shareInBackground()
 
     private val rootIcon = asset.map {
         assetIconProvider.getAssetIconOrFallback(it.token.configuration)
-    }.onStart { emit(AssetIconProvider.fallbackIcon) }.shareInBackground()
+    }
+        .onStart { emit(AssetIconProvider.fallbackIcon) }
+        .shareInBackground()
 
     private val favorites = bittensorSubnetInteractor.observeFavorites()
 
-    private val subnets = combine(catalogue, query, favorites, asset, ::mapSubnetRows).shareInBackground()
+    private val subnets = combine(catalogue, query, favorites, asset, ::mapSubnetRows)
+        .shareInBackground()
 
     val list = combine(rootIcon, subnets, asset) { icon, subnets, asset ->
         bittensorSubnetList(icon, subnets, asset.token.configuration.symbol)
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     val isEmpty = combine(subnets, isLoading, hasError) { subnets, loading, failed -> subnets.isEmpty() && !loading && !failed }
         .shareInBackground()
@@ -89,17 +100,29 @@ class BittensorChooseSubnetViewModel(
         favorites: BittensorSubnetFavorites,
         asset: Asset
     ): List<BittensorSubnetRowUi> {
+        val comparator = compareByDescending<BittensorSubnet> { it.id.value in favorites.subnetIds }
+            .thenBy { it.id.value }
         return subnets
-            .filter { query.isBlank() || it.name.contains(query, true) || it.symbol.contains(query, true) || it.id.value.toString() == query }
-            .sortedWith(compareByDescending<BittensorSubnet> { it.id.value in favorites.subnetIds }.thenBy { it.id.value })
-            .map { subnet ->
-                BittensorSubnetRowUi(
-                    subnet = subnet,
-                    metaId = favorites.metaId,
-                    favorite = subnet.id.value in favorites.subnetIds,
-                    price = subnet.priceInRao?.let { tokenFormatter.formatToken(it, asset).toString() } ?: "—"
-                )
-            }
+            .filter { it.matchesQuery(query) }
+            .sortedWith(comparator)
+            .map { subnet -> mapSubnetRow(subnet, favorites, asset) }
+    }
+
+    private fun BittensorSubnet.matchesQuery(query: String): Boolean = query.isBlank() ||
+        name.contains(query, ignoreCase = true) ||
+        symbol.contains(query, ignoreCase = true) ||
+        id.value.toString() == query
+
+    private fun mapSubnetRow(subnet: BittensorSubnet, favorites: BittensorSubnetFavorites, asset: Asset): BittensorSubnetRowUi {
+        val price = subnet.priceInRao
+            ?.let { tokenFormatter.formatToken(it, asset) }
+            ?.toString() ?: "—"
+        return BittensorSubnetRowUi(
+            subnet = subnet,
+            metaId = favorites.metaId,
+            favorite = subnet.id.value in favorites.subnetIds,
+            price = price
+        )
     }
 }
 

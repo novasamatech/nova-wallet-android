@@ -31,6 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPre
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWalletContext
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -82,18 +83,22 @@ class BittensorSubnetReviewViewModel(
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
 
-    val wallet = walletUiUseCase.selectedWalletUiFlow().shareInBackground()
+    val wallet = walletUiUseCase.selectedWalletUiFlow()
+        .shareInBackground()
 
-    val account = selectedAccountUseCase.selectedAddressModelFlow(chain::await).shareInBackground()
+    val account = selectedAccountUseCase.selectedAddressModelFlow(chain::await)
+        .shareInBackground()
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
 
-    val resultState = submission.map { it.result }.shareInBackground()
+    val resultState = submission.map { it.result }
+        .shareInBackground()
 
     private val walletState = retryController.observe("staking wallet", bittensorSubnetInteractor::observeWallet)
         .shareInBackground()
 
-    private val walletContext = walletState.filterLoaded().shareInBackground()
+    private val walletContext = walletState.filterLoaded()
+        .shareInBackground()
 
     private val preparationState = retryController.observe("stake preparation") {
         flowOf {
@@ -104,30 +109,43 @@ class BittensorSubnetReviewViewModel(
                 validatorAddress
             )
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    private val draft = preparationState.map { it.dataOrNull?.draft }.shareInBackground()
+    private val draft = preparationState.map { it.dataOrNull?.draft }
+        .shareInBackground()
 
-    private val quote = draft.map { it?.operation?.quote }.shareInBackground()
+    private val quote = draft.map { it?.operation?.quote }
+        .shareInBackground()
 
     val feeCaption = quote.map { quote ->
-        quote?.serviceFeeRate?.let { resources.getString(R.string.bittensor_subnet_fee_caption, it.movePointRight(2).toStripTrailingZerosString()) }.orEmpty()
-    }.shareInBackground()
+        val serviceFeeRate = quote?.serviceFeeRate ?: return@map ""
+        val percentage = serviceFeeRate.movePointRight(2)
+            .toStripTrailingZerosString()
+        resources.getString(R.string.bittensor_subnet_fee_caption, percentage)
+    }
+        .shareInBackground()
 
     private val hasError = combine(walletState, preparationState) { walletContext, preparation -> walletContext.isError() || preparation.isError() }
         .shareInBackground()
 
-    val fee = combine(preparationState, walletState, ::mapFeeStatus).shareInBackground()
+    val fee = combine(preparationState, walletState, ::mapFeeStatus)
+        .shareInBackground()
 
-    val validator = draft.map { it?.validator?.name ?: resources.getString(R.string.bittensor_select_validator) }.shareInBackground()
+    val validator = draft.map { it?.validator?.name ?: resources.getString(R.string.bittensor_select_validator) }
+        .shareInBackground()
 
-    val walletChanged = walletState.map { it.dataOrNull?.metaId?.let { currentMetaId -> currentMetaId != metaId } == true }.shareInBackground()
+    val walletChanged = walletState.map { it.dataOrNull?.metaId?.let { currentMetaId -> currentMetaId != metaId } == true }
+        .shareInBackground()
 
-    private val nativeToken = walletContext.map { it.asset.token }.shareInBackground()
+    private val nativeToken = walletContext.map { it.asset.token }
+        .shareInBackground()
 
-    val assets = combine(nativeToken, preparationState) { token, preparation -> mapAssets(token, preparation.dataOrNull) }.shareInBackground()
+    val assets = combine(nativeToken, preparationState) { token, preparation -> mapAssets(token, preparation.dataOrNull) }
+        .shareInBackground()
 
-    val rate = combine(nativeToken, preparationState) { token, preparation -> formatRate(token, preparation.dataOrNull) }.shareInBackground()
+    val rate = combine(nativeToken, preparationState) { token, preparation -> formatRate(token, preparation.dataOrNull) }
+        .shareInBackground()
 
     val slippage = bittensorSubnetInteractor.slippage.fraction.multiply(BigDecimal(100)).toStripTrailingZerosString() + "%"
 
@@ -135,12 +153,14 @@ class BittensorSubnetReviewViewModel(
         prepared?.validator?.let {
             iconGenerator.createAddressIcon(it.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT)
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     val confirmButtonState = combine(draft, walletChanged, submission, hasError) { draft, changed, submission, failed ->
         val label = resources.getString(R.string.common_confirm)
         if (draft == null || changed || !submission.canSubmit || failed) DescriptiveButtonState.Disabled(label) else DescriptiveButtonState.Enabled(label)
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     fun accountClicked() = launchUnit {
         externalActions.showAddressActions(account.first().address, chain.await())
@@ -149,41 +169,45 @@ class BittensorSubnetReviewViewModel(
     fun confirmClicked() = launchUnit {
         if (!submission.value.canSubmit || hasError.first() || walletChanged.first()) return@launchUnit
         val prepared = draft.first() ?: return@launchUnit
-        val wallet = walletContext.first()
-        val payload = BittensorStakeValidationPayload(metaId, wallet.metaId, wallet.asset, wallet.asset.token.amountFromPlanks(totalInPlanks), prepared.fee)
-        val failure = stakeValidationSystem.validate(payload).getOrThrow().notValidOrNull()
-        if (failure != null) {
-            showError(failure.reason.message(resources))
-            return@launchUnit
-        }
+        if (!validateStake(prepared)) return@launchUnit
         if (!submission.value.canSubmit) return@launchUnit
-        submission.value = BittensorSubmissionState.Submitting(
-            BittensorStakeResultUi.Progress(
-                resources.getString(R.string.bittensor_staking_progress_title),
-                resources.getString(R.string.bittensor_subnet_staking_progress, subnetId.value)
-            )
-        )
+        submission.value = BittensorSubmissionState.Submitting(mapProgress())
         try {
             bittensorSubnetStakingInteractor.execute(prepared)
-                .onSuccess {
-                    submission.value = BittensorSubmissionState.Completed(
-                        BittensorStakeResultUi.Success(
-                            resources.getString(R.string.bittensor_subnet_staking_success, subnetId.value),
-                            resources.getString(R.string.bittensor_subnet_staking_completed),
-                            prepared.validator.name,
-                            bittensorAmountFormatter.fee(prepared.fee, walletContext.first().asset.token)
-                        )
-                    )
-                }
-                .onFailure {
-                    if (it is CancellationException) throw it
-                    showFailure(it)
-                }
+                .getOrThrow()
+            submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             showFailure(e)
         }
+    }
+
+    private suspend fun validateStake(draft: BittensorSubnetStakeDraft): Boolean {
+        val wallet = walletContext.first()
+        val amount = wallet.asset.token.amountFromPlanks(totalInPlanks)
+        val payload = BittensorStakeValidationPayload(metaId, wallet.metaId, wallet.asset, amount, draft.fee)
+        val failure = stakeValidationSystem.validate(payload)
+            .getOrThrow()
+            .notValidOrNull() ?: return true
+
+        showError(failure.reason.message(resources))
+        return false
+    }
+
+    private fun mapProgress(): BittensorStakeResultUi.Progress = BittensorStakeResultUi.Progress(
+        resources.getString(R.string.bittensor_staking_progress_title),
+        resources.getString(R.string.bittensor_subnet_staking_progress, subnetId.value)
+    )
+
+    private suspend fun mapSuccess(draft: BittensorSubnetStakeDraft): BittensorStakeResultUi.Success {
+        val token = walletContext.first().asset.token
+        return BittensorStakeResultUi.Success(
+            resources.getString(R.string.bittensor_subnet_staking_success, subnetId.value),
+            resources.getString(R.string.bittensor_subnet_staking_completed),
+            draft.validator.name,
+            bittensorAmountFormatter.fee(draft.fee, token)
+        )
     }
 
     private fun showFailure(cause: Throwable) {
@@ -212,29 +236,35 @@ class BittensorSubnetReviewViewModel(
         return FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(amount.token, amount.fiat)))
     }
 
-    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetsView.Model {
-        val subnet = prepared?.subnet
-        val quote = prepared?.draft?.operation?.quote
-        val input = token.amountFromPlanks(totalInPlanks)
-        val output = quote?.let { BigDecimal(it.alphaOutInPlanks, BITTENSOR_ALPHA_DECIMALS) }
-        val alphaPrice = subnet?.priceInRao?.let(token::amountFromPlanks)
-        val outputInNativeToken = if (output != null && alphaPrice != null) output * alphaPrice else null
-        val outputFiat = outputInNativeToken?.let(token::toFiatOrNull)
+    private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetsView.Model = SwapAssetsView.Model(
+        assetIn = mapInputAsset(token),
+        assetOut = mapOutputAsset(token, prepared)
+    )
 
-        return SwapAssetsView.Model(
-            assetIn = SwapAssetView.Model(
-                assetIcon = icons.getAssetIconOrFallback(token.configuration),
-                amount = bittensorAmountFormatter.amount(input, token.configuration.symbol, token.toFiatOrNull(input), token.currency),
-                iconSizeDp = 48
-            ),
-            assetOut = SwapAssetView.Model(
-                assetIcon = subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
-                amount = output?.let { bittensorAmountFormatter.amount(it, TokenSymbol(subnet?.symbol?.ifBlank { "—" } ?: "—"), outputFiat, token.currency) }
-                    ?: AmountModel("—", null),
-                iconSizeDp = 48,
-                clipIconToOutline = true
-            )
+    private fun mapInputAsset(token: TokenBase): SwapAssetView.Model {
+        val input = token.amountFromPlanks(totalInPlanks)
+        return SwapAssetView.Model(
+            assetIcon = icons.getAssetIconOrFallback(token.configuration),
+            amount = bittensorAmountFormatter.amount(input, token.configuration.symbol, token.toFiatOrNull(input), token.currency),
+            iconSizeDp = 48
         )
+    }
+
+    private fun mapOutputAsset(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetView.Model = SwapAssetView.Model(
+        assetIcon = prepared?.subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
+        amount = mapOutputAmount(token, prepared),
+        iconSizeDp = 48,
+        clipIconToOutline = true
+    )
+
+    private fun mapOutputAmount(token: TokenBase, prepared: BittensorPreparedSubnetStake?): AmountModel {
+        if (prepared == null) return AmountModel("—", null)
+
+        val output = BigDecimal(prepared.draft.operation.quote.alphaOutInPlanks, BITTENSOR_ALPHA_DECIMALS)
+        val alphaPrice = prepared.subnet.priceInRao?.let(token::amountFromPlanks)
+        val outputFiat = alphaPrice?.let { token.toFiatOrNull(output * it) }
+        val symbol = TokenSymbol(prepared.subnet.symbol.ifBlank { "—" })
+        return bittensorAmountFormatter.amount(output, symbol, outputFiat, token.currency)
     }
 
     private fun formatRate(token: TokenBase, prepared: BittensorPreparedSubnetStake?): String {
