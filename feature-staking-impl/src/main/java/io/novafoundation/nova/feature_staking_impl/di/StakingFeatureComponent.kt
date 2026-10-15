@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bagList.rebag.di
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.di.BittensorStakeAmountComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.di.BittensorStakeConfirmComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di.BittensorDetailsComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSelectValidatorComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetDetailsComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di.BittensorSubnetAmountComponent
@@ -137,6 +138,8 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun bittensorDetailsComponentFactory(): BittensorDetailsComponent.Factory
 
     fun bittensorSubnetComponentFactory(): BittensorSubnetComponent.Factory
+
+    fun bittensorSelectValidatorComponentFactory(): BittensorSelectValidatorComponent.Factory
 
     fun bittensorSubnetDetailsComponentFactory(): BittensorSubnetDetailsComponent.Factory
 

@@ -1,7 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -24,13 +23,6 @@ data class BittensorValidator(
 data class BittensorRootPosition(
     val validatorHotkey: AccountIdKey,
     val stakeInPlanks: BigInteger
-)
-
-data class BittensorRootStakeDraft(
-    val metaId: Long,
-    val amountInPlanks: BigInteger,
-    val validator: BittensorValidator,
-    val fee: Fee
 )
 
 data class BittensorRootStakeRequest(

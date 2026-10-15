@@ -16,6 +16,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
@@ -333,8 +335,9 @@ class RelayStakingNavigator(
         navigationBuilder().action(R.id.action_open_bittensor_root_details).navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorStakeConfirm() {
+    override fun openBittensorStakeConfirm(payload: BittensorStakeConfirmPayload) {
         navigationBuilder().action(R.id.action_bittensorStakeAmount_to_bittensorStakeConfirm)
+            .setArgs(BittensorStakeConfirmFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
     }
 }

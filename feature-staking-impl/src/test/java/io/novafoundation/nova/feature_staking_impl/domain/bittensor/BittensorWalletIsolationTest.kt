@@ -28,7 +28,6 @@ class BittensorWalletIsolationTest {
     private val wallets = mock(WalletRepository::class.java)
 
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
-    private val state = BittensorStakingFlowState()
 
     private val fee = mock(Fee::class.java)
     private val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator")
@@ -54,7 +53,7 @@ class BittensorWalletIsolationTest {
     }
 
     @Test
-    fun `manual root choice overrides the default only after checking eligibility`() = runBlocking {
+    fun `validator lookup returns an eligible selection without modifying repository state`() = runBlocking {
         val selected = mock(MetaAccount::class.java)
         `when`(selected.id).thenReturn(1L)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
@@ -63,11 +62,12 @@ class BittensorWalletIsolationTest {
         `when`(validators.rootValidators(details.chain)).thenReturn(listOf(row))
         val interactor = interactor()
 
-        interactor.selectValidator(details.copy(validator = null), row.address)
+        val selectedValidator = interactor.rootValidator(details.chain, row.address)
 
-        assertEquals(chosenValidator, interactor.observeRootStakingDetails().first().validator)
+        assertEquals(chosenValidator, selectedValidator)
+        assertEquals(validator, interactor.observeRootStakingDetails().first().validator)
         verifyNoInteractions(extrinsics)
     }
 
-    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, wallets, validators)
+    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, wallets, validators)
 }

@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
@@ -40,7 +41,12 @@ class BittensorRootDetailsViewModel(
 
     val retryEvents = retryController.events
 
-    private val portfolioState = retryController.observe("root positions", bittensorPortfolioInteractor::observeRootPortfolio).shareInBackground()
+    private val portfolioState = retryController.observe(
+        step = "root positions",
+        transform = { it.withSafeLoading() },
+        source = bittensorPortfolioInteractor::observeRootPortfolio
+    )
+        .shareInBackground()
 
     private val portfolio = portfolioState.filterLoaded().shareInBackground()
 

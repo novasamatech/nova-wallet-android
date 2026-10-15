@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -32,6 +33,7 @@ class BittensorStakeConfirmModule {
     @IntoMap
     @ViewModelKey(BittensorStakeConfirmViewModel::class)
     fun provideViewModel(
+        payload: BittensorStakeConfirmPayload,
         resourceManager: ResourceManager,
         router: StakingRouter,
         externalActions: ExternalActions.Presentation,
@@ -49,6 +51,7 @@ class BittensorStakeConfirmModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
+            payload = payload,
             resourceManager = resourceManager,
             router = router,
             externalActions = externalActions,

@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavorites
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
@@ -34,7 +35,9 @@ class BittensorChooseSubnetViewModel(
 
     val retryEvents = retryController.events
 
-    private val catalogueState = retryController.observe("subnet catalogue") { flowOf { bittensorSubnetInteractor.subnets() } }
+    private val catalogueState = retryController.observe("subnet catalogue", transform = { it.withSafeLoading() }) {
+        flowOf { bittensorSubnetInteractor.subnets() }
+    }
         .shareInBackground()
 
     private val catalogue = catalogueState.filterLoaded()
@@ -43,7 +46,11 @@ class BittensorChooseSubnetViewModel(
 
     private val query = MutableStateFlow("")
 
-    private val assetState = retryController.observe("native asset", bittensorSubnetInteractor::observeAsset)
+    private val assetState = retryController.observe(
+        step = "native asset",
+        transform = { it.withSafeLoading() },
+        source = bittensorSubnetInteractor::observeAsset
+    )
         .shareInBackground()
 
     private val asset = assetState.filterLoaded()

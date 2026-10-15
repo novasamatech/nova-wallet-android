@@ -5,7 +5,6 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorFragment
 
 @ScreenScope
 @Subcomponent(modules = [BittensorSubnetModule::class])
@@ -17,5 +16,4 @@ interface BittensorSubnetComponent {
     }
 
     fun inject(fragment: BittensorChooseSubnetFragment)
-    fun inject(fragment: BittensorSelectValidatorFragment)
 }

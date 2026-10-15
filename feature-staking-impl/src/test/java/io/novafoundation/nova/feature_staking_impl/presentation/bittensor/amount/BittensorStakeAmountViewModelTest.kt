@@ -19,7 +19,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDat
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingFlowState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
@@ -92,9 +91,7 @@ class BittensorStakeAmountViewModelTest {
 
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
 
-    private val flowState = BittensorStakingFlowState()
-
-    private val interactor = BittensorStakingInteractor(repository, extrinsics, flowState, wallets, validators)
+    private val interactor = BittensorStakingInteractor(repository, extrinsics, wallets, validators)
 
     private val router = mock(StakingRouter::class.java)
 

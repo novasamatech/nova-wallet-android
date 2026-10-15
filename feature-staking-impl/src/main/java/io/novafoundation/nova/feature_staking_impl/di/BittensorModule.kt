@@ -42,7 +42,6 @@ import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStake
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingFlowState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -272,15 +271,10 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorStakingFlowState() = BittensorStakingFlowState()
-
-    @Provides
-    @FeatureScope
     fun provideBittensorStakingInteractor(
         repository: BittensorStakingRepository,
         extrinsicService: ExtrinsicService,
-        flowState: BittensorStakingFlowState,
         walletRepository: WalletRepository,
         validators: BittensorSubnetValidatorRepository
-    ) = BittensorStakingInteractor(repository, extrinsicService, flowState, walletRepository, validators)
+    ) = BittensorStakingInteractor(repository, extrinsicService, walletRepository, validators)
 }

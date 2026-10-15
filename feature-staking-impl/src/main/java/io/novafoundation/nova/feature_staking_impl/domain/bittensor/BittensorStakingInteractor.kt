@@ -15,36 +15,25 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 
 class BittensorStakingInteractor(
     private val repository: BittensorStakingRepository,
     private val extrinsicService: ExtrinsicService,
-    private val flowState: BittensorStakingFlowState,
     private val walletRepository: WalletRepository,
     private val validatorRepository: BittensorSubnetValidatorRepository
 ) {
 
-    fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> {
-        return combine(repository.observeRootStakingDetails(), flowState.selectedValidator) { details, selectedValidator ->
-            if (selectedValidator?.metaId == details.metaId) details.copy(validator = selectedValidator.validator) else details
-        }
-    }
-
-    suspend fun selectValidator(details: BittensorRootStakingDetails, address: String) {
-        val selectedValidator = validatorRepository.rootValidators(details.chain)
-            .firstOrNull { it.address == address && it.selectable }
-        requireNotNull(selectedValidator) { "Validator is no longer eligible for root staking" }
-        flowState.selectedValidator.value = BittensorStakingFlowState.SelectedValidator(details.metaId, selectedValidator.validator)
-    }
+    fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> = repository.observeRootStakingDetails()
 
     fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails> = repository.observeRootStakingDetails(metaId)
 
-    fun observeStakeDraft(): Flow<BittensorRootStakeDraft?> = flowState.draft
-
-    fun hasDraft(): Boolean = flowState.draft.value != null
+    suspend fun rootValidator(chain: Chain, address: String): BittensorValidator {
+        val validators = validatorRepository.rootValidators(chain)
+        val selectedValidator = validators
+            .firstOrNull { it.address == address && it.selectable }
+        return requireNotNull(selectedValidator) { "Validator is no longer eligible for root staking" }.validator
+    }
 
     suspend fun maximumStake(details: BittensorRootStakingDetails): BigInteger {
         val validator = requireNotNull(details.validator) { "Select a root validator" }
@@ -64,21 +53,15 @@ class BittensorStakingInteractor(
         }
     }
 
-    suspend fun prepareRootStake(request: BittensorRootStakeRequest, fee: Fee): BittensorRootStakeDraft {
+    suspend fun executeRootStake(request: BittensorRootStakeRequest): Result<ExtrinsicExecutionResult> = runCatching {
         validatorRepository.validateRoot(request.chain, request.validator)
-        val draft = BittensorRootStakeDraft(request.metaId, request.amountInPlanks, request.validator, fee)
-        flowState.setDraft(draft)
-        return draft
+        extrinsicService.submitExtrinsicAndAwaitExecution(request.chain, TransactionOrigin.WalletWithId(request.metaId)) {
+            addBittensorRootStake(request.validator.hotkey.value, request.amountInPlanks)
+        }
+            .requireOk()
+            .getOrThrow()
     }
-
-    suspend fun executeRootStake(chain: Chain, draft: BittensorRootStakeDraft): Result<ExtrinsicExecutionResult> = runCatching {
-        validatorRepository.validateRoot(chain, draft.validator)
-        val execution = extrinsicService.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.WalletWithId(draft.metaId)) {
-            addBittensorRootStake(draft.validator.hotkey.value, draft.amountInPlanks)
-        }.requireOk().getOrThrow()
-        flowState.clear()
-        execution
-    }.onFailure { if (it is CancellationException) throw it }
+        .onFailure { if (it is CancellationException) throw it }
 
     fun validationPayload(request: BittensorRootStakeRequest, fee: Fee, checkRootHold: Boolean = false) = BittensorStakePreflightPayload(
         chain = request.chain,
@@ -89,24 +72,4 @@ class BittensorStakingInteractor(
         fee = fee,
         checkRootHold = checkRootHold
     )
-
-    fun clearDraft() = flowState.clear()
-}
-
-class BittensorStakingFlowState {
-
-    internal data class SelectedValidator(val metaId: Long, val validator: BittensorValidator)
-
-    internal val selectedValidator = MutableStateFlow<SelectedValidator?>(null)
-
-    internal val draft = MutableStateFlow<BittensorRootStakeDraft?>(null)
-
-    fun setDraft(draft: BittensorRootStakeDraft) {
-        this.draft.value = draft
-    }
-
-    fun clear() {
-        draft.value = null
-        selectedValidator.value = null
-    }
 }

@@ -4,11 +4,11 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
-import io.novafoundation.nova.common.navigation.requireLastInput
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class BittensorSelectValidatorViewModel(
+    private val request: BittensorSelectValidatorCommunicator.Request,
     private val communicator: BittensorSelectValidatorCommunicator,
     private val bittensorValidatorInteractor: BittensorValidatorInteractor,
     private val icons: AddressIconGenerator,
@@ -39,9 +40,7 @@ class BittensorSelectValidatorViewModel(
 
     val retryEvents = retryController.events
 
-    private val request = communicator.requireLastInput()
-
-    private val validatorsState = retryController.observe("validators") {
+    private val validatorsState = retryController.observe("validators", transform = { it.withSafeLoading() }) {
         flowOf {
             val netuid = BittensorNetuid.from(request.subnetId)
             val validators = bittensorValidatorInteractor.validators(netuid)

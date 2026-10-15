@@ -63,7 +63,12 @@ class BittensorSubnetAmountViewModel(
 
     private val calculatingMax = MutableStateFlow(false)
 
-    private val walletState = retryController.observe("staking wallet", bittensorSubnetInteractor::observeWallet).shareInBackground()
+    private val walletState = retryController.observe(
+        step = "staking wallet",
+        transform = { it.withSafeLoading() },
+        source = bittensorSubnetInteractor::observeWallet
+    )
+        .shareInBackground()
 
     private val walletContext = walletState.mapNotNull { it.dataOrNull }.shareInBackground()
 
@@ -71,7 +76,7 @@ class BittensorSubnetAmountViewModel(
 
     val amount = amountChooser.inputState.map { it.value }.shareInBackground()
 
-    private val subnetState = retryController.observe("subnet") {
+    private val subnetState = retryController.observe("subnet", transform = { it.withSafeLoading() }) {
         flowOf { bittensorSubnetInteractor.subnet(initialSubnetId) }
     }.shareInBackground()
 
@@ -101,7 +106,7 @@ class BittensorSubnetAmountViewModel(
         if (request == null) {
             flowOf<QuoteResult?> { null }.withSafeLoading()
         } else {
-            retryController.observe("subnet quote") {
+            retryController.observe("subnet quote", transform = { it.withSafeLoading() }) {
                 flowOf {
                     delay(QUOTE_DEBOUNCE_MILLIS)
                     QuoteResult(request, bittensorSubnetInteractor.quote(request.subnetId, request.amount))

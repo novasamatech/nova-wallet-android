@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.model.PendingPayoutParcelable
 import io.novafoundation.nova.feature_staking_impl.presentation.pools.common.SelectingPoolPayload
@@ -112,7 +113,7 @@ interface StakingRouter {
 
     fun openBittensorRootDetails()
 
-    fun openBittensorStakeConfirm()
+    fun openBittensorStakeConfirm(payload: BittensorStakeConfirmPayload)
 
     fun openBittensorChooseSubnet()
 

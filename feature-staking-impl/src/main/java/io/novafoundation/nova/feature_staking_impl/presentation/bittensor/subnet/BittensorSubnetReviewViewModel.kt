@@ -17,6 +17,7 @@ import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -101,7 +102,11 @@ class BittensorSubnetReviewViewModel(
     val resultState = submission.map { it.result }
         .shareInBackground()
 
-    private val walletState = retryController.observe("staking wallet") { bittensorSubnetStakingInteractor.observeWallet(metaId) }
+    private val walletState = retryController.observe("staking wallet", transform = { it.withSafeLoading() }) {
+        bittensorSubnetStakingInteractor.observeWallet(
+            metaId
+        )
+    }
         .shareInBackground()
 
     private val walletContext = walletState.filterLoaded()
@@ -111,7 +116,7 @@ class BittensorSubnetReviewViewModel(
 
     private val validating = MutableStateFlow(false)
 
-    private val preparationState = retryController.observe("stake preparation") {
+    private val preparationState = retryController.observe("stake preparation", transform = { it.withSafeLoading() }) {
         preparationRefresh.flatMapLatest {
             flowOf {
                 bittensorSubnetStakingInteractor.prepare(

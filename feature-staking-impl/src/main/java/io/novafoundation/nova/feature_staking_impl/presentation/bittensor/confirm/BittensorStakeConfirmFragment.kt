@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
+import android.os.Bundle
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -13,7 +14,16 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 
+private const val PAYLOAD_KEY = "payload"
+
 class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewModel, FragmentBittensorStakeConfirmBinding>() {
+
+    companion object {
+
+        fun getBundle(payload: BittensorStakeConfirmPayload) = Bundle().apply {
+            putParcelable(PAYLOAD_KEY, payload)
+        }
+    }
 
     override fun createBinding() = FragmentBittensorStakeConfirmBinding.inflate(layoutInflater)
 
@@ -26,9 +36,10 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
     }
 
     override fun inject() {
+        val payload = argument<BittensorStakeConfirmPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
             .bittensorStakeConfirmComponentFactory()
-            .create(this)
+            .create(this, payload)
             .inject(this)
     }
 

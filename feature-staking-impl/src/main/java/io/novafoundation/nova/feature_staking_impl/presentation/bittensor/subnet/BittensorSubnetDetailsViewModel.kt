@@ -9,6 +9,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChart
@@ -60,13 +61,17 @@ class BittensorSubnetDetailsViewModel(
 
     val retryEvents = retryController.events
 
-    private val subnetState = retryController.observe("subnet") { flowOf { bittensorSubnetInteractor.subnet(subnetId) } }
+    private val subnetState = retryController.observe("subnet", transform = { it.withSafeLoading() }) {
+        flowOf { bittensorSubnetInteractor.subnet(subnetId) }
+    }
         .shareInBackground()
 
     val subnet = subnetState.mapNotNull { it.dataOrNull }
         .shareInBackground()
 
-    private val validatorsState = retryController.observe("validators") { flowOf { bittensorSubnetStakingInteractor.validators(subnetId) } }
+    private val validatorsState = retryController.observe("validators", transform = { it.withSafeLoading() }) {
+        flowOf { bittensorSubnetStakingInteractor.validators(subnetId) }
+    }
         .shareInBackground()
 
     private val validators = validatorsState.map { it.dataOrNull.orEmpty() }
@@ -92,7 +97,11 @@ class BittensorSubnetDetailsViewModel(
     val selectedChartIndex = period.map { BittensorSubnetChartPeriod.entries.indexOf(it) }
         .shareInBackground()
 
-    private val assetState = retryController.observe("asset", bittensorSubnetInteractor::observeAsset)
+    private val assetState = retryController.observe(
+        step = "asset",
+        transform = { it.withSafeLoading() },
+        source = bittensorSubnetInteractor::observeAsset
+    )
         .shareInBackground()
 
     private val asset = assetState.mapNotNull { it.dataOrNull }
@@ -183,7 +192,9 @@ class BittensorSubnetDetailsViewModel(
     }
         .distinctUntilChanged()
         .flatMapLatest { request ->
-            retryController.observe("subnet chart") { flowOf { loadChartHistory(request) } }
+            retryController.observe("subnet chart", transform = { it.withSafeLoading() }) {
+                flowOf { loadChartHistory(request) }
+            }
                 .map { BittensorSubnetChart(request.period, it) }
         }
         .shareInBackground()
