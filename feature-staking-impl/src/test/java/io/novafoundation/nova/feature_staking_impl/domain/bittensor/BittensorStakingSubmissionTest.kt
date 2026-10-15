@@ -127,7 +127,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
 
-    private val subnetDraft = BittensorSubnetStakeDraft(1L, validator, operation, fee)
+    private val subnetDraft = BittensorSubnetStakeDraft(1L, validator, operation)
 
     @Before
     fun prepare() = runBlocking {
@@ -141,6 +141,38 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         `when`(wallets.assetFlow(1L, chainAsset)).thenReturn(flowOf(asset))
         `when`(fee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger.TEN)
         flowState.setDraft(BittensorRootStakeDraft(1L, amount, validator, fee))
+    }
+
+    @Test
+    fun `validation uses the displayed fee without estimating again`() = runBlocking {
+        val payload = when (stakingType) {
+            StakingType.ROOT -> {
+                val request = BittensorRootStakeRequest(1L, chain, validator, amount)
+                rootInteractor.validationPayload(request, fee)
+            }
+            StakingType.SUBNET -> subnetStakingInteractor.validationPayload(subnetDraft, fee)
+        }
+
+        assertSame(fee, payload.fee)
+        assertEquals(0, extrinsicService.feeEstimates)
+        if (stakingType == StakingType.SUBNET) assertSame(quote, payload.quote)
+    }
+
+    @Test
+    fun `fee estimation uses the operation wallet and does not refresh the quote`() = runBlocking {
+        val estimatedFee = when (stakingType) {
+            StakingType.ROOT -> {
+                val request = BittensorRootStakeRequest(1L, chain, validator, amount)
+                rootInteractor.estimateRootStakeFee(request)
+            }
+            StakingType.SUBNET -> subnetStakingInteractor.estimateFee(subnetDraft)
+        }
+
+        assertSame(fee, estimatedFee)
+        assertEquals(1, extrinsicService.feeEstimates)
+        assertEquals(1L, (extrinsicService.feeOrigin as TransactionOrigin.WalletWithId).metaId)
+        assertEquals(BatchMode.BATCH_ALL, extrinsicService.feeOptions?.batchMode)
+        verifyNoInteractions(subnetInteractor, accounts)
     }
 
     @Test
@@ -226,12 +258,18 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         var feeOptions: ExtrinsicService.SubmissionOptions? = null
 
+        var feeEstimates = 0
+
+        var feeOrigin: TransactionOrigin? = null
+
         override suspend fun estimateFee(
             chain: Chain,
             origin: TransactionOrigin,
             submissionOptions: ExtrinsicService.SubmissionOptions,
             formExtrinsic: FormExtrinsicWithOrigin
         ): Fee {
+            feeEstimates++
+            feeOrigin = origin
             feeOptions = submissionOptions
             return fee
         }

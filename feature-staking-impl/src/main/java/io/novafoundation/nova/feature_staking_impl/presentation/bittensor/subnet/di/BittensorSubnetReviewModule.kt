@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
@@ -47,7 +48,8 @@ class BittensorSubnetReviewModule {
         retryController: BittensorRetryController,
         bittensorAmountFormatter: BittensorAmountFormatter,
         validationSystem: BittensorStakePreflightSystem,
-        validationExecutor: ValidationExecutor
+        validationExecutor: ValidationExecutor,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
             BittensorNetuid.Subnet(payload.subnetId),
@@ -67,7 +69,8 @@ class BittensorSubnetReviewModule {
             retryController = retryController,
             bittensorAmountFormatter = bittensorAmountFormatter,
             validationSystem = validationSystem,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            feeLoaderMixinFactory = feeLoaderMixinFactory
         )
     }
 

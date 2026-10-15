@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 
 @Module(includes = [ViewModelModule::class])
 class BittensorStakeAmountModule {
@@ -40,7 +41,8 @@ class BittensorStakeAmountModule {
         bittensorAmountFormatter: BittensorAmountFormatter,
         amountChooserFactory: AmountChooserMixin.Factory,
         stakeValidationSystem: BittensorStakePreflightSystem,
-        validationExecutor: ValidationExecutor
+        validationExecutor: ValidationExecutor,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             resourceManager = resourceManager,
@@ -54,7 +56,8 @@ class BittensorStakeAmountModule {
             bittensorAmountFormatter = bittensorAmountFormatter,
             amountChooserFactory = amountChooserFactory,
             stakeValidationSystem = stakeValidationSystem,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            feeLoaderMixinFactory = feeLoaderMixinFactory
         )
     }
 

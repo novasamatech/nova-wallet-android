@@ -4,13 +4,11 @@ import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
-import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
@@ -29,9 +27,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBittensorStake
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -41,6 +40,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
@@ -52,7 +58,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -70,7 +75,8 @@ class BittensorStakeAmountViewModel(
     private val bittensorAmountFormatter: BittensorAmountFormatter,
     private val amountChooserFactory: AmountChooserMixin.Factory,
     private val stakeValidationSystem: BittensorStakePreflightSystem,
-    private val validationExecutor: ValidationExecutor
+    private val validationExecutor: ValidationExecutor,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
 ) : BaseViewModel(), Validatable by validationExecutor {
 
     val retryEvents = retryController.events
@@ -102,24 +108,19 @@ class BittensorStakeAmountViewModel(
 
     private val feeRequest = combine(stakingDetails, amount, ::createFeeRequest)
         .distinctUntilChanged()
-
-    private val feeResult = feeRequest.flatMapLatest { request ->
-        if (request == null) {
-            flowOf<FeeEstimate?> { null }
-        } else {
-            retryController.observe("root fee") {
-                flowOf {
-                    delay(FEE_DEBOUNCE_MILLIS)
-                    bittensorStakingInteractor.estimateRootStakeFee(request)
-                }
-            }
-                .map { FeeEstimate(request, it) }
-        }
-    }
         .shareInBackground()
 
-    private val currentFee = combine(feeRequest, feeResult) { request, estimate ->
-        estimate?.takeIf { it.request == request }
+    private val feeContext = stakingDetails
+        .map { it.asset.token.configuration }
+        .asFeeContextFromSelf()
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorRootStakeRequest>>(
+        scope = this,
+        feeContext = feeContext
+    )
+
+    val fee = combine(feeRequest, feeLoaderMixin.fee) { request, status ->
+        status.forRequest(request)
     }
         .shareInBackground()
 
@@ -132,8 +133,8 @@ class BittensorStakeAmountViewModel(
     }
         .shareInBackground()
 
-    val maxAmount = combine(stakingDetails, currentFee) { details, fee ->
-        val available = maxAvailableInPlanks(details, fee?.state?.dataOrNull)
+    val maxAmount = combine(stakingDetails, fee) { details, fee ->
+        val available = maxAvailableInPlanks(details, fee.loadedFeeOrNull())
         formatToken(details.asset.token.amountFromPlanks(available), details.asset.token.configuration.symbol)
     }
         .shareInBackground()
@@ -158,12 +159,7 @@ class BittensorStakeAmountViewModel(
         .map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
         .shareInBackground()
 
-    val fee = combine(stakingDetails, currentFee) { details, result ->
-        result?.state?.dataOrNull?.let { bittensorAmountFormatter.fee(it, details.asset.token) } ?: BittensorFeeUi("—", "—")
-    }
-        .shareInBackground()
-
-    private val loadedContinueButtonState = combine(stakingDetails, amountInPlanks, feeResult, preparing) { details, amount, fee, preparing ->
+    private val loadedContinueButtonState = combine(stakingDetails, amountInPlanks, fee, preparing) { details, amount, fee, preparing ->
         if (preparing) DescriptiveButtonState.Loading else continueButtonState(details, amount, fee)
     }
 
@@ -178,6 +174,14 @@ class BittensorStakeAmountViewModel(
         .shareInBackground()
 
     init {
+        feeLoaderMixin.connectWith(feeRequest) { _, request ->
+            request?.let {
+                delay(FEE_DEBOUNCE_MILLIS)
+                val fee = bittensorStakingInteractor.estimateRootStakeFee(it)
+                BittensorFeeEstimate(it, fee)
+            }
+        }
+
         stakingDetails
             .onEach(::setInitialAmount)
             .launchIn(viewModelScope)
@@ -224,7 +228,9 @@ class BittensorStakeAmountViewModel(
     fun continueClicked() = launchUnit {
         if (preparing.value || continueButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
         val request = feeRequest.first() ?: return@launchUnit
-        val fee = currentFee.first()?.state?.dataOrNull ?: return@launchUnit
+        val fee = fee.first()
+            .loadedFeeOrNull()
+            ?.takeIf { it.request == request } ?: return@launchUnit
         preparing.value = true
         try {
             val payload = bittensorStakingInteractor.validationPayload(request, fee, checkRootHold = true)
@@ -233,7 +239,7 @@ class BittensorStakeAmountViewModel(
                 payload = payload,
                 progressConsumer = preparing.progressConsumer(),
                 validationFailureTransformer = { resourceManager.getString(R.string.common_error_general_title) to it.message(resourceManager) }
-            ) { prepareStake(request) }
+            ) { prepareStake(request, fee.fee) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -242,9 +248,9 @@ class BittensorStakeAmountViewModel(
         }
     }
 
-    private fun prepareStake(request: BittensorRootStakeRequest) = launchUnit {
+    private fun prepareStake(request: BittensorRootStakeRequest, fee: Fee) = launchUnit {
         try {
-            bittensorStakingInteractor.prepareRootStake(request)
+            bittensorStakingInteractor.prepareRootStake(request, fee)
             router.openBittensorStakeConfirm()
         } catch (e: CancellationException) {
             throw e
@@ -287,7 +293,7 @@ class BittensorStakeAmountViewModel(
     private fun continueButtonState(
         details: BittensorRootStakingDetails,
         amount: BigInteger?,
-        fee: FeeEstimate?
+        fee: FeeStatus<BittensorFeeEstimate<BittensorRootStakeRequest>, FeeDisplay>
     ): DescriptiveButtonState {
         val label = resourceManager.getString(R.string.common_continue)
         val validator = details.validator ?: return DescriptiveButtonState.Disabled(resourceManager.getString(R.string.bittensor_select_validator))
@@ -295,9 +301,9 @@ class BittensorStakeAmountViewModel(
             return DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_enter_amount))
         }
 
-        if (fee?.request != BittensorRootStakeRequest(details.metaId, details.chain, validator, amount)) return DescriptiveButtonState.Loading
-        if (fee.state is ExtendedLoadingState.Loading) return DescriptiveButtonState.Loading
-        val loadedFee = fee.state.dataOrNull ?: return DescriptiveButtonState.Disabled(label)
+        if (fee is FeeStatus.Loading) return DescriptiveButtonState.Loading
+        val loadedFee = fee.loadedFeeOrNull() ?: return DescriptiveButtonState.Disabled(label)
+        if (loadedFee.request != BittensorRootStakeRequest(details.metaId, details.chain, validator, amount)) return DescriptiveButtonState.Loading
         val enoughBalance = amount <= maxAvailableInPlanks(details, loadedFee)
 
         return if (enoughBalance) DescriptiveButtonState.Enabled(label) else DescriptiveButtonState.Disabled(label)
@@ -316,8 +322,6 @@ class BittensorStakeAmountViewModel(
         return fiatFormatter.formatFiat(amount, currency)
             .toString()
     }
-
-    private data class FeeEstimate(val request: BittensorRootStakeRequest, val state: ExtendedLoadingState<Fee>)
 
     private companion object {
         const val FEE_DEBOUNCE_MILLIS = 350L

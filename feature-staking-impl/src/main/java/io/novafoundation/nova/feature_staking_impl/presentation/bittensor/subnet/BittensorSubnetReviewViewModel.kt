@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isError
@@ -20,7 +19,7 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
-import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -34,19 +33,22 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWalletContext
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeValidationFailureUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetView
 import io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetsView
@@ -79,7 +81,8 @@ class BittensorSubnetReviewViewModel(
     private val retryController: BittensorRetryController,
     private val bittensorAmountFormatter: BittensorAmountFormatter,
     private val validationSystem: BittensorStakePreflightSystem,
-    private val validationExecutor: ValidationExecutor
+    private val validationExecutor: ValidationExecutor,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     val retryEvents = retryController.events
@@ -139,7 +142,18 @@ class BittensorSubnetReviewViewModel(
     private val hasError = combine(walletState, preparationState) { walletContext, preparation -> walletContext.isError() || preparation.isError() }
         .shareInBackground()
 
-    val fee = combine(preparationState, walletState, ::mapFeeStatus)
+    private val feeContext = walletContext
+        .map { it.asset.token.configuration }
+        .asFeeContextFromSelf()
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorSubnetStakeDraft>>(
+        scope = this,
+        feeContext = feeContext
+    )
+
+    val fee = combine(draft, feeLoaderMixin.fee) { draft, status ->
+        status.forRequest(draft)
+    }
         .shareInBackground()
 
     val validator = draft.map { it?.validator?.name ?: resources.getString(R.string.bittensor_select_validator) }
@@ -163,11 +177,21 @@ class BittensorSubnetReviewViewModel(
     }
         .shareInBackground()
 
-    val confirmButtonState = combine(draft, validating, submission, hasError) { draft, validating, submission, failed ->
+    val confirmButtonState = combine(draft, validating, submission, hasError, fee) { draft, validating, submission, failed, fee ->
         val label = resources.getString(R.string.common_confirm)
-        if (draft == null || validating || !submission.canSubmit || failed) DescriptiveButtonState.Disabled(label) else DescriptiveButtonState.Enabled(label)
+        val canConfirm = draft != null && !validating && submission.canSubmit && !failed && fee.loadedFeeOrNull()?.request == draft
+        if (canConfirm) DescriptiveButtonState.Enabled(label) else DescriptiveButtonState.Disabled(label)
     }
         .shareInBackground()
+
+    init {
+        feeLoaderMixin.connectWith(draft) { _, draft ->
+            draft?.let {
+                val fee = bittensorSubnetStakingInteractor.estimateFee(it)
+                BittensorFeeEstimate(it, fee)
+            }
+        }
+    }
 
     fun accountClicked() = launchUnit {
         externalActions.showAddressActions(account.first().address, chain.await())
@@ -176,9 +200,12 @@ class BittensorSubnetReviewViewModel(
     fun confirmClicked() = launchUnit {
         if (!submission.value.canSubmit || hasError.first() || validating.value) return@launchUnit
         val prepared = draft.first() ?: return@launchUnit
+        val fee = fee.first()
+            .loadedFeeOrNull()
+            ?.takeIf { it.request == prepared } ?: return@launchUnit
         validating.value = true
         try {
-            val payload = bittensorSubnetStakingInteractor.validationPayload(prepared)
+            val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
@@ -186,7 +213,7 @@ class BittensorSubnetReviewViewModel(
                 validationFailureTransformerCustom = { failure, actions ->
                     bittensorStakeValidationFailureUi(failure, actions, resources) { preparationRefresh.value += 1 }
                 }
-            ) { executeStake(prepared) }
+            ) { executeStake(prepared, fee.fee) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -196,12 +223,12 @@ class BittensorSubnetReviewViewModel(
         }
     }
 
-    private fun executeStake(prepared: BittensorSubnetStakeDraft) = launchUnit {
+    private fun executeStake(prepared: BittensorSubnetStakeDraft, fee: Fee) = launchUnit {
         if (!submission.value.canSubmit) return@launchUnit
         submission.value = BittensorSubmissionState.Submitting(mapProgress())
         try {
             bittensorSubnetStakingInteractor.execute(prepared).getOrThrow()
-            submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared))
+            submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared, fee))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -216,13 +243,13 @@ class BittensorSubnetReviewViewModel(
         resources.getString(R.string.bittensor_subnet_staking_progress, subnetId.value)
     )
 
-    private suspend fun mapSuccess(draft: BittensorSubnetStakeDraft): BittensorStakeResultUi.Success {
+    private suspend fun mapSuccess(draft: BittensorSubnetStakeDraft, fee: Fee): BittensorStakeResultUi.Success {
         val token = walletContext.first().asset.token
         return BittensorStakeResultUi.Success(
             resources.getString(R.string.bittensor_subnet_staking_success, subnetId.value),
             resources.getString(R.string.bittensor_subnet_staking_completed),
             draft.validator.name,
-            bittensorAmountFormatter.fee(draft.fee, token)
+            bittensorAmountFormatter.fee(fee, token)
         )
     }
 
@@ -234,22 +261,6 @@ class BittensorSubnetReviewViewModel(
                 cause.message ?: resources.getString(R.string.common_error_general_title)
             )
         )
-    }
-
-    private fun mapFeeStatus(
-        preparationState: ExtendedLoadingState<BittensorPreparedSubnetStake>,
-        walletState: ExtendedLoadingState<BittensorWalletContext>
-    ): FeeStatus<Unit, FeeDisplay> {
-        if (preparationState.isError() || walletState.isError()) return FeeStatus.Error
-        val draft = preparationState.dataOrNull?.draft ?: return FeeStatus.Loading(true)
-        val token = walletState.dataOrNull?.asset?.token ?: return FeeStatus.Loading(true)
-        val amount = bittensorAmountFormatter.amount(
-            draft.fee.decimalAmount,
-            draft.fee.asset.symbol,
-            token.toFiatOrNull(draft.fee.decimalAmount),
-            token.currency
-        )
-        return FeeStatus.Loaded(FeeModel(Unit, FeeDisplay(amount.token, amount.fiat)))
     }
 
     private fun mapAssets(token: TokenBase, prepared: BittensorPreparedSubnetStake?): SwapAssetsView.Model = SwapAssetsView.Model(

@@ -5,6 +5,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
@@ -56,6 +57,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
     override fun subscribe(viewModel: BittensorSubnetReviewViewModel) = with(binder) {
         observeValidations(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
+        observeRetries(viewModel.feeLoaderMixin)
         viewModel.feeCaption.observe { feeCaption.text = it }
         setupExternalActions(viewModel)
         viewModel.wallet.observe(wallet::showWallet)

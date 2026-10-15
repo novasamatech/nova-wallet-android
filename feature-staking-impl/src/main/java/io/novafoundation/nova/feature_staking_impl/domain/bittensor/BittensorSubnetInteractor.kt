@@ -25,7 +25,7 @@ class BittensorSubnetInteractor(
     private val configRepository: BittensorConfigRepository
 ) {
 
-    val slippage = BittensorSlippage(BigDecimal("0.005"))
+    val slippage = BittensorSlippage(0.005.toBigDecimal())
 
     suspend fun commissionRate(): BigDecimal = configRepository.config().commission.fraction
 

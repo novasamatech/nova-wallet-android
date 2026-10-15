@@ -59,7 +59,7 @@
                     app:primaryValueStyle="positive"
                     app:title="@string/bittensor_apy" />
 
-                <io.novafoundation.nova.common.view.TableCellView
+                <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                     android:id="@+id/bittensorStakeAmountFee"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"

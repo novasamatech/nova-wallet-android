@@ -106,5 +106,5 @@ class BittensorSubnetQuoteInteractorTest {
     }
 
     private fun interactor() = BittensorSubnetQuoteInteractor(source, configRepository)
-    private fun slippage() = BittensorSlippage(BigDecimal("0.005"))
+    private fun slippage() = BittensorSlippage(0.005.toBigDecimal())
 }

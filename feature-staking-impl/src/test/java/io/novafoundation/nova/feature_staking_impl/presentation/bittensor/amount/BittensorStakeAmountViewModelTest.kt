@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.validation.FieldValidator
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakePreflightRepository
@@ -16,11 +17,13 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubne
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingFlowState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -33,6 +36,10 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeContext
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
@@ -127,6 +134,21 @@ class BittensorStakeAmountViewModelTest {
         override fun create(scope: CoroutineScope, assetFlow: Flow<Asset>, maxActionProvider: MaxActionProvider?, fieldValidator: FieldValidator?) = chooser
     }
 
+    private val feeState = MutableStateFlow<FeeStatus<BittensorFeeEstimate<BittensorRootStakeRequest>, FeeDisplay>>(FeeStatus.NoFee)
+
+    private val feeLoader = mock(FeeLoaderMixinV2.Presentation::class.java)
+
+    private val unusedFeeLoaderFactory = mock(FeeLoaderMixinV2.Factory::class.java)
+
+    private val feeLoaderFactory = object : FeeLoaderMixinV2.Factory by unusedFeeLoaderFactory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <F : SubmissionFee> createDefault(
+            scope: CoroutineScope,
+            feeContextFlow: Flow<FeeContext>,
+            configuration: FeeLoaderMixinV2.Configuration<F, FeeDisplay>
+        ): FeeLoaderMixinV2.Presentation<F, FeeDisplay> = feeLoader as FeeLoaderMixinV2.Presentation<F, FeeDisplay>
+    }
+
     private lateinit var viewModel: BittensorStakeAmountViewModel
 
     @Before
@@ -141,6 +163,7 @@ class BittensorStakeAmountViewModelTest {
         `when`(communicator.responseFlow).thenReturn(emptyFlow())
         `when`(chooser.inputState).thenReturn(input)
         `when`(chooser.assetModel).thenReturn(emptyFlow())
+        `when`(feeLoader.fee).thenReturn(feeState)
         viewModel = BittensorStakeAmountViewModel(
             resourceManager = resources,
             router = router,
@@ -153,7 +176,8 @@ class BittensorStakeAmountViewModelTest {
             bittensorAmountFormatter = amountFormatter,
             amountChooserFactory = chooserFactory,
             stakeValidationSystem = validationSystem,
-            validationExecutor = validationExecutor
+            validationExecutor = validationExecutor,
+            feeLoaderMixinFactory = feeLoaderFactory
         )
     }
 

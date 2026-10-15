@@ -27,8 +27,7 @@ import kotlinx.coroutines.withTimeout
 data class BittensorSubnetStakeDraft(
     val metaId: Long,
     val validator: BittensorValidator,
-    val operation: BittensorSubnetStakeOperation,
-    val fee: Fee
+    val operation: BittensorSubnetStakeOperation
 )
 
 data class BittensorPreparedSubnetStake(val subnet: BittensorSubnet, val draft: BittensorSubnetStakeDraft)
@@ -77,8 +76,7 @@ class BittensorSubnetStakingInteractor(
         val quote = bittensorSubnetInteractor.quote(subnetId, amount)
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
         val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
-        val fee = estimateFee(chain, metaId, operation)
-        val draft = BittensorSubnetStakeDraft(metaId, validator, operation, fee)
+        val draft = BittensorSubnetStakeDraft(metaId, validator, operation)
         BittensorPreparedSubnetStake(subnet, draft)
     }
 
@@ -93,10 +91,9 @@ class BittensorSubnetStakingInteractor(
     }
         .onFailure { if (it is CancellationException) throw it }
 
-    suspend fun validationPayload(draft: BittensorSubnetStakeDraft): BittensorStakePreflightPayload {
+    suspend fun validationPayload(draft: BittensorSubnetStakeDraft, fee: Fee): BittensorStakePreflightPayload {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val quote = draft.operation.quote
-        val fee = estimateFee(chain, draft.metaId, draft.operation)
         return BittensorStakePreflightPayload(
             chain = chain,
             metaId = draft.metaId,
@@ -106,6 +103,11 @@ class BittensorSubnetStakingInteractor(
             fee = fee,
             quote = quote
         )
+    }
+
+    suspend fun estimateFee(draft: BittensorSubnetStakeDraft): Fee {
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
+        return estimateFee(chain, draft.metaId, draft.operation)
     }
 
     private suspend fun estimateFee(chain: Chain, metaId: Long, operation: BittensorSubnetStakeOperation): Fee {

@@ -7,6 +7,7 @@ import io.novafoundation.nova.core.updater.Updater
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.BITTENSOR_ROOT
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.PARACHAIN
@@ -60,7 +61,7 @@ class StakingUpdaters(
             TURING -> parachainUpdaters.updaters + turingExtraUpdaters.updaters
             NOMINATION_POOLS -> nominationPoolsUpdaters.updaters
             MYTHOS -> mythosUpdaters.updaters
-            StakingType.BITTENSOR_ROOT -> bittensorUpdaters.updaters
+            BITTENSOR_ROOT -> bittensorUpdaters.updaters
             UNSUPPORTED -> emptyList()
         }
 

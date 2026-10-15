@@ -28,7 +28,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
@@ -38,9 +40,11 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
@@ -69,7 +73,8 @@ class BittensorStakeConfirmViewModel(
     private val bittensorAmountFormatter: BittensorAmountFormatter,
     private val retryController: BittensorRetryController,
     private val validationSystem: BittensorStakePreflightSystem,
-    private val validationExecutor: ValidationExecutor
+    private val validationExecutor: ValidationExecutor,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
@@ -102,16 +107,22 @@ class BittensorStakeConfirmViewModel(
         .map { walletUiUseCase.walletAddressModel(it, chain.await(), AddressIconGenerator.SIZE_MEDIUM) }
         .shareInBackground()
 
-    val fee = combine(stakingDetails, stakeDraft) { details, draft ->
-        FeeStatus.Loaded(
-            FeeModel(
-                fee = Unit,
-                display = FeeDisplay(
-                    title = formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol),
-                    subtitle = formatFiatOrDash(details.asset.token.toFiatOrNull(draft.fee.decimalAmount), details.asset.token.currency)
-                )
-            )
-        )
+    private val feeRequest = stakeDraft
+        .map { BittensorRootStakeRequest(it.metaId, chain.await(), it.validator, it.amountInPlanks) }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    private val feeContext = stakingDetails
+        .map { it.asset.token.configuration }
+        .asFeeContextFromSelf()
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorRootStakeRequest>>(
+        scope = this,
+        feeContext = feeContext
+    )
+
+    val fee = combine(feeRequest, feeLoaderMixin.fee) { request, status ->
+        status.forRequest(request)
     }
         .shareInBackground()
 
@@ -130,10 +141,10 @@ class BittensorStakeConfirmViewModel(
 
     private val validating = MutableStateFlow(false)
 
-    val confirmButtonState = combine(stakingDetailsState, validating, submission) { state, validating, submission ->
+    val confirmButtonState = combine(stakingDetailsState, validating, submission, fee) { state, validating, submission, fee ->
         val details = state.dataOrNull
         val label = resourceManager.getString(R.string.common_confirm)
-        if (!submission.canSubmit || details == null || validating) {
+        if (!submission.canSubmit || details == null || validating || fee.loadedFeeOrNull() == null) {
             DescriptiveButtonState.Disabled(label)
         } else {
             DescriptiveButtonState.Enabled(label)
@@ -143,6 +154,11 @@ class BittensorStakeConfirmViewModel(
         .shareInBackground()
 
     init {
+        feeLoaderMixin.connectWith(feeRequest) { _, request ->
+            val fee = bittensorStakingInteractor.estimateRootStakeFee(request)
+            BittensorFeeEstimate(request, fee)
+        }
+
         if (!bittensorStakingInteractor.hasDraft()) {
             launchUnit {
                 showError(resourceManager.getString(R.string.bittensor_draft_expired))
@@ -165,14 +181,16 @@ class BittensorStakeConfirmViewModel(
         try {
             val draft = stakeDraft.first()
             val request = BittensorRootStakeRequest(draft.metaId, chain.await(), draft.validator, draft.amountInPlanks)
-            val fee = bittensorStakingInteractor.estimateRootStakeFee(request)
+            val fee = fee.first()
+                .loadedFeeOrNull()
+                ?.takeIf { it.request == request } ?: return@launchUnit
             val payload = bittensorStakingInteractor.validationPayload(request, fee)
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
                 progressConsumer = validating.progressConsumer(),
                 validationFailureTransformer = { resourceManager.getString(R.string.common_error_general_title) to it.message(resourceManager) }
-            ) { executeStake(draft) }
+            ) { executeStake(draft.copy(fee = fee.fee)) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

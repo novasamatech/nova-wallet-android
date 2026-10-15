@@ -64,9 +64,8 @@ class BittensorStakingInteractor(
         }
     }
 
-    suspend fun prepareRootStake(request: BittensorRootStakeRequest): BittensorRootStakeDraft {
+    suspend fun prepareRootStake(request: BittensorRootStakeRequest, fee: Fee): BittensorRootStakeDraft {
         validatorRepository.validateRoot(request.chain, request.validator)
-        val fee = estimateRootStakeFee(request)
         val draft = BittensorRootStakeDraft(request.metaId, request.amountInPlanks, request.validator, fee)
         flowState.setDraft(draft)
         return draft
