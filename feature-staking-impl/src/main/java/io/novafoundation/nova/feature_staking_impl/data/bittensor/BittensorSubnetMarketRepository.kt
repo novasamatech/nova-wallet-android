@@ -27,7 +27,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
 
     suspend fun priceId(subnetId: BittensorNetuid.Subnet): String? = mutex.withLock {
         if (loadedAt == 0L || System.nanoTime() - loadedAt > MARKET_CACHE_VALIDITY.inWholeNanoseconds) {
-            cached = bindBittensorMarketIds(loadMarkets())
+            cached = mapBittensorMarketIds(loadMarkets())
             loadedAt = System.nanoTime()
         }
         cached[subnetId]
@@ -44,7 +44,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
     }
 }
 
-internal fun bindBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> = buildMap {
+internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> = buildMap {
     rows.forEach { row ->
         val symbol = row.symbol?.trim()?.lowercase() ?: return@forEach
         if (!symbol.matches(SUBNET_SYMBOL_PATTERN)) return@forEach

@@ -6,15 +6,14 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validatorCommissionRateFromU16
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import java.math.BigDecimal
 import java.math.BigInteger
-import java.math.RoundingMode
 
 internal data class BittensorValidatorSnapshot(
     val uids: Map<AccountIdKey, Int?>,
-    val takes: Map<AccountIdKey, BigInteger?>,
+    val commissionsInU16: Map<AccountIdKey, BigInteger?>,
     val permits: List<Boolean>,
     val lastUpdates: List<BigInteger>,
     val activeThreshold: BigInteger
@@ -27,18 +26,31 @@ internal fun mapBittensorValidators(
     gates: BittensorValidatorGates,
     snapshot: BittensorValidatorSnapshot
 ): List<BittensorSubnetValidator> {
-    val isRoot = netuid.isRoot()
-    return validators.mapNotNull { validator ->
-        val uid = snapshot.uids[validator.hotkey] ?: return@mapNotNull null
-        val take = snapshot.takes[validator.hotkey] ?: return@mapNotNull null
-        if (!gates.allowsTake(take)) return@mapNotNull null
-        if (!isRoot && gates.requirePermit && snapshot.permits.getOrNull(uid) != true) return@mapNotNull null
-        val active = isRoot || !gates.requireActive || snapshot.lastUpdates.getOrNull(uid)?.let { it >= snapshot.activeThreshold } == true
-        BittensorSubnetValidator(
-            validator = validator,
-            address = chain.addressOf(validator.hotkey),
-            take = take.toBigDecimal().divide(BigDecimal(65535), 12, RoundingMode.HALF_EVEN),
-            selectable = active
-        )
-    }
+    return validators.mapNotNull { validator -> mapBittensorValidator(chain, netuid, validator, gates, snapshot) }
+}
+
+private fun mapBittensorValidator(
+    chain: Chain,
+    netuid: BittensorNetuid,
+    validator: BittensorValidator,
+    gates: BittensorValidatorGates,
+    snapshot: BittensorValidatorSnapshot
+): BittensorSubnetValidator? {
+    val uid = snapshot.uids[validator.hotkey] ?: return null
+    val commissionInU16 = snapshot.commissionsInU16[validator.hotkey] ?: return null
+    if (!gates.allowsCommission(commissionInU16)) return null
+    if (!netuid.isRoot() && gates.requirePermit && snapshot.permits.getOrNull(uid) != true) return null
+
+    return BittensorSubnetValidator(
+        validator = validator,
+        address = chain.addressOf(validator.hotkey),
+        commissionRate = validatorCommissionRateFromU16(commissionInU16),
+        selectable = isValidatorActive(netuid, uid, gates, snapshot)
+    )
+}
+
+private fun isValidatorActive(netuid: BittensorNetuid, uid: Int, gates: BittensorValidatorGates, snapshot: BittensorValidatorSnapshot): Boolean {
+    if (netuid.isRoot() || !gates.requireActive) return true
+    val lastUpdate = snapshot.lastUpdates.getOrNull(uid) ?: return false
+    return lastUpdate >= snapshot.activeThreshold
 }

@@ -21,7 +21,7 @@ class BittensorConfigRepositoryTest {
 
     @Test
     fun `canonical iOS config supplies the fee and only valid HTTPS subnet logos`() {
-        val config = bindBittensorConfig(
+        val config = mapBittensorConfig(
             document(
                 """
             {"swapFee":0.005,"subnets":[
@@ -44,12 +44,12 @@ class BittensorConfigRepositoryTest {
     @Test
     fun `missing or invalid fee uses the iOS fallback without losing valid logos`() {
         for (fee in listOf("null", "-0.1", "1", "2")) {
-            val config = bindBittensorConfig(document("""{"swapFee":$fee,"subnets":[{"netuid":1,"logo":"https://logos.test/1.png"}]}"""))
+            val config = mapBittensorConfig(document("""{"swapFee":$fee,"subnets":[{"netuid":1,"logo":"https://logos.test/1.png"}]}"""))
             assertEquals(BigDecimal("0.003"), config.commission.fraction)
             assertEquals(1, config.subnetLogos.size)
         }
-        assertEquals(BigDecimal("0.003"), bindBittensorConfig(document("""{"subnets":[]}""")).commission.fraction)
-        assertEquals(BigDecimal.ZERO, bindBittensorConfig(document("""{"swapFee":0,"subnets":[]}""")).commission.fraction)
+        assertEquals(BigDecimal("0.003"), mapBittensorConfig(document("""{"subnets":[]}""")).commission.fraction)
+        assertEquals(BigDecimal.ZERO, mapBittensorConfig(document("""{"swapFee":0,"subnets":[]}""")).commission.fraction)
     }
 
     @Test
@@ -87,7 +87,7 @@ class BittensorConfigRepositoryTest {
 
     @Test
     fun `malformed logo catalogue cannot be cached as valid config`() {
-        assertTrue(runCatching { bindBittensorConfig(document("""{"swapFee":0.004}""")) }.isFailure)
+        assertTrue(runCatching { mapBittensorConfig(document("""{"swapFee":0.004}""")) }.isFailure)
     }
 
     @Test

@@ -23,7 +23,7 @@ class RemoteBittensorConfigRepository(
     private val logger: Logger
 ) : BittensorConfigRepository {
 
-    private val cachedConfig = SingleValueCache { bindBittensorConfig(api.config(configUrl)) }
+    private val cachedConfig = SingleValueCache { mapBittensorConfig(api.config(configUrl)) }
 
     override suspend fun config(): BittensorConfig {
         try {
@@ -41,7 +41,7 @@ class RemoteBittensorConfigRepository(
 
 internal fun fallbackBittensorConfig() = BittensorConfig(BittensorSubnetCommission(BigDecimal("0.003")), emptyMap())
 
-internal fun bindBittensorConfig(remote: BittensorConfigRemote): BittensorConfig {
+internal fun mapBittensorConfig(remote: BittensorConfigRemote): BittensorConfig {
     val fraction = remote.swapFee?.takeIf { it.isNonNegative && it < BigDecimal.ONE }
     val commission = fraction?.let(::BittensorSubnetCommission) ?: fallbackBittensorConfig().commission
     val subnets = requireNotNull(remote.subnets) { "Bittensor subnet logos are missing" }

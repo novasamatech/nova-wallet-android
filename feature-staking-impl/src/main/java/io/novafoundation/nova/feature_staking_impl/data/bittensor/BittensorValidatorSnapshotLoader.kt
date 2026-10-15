@@ -49,7 +49,7 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
                 binding = { value, _ -> value?.let(::bindBittensorU16) }
             )
     }
-    val takes = async {
+    val commissionsInU16 = async {
         pallet.storage("Delegates")
             .entries(
                 keysArguments = validators.map { listOf(it.hotkey.value) },
@@ -60,7 +60,7 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
 
     BittensorValidatorSnapshot(
         uids = uids.await(),
-        takes = takes.await(),
+        commissionsInU16 = commissionsInU16.await(),
         permits = permits.await(),
         lastUpdates = updates.await(),
         activeThreshold = activeThreshold.await()

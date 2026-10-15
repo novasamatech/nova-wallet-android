@@ -75,10 +75,10 @@ class BittensorValidatorAdapter(
 
         private fun formatSubtitle(validator: BittensorSubnetValidator): String {
             val context = binder.root.context
-            val take = validator.take.movePointRight(2)
+            val commissionPercentage = validator.commissionRate.movePointRight(2)
                 .setScale(2, RoundingMode.HALF_EVEN)
                 .toStripTrailingZerosString()
-            val fee = context.getString(R.string.bittensor_validator_take, take)
+            val fee = context.getString(R.string.bittensor_validator_take, commissionPercentage)
             return if (validator.selectable) fee else fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
         }
     }

@@ -9,17 +9,17 @@ internal fun requireUsableBittensorRecommendations(response: BittensorRecommenda
     val component = requireNotNull(meta.components?.recommendations)
     require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Validator policy is unavailable or stale" }
     val gates = requireNotNull(meta.clientGates)
-    val maxTake = requireNotNull(gates.maxTake).toBigDecimal()
-    require(maxTake.isNonNegative && maxTake <= BigDecimal.ONE) { "Invalid validator take limit" }
+    val maxCommissionRate = requireNotNull(gates.maxTake).toBigDecimal()
+    require(maxCommissionRate.isNonNegative && maxCommissionRate <= BigDecimal.ONE) { "Invalid validator take limit" }
     requireNotNull(gates.requirePermit)
     requireNotNull(gates.requireActiveWithinCutoff)
 }
 
-internal fun bindBittensorValidatorGates(response: BittensorRecommendationsRemote): BittensorValidatorGates {
+internal fun mapBittensorValidatorGates(response: BittensorRecommendationsRemote): BittensorValidatorGates {
     requireUsableBittensorRecommendations(response)
     val gates = requireNotNull(response.meta?.clientGates)
     return BittensorValidatorGates(
-        maxTake = requireNotNull(gates.maxTake).toBigDecimal(),
+        maxCommissionRate = requireNotNull(gates.maxTake).toBigDecimal(),
         requirePermit = requireNotNull(gates.requirePermit),
         requireActive = requireNotNull(gates.requireActiveWithinCutoff)
     )

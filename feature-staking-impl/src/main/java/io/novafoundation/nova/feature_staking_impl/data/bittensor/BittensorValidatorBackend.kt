@@ -44,7 +44,7 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         val url = endpoint(baseUrl, "recommendations/subnets")
         val cached = recommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
             ?: loadRecommendations(url)
-        val gates = bindBittensorValidatorGates(cached.data)
+        val gates = mapBittensorValidatorGates(cached.data)
         recommendations = cached
         gates
     }
@@ -54,7 +54,7 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         val url = endpoint(baseUrl, "recommendations")
         val cached = validatorRecommendations?.takeIf { System.nanoTime() < it.deadlineNanos }
             ?: loadRecommendations(url)
-        val hotkeys = bindRecommendedHotkeys(cached.data, netuid)
+        val hotkeys = mapRecommendedHotkeys(cached.data, netuid)
         validatorRecommendations = cached
         hotkeys
     }
@@ -64,7 +64,7 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         return readCacheEntry(response)
     }
 
-    private fun bindRecommendedHotkeys(response: BittensorRecommendationsRemote, netuid: Int): List<String> {
+    private fun mapRecommendedHotkeys(response: BittensorRecommendationsRemote, netuid: Int): List<String> {
         requireUsableBittensorRecommendations(response)
         val sourceBlock = requireNotNull(response.meta?.generation?.sourceBlockNumber) { "Missing recommendation generation" }
         require(sourceBlock.isNonNegative) { "Invalid recommendation block" }

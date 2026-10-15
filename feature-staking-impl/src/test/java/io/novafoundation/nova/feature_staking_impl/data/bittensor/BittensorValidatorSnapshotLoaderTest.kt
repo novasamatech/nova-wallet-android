@@ -49,7 +49,7 @@ class BittensorValidatorSnapshotLoaderTest {
 
         assertEquals(setOf("ValidatorPermit", "LastUpdate", "Number", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates"), context.requests)
         assertEquals(mapOf(validator.hotkey to 0), snapshot.uids)
-        assertEquals(mapOf(validator.hotkey to BigInteger.ZERO), snapshot.takes)
+        assertEquals(mapOf(validator.hotkey to BigInteger.ZERO), snapshot.commissionsInU16)
         assertEquals(listOf(true), snapshot.permits)
         assertEquals(listOf(100.toBigInteger()), snapshot.lastUpdates)
         assertEquals(100.toBigInteger(), snapshot.activeThreshold)

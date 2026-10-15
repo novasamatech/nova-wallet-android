@@ -18,6 +18,6 @@ class BittensorSubnetMarketRepositoryTest {
             BittensorSubnetMarketRemote(null, "sn10")
         )
 
-        assertEquals(mapOf(BittensorNetuid.Subnet(8) to "vanta"), bindBittensorMarketIds(rows))
+        assertEquals(mapOf(BittensorNetuid.Subnet(8) to "vanta"), mapBittensorMarketIds(rows))
     }
 }

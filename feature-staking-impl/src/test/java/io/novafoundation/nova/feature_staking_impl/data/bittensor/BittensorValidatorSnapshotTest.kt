@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
 import java.math.BigInteger
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -22,7 +23,7 @@ class BittensorValidatorSnapshotTest {
 
     private val snapshot = BittensorValidatorSnapshot(
         uids = mapOf(validator.hotkey to 0),
-        takes = mapOf(validator.hotkey to BigInteger.ZERO),
+        commissionsInU16 = mapOf(validator.hotkey to BigInteger.ZERO),
         permits = listOf(true),
         lastUpdates = listOf(BigInteger.TEN),
         activeThreshold = BigInteger.TEN
@@ -41,7 +42,21 @@ class BittensorValidatorSnapshotTest {
         val root = snapshot.copy(permits = emptyList(), lastUpdates = emptyList())
         assertTrue(mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), gates, root).single().selectable)
         assertTrue(mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), gates, root.copy(uids = emptyMap())).isEmpty())
-        val excessiveTake = root.copy(takes = mapOf(validator.hotkey to BigInteger.valueOf(65535)))
-        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), gates, excessiveTake).isEmpty())
+        val excessiveCommission = root.copy(commissionsInU16 = mapOf(validator.hotkey to BigInteger.valueOf(65535)))
+        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), gates, excessiveCommission).isEmpty())
+    }
+
+    @Test
+    fun `raw delegate commission maps to a decimal rate`() {
+        val unrestrictedGates = BittensorValidatorGates(BigDecimal.ONE, requirePermit = false, requireActive = false)
+        val expectedRates = mapOf(0 to "0", 13107 to "0.2", 65535 to "1")
+
+        expectedRates.forEach { (rawCommission, expectedRate) ->
+            val commissionSnapshot = snapshot.copy(commissionsInU16 = mapOf(validator.hotkey to rawCommission.toBigInteger()))
+            val mapped = mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), unrestrictedGates, commissionSnapshot)
+                .single()
+
+            assertEquals(0, BigDecimal(expectedRate).compareTo(mapped.commissionRate))
+        }
     }
 }

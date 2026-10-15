@@ -131,18 +131,18 @@ class BittensorValidatorBackendTest {
 
     @Test
     fun `missing or stale server policy cannot enable validator selection`() {
-        assertTrue(runCatching { bindBittensorValidatorGates(BittensorRecommendationsRemote(null)) }.isFailure)
-        assertTrue(runCatching { bindBittensorValidatorGates(policy("STALE")) }.isFailure)
-        assertEquals(BigDecimal("0.18"), bindBittensorValidatorGates(policy("FRESH")).maxTake)
+        assertTrue(runCatching { mapBittensorValidatorGates(BittensorRecommendationsRemote(null)) }.isFailure)
+        assertTrue(runCatching { mapBittensorValidatorGates(policy("STALE")) }.isFailure)
+        assertEquals(BigDecimal("0.18"), mapBittensorValidatorGates(policy("FRESH")).maxCommissionRate)
         assertTrue(runCatching { BittensorValidatorGates(BigDecimal("1.01"), true, true) }.isFailure)
     }
 
     @Test
     fun `take limit uses exact integers instead of a rounded percentage`() {
         val gates = BittensorValidatorGates(BigDecimal("0.18"), true, true)
-        assertTrue(gates.allowsTake(BigInteger.valueOf(11796)))
-        assertFalse(gates.allowsTake(BigInteger.valueOf(11797)))
-        assertTrue(runCatching { gates.allowsTake(BigInteger.valueOf(65536)) }.isFailure)
+        assertTrue(gates.allowsCommission(BigInteger.valueOf(11796)))
+        assertFalse(gates.allowsCommission(BigInteger.valueOf(11797)))
+        assertTrue(runCatching { gates.allowsCommission(BigInteger.valueOf(65536)) }.isFailure)
     }
 
     @Test
