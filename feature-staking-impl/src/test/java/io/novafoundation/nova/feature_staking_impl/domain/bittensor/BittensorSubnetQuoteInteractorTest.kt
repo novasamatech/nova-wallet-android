@@ -1,19 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfig
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.math.BigDecimal
-import java.math.BigInteger
 
 class BittensorSubnetQuoteInteractorTest {
 
-    private val subnet = BittensorSubnetId(64)
+    private val subnet = BittensorNetuid.Subnet(64)
 
     private val commission = BittensorSubnetCommission(BigDecimal("0.003"))
 
@@ -28,11 +28,11 @@ class BittensorSubnetQuoteInteractorTest {
     private var requestedInput: BigInteger? = null
 
     private val source = object : BittensorSwapSource {
-        override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorSubnetId): BigInteger = BigInteger.valueOf(1000)
+        override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger = BigInteger.valueOf(1000)
 
         override suspend fun simulate(
             chainId: String,
-            subnetId: BittensorSubnetId,
+            subnetId: BittensorNetuid.Subnet,
             direction: BittensorSwapDirection,
             amountIn: BigInteger
         ): BittensorSwapSimulation {

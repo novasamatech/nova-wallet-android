@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -18,6 +18,6 @@ class BittensorSubnetMarketRepositoryTest {
             BittensorSubnetMarketRemote(null, "sn10")
         )
 
-        assertEquals(mapOf(BittensorSubnetId(8) to "vanta"), bindBittensorMarketIds(rows))
+        assertEquals(mapOf(BittensorNetuid.Subnet(8) to "vanta"), bindBittensorMarketIds(rows))
     }
 }

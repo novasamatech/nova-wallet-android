@@ -3,9 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novasama.substrate_sdk_android.hash.isPositive
@@ -35,14 +35,13 @@ internal fun bindBittensorPositions(decoded: Any?): BittensorStakePositions {
     val subnets = mutableListOf<BittensorSubnetPosition>()
     bindList(decoded) { item ->
         val value = item.castToStruct()
-        val subnetId = bindBittensorU16(value["netuid"])
+        val netuid = BittensorNetuid.from(bindBittensorU16(value["netuid"]))
         val stake = bindBittensorU64(value["stake"])
         if (stake.isPositive()) {
             val hotkey = bindAccountIdKey(value["hotkey"])
-            if (subnetId == 0) {
-                root += BittensorRootPosition(hotkey, stake)
-            } else {
-                subnets += BittensorSubnetPosition(BittensorSubnetId(subnetId), hotkey, stake)
+            when (netuid) {
+                BittensorNetuid.Root -> root += BittensorRootPosition(hotkey, stake)
+                is BittensorNetuid.Subnet -> subnets += BittensorSubnetPosition(netuid, hotkey, stake)
             }
         }
     }

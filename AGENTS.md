@@ -64,6 +64,8 @@ Use the shared iOS-compatible Bittensor configuration for the commission rate an
 
 Load the validator directory and filtering policy through attested infrastructure endpoints, not directly from tao.app. Do not invent local `maxTake` values or fallback eligibility policies when the backend is unavailable. Check UID, permit, take, and activity on-chain at one block hash using batched queries; revalidate the selected validator before submission. Backend names and optional statistics do not replace on-chain eligibility checks.
 
+Keep snapshot loading separate from validator mapping, and run independent storage reads concurrently within the same block-bound query context. Use `BittensorNetuid.Root` and `BittensorNetuid.Subnet` to distinguish root from dynamic subnets. APIs that only support dynamic subnets must accept `BittensorNetuid.Subnet`, not the base type or a raw integer. Use `isRoot()` instead of spreading root-ID comparisons through callers, and convert raw IDs at the boundary.
+
 Generate a validator's icon from its hotkey with `AddressIconGenerator`, as for other addresses in the app. A chain logo or generic placeholder does not replace an address identicon. Explicitly pass the validator selected before amount entry into confirmation. Eligibility revalidation must not silently substitute another validator.
 
 ## Self-review and refactoring
@@ -73,6 +75,10 @@ Use existing numeric sign extensions (`isPositive`, `isNegative`, `isZero`, `isN
 Give variables, classes, and functions clear, descriptive names that convey their purpose. Balance name length with the context it provides: avoid ambiguous abbreviations, but do not repeat information already clear from the surrounding scope.
 
 Separate class property declarations with a blank line, following existing ViewModel references. Apply this to both single-line properties and multi-line flow declarations.
+
+Put each successive call in a method chain on a new line. Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
+
+Do not repeat filtering already guaranteed by a backend resource contract. Verify that contract before removing a filter; keep client-owned validation, such as address decoding and on-chain eligibility checks.
 
 Model finite UI choices with enums or sealed types instead of magic integers. Keep semantic options such as `MAX` distinct from numeric amounts; do not encode them as a sentinel amount such as zero or rely on enum ordinals.
 

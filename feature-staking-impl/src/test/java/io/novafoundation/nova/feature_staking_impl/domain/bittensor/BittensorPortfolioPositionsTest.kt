@@ -1,22 +1,23 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import java.math.BigInteger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import java.math.BigInteger
 
 class BittensorPortfolioPositionsTest {
 
     private val firstValidator = AccountIdKey(ByteArray(32))
     private val secondValidator = AccountIdKey(ByteArray(32) { 1 })
-    private val subnet = BittensorSubnetId(1)
+    private val subnet = BittensorNetuid.Subnet(1)
 
     @Test
     fun `root stake includes all validators`() {
         val positions = BittensorPortfolioPositions(
             listOf(BittensorRootPosition(firstValidator, n(10)), BittensorRootPosition(secondValidator, n(20))),
-            emptyList(), emptyMap()
+            emptyList(),
+            emptyMap()
         )
         assertEquals(n(30), positions.rootStake)
         assertEquals(n(30), positions.totalStake)
@@ -37,7 +38,8 @@ class BittensorPortfolioPositionsTest {
     fun `missing price never produces a partial total`() {
         val positions = BittensorPortfolioPositions(
             listOf(BittensorRootPosition(firstValidator, n(10))),
-            listOf(BittensorSubnetPosition(subnet, firstValidator, n(1))), emptyMap()
+            listOf(BittensorSubnetPosition(subnet, firstValidator, n(1))),
+            emptyMap()
         )
         assertEquals(n(10), positions.rootStake)
         assertNull(positions.subnetStake(subnet))

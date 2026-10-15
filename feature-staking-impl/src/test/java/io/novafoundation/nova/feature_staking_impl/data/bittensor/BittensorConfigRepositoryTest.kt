@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import com.google.gson.Gson
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.io.IOException
+import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -10,8 +12,6 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.mock
-import java.io.IOException
-import java.math.BigDecimal
 
 class BittensorConfigRepositoryTest {
 
@@ -38,7 +38,7 @@ class BittensorConfigRepositoryTest {
         )
 
         assertEquals(BigDecimal("0.005"), config.commission.fraction)
-        assertEquals(mapOf(BittensorSubnetId(1) to "https://logos.test/first.png"), config.subnetLogos)
+        assertEquals(mapOf(BittensorNetuid.Subnet(1) to "https://logos.test/first.png"), config.subnetLogos)
     }
 
     @Test

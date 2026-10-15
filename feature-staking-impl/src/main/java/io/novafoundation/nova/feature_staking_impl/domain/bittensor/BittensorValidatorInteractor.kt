@@ -12,8 +12,8 @@ class BittensorValidatorInteractor(
 
     suspend fun chain(): Chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
 
-    suspend fun validators(subnetId: Int): List<BittensorSubnetValidator> {
+    suspend fun validators(netuid: BittensorNetuid): List<BittensorSubnetValidator> {
         val chain = chain()
-        return if (subnetId == 0) validatorRepository.rootValidators(chain) else validatorRepository.validators(chain, BittensorSubnetId(subnetId))
+        return validatorRepository.validators(chain, netuid)
     }
 }

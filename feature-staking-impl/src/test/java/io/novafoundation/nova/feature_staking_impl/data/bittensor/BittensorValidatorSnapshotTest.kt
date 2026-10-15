@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -29,18 +30,18 @@ class BittensorValidatorSnapshotTest {
 
     @Test
     fun `subnet permit and activity gates are evaluated from the same snapshot`() {
-        assertTrue(mapBittensorValidators(chain, 1, listOf(validator), gates, snapshot).single().selectable)
-        assertTrue(mapBittensorValidators(chain, 1, listOf(validator), gates, snapshot.copy(permits = listOf(false))).isEmpty())
+        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Subnet(1), listOf(validator), gates, snapshot).single().selectable)
+        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Subnet(1), listOf(validator), gates, snapshot.copy(permits = listOf(false))).isEmpty())
         val inactive = snapshot.copy(lastUpdates = listOf(BigInteger.ONE))
-        assertFalse(mapBittensorValidators(chain, 1, listOf(validator), gates, inactive).single().selectable)
+        assertFalse(mapBittensorValidators(chain, BittensorNetuid.Subnet(1), listOf(validator), gates, inactive).single().selectable)
     }
 
     @Test
     fun `root ignores subnet-only gates but requires registration and an allowed take`() {
         val root = snapshot.copy(permits = emptyList(), lastUpdates = emptyList())
-        assertTrue(mapBittensorValidators(chain, 0, listOf(validator), gates, root).single().selectable)
-        assertTrue(mapBittensorValidators(chain, 0, listOf(validator), gates, root.copy(uids = emptyMap())).isEmpty())
+        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), gates, root).single().selectable)
+        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), gates, root.copy(uids = emptyMap())).isEmpty())
         val excessiveTake = root.copy(takes = mapOf(validator.hotkey to BigInteger.valueOf(65535)))
-        assertTrue(mapBittensorValidators(chain, 0, listOf(validator), gates, excessiveTake).isEmpty())
+        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Root, listOf(validator), gates, excessiveTake).isEmpty())
     }
 }

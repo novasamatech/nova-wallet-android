@@ -45,7 +45,7 @@ class BittensorSubnetDetailsInteractor(
     }
 
     suspend fun history(
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         taoPriceId: String,
         currency: Currency,
         period: BittensorSubnetChartPeriod

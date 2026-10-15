@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -20,12 +22,12 @@ internal data class BittensorValidatorSnapshot(
 
 internal fun mapBittensorValidators(
     chain: Chain,
-    subnetId: Int,
+    netuid: BittensorNetuid,
     validators: List<BittensorValidator>,
     gates: BittensorValidatorGates,
     snapshot: BittensorValidatorSnapshot
 ): List<BittensorSubnetValidator> {
-    val isRoot = subnetId == 0
+    val isRoot = netuid.isRoot()
     return validators.mapNotNull { validator ->
         val uid = snapshot.uids[validator.hotkey] ?: return@mapNotNull null
         val take = snapshot.takes[validator.hotkey] ?: return@mapNotNull null

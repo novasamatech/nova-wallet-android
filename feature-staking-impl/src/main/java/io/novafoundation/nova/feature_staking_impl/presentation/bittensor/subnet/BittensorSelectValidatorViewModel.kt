@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.view.ButtonState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -41,7 +42,8 @@ class BittensorSelectValidatorViewModel(
 
     private val validatorsState = retryController.observe("validators") {
         flowOf {
-            val validators = bittensorValidatorInteractor.validators(request.subnetId)
+            val netuid = BittensorNetuid.from(request.subnetId)
+            val validators = bittensorValidatorInteractor.validators(netuid)
             validators.map { validator ->
                 val icon = icons.createAddressIcon(
                     validator.validator.hotkey.value,

@@ -9,7 +9,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 
 data class BittensorSubnet(
-    val id: BittensorSubnetId,
+    val id: BittensorNetuid.Subnet,
     val name: String,
     val symbol: String,
     val logoUrl: String?,
@@ -31,7 +31,7 @@ class BittensorSubnetInteractor(
 
     suspend fun subnets() = repository.subnets()
 
-    suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet = repository.subnet(subnetId)
+    suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = repository.subnet(subnetId)
 
     fun observeWallet() = portfolioRepository.observeWallet()
 
@@ -41,8 +41,8 @@ class BittensorSubnetInteractor(
 
     fun observeFavorites() = favorites.observeFavorites()
 
-    suspend fun toggleFavorite(metaId: Long, subnetId: BittensorSubnetId) = favorites.toggle(metaId, subnetId)
+    suspend fun toggleFavorite(metaId: Long, subnetId: BittensorNetuid.Subnet) = favorites.toggle(metaId, subnetId)
 
-    suspend fun quote(subnetId: BittensorSubnetId, amount: BigInteger): BittensorSubnetBuyQuote =
+    suspend fun quote(subnetId: BittensorNetuid.Subnet, amount: BigInteger): BittensorSubnetBuyQuote =
         bittensorSubnetQuoteInteractor.quoteBuy(ChainGeneses.BITTENSOR, subnetId, amount, slippage)
 }

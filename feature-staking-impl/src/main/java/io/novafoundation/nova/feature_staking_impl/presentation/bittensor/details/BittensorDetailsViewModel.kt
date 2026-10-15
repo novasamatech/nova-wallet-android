@@ -2,26 +2,26 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.onError
-import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPriceChartInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
@@ -201,7 +201,7 @@ class BittensorDetailsViewModel(
 
     private val subnetMetadata = reload.flatMapLatest {
         flow {
-            emit(emptyMap<BittensorSubnetId, BittensorSubnet>())
+            emit(emptyMap<BittensorNetuid.Subnet, BittensorSubnet>())
             try {
                 emit(bittensorPortfolioInteractor.subnets().associateBy { it.id })
             } catch (e: CancellationException) {

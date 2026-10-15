@@ -1,13 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.registry.TypeRegistry
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
+import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.FixedByteArray
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u16
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u64
-import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.useScaleWriter
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.metadata.ExtrinsicMetadata
@@ -15,14 +15,14 @@ import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.FunctionArgument
 import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import java.math.BigInteger
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockingDetails
 import org.mockito.Mockito.verifyNoInteractions
-import org.mockito.Mockito.`when`
-import java.math.BigInteger
 
 class BittensorStakingCallsTest {
 
@@ -93,9 +93,9 @@ class BittensorStakingCallsTest {
             `when`(builder.runtime).thenReturn(runtime)
             val hotkey = ByteArray(32) { 42 }
             if (buying) {
-                builder.addBittensorSubnetStake(BittensorSubnetId(64), hotkey, BigInteger.TEN, BigInteger.valueOf(100))
+                builder.addBittensorSubnetStake(BittensorNetuid.Subnet(64), hotkey, BigInteger.TEN, BigInteger.valueOf(100))
             } else {
-                builder.removeBittensorSubnetStake(BittensorSubnetId(64), hotkey, BigInteger.TEN, BigInteger.valueOf(100))
+                builder.removeBittensorSubnetStake(BittensorNetuid.Subnet(64), hotkey, BigInteger.TEN, BigInteger.valueOf(100))
             }
             val invocation = mockingDetails(builder).invocations.single { it.method.name == "call" }
             val call = invocation.getArgument<GenericCall.Instance>(0)
@@ -112,7 +112,7 @@ class BittensorStakingCallsTest {
     @Test
     fun `invalid subnet call parameters are rejected before creating a call`() {
         val builder = mock(ExtrinsicBuilder::class.java)
-        val subnetId = BittensorSubnetId(64)
+        val subnetId = BittensorNetuid.Subnet(64)
         assertTrue(runCatching { builder.addBittensorSubnetStake(subnetId, ByteArray(31), BigInteger.TEN, BigInteger.TEN) }.isFailure)
         assertTrue(runCatching { builder.removeBittensorSubnetStake(subnetId, ByteArray(32), BigInteger.ZERO, BigInteger.TEN) }.isFailure)
         assertTrue(runCatching { builder.addBittensorSubnetStake(subnetId, ByteArray(32), BigInteger.TEN, BigInteger.ZERO) }.isFailure)

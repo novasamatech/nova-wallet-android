@@ -15,14 +15,16 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.validation.notValidOrNull
-import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -171,7 +173,7 @@ class BittensorStakeAmountViewModel(
             .onEach(::setInitialAmount)
             .launchIn(viewModelScope)
 
-        validatorCommunicator.responseFlow.filter { it.subnetId == 0 }
+        validatorCommunicator.responseFlow.filter { BittensorNetuid.from(it.subnetId).isRoot() }
             .onEach {
                 try {
                     bittensorStakingInteractor.selectValidator(stakingDetails.first(), it.address)

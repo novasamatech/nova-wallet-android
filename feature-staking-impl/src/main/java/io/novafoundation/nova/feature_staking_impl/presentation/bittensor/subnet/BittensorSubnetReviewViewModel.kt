@@ -26,10 +26,10 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPreparedSubnetStake
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationPayload
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWalletContext
@@ -59,7 +59,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class BittensorSubnetReviewViewModel(
-    private val subnetId: BittensorSubnetId,
+    private val subnetId: BittensorNetuid.Subnet,
     private val totalInPlanks: BigInteger,
     private val metaId: Long,
     private val validatorAddress: String,

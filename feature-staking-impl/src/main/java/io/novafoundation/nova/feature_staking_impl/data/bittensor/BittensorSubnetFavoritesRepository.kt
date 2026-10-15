@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -23,7 +23,7 @@ class BittensorSubnetFavoritesRepository(
         }
     }
 
-    suspend fun toggle(metaId: Long, subnetId: BittensorSubnetId) = mutex.withLock {
+    suspend fun toggle(metaId: Long, subnetId: BittensorNetuid.Subnet) = mutex.withLock {
         check(accounts.getSelectedMetaAccount().id == metaId) { "The selected wallet has changed" }
         val key = key(metaId)
         val value = subnetId.value.toString()

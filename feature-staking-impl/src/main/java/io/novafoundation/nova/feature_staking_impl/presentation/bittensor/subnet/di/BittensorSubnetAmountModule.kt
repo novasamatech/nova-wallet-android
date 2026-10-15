@@ -9,7 +9,7 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -41,7 +41,7 @@ class BittensorSubnetAmountModule {
         bittensorAmountFormatter: BittensorAmountFormatter,
         amountChooserFactory: AmountChooserMixin.Factory
     ): ViewModel = BittensorSubnetAmountViewModel(
-        initialSubnetId = BittensorSubnetId(payload.subnetId),
+        initialSubnetId = BittensorNetuid.Subnet(payload.subnetId),
         validatorAddress = payload.validatorAddress,
         bittensorSubnetInteractor = bittensorSubnetInteractor,
         router = router,

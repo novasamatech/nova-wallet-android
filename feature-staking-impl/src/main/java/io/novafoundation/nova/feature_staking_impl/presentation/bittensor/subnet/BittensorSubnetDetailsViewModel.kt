@@ -10,11 +10,11 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChart
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 
 class BittensorSubnetDetailsViewModel(
-    private val subnetId: BittensorSubnetId,
+    private val subnetId: BittensorNetuid.Subnet,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
     private val router: StakingRouter,

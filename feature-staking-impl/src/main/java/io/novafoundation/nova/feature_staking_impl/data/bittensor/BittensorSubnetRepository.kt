@@ -3,8 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.hash.isPositive
@@ -20,7 +20,7 @@ interface BittensorSubnetRepository {
 
     suspend fun subnets(): List<BittensorSubnet>
 
-    suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet
+    suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet
 }
 
 class RealBittensorSubnetRepository(
@@ -46,7 +46,7 @@ class RealBittensorSubnetRepository(
         catalogue
     }
 
-    override suspend fun subnet(subnetId: BittensorSubnetId): BittensorSubnet = withTimeout(20_000L) {
+    override suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = withTimeout(20_000L) {
         val subnet = subnets().firstOrNull { it.id == subnetId } ?: throw NoSuchElementException("Subnet ${subnetId.value} is unavailable")
         val price = swapSource.currentAlphaPrice(ChainGeneses.BITTENSOR, subnetId)
         subnet.copy(priceInRao = price)
@@ -75,12 +75,12 @@ class RealBittensorSubnetRepository(
 internal fun bindBittensorSubnets(decoded: Any?): List<BittensorSubnet> = bindList(decoded) { item ->
     if (item == null) return@bindList null
     val value = item.castToStruct()
-    val id = bindBittensorU16(value["netuid"])
-    if (id == 0) return@bindList null
+    val netuid = BittensorNetuid.from(bindBittensorU16(value["netuid"]))
+    if (netuid !is BittensorNetuid.Subnet) return@bindList null
     // The SDK normalizes composite fields from metadata to camelCase.
     val identity = value.get<Any?>("subnetIdentity")?.castToStruct()
     BittensorSubnet(
-        id = BittensorSubnetId(id),
+        id = netuid,
         name = bindBittensorText(requireNotNull(value.get<Any?>("subnetName")) { "Subnet name field is missing" }),
         symbol = bindBittensorText(requireNotNull(value.get<Any?>("tokenSymbol")) { "Subnet symbol field is missing" }),
         logoUrl = identity?.get<Any?>("logoUrl")?.let(::bindBittensorText)?.takeIf { it.startsWith("https://") },

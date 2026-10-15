@@ -100,7 +100,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq"
     )
 
-    private val subnetId = BittensorSubnetId(1)
+    private val subnetId = BittensorNetuid.Subnet(1)
 
     private val quote = BittensorSubnetBuyQuote(
         subnetId,

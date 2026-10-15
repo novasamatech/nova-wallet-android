@@ -1,10 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
-import kotlin.time.Duration.Companion.minutes
 
 private const val MARKET_PAGE_SIZE = 250
 
@@ -21,11 +21,11 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
 
     private val mutex = Mutex()
 
-    private var cached = emptyMap<BittensorSubnetId, String>()
+    private var cached = emptyMap<BittensorNetuid.Subnet, String>()
 
     private var loadedAt = 0L
 
-    suspend fun priceId(subnetId: BittensorSubnetId): String? = mutex.withLock {
+    suspend fun priceId(subnetId: BittensorNetuid.Subnet): String? = mutex.withLock {
         if (loadedAt == 0L || System.nanoTime() - loadedAt > MARKET_CACHE_VALIDITY.inWholeNanoseconds) {
             cached = bindBittensorMarketIds(loadMarkets())
             loadedAt = System.nanoTime()
@@ -44,13 +44,13 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
     }
 }
 
-internal fun bindBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorSubnetId, String> = buildMap {
+internal fun bindBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map<BittensorNetuid.Subnet, String> = buildMap {
     rows.forEach { row ->
         val symbol = row.symbol?.trim()?.lowercase() ?: return@forEach
         if (!symbol.matches(SUBNET_SYMBOL_PATTERN)) return@forEach
         val netuid = symbol.drop(2).toIntOrNull()?.takeIf { it in 1..65535 } ?: return@forEach
         val id = row.id?.trim()?.takeIf { it.matches(MARKET_ID_PATTERN) } ?: return@forEach
-        val subnetId = BittensorSubnetId(netuid)
+        val subnetId = BittensorNetuid.Subnet(netuid)
         if (subnetId !in this) put(subnetId, id)
     }
 }

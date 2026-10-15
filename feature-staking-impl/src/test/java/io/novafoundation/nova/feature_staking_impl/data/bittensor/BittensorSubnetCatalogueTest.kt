@@ -1,6 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.call.RuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.ChainGeneses
@@ -33,7 +33,7 @@ class BittensorSubnetCatalogueTest {
 
     @Test
     fun `reuses catalogue metadata but fetches a current price for individual subnet lookups`() = runBlocking<Unit> {
-        val subnetId = BittensorSubnetId(1)
+        val subnetId = BittensorNetuid.Subnet(1)
         `when`(swaps.currentAlphaPrice(ChainGeneses.BITTENSOR, subnetId)).thenReturn(BigInteger.TEN, BigInteger.valueOf(20))
 
         repository.subnets()

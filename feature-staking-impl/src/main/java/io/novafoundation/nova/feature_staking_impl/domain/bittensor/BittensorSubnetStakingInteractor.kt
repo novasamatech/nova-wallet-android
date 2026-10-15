@@ -42,7 +42,7 @@ class BittensorSubnetStakingInteractor(
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
 
-    suspend fun maximumStake(metaId: Long, subnetId: BittensorSubnetId, validatorAddress: String): BigInteger = withTimeout(60_000L) {
+    suspend fun maximumStake(metaId: Long, subnetId: BittensorNetuid.Subnet, validatorAddress: String): BigInteger = withTimeout(60_000L) {
         requireSelectedWallet(metaId)
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val asset = wallets.assetFlow(metaId, chain.utilityAsset).first()
@@ -60,7 +60,7 @@ class BittensorSubnetStakingInteractor(
 
     suspend fun prepare(
         metaId: Long,
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         amount: BigInteger,
         validatorAddress: String
     ): BittensorPreparedSubnetStake = withTimeout(60_000L) {
@@ -87,7 +87,7 @@ class BittensorSubnetStakingInteractor(
         }.requireOk().getOrThrow()
     }.onFailure { if (it is CancellationException) throw it }
 
-    private suspend fun requireEligibleValidator(chain: Chain, subnetId: BittensorSubnetId, address: String): BittensorValidator {
+    private suspend fun requireEligibleValidator(chain: Chain, subnetId: BittensorNetuid.Subnet, address: String): BittensorValidator {
         val eligibleValidator = validators.validators(chain, subnetId).firstOrNull { it.address == address && it.selectable }
         return requireNotNull(eligibleValidator) { "Validator is no longer eligible in this subnet" }.validator
     }
@@ -96,7 +96,7 @@ class BittensorSubnetStakingInteractor(
         check(accounts.getSelectedMetaAccount().id == metaId) { "The staking wallet has changed" }
     }
 
-    suspend fun validators(subnetId: BittensorSubnetId) = validators.validators(chainRegistry.getChain(ChainGeneses.BITTENSOR), subnetId)
+    suspend fun validators(subnetId: BittensorNetuid.Subnet) = validators.validators(chainRegistry.getChain(ChainGeneses.BITTENSOR), subnetId)
 
     private suspend fun requireAffordable(chain: Chain, metaId: Long, amount: BigInteger, fee: Fee) {
         val asset = wallets.assetFlow(metaId, chain.utilityAsset).first()

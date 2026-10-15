@@ -1,10 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetBuyQuote
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapDirection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapSimulation
+import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.dynamic.DynamicTypeResolver
 import io.novasama.substrate_sdk_android.runtime.definitions.registry.TypeRegistry
@@ -12,7 +13,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.TypeReference
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.BooleanType
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.FixedByteArray
-import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u16
 import io.novasama.substrate_sdk_android.runtime.definitions.types.primitives.u64
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -21,14 +21,14 @@ import io.novasama.substrate_sdk_android.runtime.metadata.RuntimeMetadata
 import io.novasama.substrate_sdk_android.runtime.metadata.module.FunctionArgument
 import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import java.math.BigInteger
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.mockingDetails
-import org.mockito.Mockito.`when`
-import java.math.BigInteger
 
 class BittensorSubnetStakeOperationTest {
 
@@ -85,7 +85,7 @@ class BittensorSubnetStakeOperationTest {
     }
 
     private fun quote(fee: BigInteger): BittensorSubnetBuyQuote {
-        val subnet = BittensorSubnetId(64)
+        val subnet = BittensorNetuid.Subnet(64)
         return BittensorSubnetBuyQuote(
             subnet,
             BigInteger.valueOf(1000),

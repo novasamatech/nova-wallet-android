@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.common.base.BaseViewModel
-import io.novafoundation.nova.common.utils.withSafeLoading
-import kotlinx.coroutines.flow.flatMapLatest
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isError
 import io.novafoundation.nova.common.domain.isLoading
@@ -14,10 +12,11 @@ import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetBuyQuote
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -41,11 +40,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 class BittensorSubnetAmountViewModel(
-    private val initialSubnetId: BittensorSubnetId,
+    private val initialSubnetId: BittensorNetuid.Subnet,
     private val validatorAddress: String,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
@@ -187,7 +187,7 @@ class BittensorSubnetAmountViewModel(
 
     fun back() = router.back()
 
-    private data class QuoteRequest(val metaId: Long, val subnetId: BittensorSubnetId, val amount: BigInteger)
+    private data class QuoteRequest(val metaId: Long, val subnetId: BittensorNetuid.Subnet, val amount: BigInteger)
 
     private data class QuoteResult(val request: QuoteRequest, val quote: BittensorSubnetBuyQuote)
 

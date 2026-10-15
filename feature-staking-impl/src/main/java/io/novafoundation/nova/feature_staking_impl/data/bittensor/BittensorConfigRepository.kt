@@ -2,15 +2,15 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.memory.SingleValueCache
 import io.novafoundation.nova.common.utils.isNonNegative
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetCommission
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import java.math.BigDecimal
 
-data class BittensorConfig(val commission: BittensorSubnetCommission, val subnetLogos: Map<BittensorSubnetId, String>)
+data class BittensorConfig(val commission: BittensorSubnetCommission, val subnetLogos: Map<BittensorNetuid.Subnet, String>)
 
 fun interface BittensorConfigRepository {
 
@@ -49,7 +49,7 @@ internal fun bindBittensorConfig(remote: BittensorConfigRemote): BittensorConfig
         for (subnet in subnets.filterNotNull()) {
             val netuid = subnet.netuid?.takeIf { it in 1..65535 } ?: continue
             val logo = subnet.logo?.toHttpUrlOrNull()?.takeIf { it.isHttps } ?: continue
-            val subnetId = BittensorSubnetId(netuid)
+            val subnetId = BittensorNetuid.Subnet(netuid)
             if (!containsKey(subnetId)) put(subnetId, logo.toString())
         }
     }

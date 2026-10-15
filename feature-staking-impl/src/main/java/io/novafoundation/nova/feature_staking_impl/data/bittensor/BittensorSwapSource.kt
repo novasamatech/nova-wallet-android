@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapDirection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapSimulation
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
@@ -12,13 +12,13 @@ interface BittensorSwapSource {
 
     suspend fun simulate(
         chainId: String,
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         direction: BittensorSwapDirection,
         amountIn: BigInteger
     ): BittensorSwapSimulation
 
     /** Current marginal price in rao per one alpha; not the average price of a simulation. */
-    suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorSubnetId): BigInteger
+    suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger
 }
 
 class RealBittensorSwapSource(
@@ -27,7 +27,7 @@ class RealBittensorSwapSource(
 
     override suspend fun simulate(
         chainId: String,
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         direction: BittensorSwapDirection,
         amountIn: BigInteger
     ): BittensorSwapSimulation {
@@ -45,7 +45,7 @@ class RealBittensorSwapSource(
         )
     }
 
-    override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorSubnetId): BigInteger {
+    override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger {
         return runtimeCallsApi.forChain(chainId).call(
             section = "SwapRuntimeApi",
             method = "current_alpha_price",
@@ -57,7 +57,7 @@ class RealBittensorSwapSource(
 
 internal fun bindBittensorSwapSimulation(
     decoded: Any?,
-    subnetId: BittensorSubnetId,
+    subnetId: BittensorNetuid.Subnet,
     direction: BittensorSwapDirection,
     requestedAmount: BigInteger
 ): BittensorSwapSimulation {

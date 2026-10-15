@@ -28,19 +28,19 @@ class BittensorSubnetInteractorTest {
 
     @Test
     fun `subnet lookup uses the id rather than catalogue order`() = runBlocking {
-        val first = BittensorSubnet(BittensorSubnetId(2), "Second", "B", null)
-        val requested = BittensorSubnet(BittensorSubnetId(1), "First", "A", null)
+        val first = BittensorSubnet(BittensorNetuid.Subnet(2), "Second", "B", null)
+        val requested = BittensorSubnet(BittensorNetuid.Subnet(1), "First", "A", null)
         `when`(repository.subnet(requested.id)).thenReturn(requested)
 
-        assertEquals(requested, bittensorSubnetInteractor.subnet(BittensorSubnetId(1)))
+        assertEquals(requested, bittensorSubnetInteractor.subnet(BittensorNetuid.Subnet(1)))
     }
 
     @Test
     fun `missing subnet does not select a different subnet`() = runBlocking {
-        val other = BittensorSubnet(BittensorSubnetId(2), "Second", "B", null)
-        `when`(repository.subnet(BittensorSubnetId(1))).thenThrow(NoSuchElementException("Subnet is unavailable"))
+        val other = BittensorSubnet(BittensorNetuid.Subnet(2), "Second", "B", null)
+        `when`(repository.subnet(BittensorNetuid.Subnet(1))).thenThrow(NoSuchElementException("Subnet is unavailable"))
 
-        val failure = runCatching { bittensorSubnetInteractor.subnet(BittensorSubnetId(1)) }.exceptionOrNull()
+        val failure = runCatching { bittensorSubnetInteractor.subnet(BittensorNetuid.Subnet(1)) }.exceptionOrNull()
 
         assertTrue(failure is NoSuchElementException)
     }

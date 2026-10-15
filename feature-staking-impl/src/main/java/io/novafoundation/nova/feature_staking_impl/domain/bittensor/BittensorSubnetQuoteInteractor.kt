@@ -1,15 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.utils.isNonNegative
-import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withTimeout
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withTimeout
 
 /**
  * A buy quote denominated in atomic TAO/alpha units (10^9). The user's total TAO input
@@ -17,7 +17,7 @@ import java.math.RoundingMode
  * A quote is informational until its validator, wallet, fee recipient and balance are validated for submission.
  */
 data class BittensorSubnetBuyQuote(
-    val subnetId: BittensorSubnetId,
+    val subnetId: BittensorNetuid.Subnet,
     val totalTaoInPlanks: BigInteger,
     val serviceFeeTaoInPlanks: BigInteger,
     val simulation: BittensorSwapSimulation,
@@ -49,7 +49,7 @@ class BittensorSubnetQuoteInteractor(
 
     suspend fun quoteBuy(
         chainId: String,
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         totalTaoInPlanks: BigInteger,
         slippage: BittensorSlippage
     ): BittensorSubnetBuyQuote = withTimeout(20_000L) {

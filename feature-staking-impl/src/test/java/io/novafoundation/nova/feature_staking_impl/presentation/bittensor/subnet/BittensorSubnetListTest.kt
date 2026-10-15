@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
-import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -44,7 +44,7 @@ class BittensorSubnetListTest {
     }
 
     private fun row(id: Int) = BittensorSubnetRowUi(
-        subnet = BittensorSubnet(BittensorSubnetId(id), "Subnet $id", "alpha", null),
+        subnet = BittensorSubnet(BittensorNetuid.Subnet(id), "Subnet $id", "alpha", null),
         metaId = 7L,
         favorite = false,
         price = "0.01 ${symbol.value}"
