@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_deep_linking.presentation.handling.common
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.DAppHandlingException
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.ImportMnemonicHandlingException
 import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.ReferendumHandlingException
+import io.novafoundation.nova.feature_deep_linking.presentation.handling.common.DeepLinkHandlingException.StakingHandlingException
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_deep_linking.R
 
@@ -13,6 +14,17 @@ fun formatDeepLinkHandlingException(resourceManager: ResourceManager, exception:
         is DAppHandlingException -> handleDAppException(resourceManager, exception)
 
         is ImportMnemonicHandlingException -> handleImportMnemonicException(resourceManager, exception)
+
+        is StakingHandlingException -> handleStakingException(resourceManager, exception)
+    }
+}
+
+fun handleStakingException(resourceManager: ResourceManager, exception: StakingHandlingException): String {
+    return when (exception) {
+        StakingHandlingException.ChainIsNotFound,
+        StakingHandlingException.AssetIsNotFound -> resourceManager.getString(R.string.deep_linking_chain_id_is_not_found)
+
+        StakingHandlingException.StakingIsNotSupported -> resourceManager.getString(R.string.deep_linking_staking_is_not_supported)
     }
 }
 
