@@ -12,7 +12,7 @@ import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepos
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.RealStakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.RealStakingStatsDataSource
@@ -31,7 +31,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import javax.inject.Named
 
@@ -73,8 +72,7 @@ class StakingDashboardModule {
         poolAccountDerivation: PoolAccountDerivation,
         storageCache: StorageCache,
         balanceLocksRepository: BalanceLocksRepository,
-        bittensorPortfolioLoader: BittensorPortfolioLoader,
-        chainStateRepository: ChainStateRepository,
+        bittensorPositionRepository: BittensorPositionRepository,
     ) = StakingDashboardUpdaterFactory(
         stakingDashboardCache = stakingDashboardCache,
         remoteStorageSource = remoteStorageSource,
@@ -82,8 +80,7 @@ class StakingDashboardModule {
         poolAccountDerivation = poolAccountDerivation,
         storageCache = storageCache,
         balanceLocksRepository = balanceLocksRepository,
-        bittensorPortfolioLoader = bittensorPortfolioLoader,
-        chainStateRepository = chainStateRepository
+        bittensorPositionRepository = bittensorPositionRepository
     )
 
     @Provides

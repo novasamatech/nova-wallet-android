@@ -48,9 +48,11 @@ internal fun mapBittensorMarketIds(rows: List<BittensorSubnetMarketRemote>): Map
     rows.forEach { row ->
         val symbol = row.symbol?.trim()?.lowercase() ?: return@forEach
         if (!symbol.matches(SUBNET_SYMBOL_PATTERN)) return@forEach
-        val netuid = symbol.drop(2).toIntOrNull()?.takeIf { it in 1..65535 } ?: return@forEach
+        val netuid = symbol.drop(2)
+            .toIntOrNull() ?: return@forEach
+        val subnetId = runCatching { BittensorNetuid.Subnet(netuid) }
+            .getOrNull() ?: return@forEach
         val id = row.id?.trim()?.takeIf { it.matches(MARKET_ID_PATTERN) } ?: return@forEach
-        val subnetId = BittensorNetuid.Subnet(netuid)
         if (subnetId !in this) put(subnetId, id)
     }
 }

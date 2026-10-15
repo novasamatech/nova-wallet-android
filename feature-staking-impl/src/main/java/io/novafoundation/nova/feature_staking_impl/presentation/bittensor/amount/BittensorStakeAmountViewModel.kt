@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -14,17 +15,18 @@ import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
-import io.novafoundation.nova.common.validation.notValidOrNull
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationPayload
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBittensorStake
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -67,8 +69,9 @@ class BittensorStakeAmountViewModel(
     private val retryController: BittensorRetryController,
     private val bittensorAmountFormatter: BittensorAmountFormatter,
     private val amountChooserFactory: AmountChooserMixin.Factory,
-    private val stakeValidationSystem: BittensorStakeValidationSystem
-) : BaseViewModel() {
+    private val stakeValidationSystem: BittensorStakePreflightSystem,
+    private val validationExecutor: ValidationExecutor
+) : BaseViewModel(), Validatable by validationExecutor {
 
     val retryEvents = retryController.events
 
@@ -220,12 +223,27 @@ class BittensorStakeAmountViewModel(
 
     fun continueClicked() = launchUnit {
         if (preparing.value || continueButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
+        val request = feeRequest.first() ?: return@launchUnit
+        val fee = currentFee.first()?.state?.dataOrNull ?: return@launchUnit
         preparing.value = true
         try {
-            val request = feeRequest.first() ?: return@launchUnit
-            val details = stakingDetails.first()
-            val fee = currentFee.first()?.state?.dataOrNull ?: return@launchUnit
-            if (!validateStake(request, details, fee)) return@launchUnit
+            val payload = bittensorStakingInteractor.validationPayload(request, fee, checkRootHold = true)
+            validationExecutor.requireValid(
+                validationSystem = stakeValidationSystem,
+                payload = payload,
+                progressConsumer = preparing.progressConsumer(),
+                validationFailureTransformer = { resourceManager.getString(R.string.common_error_general_title) to it.message(resourceManager) }
+            ) { prepareStake(request) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            preparing.value = false
+            showError(e)
+        }
+    }
+
+    private fun prepareStake(request: BittensorRootStakeRequest) = launchUnit {
+        try {
             bittensorStakingInteractor.prepareRootStake(request)
             router.openBittensorStakeConfirm()
         } catch (e: CancellationException) {
@@ -255,17 +273,6 @@ class BittensorStakeAmountViewModel(
         } catch (e: Exception) {
             showError(e)
         }
-    }
-
-    private suspend fun validateStake(request: BittensorRootStakeRequest, details: BittensorRootStakingDetails, fee: Fee): Boolean {
-        val amount = details.asset.token.amountFromPlanks(request.amountInPlanks)
-        val payload = BittensorStakeValidationPayload(request.metaId, details.metaId, details.asset, amount, fee)
-        val failure = stakeValidationSystem.validate(payload)
-            .getOrThrow()
-            .notValidOrNull() ?: return true
-
-        showError(failure.reason.message(resourceManager))
-        return false
     }
 
     private fun setInitialAmount(details: BittensorRootStakingDetails) {
@@ -298,7 +305,7 @@ class BittensorStakeAmountViewModel(
 
     private fun maxAvailableInPlanks(details: BittensorRootStakingDetails, fee: Fee?): BigInteger {
         val feeInPlanks = fee?.maxAmountDeductionFor(details.asset.token.configuration) ?: BigInteger.ZERO
-        return (details.asset.transferableInPlanks - feeInPlanks).coerceAtLeast(BigInteger.ZERO)
+        return maximumBittensorStake(details.asset.transferableInPlanks, feeInPlanks)
     }
 
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =

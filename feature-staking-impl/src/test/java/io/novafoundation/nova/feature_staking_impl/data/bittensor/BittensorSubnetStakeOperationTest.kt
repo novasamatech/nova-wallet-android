@@ -101,7 +101,9 @@ class BittensorSubnetStakeOperationTest {
                 BigInteger.ZERO
             ),
             BigInteger.valueOf(1005),
-            java.math.BigDecimal("0.003")
+            java.math.BigDecimal("0.003"),
+            BigInteger.valueOf(1000),
+            0L
         )
     }
 

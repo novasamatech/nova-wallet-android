@@ -25,6 +25,7 @@ class StakingUpdaters(
     private val turingExtraUpdaters: Group,
     private val nominationPoolsUpdaters: Group,
     private val mythosUpdaters: Group,
+    private val bittensorUpdaters: Group,
 ) {
 
     class Group(val updaters: List<SharedStateBasedUpdater<*>>) {
@@ -59,7 +60,8 @@ class StakingUpdaters(
             TURING -> parachainUpdaters.updaters + turingExtraUpdaters.updaters
             NOMINATION_POOLS -> nominationPoolsUpdaters.updaters
             MYTHOS -> mythosUpdaters.updaters
-            UNSUPPORTED, StakingType.BITTENSOR_ROOT -> emptyList()
+            StakingType.BITTENSOR_ROOT -> bittensorUpdaters.updaters
+            UNSUPPORTED -> emptyList()
         }
 
         return byTypeUpdaters.groupBySyncingChain(stakingChain)

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confi
 
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -31,6 +32,7 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
     }
 
     override fun subscribe(viewModel: BittensorStakeConfirmViewModel) {
+        observeValidations(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         setupExternalActions(viewModel)
 

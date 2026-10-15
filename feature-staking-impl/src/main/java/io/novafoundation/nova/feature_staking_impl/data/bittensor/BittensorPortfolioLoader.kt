@@ -3,27 +3,34 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPosition
-import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withTimeout
 
 class BittensorPortfolioLoader(
-    private val positionSource: BittensorPositionSource,
     private val swapSource: BittensorSwapSource,
     private val logger: Logger
 ) {
 
-    suspend fun load(chainId: String, coldKey: AccountId, rootOnly: Boolean = false): BittensorPortfolioPositions = withTimeout(POSITIONS_TIMEOUT_MILLIS) {
-        val positions = positionSource.positions(chainId, coldKey)
-        if (rootOnly) return@withTimeout BittensorPortfolioPositions(positions.root, emptyList(), emptyMap())
-        val prices = loadSubnetPrices(chainId, positions.subnets)
+    suspend fun load(chainId: String, positions: BittensorStakePositions): BittensorPortfolioPositions {
+        val prices = try {
+            withTimeout(PRICES_TIMEOUT_MILLIS) { loadSubnetPrices(chainId, positions.subnets) }
+        } catch (e: TimeoutCancellationException) {
+            currentCoroutineContext().ensureActive()
+            logger.log("[BittensorPortfolio] Timed out loading subnet prices")
+            logger.log(e)
+            emptyMap()
+        }
 
-        BittensorPortfolioPositions(positions.root, positions.subnets, prices)
+        return BittensorPortfolioPositions(positions.root, positions.subnets, prices)
     }
 
     private suspend fun loadSubnetPrices(chainId: String, positions: List<BittensorSubnetPosition>): Map<BittensorNetuid.Subnet, BigInteger> {
@@ -53,7 +60,7 @@ class BittensorPortfolioLoader(
 
     private companion object {
 
-        const val POSITIONS_TIMEOUT_MILLIS = 20_000L
+        const val PRICES_TIMEOUT_MILLIS = 20_000L
 
         const val MAX_CONCURRENT_PRICE_REQUESTS = 4
     }

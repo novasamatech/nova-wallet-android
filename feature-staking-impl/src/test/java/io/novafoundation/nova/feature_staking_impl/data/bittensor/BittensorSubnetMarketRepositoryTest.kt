@@ -13,11 +13,13 @@ class BittensorSubnetMarketRepositoryTest {
             BittensorSubnetMarketRemote("wrong", "theta"),
             BittensorSubnetMarketRemote("root", "sn0"),
             BittensorSubnetMarketRemote("overflow", "sn65536"),
+            BittensorSubnetMarketRemote("last-subnet", "sn65535"),
             BittensorSubnetMarketRemote("invalid/id", "sn9"),
             BittensorSubnetMarketRemote("duplicate", "sn8"),
             BittensorSubnetMarketRemote(null, "sn10")
         )
 
-        assertEquals(mapOf(BittensorNetuid.Subnet(8) to "vanta"), mapBittensorMarketIds(rows))
+        val expected = mapOf(BittensorNetuid.Subnet(8) to "vanta", BittensorNetuid.Subnet(65535) to "last-subnet")
+        assertEquals(expected, mapBittensorMarketIds(rows))
     }
 }

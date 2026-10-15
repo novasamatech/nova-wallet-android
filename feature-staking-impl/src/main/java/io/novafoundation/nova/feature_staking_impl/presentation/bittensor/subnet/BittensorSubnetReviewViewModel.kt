@@ -6,6 +6,7 @@ import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isError
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.presentation.fallbackIcon
@@ -17,9 +18,10 @@ import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
-import io.novafoundation.nova.common.validation.notValidOrNull
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -28,8 +30,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPreparedSubnetStake
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationPayload
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
@@ -37,7 +38,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWal
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorStakeValidationFailureUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
 import io.novafoundation.nova.feature_wallet_api.domain.model.TokenBase
@@ -57,6 +58,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
 class BittensorSubnetReviewViewModel(
@@ -68,7 +70,7 @@ class BittensorSubnetReviewViewModel(
     private val router: StakingRouter,
     chainRegistry: ChainRegistry,
     walletUiUseCase: WalletUiUseCase,
-    selectedAccountUseCase: SelectedAccountUseCase,
+    accountRepository: AccountRepository,
     private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
     private val resources: ResourceManager,
     private val icons: AssetIconProvider,
@@ -76,17 +78,19 @@ class BittensorSubnetReviewViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val retryController: BittensorRetryController,
     private val bittensorAmountFormatter: BittensorAmountFormatter,
-    private val stakeValidationSystem: BittensorStakeValidationSystem
-) : BaseViewModel(), ExternalActions by externalActions {
+    private val validationSystem: BittensorStakePreflightSystem,
+    private val validationExecutor: ValidationExecutor
+) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     val retryEvents = retryController.events
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
 
-    val wallet = walletUiUseCase.selectedWalletUiFlow()
+    val wallet = walletUiUseCase.walletUiFlow(metaId)
         .shareInBackground()
 
-    val account = selectedAccountUseCase.selectedAddressModelFlow(chain::await)
+    val account = accountRepository.metaAccountFlow(metaId)
+        .map { walletUiUseCase.walletAddressModel(it, chain.await(), AddressIconGenerator.SIZE_MEDIUM) }
         .shareInBackground()
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
@@ -94,20 +98,26 @@ class BittensorSubnetReviewViewModel(
     val resultState = submission.map { it.result }
         .shareInBackground()
 
-    private val walletState = retryController.observe("staking wallet", bittensorSubnetInteractor::observeWallet)
+    private val walletState = retryController.observe("staking wallet") { bittensorSubnetStakingInteractor.observeWallet(metaId) }
         .shareInBackground()
 
     private val walletContext = walletState.filterLoaded()
         .shareInBackground()
 
+    private val preparationRefresh = MutableStateFlow(0)
+
+    private val validating = MutableStateFlow(false)
+
     private val preparationState = retryController.observe("stake preparation") {
-        flowOf {
-            bittensorSubnetStakingInteractor.prepare(
-                metaId,
-                subnetId,
-                totalInPlanks,
-                validatorAddress
-            )
+        preparationRefresh.flatMapLatest {
+            flowOf {
+                bittensorSubnetStakingInteractor.prepare(
+                    metaId,
+                    subnetId,
+                    totalInPlanks,
+                    validatorAddress
+                )
+            }
         }
     }
         .shareInBackground()
@@ -135,9 +145,6 @@ class BittensorSubnetReviewViewModel(
     val validator = draft.map { it?.validator?.name ?: resources.getString(R.string.bittensor_select_validator) }
         .shareInBackground()
 
-    val walletChanged = walletState.map { it.dataOrNull?.metaId?.let { currentMetaId -> currentMetaId != metaId } == true }
-        .shareInBackground()
-
     private val nativeToken = walletContext.map { it.asset.token }
         .shareInBackground()
 
@@ -156,9 +163,9 @@ class BittensorSubnetReviewViewModel(
     }
         .shareInBackground()
 
-    val confirmButtonState = combine(draft, walletChanged, submission, hasError) { draft, changed, submission, failed ->
+    val confirmButtonState = combine(draft, validating, submission, hasError) { draft, validating, submission, failed ->
         val label = resources.getString(R.string.common_confirm)
-        if (draft == null || changed || !submission.canSubmit || failed) DescriptiveButtonState.Disabled(label) else DescriptiveButtonState.Enabled(label)
+        if (draft == null || validating || !submission.canSubmit || failed) DescriptiveButtonState.Disabled(label) else DescriptiveButtonState.Enabled(label)
     }
         .shareInBackground()
 
@@ -167,32 +174,41 @@ class BittensorSubnetReviewViewModel(
     }
 
     fun confirmClicked() = launchUnit {
-        if (!submission.value.canSubmit || hasError.first() || walletChanged.first()) return@launchUnit
+        if (!submission.value.canSubmit || hasError.first() || validating.value) return@launchUnit
         val prepared = draft.first() ?: return@launchUnit
-        if (!validateStake(prepared)) return@launchUnit
+        validating.value = true
+        try {
+            val payload = bittensorSubnetStakingInteractor.validationPayload(prepared)
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                progressConsumer = validating.progressConsumer(),
+                validationFailureTransformerCustom = { failure, actions ->
+                    bittensorStakeValidationFailureUi(failure, actions, resources) { preparationRefresh.value += 1 }
+                }
+            ) { executeStake(prepared) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            showError(e)
+        } finally {
+            validating.value = false
+        }
+    }
+
+    private fun executeStake(prepared: BittensorSubnetStakeDraft) = launchUnit {
         if (!submission.value.canSubmit) return@launchUnit
         submission.value = BittensorSubmissionState.Submitting(mapProgress())
         try {
-            bittensorSubnetStakingInteractor.execute(prepared)
-                .getOrThrow()
+            bittensorSubnetStakingInteractor.execute(prepared).getOrThrow()
             submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             showFailure(e)
+        } finally {
+            validating.value = false
         }
-    }
-
-    private suspend fun validateStake(draft: BittensorSubnetStakeDraft): Boolean {
-        val wallet = walletContext.first()
-        val amount = wallet.asset.token.amountFromPlanks(totalInPlanks)
-        val payload = BittensorStakeValidationPayload(metaId, wallet.metaId, wallet.asset, amount, draft.fee)
-        val failure = stakeValidationSystem.validate(payload)
-            .getOrThrow()
-            .notValidOrNull() ?: return true
-
-        showError(failure.reason.message(resources))
-        return false
     }
 
     private fun mapProgress(): BittensorStakeResultUi.Progress = BittensorStakeResultUi.Progress(

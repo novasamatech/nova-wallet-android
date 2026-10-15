@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bittensor_validation_fee_reserve">Оставьте достаточно средств для комиссии сети и резерва на комиссию стейкинга.</string>
+    <string name="bittensor_validation_minimum_stake">Сумма после вычета комиссий сервиса и пула меньше минимального стейка.</string>
+    <string name="bittensor_validation_hotkey">Этот валидатор больше не зарегистрирован. Выберите другого валидатора.</string>
+    <string name="bittensor_validation_staking_disabled">Стейкинг в этой сети недоступен.</string>
+    <string name="bittensor_validation_root_locked">Период блокировки root-стейкинга ещё не завершён. Попробуйте позже.</string>
+    <string name="bittensor_validation_coldkey_swap">Стейкинг недоступен, пока ожидается смена coldkey.</string>
+    <string name="bittensor_validation_safe_mode">Сеть находится в безопасном режиме. Попробуйте позже.</string>
+    <string name="bittensor_validation_quote_unavailable">Обмен в этом сабнете сейчас недоступен. Попробуйте позже.</string>
+    <string name="bittensor_validation_quote_expired">Котировка устарела и обновляется. Проверьте новые суммы и подтвердите операцию ещё раз.</string>
+    <string name="bittensor_validation_slippage">Операция превышает допустимое проскальзывание. Уменьшите сумму или проверьте настройки проскальзывания.</string>
+    <string name="bittensor_price_impact_title">Высокое влияние на цену</string>
+    <string name="bittensor_validation_price_impact">Эта операция изменит цену в пуле более чем на 1%. Продолжить?</string>
+</resources>

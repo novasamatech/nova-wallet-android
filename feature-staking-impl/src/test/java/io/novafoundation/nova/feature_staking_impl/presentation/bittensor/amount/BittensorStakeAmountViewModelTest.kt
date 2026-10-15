@@ -5,17 +5,20 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.validation.FieldValidator
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakePreflightRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
+import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSelectedWalletValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingFlowState
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -70,6 +73,8 @@ class BittensorStakeAmountViewModelTest {
 
     private val repository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = assets
+
+        override fun observeRootStakingDetails(metaId: Long) = assets
     }
 
     private val extrinsics = mock(ExtrinsicService::class.java)
@@ -82,7 +87,7 @@ class BittensorStakeAmountViewModelTest {
 
     private val flowState = BittensorStakingFlowState()
 
-    private val interactor = BittensorStakingInteractor(repository, extrinsics, flowState, accounts, wallets, validators)
+    private val interactor = BittensorStakingInteractor(repository, extrinsics, flowState, wallets, validators)
 
     private val router = mock(StakingRouter::class.java)
 
@@ -102,9 +107,17 @@ class BittensorStakeAmountViewModelTest {
 
     private val amountFormatter = BittensorAmountFormatter(tokenFormatter, fiatFormatter, resources)
 
-    private val walletValidation = BittensorSelectedWalletValidation()
+    private val preflightRepository = mock(BittensorStakePreflightRepository::class.java)
 
-    private val validationSystem = bittensorStakeValidationSystem(walletValidation)
+    private val bittensorModule = BittensorStakeValidationsModule()
+
+    private val balanceValidationSystem = bittensorModule.provideStakeValidationSystem()
+
+    private val preflightValidation = BittensorStakePreflightValidation(preflightRepository, accounts, wallets, balanceValidationSystem)
+
+    private val validationSystem = ValidationSystem(preflightValidation)
+
+    private val validationExecutor = ValidationExecutor()
 
     private val chooser = mock(AmountChooserMixin.Presentation::class.java)
 
@@ -139,7 +152,8 @@ class BittensorStakeAmountViewModelTest {
             retryController = retryController,
             bittensorAmountFormatter = amountFormatter,
             amountChooserFactory = chooserFactory,
-            stakeValidationSystem = validationSystem
+            stakeValidationSystem = validationSystem,
+            validationExecutor = validationExecutor
         )
     }
 
@@ -158,7 +172,7 @@ class BittensorStakeAmountViewModelTest {
             viewModel.amount.first { it.isEmpty() }
 
             assets.emit(details(11))
-            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal(11)) == 0 }
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("10.99")) == 0 }
 
             assertEquals("", viewModel.amount.first())
         }
@@ -169,7 +183,7 @@ class BittensorStakeAmountViewModelTest {
         withTimeout(3_000L) {
             viewModel.amountChanged("3")
             assets.emit(details(10))
-            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal.TEN) == 0 }
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("9.99")) == 0 }
 
             assertEquals("3", viewModel.amount.first())
         }

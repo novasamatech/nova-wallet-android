@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amoun
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -41,6 +42,7 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
     }
 
     override fun subscribe(viewModel: BittensorStakeAmountViewModel) {
+        observeValidations(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.amountModel.observe(binder.bittensorStakeAmount::setChooseAmountModel)
         viewModel.amount.observe(::showAmount)

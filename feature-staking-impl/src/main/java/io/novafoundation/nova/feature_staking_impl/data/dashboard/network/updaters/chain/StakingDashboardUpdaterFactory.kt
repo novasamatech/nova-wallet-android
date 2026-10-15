@@ -4,7 +4,7 @@ import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
@@ -13,7 +13,6 @@ import io.novafoundation.nova.runtime.ext.StakingTypeGroup
 import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import kotlinx.coroutines.flow.Flow
 
@@ -24,8 +23,7 @@ class StakingDashboardUpdaterFactory(
     private val poolAccountDerivation: PoolAccountDerivation,
     private val storageCache: StorageCache,
     private val balanceLocksRepository: BalanceLocksRepository,
-    private val bittensorPortfolioLoader: BittensorPortfolioLoader,
-    private val chainStateRepository: ChainStateRepository,
+    private val bittensorPositionRepository: BittensorPositionRepository,
 ) {
 
     fun createUpdater(
@@ -43,9 +41,8 @@ class StakingDashboardUpdaterFactory(
                 chain,
                 chain.utilityAsset,
                 metaAccount,
-                bittensorPortfolioLoader,
-                stakingDashboardCache,
-                chainStateRepository
+                bittensorPositionRepository,
+                stakingDashboardCache
             )
             StakingTypeGroup.UNSUPPORTED -> null
         }

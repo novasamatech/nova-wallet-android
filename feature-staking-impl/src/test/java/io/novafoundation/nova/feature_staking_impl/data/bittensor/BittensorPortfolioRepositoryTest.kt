@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -36,21 +37,33 @@ import org.mockito.Mockito.verifyNoInteractions
 class BittensorPortfolioRepositoryTest {
 
     private val registry = mock(ChainRegistry::class.java)
+
     private val accounts = mock(AccountRepository::class.java)
+
     private val wallet = mock(WalletRepository::class.java)
+
     private val chain = mock(Chain::class.java)
+
     private val chainAsset = mock(Chain.Asset::class.java)
+
     private val chainStateRepository = mock(ChainStateRepository::class.java)
 
     private val blockNumbers = MutableStateFlow(BigInteger.ZERO)
+
     private val swapSource = mock(BittensorSwapSource::class.java)
+
     private val logger = mock(Logger::class.java)
+
     private val asset = mock(Asset::class.java)
+
     private var positionRequests = 0
+
     private var failFirstWallet = false
 
     private var rootStake = BigInteger.TEN
+
     private val selected = MutableStateFlow(account(1L))
+
     private val positions = object : BittensorPositionSource {
         override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions {
             positionRequests++
@@ -79,7 +92,7 @@ class BittensorPortfolioRepositoryTest {
         }
 
         assertNull(portfolio.positions)
-        verify(logger).log("[BittensorPortfolio] Failed to refresh positions")
+        verify(logger).log("[BittensorPositions] Failed to refresh positions")
         verify(logger).log((portfolio.dataStatus as BittensorDataStatus.Stale).cause)
         assertEquals(asset, repository.observeAsset().first())
     }
@@ -158,7 +171,13 @@ class BittensorPortfolioRepositoryTest {
         `when`(it.accountIdIn(chain)).thenReturn(ByteArray(32) { id.toByte() })
     }
 
-    private val portfolioLoader = BittensorPortfolioLoader(positions, swapSource, logger)
+    private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
 
-    private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, portfolioLoader, chainStateRepository, logger)
+    private val commonModule = CommonModule()
+
+    private val computationalCache = commonModule.provideComputationalCache()
+
+    private val positionRepository = RealBittensorPositionRepository(positions, portfolioLoader, chainStateRepository, computationalCache, logger)
+
+    private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository)
 }

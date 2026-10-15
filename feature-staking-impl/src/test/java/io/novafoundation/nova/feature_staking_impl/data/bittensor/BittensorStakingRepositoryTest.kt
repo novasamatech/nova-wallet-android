@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -82,13 +83,22 @@ class BittensorStakingRepositoryTest {
         override suspend fun annualPercentageYield(): BigDecimal? = null
     }
 
+    private val commonModule = CommonModule()
+
+    private val computationalCache = commonModule.provideComputationalCache()
+
+    private val swapSource = mock(BittensorSwapSource::class.java)
+
+    private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
+
+    private val positionRepository = RealBittensorPositionRepository(positions, portfolioLoader, chainStateRepository, computationalCache, logger)
+
     private val repository = RealBittensorStakingRepository(
         chainRegistry,
         walletRepository,
         accountRepository,
-        positions,
+        positionRepository,
         validatorSource,
-        chainStateRepository,
         logger
     )
 
@@ -98,7 +108,7 @@ class BittensorStakingRepositoryTest {
 
         withTimeout(3_000L) {
             repository.observeRootStakingDetails()
-                .onEach { blockNumbers.value += BigInteger.ONE }
+                .onEach { if (blockNumbers.value == BigInteger.ONE) blockNumbers.value += BigInteger.ONE }
                 .take(2)
                 .toList()
         }

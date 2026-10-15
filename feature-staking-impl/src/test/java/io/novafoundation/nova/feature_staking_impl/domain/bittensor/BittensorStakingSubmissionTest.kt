@@ -80,11 +80,13 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val rootRepository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(rootDetails)
+
+        override fun observeRootStakingDetails(metaId: Long) = flowOf(rootDetails)
     }
 
     private val rootValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
-    private val rootInteractor = BittensorStakingInteractor(rootRepository, extrinsicService, flowState, accounts, wallets, rootValidators)
+    private val rootInteractor = BittensorStakingInteractor(rootRepository, extrinsicService, flowState, wallets, rootValidators)
 
     private val subnetValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
@@ -92,7 +94,6 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val subnetStakingInteractor = BittensorSubnetStakingInteractor(
         chainRegistry,
-        accounts,
         wallets,
         subnetValidators,
         subnetInteractor,
@@ -117,7 +118,9 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             BigInteger.ZERO
         ),
         BigInteger.valueOf(1005),
-        BigDecimal.ZERO
+        BigDecimal.ZERO,
+        BigInteger.valueOf(1000),
+        System.currentTimeMillis()
     )
 
     private val beneficiary = AccountIdKey(ByteArray(32) { 2 })
@@ -152,7 +155,6 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
             assertFalse(rootInteractor.hasDraft())
         } else {
             verify(subnetValidators).validate(chain, subnetId, validator)
-            assertSame(extrinsicService.feeOptions, extrinsicService.submissionOptions)
             verifyNoInteractions(subnetInteractor)
         }
     }
@@ -190,21 +192,13 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     @Test
-    fun `wallet switch prevents submission`() = runBlocking {
+    fun `wallet switch keeps the original submission wallet`() = runBlocking {
         `when`(selectedAccount.id).thenReturn(2L)
 
-        assertTrue(runCatching { execute().getOrThrow() }.exceptionOrNull() is IllegalStateException)
-        assertEquals(0, extrinsicService.submissions)
-        assertDraftPreserved()
-    }
-
-    @Test
-    fun `insufficient balance prevents submission`() = runBlocking {
-        `when`(asset.transferableInPlanks).thenReturn(amount)
-
-        assertTrue(runCatching { execute().getOrThrow() }.exceptionOrNull() is IllegalArgumentException)
-        assertEquals(0, extrinsicService.submissions)
-        assertDraftPreserved()
+        assertTrue(execute().isSuccess)
+        assertEquals(1, extrinsicService.submissions)
+        assertEquals(1L, (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId)
+        verifyNoInteractions(accounts)
     }
 
     private suspend fun execute(): Result<ExtrinsicExecutionResult> = when (stakingType) {

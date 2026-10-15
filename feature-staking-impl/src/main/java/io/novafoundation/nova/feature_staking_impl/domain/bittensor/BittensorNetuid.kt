@@ -12,7 +12,7 @@ sealed class BittensorNetuid {
     data class Subnet(override val value: Int) : BittensorNetuid() {
 
         init {
-            require(value in 1..65535) { "Dynamic subnet id must fit into a non-zero u16" }
+            require(value in 1..UShort.MAX_VALUE.toInt()) { "Dynamic subnet id must fit into a non-zero u16" }
         }
     }
 

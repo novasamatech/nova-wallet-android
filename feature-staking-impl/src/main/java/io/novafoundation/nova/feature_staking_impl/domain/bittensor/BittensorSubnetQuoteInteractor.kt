@@ -22,7 +22,9 @@ data class BittensorSubnetBuyQuote(
     val serviceFeeTaoInPlanks: BigInteger,
     val simulation: BittensorSwapSimulation,
     val limitPrice: BigInteger,
-    val serviceFeeRate: BigDecimal
+    val serviceFeeRate: BigDecimal,
+    val spotPrice: BigInteger,
+    val capturedAtMillis: Long
 ) {
     val stakeTaoInPlanks: BigInteger get() = totalTaoInPlanks - serviceFeeTaoInPlanks
 
@@ -70,7 +72,9 @@ class BittensorSubnetQuoteInteractor(
                 serviceFeeTaoInPlanks = serviceFee,
                 simulation = simulation,
                 limitPrice = slippage.limitPrice(price.await(), BittensorSwapDirection.TAO_TO_ALPHA),
-                serviceFeeRate = commission.fraction
+                serviceFeeRate = commission.fraction,
+                spotPrice = price.await(),
+                capturedAtMillis = System.currentTimeMillis()
             )
         }
     }

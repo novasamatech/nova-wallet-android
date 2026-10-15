@@ -34,10 +34,10 @@ class BittensorSubnetFavoritesRepositoryTest {
     @Test
     fun `favorites flow belongs to wallet and ignores invalid stored ids`() = runBlocking {
         val (accounts, preferences) = dependencies(2)
-        `when`(preferences.stringSetFlow("bittensor_subnet_favorites_2")).thenReturn(flowOf(setOf("3", "0", "-1", "bad", "65536")))
+        `when`(preferences.stringSetFlow("bittensor_subnet_favorites_2")).thenReturn(flowOf(setOf("3", "0", "-1", "bad", "65535", "65536")))
         val state = BittensorSubnetFavoritesRepository(accounts, preferences).observeFavorites().first()
         assertEquals(2L, state.metaId)
-        assertEquals(setOf(3), state.subnetIds)
+        assertEquals(setOf(3, 65535), state.subnetIds)
     }
 
     @Test(expected = IllegalStateException::class)

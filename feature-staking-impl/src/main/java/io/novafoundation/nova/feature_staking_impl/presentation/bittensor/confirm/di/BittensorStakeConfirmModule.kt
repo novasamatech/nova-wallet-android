@@ -10,9 +10,11 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
@@ -34,13 +36,15 @@ class BittensorStakeConfirmModule {
         externalActions: ExternalActions.Presentation,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
-        selectedAccountUseCase: SelectedAccountUseCase,
+        accountRepository: AccountRepository,
         bittensorStakingInteractor: BittensorStakingInteractor,
         iconGenerator: AddressIconGenerator,
         fiatFormatter: FiatFormatter,
         tokenFormatter: TokenFormatter,
         bittensorAmountFormatter: BittensorAmountFormatter,
-        retryController: BittensorRetryController
+        retryController: BittensorRetryController,
+        validationSystem: BittensorStakePreflightSystem,
+        validationExecutor: ValidationExecutor
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
             resourceManager = resourceManager,
@@ -48,13 +52,15 @@ class BittensorStakeConfirmModule {
             externalActions = externalActions,
             chainRegistry = chainRegistry,
             walletUiUseCase = walletUiUseCase,
-            selectedAccountUseCase = selectedAccountUseCase,
+            accountRepository = accountRepository,
             bittensorStakingInteractor = bittensorStakingInteractor,
             iconGenerator = iconGenerator,
             fiatFormatter = fiatFormatter,
             tokenFormatter = tokenFormatter,
             bittensorAmountFormatter = bittensorAmountFormatter,
-            retryController = retryController
+            retryController = retryController,
+            validationSystem = validationSystem,
+            validationExecutor = validationExecutor
         )
     }
 

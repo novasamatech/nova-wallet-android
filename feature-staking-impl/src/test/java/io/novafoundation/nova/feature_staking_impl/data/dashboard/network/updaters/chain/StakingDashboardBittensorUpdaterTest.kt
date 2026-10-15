@@ -1,12 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.chain
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.di.modules.CommonModule
 import io.novafoundation.nova.core.updater.SharedRequestsBuilder
 import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
@@ -28,7 +30,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoInteractions
 
 class StakingDashboardBittensorUpdaterTest {
@@ -54,10 +55,9 @@ class StakingDashboardBittensorUpdaterTest {
     private val coldKey: AccountId = ByteArray(32)
 
     @Test
-    fun `registers subscription before collection and updates stake from new blocks`() = runBlocking {
+    fun `updates dashboard from the shared position stream`() = runBlocking {
         prepare()
         val updates = updater().listenForUpdates(subscriptionBuilder)
-        verify(chainStateRepository).currentRemoteBlockNumberFlow(chain.id, subscriptionBuilder)
 
         val stakes = mutableListOf<BigInteger?>()
         withTimeout(3_000L) {
@@ -88,7 +88,7 @@ class StakingDashboardBittensorUpdaterTest {
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(metaAccount.id).thenReturn(1L)
         `when`(metaAccount.accountIdIn(chain)).thenReturn(coldKey)
-        `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id, subscriptionBuilder)).thenReturn(blockNumbers)
+        `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blockNumbers)
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(
             BittensorStakePositions(listOf(BittensorRootPosition(AccountIdKey(ByteArray(32)), BigInteger.TEN)), emptyList())
         )
@@ -96,15 +96,20 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val logger = mock(Logger::class.java)
 
-    private val portfolioLoader = BittensorPortfolioLoader(positionSource, swapSource, logger)
+    private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
+
+    private val commonModule = CommonModule()
+
+    private val computationalCache = commonModule.provideComputationalCache()
+
+    private val positionRepository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger)
 
     private fun updater() = StakingDashboardBittensorUpdater(
         chain,
         chainAsset,
         metaAccount,
-        portfolioLoader,
-        cache,
-        chainStateRepository
+        positionRepository,
+        cache
     )
 
     private class RecordingCache : StakingDashboardCache {

@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
@@ -43,36 +42,15 @@ class BittensorWalletIsolationTest {
     )
     private val repository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(details)
+
+        override fun observeRootStakingDetails(metaId: Long) = flowOf(details)
     }
 
     @Test
-    fun `preparing after wallet switch does not estimate or submit an extrinsic`() = runBlocking {
-        selectAnotherWallet()
-
-        val failure = runCatching { interactor().prepareRootStake(BittensorRootStakeRequest(1L, details.chain, validator, BigInteger.ONE)) }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
-        verifyNoInteractions(extrinsics)
-    }
-
-    @Test
-    fun `execution after wallet switch never signs with the new wallet`() = runBlocking {
-        selectAnotherWallet()
-        val draft = BittensorRootStakeDraft(1, BigInteger.ONE, validator, fee)
-        state.setDraft(draft)
-
-        val failure = runCatching { interactor().executeRootStake(details.chain, draft).getOrThrow() }.exceptionOrNull()
-        assertTrue(failure is IllegalStateException)
-        verifyNoInteractions(extrinsics)
-    }
-
-    @Test
-    fun `fee request after wallet switch does not estimate a fee`() = runBlocking {
-        val selected = mock(MetaAccount::class.java)
-        `when`(selected.id).thenReturn(2L)
-        `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
+    fun `fee estimation does not depend on globally selected wallet`() = runBlocking {
         val request = BittensorRootStakeRequest(1L, details.chain, validator, BigInteger.ONE)
-        assertTrue(runCatching { interactor().estimateRootStakeFee(request) }.exceptionOrNull() is IllegalStateException)
-        verifyNoInteractions(extrinsics, validators)
+        runCatching { interactor().estimateRootStakeFee(request) }
+        verifyNoInteractions(accounts, validators)
     }
 
     @Test
@@ -91,11 +69,5 @@ class BittensorWalletIsolationTest {
         verifyNoInteractions(extrinsics)
     }
 
-    private suspend fun selectAnotherWallet() {
-        val selected = mock(MetaAccount::class.java)
-        `when`(selected.id).thenReturn(2L)
-        `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
-    }
-
-    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, accounts, wallets, validators)
+    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, wallets, validators)
 }

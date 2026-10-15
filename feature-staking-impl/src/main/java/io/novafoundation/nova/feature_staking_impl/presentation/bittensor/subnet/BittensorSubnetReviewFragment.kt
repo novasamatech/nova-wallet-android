@@ -5,6 +5,7 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
 import io.novafoundation.nova.common.view.setState
@@ -53,6 +54,7 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetReviewViewModel) = with(binder) {
+        observeValidations(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.feeCaption.observe { feeCaption.text = it }
         setupExternalActions(viewModel)
@@ -68,7 +70,6 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         }
         viewModel.fee.observe(networkFee::setFeeStatus)
         viewModel.confirmButtonState.observe(confirm::setState)
-        viewModel.walletChanged.observe { walletChanged.isVisible = it }
         bindBittensorStakeResults(
             results = viewModel.resultState,
             onDismiss = viewModel::resultDismissed,

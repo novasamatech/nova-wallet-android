@@ -11,11 +11,12 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -37,7 +38,7 @@ class BittensorSubnetReviewModule {
         router: StakingRouter,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
-        selectedAccountUseCase: SelectedAccountUseCase,
+        accountRepository: AccountRepository,
         bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
         resources: ResourceManager,
         icons: AssetIconProvider,
@@ -45,7 +46,8 @@ class BittensorSubnetReviewModule {
         iconGenerator: AddressIconGenerator,
         retryController: BittensorRetryController,
         bittensorAmountFormatter: BittensorAmountFormatter,
-        stakeValidationSystem: BittensorStakeValidationSystem
+        validationSystem: BittensorStakePreflightSystem,
+        validationExecutor: ValidationExecutor
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
             BittensorNetuid.Subnet(payload.subnetId),
@@ -56,7 +58,7 @@ class BittensorSubnetReviewModule {
             router,
             chainRegistry,
             walletUiUseCase,
-            selectedAccountUseCase,
+            accountRepository,
             bittensorSubnetStakingInteractor,
             resources,
             icons,
@@ -64,7 +66,8 @@ class BittensorSubnetReviewModule {
             iconGenerator,
             retryController = retryController,
             bittensorAmountFormatter = bittensorAmountFormatter,
-            stakeValidationSystem = stakeValidationSystem
+            validationSystem = validationSystem,
+            validationExecutor = validationExecutor
         )
     }
 

@@ -113,14 +113,6 @@
                 android:gravity="center"
                 android:textColor="@color/text_secondary" />
 
-            <TextView
-                android:id="@+id/walletChanged"
-                style="@style/TextAppearance.NovaFoundation.Regular.Body"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/bittensor_wallet_changed"
-                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 
