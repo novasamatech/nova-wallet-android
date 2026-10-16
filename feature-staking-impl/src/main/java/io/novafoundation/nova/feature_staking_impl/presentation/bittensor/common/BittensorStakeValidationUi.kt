@@ -34,7 +34,16 @@ fun bittensorStakeValidationFailureUi(
     refreshQuote: () -> Unit
 ): TransformedFailure {
     val reason = failure.reason
-    if (reason == BittensorStakeValidationFailure.QUOTE_EXPIRED) refreshQuote()
+    if (reason == BittensorStakeValidationFailure.QUOTE_EXPIRED || reason == BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED) {
+        return TransformedFailure.Custom(
+            CustomDialogDisplayer.Payload(
+                title = resources.getString(R.string.common_error_general_title),
+                message = reason.message(resources),
+                okAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.bittensor_review_updated_quote), refreshQuote),
+                cancelAction = CustomDialogDisplayer.Payload.DialogAction.noOp(resources.getString(R.string.common_cancel))
+            )
+        )
+    }
     if (reason != BittensorStakeValidationFailure.HIGH_PRICE_IMPACT) {
         return TransformedFailure.Default(resources.getString(R.string.common_error_general_title) to reason.message(resources))
     }

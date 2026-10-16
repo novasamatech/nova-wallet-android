@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorPriceImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteAvailabilityValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteFreshnessValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteTermsValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRegisteredValidatorValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRootStakeHoldValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorSafeModeValidation
@@ -212,6 +213,82 @@ class BittensorStakeValidationsTest {
         assertNull(validation.validate(payload.copy(quote = exactBoundary)).notValidOrNull())
         val aboveBoundary = exactBoundary.copy(simulation = exactBoundary.simulation.copy(amountIn = BigInteger.valueOf(302)))
         assertFailure(validation, payload.copy(quote = aboveBoundary), BittensorStakeValidationFailure.HIGH_PRICE_IMPACT)
+    }
+
+    @Test
+    fun `root top up is allowed during the withdrawal hold`() = runBlocking {
+        val topUp = payload.copy(
+            checkRootHold = false,
+            preflight = snapshot.copy(lastStakeBlock = snapshot.currentBlock)
+        )
+
+        assertNull(system.validate(topUp).getOrThrow().notValidOrNull())
+    }
+
+    @Test
+    fun `fresh market data does not loosen the reviewed price limit`() = runBlocking {
+        val validation = BittensorSlippageValidation()
+        val reviewedQuote = quote().copy(limitPrice = BigInteger.valueOf(1_010_000_000))
+        val latestQuote = reviewedQuote.copy(
+            limitPrice = BigInteger.valueOf(1_100_000_000),
+            simulation = reviewedQuote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000))
+        )
+
+        assertFailure(
+            validation,
+            payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
+            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED
+        )
+    }
+
+    @Test
+    fun `market validation uses the stricter current limit too`() = runBlocking {
+        val validation = BittensorSlippageValidation()
+        val reviewedQuote = quote()
+        val latestQuote = reviewedQuote.copy(limitPrice = reviewedQuote.postTradePrice())
+
+        assertFailure(
+            validation,
+            payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
+            BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED
+        )
+    }
+
+    @Test
+    fun `freshness is checked on the latest market snapshot`() = runBlocking {
+        val validation = BittensorQuoteFreshnessValidation()
+        val reviewedQuote = quote()
+        val latestQuote = reviewedQuote.copy(capturedAtMillis = 20_000L)
+        val value = payload.copy(quote = reviewedQuote, latestQuote = latestQuote, checkedAtMillis = 30_000L)
+
+        assertNull(validation.validate(value).notValidOrNull())
+        assertFailure(validation, value.copy(checkedAtMillis = 35_001L), BittensorStakeValidationFailure.QUOTE_EXPIRED)
+    }
+
+    @Test
+    fun `changed service fee requires reviewing new terms`() = runBlocking {
+        val validation = BittensorQuoteTermsValidation()
+        val reviewedQuote = quote()
+        val latestQuote = reviewedQuote.copy(serviceFeeTaoInPlanks = BigInteger.ONE)
+
+        assertFailure(
+            validation,
+            payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
+            BittensorStakeValidationFailure.QUOTE_EXPIRED
+        )
+    }
+
+    @Test
+    fun `price impact warning uses the current market rather than the old quote`() = runBlocking {
+        val validation = BittensorPriceImpactValidation()
+        val reviewedQuote = quote()
+        val latestQuote = reviewedQuote.copy(simulation = reviewedQuote.simulation.copy(amountOut = BigInteger.valueOf(980_000_000)))
+
+        assertFailure(
+            validation,
+            payload.copy(quote = reviewedQuote, latestQuote = latestQuote),
+            BittensorStakeValidationFailure.HIGH_PRICE_IMPACT
+        )
     }
 
     @Test

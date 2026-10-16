@@ -243,7 +243,7 @@ class BittensorStakeAmountViewModel(
             ?.takeIf { it.request == request } ?: return@launchUnit
         preparing.value = true
         try {
-            val payload = bittensorStakingInteractor.validationPayload(request, fee, checkRootHold = true)
+            val payload = bittensorStakingInteractor.validationPayload(request, fee)
             validationExecutor.requireValid(
                 validationSystem = stakeValidationSystem,
                 payload = payload,

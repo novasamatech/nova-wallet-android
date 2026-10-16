@@ -12,8 +12,9 @@ class BittensorMinimumStakeValidation : BittensorStakeValidation {
 
     override suspend fun validate(value: BittensorStakeValidationPayload): ValidationStatus<BittensorStakeValidationFailure> {
         val amount = value.asset.token.planksFromAmount(value.amount)
-        val serviceFee = value.quote?.serviceFeeTaoInPlanks ?: BigInteger.ZERO
-        val poolFee = value.quote?.simulation?.taoFee ?: BigInteger.ZERO
+        val quote = value.latestQuote ?: value.quote
+        val serviceFee = quote?.serviceFeeTaoInPlanks ?: BigInteger.ZERO
+        val poolFee = quote?.simulation?.taoFee ?: BigInteger.ZERO
         return validOrError(amount - serviceFee >= value.preflight.minimumStake + poolFee) { BittensorStakeValidationFailure.BELOW_MINIMUM_STAKE }
     }
 }

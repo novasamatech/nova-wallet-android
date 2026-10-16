@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorPriceImpactValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteAvailabilityValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteFreshnessValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteTermsValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRegisteredValidatorValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRootStakeHoldValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorSafeModeValidation
@@ -39,6 +40,8 @@ class BittensorStakeValidationsModule {
 
         val quoteFreshness = BittensorQuoteFreshnessValidation()
 
+        val quoteTerms = BittensorQuoteTermsValidation()
+
         val slippage = BittensorSlippageValidation()
 
         val priceImpact = BittensorPriceImpactValidation()
@@ -53,6 +56,7 @@ class BittensorStakeValidationsModule {
                 coldkeySwap,
                 safeMode,
                 quoteAvailability,
+                quoteTerms,
                 quoteFreshness,
                 slippage,
                 priceImpact

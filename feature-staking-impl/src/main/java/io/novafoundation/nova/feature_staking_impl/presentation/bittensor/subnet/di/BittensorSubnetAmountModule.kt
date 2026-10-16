@@ -9,7 +9,9 @@ import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -20,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 @Module(includes = [ViewModelModule::class])
@@ -39,7 +42,10 @@ class BittensorSubnetAmountModule {
         fiatFormatter: FiatFormatter,
         retryController: BittensorRetryController,
         bittensorAmountFormatter: BittensorAmountFormatter,
-        amountChooserFactory: AmountChooserMixin.Factory
+        amountChooserFactory: AmountChooserMixin.Factory,
+        validationSystem: BittensorStakePreflightSystem,
+        validationExecutor: ValidationExecutor,
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
     ): ViewModel = BittensorSubnetAmountViewModel(
         initialSubnetId = BittensorNetuid.Subnet(payload.subnetId),
         validatorAddress = payload.validatorAddress,
@@ -52,7 +58,10 @@ class BittensorSubnetAmountModule {
         fiatFormatter = fiatFormatter,
         retryController = retryController,
         bittensorAmountFormatter = bittensorAmountFormatter,
-        amountChooserFactory = amountChooserFactory
+        amountChooserFactory = amountChooserFactory,
+        validationSystem = validationSystem,
+        validationExecutor = validationExecutor,
+        feeLoaderMixinFactory = feeLoaderMixinFactory
     )
 
     @Provides

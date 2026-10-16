@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRoo
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
@@ -117,7 +118,9 @@ class BittensorStakeAmountViewModelTest {
 
     private val balanceValidationSystem = bittensorModule.provideStakeValidationSystem()
 
-    private val preflightValidation = BittensorStakePreflightValidation(preflightRepository, accounts, wallets, balanceValidationSystem)
+    private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
+
+    private val preflightValidation = BittensorStakePreflightValidation(preflightRepository, accounts, wallets, balanceValidationSystem, subnetInteractor)
 
     private val validationSystem = ValidationSystem(preflightValidation)
 

@@ -84,8 +84,9 @@ class BittensorModule {
         repository: BittensorStakePreflightRepository,
         accounts: AccountRepository,
         wallets: WalletRepository,
-        balanceValidationSystem: BittensorStakeValidationSystem
-    ) = BittensorStakePreflightValidation(repository, accounts, wallets, balanceValidationSystem)
+        balanceValidationSystem: BittensorStakeValidationSystem,
+        bittensorSubnetInteractor: BittensorSubnetInteractor
+    ) = BittensorStakePreflightValidation(repository, accounts, wallets, balanceValidationSystem, bittensorSubnetInteractor)
 
     @Provides
     fun provideBittensorStakePreflightSystem(validation: BittensorStakePreflightValidation) = ValidationSystem(validation)

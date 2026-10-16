@@ -11,7 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.hasHighPrice
 class BittensorPriceImpactValidation : BittensorStakeValidation {
 
     override suspend fun validate(value: BittensorStakeValidationPayload): ValidationStatus<BittensorStakeValidationFailure> {
-        val quote = value.quote ?: return valid()
+        val quote = value.latestQuote ?: value.quote ?: return valid()
         return validOrWarning(value.priceImpactAccepted || !quote.hasHighPriceImpact()) { BittensorStakeValidationFailure.HIGH_PRICE_IMPACT }
     }
 }

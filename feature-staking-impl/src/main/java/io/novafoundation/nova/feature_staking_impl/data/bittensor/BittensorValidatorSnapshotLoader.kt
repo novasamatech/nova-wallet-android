@@ -6,7 +6,6 @@ import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import io.novasama.substrate_sdk_android.runtime.metadata.module
@@ -17,13 +16,12 @@ import kotlinx.coroutines.coroutineScope
 
 internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
     netuid: BittensorNetuid,
-    validators: List<BittensorValidator>,
-    gates: BittensorValidatorGates
+    validators: List<BittensorValidator>
 ): BittensorValidatorSnapshot = coroutineScope {
     val pallet = runtime.metadata.module("SubtensorModule")
     val storageNetuid = netuid.value.toBigInteger()
     val permits = async {
-        if (!netuid.isRoot() && gates.requirePermit) {
+        if (!netuid.isRoot()) {
             pallet.storage("ValidatorPermit")
                 .query(storageNetuid) { bindList(it, ::bindBoolean) }
         } else {
@@ -31,7 +29,7 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
         }
     }
     val updates = async {
-        if (!netuid.isRoot() && gates.requireActive) {
+        if (!netuid.isRoot()) {
             pallet.storage("LastUpdate")
                 .query(storageNetuid) { bindList(it, ::bindNumber) }
         } else {
@@ -39,7 +37,7 @@ internal suspend fun StorageQueryContext.loadBittensorValidatorSnapshot(
         }
     }
     val activeThreshold = async {
-        if (!netuid.isRoot() && gates.requireActive) loadActiveThreshold(storageNetuid) else BigInteger.ZERO
+        if (!netuid.isRoot()) loadActiveThreshold(storageNetuid) else BigInteger.ZERO
     }
     val uids = async {
         pallet.storage("Uids")

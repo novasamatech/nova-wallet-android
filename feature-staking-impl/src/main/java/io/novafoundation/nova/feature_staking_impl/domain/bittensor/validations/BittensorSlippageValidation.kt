@@ -12,6 +12,8 @@ class BittensorSlippageValidation : BittensorStakeValidation {
 
     override suspend fun validate(value: BittensorStakeValidationPayload): ValidationStatus<BittensorStakeValidationFailure> {
         val quote = value.quote ?: return valid()
-        return validOrError(quote.postTradePrice() < quote.limitPrice) { BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED }
+        val latestQuote = value.latestQuote ?: quote
+        val limitPrice = minOf(quote.limitPrice, latestQuote.limitPrice)
+        return validOrError(latestQuote.postTradePrice() < limitPrice) { BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED }
     }
 }

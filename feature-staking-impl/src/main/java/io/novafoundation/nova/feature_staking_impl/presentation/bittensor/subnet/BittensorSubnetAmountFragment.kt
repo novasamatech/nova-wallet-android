@@ -5,6 +5,8 @@ import androidx.core.widget.doAfterTextChanged
 import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -56,7 +58,10 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetAmountViewModel) = with(binder) {
+        observeValidations(viewModel)
+        observeRetries(viewModel.feeLoaderMixin)
         observeBittensorRetries(viewModel.retryEvents)
+        viewModel.fee.observe(networkFee::setFeeStatus)
         viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.amountModel.observe(amount::setChooseAmountModel)
         viewModel.fiatAmount.observe(amount::setFiatAmount)

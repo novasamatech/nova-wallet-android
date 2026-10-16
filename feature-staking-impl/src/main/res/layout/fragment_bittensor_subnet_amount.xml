@@ -127,12 +127,12 @@
                         app:primaryValue="—"
                         app:primaryValueStyle="positive" />
 
-                    <io.novafoundation.nova.common.view.TableCellView
+                    <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
+                        android:id="@+id/networkFee"
                         android:layout_width="match_parent"
                         android:layout_height="52dp"
                         android:background="@android:color/transparent"
                         app:title="@string/network_fee"
-                        app:primaryValue="@string/bittensor_fee_on_review"
                         app:shouldDrawDivider="false" />
                 </io.novafoundation.nova.common.view.TableView>
             </LinearLayout>

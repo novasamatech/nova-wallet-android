@@ -39,18 +39,18 @@ private fun mapBittensorValidator(
     val uid = snapshot.uids[validator.hotkey] ?: return null
     val commissionInU16 = snapshot.commissionsInU16[validator.hotkey] ?: return null
     if (!gates.allowsCommission(commissionInU16)) return null
-    if (!netuid.isRoot() && gates.requirePermit && snapshot.permits.getOrNull(uid) != true) return null
+    if (!netuid.isRoot() && snapshot.permits.getOrNull(uid) != true) return null
 
     return BittensorSubnetValidator(
         validator = validator,
         address = chain.addressOf(validator.hotkey),
         commissionRate = validatorCommissionRateFromU16(commissionInU16),
-        selectable = isValidatorActive(netuid, uid, gates, snapshot)
+        selectable = isValidatorActive(netuid, uid, snapshot)
     )
 }
 
-private fun isValidatorActive(netuid: BittensorNetuid, uid: Int, gates: BittensorValidatorGates, snapshot: BittensorValidatorSnapshot): Boolean {
-    if (netuid.isRoot() || !gates.requireActive) return true
+private fun isValidatorActive(netuid: BittensorNetuid, uid: Int, snapshot: BittensorValidatorSnapshot): Boolean {
+    if (netuid.isRoot()) return true
     val lastUpdate = snapshot.lastUpdates.getOrNull(uid) ?: return false
     return lastUpdate >= snapshot.activeThreshold
 }

@@ -78,7 +78,7 @@ class RealBittensorSubnetValidatorRepository(
         if (validators.isEmpty()) return emptyList()
         val hash = rpc.getBlockHash(chain.id)
         val snapshot = storage.query(chain.id, at = hash, applyStorageDefault = true) {
-            loadBittensorValidatorSnapshot(netuid, validators, gates)
+            loadBittensorValidatorSnapshot(netuid, validators)
         }
         return mapBittensorValidators(chain, netuid, validators, gates, snapshot)
     }

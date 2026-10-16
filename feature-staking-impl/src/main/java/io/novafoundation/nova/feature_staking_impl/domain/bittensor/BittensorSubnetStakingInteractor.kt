@@ -70,14 +70,22 @@ class BittensorSubnetStakingInteractor(
         amount: BigInteger,
         validatorAddress: String
     ): BittensorPreparedSubnetStake = withTimeout(60_000L) {
-        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val subnet = bittensorSubnetInteractor.subnet(subnetId)
-        val validator = requireEligibleValidator(chain, subnetId, validatorAddress)
         val quote = bittensorSubnetInteractor.quote(subnetId, amount)
+        val draft = prepareDraft(metaId, quote, validatorAddress)
+        BittensorPreparedSubnetStake(subnet, draft)
+    }
+
+    suspend fun prepareDraft(
+        metaId: Long,
+        quote: BittensorSubnetBuyQuote,
+        validatorAddress: String
+    ): BittensorSubnetStakeDraft {
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
+        val validator = requireEligibleValidator(chain, quote.subnetId, validatorAddress)
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
         val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
-        val draft = BittensorSubnetStakeDraft(metaId, validator, operation)
-        BittensorPreparedSubnetStake(subnet, draft)
+        return BittensorSubnetStakeDraft(metaId, validator, operation)
     }
 
     suspend fun execute(draft: BittensorSubnetStakeDraft): Result<ExtrinsicExecutionResult> = runCatching {

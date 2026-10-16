@@ -35,7 +35,8 @@ class BittensorStakePreflightValidation(
     private val preflightRepository: BittensorStakePreflightRepository,
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
-    private val stakeValidationSystem: BittensorStakeValidationSystem
+    private val stakeValidationSystem: BittensorStakeValidationSystem,
+    private val bittensorSubnetInteractor: BittensorSubnetInteractor
 ) : Validation<BittensorStakePreflightPayload, BittensorStakeValidationFailure> {
 
     override suspend fun validate(value: BittensorStakePreflightPayload): ValidationStatus<BittensorStakeValidationFailure> = coroutineScope {
@@ -43,8 +44,12 @@ class BittensorStakePreflightValidation(
         val preflight = async {
             preflightRepository.load(value.chain.id, value.netuid, account.requireAccountIdIn(value.chain), value.hotkey)
         }
+        val latestQuote = async {
+            value.quote?.let { bittensorSubnetInteractor.quote(it.subnetId, it.totalTaoInPlanks) }
+        }
         val asset = walletRepository.assetFlow(value.metaId, value.chain.utilityAsset)
             .first()
+        val currentQuote = latestQuote.await()
         val payload = BittensorStakeValidationPayload(
             asset = asset,
             amount = asset.token.amountFromPlanks(value.amount),
@@ -54,7 +59,8 @@ class BittensorStakePreflightValidation(
             netuid = value.netuid,
             checkRootHold = value.checkRootHold,
             priceImpactAccepted = value.priceImpactAccepted,
-            checkedAtMillis = System.currentTimeMillis()
+            checkedAtMillis = System.currentTimeMillis(),
+            latestQuote = currentQuote
         )
         stakeValidationSystem.validate(payload)
             .getOrThrow()

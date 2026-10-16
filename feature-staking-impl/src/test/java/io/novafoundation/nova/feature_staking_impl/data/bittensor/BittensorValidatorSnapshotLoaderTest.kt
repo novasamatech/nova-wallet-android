@@ -4,7 +4,6 @@ import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.utils.ComponentHolder
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.runtime.storage.source.query.DynamicInstanceBinder
 import io.novafoundation.nova.runtime.storage.source.query.DynamicInstanceBinderWithKey
 import io.novafoundation.nova.runtime.storage.source.query.StorageKeyComponents
@@ -16,7 +15,6 @@ import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Storage
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntry
 import io.novasama.substrate_sdk_android.runtime.metadata.module.StorageEntryType
-import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
@@ -33,8 +31,6 @@ class BittensorValidatorSnapshotLoaderTest {
 
     private val validator = BittensorValidator(AccountIdKey(ByteArray(32) { 1 }), "Validator")
 
-    private val gates = BittensorValidatorGates(BigDecimal("0.2"), requirePermit = true, requireActive = true)
-
     private val delegate = mock(StorageQueryContext::class.java)
 
     private val runtime = createRuntime()
@@ -44,7 +40,7 @@ class BittensorValidatorSnapshotLoaderTest {
         val context = RecordingQueryContext(runtime, delegate, expectedReads = 7)
 
         val snapshot = withTimeout(5_000) {
-            context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator), gates)
+            context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator))
         }
 
         assertEquals(setOf("ValidatorPermit", "LastUpdate", "Number", "Tempo", "ActivityCutoffFactorMilli", "Uids", "Delegates"), context.requests)
@@ -60,7 +56,7 @@ class BittensorValidatorSnapshotLoaderTest {
         val context = RecordingQueryContext(runtime, delegate, expectedReads = 2)
 
         val snapshot = withTimeout(5_000) {
-            context.loadBittensorValidatorSnapshot(BittensorNetuid.Root, listOf(validator), gates)
+            context.loadBittensorValidatorSnapshot(BittensorNetuid.Root, listOf(validator))
         }
 
         assertEquals(setOf("Uids", "Delegates"), context.requests)
@@ -70,25 +66,13 @@ class BittensorValidatorSnapshotLoaderTest {
     }
 
     @Test
-    fun `disabled gates do not load unused storage`() = runBlocking {
-        val context = RecordingQueryContext(runtime, delegate, expectedReads = 2)
-        val disabledGates = gates.copy(requirePermit = false, requireActive = false)
-
-        withTimeout(5_000) {
-            context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator), disabledGates)
-        }
-
-        assertEquals(setOf("Uids", "Delegates"), context.requests)
-    }
-
-    @Test
     fun `failed storage read cancels other reads instead of returning a partial snapshot`() = runBlocking {
         val failure = IllegalStateException("Storage unavailable")
         val context = RecordingQueryContext(runtime, delegate, expectedReads = 7, failure = failure)
 
         try {
             withTimeout(5_000) {
-                context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator), gates)
+                context.loadBittensorValidatorSnapshot(BittensorNetuid.Subnet(1), listOf(validator))
             }
             fail("Expected storage failure")
         } catch (exception: IllegalStateException) {

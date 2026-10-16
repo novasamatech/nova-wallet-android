@@ -12,7 +12,7 @@ private const val QUOTE_LIFETIME_MILLIS = 15_000L
 class BittensorQuoteFreshnessValidation : BittensorStakeValidation {
 
     override suspend fun validate(value: BittensorStakeValidationPayload): ValidationStatus<BittensorStakeValidationFailure> {
-        val quote = value.quote ?: return valid()
+        val quote = value.latestQuote ?: value.quote ?: return valid()
         val ageMillis = value.checkedAtMillis - quote.capturedAtMillis
         return validOrError(ageMillis in 0..QUOTE_LIFETIME_MILLIS) { BittensorStakeValidationFailure.QUOTE_EXPIRED }
     }

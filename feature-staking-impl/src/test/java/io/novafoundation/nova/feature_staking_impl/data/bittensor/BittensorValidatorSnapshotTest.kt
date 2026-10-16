@@ -47,6 +47,17 @@ class BittensorValidatorSnapshotTest {
     }
 
     @Test
+    fun `subnet permit and activity remain required when backend flags are disabled`() {
+        val disabledGates = gates.copy(requirePermit = false, requireActive = false)
+        val withoutPermit = snapshot.copy(permits = listOf(false))
+        val inactive = snapshot.copy(lastUpdates = listOf(BigInteger.ZERO))
+        val subnet = BittensorNetuid.Subnet(1)
+
+        assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, withoutPermit).isEmpty())
+        assertFalse(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, inactive).single().selectable)
+    }
+
+    @Test
     fun `raw delegate commission maps to a decimal rate`() {
         val unrestrictedGates = BittensorValidatorGates(BigDecimal.ONE, requirePermit = false, requireActive = false)
         val expectedRates = mapOf(0 to "0", 13107 to "0.2", 65535 to "1")

@@ -74,7 +74,9 @@ class BittensorStakePreflightValidationTest {
 
     private val stakeValidationSystem = module.provideStakeValidationSystem()
 
-    private val validation = BittensorStakePreflightValidation(repository, accounts, wallets, stakeValidationSystem)
+    private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
+
+    private val validation = BittensorStakePreflightValidation(repository, accounts, wallets, stakeValidationSystem, subnetInteractor)
 
     private val system = ValidationSystem(validation)
 
@@ -113,11 +115,70 @@ class BittensorStakePreflightValidationTest {
     }
 
     @Test
+    fun `subnet validation reloads market after a warning without replacing the reviewed limit`() = runBlocking {
+        val reviewedQuote = quote(capturedAtMillis = 0L)
+        val latestQuote = quote(capturedAtMillis = System.currentTimeMillis())
+        val subnetPayload = payload.copy(netuid = reviewedQuote.subnetId, quote = reviewedQuote)
+        `when`(subnetInteractor.quote(reviewedQuote.subnetId, reviewedQuote.totalTaoInPlanks)).thenReturn(latestQuote)
+
+        assertNull(system.validate(subnetPayload).getOrThrow().notValidOrNull())
+
+        val movedQuote = latestQuote.copy(
+            limitPrice = BigInteger.valueOf(1_500_000_000),
+            simulation = latestQuote.simulation.copy(amountOut = BigInteger.valueOf(90_000_000))
+        )
+        `when`(subnetInteractor.quote(reviewedQuote.subnetId, reviewedQuote.totalTaoInPlanks)).thenReturn(movedQuote)
+        val failure = system.validate(subnetPayload.copy(priceImpactAccepted = true))
+            .getOrThrow()
+            .notValidOrNull()
+
+        assertEquals(BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED, failure?.reason)
+        assertEquals(BigInteger.valueOf(1_005_000_000), subnetPayload.quote?.limitPrice)
+        assertEquals(2, loads)
+    }
+
+    @Test
+    fun `market read failure cannot authorize an old reviewed quote`() = runBlocking {
+        val quote = quote(System.currentTimeMillis())
+        val subnetPayload = payload.copy(netuid = quote.subnetId, quote = quote)
+        `when`(subnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks)).thenThrow(IllegalStateException("Market unavailable"))
+
+        val result = system.validate(subnetPayload)
+
+        assertEquals("Market unavailable", result.exceptionOrNull()?.message)
+    }
+
+    @Test
     fun `failed storage read never becomes permissive defaults`() = runBlocking {
         val failure = IOException("RPC unavailable")
         sourceFailure = failure
         val result = system.validate(payload)
         assertEquals(IOException::class.java, result.exceptionOrNull()?.javaClass)
         assertEquals(failure.message, result.exceptionOrNull()?.message)
+    }
+
+    private fun quote(capturedAtMillis: Long): BittensorSubnetBuyQuote {
+        val subnetId = BittensorNetuid.Subnet(1)
+        val amount = payload.amount
+        val simulation = BittensorSwapSimulation(
+            subnetId,
+            BittensorSwapDirection.TAO_TO_ALPHA,
+            amount,
+            amount,
+            BigInteger.ZERO,
+            BigInteger.ZERO,
+            BigInteger.ZERO,
+            BigInteger.ZERO
+        )
+        return BittensorSubnetBuyQuote(
+            subnetId,
+            amount,
+            BigInteger.ZERO,
+            simulation,
+            BigInteger.valueOf(1_005_000_000),
+            BigDecimal.ZERO,
+            BigInteger.TEN.pow(9),
+            capturedAtMillis
+        )
     }
 }

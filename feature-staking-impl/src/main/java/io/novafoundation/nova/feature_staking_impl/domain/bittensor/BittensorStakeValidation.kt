@@ -17,7 +17,8 @@ data class BittensorStakeValidationPayload(
     val netuid: BittensorNetuid,
     val checkRootHold: Boolean,
     val priceImpactAccepted: Boolean,
-    val checkedAtMillis: Long
+    val checkedAtMillis: Long,
+    val latestQuote: BittensorSubnetBuyQuote? = null
 )
 
 enum class BittensorStakeValidationFailure {
