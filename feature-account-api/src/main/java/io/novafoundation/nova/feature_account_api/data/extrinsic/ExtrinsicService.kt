@@ -9,10 +9,10 @@ import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentCurrency
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
-import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
-import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.multi.CallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
@@ -47,6 +47,8 @@ interface ExtrinsicService {
     class SubmissionOptions(
         val feePaymentCurrency: FeePaymentCurrency = FeePaymentCurrency.Native,
         val batchMode: BatchMode = DEFAULT_BATCH_MODE,
+        /** Journal a mortal, immediately executable transaction before broadcasting. */
+        val recoverable: Boolean = false,
     )
 
     class FeePaymentConfig(

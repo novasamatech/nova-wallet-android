@@ -1,5 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -56,6 +61,12 @@ import org.mockito.Mockito.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorDetailsRetryTest {
+
+    private val recovery = mock(ExtrinsicSubmissionRecovery::class.java)
+
+    private val accountRepository = mock(AccountRepository::class.java)
+
+    private val metaAccount = mock(MetaAccount::class.java)
 
     private val resources = mock(ResourceManager::class.java)
 
@@ -122,6 +133,9 @@ class BittensorDetailsRetryTest {
 
     @Before
     fun prepare(): Unit = runBlocking {
+        `when`(metaAccount.id).thenReturn(1L)
+        `when`(accountRepository.selectedMetaAccountFlow()).thenReturn(flowOf(metaAccount))
+        `when`(recovery.observe(1L, ChainGeneses.BITTENSOR)).thenReturn(flowOf(ExtrinsicRecoveryState.None))
         Dispatchers.setMain(UnconfinedTestDispatcher())
         `when`(resources.getString(anyInt())).thenReturn("Message")
         `when`(asset.token).thenReturn(token)
@@ -223,7 +237,9 @@ class BittensorDetailsRetryTest {
             bittensorPriceChartInteractor = priceChartInteractor,
             retryController = retryController,
             chartAxisFormatterFactory = axisFormatterFactory,
-            fiatFormatter = fiatFormatter
+            fiatFormatter = fiatFormatter,
+            recovery = recovery,
+            accountRepository = accountRepository
         )
     }
 }

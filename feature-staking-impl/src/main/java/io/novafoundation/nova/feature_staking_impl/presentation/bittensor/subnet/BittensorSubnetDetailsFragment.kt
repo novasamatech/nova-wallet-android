@@ -98,6 +98,9 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.estimatedAlpha.observe { estimate.text = it }
         viewModel.pool.observe(pool::showValue)
+        viewModel.age.observe(age::showValue)
+        viewModel.priceHistory.observe(priceHistory::showValue)
+        viewModel.priceRange.observe(priceRange::showValue)
         viewModel.validatorCount.observe(validatorCount::showValue)
         viewModel.selectedPreset.observe { selected ->
             preset1.isSelected = selected == BittensorStakeAmountPreset.ONE

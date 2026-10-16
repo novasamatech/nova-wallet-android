@@ -55,6 +55,7 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
         viewModel.fee.observe(binder.bittensorStakeConfirmExtrinsicInformation::setFeeStatus)
         binder.bittensorStakeConfirmStakingType.showValue(viewModel.stakingType)
         viewModel.validator.observe(::showValidator)
+        viewModel.stakeAfter.observe(binder.stakeAfter::showValue)
         viewModel.apy.observe(binder.bittensorStakeConfirmApy::showValue)
         viewModel.confirmButtonState.observe(binder.bittensorStakeConfirmButton::setState)
         bindBittensorStakeResults(

@@ -27,6 +27,8 @@ class BittensorWalletIsolationTest {
     private val extrinsics = mock(ExtrinsicService::class.java)
     private val wallets = mock(WalletRepository::class.java)
 
+    private val submission = mock(BittensorSubmissionExecutor::class.java)
+
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
 
     private val fee = mock(Fee::class.java)
@@ -39,7 +41,11 @@ class BittensorWalletIsolationTest {
         annualPercentageYield = null,
         dataStatus = BittensorDataStatus.Fresh
     )
+    private val selectedValidatorYield = BigDecimal("6.5")
+
     private val repository = object : BittensorStakingRepository {
+        override suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator) = selectedValidatorYield
+
         override fun observeRootStakingDetails() = flowOf(details)
 
         override fun observeRootStakingDetails(metaId: Long) = flowOf(details)
@@ -69,5 +75,26 @@ class BittensorWalletIsolationTest {
         verifyNoInteractions(extrinsics)
     }
 
-    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, wallets, validators)
+    @Test
+    fun `selected validator uses its own yield and existing stake`() = runBlocking {
+        val selected = BittensorValidator(AccountIdKey(ByteArray(32) { 2 }), "Selected")
+        val defaultPosition = BittensorRootPosition(validator.hotkey, BigInteger.TEN)
+        val selectedPosition = BittensorRootPosition(selected.hotkey, BigInteger.ONE)
+        val initial = details.copy(
+            annualPercentageYield = BigDecimal("3.0"),
+            position = defaultPosition,
+            positions = listOf(defaultPosition, selectedPosition)
+        )
+        val interactor = interactor()
+
+        val displayed = interactor.detailsForValidator(initial, selected)
+
+        assertEquals(selected, displayed.validator)
+        assertEquals(selectedValidatorYield, displayed.annualPercentageYield)
+        assertEquals(selectedPosition, displayed.position)
+        assertEquals(defaultPosition, initial.position)
+        assertEquals(initial.metaId, displayed.metaId)
+    }
+
+    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, wallets, validators, submission)
 }

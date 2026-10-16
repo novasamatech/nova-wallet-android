@@ -94,7 +94,7 @@ class BittensorStakeAmountViewModel(
     private val selectedValidator = MutableStateFlow<SelectedValidator?>(null)
 
     private val stakingDetails = combine(stakingDetailsState.filterLoaded(), selectedValidator) { details, selected ->
-        if (selected?.metaId == details.metaId) details.copy(validator = selected.validator) else details
+        if (selected?.metaId == details.metaId) bittensorStakingInteractor.detailsForValidator(details, selected.validator) else details
     }
         .shareInBackground()
 
@@ -143,6 +143,21 @@ class BittensorStakeAmountViewModel(
             ?.let { formatFiat(it, details.asset.token.currency) }
     }
         .shareInBackground()
+
+    val currentStake = stakingDetails.map { details ->
+        if (details.dataStatus !is io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus.Fresh) {
+            "—"
+        } else {
+            formatToken(details.asset.token.amountFromPlanks(details.position?.stakeInPlanks ?: BigInteger.ZERO), details.asset.token.configuration.symbol)
+        }
+    }.shareInBackground()
+
+    val monthlyEstimate = combine(stakingDetails, amount) { details, text ->
+        val annual = details.annualPercentageYield ?: return@combine "—"
+        val principal = text.toBigDecimalOrNull()?.takeIf { it.signum() > 0 } ?: return@combine "—"
+        val estimate = io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection(principal, annual)
+        "≈ " + formatToken(estimate, details.asset.token.configuration.symbol)
+    }.shareInBackground()
 
     val maxAmount = combine(stakingDetails, fee) { details, fee ->
         val available = maxAvailableInPlanks(details, fee.loadedFeeOrNull())

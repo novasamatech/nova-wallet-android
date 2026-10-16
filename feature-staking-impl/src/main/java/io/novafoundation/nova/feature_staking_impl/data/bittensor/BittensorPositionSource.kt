@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
@@ -41,7 +42,7 @@ internal fun bindBittensorPositions(decoded: Any?): BittensorStakePositions {
             val hotkey = bindAccountIdKey(value["hotkey"])
             when (netuid) {
                 BittensorNetuid.Root -> root += BittensorRootPosition(hotkey, stake)
-                is BittensorNetuid.Subnet -> subnets += BittensorSubnetPosition(netuid, hotkey, stake)
+                is BittensorNetuid.Subnet -> subnets += BittensorSubnetPosition(netuid, hotkey, stake, value.get<Any?>("isRegistered")?.let(::bindBoolean))
             }
         }
     }

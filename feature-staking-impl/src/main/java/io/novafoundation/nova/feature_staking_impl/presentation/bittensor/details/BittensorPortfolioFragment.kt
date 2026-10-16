@@ -8,8 +8,12 @@ import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeResultBottomSheet
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 
 class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorPortfolioBinding>() {
+
+    private var recoverySheet: BittensorStakeResultBottomSheet? = null
 
     private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
 
@@ -51,9 +55,40 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         }
         viewModel.positions.observe(adapter::submitList)
         viewModel.empty.observe { empty.isVisible = it }
+        viewModel.recoveryResult.observe { recovered ->
+            if (recovered == null) dismissRecoverySheet() else showRecoveryResult(recovered)
+        }
         viewModel.warning.observe {
             warning.text = it
             warning.isVisible = it != null
         }
+    }
+    private fun showRecoveryResult(result: BittensorStakeResultUi.Recovered) {
+        val sheet = recoverySheet ?: BittensorStakeResultBottomSheet(
+            requireContext(),
+            onClose = { recoverySheet?.dismiss() },
+            onTryAgain = {},
+            onDiscoverSubnets = { recoverySheet?.dismiss() },
+            onViewPosition = { recoverySheet?.dismiss() }
+        ).also {
+            recoverySheet = it
+            it.show()
+        }
+        sheet.setState(result)
+        sheet.setOnDismissListener {
+            recoverySheet = null
+            viewModel.recoveryResultDismissed(result.metaId, result.transactionHash)
+        }
+    }
+
+    private fun dismissRecoverySheet() {
+        recoverySheet?.setOnDismissListener(null)
+        recoverySheet?.dismiss()
+        recoverySheet = null
+    }
+
+    override fun onDestroyView() {
+        dismissRecoverySheet()
+        super.onDestroyView()
     }
 }

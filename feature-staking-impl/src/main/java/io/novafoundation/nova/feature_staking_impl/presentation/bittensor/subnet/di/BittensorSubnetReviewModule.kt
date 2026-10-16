@@ -49,7 +49,11 @@ class BittensorSubnetReviewModule {
         bittensorAmountFormatter: BittensorAmountFormatter,
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        estimates: io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository,
+        tokenFormatter: io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter,
+        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
+        chainStateRepository: io.novafoundation.nova.runtime.repository.ChainStateRepository
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
             BittensorNetuid.Subnet(payload.subnetId),
@@ -70,7 +74,11 @@ class BittensorSubnetReviewModule {
             bittensorAmountFormatter = bittensorAmountFormatter,
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
-            feeLoaderMixinFactory = feeLoaderMixinFactory
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            estimates = estimates,
+            tokenFormatter = tokenFormatter,
+            recovery = recovery,
+            chainStateRepository = chainStateRepository
         )
     }
 

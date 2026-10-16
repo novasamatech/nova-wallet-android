@@ -5,6 +5,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
@@ -33,12 +34,25 @@ class RealBittensorSubnetValidatorRepository(
     override suspend fun validateRoot(chain: Chain, validator: BittensorValidator) = validate(chain, BittensorNetuid.Root, validator)
 
     override suspend fun validators(chain: Chain, netuid: BittensorNetuid): List<BittensorSubnetValidator> = withTimeout(45_000L) {
-        val gates = backend.gates()
+        val ranking = backend.rankedValidators(netuid.value)
+        val gates = mapBittensorValidatorGates(BittensorRecommendationsRemote(ranking.meta))
+        val rankedRows = requireNotNull(ranking.items)
+        val recommendedHotkeys = rankedRows
+            .filter { it.eligible == true && it.recommendationClass in setOf("stable", "balanced", "higherUpside") }
+            .mapNotNull { it.hotkey }
+            .toSet()
+        val rankedNames = rankedRows.associateBy { it.hotkey }
         val response = backend.validators(netuid.value)
         val candidates = mapCandidates(chain, response)
+            .map { validator ->
+                val name = rankedNames[chain.addressOf(validator.hotkey.value)]?.validatorName?.trim()?.takeIf(String::isNotBlank)
+                validator.copy(name = name ?: validator.name)
+            }
         enrich(chain, netuid, candidates, gates)
+            .map { row -> row.copy(recommended = row.selectable && row.address in recommendedHotkeys) }
             .sortedWith(
                 compareByDescending<BittensorSubnetValidator> { it.selectable }
+                    .thenByDescending { it.recommended }
                     .thenBy { it.validator.name }
             )
     }

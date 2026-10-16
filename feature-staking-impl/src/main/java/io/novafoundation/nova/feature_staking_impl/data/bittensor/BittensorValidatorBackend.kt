@@ -8,6 +8,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.CacheControl
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.HttpException
 import retrofit2.Response
 
@@ -21,6 +22,10 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
     private var cachedBaseUrl: HttpUrl? = null
 
     private val lists = mutableMapOf<Int, Cached<BittensorValidatorsRemote>>()
+
+    private val rootValidators = mutableMapOf<String, Cached<BittensorRootValidatorRemote>>()
+
+    private val ranked = mutableMapOf<Int, Cached<BittensorRankedValidatorsRemote>>()
 
     private var recommendations: Cached<BittensorRecommendationsRemote>? = null
 
@@ -36,6 +41,57 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         requireNotNull(cached.data.items) { "Missing validator directory" }
         if (lists.size >= 64) lists.clear()
         lists[netuid] = cached
+        cached.data
+    }
+
+    private data class ClaimEventId(val block: Long, val extrinsic: Int, val event: Int)
+
+    suspend fun receivedRootRewards(accountSubject: String): java.math.BigDecimal = mutex.withLock {
+        val baseUrl = refreshInfrastructure()
+        val target = requireNotNull(endpoint(baseUrl, "root/claims/search").toHttpUrlOrNull()).newBuilder()
+            .addQueryParameter("accountSubject", accountSubject).addQueryParameter("page", "1").build()
+        val response = api.rootClaims(target.toString())
+        if (!response.isSuccessful) throw HttpException(response)
+        val body = requireNotNull(response.body())
+        require(body.historyScope == "TAO_APP_PARTIAL")
+        val component = requireNotNull(body.meta?.components?.rootClaims)
+        require(component.availability == "AVAILABLE" && component.freshness == "FRESH")
+        val seen = mutableSetOf<ClaimEventId>()
+        requireNotNull(body.items).fold(java.math.BigDecimal.ZERO) { total, row ->
+            val block = requireNotNull(row.block)
+            val extrinsic = requireNotNull(row.extrinsicIndex)
+            val event = requireNotNull(row.eventIndex)
+            require(block >= 0 && extrinsic >= 0 && event >= 0)
+            val amount = requireNotNull(row.payoutTao).toBigDecimal()
+            require(amount.isNonNegative)
+            if (seen.add(ClaimEventId(block, extrinsic, event))) total + amount else total
+        }
+    }
+
+    suspend fun rootValidator(hotkey: String): BittensorRootValidatorRemote = mutex.withLock {
+        val baseUrl = refreshInfrastructure()
+        require(hotkey.length == 48 && hotkey.all { it in "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz" })
+        val cached = rootValidators[hotkey]?.takeIf { System.nanoTime() < it.deadlineNanos }
+            ?: readCacheEntry(api.rootValidator(endpoint(baseUrl, "root/validators/$hotkey"))).also {
+                if (rootValidators.size >= 64) rootValidators.clear()
+                rootValidators[hotkey] = it
+            }
+        val component = requireNotNull(cached.data.meta?.components?.rootValidator)
+        require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Root validator data is unavailable or stale" }
+        require(cached.data.validator?.hotkey == hotkey)
+        cached.data
+    }
+
+    suspend fun rankedValidators(netuid: Int): BittensorRankedValidatorsRemote = mutex.withLock {
+        val baseUrl = refreshInfrastructure()
+        require(netuid in 0..65535)
+        val cached = ranked[netuid]?.takeIf { System.nanoTime() < it.deadlineNanos }
+            ?: readCacheEntry(api.rankedValidators(endpoint(baseUrl, "recommendations/subnets/$netuid/validators"))).also {
+                if (ranked.size >= 64) ranked.clear()
+                ranked[netuid] = it
+            }
+        mapBittensorValidatorGates(BittensorRecommendationsRemote(cached.data.meta))
+        requireNotNull(cached.data.items)
         cached.data
     }
 
@@ -81,6 +137,8 @@ class BittensorValidatorBackend(private val api: BittensorValidatorsApi, private
         require(base.isHttps) { "Infrastructure requires HTTPS" }
         if (base != cachedBaseUrl) {
             lists.clear()
+            rootValidators.clear()
+            ranked.clear()
             recommendations = null
             validatorRecommendations = null
             cachedBaseUrl = base

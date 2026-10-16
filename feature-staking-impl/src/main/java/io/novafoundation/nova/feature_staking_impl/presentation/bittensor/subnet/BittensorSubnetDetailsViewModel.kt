@@ -42,6 +42,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.expectedBlockTime
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.common.utils.shareInBackground
+import kotlinx.coroutines.flow.catch
+import java.math.BigDecimal
 
 class BittensorSubnetDetailsViewModel(
     private val subnetId: BittensorNetuid.Subnet,
@@ -56,7 +64,9 @@ class BittensorSubnetDetailsViewModel(
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     private val fiatFormatter: FiatFormatter,
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
-    private val retryController: BittensorRetryController
+    private val retryController: BittensorRetryController,
+    private val rpc: RpcCalls,
+    private val chainState: ChainStateRepository
 ) : BaseViewModel() {
 
     val retryEvents = retryController.events
@@ -265,6 +275,56 @@ class BittensorSubnetDetailsViewModel(
             router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(subnetId.value, selected.address))
         }
     }
+
+    private val ageState = retryController.observe(
+        step = "subnet age",
+        transform = { source -> source.onStart { emit(null) }.catch { emit(null) } }
+    ) {
+        subnet.flatMapLatest { subnet ->
+            flowOf {
+                val registration = subnet?.registrationBlock ?: return@flowOf null
+                val latest = java.math.BigInteger.valueOf(rpc.getBlockHeader(ChainGeneses.BITTENSOR).number.toLong())
+                require(latest >= registration) { "Registration block is ahead of the chain" }
+                val blockTime = chainState.expectedBlockTime(ChainGeneses.BITTENSOR)
+                require(blockTime.isPositive())
+                (latest - registration).toBigDecimal() * blockTime.inWholeMilliseconds.toBigDecimal() / BigDecimal(86_400_000)
+            }
+                .onStart { emit(null) }
+        }
+    }
+        .shareInBackground()
+
+    val age = ageState.map { it?.let { days -> resources.getString(R.string.bittensor_safety_age_days, days.toBigInteger().toString()) } ?: "—" }
+        .shareInBackground()
+
+    private val safetyHistory = retryController.observe(
+        step = "subnet safety history",
+        transform = { source -> source.onStart { emit(null) }.catch { emit(null) } }
+    ) {
+        asset.flatMapLatest { asset ->
+            flowOf<List<BittensorSubnetPricePoint>?> {
+                val priceId = asset.token.configuration.priceId ?: return@flowOf emptyList()
+                bittensorSubnetDetailsInteractor.history(subnetId, priceId, asset.token.currency, BittensorSubnetChartPeriod.MONTH)
+            }
+                .onStart { emit(null) }
+        }
+    }
+        .shareInBackground()
+
+    val priceHistory = safetyHistory.map { state ->
+        state?.takeIf { it.size >= 2 }?.let { points ->
+            val days = (points.last().timestamp - points.first().timestamp) / 86_400
+            resources.getString(R.string.bittensor_safety_observed_days, days.toString())
+        } ?: "—"
+    }.shareInBackground()
+
+    val priceRange = combine(safetyHistory, asset) { state, asset ->
+        state?.takeIf { it.size >= 2 }?.let { points ->
+            val low = tokenFormatter.formatToken(points.minOf { it.tao }, asset.token.configuration.symbol)
+            val high = tokenFormatter.formatToken(points.maxOf { it.tao }, asset.token.configuration.symbol)
+            "$low – $high"
+        } ?: "—"
+    }.shareInBackground()
 
     fun back() = router.back()
 

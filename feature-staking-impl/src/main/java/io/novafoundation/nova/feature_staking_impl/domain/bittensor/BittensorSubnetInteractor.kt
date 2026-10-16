@@ -14,7 +14,8 @@ data class BittensorSubnet(
     val symbol: String,
     val logoUrl: String?,
     val priceInRao: BigInteger? = null,
-    val taoReserveInPlanks: BigInteger? = null
+    val taoReserveInPlanks: BigInteger? = null,
+    val registrationBlock: BigInteger? = null
 )
 
 class BittensorSubnetInteractor(

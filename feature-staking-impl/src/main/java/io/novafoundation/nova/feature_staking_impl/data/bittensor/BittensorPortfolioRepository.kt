@@ -60,7 +60,14 @@ class RealBittensorPortfolioRepository(
                     walletRepository.assetFlow(account.id, chain.utilityAsset),
                     observePositions(chain, account.requireAccountIdIn(chain), rootOnly)
                 ) { asset, positionState ->
-                    BittensorPortfolio(account.id, chain, asset, positionState.positions, positionState.status)
+                    BittensorPortfolio(
+                        account.id,
+                        chain,
+                        asset,
+                        positionState.positions,
+                        positionState.status,
+                        supportsImmediateOperations = account.type != io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG
+                    )
                 }
             }
     }

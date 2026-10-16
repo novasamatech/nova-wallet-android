@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_api.di
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
@@ -162,6 +163,8 @@ interface AccountFeatureApi {
     fun addressDisplayUseCase(): AddressDisplayUseCase
 
     fun accountUseCase(): SelectedAccountUseCase
+
+    fun extrinsicSubmissionRecovery(): ExtrinsicSubmissionRecovery
 
     fun extrinsicService(): ExtrinsicService
 

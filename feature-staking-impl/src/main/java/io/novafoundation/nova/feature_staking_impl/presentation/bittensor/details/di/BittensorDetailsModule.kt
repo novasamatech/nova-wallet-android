@@ -44,7 +44,9 @@ class BittensorDetailsModule {
         bittensorPriceChartInteractor: BittensorPriceChartInteractor,
         retryController: BittensorRetryController,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
-        fiatFormatter: FiatFormatter
+        fiatFormatter: FiatFormatter,
+        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
+        accountRepository: io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
     ): ViewModel = BittensorDetailsViewModel(
         bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
@@ -55,7 +57,9 @@ class BittensorDetailsModule {
         bittensorPriceChartInteractor = bittensorPriceChartInteractor,
         retryController = retryController,
         chartAxisFormatterFactory = chartAxisFormatterFactory,
-        fiatFormatter = fiatFormatter
+        fiatFormatter = fiatFormatter,
+        recovery = recovery,
+        accountRepository = accountRepository
     )
 
     @Provides
@@ -69,7 +73,10 @@ class BittensorDetailsModule {
         addressIconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         amountFormatter: BittensorAmountFormatter,
-        retryController: BittensorRetryController
+        retryController: BittensorRetryController,
+        claims: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor,
+        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
+        accountRepository: io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
     ): ViewModel = BittensorRootDetailsViewModel(
         interactor,
         router,
@@ -78,7 +85,10 @@ class BittensorDetailsModule {
         addressIconGenerator,
         externalActions,
         amountFormatter,
-        retryController
+        retryController,
+        claims = claims,
+        recovery = recovery,
+        accountRepository = accountRepository
     )
 
     @Provides

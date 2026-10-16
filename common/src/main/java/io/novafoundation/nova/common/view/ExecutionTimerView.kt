@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.execution
+package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.os.CountDownTimer
@@ -19,8 +19,8 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_swap_impl.R
-import io.novafoundation.nova.feature_swap_impl.databinding.ViewExecutionTimerBinding
+import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewExecutionTimerBinding
 import kotlin.math.cos
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -40,6 +40,8 @@ class ExecutionTimerView @JvmOverloads constructor(
 
         object Error : State
 
+        object Waiting : State
+
         class CountdownTimer(val duration: Duration) : State
     }
 
@@ -51,6 +53,7 @@ class ExecutionTimerView @JvmOverloads constructor(
     private val slideTopOutAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_slide_bottom_out)
 
     private var currentTimer: CountDownTimer? = null
+    private var pendingTimerStart: Runnable? = null
 
     init {
         setupTimerSwitcher()
@@ -59,7 +62,7 @@ class ExecutionTimerView @JvmOverloads constructor(
     fun setState(state: State) {
         currentState = state
 
-        currentTimer?.cancel()
+        stopTimer()
 
         when (state) {
             State.Success -> {
@@ -72,6 +75,14 @@ class ExecutionTimerView @JvmOverloads constructor(
                 hideTimerWithAnimation()
                 binder.executionResult.setImageResource(R.drawable.ic_execution_result_error)
                 binder.executionResult.fadeInWithScale()
+            }
+
+            State.Waiting -> {
+                binder.executionResult.makeGone()
+                binder.executionTimeSwitcher.makeGone()
+                binder.executionTimeSeconds.makeGone()
+                binder.executionProgress.makeVisible()
+                binder.executionProgress.runInfinityRotationAnimation()
             }
 
             is State.CountdownTimer -> {
@@ -104,7 +115,20 @@ class ExecutionTimerView @JvmOverloads constructor(
     }
 
     private fun runTimerWithDelay(delay: Long, timer: CountDownTimer) {
-        postDelayed({ timer.start() }, delay)
+        pendingTimerStart = Runnable { timer.start() }.also { postDelayed(it, delay) }
+    }
+
+    private fun stopTimer() {
+        pendingTimerStart?.let(::removeCallbacks)
+        pendingTimerStart = null
+        currentTimer?.cancel()
+        currentTimer = null
+    }
+
+    override fun onDetachedFromWindow() {
+        stopTimer()
+        binder.executionProgress.clearAnimation()
+        super.onDetachedFromWindow()
     }
 
     private fun setupTimerSwitcher() {

@@ -48,6 +48,8 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
         viewModel.amountModel.observe(binder.bittensorStakeAmount::setChooseAmountModel)
         viewModel.amount.observe(::showAmount)
         viewModel.fiatAmount.observe(binder.bittensorStakeAmount::setFiatAmount)
+        viewModel.currentStake.observe(binder.currentStake::showValue)
+        viewModel.monthlyEstimate.observe(binder.monthlyEstimate::showValue)
         viewModel.maxAmount.observe(binder.bittensorStakeAmount::setMaxAmountDisplay)
         viewModel.validator.observe(::showValidator)
         viewModel.apy.observe(binder.bittensorStakeAmountApy::showValue)

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.AccountId
@@ -23,6 +24,21 @@ fun ExtrinsicBuilder.addBittensorRootStake(hotkey: AccountId, amount: Balance) {
             "netuid" to ROOT_NETUID,
             "amount_staked" to amount
         )
+    )
+}
+
+fun ExtrinsicBuilder.removeBittensorRootStake(hotkey: AccountId, amount: Balance) {
+    require(hotkey.size == 32 && amount.signum() > 0 && amount <= MAX_U64)
+    call(SUBTENSOR_MODULE, "remove_stake", mapOf("hotkey" to hotkey, "netuid" to ROOT_NETUID, "amount_unstaked" to amount))
+}
+
+fun ExtrinsicBuilder.removeFullBittensorStake(hotkey: AccountId, netuid: BittensorNetuid, limitPrice: BigInteger?) {
+    require(hotkey.size == 32)
+    require(if (netuid.isRoot()) limitPrice == null else limitPrice != null && limitPrice.signum() > 0 && limitPrice <= MAX_U64)
+    call(
+        SUBTENSOR_MODULE,
+        "remove_stake_full_limit",
+        mapOf("hotkey" to hotkey, "netuid" to BigInteger.valueOf(netuid.value.toLong()), "limit_price" to limitPrice)
     )
 }
 

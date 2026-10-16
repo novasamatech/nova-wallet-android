@@ -107,6 +107,12 @@ interface StakingRouter {
 
     fun openStakingDashboard()
 
+    fun openBittensorExitAmount(position: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload)
+
+    fun openBittensorExitReview(review: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitReviewPayload)
+
+    fun openBittensorRootClaim()
+
     fun openBittensorRootStaking()
 
     fun openBittensorPortfolio()
@@ -118,6 +124,8 @@ interface StakingRouter {
     fun openBittensorChooseSubnet()
 
     fun openBittensorSubnetDetails(payload: BittensorSubnetDetailsPayload)
+
+    fun openBittensorSubnetPosition(payload: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload)
 
     fun openBittensorSubnetAmount(payload: BittensorSubnetAmountPayload)
 

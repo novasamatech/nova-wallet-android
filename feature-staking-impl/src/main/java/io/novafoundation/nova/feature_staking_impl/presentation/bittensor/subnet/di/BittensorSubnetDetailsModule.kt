@@ -43,7 +43,9 @@ class BittensorSubnetDetailsModule {
         validatorCommunicator: BittensorSelectValidatorCommunicator,
         fiatFormatter: FiatFormatter,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
-        retryController: BittensorRetryController
+        retryController: BittensorRetryController,
+        rpc: io.novafoundation.nova.runtime.network.rpc.RpcCalls,
+        chainState: io.novafoundation.nova.runtime.repository.ChainStateRepository
     ): ViewModel = BittensorSubnetDetailsViewModel(
         subnetId = BittensorNetuid.Subnet(payload.subnetId),
         bittensorSubnetInteractor = bittensorSubnetInteractor,
@@ -57,7 +59,9 @@ class BittensorSubnetDetailsModule {
         validatorCommunicator = validatorCommunicator,
         fiatFormatter = fiatFormatter,
         chartAxisFormatterFactory = chartAxisFormatterFactory,
-        retryController = retryController
+        retryController = retryController,
+        rpc = rpc,
+        chainState = chainState
     )
 
     @Provides

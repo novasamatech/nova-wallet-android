@@ -16,9 +16,18 @@ sealed interface BittensorStakeResultUi {
         val fee: BittensorFeeUi
     ) : BittensorStakeResultUi
 
+    data class Recovered(
+        val title: String,
+        val description: String,
+        val transactionHash: String,
+        val metaId: Long,
+        val successful: Boolean
+    ) : BittensorStakeResultUi
+
     data class Failure(
         val title: String,
         val description: String,
-        val error: String
+        val error: String,
+        val canRetry: Boolean = true
     ) : BittensorStakeResultUi
 }

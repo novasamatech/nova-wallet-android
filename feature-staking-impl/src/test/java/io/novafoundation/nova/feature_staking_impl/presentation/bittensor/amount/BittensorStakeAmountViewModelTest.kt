@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
@@ -90,9 +91,11 @@ class BittensorStakeAmountViewModelTest {
 
     private val wallets = mock(WalletRepository::class.java)
 
+    private val submission = mock(BittensorSubmissionExecutor::class.java)
+
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
 
-    private val interactor = BittensorStakingInteractor(repository, extrinsics, wallets, validators)
+    private val interactor = BittensorStakingInteractor(repository, extrinsics, wallets, validators, submission)
 
     private val router = mock(StakingRouter::class.java)
 

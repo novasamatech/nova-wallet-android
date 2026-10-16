@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/secondary_screen_background"
-    android:orientation="vertical">
+    android:orientation="vertical" >
+
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/bittensorStakeConfirmToolbar"
         android:layout_width="match_parent"
@@ -41,7 +42,8 @@
         app:childrenPaddingEnd="16dp"
         app:childrenPaddingStart="16dp"
         app:childrenPaddingTop="0dp"
-        app:drawDividers="true">
+        app:drawDividers="true" >
+
         <io.novafoundation.nova.common.view.TableCellView
             android:id="@+id/bittensorStakeConfirmStakingType"
             android:layout_width="match_parent"
@@ -64,7 +66,12 @@
             app:primaryValueStyle="positive"
             app:shouldDrawDivider="false"
             app:title="@string/bittensor_apy"
-            tools:primaryValue="7% · paid in TOKEN" />
+            tools:primaryValue="7% · paid in TAO" />
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/stakeAfter"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            app:title="@string/bittensor_exit_stake_after" />
     </io.novafoundation.nova.common.view.TableView>
 
     <Space

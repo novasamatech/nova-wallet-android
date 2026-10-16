@@ -48,7 +48,8 @@ class BittensorStakeConfirmModule {
         retryController: BittensorRetryController,
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
             payload = payload,
@@ -66,7 +67,8 @@ class BittensorStakeConfirmModule {
             retryController = retryController,
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
-            feeLoaderMixinFactory = feeLoaderMixinFactory
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            recovery = recovery
         )
     }
 

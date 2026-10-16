@@ -32,6 +32,8 @@ Preserve navigation XML organization: keep the leading include block together, g
 
 ## Operation confirmation
 
+Operation confirmation does not support switching wallets from another screen. Preserve the explicit-wallet operation contract without introducing UI for that unsupported scenario.
+
 Use `FeeLoaderMixinV2` for transaction fee loading, presentation, and retry handling, following existing `createDefault`/`createDefaultBy` and `connectWith` usages. Do not build a parallel fee-loading state machine in a feature ViewModel. Keep estimates associated with their operation inputs, and use the same loaded fee for display and validation. Retrying a fee estimate must not silently replace a confirmed quote, amount, or price limit.
 
 Fee estimation and submission must use the same call builder, including service fees and batch mode. Do not replace confirmed amounts or protective price limits with a fresh quote just before signing. Bind confirmation data and signing to the explicit operation wallet, not the globally selected wallet. Do not reject an operation merely because the selected meta-account changed. Recheck that operation wallet's available balance and applicable permissions before submission. Do not substitute a root validator for a subnet validator without explicit configuration and eligibility checks in that subnet.
@@ -109,3 +111,7 @@ Keep read and mapping methods free of hidden workflow state changes. Pass an exp
 Prefer named models for meaningful requests and load results over positional `Pair`/`Triple` values. Use scope functions for short transformations; keep validation, mutation and operation sequencing explicit. Do not manufacture zero-valued data merely to call a formatter and erase the result afterwards.
 
 Share subscriptions, decoding, and loading when multiple consumers need different parts of the same runtime response. Key shared streams by chain and account identity, bind their lifetime to active consumers, and keep dashboard and screen state derived from the same source. Keep recovery independent for unrelated reads, and keep screen-specific sources out of screens that do not consume them.
+
+## Bittensor position actions
+
+Keep root staking and subnet trading as separate flows. Root positions use Add stake and Unstake. Subnet positions have their own position-details screen with Buy more and Sell actions; do not route an existing subnet position to the discovery screen or label its trading flow as root staking. Use the corresponding Figma amount, confirmation, waiting, and result frames.

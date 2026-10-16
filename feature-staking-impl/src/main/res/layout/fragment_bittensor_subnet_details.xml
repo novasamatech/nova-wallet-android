@@ -5,26 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/secondary_screen_background">
+    android:background="@color/secondary_screen_background" >
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:fillViewport="true">
+        android:fillViewport="true" >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="16dp" >
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
                 <TextView
                     android:id="@+id/priceTitle"
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -32,16 +31,15 @@
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_secondary" />
-
                 <TextView
                     android:id="@+id/tao"
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                     android:layout_width="56dp"
                     android:layout_height="32dp"
                     android:gravity="center"
+                    android:text="TAO"
                     android:textColor="@color/bittensor_price_unit_text"
                     android:background="@drawable/background_chart_button" />
-
                 <TextView
                     android:id="@+id/fiat"
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -51,14 +49,12 @@
                     android:gravity="center"
                     android:background="@drawable/background_chart_button" />
             </LinearLayout>
-
             <TextView
                 android:id="@+id/price"
                 style="@style/TextAppearance.NovaFoundation.Bold.Title2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="—" />
-
             <TextView
                 android:id="@+id/change"
                 style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
@@ -66,13 +62,11 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/text_positive"
                 android:text="—" />
-
             <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />
-
             <TextView
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
                 android:layout_width="match_parent"
@@ -80,13 +74,12 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/bittensor_validator"
                 android:textColor="@color/text_secondary" />
-
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:childrenPaddingStart="16dp"
-                app:childrenPaddingEnd="16dp">
+                app:childrenPaddingEnd="16dp" >
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/validator"
                     android:layout_width="match_parent"
@@ -95,7 +88,6 @@
                     app:primaryValue="@string/bittensor_select_validator"
                     app:primaryValueEndIcon="@drawable/ic_chevron_right_16" />
             </io.novafoundation.nova.common.view.TableView>
-
             <TextView
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
                 android:layout_width="match_parent"
@@ -103,18 +95,17 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/bittensor_what_you_could_get"
                 android:textColor="@color/text_secondary" />
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="16dp"
                 android:layout_marginTop="8dp"
-                android:background="@drawable/bg_primary_list_item_corner_12_solid">
+                android:background="@drawable/bg_primary_list_item_corner_12_solid" >
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="36dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal" >
                     <TextView
                         android:id="@+id/preset1"
                         style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
@@ -123,8 +114,8 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:gravity="center"
+                        android:text="1 TAO"
                         android:background="@drawable/bg_bittensor_amount_preset" />
-
                     <TextView
                         android:id="@+id/preset5"
                         style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
@@ -134,8 +125,8 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:layout_marginStart="8dp"
+                        android:text="5 TAO"
                         android:background="@drawable/bg_bittensor_amount_preset" />
-
                     <TextView
                         android:id="@+id/preset10"
                         style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
@@ -145,8 +136,8 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:layout_marginStart="8dp"
+                        android:text="10 TAO"
                         android:background="@drawable/bg_bittensor_amount_preset" />
-
                     <TextView
                         android:id="@+id/presetMax"
                         style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
@@ -159,7 +150,6 @@
                         android:text="@string/bittensor_max"
                         android:background="@drawable/bg_bittensor_amount_preset" />
                 </LinearLayout>
-
                 <TextView
                     android:id="@+id/estimate"
                     style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
@@ -167,7 +157,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="—" />
-
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                     android:layout_width="match_parent"
@@ -175,7 +164,6 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/bittensor_monthly_unavailable"
                     android:textColor="@color/text_secondary" />
-
                 <TextView
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                     android:layout_width="match_parent"
@@ -184,7 +172,6 @@
                     android:text="@string/bittensor_estimate_disclaimer"
                     android:textColor="@color/text_secondary" />
             </LinearLayout>
-
             <TextView
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
                 android:layout_width="match_parent"
@@ -192,60 +179,56 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/bittensor_risk_factors"
                 android:textColor="@color/text_secondary" />
-
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 app:childrenPaddingStart="16dp"
                 app:childrenPaddingEnd="16dp"
-                app:drawDividers="true">
+                app:drawDividers="true" >
                 <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/age"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:title="@string/bittensor_subnet_age"
                     app:primaryValue="—" />
-
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/validatorCount"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:title="@string/bittensor_validator"
                     app:primaryValue="—" />
-
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/pool"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:title="@string/bittensor_pool"
                     app:primaryValue="—" />
-
                 <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/priceHistory"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:title="@string/bittensor_price_history"
                     app:primaryValue="—" />
-
                 <io.novafoundation.nova.common.view.TableCellView
+                    android:id="@+id/priceRange"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:title="@string/bittensor_price_range"
                     app:primaryValue="—" />
             </io.novafoundation.nova.common.view.TableView>
-
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 app:childrenPaddingStart="16dp"
-                app:childrenPaddingEnd="16dp">
+                app:childrenPaddingEnd="16dp" >
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/more"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
                     app:title="@string/bittensor_more_details"
                     app:primaryValueEndIcon="@drawable/ic_chevron_down" />
-
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/subnetNumber"
                     android:layout_width="match_parent"
@@ -255,13 +238,12 @@
             </io.novafoundation.nova.common.view.TableView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="84dp"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:background="@color/solid_navigation_background">
+        android:background="@color/solid_navigation_background" >
         <ImageButton
             android:id="@+id/favorite"
             android:layout_width="52dp"
@@ -269,7 +251,6 @@
             android:background="@drawable/bg_primary_list_item_corner_12_solid"
             android:src="@drawable/ic_favorite_heart_outline"
             android:contentDescription="@string/bittensor_add_favorite" />
-
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/useSubnet"
             style="@style/Widget.Nova.Button.Primary"

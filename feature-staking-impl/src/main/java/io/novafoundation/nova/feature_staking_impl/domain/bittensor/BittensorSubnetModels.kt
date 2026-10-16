@@ -6,7 +6,8 @@ import java.math.BigInteger
 data class BittensorSubnetPosition(
     val subnetId: BittensorNetuid.Subnet,
     val validatorHotkey: AccountIdKey,
-    val alphaInPlanks: BigInteger
+    val alphaInPlanks: BigInteger,
+    val isRegistered: Boolean? = null
 )
 
 enum class BittensorSwapDirection {

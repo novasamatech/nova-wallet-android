@@ -1,5 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionResolution
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
+import kotlinx.coroutines.test.runTest
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
@@ -69,6 +74,10 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val extrinsicService = RecordingExtrinsicService(unusedExtrinsicService, fee, Result.success(successfulExecution))
 
+    private val recovery = mock(ExtrinsicSubmissionRecovery::class.java)
+
+    private val submission = BittensorSubmissionExecutor(extrinsicService, recovery)
+
     private val validator = BittensorValidator(AccountIdKey(ByteArray(32) { 1 }), "Validator")
 
     private val amount = BigInteger.valueOf(1000)
@@ -83,7 +92,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val rootValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
-    private val rootInteractor = BittensorStakingInteractor(rootRepository, extrinsicService, wallets, rootValidators)
+    private val rootInteractor = BittensorStakingInteractor(rootRepository, extrinsicService, wallets, rootValidators, submission)
 
     private val subnetValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
@@ -95,7 +104,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         subnetValidators,
         subnetInteractor,
         extrinsicService,
-        "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq"
+        "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
+        submission
     )
 
     private val subnetId = BittensorNetuid.Subnet(1)
@@ -128,6 +138,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     @Before
     fun prepare(): Unit = runBlocking {
+        `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
+        resolve(RecoveredExtrinsicOutcome.SUCCESS)
         `when`(selectedAccount.id).thenReturn(1L)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selectedAccount)
         `when`(chainRegistry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
@@ -173,7 +185,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     @Test
     fun `successful execution uses standard submission with explicit operation parameters`() = runBlocking {
-        assertSame(successfulExecution, execute().getOrThrow())
+        assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
         assertEquals(1, extrinsicService.submissions)
         assertEquals(1L, (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId)
         assertEquals(BatchMode.BATCH_ALL, extrinsicService.submissionOptions?.batchMode)
@@ -187,31 +199,33 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     @Test
-    fun `network failure is returned without an automatic resubmission or persistent lock`() = runBlocking {
+    fun `failure before recording a signed transaction permits a retry`() = runBlocking {
         val failure = IOException("Connection lost")
         extrinsicService.result = Result.failure(failure)
 
-        assertSame(failure, execute().exceptionOrNull())
+        assertSame(failure, (execute() as BittensorOperationResult.Failure).cause)
         assertEquals(1, extrinsicService.submissions)
 
         extrinsicService.result = Result.success(successfulExecution)
-        assertSame(successfulExecution, execute().getOrThrow())
+        assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
         assertEquals(2, extrinsicService.submissions)
     }
 
     @Test
-    fun `unknown execution outcome is not reported as success`() = runBlocking {
+    fun `unknown execution outcome is not reported as success`() = runTest {
+        `when`(recovery.reconcile(1L, chain.id)).thenReturn(ExtrinsicRecoveryState.Pending(successfulExecution.extrinsicHash))
         extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Unknown))
 
-        assertTrue(execute().isFailure)
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
         assertEquals(1, extrinsicService.submissions)
     }
 
     @Test
     fun `on chain failure is propagated`() = runBlocking {
+        resolve(RecoveredExtrinsicOutcome.FAILURE)
         extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Failed(DispatchError.Token)))
 
-        assertSame(DispatchError.Token, execute().exceptionOrNull())
+        assertSame(DispatchError.Token, (execute() as BittensorOperationResult.Failure).cause)
         assertEquals(1, extrinsicService.submissions)
     }
 
@@ -219,13 +233,38 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `wallet switch keeps the original submission wallet`() = runBlocking {
         `when`(selectedAccount.id).thenReturn(2L)
 
-        assertTrue(execute().isSuccess)
+        assertTrue(execute() is BittensorOperationResult.Success)
         assertEquals(1, extrinsicService.submissions)
         assertEquals(1L, (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId)
         verifyNoInteractions(accounts)
     }
 
-    private suspend fun execute(): Result<ExtrinsicExecutionResult> = when (stakingType) {
+    @Test
+    fun `lost response after broadcast blocks another submission`() = runBlocking {
+        extrinsicService.result = Result.failure(IOException("Connection lost"))
+        `when`(recovery.pendingHash(1L)).thenReturn(null, successfulExecution.extrinsicHash)
+
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
+        assertEquals(1, extrinsicService.submissions)
+        assertTrue(extrinsicService.submissionOptions!!.recoverable)
+    }
+
+    @Test
+    fun `receipt for an earlier transaction cannot complete the new operation`() = runTest {
+        val previousReceipt = ExtrinsicSubmissionResolution("0xprevious", RecoveredExtrinsicOutcome.SUCCESS)
+        `when`(recovery.reconcile(1L, chain.id)).thenReturn(ExtrinsicRecoveryState.Resolved(previousReceipt))
+
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
+        assertEquals(1, extrinsicService.submissions)
+    }
+
+    private suspend fun resolve(outcome: RecoveredExtrinsicOutcome) {
+        val result = ExtrinsicSubmissionResolution(successfulExecution.extrinsicHash, outcome)
+        `when`(recovery.reconcile(1L, chain.id)).thenReturn(ExtrinsicRecoveryState.Resolved(result))
+    }
+
+    private suspend fun execute(): BittensorOperationResult = when (stakingType) {
         StakingType.ROOT -> rootInteractor.executeRootStake(BittensorRootStakeRequest(1L, chain, validator, amount))
         StakingType.SUBNET -> subnetStakingInteractor.execute(subnetDraft)
     }

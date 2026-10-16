@@ -27,4 +27,10 @@ data class BittensorValidatorGates(val maxCommissionRate: BigDecimal, val requir
 internal fun validatorCommissionRateFromU16(commissionInU16: BigInteger): BigDecimal = commissionInU16.toBigDecimal()
     .divide(VALIDATOR_COMMISSION_DENOMINATOR.toBigDecimal(), COMMISSION_RATE_SCALE, RoundingMode.HALF_EVEN)
 
-data class BittensorSubnetValidator(val validator: BittensorValidator, val address: String, val commissionRate: BigDecimal, val selectable: Boolean)
+data class BittensorSubnetValidator(
+    val validator: BittensorValidator,
+    val address: String,
+    val commissionRate: BigDecimal,
+    val selectable: Boolean,
+    val recommended: Boolean = false
+)

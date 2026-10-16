@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.view.showLoadingValue
 import android.os.Bundle
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
@@ -52,6 +54,12 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
             }
         )
         subnet.setOnClickListener { viewModel.chooseSubnetClicked() }
+        subnet.isClickable = !viewModel.existingPosition
+        subnetArrow.isVisible = !viewModel.existingPosition
+        if (viewModel.existingPosition) {
+            toolbar.setTitle(getString(R.string.bittensor_buy_more))
+            amount.setTitle(getString(R.string.bittensor_you_pay))
+        }
         rate.title.setOnClickListener { showInfo(R.string.bittensor_exchange_rate, getString(R.string.swap_rate_description)) }
         continueButton.prepareForProgress(viewLifecycleOwner)
         continueButton.setOnClickListener { viewModel.continueClicked() }
@@ -61,6 +69,8 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         observeValidations(viewModel)
         observeRetries(viewModel.feeLoaderMixin)
         observeBittensorRetries(viewModel.retryEvents)
+        viewModel.monthlyEstimate.observe(monthlyTokens::showValue)
+        viewModel.projectedAveragePrice.observe(projectedAveragePrice::showLoadingValue)
         viewModel.fee.observe(networkFee::setFeeStatus)
         viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.amountModel.observe(amount::setChooseAmountModel)
@@ -81,6 +91,8 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
                 bittensorSubnetIcon()
             }
         }
+        viewModel.validator.observe(validator::showValue)
+        viewModel.apy.observe { subnetApy.text = it }
         viewModel.alphaAmount.observe(receive::showValue)
         viewModel.rate.observe(rate::showValue)
         viewModel.continueButtonState.observe(continueButton::setState)

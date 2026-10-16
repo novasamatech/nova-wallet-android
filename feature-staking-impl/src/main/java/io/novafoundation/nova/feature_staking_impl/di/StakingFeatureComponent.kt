@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.di.BittensorRootClaimComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.di.BittensorSubnetPositionComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di.BittensorExitReviewComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di.BittensorExitAmountComponent
 import dagger.BindsInstance
 import dagger.Component
 import io.novafoundation.nova.analytics.di.AnalyticsFeatureApi
@@ -136,6 +140,14 @@ interface StakingFeatureComponent : StakingFeatureApi {
     fun bittensorStakeConfirmComponentFactory(): BittensorStakeConfirmComponent.Factory
 
     fun bittensorDetailsComponentFactory(): BittensorDetailsComponent.Factory
+
+    fun bittensorExitAmountComponentFactory(): BittensorExitAmountComponent.Factory
+
+    fun bittensorExitReviewComponentFactory(): BittensorExitReviewComponent.Factory
+
+    fun bittensorSubnetPositionComponentFactory(): BittensorSubnetPositionComponent.Factory
+
+    fun bittensorRootClaimComponentFactory(): BittensorRootClaimComponent.Factory
 
     fun bittensorSubnetComponentFactory(): BittensorSubnetComponent.Factory
 

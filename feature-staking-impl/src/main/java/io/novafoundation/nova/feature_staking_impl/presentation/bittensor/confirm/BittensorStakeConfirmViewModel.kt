@@ -1,5 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -74,7 +79,8 @@ class BittensorStakeConfirmViewModel(
     private val retryController: BittensorRetryController,
     private val validationSystem: BittensorStakePreflightSystem,
     private val validationExecutor: ValidationExecutor,
-    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+    private val recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
@@ -92,7 +98,9 @@ class BittensorStakeConfirmViewModel(
     }
         .shareInBackground()
 
-    private val stakingDetails = stakingDetailsState.filterLoaded()
+    private val stakingDetails = combine(stakingDetailsState.filterLoaded(), stakeRequest) { details, request ->
+        bittensorStakingInteractor.detailsForValidator(details, request.validator)
+    }
         .shareInBackground()
 
     val amount = combine(stakingDetails, stakeRequest, ::mapAmount)
@@ -119,6 +127,13 @@ class BittensorStakeConfirmViewModel(
     }
         .shareInBackground()
 
+    val stakeAfter = combine(stakingDetails, stakeRequest) { details, request ->
+        val before = details.position?.stakeInPlanks ?: java.math.BigInteger.ZERO
+        val token = details.asset.token
+        formatToken(token.amountFromPlanks(before), token.configuration.symbol) + " → " +
+            formatToken(token.amountFromPlanks(before + request.amountInPlanks), token.configuration.symbol)
+    }.shareInBackground()
+
     val stakingType = resourceManager.getString(R.string.bittensor_root_staking)
 
     val validator = stakeRequest.map(::mapValidator)
@@ -128,6 +143,32 @@ class BittensorStakeConfirmViewModel(
         .shareInBackground()
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
+
+    private var submittedHash: String? = null
+
+    private val recoveryState = recovery.observe(payload.metaId, ChainGeneses.BITTENSOR)
+        .onEach { state ->
+            if (submission.value !is BittensorSubmissionState.Submitting) {
+                when (state) {
+                    is ExtrinsicRecoveryState.Pending -> submission.value = unresolved(state.hash)
+                    is ExtrinsicRecoveryState.Resolved -> if (submission.value is BittensorSubmissionState.Unresolved) {
+                        submission.value = BittensorSubmissionState.Recovered(state.result.toUi(resourceManager, payload.metaId))
+                    }
+                    ExtrinsicRecoveryState.None -> Unit
+                }
+            }
+        }
+        .shareInBackground()
+
+    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
+        hash,
+        BittensorStakeResultUi.Failure(
+            resourceManager.getString(R.string.bittensor_submission_unknown_title),
+            resourceManager.getString(R.string.bittensor_submission_unknown_description),
+            hash,
+            canRetry = false
+        )
+    )
 
     val resultState = submission.map { it.result }
         .shareInBackground()
@@ -147,6 +188,7 @@ class BittensorStakeConfirmViewModel(
         .shareInBackground()
 
     init {
+        recoveryState.launchIn(this)
         feeLoaderMixin.connectWith(stakeRequest) { _, request ->
             val fee = bittensorStakingInteractor.estimateRootStakeFee(request)
             BittensorFeeEstimate(request, fee)
@@ -190,8 +232,17 @@ class BittensorStakeConfirmViewModel(
         try {
             val details = stakingDetails.first()
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
-            bittensorStakingInteractor.executeRootStake(request).getOrThrow()
-            submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee))
+            when (val result = bittensorStakingInteractor.executeRootStake(request)) {
+                is BittensorOperationResult.Success -> {
+                    submittedHash = result.transactionHash
+                    submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee))
+                }
+                is BittensorOperationResult.Failure -> {
+                    submittedHash = result.transactionHash
+                    submission.value = BittensorSubmissionState.Failed(mapFailure(result.cause))
+                }
+                is BittensorOperationResult.Unknown -> submission.value = unresolved(result.transactionHash)
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -201,12 +252,24 @@ class BittensorStakeConfirmViewModel(
         }
     }
 
+    private fun acknowledgeResult() = launchUnit {
+        val recovered = submission.value as? BittensorSubmissionState.Recovered
+        val hash = recovered?.recovery?.transactionHash ?: submittedHash
+        hash?.let { recovery.acknowledge(payload.metaId, it) }
+    }
+
     fun resultDismissed() {
+        acknowledgeResult()
         submission.value = submission.value.dismissResult()
     }
 
     fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) router.openBittensorRootDetails()
+        acknowledgeResult()
+        if (submission.value is BittensorSubmissionState.Completed ||
+            (submission.value as? BittensorSubmissionState.Recovered)?.recovery?.successful == true
+        ) {
+            router.openBittensorRootDetails()
+        }
     }
 
     private fun mapAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): AmountModel {

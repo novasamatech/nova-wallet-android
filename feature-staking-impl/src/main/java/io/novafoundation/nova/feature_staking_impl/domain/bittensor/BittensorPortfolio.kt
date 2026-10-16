@@ -9,7 +9,8 @@ data class BittensorPortfolio(
     val chain: Chain,
     val asset: Asset,
     val positions: BittensorPortfolioPositions?,
-    val dataStatus: BittensorDataStatus
+    val dataStatus: BittensorDataStatus,
+    val supportsImmediateOperations: Boolean = true
 )
 
 data class BittensorStakePositions(

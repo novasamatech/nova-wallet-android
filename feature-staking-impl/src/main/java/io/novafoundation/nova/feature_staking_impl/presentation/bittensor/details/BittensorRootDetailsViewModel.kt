@@ -27,6 +27,30 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.hash.isPositive
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorRecoveryRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorWalletRecovery
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
+import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.common.utils.Event
+import io.novafoundation.nova.common.utils.event
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
+import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onStart
+import java.math.BigInteger
+
+data class BittensorExitChoice(val payload: BittensorExitPositionPayload, val address: String, val amount: AmountModel)
 
 class BittensorRootDetailsViewModel(
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
@@ -36,7 +60,10 @@ class BittensorRootDetailsViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val externalActions: ExternalActions.Presentation,
     private val amountFormatter: BittensorAmountFormatter,
-    private val retryController: BittensorRetryController
+    private val retryController: BittensorRetryController,
+    private val claims: BittensorRootClaimInteractor,
+    private val recovery: ExtrinsicSubmissionRecovery,
+    private val accountRepository: AccountRepository
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     val retryEvents = retryController.events
@@ -52,7 +79,101 @@ class BittensorRootDetailsViewModel(
 
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }.shareInBackground()
 
-    val canAddStake = portfolioState.map { it.dataOrNull?.dataStatus is BittensorDataStatus.Fresh }.shareInBackground()
+    private val recoveryState = accountRepository.selectedMetaAccountFlow()
+        .map { BittensorRecoveryRequest(it.id, ChainGeneses.BITTENSOR) }
+        .distinctUntilChanged()
+        .flatMapLatest { (metaId, chainId) ->
+            recovery.observe(metaId, chainId).map { BittensorWalletRecovery(metaId, it) }
+                .onStart { emit(BittensorWalletRecovery(metaId, ExtrinsicRecoveryState.None)) }
+        }
+        .onStart { emit(BittensorWalletRecovery(0L, ExtrinsicRecoveryState.None)) }
+        .shareInBackground()
+
+    val recoveryResult = recoveryState.map { (metaId, state) ->
+        (state as? ExtrinsicRecoveryState.Resolved)?.result?.takeUnless { it.acknowledged }?.toUi(resources, metaId)
+    }
+        .shareInBackground()
+
+    fun recoveryResultDismissed(metaId: Long, hash: String) = launchUnit {
+        recovery.acknowledge(metaId, hash)
+    }
+
+    private val claimState = retryController.observe(
+        step = "claimable root rewards",
+        transform = { it.withSafeLoading() }
+    ) {
+        accountRepository.selectedMetaAccountFlow()
+            .map { it.id }
+            .distinctUntilChanged()
+            .flatMapLatest { io.novafoundation.nova.common.utils.flowOf { claims.load() } }
+    }
+        .shareInBackground(kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000))
+
+    val receivedRootRewards = retryController.observe(
+        step = "received root rewards",
+        transform = { source -> source.onStart { emit("—") }.catch { emit("—") } }
+    ) {
+        accountRepository.selectedMetaAccountFlow()
+            .map { it.id }
+            .distinctUntilChanged()
+            .flatMapLatest {
+                io.novafoundation.nova.common.utils.flowOf {
+                    val (asset, amount) = claims.receivedRewards()
+                    val token = asset.token
+                    amountFormatter.amount(amount, token.configuration.symbol, token.toFiatOrNull(amount), token.currency).token
+                }
+                    .onStart { emit("—") }
+            }
+    }
+        .shareInBackground(kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000))
+
+    val claimableRewards = claimState.map { state ->
+        state.dataOrNull?.let { claim ->
+            val amount = claim.claims.claimable.fold(BigInteger.ZERO) { sum, preview -> sum + preview.redeemable }
+            val tokenAmount = claim.asset.token.amountFromPlanks(amount)
+            amountFormatter.amount(tokenAmount, claim.asset.token.configuration.symbol, claim.asset.token.toFiatOrNull(tokenAmount), claim.asset.token.currency)
+        } ?: AmountModel("—", null)
+    }.shareInBackground(kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000))
+
+    val canClaim = combine(claimState, recoveryState) { state, recovery ->
+        state.dataOrNull?.let { it.supportsImmediateOperations && it.metaId == recovery.metaId && it.claims.claimable.isNotEmpty() } == true &&
+            recovery.state !is ExtrinsicRecoveryState.Pending
+    }.shareInBackground(kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000))
+
+    fun claimClicked() = launchUnit { if (canClaim.first()) router.openBittensorRootClaim() }
+
+    val exitChoices = MutableLiveData<Event<List<BittensorExitChoice>>>()
+
+    fun unstakeRoot() = launchUnit {
+        if (!canAddStake.first()) return@launchUnit
+        val data = portfolio.first()
+        val choices = data.positions?.root.orEmpty().filter { it.stakeInPlanks.isPositive() }.map {
+            val address = data.chain.addressOf(it.validatorHotkey.value)
+            BittensorExitChoice(BittensorExitPositionPayload(data.metaId, 0, address), address, formatExitAmount(it.stakeInPlanks, data))
+        }
+        if (choices.size == 1) selectExit(choices.single()) else if (choices.isNotEmpty()) exitChoices.value = choices.event()
+    }
+
+    fun selectExit(choice: BittensorExitChoice) = launchUnit {
+        val data = portfolio.first()
+        if (canAddStake.first() && data.metaId == choice.payload.metaId &&
+            data.positions?.root.orEmpty().any { data.chain.addressOf(it.validatorHotkey.value) == choice.address && it.stakeInPlanks.isPositive() }
+        ) {
+            router.openBittensorExitAmount(choice.payload)
+        }
+    }
+
+    private fun formatExitAmount(planks: BigInteger, data: BittensorPortfolio): AmountModel {
+        val token = data.asset.token
+        val amount = token.amountFromPlanks(planks)
+        return amountFormatter.amount(amount, token.configuration.symbol, token.toFiatOrNull(amount), token.currency)
+    }
+
+    val canAddStake = combine(portfolioState, recoveryState) { portfolio, recovery ->
+        val data = portfolio.dataOrNull
+        data?.supportsImmediateOperations == true && data.metaId == recovery.metaId &&
+            data.dataStatus is BittensorDataStatus.Fresh && recovery.state !is ExtrinsicRecoveryState.Pending
+    }.shareInBackground()
 
     val rootStake = portfolio.map { portfolio ->
         val stake = portfolio.positions?.rootStake ?: return@map AmountModel("—", null)

@@ -104,7 +104,8 @@ private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
         symbol = bindBittensorText(requireNotNull(value.get<Any?>("tokenSymbol")) { "Subnet symbol field is missing" }),
         logoUrl = logoUrl,
         priceInRao = bindBittensorSubnetPrice(value.get<Any?>("taoIn"), value.get<Any?>("alphaIn")),
-        taoReserveInPlanks = value.get<Any?>("taoIn")?.let(::bindBittensorU64)
+        taoReserveInPlanks = value.get<Any?>("taoIn")?.let(::bindBittensorU64),
+        registrationBlock = value.get<Any?>("networkRegisteredAt")?.let(::bindBittensorU64)
     )
 }
 

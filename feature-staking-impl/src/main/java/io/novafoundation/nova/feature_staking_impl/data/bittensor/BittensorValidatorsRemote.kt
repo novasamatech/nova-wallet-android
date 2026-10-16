@@ -11,7 +11,13 @@ class BittensorRecommendationsRemote(val meta: Meta?, val classes: Classes? = nu
     class Generation(val sourceBlockNumber: BigInteger?)
     class Classes(val stable: List<Item>?, val balanced: List<Item>?, val higherUpside: List<Item>?)
     class Item(val netuid: Int?, val hotkey: String?)
-    class Components(val recommendations: Component?)
+    class Components(
+        val recommendations: Component?,
+        val rootValidator: Component? = null,
+        val rootClaims: Component? = null,
+        val alphaYield: Component? = null,
+        val operationHistory: Component? = null
+    )
     class Component(val availability: String?, val freshness: String?)
     class Gates(val maxTake: String?, val requirePermit: Boolean?, val requireActiveWithinCutoff: Boolean?)
 }

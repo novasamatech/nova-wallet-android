@@ -5,8 +5,6 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetStakeOperation
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
@@ -18,7 +16,6 @@ import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import java.math.BigInteger
-import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -38,7 +35,8 @@ class BittensorSubnetStakingInteractor(
     private val validators: BittensorSubnetValidatorRepository,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val extrinsics: ExtrinsicService,
-    private val beneficiaryAddress: String
+    private val beneficiaryAddress: String,
+    private val submission: BittensorSubmissionExecutor
 ) {
 
     fun observeWallet(metaId: Long): Flow<BittensorWalletContext> = flowOfAll {
@@ -88,16 +86,11 @@ class BittensorSubnetStakingInteractor(
         return BittensorSubnetStakeDraft(metaId, validator, operation)
     }
 
-    suspend fun execute(draft: BittensorSubnetStakeDraft): Result<ExtrinsicExecutionResult> = runCatching {
+    suspend fun execute(draft: BittensorSubnetStakeDraft): BittensorOperationResult {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         validators.validate(chain, draft.operation.quote.subnetId, draft.validator)
-        extrinsics.submitExtrinsicAndAwaitExecution(chain, TransactionOrigin.WalletWithId(draft.metaId), options) {
-            draft.operation.build(this)
-        }
-            .requireOk()
-            .getOrThrow()
+        return submission.execute(draft.metaId, chain) { draft.operation.build(this) }
     }
-        .onFailure { if (it is CancellationException) throw it }
 
     suspend fun validationPayload(draft: BittensorSubnetStakeDraft, fee: Fee): BittensorStakePreflightPayload {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)

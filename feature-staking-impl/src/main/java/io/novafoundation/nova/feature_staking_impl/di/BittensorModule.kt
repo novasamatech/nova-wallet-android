@@ -67,6 +67,18 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorExitRuntimeSource
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorRootClaimSource
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 
 private const val SERVICE_FEE_BENEFICIARY = "BittensorServiceFeeBeneficiary"
 
@@ -105,8 +117,12 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorValidatorSource(backend: BittensorValidatorBackend, validators: BittensorSubnetValidatorRepository): BittensorRootValidatorSource =
-        RemoteBittensorRootValidatorSource(backend, validators)
+    fun provideBittensorValidatorSource(
+        backend: BittensorValidatorBackend,
+        validators: BittensorSubnetValidatorRepository,
+        logger: Logger
+    ): BittensorRootValidatorSource =
+        RemoteBittensorRootValidatorSource(backend, validators, logger)
 
     @Provides
     fun provideBittensorConfigApi(apiCreator: NetworkApiCreator): BittensorConfigApi = apiCreator.create(BittensorConfigApi::class.java)
@@ -197,14 +213,16 @@ class BittensorModule {
         validators: BittensorSubnetValidatorRepository,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         extrinsics: ExtrinsicService,
-        @Named(SERVICE_FEE_BENEFICIARY) beneficiaryAddress: String
+        @Named(SERVICE_FEE_BENEFICIARY) beneficiaryAddress: String,
+        submission: BittensorSubmissionExecutor
     ) = BittensorSubnetStakingInteractor(
         chainRegistry,
         wallets,
         validators,
         bittensorSubnetInteractor,
         extrinsics,
-        beneficiaryAddress
+        beneficiaryAddress,
+        submission
     )
 
     @Provides
@@ -276,6 +294,73 @@ class BittensorModule {
         repository: BittensorStakingRepository,
         extrinsicService: ExtrinsicService,
         walletRepository: WalletRepository,
-        validators: BittensorSubnetValidatorRepository
-    ) = BittensorStakingInteractor(repository, extrinsicService, walletRepository, validators)
+        validators: BittensorSubnetValidatorRepository,
+        submission: BittensorSubmissionExecutor
+    ) = BittensorStakingInteractor(repository, extrinsicService, walletRepository, validators, submission)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorEstimates(
+        @Attested apiCreator: NetworkApiCreator,
+        infrastructureUrls: InfrastructureUrls,
+        accounts: AccountRepository,
+        wallets: WalletRepository,
+        logger: Logger
+    ): BittensorEstimatesRepository {
+        val api = apiCreator.create(BittensorEstimatesApi::class.java)
+        return BittensorEstimatesRepository(api, infrastructureUrls, 12_000L, accounts, wallets, logger)
+    }
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService, recovery: ExtrinsicSubmissionRecovery) =
+        BittensorSubmissionExecutor(extrinsics, recovery)
+
+    @Provides
+    fun provideBittensorRootClaimSource(
+        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
+        rpc: RpcCalls,
+        chains: ChainRegistry
+    ): BittensorRootClaimSource =
+        RealBittensorRootClaimSource(storage, rpc, chains)
+
+    @Provides
+    fun provideBittensorRootClaim(
+        chains: ChainRegistry,
+        accounts: AccountRepository,
+        wallets: WalletRepository,
+        source: BittensorRootClaimSource,
+        extrinsics: ExtrinsicService,
+        submission: BittensorSubmissionExecutor,
+        constants: WalletConstants,
+        backend: BittensorValidatorBackend
+    ) =
+        BittensorRootClaimInteractor(chains, accounts, wallets, source, extrinsics, submission, constants, backend)
+
+    @Provides
+    fun provideBittensorExitSource(@Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource, rpc: RpcCalls, chains: ChainRegistry): BittensorExitRuntimeSource =
+        RealBittensorExitRuntimeSource(storage, rpc, chains)
+
+    @Provides
+    fun provideBittensorSubnetMetadata(subnets: BittensorSubnetRepository, config: BittensorConfigRepository) =
+        BittensorSubnetMetadataInteractor(subnets, config)
+
+    @Provides
+    fun provideBittensorExit(
+        chains: ChainRegistry,
+        accounts: AccountRepository,
+        wallets: WalletRepository,
+        source: BittensorExitRuntimeSource,
+        subnets: BittensorSubnetMetadataInteractor,
+        swaps: BittensorSwapSource,
+        config: BittensorConfigRepository,
+        subnetInteractor: BittensorSubnetInteractor,
+        extrinsics: ExtrinsicService,
+        submission: BittensorSubmissionExecutor,
+        constants: WalletConstants,
+        logger: Logger
+    ) = BittensorExitInteractor(
+        chains, accounts, wallets, source, subnets, swaps, config, subnetInteractor.slippage,
+        extrinsics, submission, constants, "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq", logger
+    )
 }

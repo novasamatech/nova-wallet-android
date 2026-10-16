@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.runtime.ext.addressOf
 import com.google.gson.Gson
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
@@ -162,9 +163,95 @@ class BittensorValidatorBackendTest {
         assertEquals(4, api.requests.size)
     }
 
+    @Test
+    fun `ranked validators use the actual ranking route and cache only fresh HTTP data`() = runBlocking {
+        val api = Api("max-age=60")
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        backend.rankedValidators(64)
+        backend.rankedValidators(64)
+        assertEquals(listOf("https://infra.test/v1/bittensor/recommendations/subnets/64/validators"), api.requests)
+    }
+
+    @Test
+    fun `a stale ranking cannot supply recommendation or selection gates`() = runBlocking {
+        val api = Api("max-age=60")
+        api.rankedFreshness = "STALE"
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        assertTrue(runCatching { backend.rankedValidators(64) }.isFailure)
+    }
+
+    @Test
+    fun `root metrics must describe the requested hotkey`() = runBlocking {
+        val address = "5".repeat(48)
+        val api = Api("max-age=60")
+        api.root = BittensorRootValidatorRemote(BittensorRootValidatorRemote.Validator("6".repeat(48), "Other", null), rootMeta())
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        assertTrue(runCatching { backend.rootValidator(address) }.isFailure)
+    }
+
+    @Test
+    fun `root yield is annual percent already net of validator take`() = runBlocking {
+        val address = "5".repeat(48)
+        val api = Api("max-age=60")
+        api.root = BittensorRootValidatorRemote(
+            BittensorRootValidatorRemote.Validator(
+                address,
+                "Synthetic",
+                BittensorRootValidatorRemote.Yield(
+                    BittensorRootValidatorRemote.Window("7.25", "FULL", "REPORTED")
+                )
+            ),
+            rootMeta()
+        )
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        val validators = org.mockito.Mockito.mock(BittensorSubnetValidatorRepository::class.java)
+        val logger = org.mockito.Mockito.mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
+        val chain = org.mockito.Mockito.mock(io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain::class.java)
+        org.mockito.Mockito.`when`(chain.addressPrefix).thenReturn(42)
+        val hotkey = io.novafoundation.nova.common.address.AccountIdKey(ByteArray(32) { 1 })
+        val validator = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator(hotkey, "Synthetic")
+        api.root = BittensorRootValidatorRemote(
+            BittensorRootValidatorRemote.Validator(chain.addressOf(hotkey.value), "Synthetic", api.root!!.validator!!.stakeYield),
+            rootMeta()
+        )
+        val source = RemoteBittensorRootValidatorSource(backend, validators, logger)
+        assertEquals(BigDecimal("7.25"), source.annualPercentageYield(chain, validator))
+    }
+
+    @Test
+    fun `reported root rewards sum TAO payouts without duplicating an event`() = runBlocking {
+        val api = Api("no-store")
+        val first = BittensorRootClaimsRemote.Item(100, 1, 2, "synthetic", "0.125")
+        api.claims = BittensorRootClaimsRemote(
+            listOf(first, first, BittensorRootClaimsRemote.Item(101, 1, 2, "synthetic", "0.375")),
+            "TAO_APP_PARTIAL",
+            BittensorRootClaimsRemote.Meta(
+                BittensorRootClaimsRemote.Components(
+                    BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
+                )
+            )
+        )
+        val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
+        val backend = BittensorValidatorBackend(api, urls)
+        assertEquals(BigDecimal("0.500"), backend.receivedRootRewards("synthetic-subject"))
+    }
+
+    private fun rootMeta() = BittensorRootValidatorRemote.Meta(
+        BittensorRootValidatorRemote.Components(
+            BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
+        )
+    )
+
     private class Api(private val cacheControl: String) : BittensorValidatorsApi {
 
         val requests = mutableListOf<String>()
+        var rankedFreshness = "FRESH"
+        var root: BittensorRootValidatorRemote? = null
+        var claims: BittensorRootClaimsRemote? = null
 
         var recommendationsDocument = policy("FRESH")
 
@@ -175,6 +262,18 @@ class BittensorValidatorBackendTest {
         override suspend fun recommendations(url: String): Response<BittensorRecommendationsRemote> {
             requests += url
             return Response.success(recommendationsDocument, headers())
+        }
+        override suspend fun rootClaims(url: String): Response<BittensorRootClaimsRemote> {
+            requests += url
+            return claims?.let { Response.success(it, headers()) } ?: Response.error(503, okhttp3.ResponseBody.create(null, ""))
+        }
+        override suspend fun rootValidator(url: String): Response<BittensorRootValidatorRemote> {
+            requests += url
+            return root?.let { Response.success(it, headers()) } ?: Response.error(503, okhttp3.ResponseBody.create(null, ""))
+        }
+        override suspend fun rankedValidators(url: String): Response<BittensorRankedValidatorsRemote> {
+            requests += url
+            return Response.success(BittensorRankedValidatorsRemote(policy(rankedFreshness).meta, emptyList()), headers())
         }
         private fun headers() = Headers.Builder().add("Cache-Control", cacheControl).build()
     }

@@ -79,7 +79,11 @@ class BittensorValidatorAdapter(
                 .setScale(2, RoundingMode.HALF_EVEN)
                 .toStripTrailingZerosString()
             val fee = context.getString(R.string.bittensor_validator_take, commissionPercentage)
-            return if (validator.selectable) fee else fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
+            return when {
+                !validator.selectable -> fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
+                validator.recommended -> context.getString(R.string.bittensor_recommended_validator) + " · " + fee
+                else -> fee
+            }
         }
     }
 
