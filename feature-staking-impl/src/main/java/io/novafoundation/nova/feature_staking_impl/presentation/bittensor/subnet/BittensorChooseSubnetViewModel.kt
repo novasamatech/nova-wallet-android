@@ -35,7 +35,10 @@ class BittensorChooseSubnetViewModel(
 
     val retryEvents = retryController.events
 
-    private val catalogueState = retryController.observe("subnet catalogue", transform = { it.withSafeLoading() }) {
+    private val catalogueState = retryController.observe(
+        step = "subnet catalogue",
+        transform = { it.withSafeLoading() }
+    ) {
         flowOf { bittensorSubnetInteractor.subnets() }
     }
         .shareInBackground()

@@ -40,7 +40,10 @@ class BittensorSelectValidatorViewModel(
 
     val retryEvents = retryController.events
 
-    private val validatorsState = retryController.observe("validators", transform = { it.withSafeLoading() }) {
+    private val validatorsState = retryController.observe(
+        step = "validators",
+        transform = { it.withSafeLoading() }
+    ) {
         flowOf {
             val netuid = BittensorNetuid.from(request.subnetId)
             val validators = bittensorValidatorInteractor.validators(netuid)

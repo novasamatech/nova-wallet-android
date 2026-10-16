@@ -84,7 +84,10 @@ class BittensorStakeConfirmViewModel(
     private val stakeRequest = flowOf { payload.toStakeRequest(chain.await()) }
         .shareInBackground()
 
-    private val stakingDetailsState = retryController.observe("root confirmation", transform = { it.withSafeLoading() }) {
+    private val stakingDetailsState = retryController.observe(
+        step = "root confirmation",
+        transform = { it.withSafeLoading() }
+    ) {
         bittensorStakingInteractor.observeRootStakingDetails(payload.metaId)
     }
         .shareInBackground()

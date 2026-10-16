@@ -61,7 +61,10 @@ class BittensorSubnetDetailsViewModel(
 
     val retryEvents = retryController.events
 
-    private val subnetState = retryController.observe("subnet", transform = { it.withSafeLoading() }) {
+    private val subnetState = retryController.observe(
+        step = "subnet",
+        transform = { it.withSafeLoading() }
+    ) {
         flowOf { bittensorSubnetInteractor.subnet(subnetId) }
     }
         .shareInBackground()
@@ -69,7 +72,10 @@ class BittensorSubnetDetailsViewModel(
     val subnet = subnetState.mapNotNull { it.dataOrNull }
         .shareInBackground()
 
-    private val validatorsState = retryController.observe("validators", transform = { it.withSafeLoading() }) {
+    private val validatorsState = retryController.observe(
+        step = "validators",
+        transform = { it.withSafeLoading() }
+    ) {
         flowOf { bittensorSubnetStakingInteractor.validators(subnetId) }
     }
         .shareInBackground()
@@ -192,7 +198,10 @@ class BittensorSubnetDetailsViewModel(
     }
         .distinctUntilChanged()
         .flatMapLatest { request ->
-            retryController.observe("subnet chart", transform = { it.withSafeLoading() }) {
+            retryController.observe(
+                step = "subnet chart",
+                transform = { it.withSafeLoading() }
+            ) {
                 flowOf { loadChartHistory(request) }
             }
                 .map { BittensorSubnetChart(request.period, it) }

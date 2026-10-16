@@ -102,7 +102,10 @@ class BittensorSubnetReviewViewModel(
     val resultState = submission.map { it.result }
         .shareInBackground()
 
-    private val walletState = retryController.observe("staking wallet", transform = { it.withSafeLoading() }) {
+    private val walletState = retryController.observe(
+        step = "staking wallet",
+        transform = { it.withSafeLoading() }
+    ) {
         bittensorSubnetStakingInteractor.observeWallet(
             metaId
         )
@@ -116,7 +119,10 @@ class BittensorSubnetReviewViewModel(
 
     private val validating = MutableStateFlow(false)
 
-    private val preparationState = retryController.observe("stake preparation", transform = { it.withSafeLoading() }) {
+    private val preparationState = retryController.observe(
+        step = "stake preparation",
+        transform = { it.withSafeLoading() }
+    ) {
         preparationRefresh.flatMapLatest {
             flowOf {
                 bittensorSubnetStakingInteractor.prepare(

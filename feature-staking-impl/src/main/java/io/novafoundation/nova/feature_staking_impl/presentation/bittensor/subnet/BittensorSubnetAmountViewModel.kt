@@ -76,7 +76,10 @@ class BittensorSubnetAmountViewModel(
 
     val amount = amountChooser.inputState.map { it.value }.shareInBackground()
 
-    private val subnetState = retryController.observe("subnet", transform = { it.withSafeLoading() }) {
+    private val subnetState = retryController.observe(
+        step = "subnet",
+        transform = { it.withSafeLoading() }
+    ) {
         flowOf { bittensorSubnetInteractor.subnet(initialSubnetId) }
     }.shareInBackground()
 
@@ -106,7 +109,10 @@ class BittensorSubnetAmountViewModel(
         if (request == null) {
             flowOf<QuoteResult?> { null }.withSafeLoading()
         } else {
-            retryController.observe("subnet quote", transform = { it.withSafeLoading() }) {
+            retryController.observe(
+                step = "subnet quote",
+                transform = { it.withSafeLoading() }
+            ) {
                 flowOf {
                     delay(QUOTE_DEBOUNCE_MILLIS)
                     QuoteResult(request, bittensorSubnetInteractor.quote(request.subnetId, request.amount))
