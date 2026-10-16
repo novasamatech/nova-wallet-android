@@ -38,7 +38,8 @@ internal fun bindBittensorSubnets(decoded: Any?): List<BittensorSubnet> = bindLi
         symbol = bindBittensorText(requireNotNull(value.get<Any?>("tokenSymbol")) { "Subnet symbol field is missing" }),
         logoUrl = identity?.get<Any?>("logoUrl")?.let(::bindBittensorText)?.takeIf { it.startsWith("https://") },
         priceInRao = bindBittensorSubnetPrice(value.get<Any?>("taoIn"), value.get<Any?>("alphaIn")),
-        taoReserveInPlanks = value.get<Any?>("taoIn")?.let(::bindBittensorU64)
+        taoReserveInPlanks = value.get<Any?>("taoIn")?.let(::bindBittensorU64),
+        registrationBlock = value.get<Any?>("networkRegisteredAt")?.let(::bindBittensorU64)
     )
 }.filterNotNull().sortedBy { it.id.value }.also { subnets ->
     require(subnets.map { it.id }.distinct().size == subnets.size) { "Duplicate subnet ids" }

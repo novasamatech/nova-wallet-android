@@ -73,15 +73,15 @@
                 android:text="@string/bittensor_risk_factors" android:textColor="@color/text_secondary" />
             <io.novafoundation.nova.common.view.TableView android:layout_width="match_parent" android:layout_height="wrap_content"
                 android:layout_marginTop="8dp" app:childrenPaddingStart="16dp" app:childrenPaddingEnd="16dp" app:drawDividers="true">
-                <io.novafoundation.nova.common.view.TableCellView android:layout_width="match_parent" android:layout_height="52dp"
+                <io.novafoundation.nova.common.view.TableCellView android:id="@+id/age" android:layout_width="match_parent" android:layout_height="52dp"
                     app:title="@string/bittensor_subnet_age" app:primaryValue="—" />
                 <io.novafoundation.nova.common.view.TableCellView android:id="@+id/validatorCount" android:layout_width="match_parent" android:layout_height="52dp"
                     app:title="@string/bittensor_validator" app:primaryValue="—" />
                 <io.novafoundation.nova.common.view.TableCellView android:id="@+id/pool" android:layout_width="match_parent" android:layout_height="52dp"
                     app:title="@string/bittensor_pool" app:primaryValue="—" />
-                <io.novafoundation.nova.common.view.TableCellView android:layout_width="match_parent" android:layout_height="52dp"
+                <io.novafoundation.nova.common.view.TableCellView android:id="@+id/priceHistory" android:layout_width="match_parent" android:layout_height="52dp"
                     app:title="@string/bittensor_price_history" app:primaryValue="—" />
-                <io.novafoundation.nova.common.view.TableCellView android:layout_width="match_parent" android:layout_height="52dp"
+                <io.novafoundation.nova.common.view.TableCellView android:id="@+id/priceRange" android:layout_width="match_parent" android:layout_height="52dp"
                     app:title="@string/bittensor_price_range" app:primaryValue="—" />
             </io.novafoundation.nova.common.view.TableView>
             <io.novafoundation.nova.common.view.TableView android:layout_width="match_parent" android:layout_height="wrap_content"

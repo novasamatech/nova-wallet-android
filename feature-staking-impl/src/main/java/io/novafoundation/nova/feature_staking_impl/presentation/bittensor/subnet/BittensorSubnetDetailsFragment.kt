@@ -34,6 +34,9 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         chart.showPlotOnly(change)
         chart.setPlotHeight(208)
         chart.onPeriodSelected = viewModel::selectPeriod
+        age.setOnClickListener { viewModel.retrySafety() }
+        priceHistory.setOnClickListener { viewModel.retrySafety() }
+        priceRange.setOnClickListener { viewModel.retrySafety() }
         more.setOnClickListener { subnetNumber.isVisible = !subnetNumber.isVisible }
     }
     override fun subscribe(viewModel: BittensorSubnetDetailsViewModel) = with(binder) {
@@ -66,6 +69,9 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.estimatedAlpha.observe { estimate.text = it }
         viewModel.pool.observe(pool::showValue)
+        viewModel.age.observe(age::showValue)
+        viewModel.priceHistory.observe(priceHistory::showValue)
+        viewModel.priceRange.observe(priceRange::showValue)
         viewModel.validatorCount.observe(validatorCount::showValue)
         viewModel.selectedPreset.observe { selected ->
             preset1.isSelected = selected == 1

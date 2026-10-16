@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSelection
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.navigation.requireLastInput
@@ -31,7 +32,8 @@ class BittensorSelectValidatorViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val chainRegistry: ChainRegistry,
     private val resources: ResourceManager,
-    private val logger: Logger
+    private val logger: Logger,
+    private val rootSelection: BittensorRootValidatorSelection
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val request = communicator.requireLastInput()
@@ -53,7 +55,8 @@ class BittensorSelectValidatorViewModel(
     init {
         launchUnit {
             try {
-                validators.value = staking.validators(BittensorSubnetId(request.subnetId)).map { validator ->
+                val candidates = if (request.subnetId == 0) staking.rootValidators() else staking.validators(BittensorSubnetId(request.subnetId))
+                validators.value = candidates.map { validator ->
                     val icon = icons.createAddressIcon(
                         validator.validator.hotkey.value,
                         AddressIconGenerator.SIZE_MEDIUM,
@@ -88,6 +91,7 @@ class BittensorSelectValidatorViewModel(
 
     fun confirmClicked() {
         val row = validators.value.firstOrNull { it.validator.address == selected.value && it.validator.selectable } ?: return
+        if (request.subnetId == 0) rootSelection.select(row.validator.address)
         communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, row.validator.address))
         router.back()
     }

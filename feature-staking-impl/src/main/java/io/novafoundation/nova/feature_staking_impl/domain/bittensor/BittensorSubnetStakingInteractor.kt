@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
@@ -40,6 +39,8 @@ class BittensorSubnetStakingInteractor(
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+
+    suspend fun rootValidators(): List<BittensorSubnetValidator> = validators.rootValidators(chainRegistry.getChain(ChainGeneses.BITTENSOR))
 
     suspend fun maximumStake(metaId: Long, subnetId: BittensorSubnetId, validatorAddress: String): BigInteger = withTimeout(60_000L) {
         requireSelectedWallet(metaId)
@@ -87,7 +88,9 @@ class BittensorSubnetStakingInteractor(
     }
 
     private suspend fun requireSelectedWallet(metaId: Long) {
-        check(accounts.getSelectedMetaAccount().id == metaId) { "The staking wallet has changed" }
+        val selected = accounts.getSelectedMetaAccount()
+        check(selected.id == metaId) { "The staking wallet has changed" }
+        requireBittensorImmediateWallet(selected)
     }
 
     suspend fun validators(subnetId: BittensorSubnetId) = validators.validators(chainRegistry.getChain(ChainGeneses.BITTENSOR), subnetId)

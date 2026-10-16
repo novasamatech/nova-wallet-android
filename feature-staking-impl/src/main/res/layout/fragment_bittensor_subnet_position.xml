@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/secondary_screen_background">
+
+    <io.novafoundation.nova.common.view.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_block_12"
+                android:padding="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="top">
+
+                    <ImageView
+                        android:id="@+id/subnetIcon"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:scaleType="centerCrop" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/subnetCaption"
+                            style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/text_secondary" />
+
+                        <TextView
+                            android:id="@+id/holding"
+                            style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="—" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/activeStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:background="@drawable/bg_bittensor_active_status"
+                        android:paddingStart="6dp"
+                        android:paddingEnd="8dp"
+                        android:paddingVertical="4dp">
+
+                        <ImageView
+                            android:layout_width="7dp"
+                            android:layout_height="7dp"
+                            android:src="@drawable/ic_status_indicator"
+                            app:tint="@color/icon_positive" />
+
+                        <TextView
+                            style="@style/TextAppearance.NovaFoundation.SemiBold.Caps2"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="5dp"
+                            android:text="@string/common_active"
+                            android:textAllCaps="true"
+                            android:textColor="@color/text_positive" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <io.novafoundation.nova.common.view.TableView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:showBackground="false"
+                    android:layout_marginTop="12dp">
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/averagePrice"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/bittensor_exit_avg_buy_price"
+                        app:primaryValue="—" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/worth"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/bittensor_exit_worth_now"
+                        app:primaryValue="—" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/earned"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:title="@string/bittensor_estimated_profit"
+                        app:primaryValue="—" />
+                </io.novafoundation.nova.common.view.TableView>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/positionError"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_negative"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/retryPosition"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="@string/common_retry"
+                android:gravity="center"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/priceTitle"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" />
+
+            <TextView
+                android:id="@+id/price"
+                style="@style/TextAppearance.NovaFoundation.Bold.Title2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="—" />
+
+            <TextView
+                android:id="@+id/change"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="—"
+                android:textColor="@color/text_secondary" />
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+                android:id="@+id/chart"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/chartError"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_negative"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/retryChart"
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="@string/common_retry"
+                android:gravity="center"
+                android:visibility="gone" />
+
+            <TextView
+                style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/bittensor_validator"
+                android:textColor="@color/text_secondary" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/validators"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="16dp"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/sell"
+            style="@style/Widget.Nova.Button.Secondary"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="52dp"
+            android:text="@string/bittensor_exit_sell" />
+
+        <io.novafoundation.nova.common.view.PrimaryButton
+            android:id="@+id/buy"
+            style="@style/Widget.Nova.Button.Primary"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="52dp"
+            android:layout_marginStart="16dp"
+            android:text="@string/bittensor_exit_buy" />
+    </LinearLayout>
+</LinearLayout>

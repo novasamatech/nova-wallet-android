@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSelection
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.requireOk
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.addBittensorRootStake
@@ -22,11 +24,20 @@ class BittensorStakingInteractor(
     private val flowState: BittensorStakingFlowState,
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
-    private val submission: BittensorSubmissionExecutor
+    private val submission: BittensorSubmissionExecutor,
+    private val validators: BittensorSubnetValidatorRepository,
+    private val selection: BittensorRootValidatorSelection
 ) {
 
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> {
         return repository.observeRootStakingDetails().onEach(flowState::setDetails)
+    }
+
+    suspend fun selectRootValidator(address: String) {
+        val details = flowState.latestDetails ?: repository.observeRootStakingDetails().firstAndRemember()
+        val validator = validators.rootValidators(details.chain).firstOrNull { it.address == address && it.selectable }
+        requireNotNull(validator) { "Root validator is unavailable" }
+        selection.select(address)
     }
 
     fun observeStakeDraft(): Flow<BittensorRootStakeDraft> = flowState.draft.filterNotNull()
@@ -44,6 +55,10 @@ class BittensorStakingInteractor(
     suspend fun prepareRootStake(amountInPlanks: BigInteger): BittensorRootStakeDraft {
         val details = flowState.latestDetails ?: repository.observeRootStakingDetails().firstAndRemember()
         requireSelectedWallet(details.metaId)
+        require(selection.address.value == null || selection.address.value == details.chain.addressOf(details.validator.hotkey.value)) {
+            "The selected validator is still loading. Review the stake again"
+        }
+        validators.validateRoot(details.chain, details.validator)
         val fee = estimateRootStakeFee(amountInPlanks)
         requireSelectedWallet(details.metaId)
 
@@ -57,7 +72,12 @@ class BittensorStakingInteractor(
         val draft = requireNotNull(flowState.draft.value) { "Bittensor stake draft is missing" }
 
         require(details.metaId == draft.metaId) { "The staking wallet has changed" }
+        require(details.validator.hotkey == draft.validator.hotkey) { "The selected root validator changed. Review the stake again" }
         requireSelectedWallet(draft.metaId)
+        require(selection.address.value == null || selection.address.value == details.chain.addressOf(draft.validator.hotkey.value)) {
+            "The selected root validator changed. Review the stake again"
+        }
+        validators.validateRoot(details.chain, draft.validator)
         val asset = walletRepository.assetFlow(draft.metaId, details.chain.utilityAsset).first()
         val fee = extrinsicService.estimateFee(details.chain, TransactionOrigin.WalletWithId(draft.metaId)) {
             addBittensorRootStake(draft.validator.hotkey.value, draft.amountInPlanks)
@@ -81,7 +101,9 @@ class BittensorStakingInteractor(
     }
 
     private suspend fun requireSelectedWallet(metaId: Long) {
-        check(accountRepository.getSelectedMetaAccount().id == metaId) { "The staking wallet has changed" }
+        val selected = accountRepository.getSelectedMetaAccount()
+        check(selected.id == metaId) { "The staking wallet has changed" }
+        requireBittensorImmediateWallet(selected)
     }
 
     private suspend fun Flow<BittensorRootStakingDetails>.firstAndRemember(): BittensorRootStakingDetails {

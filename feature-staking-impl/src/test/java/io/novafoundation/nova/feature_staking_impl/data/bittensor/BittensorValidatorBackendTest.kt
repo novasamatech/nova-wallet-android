@@ -54,8 +54,84 @@ class BittensorValidatorBackendTest {
         assertTrue(runCatching { gates.allowsTake(BigInteger.valueOf(65536)) }.isFailure)
     }
 
+    @Test
+    fun `ranked validators use the actual ranking route and cache only fresh HTTP data`() = runBlocking {
+        val api = Api("max-age=60")
+        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        backend.rankedValidators(64)
+        backend.rankedValidators(64)
+        assertEquals(listOf("https://infra.test/v1/bittensor/recommendations/subnets/64/validators"), api.requests)
+    }
+
+    @Test
+    fun `a stale ranking cannot supply recommendation or selection gates`() = runBlocking {
+        val api = Api("max-age=60")
+        api.rankedFreshness = "STALE"
+        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        assertTrue(runCatching { backend.rankedValidators(64) }.isFailure)
+    }
+
+    @Test
+    fun `root metrics must describe the requested hotkey`() = runBlocking {
+        val address = "5".repeat(48)
+        val api = Api("max-age=60")
+        api.root = BittensorRootValidatorRemote(BittensorRootValidatorRemote.Validator("6".repeat(48), "Other", null), rootMeta())
+        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        assertTrue(runCatching { backend.rootValidator(address) }.isFailure)
+    }
+
+    @Test
+    fun `root yield is annual percent already net of validator take`() = runBlocking {
+        val address = "5".repeat(48)
+        val api = Api("max-age=60")
+        api.root = BittensorRootValidatorRemote(
+            BittensorRootValidatorRemote.Validator(
+                address,
+                "Synthetic",
+                BittensorRootValidatorRemote.Yield(
+                    BittensorRootValidatorRemote.Window("7.25", "FULL", "REPORTED")
+                )
+            ),
+            rootMeta()
+        )
+        val config = object : BittensorEarnConfigApi {
+            override suspend fun getConfig(url: String) = BittensorEarnConfigRemote(BittensorEarnConfigRemote.Entry(true), address)
+        }
+        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        val selection = BittensorRootValidatorSelection()
+        val logger = org.mockito.Mockito.mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
+        val source = RemoteBittensorRootValidatorSource(config, "https://config.test/", backend, logger, selection)
+        assertEquals(BigDecimal("7.25"), source.annualPercentageYield())
+    }
+
+    @Test
+    fun `reported root rewards sum TAO payouts without duplicating an event`() = runBlocking {
+        val api = Api("no-store")
+        val first = BittensorRootClaimsRemote.Item(100, 1, 2, "synthetic", "0.125")
+        api.claims = BittensorRootClaimsRemote(
+            listOf(first, first, BittensorRootClaimsRemote.Item(101, 1, 2, "synthetic", "0.375")),
+            "TAO_APP_PARTIAL",
+            BittensorRootClaimsRemote.Meta(
+                BittensorRootClaimsRemote.Components(
+                    BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
+                )
+            )
+        )
+        val backend = BittensorValidatorBackend(api, "https://infra.test/")
+        assertEquals(BigDecimal("0.500"), backend.receivedRootRewards("synthetic-subject"))
+    }
+
+    private fun rootMeta() = BittensorRootValidatorRemote.Meta(
+        BittensorRootValidatorRemote.Components(
+            BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
+        )
+    )
+
     private class Api(private val cacheControl: String) : BittensorValidatorsApi {
         val requests = mutableListOf<String>()
+        var rankedFreshness = "FRESH"
+        var root: BittensorRootValidatorRemote? = null
+        var claims: BittensorRootClaimsRemote? = null
         override suspend fun validators(url: String): Response<BittensorValidatorsRemote> {
             requests += url
             return Response.success(BittensorValidatorsRemote(emptyList()), headers())
@@ -63,6 +139,18 @@ class BittensorValidatorBackendTest {
         override suspend fun recommendations(url: String): Response<BittensorRecommendationsRemote> {
             requests += url
             return Response.success(policy("FRESH"), headers())
+        }
+        override suspend fun rootClaims(url: String): Response<BittensorRootClaimsRemote> {
+            requests += url
+            return claims?.let { Response.success(it, headers()) } ?: Response.error(503, okhttp3.ResponseBody.create(null, ""))
+        }
+        override suspend fun rootValidator(url: String): Response<BittensorRootValidatorRemote> {
+            requests += url
+            return root?.let { Response.success(it, headers()) } ?: Response.error(503, okhttp3.ResponseBody.create(null, ""))
+        }
+        override suspend fun rankedValidators(url: String): Response<BittensorRankedValidatorsRemote> {
+            requests += url
+            return Response.success(BittensorRankedValidatorsRemote(policy(rankedFreshness).meta, emptyList()), headers())
         }
         private fun headers() = Headers.Builder().add("Cache-Control", cacheControl).build()
     }

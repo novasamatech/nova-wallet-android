@@ -14,7 +14,8 @@ value class BittensorSubnetId(val value: Int) {
 data class BittensorSubnetPosition(
     val subnetId: BittensorSubnetId,
     val validatorHotkey: AccountIdKey,
-    val alphaInPlanks: BigInteger
+    val alphaInPlanks: BigInteger,
+    val isRegistered: Boolean? = null
 )
 
 enum class BittensorSwapDirection {

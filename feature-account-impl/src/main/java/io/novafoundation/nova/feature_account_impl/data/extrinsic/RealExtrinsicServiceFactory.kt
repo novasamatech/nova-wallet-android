@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic
 
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.RealExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
@@ -21,6 +22,7 @@ class RealExtrinsicServiceFactory(
     private val eventsRepository: EventsRepository,
     private val feePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val signingContextFactory: SigningContext.Factory,
+    private val submissionRecovery: RealExtrinsicSubmissionRecovery,
 ) : ExtrinsicService.Factory {
 
     override fun create(feeConfig: ExtrinsicService.FeePaymentConfig): ExtrinsicService {
@@ -35,7 +37,8 @@ class RealExtrinsicServiceFactory(
             feePaymentProviderRegistry = registry,
             eventsRepository = eventsRepository,
             coroutineScope = feeConfig.coroutineScope,
-            signingContextFactory = signingContextFactory
+            signingContextFactory = signingContextFactory,
+            submissionRecovery = submissionRecovery
         )
     }
 

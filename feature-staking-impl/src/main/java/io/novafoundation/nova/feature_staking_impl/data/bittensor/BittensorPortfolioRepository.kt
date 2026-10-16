@@ -85,7 +85,14 @@ class RealBittensorPortfolioRepository(
                     }
                 }
             ) { asset, (positions, status) ->
-                BittensorPortfolio(account.id, chain, asset, positions, status)
+                BittensorPortfolio(
+                    account.id,
+                    chain,
+                    asset,
+                    positions,
+                    status,
+                    supportsImmediateOperations = account.type != io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG
+                )
             }
         }
     }

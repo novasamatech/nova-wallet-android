@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSelection
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -67,5 +69,8 @@ class BittensorWalletIsolationTest {
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
     }
 
-    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, accounts, wallets, submission)
+    private val validators = org.mockito.Mockito.mock(BittensorSubnetValidatorRepository::class.java)
+    private val selection = BittensorRootValidatorSelection()
+
+    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, state, accounts, wallets, submission, validators, selection)
 }

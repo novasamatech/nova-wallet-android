@@ -34,11 +34,11 @@
                         <TextView android:id="@+id/subnetName" style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
                             android:layout_width="match_parent" android:layout_height="wrap_content"
                             android:textDirection="ltr" android:maxLines="1" android:ellipsize="end" />
-                        <TextView style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                        <TextView android:id="@+id/subnetApy" style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                             android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="2dp"
                             android:text="@string/bittensor_apy_unavailable" android:textColor="@color/text_secondary" />
                     </LinearLayout>
-                    <ImageView android:layout_width="20dp" android:layout_height="20dp"
+                    <ImageView android:id="@+id/subnetArrow" android:layout_width="20dp" android:layout_height="20dp"
                         android:src="@drawable/ic_chevron_right" app:tint="@color/icon_secondary"
                         android:importantForAccessibility="no" />
                 </LinearLayout>
@@ -48,6 +48,8 @@
                     app:showBackground="false"
                     app:childrenPaddingStart="0dp" app:childrenPaddingEnd="0dp"
                     app:childrenPaddingTop="0dp" app:childrenPaddingBottom="0dp" app:drawDividers="true">
+                    <io.novafoundation.nova.common.view.TableCellView android:id="@+id/validator"
+                        android:layout_width="match_parent" android:layout_height="44dp" app:title="@string/bittensor_validator" />
                     <io.novafoundation.nova.common.view.TableCellView android:id="@+id/receive"
                         android:layout_width="match_parent" android:layout_height="44dp" android:background="@android:color/transparent"
                         app:title="@string/bittensor_you_receive" />
@@ -60,6 +62,12 @@
                     <io.novafoundation.nova.common.view.TableCellView
                         android:layout_width="match_parent" android:layout_height="52dp" android:background="@android:color/transparent"
                         app:title="@string/network_fee" app:primaryValue="@string/bittensor_fee_on_review" app:shouldDrawDivider="false" />
+                    <io.novafoundation.nova.common.view.TableCellView android:id="@+id/monthlyEstimate"
+                        android:layout_width="match_parent" android:layout_height="44dp" app:title="@string/bittensor_monthly_projection" />
+                    <io.novafoundation.nova.common.view.TableCellView android:id="@+id/fee"
+                        android:layout_width="match_parent" android:layout_height="44dp" app:title="@string/network_fee" />
+                    <io.novafoundation.nova.common.view.TableCellView android:id="@+id/projectedAveragePrice"
+                        android:layout_width="match_parent" android:layout_height="44dp" app:title="@string/bittensor_exit_avg_buy_price" />
                 </io.novafoundation.nova.common.view.TableView>
 
             </LinearLayout>

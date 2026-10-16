@@ -1,5 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.runtime.ext.accountIdOf
+import kotlinx.coroutines.flow.flatMapLatest
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -8,6 +16,7 @@ import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
@@ -48,7 +57,9 @@ class BittensorSubnetAmountViewModel(
     private val icons: AssetIconProvider,
     private val tokenFormatter: TokenFormatter,
     private val logger: Logger,
-    private val staking: BittensorSubnetStakingInteractor
+    private val staking: BittensorSubnetStakingInteractor,
+    val existingPosition: Boolean = false,
+    estimates: BittensorEstimatesRepository
 ) : BaseViewModel() {
 
     private val input = MutableStateFlow("")
@@ -106,6 +117,54 @@ class BittensorSubnetAmountViewModel(
             "≈ \u200e" + tokenFormatter.formatToken(BigDecimal(it.quote.alphaOutInPlanks, 9), TokenSymbol(subnet.symbol.ifBlank { "—" }))
         } ?: "—"
     }.shareInBackground()
+
+    private val yieldState = estimates.observeAlphaYields(portfolio.map { it.chain }, initialSubnetId).shareInBackground()
+
+    private val costBasisState = estimates.observeCostBasis(portfolio.map { BittensorEstimateContext(it.metaId, it.chain) }).shareInBackground()
+
+    val annualYield = combine(yieldState, portfolio) { state, portfolio ->
+        val key = runCatching { AccountIdKey(portfolio.chain.accountIdOf(validatorAddress)) }.getOrNull()
+        key?.let { state?.get(it) }
+    }.shareInBackground()
+
+    val apy = annualYield.map { it?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } ?: "—" }.shareInBackground()
+
+    val monthlyEstimate = combine(quote, annualYield, subnet) { quote, annual, subnet ->
+        if (quote == null || annual == null || subnet == null) {
+            "—"
+        } else {
+            val alpha = io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection(
+                BigDecimal(quote.quote.alphaOutInPlanks, 9),
+                annual
+            )
+            "≈ " + tokenFormatter.formatToken(alpha, TokenSymbol(subnet.symbol.ifBlank { "—" }))
+        }
+    }.shareInBackground()
+
+    val projectedAveragePrice = combine(costBasisState, quote, portfolio) { state, quote, portfolio ->
+        state.map { basis ->
+            val current = basis?.forSubnet(initialSubnetId.value)
+            if (current == null || quote == null) {
+                "—"
+            } else {
+                val projected = current.adding(quote.quote.totalTaoInPlanks, quote.quote.alphaOutInPlanks)
+                "≈ " + tokenFormatter.formatToken(projected.averagePrice, portfolio.asset.token.configuration.symbol)
+            }
+        }
+    }.shareInBackground()
+
+    val fee = request.debounce(350L).flatMapLatest { request ->
+        flowOf {
+            val amount = request.amount ?: return@flowOf null
+            val subnet = request.subnetId ?: return@flowOf null
+            val selected = staking.validators(subnet).firstOrNull { it.address == validatorAddress && it.selectable }
+            requireNotNull(selected) { "Validator is no longer eligible in this subnet" }
+            val draft = staking.prepare(request.metaId, subnet, amount, selected.validator)
+            tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol).toString()
+        }.withSafeLoading()
+    }.shareInBackground()
+
+    val validatorLabel = validatorAddress
 
     val rate = combine(subnet.filterNotNull(), quote) { subnet, quote ->
         quote?.takeIf { it.request.subnetId == subnet.id }?.let {
@@ -166,7 +225,7 @@ class BittensorSubnetAmountViewModel(
         }
     }
 
-    fun chooseSubnetClicked() = router.openBittensorChooseSubnet()
+    fun chooseSubnetClicked() { if (!existingPosition) router.openBittensorChooseSubnet() }
 
     fun continueClicked() = launchUnit {
         if (calculatingMax.value) return@launchUnit

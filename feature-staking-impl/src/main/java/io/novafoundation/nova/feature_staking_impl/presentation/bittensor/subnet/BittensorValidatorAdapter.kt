@@ -62,7 +62,8 @@ class BittensorValidatorAdapter(
             )
             name.text = row.validator.name.ifBlank { row.address }
             val take = row.take.movePointRight(2).setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
-            val fee = root.context.getString(R.string.bittensor_validator_take, take)
+            val takeLabel = root.context.getString(R.string.bittensor_validator_take, take)
+            val fee = if (row.recommended) root.context.getString(R.string.bittensor_recommended_validator) + " · " + takeLabel else takeLabel
             subtitle.text = if (row.selectable) fee else fee + " · " + root.context.getString(R.string.staking_nominator_status_inactive)
             icon.setImageDrawable(model.icon)
             info.contentDescription = root.context.getString(R.string.bittensor_validator_address_info, name.text)

@@ -35,6 +35,14 @@ class BittensorPositionBindingTest {
         bindBittensorRootPositions(listOf(Struct.Instance(mapOf("netuid" to BigInteger.ZERO))))
     }
 
+    @Test
+    fun `registration uses the normalized SDK field and remains unknown when absent`() {
+        val raw = position(64, 100)
+        val known = Struct.Instance(raw.mapping + ("isRegistered" to true))
+        assertEquals(true, bindBittensorSubnetPositions(listOf(known)).single().isRegistered)
+        assertEquals(null, bindBittensorSubnetPositions(listOf(raw)).single().isRegistered)
+    }
+
     private fun position(netuid: Long, stake: Long, hotkey: Byte = 1) = Struct.Instance(
         mapOf(
             "netuid" to BigInteger.valueOf(netuid),

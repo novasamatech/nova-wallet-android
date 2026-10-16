@@ -48,7 +48,13 @@ sealed interface BittensorOperationResult {
 
     data class Success(val transactionHash: String) : BittensorOperationResult
 
-    data class Failure(val cause: Throwable) : BittensorOperationResult
+    data class Failure(val cause: Throwable, val transactionHash: String? = null) : BittensorOperationResult
 
     data class Unknown(val transactionHash: String) : BittensorOperationResult
+}
+
+internal fun requireBittensorImmediateWallet(wallet: io.novafoundation.nova.feature_account_api.domain.model.MetaAccount) {
+    require(wallet.type != io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG) {
+        "Bittensor multisig approval flows are not supported yet"
+    }
 }

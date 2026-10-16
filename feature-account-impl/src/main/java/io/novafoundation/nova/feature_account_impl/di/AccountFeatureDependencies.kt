@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_account_impl.di
 
 import android.content.Context
+import android.content.SharedPreferences
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
@@ -81,6 +83,10 @@ import java.util.Random
 import javax.inject.Named
 
 interface AccountFeatureDependencies {
+
+    fun sharedPreferences(): SharedPreferences
+
+    fun logger(): Logger
 
     fun analyticsService(): AnalyticsService
 

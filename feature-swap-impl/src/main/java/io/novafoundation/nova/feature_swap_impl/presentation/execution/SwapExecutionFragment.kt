@@ -5,6 +5,7 @@ import android.view.Gravity
 import android.view.animation.AnimationUtils
 import android.widget.TextSwitcher
 import android.widget.TextView
+import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.makeGone

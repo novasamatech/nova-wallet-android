@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.LinearInterpolator
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_staking_impl.databinding.BottomSheetBittensorStakeResultBinding
@@ -39,8 +40,11 @@ class BittensorStakeResultBottomSheet(
         val inProgress = state is BittensorStakeResultUi.Progress
 
         binder.bittensorStakeResultProgress.setVisible(inProgress)
-        binder.bittensorStakeResultSuccess.setVisible(state is BittensorStakeResultUi.Success)
-        binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure)
+        binder.bittensorStakeResultSuccess.setVisible(state is BittensorStakeResultUi.Success || state is BittensorStakeResultUi.Recovered && state.successful)
+        binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure || state is BittensorStakeResultUi.Recovered && !state.successful)
+        binder.bittensorStakeResultValidator.isVisible = state is BittensorStakeResultUi.Success
+        binder.bittensorStakeResultFee.isVisible = state is BittensorStakeResultUi.Success
+        (binder.bittensorStakeResultFee.parent as View).isVisible = state is BittensorStakeResultUi.Success
 
         setCancelable(!inProgress)
         setCanceledOnTouchOutside(!inProgress)
@@ -55,6 +59,14 @@ class BittensorStakeResultBottomSheet(
             is BittensorStakeResultUi.Progress -> showProgress(state)
             is BittensorStakeResultUi.Success -> showSuccess(state)
             is BittensorStakeResultUi.Failure -> showFailure(state)
+            is BittensorStakeResultUi.Recovered -> {
+                if (state.successful) {
+                    binder.bittensorStakeResultSuccessTitle.text = state.title
+                    binder.bittensorStakeResultSuccessDescription.text = state.description
+                } else {
+                    showFailure(BittensorStakeResultUi.Failure(state.title, state.description, state.transactionHash, canRetry = false))
+                }
+            }
         }
     }
 

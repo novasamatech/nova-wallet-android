@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import kotlinx.coroutines.flow.first
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -49,7 +52,8 @@ class BittensorStakeAmountViewModel(
     private val router: StakingRouter,
     private val interactor: BittensorStakingInteractor,
     private val assetIconProvider: AssetIconProvider,
-    private val iconGenerator: AddressIconGenerator
+    private val iconGenerator: AddressIconGenerator,
+    private val validatorCommunicator: BittensorSelectValidatorCommunicator
 ) : BaseViewModel() {
 
     private val loadingFailed = MutableStateFlow(false)
@@ -95,20 +99,44 @@ class BittensorStakeAmountViewModel(
             ?.let { formatFiat(it, details) }
     }.shareInBackground()
 
+    val currentStake = stakingDetails.map { details ->
+        if (details.dataStatus !is io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus.Fresh) {
+            "—"
+        } else {
+            formatToken(details.asset.token.amountFromPlanks(details.position?.stakeInPlanks ?: BigInteger.ZERO), details.asset.token.configuration.symbol)
+        }
+    }.shareInBackground()
+
     val maxAmount = combine(stakingDetails, feeResult) { details, fee ->
         val available = maxAvailableInPlanks(details, fee?.result?.getOrNull())
         formatToken(details.asset.token.amountFromPlanks(available), details.asset.token.configuration.symbol)
     }.shareInBackground()
 
     val validator = stakingDetails
-        .map { BittensorValidatorUi(it.validator.name, Icon.FromDrawable(iconGenerator.createAddressIcon(
-            it.validator.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT
-        ))) }
+        .map {
+            BittensorValidatorUi(
+                it.validator.name,
+                Icon.FromDrawable(
+                    iconGenerator.createAddressIcon(
+                        it.validator.hotkey.value,
+                        AddressIconGenerator.SIZE_MEDIUM,
+                        AddressIconGenerator.BACKGROUND_TRANSPARENT
+                    )
+                )
+            )
+        }
         .shareInBackground()
 
     val apy = stakingDetails
         .map(::formatApy)
         .shareInBackground()
+
+    val monthlyEstimate = combine(stakingDetails, amount) { details, text ->
+        val annual = details.annualPercentageYield ?: return@combine "—"
+        val principal = text.toBigDecimalOrNull()?.takeIf { it.signum() > 0 } ?: return@combine "—"
+        val estimate = io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection(principal, annual)
+        "≈ " + formatToken(estimate, details.asset.token.configuration.symbol)
+    }.shareInBackground()
 
     val fee = combine(stakingDetails, feeResult) { details, result ->
         result?.result?.getOrNull()?.let { mapFee(it, details) } ?: BittensorFeeUi("—", "—")
@@ -126,6 +154,25 @@ class BittensorStakeAmountViewModel(
         .shareInBackground()
 
     init {
+        validatorCommunicator.responseFlow.onEach { response ->
+            if (response.subnetId == 0) {
+                if (preparing.value) return@onEach
+                preparing.value = true
+                try {
+                    kotlinx.coroutines.withTimeout(60_000) {
+                        interactor.selectRootValidator(response.address)
+                        stakingDetails.first { it.chain.addressOf(it.validator.hotkey.value) == response.address }
+                    }
+                } catch (e: CancellationException) {
+                    if (e !is kotlinx.coroutines.TimeoutCancellationException) throw e
+                    showError(resourceManager.getString(R.string.common_retry_message))
+                } catch (e: Exception) {
+                    showError(e)
+                } finally {
+                    preparing.value = false
+                }
+            }
+        }.launchIn(viewModelScope)
         stakingDetails
             .onEach(::setInitialAmount)
             .launchIn(viewModelScope)
@@ -150,7 +197,11 @@ class BittensorStakeAmountViewModel(
         _amount.value = max.toStripTrailingZerosString()
     }
 
-    fun validatorClicked() = Unit
+    fun validatorClicked() = launchUnit {
+        if (preparing.value) return@launchUnit
+        val details = stakingDetails.first()
+        validatorCommunicator.openRequest(BittensorSelectValidatorCommunicator.Request(0, details.chain.addressOf(details.validator.hotkey.value)))
+    }
 
     fun continueClicked() = launchUnit {
         if (preparing.value || loadingFailed.value) return@launchUnit

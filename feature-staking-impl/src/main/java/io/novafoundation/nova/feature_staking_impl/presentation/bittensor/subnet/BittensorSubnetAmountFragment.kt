@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.view.showLoadingValue
+import androidx.core.view.isVisible
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import coil.load
@@ -37,6 +39,12 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
             }
         )
         subnet.setOnClickListener { viewModel.chooseSubnetClicked() }
+        subnet.isClickable = !viewModel.existingPosition
+        subnetArrow.isVisible = !viewModel.existingPosition
+        if (viewModel.existingPosition) {
+            toolbar.setTitle(getString(R.string.bittensor_buy_more))
+            amount.setTitle(getString(R.string.bittensor_you_pay))
+        }
         rate.title.setOnClickListener { showInfo(R.string.bittensor_exchange_rate, R.string.swap_rate_description) }
         continueButton.prepareForProgress(viewLifecycleOwner)
         continueButton.setOnClickListener { viewModel.continueClicked() }
@@ -64,6 +72,11 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
                 error(R.drawable.ic_nova)
             }
         }
+        validator.showValue(viewModel.validatorLabel)
+        viewModel.apy.observe { subnetApy.text = it }
+        viewModel.monthlyEstimate.observe(monthlyEstimate::showValue)
+        viewModel.fee.observe(fee::showLoadingValue)
+        viewModel.projectedAveragePrice.observe(projectedAveragePrice::showLoadingValue)
         viewModel.alphaAmount.observe(receive::showValue)
         viewModel.rate.observe(rate::showValue)
         viewModel.continueButtonState.observe(continueButton::setState)

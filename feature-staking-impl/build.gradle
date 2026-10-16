@@ -5,6 +5,7 @@ apply from: '../scripts/secrets.gradle'
 android {
 
     defaultConfig {
+        buildConfigField "String", "BITTENSOR_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/bittensor/v1/config.json\""
 
 
 

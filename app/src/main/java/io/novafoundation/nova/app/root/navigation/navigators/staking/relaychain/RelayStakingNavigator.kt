@@ -1,5 +1,8 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitReviewFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitAmountFragment
 import androidx.core.os.bundleOf
 
 import io.novafoundation.nova.app.R
@@ -293,6 +296,20 @@ class RelayStakingNavigator(
         stakingDashboardRouter.openStakingDashboard()
     }
 
+    override fun openBittensorExitAmount(position: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_exit_amount)
+            .setArgs(BittensorExitAmountFragment.getBundle(position)).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorExitReview(review: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitReviewPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_exit_review)
+            .setArgs(BittensorExitReviewFragment.getBundle(review)).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorRootClaim() {
+        navigationBuilder().action(R.id.action_open_bittensor_root_claim).navigateInFirstAttachedContext()
+    }
+
     override fun openBittensorRootStaking() {
         navigationBuilder().action(R.id.action_open_bittensor_root_staking)
             .navigateInFirstAttachedContext()
@@ -307,9 +324,17 @@ class RelayStakingNavigator(
             .setArgs(bundleOf("subnetId" to subnetId)).navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorSubnetAmount(subnetId: Int, validatorAddress: String) {
+    override fun openBittensorSubnetPosition(
+        payload: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
+    ) {
+        navigationBuilder().action(R.id.action_open_bittensor_subnet_position)
+            .setArgs(BittensorSubnetPositionFragment.getBundle(payload)).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorSubnetAmount(subnetId: Int, validatorAddress: String, existingPosition: Boolean) {
         navigationBuilder().action(R.id.action_open_bittensor_subnet_amount)
-            .setArgs(bundleOf("subnetId" to subnetId, "validatorAddress" to validatorAddress)).navigateInFirstAttachedContext()
+            .setArgs(bundleOf("subnetId" to subnetId, "validatorAddress" to validatorAddress, "existingPosition" to existingPosition))
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBittensorSubnetReview(subnetId: Int, amount: String, metaId: Long, validatorAddress: String) {

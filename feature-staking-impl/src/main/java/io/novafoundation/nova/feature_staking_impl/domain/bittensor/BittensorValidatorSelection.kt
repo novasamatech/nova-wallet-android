@@ -16,4 +16,10 @@ data class BittensorValidatorGates(val maxTake: BigDecimal, val requirePermit: B
     }
 }
 
-data class BittensorSubnetValidator(val validator: BittensorValidator, val address: String, val take: BigDecimal, val selectable: Boolean)
+data class BittensorSubnetValidator(
+    val validator: BittensorValidator,
+    val address: String,
+    val take: BigDecimal,
+    val selectable: Boolean,
+    val recommended: Boolean = false
+)

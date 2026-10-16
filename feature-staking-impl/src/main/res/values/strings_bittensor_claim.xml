@@ -1,0 +1,13 @@
+<resources>
+    <string name="bittensor_claim_action">Claim root rewards</string>
+    <string name="bittensor_claim_redeemable">You will get</string>
+    <string name="bittensor_claim_forfeited">Estimated forfeiture</string>
+    <string name="bittensor_claim_other_hotkeys">Other hotkeys with claimable rewards: %1$d. Each claim is a separate transaction.</string>
+    <string name="bittensor_claim_none">No root rewards meet the minimum claim amount.</string>
+    <string name="bittensor_claim_progress">Claiming root rewards</string>
+    <string name="bittensor_claim_completed">Rewards claimed</string>
+    <string name="bittensor_claim_completed_description">The claim was confirmed in a finalized block.</string>
+    <string name="bittensor_claim_available">Claimable rewards</string>
+    <string name="bittensor_reported_claims">Reported claimed rewards</string>
+    <string name="bittensor_reported_claims_scope">Latest 100 reported root claims. This is a partial history.</string>
+</resources>

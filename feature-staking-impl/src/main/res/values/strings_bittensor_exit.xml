@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="bittensor_exit_root_title">Unstake from root</string>
+    <string name="bittensor_exit_sell_title">Sell %1$s</string>
+    <string name="bittensor_exit_review_sale">Review sale</string>
+    <string name="bittensor_exit_you_unstake">You unstake</string>
+    <string name="bittensor_exit_you_sell">You sell</string>
+    <string name="bittensor_exit_stake_after">Stake after</string>
+    <string name="bittensor_exit_avg_buy_price">Avg buy price</string>
+    <string name="bittensor_exit_earned">Earned</string>
+    <string name="bittensor_exit_fee_from_free">The network fee is paid from your free %1$s balance. Keep enough %1$s for the fee and the minimum account balance.</string>
+    <string name="bittensor_exit_fee_from_stake">The network fee is taken from your root stake. %1$s returns to your free balance after confirmation.</string>
+    <string name="bittensor_exit_unstaking_progress">Unstaking from root</string>
+    <string name="bittensor_exit_selling_progress">Selling %1$s for %2$s</string>
+    <string name="bittensor_exit_root_completed">Unstake completed</string>
+    <string name="bittensor_exit_root_completed_description">The root withdrawal was confirmed in a finalized block.</string>
+    <string name="bittensor_exit_sell">Sell</string>
+    <string name="bittensor_exit_buy">Buy</string>
+    <string name="bittensor_exit_position">Staking position</string>
+    <string name="bittensor_exit_worth_now">Worth now</string>
+    <string name="bittensor_exit_select_position">Choose a staking position</string>
+    <string name="bittensor_exit_received">You will get</string>
+    <string name="bittensor_exit_completed_operation">1 operation</string>
+    <string name="bittensor_buy_more">Buy more</string>
+    <string name="bittensor_you_pay">You pay</string>
+    <string name="bittensor_safety_age_days">≈ %1$s days</string>
+    <string name="bittensor_safety_observed_days">%1$s days of observed prices</string>
+    <string name="bittensor_adds_to_current">Adds to current</string>
+    <string name="bittensor_recommended_validator">Recommended</string>
+    <string name="bittensor_monthly_projection">Estimated monthly rewards</string>
+    <string name="bittensor_estimated_profit">Estimated profit</string>
+    <string name="bittensor_exit_full_position">You withdraw the full position, including rewards accrued before execution.</string>
+    <string name="bittensor_multisig_unavailable">Bittensor transactions are not yet available for multisig wallets.</string>
+    <string name="bittensor_exit_service_fee">Includes %1$s Nova Wallet fee.</string>
+</resources>

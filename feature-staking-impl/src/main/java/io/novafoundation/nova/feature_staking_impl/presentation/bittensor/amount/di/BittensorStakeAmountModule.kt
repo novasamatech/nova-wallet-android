@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.di
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -26,14 +27,16 @@ class BittensorStakeAmountModule {
         router: StakingRouter,
         interactor: BittensorStakingInteractor,
         assetIconProvider: AssetIconProvider,
-        iconGenerator: AddressIconGenerator
+        iconGenerator: AddressIconGenerator,
+        validatorCommunicator: BittensorSelectValidatorCommunicator
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             resourceManager = resourceManager,
             router = router,
             interactor = interactor,
             assetIconProvider = assetIconProvider,
-            iconGenerator = iconGenerator
+            iconGenerator = iconGenerator,
+            validatorCommunicator = validatorCommunicator
         )
     }
 

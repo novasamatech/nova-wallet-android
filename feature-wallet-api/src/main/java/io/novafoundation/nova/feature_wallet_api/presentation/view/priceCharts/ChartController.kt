@@ -1,11 +1,13 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts
 
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
 import android.view.MotionEvent
 import android.view.View
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -49,6 +51,23 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.axisRight.setDrawLabels(show)
         chart.invalidate()
     }
+
+    fun setReferencePrice(value: Float?, label: String) {
+        chart.axisRight.removeAllLimitLines()
+        if (value != null && value > 0 && !value.isInfinite() && !value.isNaN()) {
+            val line = LimitLine(value, label)
+            line.lineWidth = 1f
+            line.lineColor = context.getColor(R.color.text_secondary)
+            line.textColor = context.getColor(R.color.text_secondary)
+            line.textSize = 11f
+            line.enableDashedLine(4.dpF(context), 4.dpF(context), 0f)
+            line.labelPosition = LimitLine.LimitLabelPosition.RIGHT_TOP
+            chart.axisRight.addLimitLine(line)
+        }
+        chart.invalidate()
+    }
+
+    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = setAxisLabelFormatter(formatter::format)
 
     fun setAxisLabelFormatter(format: (Float) -> String) {
         chart.axisRight.valueFormatter = object : ValueFormatter() {

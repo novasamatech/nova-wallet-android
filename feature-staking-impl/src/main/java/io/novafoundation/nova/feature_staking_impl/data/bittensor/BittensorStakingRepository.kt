@@ -39,7 +39,8 @@ class RealBittensorStakingRepository(
     private val accountRepository: AccountRepository,
     private val positionSource: BittensorPositionSource,
     private val validatorSource: BittensorRootValidatorSource,
-    private val positionUpdates: BittensorPositionUpdates
+    private val positionUpdates: BittensorPositionUpdates,
+    private val selection: BittensorRootValidatorSelection
 ) : BittensorStakingRepository {
 
     override fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> = flowOfAll {
@@ -54,8 +55,8 @@ class RealBittensorStakingRepository(
                     metaId = metaAccount.id,
                     chain = chain,
                     asset = asset,
-                    validator = validatorSource.preferredValidator(chain),
-                    annualPercentageYield = validatorSource.annualPercentageYield(),
+                    validator = position.validator,
+                    annualPercentageYield = position.apy,
                     position = position.position,
                     dataStatus = position.status
                 )
@@ -68,20 +69,25 @@ class RealBittensorStakingRepository(
     }
 
     private fun observePosition(chain: Chain, coldkey: ByteArray): Flow<PositionState> {
-        var cachedPosition: BittensorRootPosition? = null
-        return positionUpdates.updates.mapLatest {
+        var cached: PositionState? = null
+        return combine(positionUpdates.updates, selection.address) { _, _ -> Unit }.mapLatest {
+            val validator = validatorSource.preferredValidator(chain)
             try {
-                val validator = validatorSource.preferredValidator(chain)
-                cachedPosition = positionSource.rootPositions(chain.id, coldkey)
-                    .firstOrNull { it.validatorHotkey == validator.hotkey }
-                PositionState(cachedPosition, BittensorDataStatus.Fresh)
+                val position = positionSource.rootPositions(chain.id, coldkey).firstOrNull { it.validatorHotkey == validator.hotkey }
+                PositionState(validator, validatorSource.annualPercentageYield(), position, BittensorDataStatus.Fresh).also { cached = it }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                PositionState(cachedPosition, BittensorDataStatus.Stale(e))
+                val previous = cached?.takeIf { it.validator.hotkey == validator.hotkey }
+                PositionState(validator, previous?.apy, previous?.position, BittensorDataStatus.Stale(e))
             }
         }
     }
 
-    private data class PositionState(val position: BittensorRootPosition?, val status: BittensorDataStatus)
+    private data class PositionState(
+        val validator: BittensorValidator,
+        val apy: BigDecimal?,
+        val position: BittensorRootPosition?,
+        val status: BittensorDataStatus
+    )
 }

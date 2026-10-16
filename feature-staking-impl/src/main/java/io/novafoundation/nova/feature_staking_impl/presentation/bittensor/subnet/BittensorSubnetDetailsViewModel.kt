@@ -1,5 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import kotlinx.coroutines.flow.onStart
+import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
+import io.novafoundation.nova.runtime.repository.expectedBlockTime
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import kotlinx.coroutines.flow.flatMapLatest
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -44,7 +51,9 @@ class BittensorSubnetDetailsViewModel(
     private val iconGenerator: AddressIconGenerator,
     private val details: BittensorSubnetDetailsInteractor,
     private val logger: Logger,
-    private val validatorCommunicator: BittensorSelectValidatorCommunicator
+    private val validatorCommunicator: BittensorSelectValidatorCommunicator,
+    private val rpc: RpcCalls,
+    private val chainState: ChainStateRepository
 ) : BaseViewModel() {
     private val subnetState = MutableStateFlow<BittensorSubnet?>(null)
     val subnet = subnetState.asStateFlow()
@@ -110,6 +119,58 @@ class BittensorSubnetDetailsViewModel(
                 logger.log(e)
             }
         }.shareInBackground()
+    private val safetyReload = MutableStateFlow(0L)
+
+    private val ageState = combine(subnet, safetyReload) { subnet, _ -> subnet?.registrationBlock }
+        .flatMapLatest { registration ->
+            flowOf {
+                registration ?: return@flowOf null
+                val latest = java.math.BigInteger.valueOf(rpc.getBlockHeader(ChainGeneses.BITTENSOR).number.toLong())
+                require(latest >= registration) { "Registration block is ahead of the chain" }
+                val blockTime = chainState.expectedBlockTime(ChainGeneses.BITTENSOR)
+                require(blockTime.isPositive())
+                (latest - registration).toBigDecimal() * blockTime.inWholeMilliseconds.toBigDecimal() / BigDecimal(86_400_000)
+            }.onStart { emit(null) }
+                .catch { cause ->
+                    logger.log("[BittensorSubnetDetails] Safety data unavailable")
+                    logger.log(cause)
+                    emit(null)
+                }
+        }.shareInBackground()
+
+    val age = ageState.map { it?.let { days -> resources.getString(R.string.bittensor_safety_age_days, days.toBigInteger().toString()) } ?: "—" }
+        .shareInBackground()
+
+    private val safetyHistory = combine(chartAsset, safetyReload) { asset, _ -> asset }
+        .flatMapLatest { asset ->
+            flowOf<List<io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPricePoint>?> {
+                val priceId = asset.token.configuration.priceId ?: return@flowOf emptyList()
+                details.history(subnetId, priceId, asset.token.currency, BittensorSubnetChartPeriod.MONTH)
+            }.onStart { emit(null) }
+                .catch { cause ->
+                    logger.log("[BittensorSubnetDetails] Safety data unavailable")
+                    logger.log(cause)
+                    emit(null)
+                }
+        }.shareInBackground()
+
+    val priceHistory = safetyHistory.map { state ->
+        state?.takeIf { it.size >= 2 }?.let { points ->
+            val days = (points.last().timestamp - points.first().timestamp) / 86_400
+            resources.getString(R.string.bittensor_safety_observed_days, days.toString())
+        } ?: "—"
+    }.shareInBackground()
+
+    val priceRange = combine(safetyHistory, chartAsset) { state, asset ->
+        state?.takeIf { it.size >= 2 }?.let { points ->
+            val low = formatter.formatToken(points.minOf { it.tao }, asset.token.configuration.symbol)
+            val high = formatter.formatToken(points.maxOf { it.tao }, asset.token.configuration.symbol)
+            "$low – $high"
+        } ?: "—"
+    }.shareInBackground()
+
+    fun retrySafety() { safetyReload.value++ }
+
     private val periods = BittensorSubnetChartPeriod.entries
     private val labels = listOf("1D", "7D", "1M", "3M", "1Y")
     val charts = combine(chartPoints, period, fiat) { points, selected, fiat ->

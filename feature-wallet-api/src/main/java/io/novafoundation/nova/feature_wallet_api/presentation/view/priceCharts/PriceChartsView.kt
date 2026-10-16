@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts
 
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -85,6 +86,10 @@ class PriceChartsView @JvmOverloads constructor(
     fun setPlotHeight(heightDp: Int) {
         binder.priceChart.layoutParams = binder.priceChart.layoutParams.apply { height = heightDp.dpF.toInt() }
     }
+
+    fun setReferencePrice(value: Float?, label: String) = controller.setReferencePrice(value, label)
+
+    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = setAxisLabelFormatter(formatter::format)
 
     fun setAxisLabelFormatter(format: (Float) -> String) = controller.setAxisLabelFormatter(format)
 
