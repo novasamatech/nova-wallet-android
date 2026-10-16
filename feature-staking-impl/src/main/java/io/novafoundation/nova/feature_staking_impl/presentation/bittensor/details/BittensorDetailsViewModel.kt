@@ -4,9 +4,12 @@ import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
@@ -15,6 +18,7 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
@@ -25,6 +29,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
@@ -38,19 +43,17 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPricePriceTextInjector
 import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
-import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.update
 
 class BittensorDetailsViewModel(
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
@@ -60,58 +63,41 @@ class BittensorDetailsViewModel(
     private val assetIconProvider: AssetIconProvider,
     private val externalActions: ExternalActions.Presentation,
     private val bittensorPriceChartInteractor: BittensorPriceChartInteractor,
-    private val logger: Logger,
+    private val retryController: BittensorRetryController,
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
     private val fiatFormatter: FiatFormatter
 ) : BaseViewModel(), ExternalActions by externalActions {
 
-    private val reload = MutableStateFlow(0L)
+    val retryEvents = retryController.events
 
-    private val portfolioState = reload.flatMapLatest {
-        bittensorPortfolioInteractor.observePortfolio()
-            .withSafeLoading()
-            .onError {
-                logger.log("[BittensorPortfolio] Portfolio stream failed")
-                logger.log(it)
-            }
-    }
+    private val portfolioState = retryController.observe(
+        step = "portfolio",
+        transform = { it.withSafeLoading() },
+        source = bittensorPortfolioInteractor::observePortfolio
+    )
         .shareInBackground()
 
     private val portfolio = portfolioState.filterLoaded()
         .shareInBackground()
 
-    private val failed = portfolioState.map { it is ExtendedLoadingState.Error }
+    val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
         .shareInBackground()
 
-    val isLoading = combine(
-        portfolio.map { it.dataStatus is BittensorDataStatus.Loading }
-            .onStart { emit(true) },
-        failed
-    ) { loading, failed ->
-        loading && !failed
-    }
-        .shareInBackground()
-
-    private val portfolioWarning = portfolio.map {
+    val warning = portfolioState.map { state ->
+        val portfolio = state.dataOrNull
         when {
-            it.dataStatus is BittensorDataStatus.Loading -> null
-            it.positions == null -> resources.getString(R.string.common_retry_message)
-            it.dataStatus is BittensorDataStatus.Stale -> resources.getString(R.string.bittensor_positions_stale)
-            it.positions.totalStake == null -> resources.getString(R.string.bittensor_valuation_unavailable)
+            portfolio == null || portfolio.dataStatus is BittensorDataStatus.Loading -> null
+            portfolio.dataStatus is BittensorDataStatus.Stale -> resources.getString(R.string.bittensor_positions_stale)
+            portfolio.positions?.totalStake == null -> resources.getString(R.string.bittensor_valuation_unavailable)
             else -> null
         }
-    }
-        .onStart { emit(null) }
-
-    val warning = combine(portfolioWarning, failed) { warning, failed ->
-        if (failed) resources.getString(R.string.common_retry_message) else warning
     }
         .shareInBackground()
 
     val totalStake = portfolio.map { data -> formatAmount(data.positions?.totalStake, data) }
         .shareInBackground()
 
-    val canAddStake = combine(portfolio, failed) { data, failed -> !failed && data.dataStatus is BittensorDataStatus.Fresh }
+    val canAddStake = portfolioState.map { it.dataOrNull?.dataStatus is BittensorDataStatus.Fresh }
         .onStart { emit(false) }
         .shareInBackground()
 
@@ -123,16 +109,11 @@ class BittensorDetailsViewModel(
     val selectedChartIndex = chartPeriod.map { PricePeriod.entries.indexOf(it) }
         .shareInBackground()
 
-    private val chartReload = MutableStateFlow(0L)
-
-    private val chartAssetState = chartReload.flatMapLatest {
-        bittensorPortfolioInteractor.observeAsset()
-            .withSafeLoading()
-            .onError {
-                logger.log("[BittensorChart] Failed to load native asset")
-                logger.log(it)
-            }
-    }
+    private val chartAssetState = retryController.observe(
+        step = "chart asset",
+        transform = { it.withSafeLoading() },
+        source = bittensorPortfolioInteractor::observeAsset
+    )
         .shareInBackground()
 
     private val chartAsset = chartAssetState.filterLoaded()
@@ -184,7 +165,7 @@ class BittensorDetailsViewModel(
                     if (priceId == null) {
                         flowOf(AssetPriceChart(period, ExtendedLoadingState.Loaded(emptyList())))
                     } else {
-                        bittensorPriceChartInteractor.observe(priceId, currency, period)
+                        observePriceChart(priceId, currency, period)
                     }
                 }
             }
@@ -192,13 +173,25 @@ class BittensorDetailsViewModel(
         .onStart { emit(AssetPriceChart(PricePeriod.MONTH, ExtendedLoadingState.Loading)) }
         .shareInBackground()
 
-    val chartFailed = chartData.map { it.chart is ExtendedLoadingState.Error }
-        .shareInBackground()
-
     val priceChartModels = chartData.map { data ->
         periods.mapIndexed { index, period -> mapPriceChart(data, period, chartButtonTexts[index]) }
     }
         .shareInBackground()
+
+    private fun observePriceChart(priceId: String, currency: Currency, period: PricePeriod): Flow<AssetPriceChart> {
+        return retryController.observe(
+            step = "price chart",
+            transform = { prices ->
+                prices.withSafeLoading()
+                    .map { AssetPriceChart(period, it) }
+            }
+        ) {
+            bittensorPriceChartInteractor.observe(priceId, currency, period)
+                .map { it.chart }
+                .onError { throw IllegalStateException("Price chart request failed", it) }
+                .filterLoaded()
+        }
+    }
 
     private fun mapPriceChart(data: AssetPriceChart, period: PricePeriod, button: String): PriceChartModel {
         if (period != data.range) return PriceChartModel.Loading(button)
@@ -219,23 +212,14 @@ class BittensorDetailsViewModel(
         periods.getOrNull(index)?.let { chartPeriod.value = it }
     }
 
-    fun retryChart() {
-        chartReload.update { it + 1 }
+    private val subnetMetadata = retryController.observe(
+        step = "subnet metadata",
+        transform = { it.catch { } }
+    ) {
+        flowOf { bittensorPortfolioInteractor.subnets() }
+            .map { subnets -> subnets.associateBy { it.id } }
     }
-
-    private val subnetMetadata = reload.flatMapLatest {
-        flow {
-            emit(emptyMap<BittensorNetuid.Subnet, BittensorSubnet>())
-            try {
-                emit(bittensorPortfolioInteractor.subnets().associateBy { it.id })
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                logger.log("[BittensorPortfolio] Failed to load subnet metadata")
-                logger.log(e)
-            }
-        }
-    }
+        .onStart { emit(emptyMap()) }
         .shareInBackground()
 
     val positions = combine(portfolio, subnetMetadata, ::mapPositions)
@@ -280,10 +264,6 @@ class BittensorDetailsViewModel(
     fun back() = router.back()
 
     fun addPosition() = router.openBittensorChooseSubnet()
-
-    fun retry() {
-        reload.update { it + 1 }
-    }
 
     fun positionClicked(position: BittensorPositionUi) {
         when (val action = position.action) {

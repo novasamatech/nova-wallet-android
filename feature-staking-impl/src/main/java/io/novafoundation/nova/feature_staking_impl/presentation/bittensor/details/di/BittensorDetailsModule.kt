@@ -42,7 +42,7 @@ class BittensorDetailsModule {
         assetIconProvider: AssetIconProvider,
         externalActions: ExternalActions.Presentation,
         bittensorPriceChartInteractor: BittensorPriceChartInteractor,
-        logger: Logger,
+        retryController: BittensorRetryController,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
         fiatFormatter: FiatFormatter
     ): ViewModel = BittensorDetailsViewModel(
@@ -53,7 +53,7 @@ class BittensorDetailsModule {
         assetIconProvider = assetIconProvider,
         externalActions = externalActions,
         bittensorPriceChartInteractor = bittensorPriceChartInteractor,
-        logger = logger,
+        retryController = retryController,
         chartAxisFormatterFactory = chartAxisFormatterFactory,
         fiatFormatter = fiatFormatter
     )

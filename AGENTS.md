@@ -50,6 +50,8 @@ Use `mapNotNull` when a derived flow should emit only available values instead o
 
 Independent data, such as wallet positions and a market chart, must have independent sources, error states, and retries. Failure of one load must not hide another load's successful data. When converting an exception into an error or stale state, log diagnostic context and the cause without secrets or personal data.
 
+Use the established retry dialog for failed screen reads instead of adding inline error/retry controls. Preserve automatic recovery of reactive sources and distinguish stale-data warnings from terminal loading errors.
+
 Derive staking and dashboard updates from reactive balance or on-chain state sources. Do not introduce a feature-specific event bus or call dashboard refresh methods after submitting a transaction. Keep complex input flows in named private methods so that `combine` only assembles their results. Do not wrap `ChainRegistry.getChain` in a dedicated timeout; chain lookup uses the existing registry lifecycle.
 
 ## Remote API models
