@@ -78,6 +78,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class SelectSendViewModel(
     private val chainRegistry: ChainRegistry,
@@ -93,6 +95,7 @@ class SelectSendViewModel(
     private val accountRepository: AccountRepository,
     private val maxActionProviderFactory: MaxActionProviderFactory,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     actionAwaitableMixinFactory: ActionAwaitableMixin.Factory,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     selectedAccountUseCase: SelectedAccountUseCase,
@@ -391,7 +394,7 @@ class SelectSendViewModel(
         router.openConfirmTransfer(transferDraft)
     }
 
-    private fun trackSendInitiated(validPayload: AssetTransferPayload) {
+    private suspend fun trackSendInitiated(validPayload: AssetTransferPayload) {
         val transfer = validPayload.transfer
         val isCrossChain = transfer.originChain.id != transfer.destinationChain.id
 
@@ -401,7 +404,7 @@ class SelectSendViewModel(
                 network = transfer.originChain.name,
                 destinationNetwork = transfer.destinationChain.name.takeIf { isCrossChain },
                 assetCategory = AssetCategoryClassifier.classify(transfer.originChainAsset.symbol.value),
-                amountBucket = AmountBucket.from(validPayload.originUsedAsset.token.amountToFiat(transfer.amount)),
+                amountBucket = AmountBucket.fromOrUnknown(usdRateRepository.amountToUsd(validPayload.originUsedAsset.token.configuration, transfer.amount)),
                 isCrossChain = isCrossChain
             )
         )

@@ -27,18 +27,21 @@ class ChartController(private val chart: LineChart, private val callback: Callba
     private val context = chart.context
 
     private val chartUIParams = ChartUIParams.default(context)
+
     private val longClickDetector = LongPressDetector(cancelDistance = 5.dpF(context), timeout = 200, ::onChartsLongClick)
 
     private var currentEntries: List<Entry> = emptyList()
+
     private var useNeutralColor = false
+
     private var filledLine = false
 
-    fun useFilledLine() {
-        filledLine = true
+    fun setFilledLine(enabled: Boolean) {
+        filledLine = enabled
         chart.axisRight.apply {
-            textSize = 12f
-            typeface = Typeface.DEFAULT
-            setLabelCount(3, true)
+            textSize = if (enabled) 12f else 9f
+            typeface = if (enabled) Typeface.DEFAULT else Typeface.MONOSPACE
+            setLabelCount(if (enabled) 3 else chartUIParams.gridLines, true)
         }
         updateChart()
     }
@@ -67,11 +70,9 @@ class ChartController(private val chart: LineChart, private val callback: Callba
         chart.invalidate()
     }
 
-    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = setAxisLabelFormatter(formatter::format)
-
-    fun setAxisLabelFormatter(format: (Float) -> String) {
+    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) {
         chart.axisRight.valueFormatter = object : ValueFormatter() {
-            override fun getFormattedValue(value: Float): String = format(value)
+            override fun getFormattedValue(value: Float): String = formatter.format(value)
         }
         chart.notifyDataSetChanged()
         chart.invalidate()

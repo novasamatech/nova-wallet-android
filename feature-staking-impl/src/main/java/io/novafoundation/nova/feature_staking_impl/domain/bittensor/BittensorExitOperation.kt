@@ -19,7 +19,7 @@ class BittensorExitOperation(val quote: BittensorExitQuote, val hotkey: AccountI
         when {
             quote.fullExit -> removeFullBittensorStake(hotkey.value, quote.netuid, quote.limitPrice)
             quote.netuid.isRoot() -> removeBittensorRootStake(hotkey.value, quote.amount)
-            else -> removeBittensorSubnetStake(BittensorSubnetId(quote.netuid.value), hotkey.value, quote.amount, requireNotNull(quote.limitPrice))
+            else -> removeBittensorSubnetStake(BittensorNetuid.Subnet(quote.netuid.value), hotkey.value, quote.amount, requireNotNull(quote.limitPrice))
         }
         if (quote.serviceFee.isPositive()) nativeTransfer(beneficiary.value, quote.serviceFee, TransferMode.KEEP_ALIVE)
         Unit

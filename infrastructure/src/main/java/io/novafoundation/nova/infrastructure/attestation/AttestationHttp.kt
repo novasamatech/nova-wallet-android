@@ -41,6 +41,16 @@ internal fun errorCodeOf(body: String?): String? = body?.let { ERROR_CODE.find(i
 
 internal fun HttpException.errorCode(): String? = errorCodeOf(runCatching { response()?.errorBody()?.string() }.getOrNull())
 
+// The attestation contract's error codes, the same list the iOS client knows
+private val ATTESTATION_ERROR_CODES = setOf(
+    "invalid_request", "unsupported_profile", "invalid_target", "unsupported_platform", "unsupported_attestation_type",
+    "unknown_client", "invalid_challenge", "invalid_proof", "attestation_failed", "app_not_allowed", "binding_not_allowed",
+    "client_already_registered", "request_too_large", "unsupported_media_type", "attestation_unavailable"
+)
+
+/** The attestation error code of a failed call, or null when the backend answered without one it defines. Reads the error body. */
+fun HttpException.attestationErrorCode(): String? = errorCode()?.takeIf { it in ATTESTATION_ERROR_CODES }
+
 /** Applies [normalizedForAttestation] to the backend's own bootstrap endpoints. */
 internal class ExactJsonContentTypeInterceptor : Interceptor {
 

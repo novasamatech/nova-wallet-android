@@ -3,7 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Balance
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.extrinsic.builder.ExtrinsicBuilder
 import io.novasama.substrate_sdk_android.runtime.extrinsic.call
@@ -13,7 +13,7 @@ private const val SUBTENSOR_MODULE = "SubtensorModule"
 private val ROOT_NETUID = BigInteger.ZERO
 
 fun ExtrinsicBuilder.addBittensorRootStake(hotkey: AccountId, amount: Balance) {
-    require(amount.signum() > 0) { "Stake amount must be positive" }
+    require(amount.isPositive()) { "Stake amount must be positive" }
     require(amount <= MAX_U64) { "Stake amount must fit into u64" }
 
     call(
@@ -43,7 +43,7 @@ fun ExtrinsicBuilder.removeFullBittensorStake(hotkey: AccountId, netuid: Bittens
 }
 
 fun ExtrinsicBuilder.addBittensorSubnetStake(
-    subnetId: BittensorSubnetId,
+    subnetId: BittensorNetuid.Subnet,
     hotkey: AccountId,
     taoAmount: Balance,
     limitPrice: BigInteger
@@ -52,7 +52,7 @@ fun ExtrinsicBuilder.addBittensorSubnetStake(
 }
 
 fun ExtrinsicBuilder.removeBittensorSubnetStake(
-    subnetId: BittensorSubnetId,
+    subnetId: BittensorNetuid.Subnet,
     hotkey: AccountId,
     alphaAmount: Balance,
     limitPrice: BigInteger
@@ -63,14 +63,14 @@ fun ExtrinsicBuilder.removeBittensorSubnetStake(
 private fun ExtrinsicBuilder.bittensorSubnetStakeCall(
     callName: String,
     amountArgument: String,
-    subnetId: BittensorSubnetId,
+    subnetId: BittensorNetuid.Subnet,
     hotkey: AccountId,
     amount: Balance,
     limitPrice: BigInteger
 ) {
     require(hotkey.size == 32) { "Validator hotkey must be AccountId32" }
-    require(amount.signum() > 0 && amount <= MAX_U64) { "Subnet amount must be a positive u64" }
-    require(limitPrice.signum() > 0 && limitPrice <= MAX_U64) { "Subnet limit price must be a positive u64" }
+    require(amount.isPositive() && amount <= MAX_U64) { "Subnet amount must be a positive u64" }
+    require(limitPrice.isPositive() && limitPrice <= MAX_U64) { "Subnet limit price must be a positive u64" }
 
     call(
         moduleName = SUBTENSOR_MODULE,

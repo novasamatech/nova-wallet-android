@@ -28,7 +28,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import kotlinx.coroutines.flow.mapNotNull
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartPeriod
@@ -61,7 +60,7 @@ enum class BittensorPositionTradeAction { BUY, SELL }
 data class BittensorPositionChoiceRequest(val action: BittensorPositionTradeAction, val positions: List<BittensorExitPositionPayload>)
 
 class BittensorSubnetPositionViewModel(
-    private val subnetId: BittensorSubnetId,
+    private val subnetId: BittensorNetuid.Subnet,
     private val interactor: BittensorSubnetInteractor,
     private val details: BittensorSubnetDetailsInteractor,
     private val metadata: BittensorSubnetMetadataInteractor,
@@ -279,7 +278,13 @@ class BittensorSubnetPositionViewModel(
         val data = portfolio.first() ?: return@launchUnit
         if (data.metaId != payload.metaId || held.first().none { data.chain.addressOf(it.validatorHotkey.value) == payload.hotkeyAddress }) return@launchUnit
         if (action == BittensorPositionTradeAction.BUY) {
-            router.openBittensorSubnetAmount(subnetId.value, payload.hotkeyAddress, existingPosition = true)
+            router.openBittensorSubnetAmount(
+                io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload(
+                    subnetId.value,
+                    payload.hotkeyAddress,
+                    existingPosition = true
+                )
+            )
         } else {
             router.openBittensorExitAmount(payload)
         }

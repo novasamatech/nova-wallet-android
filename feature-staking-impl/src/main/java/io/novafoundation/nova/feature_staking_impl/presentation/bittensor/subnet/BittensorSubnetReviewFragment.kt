@@ -1,15 +1,17 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.common.view.showLoadingValue
+import android.os.Bundle
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
-import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showWallet
@@ -17,18 +19,30 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.common.view.ExecutionTimerView
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeResultBottomSheet
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
+
+private const val PAYLOAD_KEY = "payload"
 
 class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewModel, FragmentBittensorSubnetReviewBinding>() {
+
+    companion object {
+
+        fun getBundle(payload: BittensorSubnetReviewPayload) = Bundle().apply {
+            putParcelable(PAYLOAD_KEY, payload)
+        }
+    }
 
     private var resultBottomSheet: BittensorStakeResultBottomSheet? = null
 
     override fun createBinding() = FragmentBittensorSubnetReviewBinding.inflate(layoutInflater)
 
     override fun inject() {
+        val payload = argument<BittensorSubnetReviewPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetComponentFactory().create(this).inject(this)
+            .bittensorSubnetReviewComponentFactory().create(this, payload).inject(this)
     }
 
     override fun initViews() {
@@ -56,6 +70,10 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
     }
 
     override fun subscribe(viewModel: BittensorSubnetReviewViewModel) = with(binder) {
+        observeValidations(viewModel)
+        observeBittensorRetries(viewModel.retryEvents)
+        observeRetries(viewModel.feeLoaderMixin)
+        viewModel.feeCaption.observe { feeCaption.text = it }
         setupExternalActions(viewModel)
         viewModel.wallet.observe(wallet::showWallet)
         viewModel.account.observe(account::showAddress)
@@ -98,14 +116,12 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             execution.networkFee.setFeeStatus(it)
         }
         viewModel.confirmButtonState.observe(confirm::setState)
-        viewModel.walletChanged.observe { walletChanged.isVisible = it }
         viewModel.resultState.observe { it?.let(::showResult) }
     }
 
     private fun showDescription(titleRes: Int, descriptionRes: Int) {
         DescriptionBottomSheet(requireContext(), getString(titleRes), getString(descriptionRes)).show()
     }
-
     private fun showResult(state: BittensorStakeResultUi) {
         val sheet = resultBottomSheet ?: BittensorStakeResultBottomSheet(
             requireContext(),

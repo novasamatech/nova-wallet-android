@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_assets.presentation.balance.detail
 
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartTextInjectors
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -103,7 +104,8 @@ class BalanceDetailViewModel(
     private val amountFormatter: AmountFormatter,
     private val chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
     private val giftsAvailableGiftAssetsUseCase: AvailableGiftAssetsUseCase,
-    private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin
+    private val giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
+    private val fiatFormatter: FiatFormatter
 ) : BaseViewModel(), TransactionHistoryUi by transactionHistoryMixin, Browserable {
 
     override val openBrowserEvent = MutableLiveData<Event<String>>()
@@ -192,8 +194,8 @@ class BalanceDetailViewModel(
         val currency = currencyInteractor.getSelectedCurrency()
 
         PriceChartTextInjectors(
-            RealPricePriceTextInjector(currency, lastCoinRate),
-            RealPriceChangeTextInjector(resourceManager, currency),
+            RealPricePriceTextInjector(currency, lastCoinRate, fiatFormatter),
+            RealPriceChangeTextInjector(resourceManager, currency, fiatFormatter),
             RealDateChartTextInjector(resourceManager)
         )
     }.shareInBackground()

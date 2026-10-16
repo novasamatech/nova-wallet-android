@@ -4,7 +4,10 @@ import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
+import io.novafoundation.nova.feature_account_api.domain.updaters.AccountUpdateScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionsUpdater
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdateSystem
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
 import io.novafoundation.nova.feature_staking_impl.di.staking.mythos.Mythos
@@ -63,7 +66,8 @@ class UpdatersModule {
         @Turing turingUpdaters: StakingUpdaters.Group,
         @NominationPools nominationPoolsUpdaters: StakingUpdaters.Group,
         @Mythos mythosUpdaters: StakingUpdaters.Group,
-        @CommonUpdaters commonUpdaters: StakingUpdaters.Group
+        @CommonUpdaters commonUpdaters: StakingUpdaters.Group,
+        @Bittensor bittensorUpdaters: StakingUpdaters.Group
     ): StakingUpdaters {
         return StakingUpdaters(
             relaychainUpdaters = relaychainUpdaters,
@@ -71,9 +75,23 @@ class UpdatersModule {
             commonUpdaters = commonUpdaters,
             turingExtraUpdaters = turingUpdaters,
             nominationPoolsUpdaters = nominationPoolsUpdaters,
-            mythosUpdaters = mythosUpdaters
+            mythosUpdaters = mythosUpdaters,
+            bittensorUpdaters = bittensorUpdaters
         )
     }
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorPositionsUpdater(
+        scope: AccountUpdateScope,
+        chainRegistry: ChainRegistry,
+        positionRepository: BittensorPositionRepository
+    ) = BittensorPositionsUpdater(scope, chainRegistry, positionRepository)
+
+    @Provides
+    @FeatureScope
+    @Bittensor
+    fun provideBittensorUpdaters(positionsUpdater: BittensorPositionsUpdater) = StakingUpdaters.Group(positionsUpdater)
 
     @Provides
     @FeatureScope
@@ -122,3 +140,7 @@ class UpdatersModule {
 @Qualifier
 @Retention(AnnotationRetention.SOURCE)
 annotation class CommonUpdaters
+
+@Qualifier
+@Retention(AnnotationRetention.SOURCE)
+annotation class Bittensor

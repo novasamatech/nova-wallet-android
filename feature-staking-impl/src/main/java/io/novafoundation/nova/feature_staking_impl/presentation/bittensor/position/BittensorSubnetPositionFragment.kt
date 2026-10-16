@@ -54,7 +54,8 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         retryPosition.setOnClickListener { viewModel.retryPosition() }
         retryChart.setOnClickListener { viewModel.retryChart() }
         validators.adapter = adapter
-        chart.showPlotOnly(change)
+        chart.setPresentation(io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView.Presentation.PLOT_ONLY)
+        chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPlotHeight(208)
         chart.onPeriodSelected = viewModel::selectPeriod
     }

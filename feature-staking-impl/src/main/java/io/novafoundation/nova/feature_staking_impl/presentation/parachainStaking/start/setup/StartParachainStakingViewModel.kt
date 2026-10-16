@@ -60,6 +60,8 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.amountToUsd
 
 class StartParachainStakingViewModel(
     private val router: ParachainStakingRouter,
@@ -80,6 +82,7 @@ class StartParachainStakingViewModel(
     private val selectedAssetState: StakingSharedState,
     private val amountFormatter: AmountFormatter,
     private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository,
     hintsMixinFactory: ConfirmStartParachainStakingHintsMixinFactory,
     amountChooserMixinFactory: AmountChooserMixin.Factory,
 ) : StartSingleSelectStakingViewModel<Collator, StartParachainStakingViewModel.ParachainLogic>(
@@ -187,7 +190,7 @@ class StartParachainStakingViewModel(
             AnalyticsEvent.StakingInitiated(
                 stakingType = ANALYTICS_STAKING_TYPE_DIRECT,
                 network = selectedAssetState.chain().name,
-                amountBucket = AmountBucket.from(asset.token.amountToFiat(amount))
+                amountBucket = AmountBucket.fromOrUnknown(usdRateRepository.amountToUsd(asset.token.configuration, amount))
             )
         )
     }

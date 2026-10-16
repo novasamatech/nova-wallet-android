@@ -1,12 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 
-class BittensorPortfolioInteractor(private val repository: BittensorPortfolioRepository) {
+class BittensorPortfolioInteractor(
+    private val repository: BittensorPortfolioRepository,
+    private val subnetRepository: BittensorSubnetRepository
+) {
+
+    suspend fun subnets() = subnetRepository.subnets()
 
     fun observeAsset() = repository.observeAsset()
 
-    fun observePortfolio() = repository.observePortfolio()
+    fun observeRootPortfolio() = repository.observeRootPortfolio()
 
-    fun refresh() = repository.refresh()
+    fun observePortfolio() = repository.observePortfolio()
 }

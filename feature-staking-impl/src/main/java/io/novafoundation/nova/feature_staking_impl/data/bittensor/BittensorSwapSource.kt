@@ -1,24 +1,24 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.common.data.network.runtime.binding.bindNumber
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapDirection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapSimulation
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 
 interface BittensorSwapSource {
 
     suspend fun simulate(
         chainId: String,
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         direction: BittensorSwapDirection,
         amountIn: BigInteger
     ): BittensorSwapSimulation
 
     /** Current marginal price in rao per one alpha; not the average price of a simulation. */
-    suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorSubnetId): BigInteger
+    suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger
 }
 
 class RealBittensorSwapSource(
@@ -27,11 +27,11 @@ class RealBittensorSwapSource(
 
     override suspend fun simulate(
         chainId: String,
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         direction: BittensorSwapDirection,
         amountIn: BigInteger
     ): BittensorSwapSimulation {
-        require(amountIn.signum() > 0 && amountIn.bitLength() <= 64) { "Swap input must be a positive u64" }
+        require(amountIn.isPositive() && amountIn.bitLength() <= 64) { "Swap input must be a positive u64" }
         val buying = direction == BittensorSwapDirection.TAO_TO_ALPHA
 
         return runtimeCallsApi.forChain(chainId).call(
@@ -45,19 +45,25 @@ class RealBittensorSwapSource(
         )
     }
 
-    override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorSubnetId): BigInteger {
+    override suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger {
         return runtimeCallsApi.forChain(chainId).call(
             section = "SwapRuntimeApi",
             method = "current_alpha_price",
             arguments = mapOf("netuid" to BigInteger.valueOf(subnetId.value.toLong())),
-            returnBinding = { bindBittensorU64(it).also { price -> require(price.signum() > 0) { "Subnet has no valid alpha price" } } }
+            returnBinding = ::bindAlphaPrice
         )
+    }
+
+    private fun bindAlphaPrice(decoded: Any?): BigInteger {
+        val price = bindBittensorU64(decoded)
+        require(price.isPositive()) { "Subnet has no valid alpha price" }
+        return price
     }
 }
 
 internal fun bindBittensorSwapSimulation(
     decoded: Any?,
-    subnetId: BittensorSubnetId,
+    subnetId: BittensorNetuid.Subnet,
     direction: BittensorSwapDirection,
     requestedAmount: BigInteger
 ): BittensorSwapSimulation {
@@ -71,7 +77,7 @@ internal fun bindBittensorSwapSimulation(
     val amountOut = if (buying) alphaAmount else taoAmount
 
     // Runtime reports simulation failures as an all-zero struct, not an RPC error.
-    require(amountIn.signum() > 0 && amountOut.signum() > 0) { "Subnet swap simulation failed" }
+    require(amountIn.isPositive() && amountOut.isPositive()) { "Subnet swap simulation failed" }
     val inputFee = if (buying) taoFee else alphaFee
     require(amountIn + inputFee <= requestedAmount) { "Simulation input including fee exceeds the requested amount" }
 
@@ -85,8 +91,4 @@ internal fun bindBittensorSwapSimulation(
         taoSlippage = bindBittensorU64(value["taoSlippage"]),
         alphaSlippage = bindBittensorU64(value["alphaSlippage"])
     )
-}
-
-internal fun bindBittensorU64(decoded: Any?): BigInteger = bindNumber(decoded).also {
-    require(it.signum() >= 0 && it.bitLength() <= 64) { "Invalid Bittensor u64 value" }
 }

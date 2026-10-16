@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -9,7 +9,7 @@ class BittensorSubnetPositionTitleTest {
 
     @Test
     fun `catalogue name and alpha symbol replace numbered placeholder`() {
-        val subnet = BittensorSubnet(BittensorSubnetId(1), "Crucible", "α", null)
+        val subnet = BittensorSubnet(BittensorNetuid.Subnet(1), "Crucible", "α", null)
         assertEquals("Crucible α", subnetPositionTitle(subnet, "Subnet 1"))
     }
 
@@ -20,7 +20,7 @@ class BittensorSubnetPositionTitleTest {
 
     @Test
     fun `blank metadata does not produce an empty title`() {
-        val subnet = BittensorSubnet(BittensorSubnetId(1), "", "", null)
+        val subnet = BittensorSubnet(BittensorNetuid.Subnet(1), "", "", null)
         assertEquals("Subnet 1", subnetPositionTitle(subnet, "Subnet 1"))
     }
 }

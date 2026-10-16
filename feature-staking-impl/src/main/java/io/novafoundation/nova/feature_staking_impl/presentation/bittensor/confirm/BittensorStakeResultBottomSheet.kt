@@ -88,7 +88,7 @@ class BittensorStakeResultBottomSheet(
     }
 
     private fun showFailure(state: BittensorStakeResultUi.Failure) {
-        binder.bittensorStakeResultTryAgain.setVisible(state.canRetry)
+        binder.bittensorStakeResultTryAgain.isVisible = state.canRetry
         binder.bittensorStakeResultFailureTitle.text = state.title
         binder.bittensorStakeResultFailureDescription.text = state.description
         binder.bittensorStakeResultError.setMessage(state.error)

@@ -3,16 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import java.math.BigInteger
 
-@JvmInline
-value class BittensorSubnetId(val value: Int) {
-
-    init {
-        require(value in 1..65535) { "Dynamic subnet id must fit into a non-zero u16" }
-    }
-}
-
 data class BittensorSubnetPosition(
-    val subnetId: BittensorSubnetId,
+    val subnetId: BittensorNetuid.Subnet,
     val validatorHotkey: AccountIdKey,
     val alphaInPlanks: BigInteger,
     val isRegistered: Boolean? = null
@@ -24,7 +16,7 @@ enum class BittensorSwapDirection {
 
 /** Runtime simulation only: Nova service commission is not included in these amounts. */
 data class BittensorSwapSimulation(
-    val subnetId: BittensorSubnetId,
+    val subnetId: BittensorNetuid.Subnet,
     val direction: BittensorSwapDirection,
     /** Net pool input, excluding the runtime fee in the input token. */
     val amountIn: BigInteger,

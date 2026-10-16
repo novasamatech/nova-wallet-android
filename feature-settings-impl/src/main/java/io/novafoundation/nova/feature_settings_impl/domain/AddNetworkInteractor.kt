@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_settings_impl.domain
 import io.novafoundation.nova.common.data.network.coingecko.CoinGeckoLinkParser
 import io.novafoundation.nova.common.data.network.runtime.model.firstTokenSymbol
 import io.novafoundation.nova.common.validation.ValidationSystem
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_assets.domain.tokens.add.validations.CoinGeckoLinkValidationFactory
 import io.novafoundation.nova.feature_settings_impl.data.NodeChainIdRepositoryFactory
 import io.novafoundation.nova.feature_settings_impl.domain.model.CustomNetworkPayload
@@ -15,7 +16,9 @@ import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetw
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.validateNetworkNodeIsAlive
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.validateNetworkNotAdded
 import io.novafoundation.nova.feature_settings_impl.domain.validation.customNetwork.validateNodeSupportedByNetwork
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityRepository
 import io.novafoundation.nova.runtime.ext.evmChainIdFrom
+import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.NetworkType
@@ -57,7 +60,9 @@ class RealAddNetworkInteractor(
     private val coinGeckoLinkValidationFactory: CoinGeckoLinkValidationFactory,
     private val coinGeckoLinkParser: CoinGeckoLinkParser,
     private val nodeConnectionFactory: NodeConnectionFactory,
-    private val customChainFactory: CustomChainFactory
+    private val customChainFactory: CustomChainFactory,
+    private val accountRepository: AccountRepository,
+    private val assetVisibilityRepository: AssetVisibilityRepository
 ) : AddNetworkInteractor {
 
     override suspend fun createSubstrateNetwork(
@@ -67,7 +72,7 @@ class RealAddNetworkInteractor(
     ) = runCatching {
         val chain = customChainFactory.createSubstrateChain(payload, prefilledChain, coroutineScope)
 
-        chainRepository.addChain(chain)
+        addChainAndShowAssets(chain)
     }
 
     override suspend fun createEvmNetwork(
@@ -76,7 +81,7 @@ class RealAddNetworkInteractor(
     ) = runCatching {
         val chain = customChainFactory.createEvmChain(payload, prefilledChain)
 
-        chainRepository.addChain(chain)
+        addChainAndShowAssets(chain)
     }
 
     override fun getSubstrateValidationSystem(coroutineScope: CoroutineScope): CustomNetworkValidationSystem {
@@ -125,6 +130,22 @@ class RealAddNetworkInteractor(
 
             chainRepository.editChain(chainId, chainName, tokenSymbol, blockExplorer, priceId)
         }
+    }
+
+    /**
+     * A network the user adds is never in the curated default list, so without an explicit decision its tokens
+     * would stay hidden right after it was added. Shown in the wallet the user added it from - other wallets
+     * still pick the tokens up through balance discovery once they hold them.
+     *
+     * Visibility rows reference the chain assets, so they can only be written once the chain is inserted.
+     */
+    private suspend fun addChainAndShowAssets(chain: Chain) {
+        chainRepository.addChain(chain)
+
+        val selectedMetaId = accountRepository.getSelectedMetaAccount().id
+        val choices = chain.assets.associate { it.fullId to true }
+
+        assetVisibilityRepository.setVisibility(selectedMetaId, choices)
     }
 
     private fun getNodeConnectionSingletonHelper(coroutineScope: CoroutineScope): NodeConnectionSingletonHelper {

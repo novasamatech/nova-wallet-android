@@ -16,6 +16,7 @@ import io.novafoundation.nova.feature_push_notifications.di.PushNotificationsFea
 import io.novafoundation.nova.feature_settings_api.SettingsFeatureApi
 import io.novafoundation.nova.feature_settings_impl.SettingsRouter
 import io.novafoundation.nova.feature_settings_impl.presentation.assetIcons.di.AppearanceComponent
+import io.novafoundation.nova.feature_settings_impl.presentation.privacy.di.PrivacyComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.main.di.NetworkManagementListComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.networkList.addedNetworks.di.AddedNetworkListComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.cloudBackup.settings.di.CloudBackupSettingsComponent
@@ -27,6 +28,7 @@ import io.novafoundation.nova.feature_settings_impl.presentation.networkManageme
 import io.novafoundation.nova.feature_settings_impl.presentation.networkManagement.node.di.CustomNodeComponent
 import io.novafoundation.nova.feature_settings_impl.presentation.settings.di.SettingsComponent
 import io.novafoundation.nova.feature_versions_api.di.VersionsFeatureApi
+import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.feature_wallet_connect_api.di.WalletConnectFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 
@@ -52,6 +54,8 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
     fun addNetworkMainFactory(): AddNetworkMainComponent.Factory
 
     fun appearanceFactory(): AppearanceComponent.Factory
+
+    fun privacyFactory(): PrivacyComponent.Factory
 
     fun addNetworkFactory(): AddNetworkComponent.Factory
 
@@ -86,7 +90,8 @@ interface SettingsFeatureComponent : SettingsFeatureApi {
             WalletConnectFeatureApi::class,
             VersionsFeatureApi::class,
             PushNotificationsFeatureApi::class,
-            CloudBackupFeatureApi::class
+            CloudBackupFeatureApi::class,
+            WalletFeatureApi::class
         ]
     )
     interface SettingsFeatureDependenciesComponent : SettingsFeatureDependencies

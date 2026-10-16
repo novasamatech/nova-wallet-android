@@ -103,7 +103,6 @@ class RealExtrinsicService(
     ): Result<ExtrinsicSubmission> = runCatching {
         val (extrinsic, submissionOrigin, _, callExecutionType, signingHierarchy) = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
         recordRecoverableSubmission(chain, origin, submissionOptions, extrinsic)
-        submissionOptions.onSigned?.invoke(extrinsic.extrinsicHex.extrinsicHash())
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
 
         ExtrinsicSubmission(hash, submissionOrigin, callExecutionType, signingHierarchy)
@@ -141,7 +140,6 @@ class RealExtrinsicService(
     ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> = runCatching {
         val singleSubmission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
         recordRecoverableSubmission(chain, origin, submissionOptions, singleSubmission.extrinsic)
-        submissionOptions.onSigned?.invoke(singleSubmission.extrinsic.extrinsicHex.extrinsicHash())
 
         rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic)
             .map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
@@ -16,7 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeResultBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 
-class BittensorRootDetailsFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorRootDetailsBinding>() {
+class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel, FragmentBittensorRootDetailsBinding>() {
 
     private var exitSheet: FixedListBottomSheet<BottomSheeetFixedListBinding>? = null
 
@@ -41,11 +42,11 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorDetailsViewModel, Fra
         claim.setOnClickListener { viewModel.claimClicked() }
         unstake.setBadge(null)
         unstake.setOnClickListener { viewModel.unstakeRoot() }
-        retry.setOnClickListener { viewModel.retry() }
         validators.adapter = adapter
     }
 
-    override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
+    override fun subscribe(viewModel: BittensorRootDetailsViewModel) = with(binder) {
+        observeBittensorRetries(viewModel.retryEvents)
         setupExternalActions(viewModel)
         viewModel.isLoading.observe { loading.isVisible = it }
         viewModel.exitChoices.observe(viewLifecycleOwner, EventObserver { choices -> showExitChoices(choices) })
@@ -71,7 +72,6 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorDetailsViewModel, Fra
         viewModel.warning.observe {
             warning.text = it
             warning.isVisible = it != null
-            retry.isVisible = it != null
         }
     }
     private fun showExitChoices(choices: List<BittensorExitChoice>) {

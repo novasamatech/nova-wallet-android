@@ -9,10 +9,10 @@ import java.math.BigInteger
 
 class BittensorConfigMappingTest {
 
-    @Test fun `configured commission determines exact service fee`() {
+    @Test fun `configured commission is included in total spend`() {
         val remote = BittensorConfigRemote(BigDecimal("0.005"), emptyList())
         val config = mapBittensorConfig(remote)
-        assertEquals(BigInteger.valueOf(5_000_000), config.commission.feeFor(BigInteger.valueOf(1_000_000_000)))
+        assertEquals(BigInteger.valueOf(5_000_000), config.commission.feeFor(BigInteger.valueOf(1_005_000_000)))
     }
 
     @Test fun `invalid commission uses established fallback`() {

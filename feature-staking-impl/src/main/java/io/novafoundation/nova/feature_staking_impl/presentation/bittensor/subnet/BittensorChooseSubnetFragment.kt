@@ -7,10 +7,12 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorChooseSubnetBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 
 class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewModel, FragmentBittensorChooseSubnetBinding>() {
 
     private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+
     private val adapter by lazy {
         BittensorSubnetListAdapter(imageLoader, viewModel::rootStaking, viewModel::select, viewModel::toggleFavorite)
     }
@@ -22,21 +24,17 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
             .bittensorSubnetComponentFactory().create(this).inject(this)
     }
 
-    override fun initViews() = with(binder) {
+    override fun initViews(): Unit = with(binder) {
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
         subnets.adapter = adapter
         toolbar.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
-        retry.setOnClickListener { viewModel.retry() }
     }
 
     override fun subscribe(viewModel: BittensorChooseSubnetViewModel) = with(binder) {
+        observeBittensorRetries(viewModel.retryEvents)
         viewModel.list.observe(adapter::submitList)
         viewModel.isEmpty.observe { empty.isVisible = it }
         viewModel.isLoading.observe { loading.isVisible = it }
-        viewModel.hasError.observe {
-            error.isVisible = it
-            retry.isVisible = it
-        }
     }
 }

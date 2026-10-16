@@ -3,12 +3,14 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amoun
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorStakeAmountBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
@@ -20,6 +22,7 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
     override fun initViews() {
         binder.bittensorStakeAmountContinue.prepareForProgress(viewLifecycleOwner)
         binder.bittensorStakeAmountToolbar.setHomeButtonListener { viewModel.back() }
+        onBackPressed { viewModel.back() }
         binder.bittensorStakeAmountValidator.setOnClickListener { viewModel.validatorClicked() }
         binder.bittensorStakeAmountContinue.setOnClickListener { viewModel.continueClicked() }
         binder.bittensorStakeAmount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
@@ -39,15 +42,18 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
     }
 
     override fun subscribe(viewModel: BittensorStakeAmountViewModel) {
+        observeValidations(viewModel)
+        observeBittensorRetries(viewModel.retryEvents)
+        observeRetries(viewModel.feeLoaderMixin)
         viewModel.amountModel.observe(binder.bittensorStakeAmount::setChooseAmountModel)
         viewModel.amount.observe(::showAmount)
         viewModel.fiatAmount.observe(binder.bittensorStakeAmount::setFiatAmount)
         viewModel.currentStake.observe(binder.currentStake::showValue)
+        viewModel.monthlyEstimate.observe(binder.monthlyEstimate::showValue)
         viewModel.maxAmount.observe(binder.bittensorStakeAmount::setMaxAmountDisplay)
         viewModel.validator.observe(::showValidator)
         viewModel.apy.observe(binder.bittensorStakeAmountApy::showValue)
-        viewModel.monthlyEstimate.observe(binder.monthlyEstimate::showValue)
-        viewModel.fee.observe(::showFee)
+        viewModel.fee.observe(binder.bittensorStakeAmountFee::setFeeStatus)
         viewModel.continueButtonState.observe(binder.bittensorStakeAmountContinue::setState)
     }
 
@@ -64,9 +70,5 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
         bittensorStakeAmountValidator.showValue(validator.name)
         validator.icon?.let { bittensorStakeAmountValidator.loadImage(it) }
             ?: bittensorStakeAmountValidator.setImage(R.drawable.ic_nova, 20)
-    }
-
-    private fun showFee(fee: BittensorFeeUi) {
-        binder.bittensorStakeAmountFee.showValue(fee.amount, fee.fiatAmount)
     }
 }

@@ -24,7 +24,7 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -85,7 +85,7 @@ class BittensorExitReviewViewModel(
     private val recovery: ExtrinsicSubmissionRecovery,
     chains: ChainRegistry,
     walletUi: WalletUiUseCase,
-    accounts: SelectedAccountUseCase,
+    accounts: AccountRepository,
     chainState: ChainStateRepository,
     private val externalActions: ExternalActions.Presentation,
     estimates: BittensorEstimatesRepository,
@@ -97,9 +97,10 @@ class BittensorExitReviewViewModel(
 
     private val chain by lazyAsync { chains.getChain(ChainGeneses.BITTENSOR) }
 
-    val wallet = walletUi.selectedWalletUiFlow().shareInBackground()
+    val wallet = walletUi.walletUiFlow(payload.position.metaId).shareInBackground()
 
-    val account = accounts.selectedAddressModelFlow(chain::await).shareInBackground()
+    val account = accounts.metaAccountFlow(payload.position.metaId)
+        .map { walletUi.walletAddressModel(it, chain.await(), AddressIconGenerator.SIZE_MEDIUM) }.shareInBackground()
 
     private val confirmMutex = Mutex()
 

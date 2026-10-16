@@ -6,10 +6,6 @@ import retrofit2.http.Query
 
 interface ProxyPriceApi {
 
-    companion object {
-        const val BASE_URL = "https://tokens-price.novasama-tech.org"
-    }
-
     @GET("/api/v3/coins/{id}/market_chart")
     suspend fun getLastCoinRange(
         @Path("id") id: String,

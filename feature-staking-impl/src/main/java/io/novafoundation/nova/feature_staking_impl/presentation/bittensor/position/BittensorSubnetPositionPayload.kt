@@ -2,10 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.posit
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 
 @Parcelize
 data class BittensorSubnetPositionPayload(val subnetId: Int) : Parcelable {
 
-    fun subnetId() = BittensorSubnetId(subnetId)
+    fun subnetId() = BittensorNetuid.Subnet(subnetId)
 }

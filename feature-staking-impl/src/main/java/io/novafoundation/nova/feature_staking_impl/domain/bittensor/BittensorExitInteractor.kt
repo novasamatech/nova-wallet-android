@@ -43,9 +43,8 @@ class BittensorExitInteractor(
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
 
     suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition {
-        val wallet = accounts.getSelectedMetaAccount()
+        val wallet = accounts.getMetaAccount(metaId)
         requireBittensorImmediateWallet(wallet)
-        check(wallet.id == metaId) { "The staking wallet has changed" }
         val chain = chains.getChain(ChainGeneses.BITTENSOR)
         val coldkey = AccountIdKey(wallet.requireAccountIdIn(chain))
         val hotkey = AccountIdKey(chain.accountIdOf(hotkeyAddress))
@@ -78,7 +77,7 @@ class BittensorExitInteractor(
         val quote = if (position.isRoot) {
             BittensorExitQuote(BittensorNetuid.Root, actual, fullExit, actual, actual, BigInteger.ZERO, null)
         } else {
-            val subnetId = BittensorSubnetId(position.netuid.value)
+            val subnetId = BittensorNetuid.Subnet(position.netuid.value)
             val simulated = swaps.simulate(position.chain.id, subnetId, BittensorSwapDirection.ALPHA_TO_TAO, actual)
             require(simulated.direction == BittensorSwapDirection.ALPHA_TO_TAO && simulated.subnetId == subnetId)
             require(simulated.amountIn + simulated.alphaFee == actual && simulated.amountOut.isPositive())
@@ -141,7 +140,7 @@ class BittensorExitInteractor(
     }
 
     private suspend fun requireWallet(metaId: Long, coldkey: AccountIdKey, chain: Chain) {
-        val wallet = accounts.getSelectedMetaAccount()
+        val wallet = accounts.getMetaAccount(metaId)
         requireBittensorImmediateWallet(wallet)
         check(wallet.id == metaId && wallet.requireAccountIdIn(chain).contentEquals(coldkey.value)) { "The staking wallet has changed" }
     }

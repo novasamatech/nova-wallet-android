@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorValidatorBinding
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import java.math.RoundingMode
 
 class BittensorValidatorAdapter(
@@ -25,7 +26,7 @@ class BittensorValidatorAdapter(
         val previous = selectedAddress
         selectedAddress = address
         currentList.forEachIndexed { index, row ->
-            if (row.validator.address == previous || row.validator.address == address) notifyItemChanged(index)
+            if (row.eligibility.address == previous || row.eligibility.address == address) notifyItemChanged(index)
         }
     }
 
@@ -34,7 +35,7 @@ class BittensorValidatorAdapter(
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val row = getItem(position)
-        holder.bind(row, row.validator.address == selectedAddress, onSelected, onInfo)
+        holder.bind(row, row.eligibility.address == selectedAddress, onSelected, onInfo)
     }
 
     class Holder(private val binder: ItemBittensorValidatorBinding) : RecyclerView.ViewHolder(binder.root) {
@@ -45,12 +46,22 @@ class BittensorValidatorAdapter(
             onSelected: (BittensorValidatorUi) -> Unit,
             onInfo: (BittensorValidatorUi) -> Unit
         ) = with(binder) {
-            val row = model.validator
+            val row = model.eligibility
             root.alpha = if (row.selectable) 1f else 0.5f
             choice.isChecked = selected
             choice.isEnabled = row.selectable
+            bindAccessibility(selected)
+            name.text = row.validator.name.ifBlank { row.address }
+            subtitle.text = formatSubtitle(row)
+            icon.setImageDrawable(model.icon)
+            info.contentDescription = root.context.getString(R.string.bittensor_validator_address_info, name.text)
+            info.setOnClickListener { onInfo(model) }
+            root.setOnClickListener { if (row.selectable) onSelected(model) }
+        }
+
+        private fun bindAccessibility(selected: Boolean) {
             ViewCompat.setAccessibilityDelegate(
-                root,
+                binder.root,
                 object : AccessibilityDelegateCompat() {
                     override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
                         super.onInitializeAccessibilityNodeInfo(host, info)
@@ -60,20 +71,24 @@ class BittensorValidatorAdapter(
                     }
                 }
             )
-            name.text = row.validator.name.ifBlank { row.address }
-            val take = row.take.movePointRight(2).setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
-            val takeLabel = root.context.getString(R.string.bittensor_validator_take, take)
-            val fee = if (row.recommended) root.context.getString(R.string.bittensor_recommended_validator) + " · " + takeLabel else takeLabel
-            subtitle.text = if (row.selectable) fee else fee + " · " + root.context.getString(R.string.staking_nominator_status_inactive)
-            icon.setImageDrawable(model.icon)
-            info.contentDescription = root.context.getString(R.string.bittensor_validator_address_info, name.text)
-            info.setOnClickListener { onInfo(model) }
-            root.setOnClickListener { if (row.selectable) onSelected(model) }
+        }
+
+        private fun formatSubtitle(validator: BittensorSubnetValidator): String {
+            val context = binder.root.context
+            val commissionPercentage = validator.commissionRate.movePointRight(2)
+                .setScale(2, RoundingMode.HALF_EVEN)
+                .toStripTrailingZerosString()
+            val fee = context.getString(R.string.bittensor_validator_take, commissionPercentage)
+            return when {
+                !validator.selectable -> fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
+                validator.recommended -> context.getString(R.string.bittensor_recommended_validator) + " · " + fee
+                else -> fee
+            }
         }
     }
 
     private object DiffCallback : DiffUtil.ItemCallback<BittensorValidatorUi>() {
-        override fun areItemsTheSame(old: BittensorValidatorUi, new: BittensorValidatorUi) = old.validator.address == new.validator.address
+        override fun areItemsTheSame(old: BittensorValidatorUi, new: BittensorValidatorUi) = old.eligibility.address == new.eligibility.address
         override fun areContentsTheSame(old: BittensorValidatorUi, new: BittensorValidatorUi) = old == new
     }
 }

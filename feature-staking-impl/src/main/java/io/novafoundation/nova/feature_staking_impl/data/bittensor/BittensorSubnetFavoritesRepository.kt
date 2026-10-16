@@ -2,7 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
@@ -17,13 +17,19 @@ class BittensorSubnetFavoritesRepository(
 
     private val mutex = Mutex()
 
-    fun observeFavorites() = accounts.selectedMetaAccountFlow().flatMapLatest { account ->
-        preferences.stringSetFlow(key(account.id)).map { stored ->
-            BittensorSubnetFavorites(account.id, stored.orEmpty().mapNotNull(String::toIntOrNull).filter { it in 1..65535 }.toSet())
+    fun observeFavorites() = accounts.selectedMetaAccountFlow()
+        .flatMapLatest { account ->
+            preferences.stringSetFlow(key(account.id))
+                .map { stored ->
+                    val subnetIds = stored.orEmpty()
+                        .mapNotNull(::parseSubnetId)
+                        .map { it.value }
+                        .toSet()
+                    BittensorSubnetFavorites(account.id, subnetIds)
+                }
         }
-    }
 
-    suspend fun toggle(metaId: Long, subnetId: BittensorSubnetId) = mutex.withLock {
+    suspend fun toggle(metaId: Long, subnetId: BittensorNetuid.Subnet) = mutex.withLock {
         check(accounts.getSelectedMetaAccount().id == metaId) { "The selected wallet has changed" }
         val key = key(metaId)
         val value = subnetId.value.toString()
@@ -32,4 +38,10 @@ class BittensorSubnetFavoritesRepository(
     }
 
     private fun key(metaId: Long) = "bittensor_subnet_favorites_" + metaId
+
+    private fun parseSubnetId(value: String): BittensorNetuid.Subnet? {
+        val netuid = value.toIntOrNull() ?: return null
+        return runCatching { BittensorNetuid.Subnet(netuid) }
+            .getOrNull()
+    }
 }

@@ -1,20 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
-
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RemoteBittensorConfigRepository
 import dagger.Binds
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorExitRuntimeSource
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorRootClaimSource
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSelection
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -23,7 +9,6 @@ import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.data.network.AppLinksProvider
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
-import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -48,29 +33,7 @@ import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updater
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.domain.api.StakingRepository
 import io.novafoundation.nova.feature_staking_api.presentation.nominationPools.display.PoolDisplayUseCase
-import io.novafoundation.nova.feature_staking_impl.BuildConfig
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEarnConfigApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavoritesRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketsApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorsApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPositionSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorStakingRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorSubnetRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorSubnetValidatorRepository
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorSwapSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RemoteBittensorRootValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.mythos.repository.MythosStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.network.subquery.StakingApi
@@ -120,16 +83,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.StakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.alerts.AlertsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.RealStakingAnnouncementsUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingFlowState
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetCommission
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetQuoteInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.common.EraTimeCalculatorFactory
 import io.novafoundation.nova.feature_staking_impl.domain.common.RealStakingHoldsMigrationUseCase
 import io.novafoundation.nova.feature_staking_impl.domain.common.StakingHoldsMigrationUseCase
@@ -167,8 +120,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.PoolDisplayFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.nominationPools.common.display.RealPoolDisplayUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.components.CompoundStakingComponentFactory
-import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.CoingeckoApi
-import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.feature_wallet_api.di.common.AssetUseCaseModule
 import io.novafoundation.nova.feature_wallet_api.domain.AssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.TokenUseCase
@@ -176,7 +127,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.create
-import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -187,13 +137,12 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.TotalIssuanceRepository
 import io.novafoundation.nova.runtime.state.SelectedAssetOptionSharedState
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 const val PAYOUTS_BULK_RETRIEVER_PAGE_SIZE = 500
 const val DEFAULT_BULK_RETRIEVER_PAGE_SIZE = 1000
 
-@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class, BindsModule::class])
+@Module(includes = [AssetUseCaseModule::class, DeepLinkModule::class, BindsModule::class, BittensorModule::class])
 class StakingFeatureModule {
 
     @Module
@@ -201,13 +150,6 @@ class StakingFeatureModule {
 
         @Binds
         fun bindHoldsMigrationUseCase(real: RealStakingHoldsMigrationUseCase): StakingHoldsMigrationUseCase
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorConfig(apiCreator: NetworkApiCreator, logger: Logger): BittensorConfigRepository {
-        val api = apiCreator.create(BittensorConfigApi::class.java)
-        return RemoteBittensorConfigRepository(api, BuildConfig.BITTENSOR_CONFIG_URL, logger)
     }
 
     @Provides
@@ -236,240 +178,6 @@ class StakingFeatureModule {
         feeLoaderMixinFactory: FeeLoaderMixin.Factory,
         tokenUseCase: TokenUseCase,
     ): FeeLoaderMixin.Presentation = feeLoaderMixinFactory.create(tokenUseCase)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorValidatorSource(
-        apiCreator: NetworkApiCreator,
-        backend: BittensorValidatorBackend,
-        logger: Logger,
-        selection: BittensorRootValidatorSelection
-    ): BittensorRootValidatorSource {
-        val api = apiCreator.create(BittensorEarnConfigApi::class.java)
-        return RemoteBittensorRootValidatorSource(api, BuildConfig.BITTENSOR_EARN_CONFIG_URL, backend, logger, selection)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorRootSelection() = BittensorRootValidatorSelection()
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorPositionSource(runtimeCallsApi: MultiChainRuntimeCallsApi): BittensorPositionSource =
-        RealBittensorPositionSource(runtimeCallsApi)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorPositionUpdates() = BittensorPositionUpdates()
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorSubnetRepository(runtimeCalls: MultiChainRuntimeCallsApi): BittensorSubnetRepository =
-        RealBittensorSubnetRepository(runtimeCalls)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorSubnetFavorites(accounts: AccountRepository, preferences: Preferences) =
-        BittensorSubnetFavoritesRepository(accounts, preferences)
-
-    @Provides
-    fun provideBittensorSubnetCommission() = BittensorSubnetCommission(java.math.BigDecimal("0.003"))
-
-    @Provides
-    fun provideBittensorSubnetQuotes(source: BittensorSwapSource, commission: BittensorSubnetCommission) =
-        BittensorSubnetQuoteInteractor(source, commission)
-
-    @Provides
-    fun provideBittensorSubnetInteractor(
-        repository: BittensorSubnetRepository,
-        portfolioRepository: BittensorPortfolioRepository,
-        quotes: BittensorSubnetQuoteInteractor,
-        favorites: BittensorSubnetFavoritesRepository
-    ) = BittensorSubnetInteractor(repository, portfolioRepository, quotes, favorites)
-
-    @Provides
-    fun provideBittensorSubnetValidators(
-        backend: BittensorValidatorBackend,
-        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
-        rpc: RpcCalls
-    ): BittensorSubnetValidatorRepository =
-        RealBittensorSubnetValidatorRepository(backend, storage, rpc)
-
-    @Provides
-    fun provideBittensorSubnetMarketsApi(apiCreator: NetworkApiCreator): BittensorSubnetMarketsApi =
-        apiCreator.create(BittensorSubnetMarketsApi::class.java, CoingeckoApi.BASE_URL)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorSubnetMarkets(api: BittensorSubnetMarketsApi) = BittensorSubnetMarketRepository(api)
-
-    @Provides
-    fun provideBittensorSubnetDetails(
-        markets: BittensorSubnetMarketRepository,
-        prices: CoinPriceRepository,
-        commission: BittensorSubnetCommission
-    ) = BittensorSubnetDetailsInteractor(markets, prices, commission)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorEstimates(
-        @Attested apiCreator: NetworkApiCreator,
-        infrastructureBaseUrl: String,
-        accounts: AccountRepository,
-        wallets: WalletRepository,
-        logger: Logger
-    ): BittensorEstimatesRepository {
-        val api = apiCreator.create(BittensorEstimatesApi::class.java)
-        return BittensorEstimatesRepository(api, infrastructureBaseUrl, 12_000L, accounts, wallets, logger)
-    }
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorValidatorBackend(
-        @Attested apiCreator: NetworkApiCreator,
-        infrastructureBaseUrl: String
-    ) = BittensorValidatorBackend(apiCreator.create(BittensorValidatorsApi::class.java), infrastructureBaseUrl)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService, recovery: ExtrinsicSubmissionRecovery) =
-        BittensorSubmissionExecutor(extrinsics, recovery)
-
-    @Provides
-    fun provideBittensorRootClaimSource(
-        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
-        rpc: RpcCalls,
-        chains: ChainRegistry
-    ): BittensorRootClaimSource =
-        RealBittensorRootClaimSource(storage, rpc, chains)
-
-    @Provides
-    fun provideBittensorRootClaim(
-        chains: ChainRegistry,
-        accounts: AccountRepository,
-        wallets: WalletRepository,
-        source: BittensorRootClaimSource,
-        extrinsics: ExtrinsicService,
-        submission: BittensorSubmissionExecutor,
-        constants: WalletConstants,
-        backend: BittensorValidatorBackend
-    ) =
-        BittensorRootClaimInteractor(chains, accounts, wallets, source, extrinsics, submission, constants, backend)
-
-    @Provides
-    fun provideBittensorExitSource(@Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource, rpc: RpcCalls, chains: ChainRegistry): BittensorExitRuntimeSource =
-        RealBittensorExitRuntimeSource(storage, rpc, chains)
-
-    @Provides
-    fun provideBittensorSubnetMetadata(subnets: BittensorSubnetRepository, config: BittensorConfigRepository) =
-        BittensorSubnetMetadataInteractor(subnets, config)
-
-    @Provides
-    fun provideBittensorExit(
-        chains: ChainRegistry,
-        accounts: AccountRepository,
-        wallets: WalletRepository,
-        source: BittensorExitRuntimeSource,
-        subnets: BittensorSubnetMetadataInteractor,
-        swaps: BittensorSwapSource,
-        config: BittensorConfigRepository,
-        subnetInteractor: BittensorSubnetInteractor,
-        extrinsics: ExtrinsicService,
-        submission: BittensorSubmissionExecutor,
-        constants: WalletConstants,
-        logger: Logger
-    ) = BittensorExitInteractor(
-        chains, accounts, wallets, source, subnets, swaps, config, subnetInteractor.slippage,
-        extrinsics, submission, constants, "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq", logger
-    )
-
-    @Provides
-    fun provideBittensorSubnetStaking(
-        chainRegistry: ChainRegistry,
-        accounts: AccountRepository,
-        wallets: WalletRepository,
-        validators: BittensorSubnetValidatorRepository,
-        subnets: BittensorSubnetInteractor,
-        portfolio: BittensorPortfolioRepository,
-        extrinsics: ExtrinsicService,
-        submission: BittensorSubmissionExecutor
-    ) = BittensorSubnetStakingInteractor(
-        chainRegistry,
-        accounts,
-        wallets,
-        validators,
-        subnets,
-        portfolio,
-        extrinsics,
-        "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
-        submission
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorSwapSource(runtimeCallsApi: MultiChainRuntimeCallsApi): BittensorSwapSource =
-        RealBittensorSwapSource(runtimeCallsApi)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorPortfolioRepository(
-        chainRegistry: ChainRegistry,
-        accountRepository: AccountRepository,
-        walletRepository: WalletRepository,
-        positionSource: BittensorPositionSource,
-        swapSource: BittensorSwapSource,
-        positionUpdates: BittensorPositionUpdates,
-        logger: Logger
-    ): BittensorPortfolioRepository = RealBittensorPortfolioRepository(
-        chainRegistry,
-        accountRepository,
-        walletRepository,
-        positionSource,
-        swapSource,
-        positionUpdates,
-        logger
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorPortfolioInteractor(repository: BittensorPortfolioRepository) = BittensorPortfolioInteractor(repository)
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorStakingRepository(
-        chainRegistry: ChainRegistry,
-        walletRepository: WalletRepository,
-        accountRepository: AccountRepository,
-        positionSource: BittensorPositionSource,
-        validatorSource: BittensorRootValidatorSource,
-        positionUpdates: BittensorPositionUpdates,
-        selection: BittensorRootValidatorSelection
-    ): BittensorStakingRepository = RealBittensorStakingRepository(
-        chainRegistry = chainRegistry,
-        walletRepository = walletRepository,
-        accountRepository = accountRepository,
-        positionSource = positionSource,
-        validatorSource = validatorSource,
-        positionUpdates = positionUpdates,
-        selection = selection
-    )
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorStakingFlowState() = BittensorStakingFlowState()
-
-    @Provides
-    @FeatureScope
-    fun provideBittensorStakingInteractor(
-        repository: BittensorStakingRepository,
-        extrinsicService: ExtrinsicService,
-        flowState: BittensorStakingFlowState,
-        accountRepository: AccountRepository,
-        walletRepository: WalletRepository,
-        submission: BittensorSubmissionExecutor,
-        validators: BittensorSubnetValidatorRepository,
-        selection: BittensorRootValidatorSelection
-    ) = BittensorStakingInteractor(repository, extrinsicService, flowState, accountRepository, walletRepository, submission, validators, selection)
 
     @Provides
     @FeatureScope

@@ -1,14 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetFavoritesRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import java.math.BigDecimal
 import java.math.BigInteger
 
 data class BittensorSubnet(
-    val id: BittensorSubnetId,
+    val id: BittensorNetuid.Subnet,
     val name: String,
     val symbol: String,
     val logoUrl: String?,
@@ -20,13 +21,20 @@ data class BittensorSubnet(
 class BittensorSubnetInteractor(
     private val repository: BittensorSubnetRepository,
     private val portfolioRepository: BittensorPortfolioRepository,
-    private val quotes: BittensorSubnetQuoteInteractor,
-    private val favorites: BittensorSubnetFavoritesRepository
+    private val bittensorSubnetQuoteInteractor: BittensorSubnetQuoteInteractor,
+    private val favorites: BittensorSubnetFavoritesRepository,
+    private val configRepository: BittensorConfigRepository
 ) {
 
-    val slippage = BittensorSlippage(BigDecimal("0.005"))
+    val slippage = BittensorSlippage(0.005.toBigDecimal())
+
+    suspend fun commissionRate(): BigDecimal = configRepository.config().commission.fraction
 
     suspend fun subnets() = repository.subnets()
+
+    suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = repository.subnet(subnetId)
+
+    fun observeWallet() = portfolioRepository.observeWallet()
 
     fun observePortfolio() = portfolioRepository.observePortfolio()
 
@@ -34,8 +42,8 @@ class BittensorSubnetInteractor(
 
     fun observeFavorites() = favorites.observeFavorites()
 
-    suspend fun toggleFavorite(metaId: Long, subnetId: BittensorSubnetId) = favorites.toggle(metaId, subnetId)
+    suspend fun toggleFavorite(metaId: Long, subnetId: BittensorNetuid.Subnet) = favorites.toggle(metaId, subnetId)
 
-    suspend fun quote(subnetId: BittensorSubnetId, amount: BigInteger): BittensorSubnetBuyQuote =
-        quotes.quoteBuy(ChainGeneses.BITTENSOR, subnetId, amount, slippage)
+    suspend fun quote(subnetId: BittensorNetuid.Subnet, amount: BigInteger): BittensorSubnetBuyQuote =
+        bittensorSubnetQuoteInteractor.quoteBuy(ChainGeneses.BITTENSOR, subnetId, amount, slippage)
 }

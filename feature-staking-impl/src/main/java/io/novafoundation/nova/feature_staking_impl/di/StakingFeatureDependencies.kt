@@ -6,6 +6,8 @@ import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.infrastructure.di.Attested
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.announcements.AnnouncementsRepository
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
@@ -69,7 +71,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
-import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -85,10 +86,11 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface StakingFeatureDependencies {
 
-    val infrastructureBaseUrl: String
+    val infrastructureUrls: InfrastructureUrls
 
     @get:Attested
     val attestedNetworkApiCreator: NetworkApiCreator
@@ -96,6 +98,8 @@ interface StakingFeatureDependencies {
     val coinPriceRepository: io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 
     fun analyticsService(): AnalyticsService
+
+    fun usdRateRepository(): UsdRateRepository
 
     fun assetVisibilityUseCase(): AssetVisibilityUseCase
 
@@ -171,6 +175,8 @@ interface StakingFeatureDependencies {
 
     val tokenFormatter: TokenFormatter
 
+    val fiatFormatter: FiatFormatter
+
     fun logger(): Logger
 
     val chainMigrationInfoUseCase: ChainMigrationInfoUseCase
@@ -222,8 +228,6 @@ interface StakingFeatureDependencies {
     fun addressxDisplayUseCase(): AddressDisplayUseCase
 
     fun extrinsicSubmissionRecovery(): ExtrinsicSubmissionRecovery
-
-    fun fiatFormatter(): FiatFormatter
 
     fun extrinsicService(): ExtrinsicService
 

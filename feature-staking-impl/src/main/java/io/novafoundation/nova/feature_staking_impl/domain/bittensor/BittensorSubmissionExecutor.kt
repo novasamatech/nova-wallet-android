@@ -32,7 +32,10 @@ class BittensorSubmissionExecutor(
             val resolution = withTimeoutOrNull(60_000) {
                 while (true) {
                     when (val state = recovery.reconcile(metaId, chain.id)) {
-                        is ExtrinsicRecoveryState.Resolved -> return@withTimeoutOrNull state.result
+                        is ExtrinsicRecoveryState.Resolved -> {
+                            if (state.result.hash == execution.extrinsicHash) return@withTimeoutOrNull state.result
+                            delay(3_000)
+                        }
                         else -> delay(3_000)
                     }
                 }

@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
@@ -44,7 +44,7 @@ class BittensorExitReviewModule {
         recovery: ExtrinsicSubmissionRecovery,
         chains: ChainRegistry,
         walletUi: WalletUiUseCase,
-        accounts: SelectedAccountUseCase,
+        accounts: AccountRepository,
         chainState: ChainStateRepository,
         externalActions: ExternalActions.Presentation,
         estimates: BittensorEstimatesRepository,

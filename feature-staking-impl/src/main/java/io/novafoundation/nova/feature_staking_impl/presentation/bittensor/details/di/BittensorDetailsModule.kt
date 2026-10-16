@@ -1,10 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoMap
@@ -14,14 +12,16 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPriceChartInteractor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorDetailsViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootDetailsViewModel
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 @Module(includes = [ViewModelModule::class])
@@ -35,34 +35,66 @@ class BittensorDetailsModule {
     @IntoMap
     @ViewModelKey(BittensorDetailsViewModel::class)
     fun provideViewModel(
-        interactor: BittensorPortfolioInteractor,
+        bittensorPortfolioInteractor: BittensorPortfolioInteractor,
         router: StakingRouter,
         resources: ResourceManager,
-        amountFormatter: AmountFormatter,
+        amountFormatter: BittensorAmountFormatter,
         assetIconProvider: AssetIconProvider,
-        iconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
-        priceCharts: BittensorPriceChartInteractor,
-        logger: Logger,
-        subnetRepository: BittensorSubnetRepository,
-        recovery: ExtrinsicSubmissionRecovery,
-        accountRepository: AccountRepository,
-        claims: BittensorRootClaimInteractor
+        bittensorPriceChartInteractor: BittensorPriceChartInteractor,
+        retryController: BittensorRetryController,
+        chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
+        fiatFormatter: FiatFormatter,
+        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
+        accountRepository: io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
     ): ViewModel = BittensorDetailsViewModel(
-        interactor = interactor,
+        bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
         resources = resources,
         amountFormatter = amountFormatter,
         assetIconProvider = assetIconProvider,
-        iconGenerator = iconGenerator,
         externalActions = externalActions,
-        priceChartInteractor = priceCharts,
-        logger = logger,
-        subnetRepository = subnetRepository,
+        bittensorPriceChartInteractor = bittensorPriceChartInteractor,
+        retryController = retryController,
+        chartAxisFormatterFactory = chartAxisFormatterFactory,
+        fiatFormatter = fiatFormatter,
         recovery = recovery,
-        accountRepository = accountRepository,
-        claims = claims
+        accountRepository = accountRepository
     )
+
+    @Provides
+    @IntoMap
+    @ViewModelKey(BittensorRootDetailsViewModel::class)
+    fun provideRootViewModel(
+        interactor: BittensorPortfolioInteractor,
+        router: StakingRouter,
+        resources: ResourceManager,
+        icons: AssetIconProvider,
+        addressIconGenerator: AddressIconGenerator,
+        externalActions: ExternalActions.Presentation,
+        amountFormatter: BittensorAmountFormatter,
+        retryController: BittensorRetryController,
+        claims: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor,
+        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
+        accountRepository: io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+    ): ViewModel = BittensorRootDetailsViewModel(
+        interactor,
+        router,
+        resources,
+        icons,
+        addressIconGenerator,
+        externalActions,
+        amountFormatter,
+        retryController,
+        claims = claims,
+        recovery = recovery,
+        accountRepository = accountRepository
+    )
+
+    @Provides
+    fun provideRootViewModelCreator(fragment: Fragment, factory: ViewModelProvider.Factory):
+        BittensorRootDetailsViewModel =
+        ViewModelProvider(fragment, factory)[BittensorRootDetailsViewModel::class.java]
 
     @Provides
     fun provideViewModelCreator(fragment: Fragment, factory: ViewModelProvider.Factory): BittensorDetailsViewModel =

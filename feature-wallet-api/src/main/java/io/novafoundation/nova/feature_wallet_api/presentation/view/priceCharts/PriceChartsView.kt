@@ -55,13 +55,33 @@ class PriceChartsView @JvmOverloads constructor(
 
     private val binder = ViewPriceChartsBinding.inflate(inflater(), this)
 
+    private val fullLayoutConstraints = ConstraintSet().apply { clone(this@PriceChartsView) }
+
     private var charts: List<PriceChartModel> = emptyList()
+
     private var selectedChartIndex = 0
-    private var externalChangeView: TextView? = null
+
+    enum class Presentation { FULL, PLOT_ONLY }
+
+    private var presentation = Presentation.FULL
 
     /** A plot-only presentation for screens that already own their amount header. */
-    fun showPlotOnly(changeView: TextView) {
-        externalChangeView = changeView
+    fun setPresentation(presentation: Presentation) {
+        this.presentation = presentation
+        controller.setFilledLine(presentation == Presentation.PLOT_ONLY)
+        when (presentation) {
+            Presentation.FULL -> showFullPresentation()
+            Presentation.PLOT_ONLY -> showPlotOnlyPresentation()
+        }
+    }
+
+    private fun showFullPresentation() {
+        fullLayoutConstraints.applyTo(this)
+        binder.priceChartTitle.isGone = false
+        if (charts.isEmpty()) showLoadingState() else selectChart(selectedChartIndex)
+    }
+
+    private fun showPlotOnlyPresentation() {
         binder.priceChartTitle.isGone = true
         binder.priceChartCurrentPrice.isGone = true
         binder.priceChartPriceChange.isGone = true
@@ -73,10 +93,13 @@ class PriceChartsView @JvmOverloads constructor(
             connect(binder.priceChart.id, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP)
             applyTo(this@PriceChartsView)
         }
-        controller.useFilledLine()
     }
 
     var onPeriodSelected: ((Int) -> Unit)? = null
+
+    var onPriceChange: ((Float, Float) -> Unit)? = null
+
+    var onContentVisibilityChanged: ((Boolean) -> Unit)? = null
 
     fun setSelectedPeriod(index: Int) {
         selectedChartIndex = index
@@ -89,16 +112,14 @@ class PriceChartsView @JvmOverloads constructor(
 
     fun setReferencePrice(value: Float?, label: String) = controller.setReferencePrice(value, label)
 
-    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = setAxisLabelFormatter(formatter::format)
-
-    fun setAxisLabelFormatter(format: (Float) -> String) = controller.setAxisLabelFormatter(format)
-
-    private val horizontalScrollDetector = HorizontalScrollDetector(5.dpF)
+    fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = controller.setAxisLabelFormatter(formatter)
 
     private val controller: ChartController
 
     private var priceTextInjector: PriceTextInjector? = null
+
     private var priceChangeTextInjector: PriceChangeTextInjector? = null
+
     private var dateTextInjector: DateChartTextInjector? = null
 
     init {
@@ -111,15 +132,11 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     fun setCharts(charts: List<PriceChartModel>) {
+        val periodLabelsChanged = this.charts.map { it.buttonText } != charts.map { it.buttonText }
         this.charts = charts
 
-        binder.priceChartButtons.removeAllViews()
-        charts.forEachIndexed { index, priceChartModel ->
-            if (index > 0) {
-                binder.priceChartButtons.addView(createSpace())
-            }
-
-            binder.priceChartButtons.addView(createButton(priceChartModel.buttonText, index))
+        if (periodLabelsChanged) {
+            updatePeriodButtons(charts)
         }
 
         if (charts.isEmpty()) {
@@ -130,6 +147,14 @@ class PriceChartsView @JvmOverloads constructor(
             }
 
             selectChart(selectedChartIndex)
+        }
+    }
+
+    private fun updatePeriodButtons(charts: List<PriceChartModel>) {
+        binder.priceChartButtons.removeAllViews()
+        charts.forEachIndexed { index, model ->
+            if (index > 0) binder.priceChartButtons.addView(createSpace())
+            binder.priceChartButtons.addView(createButton(model.buttonText, index))
         }
     }
 
@@ -144,8 +169,9 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     override fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean) {
-        priceChangeTextInjector?.format(startEntry.y, selectedEntry.y, externalChangeView ?: binder.priceChartPriceChange)
-        if (externalChangeView == null) {
+        onPriceChange?.invoke(startEntry.y, selectedEntry.y)
+        if (presentation == Presentation.FULL) {
+            priceChangeTextInjector?.format(startEntry.y, selectedEntry.y, binder.priceChartPriceChange)
             priceTextInjector?.format(selectedEntry.y, binder.priceChartCurrentPrice, isEntrySelected)
             dateTextInjector?.format(selectedEntry.x.roundToLong(), isEntrySelected, binder.priceChartDate, charts[selectedChartIndex])
         }
@@ -171,19 +197,17 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun setChartContentVisible(visible: Boolean) {
+        onContentVisibilityChanged?.invoke(visible)
         binder.priceChart.setVisible(visible, falseState = View.INVISIBLE)
-        externalChangeView?.let {
-            it.setVisible(visible, falseState = View.INVISIBLE)
-            return
-        }
+        if (presentation == Presentation.PLOT_ONLY) return
         binder.priceChartDate.setVisible(visible, falseState = View.INVISIBLE)
         binder.priceChartPriceChange.setVisible(visible, falseState = View.INVISIBLE)
         binder.priceChartCurrentPrice.setVisible(visible, falseState = View.INVISIBLE)
     }
 
     private fun setShimmeringVisible(visible: Boolean) {
-        binder.priceChartPriceChangeShimmering.isGone = !visible || externalChangeView != null
-        binder.priceChartCurrentPriceShimmering.isGone = !visible || externalChangeView != null
+        binder.priceChartPriceChangeShimmering.isGone = !visible || presentation == Presentation.PLOT_ONLY
+        binder.priceChartCurrentPriceShimmering.isGone = !visible || presentation == Presentation.PLOT_ONLY
         binder.priceChartShimmering.isGone = !visible
     }
 

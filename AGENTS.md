@@ -12,6 +12,10 @@ Reuse `ExternalActions.showAddressActions` and `setupExternalActions` for addres
 
 Use the standard `RadioButton` with `wrap_content` dimensions, following existing selection screens. Fixed bounds copied from a design can clip the theme drawable; do not shrink the control's bounds to match the visible circle.
 
+## String resources and localization
+
+Keep string resources in `strings.xml`, not feature-specific resource files. During feature development, add source strings only to `common/src/main/res/values/strings.xml`. Do not add manual translations to locale-specific resources: translations are handled by the established pre-release pipeline.
+
 ## Tables inside cards
 
 When a `TableView` is inside a card with its own background, disable the table background with `app:showBackground="false"`. Setting `android:background` is insufficient because the component overrides it during construction. Do not introduce nested containers absent from the design.
@@ -22,25 +26,33 @@ Sections belonging to one selection list must scroll together in one `RecyclerVi
 
 ## Screen navigation arguments
 
-Follow existing screen navigation patterns: expose typed `Parcelable` payloads in router methods, build arguments through the destination Fragment's `getBundle(payload)`, and read the payload in that Fragment before binding it into the screen DI component. Do not scatter argument keys or parse individual Bundle values in navigators and DI modules.
+Follow existing screen navigation patterns: expose typed `Parcelable` payloads in router methods, build arguments through the destination Fragment's `getBundle(payload)`, and read the payload in that Fragment before binding it into the screen DI component. Do not scatter argument keys or parse individual Bundle values in navigators and DI modules. Pass operation inputs between screens in fragment payloads, not feature-scoped mutable draft/selection holders. Confirmation must reconstruct its operation from its own arguments, including the explicit wallet, amount, and validator. Pass selector inputs in its fragment arguments as well; keep the established communicator for returning the selection result. Repository caches and screen-local editable/execution state are not navigation payloads.
 
 Preserve navigation XML organization: keep the leading include block together, group global actions with actions and related destinations together, and do not prepend feature nodes ahead of includes. Match neighboring XML indentation, place attributes on separate lines, and separate sibling declarations with blank lines.
 
 ## Operation confirmation
 
-Fee estimation and submission must use the same call builder, including service fees and batch mode. Do not replace confirmed amounts or protective price limits with a fresh quote just before signing. Recheck the selected wallet, available balance, and applicable permissions before submission. Do not substitute a root validator for a subnet validator without explicit configuration and eligibility checks in that subnet.
+Operation confirmation does not support switching wallets from another screen. Preserve the explicit-wallet operation contract without introducing UI for that unsupported scenario.
+
+Use `FeeLoaderMixinV2` for transaction fee loading, presentation, and retry handling, following existing `createDefault`/`createDefaultBy` and `connectWith` usages. Do not build a parallel fee-loading state machine in a feature ViewModel. Keep estimates associated with their operation inputs, and use the same loaded fee for display and validation. Retrying a fee estimate must not silently replace a confirmed quote, amount, or price limit.
+
+Fee estimation and submission must use the same call builder, including service fees and batch mode. Do not replace confirmed amounts or protective price limits with a fresh quote just before signing. Bind confirmation data and signing to the explicit operation wallet, not the globally selected wallet. Do not reject an operation merely because the selected meta-account changed. Recheck that operation wallet's available balance and applicable permissions before submission. Do not substitute a root validator for a subnet validator without explicit configuration and eligibility checks in that subnet.
 
 Before extending shared transaction APIs or introducing feature-specific submission tracking, inspect existing transfer, swap, and staking flows. Reuse their established submission and error-handling path. Cross-cutting reliability changes belong in shared infrastructure, not feature-specific signing callbacks or persistent pending locks.
+
+Implement each validation rule as a separate Validation with one responsibility; keep data loading outside rule logic and let ValidationSystem compose the rules. Reuse existing amount and balance validations. Use the existing Validation/ValidationSystem and ValidationExecutor pipeline for expected transaction validation failures and warnings. Map failures through the established validation UI formatters; do not route them through custom exceptions or separate confirmation-dialog mechanisms. Revalidate time-sensitive data when continuing after a warning.
 
 ## Independent loading on one screen
 
 Load interactor data with `flowOf { ... }` or an interactor-provided Flow and share it with `shareInBackground()` when reused. Derive loading and presentation values with the established flow operators instead of copying them into `MutableStateFlow` from `init`. Keep mutable flows for user-editable state and explicit operation/retry controls, not redundant copies of loaded data. Name selections after the selected entity. Keep entity lookup by ID in the interactor rather than filtering its catalogue in the ViewModel.
 
-Use `withSafeLoading()` only when its loading state is consumed by the UI, including disabling actions while data is loading. Do not add loading wrappers solely to catch exceptions; use `catch` with appropriate error reporting when no loading state is needed.
+Use `withSafeLoading()` only when its loading state is consumed by the UI, including disabling actions while data is loading. Do not add loading wrappers solely to catch exceptions; use `catch` with appropriate error reporting when no loading state is needed. Retry infrastructure must not impose UI loading states; apply loading-state transformations at the consuming ViewModel, per attempt when retries must reset the UI.
 
 Use `mapNotNull` when a derived flow should emit only available values instead of forwarding null and checking it in every consumer. Preserve nullable emissions when null explicitly clears stale UI data, selection, or operation readiness during loading or failure.
 
 Independent data, such as wallet positions and a market chart, must have independent sources, error states, and retries. Failure of one load must not hide another load's successful data. When converting an exception into an error or stale state, log diagnostic context and the cause without secrets or personal data.
+
+Use the established retry dialog for failed screen reads instead of adding inline error/retry controls. Preserve automatic recovery of reactive sources and distinguish stale-data warnings from terminal loading errors.
 
 Derive staking and dashboard updates from reactive balance or on-chain state sources. Do not introduce a feature-specific event bus or call dashboard refresh methods after submitting a transaction. Keep complex input flows in named private methods so that `combine` only assembles their results. Do not wrap `ChainRegistry.getChain` in a dedicated timeout; chain lookup uses the existing registry lifecycle.
 
@@ -82,6 +94,8 @@ Keep domain invariants in their owning types. Do not repeat constructor range ch
 
 Separate class property declarations with a blank line, following existing ViewModel references. Apply this to both single-line properties and multi-line flow declarations.
 
+For calls with multiple arguments that include a lambda or are followed by a trailing lambda, put each parenthesized argument on its own line. Keep the closing parenthesis on a separate line; do not compress such calls just because they fit the line-length limit.
+
 Put each successive call in a method chain on a new line. Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
 
 Do not repeat filtering already guaranteed by a backend resource contract. Verify that contract before removing a filter; keep client-owned validation, such as address decoding and on-chain eligibility checks.
@@ -96,8 +110,7 @@ Keep read and mapping methods free of hidden workflow state changes. Pass an exp
 
 Prefer named models for meaningful requests and load results over positional `Pair`/`Triple` values. Use scope functions for short transformations; keep validation, mutation and operation sequencing explicit. Do not manufacture zero-valued data merely to call a formatter and erase the result afterwards.
 
-Share decoding and loading when multiple consumers need different parts of the same runtime response. Keep recovery independent for unrelated reads, and keep screen-specific sources out of screens that do not consume them.
-
+Share subscriptions, decoding, and loading when multiple consumers need different parts of the same runtime response. Key shared streams by chain and account identity, bind their lifetime to active consumers, and keep dashboard and screen state derived from the same source. Keep recovery independent for unrelated reads, and keep screen-specific sources out of screens that do not consume them.
 
 ## Bittensor position actions
 

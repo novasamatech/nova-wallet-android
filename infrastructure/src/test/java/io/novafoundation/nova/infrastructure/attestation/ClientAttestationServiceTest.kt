@@ -5,13 +5,15 @@ import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.base
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.requestDigest
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.sha256
 import kotlinx.coroutines.runBlocking
+import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -22,7 +24,7 @@ private const val APP_PACKAGE = "io.novafoundation.nova.test"
 private const val CHALLENGE = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8"
 private const val INTEGRITY_TOKEN = "integrity-token"
 
-private val REGISTER_URL = "https://api.example.test/v1/attestation/register".toHttpUrl()
+private val INFRA_URL = "https://api.example.test/".toHttpUrl()
 private val PUBLIC_KEY = "public-key".toByteArray()
 private val BODY = """{"v":1}""".toByteArray()
 
@@ -54,17 +56,22 @@ private class FakeAttestationApi : AttestationApi {
     val challengeRequests = mutableListOf<AttestationChallengeRequest>()
     val registrations = mutableListOf<AttestationRegisterRequest>()
 
+    val challengeUrls = mutableListOf<String>()
+    val registerUrls = mutableListOf<String>()
+
     val challengeFailures = ArrayDeque<HttpException>()
     val registerFailures = ArrayDeque<HttpException>()
 
-    override suspend fun challenge(request: AttestationChallengeRequest): AttestationChallengeResponse {
+    override suspend fun challenge(url: String, request: AttestationChallengeRequest): AttestationChallengeResponse {
+        challengeUrls += url
         challengeRequests += request
         challengeFailures.removeFirstOrNull()?.let { throw it }
 
         return AttestationChallengeResponse(CHALLENGE)
     }
 
-    override suspend fun register(request: AttestationRegisterRequest) {
+    override suspend fun register(url: String, request: AttestationRegisterRequest) {
+        registerUrls += url
         registrations += request
         registerFailures.removeFirstOrNull()?.let { throw it }
     }
@@ -80,6 +87,7 @@ class ClientAttestationServiceTest {
     private lateinit var keyPairStore: RecordingKeyPairStore
     private lateinit var api: FakeAttestationApi
     private lateinit var requestedHashes: MutableList<String>
+    private var infraUrl: HttpUrl? = INFRA_URL
 
     @Before
     fun setUp() {
@@ -87,21 +95,21 @@ class ClientAttestationServiceTest {
         keyPairStore = RecordingKeyPairStore()
         api = FakeAttestationApi()
         requestedHashes = mutableListOf()
+        infraUrl = INFRA_URL
     }
 
-    private fun service(mode: AttestationMode = AttestationMode.PLAY_INTEGRITY) = RealClientAttestationService(
+    private fun service() = RealClientAttestationService(
         api = api,
         identity = identity,
         keyPairStore = keyPairStore,
         integrityTokens = IntegrityTokenSource { requestHash -> INTEGRITY_TOKEN.also { requestedHashes += requestHash } },
         appPackage = APP_PACKAGE,
-        registerUrl = REGISTER_URL,
-        mode = mode
+        urls = InfrastructureUrls { infraUrl }
     )
 
     @Test
     fun `registration and the proof follow profile 2`() = runBlocking<Unit> {
-        val headers = service().proofHeaders(REQUEST_CONTEXT, BODY)!!
+        val headers = service().proofHeaders(REQUEST_CONTEXT, BODY)
         val clientId = identity.clientId()
 
         assertEquals(listOf("register", "request"), api.challengeRequests.map { it.purpose })
@@ -137,6 +145,24 @@ class ClientAttestationServiceTest {
             headers
         )
         assertTrue(identity.isAttested())
+
+        // Both calls go to the host the global config names
+        assertEquals(listOf("https://api.example.test/v1/attestation/challenges"), api.challengeUrls.distinct())
+        assertEquals(listOf("https://api.example.test/v1/attestation/register"), api.registerUrls)
+    }
+
+    @Test
+    fun `without an infrastructure URL in the config nothing is sent`() = runBlocking<Unit> {
+        infraUrl = null
+        val service = service()
+
+        assertFailsWith<InfrastructureUrlMissingException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+        assertTrue(api.challengeRequests.isEmpty())
+
+        // Not a rejection: once the config names a host, the same service attests as usual
+        infraUrl = INFRA_URL
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        assertEquals(1, api.registrations.size)
     }
 
     @Test
@@ -238,10 +264,44 @@ class ClientAttestationServiceTest {
     }
 
     @Test
-    fun `a build without attestation signs nothing`() = runBlocking<Unit> {
-        assertNull(service(mode = AttestationMode.UNATTESTED).proofHeaders(REQUEST_CONTEXT, BODY))
+    fun `forgetting the client drops the identity and its key`() = runBlocking<Unit> {
+        val service = service()
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        val original = identity.clientId()
 
+        service.forgetClient()
+
+        assertEquals(null, identity.existingClientId())
+        assertEquals(listOf(original), keyPairStore.deleted)
+
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+
+        assertNotEquals(original, api.registrations.last().client_id)
+        assertEquals(2, api.registrations.size)
+    }
+
+    @Test
+    fun `forgetting a client that was never created changes nothing`() = runBlocking<Unit> {
+        service().forgetClient()
+
+        assertEquals(null, identity.existingClientId())
+        assertTrue(keyPairStore.deleted.isEmpty())
+    }
+
+    @Test
+    fun `while client creation is not allowed no identity is minted or registered`() = runBlocking<Unit> {
+        val service = service()
+        service.setClientCreationAllowed(false)
+
+        assertFailsWith<AttestationUnavailableException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+
+        assertEquals(null, identity.existingClientId())
         assertTrue(api.challengeRequests.isEmpty())
+
+        service.setClientCreationAllowed(true)
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+
+        assertEquals(identity.clientId(), api.registrations.single().client_id)
     }
 
     private inline fun <reified T : Throwable> assertFailsWith(block: () -> Unit): T {

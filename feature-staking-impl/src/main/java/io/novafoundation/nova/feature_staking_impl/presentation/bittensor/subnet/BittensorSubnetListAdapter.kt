@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import coil.ImageLoader
 import coil.load
-import coil.transform.CircleCropTransformation
 import io.novafoundation.nova.common.list.BaseGroupedDiffCallback
 import io.novafoundation.nova.common.list.GroupedListAdapter
 import io.novafoundation.nova.common.list.GroupedListHolder
@@ -14,6 +13,8 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorRootChoiceBinding
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorSubnetBinding
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorSubnetGroupBinding
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorSubnetIcon
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 
 class BittensorSubnetListAdapter(
     private val imageLoader: ImageLoader,
@@ -59,6 +60,7 @@ class BittensorSubnetListAdapter(
 
         fun bind(item: BittensorSubnetListItem.Root) = with(binding) {
             rootIcon.setIcon(item.icon, imageLoader)
+            description.text = root.context.getString(R.string.bittensor_root_row_description, item.tokenSymbol.value)
             root.setOnClickListener { onRootClick() }
         }
     }
@@ -68,21 +70,22 @@ class BittensorSubnetListAdapter(
         fun bind(item: BittensorSubnetRowUi) = with(binding) {
             val subnet = item.subnet
             val name = subnet.name.ifBlank { root.context.getString(R.string.bittensor_subnet_number, subnet.id.value) }
-            title.text = "\u200e" + listOf(name, subnet.symbol).filter(String::isNotBlank).joinToString(" ")
+            title.text = "\u200e" + subnet.displayName(name)
             price.text = item.price
             logo.load(subnet.logoUrl, imageLoader) {
-                transformations(CircleCropTransformation())
-                placeholder(R.drawable.ic_nova)
-                fallback(R.drawable.ic_nova)
-                error(R.drawable.ic_nova)
+                bittensorSubnetIcon()
             }
-            favorite.setImageResource(if (item.favorite) R.drawable.ic_favorite_heart_filled_20 else R.drawable.ic_favorite_heart_outline_20)
-            if (item.favorite) favorite.imageTintList = null else favorite.setImageTintRes(R.color.icon_secondary)
-            favoriteAction.contentDescription = root.context.getString(
-                if (item.favorite) R.string.bittensor_remove_favorite else R.string.bittensor_add_favorite
-            )
+            bindFavorite(item.favorite)
             favoriteAction.setOnClickListener { onFavorite(item) }
             root.setOnClickListener { onClick(item) }
+        }
+
+        private fun bindFavorite(isFavorite: Boolean) = with(binding) {
+            favorite.setImageResource(if (isFavorite) R.drawable.ic_favorite_heart_filled_20 else R.drawable.ic_favorite_heart_outline_20)
+            if (isFavorite) favorite.imageTintList = null else favorite.setImageTintRes(R.color.icon_secondary)
+            favoriteAction.contentDescription = root.context.getString(
+                if (isFavorite) R.string.bittensor_remove_favorite else R.string.bittensor_add_favorite
+            )
         }
     }
 

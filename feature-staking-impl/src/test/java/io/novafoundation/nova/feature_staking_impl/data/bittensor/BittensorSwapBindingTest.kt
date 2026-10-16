@@ -1,18 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapDirection
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import java.math.BigInteger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.math.BigInteger
 
 class BittensorSwapBindingTest {
 
     @Test
     fun `buy uses tao input and alpha output without subtracting runtime fees again`() {
-        val result = bindBittensorSwapSimulation(simulation(100, 200), BittensorSubnetId(64), BittensorSwapDirection.TAO_TO_ALPHA, 102.bi())
+        val result = bindBittensorSwapSimulation(simulation(100, 200), BittensorNetuid.Subnet(64), BittensorSwapDirection.TAO_TO_ALPHA, 102.bi())
 
         assertEquals(100.bi(), result.amountIn)
         assertEquals(200.bi(), result.amountOut)
@@ -22,7 +22,7 @@ class BittensorSwapBindingTest {
 
     @Test
     fun `sell uses alpha input and tao output`() {
-        val result = bindBittensorSwapSimulation(simulation(100, 200), BittensorSubnetId(64), BittensorSwapDirection.ALPHA_TO_TAO, 200.bi())
+        val result = bindBittensorSwapSimulation(simulation(100, 200), BittensorNetuid.Subnet(64), BittensorSwapDirection.ALPHA_TO_TAO, 200.bi())
 
         assertEquals(200.bi(), result.amountIn)
         assertEquals(100.bi(), result.amountOut)
@@ -31,7 +31,7 @@ class BittensorSwapBindingTest {
     @Test
     fun `sell accounts for the alpha input fee without deducting output again`() {
         val decoded = simulation(100, 200, taoFee = 0, alphaFee = 3)
-        val result = bindBittensorSwapSimulation(decoded, BittensorSubnetId(64), BittensorSwapDirection.ALPHA_TO_TAO, 203.bi())
+        val result = bindBittensorSwapSimulation(decoded, BittensorNetuid.Subnet(64), BittensorSwapDirection.ALPHA_TO_TAO, 203.bi())
 
         assertEquals(203.bi(), result.amountIn + result.alphaFee)
         assertEquals(100.bi(), result.amountOut)
@@ -55,7 +55,7 @@ class BittensorSwapBindingTest {
                 "alphaSlippage" to 195_631.bi()
             )
         )
-        val result = bindBittensorSwapSimulation(decoded, BittensorSubnetId(3), BittensorSwapDirection.TAO_TO_ALPHA, 9_970_000.bi())
+        val result = bindBittensorSwapSimulation(decoded, BittensorNetuid.Subnet(3), BittensorSwapDirection.TAO_TO_ALPHA, 9_970_000.bi())
 
         assertEquals(9_970_000.bi(), result.amountIn + result.taoFee)
         assertEquals(388_238_168.bi(), result.amountOut)
@@ -76,9 +76,11 @@ class BittensorSwapBindingTest {
     }
 
     private fun assertRejected(decoded: Any?) {
-        assertTrue(runCatching {
-            bindBittensorSwapSimulation(decoded, BittensorSubnetId(64), BittensorSwapDirection.TAO_TO_ALPHA, 100.bi())
-        }.isFailure)
+        assertTrue(
+            runCatching {
+                bindBittensorSwapSimulation(decoded, BittensorNetuid.Subnet(64), BittensorSwapDirection.TAO_TO_ALPHA, 100.bi())
+            }.isFailure
+        )
     }
 
     private fun simulation(tao: Long, alpha: Long, taoFee: Long = 2, alphaFee: Long = 0) = Struct.Instance(

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import android.os.Bundle
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -7,16 +8,29 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExt
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSelectValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+
+private const val PAYLOAD_KEY = "payload"
 
 class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorViewModel, FragmentBittensorSelectValidatorBinding>() {
+
+    companion object {
+
+        fun getBundle(payload: BittensorSelectValidatorCommunicator.Request) = Bundle().apply {
+            putParcelable(PAYLOAD_KEY, payload)
+        }
+    }
 
     private val adapter by lazy { BittensorValidatorAdapter(viewModel::select, viewModel::infoClicked) }
 
     override fun createBinding() = FragmentBittensorSelectValidatorBinding.inflate(layoutInflater)
 
     override fun inject() {
+        val payload = argument<BittensorSelectValidatorCommunicator.Request>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetComponentFactory().create(this).inject(this)
+            .bittensorSelectValidatorComponentFactory()
+            .create(this, payload)
+            .inject(this)
     }
 
     override fun initViews() {
@@ -27,6 +41,7 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
     }
 
     override fun subscribe(viewModel: BittensorSelectValidatorViewModel) = with(binder) {
+        observeBittensorRetries(viewModel.retryEvents)
         setupExternalActions(viewModel)
         viewModel.rows.observe(adapter::submitList)
         viewModel.selectedAddress.observe(adapter::select)
@@ -34,8 +49,8 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
         viewModel.buttonLabel.observe { confirm.text = it }
         viewModel.isLoading.observe {
             progress.isVisible = it
-            empty.isVisible = !it && viewModel.rows.value.isEmpty()
         }
+        viewModel.isEmpty.observe { empty.isVisible = it }
     }
 
     override fun onDestroyView() {

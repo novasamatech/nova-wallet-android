@@ -3,11 +3,14 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.announcements.Announcement
 import io.novafoundation.nova.common.domain.map
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.getAssetIconOrFallback
+import io.novafoundation.nova.common.presentation.masking.MaskableModel
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
+import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.firstLoaded
 import io.novafoundation.nova.common.utils.formatting.format
@@ -25,31 +28,30 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSynci
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
-import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
 import io.novafoundation.nova.feature_staking_impl.presentation.announcements.mapAnnouncementToUi
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapper
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.SyncingData
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.view.syncingIf
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.common.AvailableStakingOptionsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.view.StakeStatusModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatAmountToAmountModel
-import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatter
-import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 private class DashboardFormatters(
     val maskableValueFormatter: MaskableValueFormatter,
@@ -172,53 +174,66 @@ class StakingDashboardViewModel(
         formatters: DashboardFormatters,
         chainAnnouncements: Map<String, Announcement>
     ): StakingDashboardModel.HasStakeItem {
-        val stats = hasStake.stakingState.stats
         val isSyncingPrimary = hasStake.syncingStage.isSyncingPrimary()
         val isSyncingSecondary = hasStake.syncingStage.isSyncingSecondary()
         val isBittensor = hasStake.stakingState.stakingType == Chain.Asset.StakingType.BITTENSOR_ROOT
+        val stats = if (isBittensor) mapBittensorStats(formatters) else mapStakeStats(hasStake, formatters)
 
-        val stakingTypBadge = if (hasStake.stakingState.showStakingType) {
+        val stakingTypeBadge = if (hasStake.stakingState.showStakingType) {
             formatters.presentationMapper.mapStakingTypeToUi(hasStake.stakingState.stakingType)
         } else {
             null
         }
+        val stake = formatters.maskableValueFormatter.format {
+            hasStake.stakingState.stake?.let { amountFormatter.formatAmountToAmountModel(it, hasStake.token) } ?: AmountModel("—", null)
+        }.syncingIf(if (isBittensor) isSyncingPrimary else isSyncingSecondary)
 
         return StakingDashboardModel.HasStakeItem(
             assetLabel = resourceManager.getString(R.string.staking_rewards, hasStake.token.configuration.name).syncingIf(isSyncingPrimary),
             assetId = hasStake.token.configuration.fullId,
-            rewards = if (isBittensor) {
-                ExtendedLoadingState.Loaded(formatters.maskableValueFormatter.format { AmountModel("—", null) }.syncingIf(false))
-            } else {
-                stats.map {
-                    formatters.maskableValueFormatter.format {
-                        amountFormatter.formatAmountToAmountModel(it.rewards, hasStake.token)
-                    }.syncingIf(isSyncingSecondary)
-                }
-            },
-            stake = formatters.maskableValueFormatter.format {
-                hasStake.stakingState.stake?.let { amountFormatter.formatAmountToAmountModel(it, hasStake.token) } ?: AmountModel("—", null)
-            }.syncingIf(if (isBittensor) isSyncingPrimary else isSyncingSecondary),
-            status = if (isBittensor) {
-                ExtendedLoadingState.Loaded(
-                    StakeStatusModel(
-                        indicatorRes = R.drawable.ic_indicator_inactive_pulse,
-                        text = resourceManager.getString(R.string.bittensor_staking),
-                        textColorRes = R.color.text_primary
-                    ).syncingIf(false)
-                )
-            } else {
-                stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncingSecondary) }
-            },
-            earnings = if (isBittensor) {
-                ExtendedLoadingState.Loaded("—".syncingIf(false))
-            } else {
-                stats.map { it.estimatedEarnings.format().syncingIf(isSyncingSecondary) }
-            },
-            stakingTypeBadge = stakingTypBadge,
+            rewards = stats.rewards,
+            stake = stake,
+            status = stats.status,
+            earnings = stats.earnings,
+            stakingTypeBadge = stakingTypeBadge,
             assetIcon = assetIconProvider.getAssetIconOrFallback(hasStake.token.configuration.icon).syncingIf(isSyncingPrimary),
             announcement = chainAnnouncements[hasStake.chain.id]?.let(::mapAnnouncementToUi)
         )
     }
+
+    private fun mapStakeStats(hasStake: AggregatedStakingDashboardOption<HasStake>, formatters: DashboardFormatters): StakeStatsUi {
+        val stats = hasStake.stakingState.stats
+        val isSyncing = hasStake.syncingStage.isSyncingSecondary()
+        return StakeStatsUi(
+            rewards = stats.map { statistics ->
+                formatters.maskableValueFormatter.format {
+                    amountFormatter.formatAmountToAmountModel(statistics.rewards, hasStake.token)
+                }.syncingIf(isSyncing)
+            },
+            status = stats.map { mapStakingStatusToUi(it.status).syncingIf(isSyncing) },
+            earnings = stats.map { it.estimatedEarnings.format().syncingIf(isSyncing) }
+        )
+    }
+
+    private fun mapBittensorStats(formatters: DashboardFormatters): StakeStatsUi {
+        val rewards = formatters.maskableValueFormatter.format { AmountModel("—", null) }
+        val status = StakeStatusModel(
+            indicatorRes = R.drawable.ic_indicator_inactive_pulse,
+            text = resourceManager.getString(R.string.bittensor_staking),
+            textColorRes = R.color.text_primary
+        )
+        return StakeStatsUi(
+            rewards = ExtendedLoadingState.Loaded(rewards.syncingIf(false)),
+            status = ExtendedLoadingState.Loaded(status.syncingIf(false)),
+            earnings = ExtendedLoadingState.Loaded("—".syncingIf(false))
+        )
+    }
+
+    private class StakeStatsUi(
+        val rewards: ExtendedLoadingState<SyncingData<MaskableModel<AmountModel>>>,
+        val status: ExtendedLoadingState<SyncingData<StakeStatusModel>>,
+        val earnings: ExtendedLoadingState<SyncingData<String>>
+    )
 
     private fun mapStakingStatusToUi(stakingStatus: HasStake.StakingStatus): StakeStatusModel {
         return when (stakingStatus) {

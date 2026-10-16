@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="bittensor_subnet_execution_buying">Buying %1$s %2$s with TAO</string>
-    <string name="bittensor_subnet_execution_operation">1 of 1 operation</string>
-    <string name="bittensor_position_details">Position details</string>
-</resources>

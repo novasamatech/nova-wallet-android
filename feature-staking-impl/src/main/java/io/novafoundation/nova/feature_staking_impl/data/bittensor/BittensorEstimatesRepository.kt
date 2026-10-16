@@ -10,14 +10,13 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEst
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedCostBasis
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorReportedOperation
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetId
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import okhttp3.CacheControl
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.runtime.ext.addressOf
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.Response
 import retrofit2.HttpException
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -37,7 +36,7 @@ import java.math.BigDecimal
 
 class BittensorEstimatesRepository(
     private val api: BittensorEstimatesApi,
-    private val baseUrl: String,
+    private val infrastructureUrls: io.novafoundation.nova.infrastructure.InfrastructureUrls,
     private val spacingMillis: Long,
     private val accounts: AccountRepository,
     private val wallets: WalletRepository,
@@ -51,7 +50,7 @@ class BittensorEstimatesRepository(
 
     private val yieldMutex = Mutex()
 
-    private val yields = mutableMapOf<Int, Cached<Map<AccountIdKey, BigDecimal>>>()
+    private val yields = mutableMapOf<String, Cached<Map<AccountIdKey, BigDecimal>>>()
 
     fun observeCostBasis(
         context: Flow<BittensorEstimateContext?>,
@@ -75,7 +74,7 @@ class BittensorEstimatesRepository(
 
     fun observeAlphaYields(
         context: Flow<Chain?>,
-        subnetId: BittensorSubnetId,
+        subnetId: BittensorNetuid.Subnet,
         retry: Flow<Long> = kotlinx.coroutines.flow.flowOf(0L)
     ): Flow<Map<AccountIdKey, BigDecimal>?> =
         combine(context.distinctUntilChanged(), retry) { chain, _ -> chain }
@@ -99,14 +98,20 @@ class BittensorEstimatesRepository(
     }
 
     private suspend fun costBasis(account: String, revision: java.math.BigInteger?): BittensorEstimatedCostBasis = historyMutex.withLock {
-        histories[account]?.takeIf { System.nanoTime() < it.until && revision == it.revision }?.let { return@withLock it.value }
+        val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
+        val cacheKey = "$baseUrl:$account"
+        histories[cacheKey]?.takeIf { System.nanoTime() < it.until && revision == it.revision }?.let { return@withLock it.value }
         var validUntil = Long.MAX_VALUE
         val rows = mutableListOf<BittensorReportedOperation>()
         var page: Int? = 1
         repeat(10) {
             val current = page ?: return@repeat
             if (it > 0) delay(spacingMillis)
-            val response = withTimeout(25_000) { api.operations(url("operations/search", mapOf("accountSubject" to account, "page" to current.toString()))) }
+            val response = withTimeout(25_000) {
+                api.operations(
+                    url(baseUrl, "operations/search", mapOf("accountSubject" to account, "page" to current.toString()))
+                )
+            }
             validUntil = minOf(validUntil, deadline(response))
             val body = body(response)
             fresh(body.meta?.components?.operationHistory)
@@ -124,20 +129,22 @@ class BittensorEstimatesRepository(
         }
         val result = BittensorEstimatedCostBasis(rows, allProviderPagesRead = page == null)
         if (histories.size >= 8) histories.clear()
-        histories[account] = Cached(result, validUntil, revision)
+        histories[cacheKey] = Cached(result, validUntil, revision)
         result
     }
 
     /** Like iOS, reportedRate is interpreted as annual percent; no validator take is subtracted again. */
-    suspend fun alphaYields(chain: Chain, subnet: BittensorSubnetId): Map<AccountIdKey, BigDecimal> = yieldMutex.withLock {
-        yields[subnet.value]?.takeIf { System.nanoTime() < it.until }?.let { return@withLock it.value }
+    suspend fun alphaYields(chain: Chain, subnet: BittensorNetuid.Subnet): Map<AccountIdKey, BigDecimal> = yieldMutex.withLock {
+        val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
+        val cacheKey = "$baseUrl:${subnet.value}"
+        yields[cacheKey]?.takeIf { System.nanoTime() < it.until }?.let { return@withLock it.value }
         var validUntil = Long.MAX_VALUE
         val result = mutableMapOf<AccountIdKey, BigDecimal>()
         var page: Int? = 1
         repeat(3) {
             val current = page ?: return@repeat
             if (it > 0) delay(spacingMillis)
-            val response = withTimeout(25_000) { api.alphaYields(url("subnets/${subnet.value}/yields/alpha", mapOf("page" to current.toString()))) }
+            val response = withTimeout(25_000) { api.alphaYields(url(baseUrl, "subnets/${subnet.value}/yields/alpha", mapOf("page" to current.toString()))) }
             validUntil = minOf(validUntil, deadline(response))
             val body = body(response)
             fresh(body.meta?.components?.alphaYield)
@@ -151,7 +158,7 @@ class BittensorEstimatesRepository(
             page = next(body.pageInfo, current)
         }
         if (yields.size >= 64) yields.clear()
-        yields[subnet.value] = Cached(result, validUntil)
+        yields[cacheKey] = Cached(result, validUntil)
         result
     }
 
@@ -177,8 +184,7 @@ class BittensorEstimatesRepository(
         return requireNotNull(response.body())
     }
 
-    private fun url(path: String, query: Map<String, String>): String {
-        val base = requireNotNull(baseUrl.toHttpUrlOrNull())
+    private fun url(base: okhttp3.HttpUrl, path: String, query: Map<String, String>): String {
         require(base.isHttps)
         val target = requireNotNull(base.resolve("/v1/bittensor/$path")).newBuilder()
         query.forEach { (key, value) -> target.addQueryParameter(key, value) }

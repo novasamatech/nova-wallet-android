@@ -47,8 +47,6 @@ interface ExtrinsicService {
     class SubmissionOptions(
         val feePaymentCurrency: FeePaymentCurrency = FeePaymentCurrency.Native,
         val batchMode: BatchMode = DEFAULT_BATCH_MODE,
-        /** Called with the signed extrinsic hash before broadcasting. Must succeed before submission proceeds. */
-        val onSigned: (suspend (String) -> Unit)? = null,
         /** Journal a mortal, immediately executable transaction before broadcasting. */
         val recoverable: Boolean = false,
     )

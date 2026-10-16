@@ -45,6 +45,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.planksToUsd
 
 class ConfirmUnbondMythosViewModel(
     private val router: MythosStakingRouter,
@@ -64,7 +66,8 @@ class ConfirmUnbondMythosViewModel(
     assetUseCase: AssetUseCase,
     walletUiUseCase: WalletUiUseCase,
     private val amountFormatter: AmountFormatter,
-    private val analyticsService: AnalyticsService
+    private val analyticsService: AnalyticsService,
+    private val usdRateRepository: UsdRateRepository
 ) : BaseViewModel(),
     Validatable by validationExecutor,
     ExternalActions by externalActions,
@@ -158,13 +161,13 @@ class ConfirmUnbondMythosViewModel(
 
     private fun trackUnstakeCompleted() = launch {
         val asset = assetFlow.first()
-        val fiatAmount = asset.token.planksToFiat(payload.amount)
+        val usdAmount = usdRateRepository.planksToUsd(asset.token.configuration, payload.amount)
 
         analyticsService.track(
             AnalyticsEvent.UnstakeCompleted(
                 stakingType = ANALYTICS_STAKING_TYPE_MYTHOS,
                 network = selectedAssetState.chain().name,
-                amountBucket = AmountBucket.from(fiatAmount)
+                amountBucket = AmountBucket.fromOrUnknown(usdAmount)
             )
         )
     }

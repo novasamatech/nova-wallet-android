@@ -6,15 +6,13 @@ import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.core.storage.StorageCache
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionUpdates
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.core_db.dao.StakingDashboardDao
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_dapp_api.data.repository.DAppMetadataRepository
 import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboardUpdateSystem
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.RealStakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.RealStakingStatsDataSource
@@ -74,9 +72,7 @@ class StakingDashboardModule {
         poolAccountDerivation: PoolAccountDerivation,
         storageCache: StorageCache,
         balanceLocksRepository: BalanceLocksRepository,
-        bittensorPositionSource: BittensorPositionSource,
-        bittensorPositionUpdates: BittensorPositionUpdates,
-        bittensorSwapSource: BittensorSwapSource,
+        bittensorPositionRepository: BittensorPositionRepository,
     ) = StakingDashboardUpdaterFactory(
         stakingDashboardCache = stakingDashboardCache,
         remoteStorageSource = remoteStorageSource,
@@ -84,9 +80,7 @@ class StakingDashboardModule {
         poolAccountDerivation = poolAccountDerivation,
         storageCache = storageCache,
         balanceLocksRepository = balanceLocksRepository,
-        bittensorPositionSource = bittensorPositionSource,
-        bittensorPositionUpdates = bittensorPositionUpdates,
-        bittensorSwapSource = bittensorSwapSource
+        bittensorPositionRepository = bittensorPositionRepository
     )
 
     @Provides

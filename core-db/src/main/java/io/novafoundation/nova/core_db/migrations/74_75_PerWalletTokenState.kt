@@ -35,23 +35,16 @@ val PerWalletTokenState_74_75 = object : Migration(74, 75) {
         // Hiding a token used to be a per-install flag, so every wallet inherits those decisions.
         // Has to happen before the first sync: balance discovery only skips assets that already
         // have a row, so a token the user hid while still holding a balance in it would come back.
+        //
+        // Only hides are carried over. Everything the user never switched off gets no row and falls
+        // under the same rules as a fresh install: the curated default list plus whatever balance
+        // discovery reveals. Zero-balance tokens outside the default list disappear for existing
+        // wallets too - this is intended and matches iOS.
         db.execSQL(
             """
             INSERT OR REPLACE INTO `chain_asset_visibility` (`metaId`, `chainId`, `assetId`, `visible`)
             SELECT m.`id`, a.`chainId`, a.`id`, 0 FROM `chain_assets` AS a CROSS JOIN `meta_accounts` AS m
             WHERE a.`enabled` = 0
-            """.trimIndent()
-        )
-
-        // Everything else a wallet could see before the update stays visible, zero balances included.
-        // The curated default list is for wallets that start fresh; imposing it on an existing one would
-        // silently take away tokens its owner is used to seeing. Only wallets that exist right now get
-        // these rows - a wallet created after the update starts from the curated list like a new install.
-        db.execSQL(
-            """
-            INSERT OR IGNORE INTO `chain_asset_visibility` (`metaId`, `chainId`, `assetId`, `visible`)
-            SELECT m.`id`, a.`chainId`, a.`id`, 1 FROM `chain_assets` AS a CROSS JOIN `meta_accounts` AS m
-            WHERE a.`enabled` = 1
             """.trimIndent()
         )
     }

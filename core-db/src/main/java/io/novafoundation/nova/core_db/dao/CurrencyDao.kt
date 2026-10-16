@@ -41,6 +41,9 @@ abstract class CurrencyDao {
     @Query(RETRIEVE_SELECTED_CURRENCY)
     abstract suspend fun getSelectedCurrency(): CurrencyLocal?
 
+    @Query("SELECT * FROM currencies WHERE coingeckoId = :coingeckoId")
+    abstract suspend fun getCurrencyByCoingeckoId(coingeckoId: String): CurrencyLocal?
+
     @Query(RETRIEVE_SELECTED_CURRENCY)
     abstract fun observeSelectCurrency(): Flow<CurrencyLocal>
 

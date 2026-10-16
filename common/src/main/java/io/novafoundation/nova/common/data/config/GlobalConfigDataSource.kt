@@ -32,6 +32,7 @@ class RealGlobalConfigDataSource(
     private fun GlobalConfigRemote.toDomain() = GlobalConfig(
         multisigsApiUrl = multisigsApiUrl,
         proxyApiUrl = proxyApiUrl,
-        multiStakingApiUrl = multiStakingApiUrl
+        multiStakingApiUrl = multiStakingApiUrl,
+        infraUrl = infraUrl
     )
 }

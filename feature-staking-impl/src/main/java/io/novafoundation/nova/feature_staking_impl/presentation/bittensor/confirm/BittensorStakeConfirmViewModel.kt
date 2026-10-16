@@ -1,250 +1,291 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorRecoveryRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorWalletRecovery
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.filterLoaded
+import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
-import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
+import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
+import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
-import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
+import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeDraft
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import java.math.BigInteger
-import java.math.BigDecimal
-import java.text.NumberFormat
 
 class BittensorStakeConfirmViewModel(
+    private val payload: BittensorStakeConfirmPayload,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
     private val externalActions: ExternalActions.Presentation,
     chainRegistry: ChainRegistry,
     walletUiUseCase: WalletUiUseCase,
-    selectedAccountUseCase: SelectedAccountUseCase,
-    private val interactor: BittensorStakingInteractor,
+    accountRepository: AccountRepository,
+    private val bittensorStakingInteractor: BittensorStakingInteractor,
     private val iconGenerator: AddressIconGenerator,
-    private val recovery: ExtrinsicSubmissionRecovery
-) : BaseViewModel(), ExternalActions by externalActions {
+    private val fiatFormatter: FiatFormatter,
+    private val tokenFormatter: TokenFormatter,
+    private val bittensorAmountFormatter: BittensorAmountFormatter,
+    private val retryController: BittensorRetryController,
+    private val validationSystem: BittensorStakePreflightSystem,
+    private val validationExecutor: ValidationExecutor,
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+    private val recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
-    private val stakingDetails = interactor.observeRootStakingDetails()
-        .catch { showError(it) }
+
+    val retryEvents = retryController.events
+
+    private val stakeRequest = flowOf { payload.toStakeRequest(chain.await()) }
         .shareInBackground()
-    private val stakeDraft = interactor.observeStakeDraft().shareInBackground()
 
-    val amount = combine(stakingDetails, stakeDraft, ::mapAmount).shareInBackground()
-    val wallet = walletUiUseCase.selectedWalletUiFlow().shareInBackground()
-    val account = selectedAccountUseCase.selectedAddressModelFlow(chain::await).shareInBackground()
+    private val stakingDetailsState = retryController.observe(
+        step = "root confirmation",
+        transform = { it.withSafeLoading() }
+    ) {
+        bittensorStakingInteractor.observeRootStakingDetails(payload.metaId)
+    }
+        .shareInBackground()
 
-    val fee = combine(stakingDetails, stakeDraft) { details, draft ->
-        FeeStatus.Loaded(
-            FeeModel(
-                fee = Unit,
-                display = FeeDisplay(
-                    title = formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol),
-                    subtitle = formatFiatOrDash(details.asset.token.toFiatOrNull(draft.fee.decimalAmount), details)
-                )
-            )
-        )
-    }.shareInBackground()
+    private val stakingDetails = combine(stakingDetailsState.filterLoaded(), stakeRequest) { details, request ->
+        bittensorStakingInteractor.detailsForValidator(details, request.validator)
+    }
+        .shareInBackground()
 
-    val stakeAfter = combine(stakingDetails, stakeDraft) { details, draft ->
-        if (details.metaId != draft.metaId || details.validator.hotkey != draft.validator.hotkey ||
-            details.dataStatus !is io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus.Fresh
-        ) {
-            return@combine "—"
-        }
-        val before = details.position?.stakeInPlanks ?: BigInteger.ZERO
+    val amount = combine(stakingDetails, stakeRequest, ::mapAmount)
+        .shareInBackground()
+
+    val wallet = walletUiUseCase.walletUiFlow(payload.metaId)
+        .shareInBackground()
+
+    val account = accountRepository.metaAccountFlow(payload.metaId)
+        .map { walletUiUseCase.walletAddressModel(it, chain.await(), AddressIconGenerator.SIZE_MEDIUM) }
+        .shareInBackground()
+
+    private val feeContext = stakingDetails
+        .map { it.asset.token.configuration }
+        .asFeeContextFromSelf()
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorRootStakeRequest>>(
+        scope = this,
+        feeContext = feeContext
+    )
+
+    val fee = combine(stakeRequest, feeLoaderMixin.fee) { request, status ->
+        status.forRequest(request)
+    }
+        .shareInBackground()
+
+    val stakeAfter = combine(stakingDetails, stakeRequest) { details, request ->
+        val before = details.position?.stakeInPlanks ?: java.math.BigInteger.ZERO
         val token = details.asset.token
         formatToken(token.amountFromPlanks(before), token.configuration.symbol) + " → " +
-            formatToken(token.amountFromPlanks(before + draft.amountInPlanks), token.configuration.symbol)
+            formatToken(token.amountFromPlanks(before + request.amountInPlanks), token.configuration.symbol)
     }.shareInBackground()
 
-    val stakingType = flowOf(resourceManager.getString(R.string.bittensor_root_staking)).shareInBackground()
-    val validator = stakeDraft.map(::mapValidator).shareInBackground()
-    val apy = stakingDetails.map(::formatApy).shareInBackground()
-    private val _resultState = MutableStateFlow<BittensorStakeResultUi?>(null)
-    val resultState = _resultState.asStateFlow()
-    private val executing = MutableStateFlow(false)
-    private val completed = MutableStateFlow(false)
-    private data class ResultOrigin(val metaId: Long, val hash: String)
+    val stakingType = resourceManager.getString(R.string.bittensor_root_staking)
 
-    private var resultOrigin: ResultOrigin? = null
-    private var recoveringHash: String? = null
+    val validator = stakeRequest.map(::mapValidator)
+        .shareInBackground()
 
-    private val recoveryState = stakingDetails.map { BittensorRecoveryRequest(it.metaId, it.chain.id) }.distinctUntilChanged()
-        .flatMapLatest { (metaId, chainId) ->
-            recovery.observe(metaId, chainId).map { BittensorWalletRecovery(metaId, it) }
-                .onStart { emit(BittensorWalletRecovery(metaId, ExtrinsicRecoveryState.None)) }
-        }
-        .onEach { (recoveryMetaId, state) ->
-            if (!executing.value) {
+    val apy = stakingDetails.map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
+        .shareInBackground()
+
+    private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
+
+    private var submittedHash: String? = null
+
+    private val recoveryState = recovery.observe(payload.metaId, ChainGeneses.BITTENSOR)
+        .onEach { state ->
+            if (submission.value !is BittensorSubmissionState.Submitting) {
                 when (state) {
-                    is ExtrinsicRecoveryState.Pending -> {
-                        recoveringHash = state.hash
-                        _resultState.value = BittensorStakeResultUi.Failure(
-                            resourceManager.getString(R.string.bittensor_submission_unknown_title),
-                            resourceManager.getString(R.string.bittensor_submission_unknown_description),
-                            state.hash,
-                            canRetry = false
-                        )
-                    }
-                    is ExtrinsicRecoveryState.Resolved -> {
-                        val shownHash = (_resultState.value as? BittensorStakeResultUi.Failure)?.error
-                        if (recoveringHash == state.result.hash || shownHash == state.result.hash) {
-                            val recovered = state.result.toUi(resourceManager, recoveryMetaId)
-                            completed.value = recovered.successful
-                            _resultState.value = recovered
-                            recoveringHash = null
-                        }
+                    is ExtrinsicRecoveryState.Pending -> submission.value = unresolved(state.hash)
+                    is ExtrinsicRecoveryState.Resolved -> if (submission.value is BittensorSubmissionState.Unresolved) {
+                        submission.value = BittensorSubmissionState.Recovered(state.result.toUi(resourceManager, payload.metaId))
                     }
                     ExtrinsicRecoveryState.None -> Unit
                 }
             }
         }
-        .onStart { emit(BittensorWalletRecovery(0L, ExtrinsicRecoveryState.None)) }
         .shareInBackground()
 
-    val confirmButtonState = combine(stakingDetails, stakeDraft, executing, completed, recoveryState) { details, draft, executing, completed, recovery ->
+    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
+        hash,
+        BittensorStakeResultUi.Failure(
+            resourceManager.getString(R.string.bittensor_submission_unknown_title),
+            resourceManager.getString(R.string.bittensor_submission_unknown_description),
+            hash,
+            canRetry = false
+        )
+    )
+
+    val resultState = submission.map { it.result }
+        .shareInBackground()
+
+    private val validating = MutableStateFlow(false)
+
+    val confirmButtonState = combine(stakingDetailsState, validating, submission, fee) { state, validating, submission, fee ->
+        val details = state.dataOrNull
         val label = resourceManager.getString(R.string.common_confirm)
-        if (executing || completed || details.metaId != draft.metaId || details.validator.hotkey != draft.validator.hotkey ||
-            recovery.state is ExtrinsicRecoveryState.Pending
-        ) {
+        if (!submission.canSubmit || details == null || validating || fee.loadedFeeOrNull() == null) {
             DescriptiveButtonState.Disabled(label)
         } else {
             DescriptiveButtonState.Enabled(label)
         }
-    }.onStart { emit(DescriptiveButtonState.Loading) }.shareInBackground()
+    }
+        .onStart { emit(DescriptiveButtonState.Loading) }
+        .shareInBackground()
 
     init {
-        if (!interactor.hasDraft()) {
-            launchUnit {
-                showError(resourceManager.getString(R.string.bittensor_draft_expired))
-                router.back()
-            }
+        recoveryState.launchIn(this)
+        feeLoaderMixin.connectWith(stakeRequest) { _, request ->
+            val fee = bittensorStakingInteractor.estimateRootStakeFee(request)
+            BittensorFeeEstimate(request, fee)
         }
     }
 
     fun back() {
-        if (!executing.value) router.back()
+        if (submission.value !is BittensorSubmissionState.Submitting) router.back()
     }
 
     fun accountClicked() = launchUnit {
         externalActions.showAddressActions(account.first().address, chain.await())
     }
 
-    fun validatorClicked() = launchUnit {
-        val draft = stakeDraft.first()
-        externalActions.showAddressActions(chain.await().addressOf(draft.validator.hotkey.value), chain.await())
+    fun confirmClicked() = launchUnit {
+        if (!submission.value.canSubmit || validating.value || stakingDetailsState.first().dataOrNull == null) return@launchUnit
+        validating.value = true
+        try {
+            val request = stakeRequest.first()
+            val fee = fee.first()
+                .loadedFeeOrNull()
+                ?.takeIf { it.request == request } ?: return@launchUnit
+            val payload = bittensorStakingInteractor.validationPayload(request, fee)
+            validationExecutor.requireValid(
+                validationSystem = validationSystem,
+                payload = payload,
+                progressConsumer = validating.progressConsumer(),
+                validationFailureTransformer = { resourceManager.getString(R.string.common_error_general_title) to it.message(resourceManager) }
+            ) { executeStake(request, fee.fee) }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            showError(e)
+        } finally {
+            validating.value = false
+        }
     }
 
-    fun confirmClicked() = launchUnit {
-        if (executing.value || completed.value) return@launchUnit
-        executing.value = true
+    private fun executeStake(request: BittensorRootStakeRequest, fee: Fee) = launchUnit {
+        if (!submission.value.canSubmit) return@launchUnit
         try {
             val details = stakingDetails.first()
-            val draft = stakeDraft.first()
-            _resultState.value = mapProgress(details, draft)
-
-            when (val result = interactor.executeRootStake()) {
+            submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
+            when (val result = bittensorStakingInteractor.executeRootStake(request)) {
                 is BittensorOperationResult.Success -> {
-                    resultOrigin = ResultOrigin(draft.metaId, result.transactionHash)
-                    completed.value = true
-                    _resultState.value = mapSuccess(details, draft)
+                    submittedHash = result.transactionHash
+                    submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee))
                 }
                 is BittensorOperationResult.Failure -> {
-                    resultOrigin = result.transactionHash?.let { ResultOrigin(draft.metaId, it) }
-                    _resultState.value = mapFailure(result.cause)
+                    submittedHash = result.transactionHash
+                    submission.value = BittensorSubmissionState.Failed(mapFailure(result.cause))
                 }
-                is BittensorOperationResult.Unknown -> {
-                    completed.value = true
-                    _resultState.value = BittensorStakeResultUi.Failure(
-                        resourceManager.getString(R.string.bittensor_submission_unknown_title),
-                        resourceManager.getString(R.string.bittensor_submission_unknown_description),
-                        result.transactionHash,
-                        canRetry = false
-                    )
-                }
+                is BittensorOperationResult.Unknown -> submission.value = unresolved(result.transactionHash)
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            _resultState.value = mapFailure(e)
+            submission.value = BittensorSubmissionState.Failed(mapFailure(e))
         } finally {
-            executing.value = false
+            validating.value = false
         }
     }
 
-    fun retryClicked() {
-        confirmClicked()
+    private fun acknowledgeResult() = launchUnit {
+        val recovered = submission.value as? BittensorSubmissionState.Recovered
+        val hash = recovered?.recovery?.transactionHash ?: submittedHash
+        hash?.let { recovery.acknowledge(payload.metaId, it) }
     }
 
     fun resultDismissed() {
-        val recovered = _resultState.value as? BittensorStakeResultUi.Recovered
-        _resultState.value = null
-        val origin = recovered?.let { ResultOrigin(it.metaId, it.transactionHash) } ?: resultOrigin
-        if (origin != null) launchUnit { recovery.acknowledge(origin.metaId, origin.hash) }
+        acknowledgeResult()
+        submission.value = submission.value.dismissResult()
     }
 
-    fun viewPositionClicked() = launchUnit {
-        resultOrigin?.let { recovery.acknowledge(it.metaId, it.hash) }
-        if (completed.value) router.openBittensorRootDetails()
+    fun viewPositionClicked() {
+        acknowledgeResult()
+        if (submission.value is BittensorSubmissionState.Completed ||
+            (submission.value as? BittensorSubmissionState.Recovered)?.recovery?.successful == true
+        ) {
+            router.openBittensorRootDetails()
+        }
     }
 
-    private fun mapAmount(details: BittensorRootStakingDetails, draft: BittensorRootStakeDraft): AmountModel {
-        val amount = details.asset.token.amountFromPlanks(draft.amountInPlanks)
+    private fun mapAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): AmountModel {
+        val amount = details.asset.token.amountFromPlanks(request.amountInPlanks)
         return AmountModel(
             token = formatToken(amount, details.asset.token.configuration.symbol),
-            fiat = formatFiatOrDash(details.asset.token.toFiatOrNull(amount), details)
+            fiat = formatFiatOrDash(details.asset.token.toFiatOrNull(amount), details.asset.token.currency)
         )
     }
 
-    private suspend fun mapValidator(draft: BittensorRootStakeDraft): BittensorValidatorUi {
+    private suspend fun mapValidator(request: BittensorRootStakeRequest): BittensorValidatorUi {
         return BittensorValidatorUi(
-            draft.validator.name,
+            request.validator.name,
             Icon.FromDrawable(
                 iconGenerator.createAddressIcon(
-                    draft.validator.hotkey.value,
+                    request.validator.hotkey.value,
                     AddressIconGenerator.SIZE_MEDIUM,
                     AddressIconGenerator.BACKGROUND_TRANSPARENT
                 )
@@ -252,28 +293,23 @@ class BittensorStakeConfirmViewModel(
         )
     }
 
-    private fun formatApy(details: BittensorRootStakingDetails): String {
-        val apy = details.annualPercentageYield?.toStripTrailingZerosString() ?: return "—"
-        return resourceManager.getString(R.string.bittensor_apy_paid_in, "$apy%", details.asset.token.configuration.symbol)
-    }
-
-    private fun mapProgress(details: BittensorRootStakingDetails, draft: BittensorRootStakeDraft): BittensorStakeResultUi.Progress {
-        val amount = formatDraftAmount(details, draft)
+    private fun mapProgress(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): BittensorStakeResultUi.Progress {
+        val amount = formatStakeAmount(details, request)
         return BittensorStakeResultUi.Progress(
             title = resourceManager.getString(R.string.bittensor_staking_progress_title),
             description = resourceManager.getString(R.string.bittensor_staking_progress_description, amount)
         )
     }
 
-    private fun mapSuccess(details: BittensorRootStakingDetails, draft: BittensorRootStakeDraft): BittensorStakeResultUi.Success {
-        val amount = formatDraftAmount(details, draft)
+    private fun mapSuccess(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest, fee: Fee): BittensorStakeResultUi.Success {
+        val amount = formatStakeAmount(details, request)
         return BittensorStakeResultUi.Success(
             title = resourceManager.getString(R.string.bittensor_staking_success_title, amount),
             description = resourceManager.getString(R.string.bittensor_staking_success_description),
-            validator = draft.validator.name,
+            validator = request.validator.name,
             fee = BittensorFeeUi(
-                amount = formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol),
-                fiatAmount = formatFiatOrDash(details.asset.token.toFiatOrNull(draft.fee.decimalAmount), details)
+                amount = formatToken(fee.decimalAmount, fee.asset.symbol),
+                fiatAmount = formatFiatOrDash(details.asset.token.toFiatOrNull(fee.decimalAmount), details.asset.token.currency)
             )
         )
     }
@@ -286,19 +322,19 @@ class BittensorStakeConfirmViewModel(
         )
     }
 
-    private fun formatDraftAmount(details: BittensorRootStakingDetails, draft: BittensorRootStakeDraft): String {
-        val amount = details.asset.token.amountFromPlanks(draft.amountInPlanks)
+    private fun formatStakeAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): String {
+        val amount = details.asset.token.amountFromPlanks(request.amountInPlanks)
         return formatToken(amount, details.asset.token.configuration.symbol)
     }
 
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =
-        "${amount.toStripTrailingZerosString()} ${symbol.value}"
+        tokenFormatter.formatToken(amount, symbol)
+            .toString()
 
-    private fun formatFiatOrDash(amount: BigDecimal?, details: BittensorRootStakingDetails): String {
+    private fun formatFiatOrDash(amount: BigDecimal?, currency: Currency): String {
         if (amount == null) return "—"
 
-        return NumberFormat.getCurrencyInstance().apply {
-            currency = java.util.Currency.getInstance(details.asset.token.currency.code)
-        }.format(amount)
+        return fiatFormatter.formatFiat(amount, currency)
+            .toString()
     }
 }

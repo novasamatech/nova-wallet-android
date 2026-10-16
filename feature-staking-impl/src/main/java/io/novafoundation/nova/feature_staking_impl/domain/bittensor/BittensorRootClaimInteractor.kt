@@ -93,7 +93,7 @@ class BittensorRootClaimInteractor(
     }
 
     private suspend fun requireWallet(state: BittensorRootClaimState, immediate: Boolean = true) {
-        val selected = accounts.getSelectedMetaAccount()
+        val selected = accounts.getMetaAccount(state.metaId)
         if (immediate) requireBittensorImmediateWallet(selected)
         check(selected.id == state.metaId && selected.requireAccountIdIn(state.chain).contentEquals(state.coldkey.value)) { "The staking wallet has changed" }
     }
