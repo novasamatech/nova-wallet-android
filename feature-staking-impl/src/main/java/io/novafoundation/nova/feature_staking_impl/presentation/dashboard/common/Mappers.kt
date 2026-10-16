@@ -18,6 +18,7 @@ import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.Aggrega
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NotYetResolved
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.WithoutStake
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingPrimary
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.allStakingTypes
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.isSyncingSecondary
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
@@ -110,7 +111,11 @@ class RealStakingDashboardPresentationMapper(
         return StakingDashboardModel.NoStakeItem(
             tokenName = noStake.token.configuration.name.syncingIf(syncingStage.isSyncingPrimary()),
             assetId = noStake.token.configuration.fullId,
-            earnings = stats.map { it.estimatedEarnings.format().syncingIf(syncingStage.isSyncingSecondary()) },
+            earnings = if (noStake.stakingState.flowType.allStakingTypes.singleOrNull() == StakingType.BITTENSOR_ROOT) {
+                ExtendedLoadingState.Loaded("—".syncingIf(false))
+            } else {
+                stats.map { it.estimatedEarnings.format().syncingIf(syncingStage.isSyncingSecondary()) }
+            },
             availableBalance = formattedAvailableBalance,
             stakingTypeBadge = stakingType?.let(::mapStakingTypeToUi),
             assetIcon = assetIconProvider.getAssetIconOrFallback(noStake.token.configuration.icon).syncingIf(syncingStage.isSyncingPrimary())

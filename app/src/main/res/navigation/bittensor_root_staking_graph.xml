@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bittensor_root_staking_graph"
+    app:startDestination="@id/bittensorStakeAmountFragment">
+
+    <fragment
+        android:id="@+id/bittensorStakeAmountFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountFragment"
+        android:label="BittensorStakeAmountFragment"
+        tools:layout="@layout/fragment_bittensor_stake_amount">
+
+        <action
+            android:id="@+id/action_bittensorStakeAmount_to_bittensorStakeConfirm"
+            app:destination="@id/bittensorStakeConfirmFragment"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@anim/fragment_close_enter"
+            app:popExitAnim="@anim/fragment_close_exit" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/bittensorStakeConfirmFragment"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmFragment"
+        android:label="BittensorStakeConfirmFragment"
+        tools:layout="@layout/fragment_bittensor_stake_confirm" />
+</navigation>

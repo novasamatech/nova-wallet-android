@@ -1,5 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking
 
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
@@ -25,6 +27,10 @@ class StartMultiStakingNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), StartMultiStakingRouter {
 
     override fun openStartStakingLanding(payload: StartStakingLandingPayload) {
+        if (payload.availableStakingOptions.stakingTypes.singleOrNull() == Chain.Asset.StakingType.BITTENSOR_ROOT) {
+            openBittensorRootStaking()
+            return
+        }
         navigationBuilder().action(R.id.action_mainFragment_to_startStackingLanding)
             .setArgs(StartStakingLandingFragment.getBundle(payload))
             .navigateInFirstAttachedContext()
@@ -34,6 +40,10 @@ class StartMultiStakingNavigator(
         navigationBuilder().action(R.id.action_startStakingLandingFragment_to_staking_parachain_start_graph)
             .setArgs(StartParachainStakingFragment.getBundle(StartParachainStakingPayload(StartParachainStakingMode.START)))
             .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorRootStaking() {
+        navigationBuilder().action(R.id.action_open_bittensor_root_staking).navigateInFirstAttachedContext()
     }
 
     override fun openStartMythosStaking() {

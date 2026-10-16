@@ -86,7 +86,7 @@ class RealStakingDashboardRepository(
         }
 
         return HasStake(
-            stake = requireNotNull(localItem.stake),
+            stake = localItem.stake,
             stats = ExtendedLoadingState.fromOption(stats)
         )
     }

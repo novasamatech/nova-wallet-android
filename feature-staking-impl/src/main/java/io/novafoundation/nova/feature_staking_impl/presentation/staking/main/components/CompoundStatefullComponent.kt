@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.utils.switchMap
 import io.novafoundation.nova.common.utils.withItemScope
 import io.novafoundation.nova.feature_staking_impl.data.StakingOption
 import io.novafoundation.nova.feature_staking_impl.data.StakingSharedState
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.ALEPH_ZERO
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.MYTHOS
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain.Asset.StakingType.NOMINATION_POOLS
@@ -81,7 +82,7 @@ private class CompoundStakingComponent<S, E, A>(
 
     private fun createDelegate(stakingOption: StakingOption, childHostContext: ComponentHostContext): StatefullComponent<S, E, A> {
         return when (stakingOption.additional.stakingType) {
-            UNSUPPORTED -> UnsupportedComponent()
+            UNSUPPORTED, Chain.Asset.StakingType.BITTENSOR_ROOT -> UnsupportedComponent()
             RELAYCHAIN, RELAYCHAIN_AURA, ALEPH_ZERO -> relaychainComponentCreator(stakingOption, childHostContext)
             PARACHAIN -> parachainComponentCreator(stakingOption, childHostContext)
             TURING -> turingComponentCreator(stakingOption, childHostContext)

@@ -14,6 +14,7 @@ fun Chain.Asset.StakingType.toAnalyticsStakingType(): String {
         StakingTypeGroup.RELAYCHAIN, StakingTypeGroup.PARACHAIN -> ANALYTICS_STAKING_TYPE_DIRECT
         StakingTypeGroup.NOMINATION_POOL -> ANALYTICS_STAKING_TYPE_POOL
         StakingTypeGroup.MYTHOS -> ANALYTICS_STAKING_TYPE_MYTHOS
+        StakingTypeGroup.BITTENSOR -> "bittensor-root"
         StakingTypeGroup.UNSUPPORTED -> ANALYTICS_STAKING_TYPE_UNSUPPORTED
     }
 }

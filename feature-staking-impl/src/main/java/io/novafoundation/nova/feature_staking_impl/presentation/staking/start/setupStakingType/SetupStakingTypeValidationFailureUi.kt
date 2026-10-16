@@ -25,6 +25,7 @@ fun handleSetupStakingTypeValidationFailure(chainAsset: Chain.Asset, error: Edit
             when (error.stakingType.group()) {
                 StakingTypeGroup.PARACHAIN,
                 StakingTypeGroup.MYTHOS,
+                StakingTypeGroup.BITTENSOR,
                 StakingTypeGroup.RELAYCHAIN -> TitleAndMessage(
                     resourceManager.getString(R.string.setup_staking_type_already_used_title),
                     resourceManager.getString(R.string.setup_staking_type_direct_already_used_message)

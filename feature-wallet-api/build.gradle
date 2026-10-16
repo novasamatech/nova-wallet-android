@@ -26,6 +26,8 @@ dependencies {
     implementation substrateSdkDep
 
     implementation constraintDep
+    implementation chartsDep
+    implementation shimmerDep
 
     implementation lifeCycleKtxDep
 

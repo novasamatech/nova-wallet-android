@@ -398,7 +398,7 @@ class RealStakingDashboardInteractor(
     @JvmName("sortedHasStakeByChain")
     private fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
         return sortedWith(
-            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.token.planksToFiat(it.stakingState.stake) }
+            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { option -> option.stakingState.stake?.let(option.token::planksToFiat) }
                 .thenByDescending { it.stakingState.stake }
                 .thenBy { it.chain.testnetsLastAscendingOrder }
                 .thenBy { it.chain.alphabeticalOrder }
@@ -456,6 +456,7 @@ class RealStakingDashboardInteractor(
             StakingTypeGroup.NOMINATION_POOL -> transferableInPlanks
             StakingTypeGroup.UNSUPPORTED -> Balance.ZERO
             StakingTypeGroup.MYTHOS -> freeInPlanks
+            StakingTypeGroup.BITTENSOR -> transferableInPlanks
         }
     }
 
