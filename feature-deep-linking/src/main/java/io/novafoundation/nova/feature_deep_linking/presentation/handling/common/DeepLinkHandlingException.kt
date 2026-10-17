@@ -28,4 +28,13 @@ sealed class DeepLinkHandlingException : Exception() {
 
         object InvalidDerivationPath : ImportMnemonicHandlingException()
     }
+
+    sealed class StakingHandlingException : DeepLinkHandlingException() {
+
+        object ChainIsNotFound : StakingHandlingException()
+
+        object AssetIsNotFound : StakingHandlingException()
+
+        object StakingIsNotSupported : StakingHandlingException()
+    }
 }
