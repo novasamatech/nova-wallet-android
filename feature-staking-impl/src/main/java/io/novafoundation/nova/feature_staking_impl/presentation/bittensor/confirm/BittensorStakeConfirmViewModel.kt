@@ -157,16 +157,6 @@ class BittensorStakeConfirmViewModel(
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
 
-    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
-        hash,
-        BittensorStakeResultUi.Failure(
-            resourceManager.getString(R.string.bittensor_submission_unknown_title),
-            resourceManager.getString(R.string.bittensor_submission_unknown_description),
-            hash,
-            canRetry = false
-        )
-    )
-
     val resultState = submission.map { it.result }
         .shareInBackground()
 
@@ -195,6 +185,16 @@ class BittensorStakeConfirmViewModel(
             BittensorFeeEstimate(request, fee)
         }
     }
+
+    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
+        hash,
+        BittensorStakeResultUi.Failure(
+            resourceManager.getString(R.string.bittensor_submission_unknown_title),
+            resourceManager.getString(R.string.bittensor_submission_unknown_description),
+            hash,
+            canRetry = false
+        )
+    )
 
     fun back() {
         if (submission.value !is BittensorSubmissionState.Submitting) router.back()

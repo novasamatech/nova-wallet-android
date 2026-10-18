@@ -228,8 +228,6 @@ class BittensorSubnetDetailsViewModel(
 
     private val chartPeriods = BittensorSubnetChartPeriod.entries
 
-    private fun periodLabel(period: BittensorSubnetChartPeriod): String = resources.getString(period.labelRes())
-
     private val chartData = combine(
         asset,
         period
@@ -252,68 +250,6 @@ class BittensorSubnetDetailsViewModel(
 
     val priceChangeFormatter = period.map { BittensorChartChangeTextInjector(periodLabel(it)) }
         .shareInBackground()
-
-    init {
-        combine(
-            validatorCommunicator.responseFlow,
-            validatorsState
-        ) { response, validators ->
-            validators.dataOrNull?.firstOrNull { response.subnetId == subnetId.value && it.address == response.address }
-        }
-            .mapNotNull { it }
-            .onEach(::validatorSelected)
-            .launchIn(this)
-    }
-
-    fun validatorClicked() = launchUnit {
-        if (canContinue.first()) {
-            validatorCommunicator.openRequest(
-                BittensorSelectValidatorCommunicator.Request(
-                    subnetId.value,
-                    selectedValidator.first()
-                        ?.address
-                )
-            )
-        }
-    }
-
-    private fun validatorSelected(row: BittensorSubnetValidator) {
-        if (row.selectable) selectedValidatorAddress.value = row.address
-    }
-
-    fun selectPreset(value: BittensorStakeAmountPreset) {
-        presetSelection.value = value
-    }
-
-    fun showFiat(value: Boolean) {
-        _isFiatMode.value = value
-    }
-
-    fun selectPeriod(index: Int) {
-        chartPeriods.getOrNull(index)
-            ?.let { period.value = it }
-    }
-
-    fun toggleFavorite() = launchUnit {
-        try {
-            val favorites = bittensorSubnetInteractor.observeFavorites()
-                .first()
-            bittensorSubnetInteractor.toggleFavorite(favorites.metaId, subnetId)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            reportFailure("favorite", e)
-        }
-    }
-
-    fun continueClicked() = launchUnit {
-        val selected = selectedValidator.first()
-        if (selected == null) {
-            validatorClicked()
-        } else if (canContinue.first()) {
-            router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(subnetId.value, selected.address))
-        }
-    }
 
     private val ageState = subnetState.flatMapLatest { state ->
         val subnet = state.dataOrNull
@@ -394,6 +330,70 @@ class BittensorSubnetDetailsViewModel(
         }
     }
         .shareInBackground()
+
+    init {
+        combine(
+            validatorCommunicator.responseFlow,
+            validatorsState
+        ) { response, validators ->
+            validators.dataOrNull?.firstOrNull { response.subnetId == subnetId.value && it.address == response.address }
+        }
+            .mapNotNull { it }
+            .onEach(::validatorSelected)
+            .launchIn(this)
+    }
+
+    private fun periodLabel(period: BittensorSubnetChartPeriod): String = resources.getString(period.labelRes())
+
+    fun validatorClicked() = launchUnit {
+        if (canContinue.first()) {
+            validatorCommunicator.openRequest(
+                BittensorSelectValidatorCommunicator.Request(
+                    subnetId.value,
+                    selectedValidator.first()
+                        ?.address
+                )
+            )
+        }
+    }
+
+    private fun validatorSelected(row: BittensorSubnetValidator) {
+        if (row.selectable) selectedValidatorAddress.value = row.address
+    }
+
+    fun selectPreset(value: BittensorStakeAmountPreset) {
+        presetSelection.value = value
+    }
+
+    fun showFiat(value: Boolean) {
+        _isFiatMode.value = value
+    }
+
+    fun selectPeriod(index: Int) {
+        chartPeriods.getOrNull(index)
+            ?.let { period.value = it }
+    }
+
+    fun toggleFavorite() = launchUnit {
+        try {
+            val favorites = bittensorSubnetInteractor.observeFavorites()
+                .first()
+            bittensorSubnetInteractor.toggleFavorite(favorites.metaId, subnetId)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            reportFailure("favorite", e)
+        }
+    }
+
+    fun continueClicked() = launchUnit {
+        val selected = selectedValidator.first()
+        if (selected == null) {
+            validatorClicked()
+        } else if (canContinue.first()) {
+            router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(subnetId.value, selected.address))
+        }
+    }
 
     fun back() = router.back()
 

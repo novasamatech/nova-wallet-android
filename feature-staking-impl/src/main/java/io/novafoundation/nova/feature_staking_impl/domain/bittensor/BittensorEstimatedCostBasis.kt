@@ -22,13 +22,13 @@ data class BittensorEstimatedPurchaseTotals(
     val paidTao: BigInteger,
     val receivedAlpha: BigInteger
 ) {
-    init {
-        require(paidTao.isPositive() && receivedAlpha.isPositive())
-    }
-
     val averagePrice: BigDecimal
         get() = paidTao.toBigDecimal()
             .divide(receivedAlpha.toBigDecimal(), 18, RoundingMode.DOWN)
+
+    init {
+        require(paidTao.isPositive() && receivedAlpha.isPositive())
+    }
 
     fun adding(tao: BigInteger, alpha: BigInteger) = BittensorEstimatedPurchaseTotals(paidTao + tao, receivedAlpha + alpha)
 

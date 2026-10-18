@@ -171,15 +171,6 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    init {
-        feeLoaderMixin.connectWith(request) { _, request ->
-            request?.let {
-                val fee = bittensorExitInteractor.estimateFee(it.position, it.quote)
-                BittensorFeeEstimate(it, fee)
-            }
-        }
-    }
-
     val title = position.map {
         if (isRoot) {
             resources.getString(R.string.bittensor_exit_root_title)
@@ -317,6 +308,15 @@ class BittensorExitAmountViewModel(
         }
     }
         .shareInBackground()
+
+    init {
+        feeLoaderMixin.connectWith(request) { _, request ->
+            request?.let {
+                val fee = bittensorExitInteractor.estimateFee(it.position, it.quote)
+                BittensorFeeEstimate(it, fee)
+            }
+        }
+    }
 
     fun amountChanged(value: String) {
         if (input.value.text != value) input.value = ExitAmountInput(value)

@@ -184,6 +184,19 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
+    private val subnetMetadata = retryController.observe(
+        step = "subnet metadata",
+        transform = { it.catch { } }
+    ) {
+        flowOf { bittensorPortfolioInteractor.subnets() }
+            .map { subnets -> subnets.associateBy { it.id } }
+    }
+        .onStart { emit(emptyMap()) }
+        .shareInBackground()
+
+    val positions = combine(portfolio, subnetMetadata, ::mapPositions)
+        .shareInBackground()
+
     private fun observePriceChart(priceId: String, currency: Currency, period: PricePeriod): Flow<AssetPriceChart> {
         return retryController.observe(
             step = "price chart",
@@ -221,19 +234,6 @@ class BittensorDetailsViewModel(
         periods.getOrNull(index)
             ?.let { chartPeriod.value = it }
     }
-
-    private val subnetMetadata = retryController.observe(
-        step = "subnet metadata",
-        transform = { it.catch { } }
-    ) {
-        flowOf { bittensorPortfolioInteractor.subnets() }
-            .map { subnets -> subnets.associateBy { it.id } }
-    }
-        .onStart { emit(emptyMap()) }
-        .shareInBackground()
-
-    val positions = combine(portfolio, subnetMetadata, ::mapPositions)
-        .shareInBackground()
 
     private fun mapPositions(portfolio: BittensorPortfolio, metadata: Map<BittensorNetuid.Subnet, BittensorSubnet>): List<BittensorPositionUi> {
         val positions = portfolio.positions ?: return emptyList()

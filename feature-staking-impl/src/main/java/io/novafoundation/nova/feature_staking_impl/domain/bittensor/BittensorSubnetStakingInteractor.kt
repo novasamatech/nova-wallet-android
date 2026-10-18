@@ -39,12 +39,12 @@ class BittensorSubnetStakingInteractor(
     private val submissionExecutor: BittensorSubmissionExecutor
 ) {
 
+    private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+
     fun observeWallet(metaId: Long): Flow<BittensorWalletContext> = flowOfAll {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         walletRepository.assetFlow(metaId, chain.utilityAsset).map { BittensorWalletContext(metaId, chain, it) }
     }
-
-    private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
 
     suspend fun maximumStake(metaId: Long, subnetId: BittensorNetuid.Subnet, validatorAddress: String): BigInteger = withTimeout(60_000L) {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)

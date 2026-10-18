@@ -138,16 +138,62 @@ class BittensorRootDetailsViewModel(
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
-    fun claimClicked() = launchUnit {
-        if (!canClaim.first()) return@launchUnit
-        val claim = claimState.first().dataOrNull ?: return@launchUnit
-        router.openBittensorRootClaim(BittensorRootClaimPayload(claim.metaId))
+    val canAddStake = portfolioState.map { portfolio ->
+        val data = portfolio.dataOrNull
+        data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh
     }
+        .shareInBackground()
+
+    val rootStake = portfolio.map { portfolio ->
+        val stake = portfolio.positions?.rootStake ?: return@map AmountModel("—", null)
+        val token = portfolio.asset.token
+        val amount = token.amountFromPlanks(stake)
+        amountFormatter.amount(
+            amount,
+            token.configuration.symbol,
+            token.toFiatOrNull(amount),
+            token.currency
+        )
+    }
+        .shareInBackground()
+
+    val assetIcon = portfolio.map { assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration) }
+        .shareInBackground()
+
+    val hasRootStake = portfolio.map { it.positions?.rootStake?.isPositive() == true }
+        .shareInBackground()
+
+    val validators = portfolio.map { portfolio ->
+        portfolio.positions?.root.orEmpty().map { position ->
+            val address = portfolio.chain.addressOf(position.validatorHotkey.value)
+            BittensorPositionUi(
+                id = address,
+                title = address.ellipsizeAddress(),
+                subtitle = resources.getString(R.string.bittensor_validator),
+                amount = AmountModel("", null),
+                icon = Icon.FromDrawable(iconGenerator.createAddressIcon(position.validatorHotkey.value, 32)),
+                action = BittensorPositionAction.ValidatorDetails(address),
+                iconSizeDp = 32
+            )
+        }
+    }
+        .shareInBackground()
+
+    val warning = portfolio.map {
+        if (it.dataStatus is BittensorDataStatus.Stale) resources.getString(R.string.bittensor_positions_stale) else null
+    }
+        .shareInBackground()
 
     init {
         unstakePositionCommunicator.responseFlow
             .onEach { selectExit(it.position) }
             .launchIn(this)
+    }
+
+    fun claimClicked() = launchUnit {
+        if (!canClaim.first()) return@launchUnit
+        val claim = claimState.first().dataOrNull ?: return@launchUnit
+        router.openBittensorRootClaim(BittensorRootClaimPayload(claim.metaId))
     }
 
     fun unstakeRoot() = launchUnit {
@@ -194,52 +240,6 @@ class BittensorRootDetailsViewModel(
             token.currency
         )
     }
-
-    val canAddStake = portfolioState.map { portfolio ->
-        val data = portfolio.dataOrNull
-        data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh
-    }
-        .shareInBackground()
-
-    val rootStake = portfolio.map { portfolio ->
-        val stake = portfolio.positions?.rootStake ?: return@map AmountModel("—", null)
-        val token = portfolio.asset.token
-        val amount = token.amountFromPlanks(stake)
-        amountFormatter.amount(
-            amount,
-            token.configuration.symbol,
-            token.toFiatOrNull(amount),
-            token.currency
-        )
-    }
-        .shareInBackground()
-
-    val assetIcon = portfolio.map { assetIconProvider.getAssetIconOrFallback(it.asset.token.configuration) }
-        .shareInBackground()
-
-    val hasRootStake = portfolio.map { it.positions?.rootStake?.isPositive() == true }
-        .shareInBackground()
-
-    val validators = portfolio.map { portfolio ->
-        portfolio.positions?.root.orEmpty().map { position ->
-            val address = portfolio.chain.addressOf(position.validatorHotkey.value)
-            BittensorPositionUi(
-                id = address,
-                title = address.ellipsizeAddress(),
-                subtitle = resources.getString(R.string.bittensor_validator),
-                amount = AmountModel("", null),
-                icon = Icon.FromDrawable(iconGenerator.createAddressIcon(position.validatorHotkey.value, 32)),
-                action = BittensorPositionAction.ValidatorDetails(address),
-                iconSizeDp = 32
-            )
-        }
-    }
-        .shareInBackground()
-
-    val warning = portfolio.map {
-        if (it.dataStatus is BittensorDataStatus.Stale) resources.getString(R.string.bittensor_positions_stale) else null
-    }
-        .shareInBackground()
 
     fun addStake() = router.openBittensorRootStaking()
 

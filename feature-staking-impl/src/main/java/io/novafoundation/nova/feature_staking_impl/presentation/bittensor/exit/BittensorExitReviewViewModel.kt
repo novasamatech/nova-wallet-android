@@ -175,15 +175,6 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    init {
-        feeLoaderMixin.connectWith(request) { _, request ->
-            request?.let {
-                val fee = bittensorExitInteractor.estimateFee(it.position, it.quote)
-                BittensorFeeEstimate(it, fee)
-            }
-        }
-    }
-
     val position = prepared.map { it.dataOrNull?.position }
         .shareInBackground()
 
@@ -345,12 +336,6 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    fun remainingExecutionTime(): Duration {
-        val running = execution.value as? ExitExecution.Running ?: return Duration.ZERO
-        val elapsed = (SystemClock.elapsedRealtime() - running.startedAt).milliseconds
-        return (running.estimatedDuration - elapsed).coerceAtLeast(Duration.ZERO)
-    }
-
     val confirmButtonState = combine(
         prepared,
         execution,
@@ -373,12 +358,6 @@ class BittensorExitReviewViewModel(
         if (isRoot) null else (state as? ExitExecution.Failure)?.model
     }
         .shareInBackground()
-
-    fun retryClicked() {
-        val failure = execution.value as? ExitExecution.Failure ?: return
-        if (!failure.model.canRetry) return
-        execution.value = ExitExecution.Idle
-    }
 
     val resultState = combine(
         prepared,
@@ -412,6 +391,27 @@ class BittensorExitReviewViewModel(
         }
     }
         .shareInBackground()
+
+    init {
+        feeLoaderMixin.connectWith(request) { _, request ->
+            request?.let {
+                val fee = bittensorExitInteractor.estimateFee(it.position, it.quote)
+                BittensorFeeEstimate(it, fee)
+            }
+        }
+    }
+
+    fun remainingExecutionTime(): Duration {
+        val running = execution.value as? ExitExecution.Running ?: return Duration.ZERO
+        val elapsed = (SystemClock.elapsedRealtime() - running.startedAt).milliseconds
+        return (running.estimatedDuration - elapsed).coerceAtLeast(Duration.ZERO)
+    }
+
+    fun retryClicked() {
+        val failure = execution.value as? ExitExecution.Failure ?: return
+        if (!failure.model.canRetry) return
+        execution.value = ExitExecution.Idle
+    }
 
     fun confirmClicked() = launchUnit {
         if (!confirmMutex.tryLock()) return@launchUnit

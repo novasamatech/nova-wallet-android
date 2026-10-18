@@ -274,21 +274,6 @@ class BittensorSubnetPositionViewModel(
         }
         .shareInBackground()
 
-    private fun loadChart(request: ChartRequest) = flowOf {
-        val asset = request.asset
-        val priceId = asset?.token?.configuration?.priceId
-        if (priceId == null) {
-            emptyList()
-        } else {
-            bittensorSubnetDetailsInteractor.history(
-                subnetId,
-                priceId,
-                asset.token.currency,
-                request.period
-            )
-        }
-    }
-
     val axisFormatter = chartAssetState
         .mapNotNull { it.dataOrNull }
         .map { BittensorPositionChartFormatter(tokenFormatter, it.token.configuration.symbol) }
@@ -348,6 +333,21 @@ class BittensorSubnetPositionViewModel(
         .shareInBackground()
 
     val choices = MutableLiveData<Event<BittensorPositionChoiceRequest>>()
+
+    private fun loadChart(request: ChartRequest) = flowOf {
+        val asset = request.asset
+        val priceId = asset?.token?.configuration?.priceId
+        if (priceId == null) {
+            emptyList()
+        } else {
+            bittensorSubnetDetailsInteractor.history(
+                subnetId,
+                priceId,
+                asset.token.currency,
+                request.period
+            )
+        }
+    }
 
     fun sellClicked() = choose(BittensorPositionTradeAction.SELL)
 

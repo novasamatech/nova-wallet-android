@@ -100,6 +100,8 @@ Keep domain invariants in their owning types. Do not repeat constructor range ch
 
 Separate class property declarations with a blank line, following existing ViewModel references. Apply this to both single-line properties and multi-line flow declarations.
 
+Order class members as properties, init blocks, then functions. Do not interleave methods or init blocks with property declarations. When moving init blocks, check initialization dependencies and side effects first; preserve property initialization order and the relative order of multiple init blocks.
+
 For calls with multiple arguments that include a lambda or are followed by a trailing lambda, put each parenthesized argument on its own line. Keep the closing parenthesis on a separate line; do not compress such calls just because they fit the line-length limit.
 
 Put successive transformation calls in a method chain on separate lines when this improves readability. Keep short expressions, simple property access, and short predicate calls together; do not mechanically split expressions such as `finalizedBlock(chainId).number` or `hash.equals(transactionHash, ignoreCase = true)`. Keep a short call and its arguments on one line when they fit naturally. When an `if` condition contains a multi-line collection predicate or nested transformation, extract a descriptively named Boolean before the `if` so the control flow remains immediately visible.

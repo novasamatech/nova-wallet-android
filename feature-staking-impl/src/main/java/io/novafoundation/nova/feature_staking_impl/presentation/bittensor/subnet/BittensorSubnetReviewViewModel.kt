@@ -117,16 +117,6 @@ class BittensorSubnetReviewViewModel(
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
 
-    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
-        hash,
-        BittensorStakeResultUi.Failure(
-            resources.getString(R.string.bittensor_submission_unknown_title),
-            resources.getString(R.string.bittensor_submission_unknown_description),
-            hash,
-            canRetry = false
-        )
-    )
-
     val executionFailure = submission.map { state ->
         state.result as? BittensorStakeResultUi.Failure
     }
@@ -288,12 +278,6 @@ class BittensorSubnetReviewViewModel(
     val showExecution = submission.map { it !is BittensorSubmissionState.Ready }
         .shareInBackground()
 
-    fun remainingExecutionTime(): Duration = (
-        (duration.replayCache.lastOrNull() ?: Duration.ZERO) -
-            (SystemClock.elapsedRealtime() - executionStartedAt).milliseconds
-        )
-        .coerceAtLeast(Duration.ZERO)
-
     val executionSubtitle = combine(
         preparationState,
         submission
@@ -361,6 +345,22 @@ class BittensorSubnetReviewViewModel(
             }
         }
     }
+
+    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
+        hash,
+        BittensorStakeResultUi.Failure(
+            resources.getString(R.string.bittensor_submission_unknown_title),
+            resources.getString(R.string.bittensor_submission_unknown_description),
+            hash,
+            canRetry = false
+        )
+    )
+
+    fun remainingExecutionTime(): Duration = (
+        (duration.replayCache.lastOrNull() ?: Duration.ZERO) -
+            (SystemClock.elapsedRealtime() - executionStartedAt).milliseconds
+        )
+        .coerceAtLeast(Duration.ZERO)
 
     fun accountClicked() = launchUnit {
         externalActions.showAddressActions(

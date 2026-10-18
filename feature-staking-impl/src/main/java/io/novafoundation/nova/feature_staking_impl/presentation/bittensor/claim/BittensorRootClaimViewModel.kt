@@ -142,10 +142,6 @@ class BittensorRootClaimViewModel(
         }
         .shareInBackground()
 
-    fun accountClicked() = launchUnit {
-        state.first().dataOrNull?.let { externalActions.showAddressActions(it.chain.addressOf(it.coldkey.value), it.chain) }
-    }
-
     val feeCaption = state.map { state ->
         val symbol = state.dataOrNull?.asset?.token?.configuration?.symbol?.value ?: return@map null
         resources.getString(R.string.bittensor_exit_fee_from_free, symbol)
@@ -247,6 +243,10 @@ class BittensorRootClaimViewModel(
                     ?.let { BittensorFeeEstimate(claimState, it) }
             }
         }
+    }
+
+    fun accountClicked() = launchUnit {
+        state.first().dataOrNull?.let { externalActions.showAddressActions(it.chain.addressOf(it.coldkey.value), it.chain) }
     }
 
     fun confirmClicked() = launchUnit {
