@@ -8,7 +8,6 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector
@@ -163,8 +162,6 @@ interface AccountFeatureApi {
     fun addressDisplayUseCase(): AddressDisplayUseCase
 
     fun accountUseCase(): SelectedAccountUseCase
-
-    fun extrinsicSubmissionRecovery(): ExtrinsicSubmissionRecovery
 
     fun extrinsicService(): ExtrinsicService
 

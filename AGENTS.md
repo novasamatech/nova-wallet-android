@@ -40,6 +40,8 @@ Fee estimation and submission must use the same call builder, including service 
 
 Before extending shared transaction APIs or introducing feature-specific submission tracking, inspect existing transfer, swap, and staking flows. Reuse their established submission and error-handling path. Cross-cutting reliability changes belong in shared infrastructure, not feature-specific signing callbacks or persistent pending locks.
 
+Bittensor uses the standard `submitExtrinsicAndAwaitExecution` path, like on-chain swaps. Do not add a durable submission journal, finalized-block recovery scanner, or wallet-wide pending lock without an explicit requirement. An unknown dispatch outcome must not be presented as success; do not promise automatic outcome recovery when none is implemented.
+
 Implement each validation rule as a separate Validation with one responsibility; keep data loading outside rule logic and let ValidationSystem compose the rules. Reuse existing amount and balance validations. Use the existing Validation/ValidationSystem and ValidationExecutor pipeline for expected transaction validation failures and warnings. Map failures through the established validation UI formatters; do not route them through custom exceptions or separate confirmation-dialog mechanisms. Revalidate time-sensitive data when continuing after a warning.
 
 ## Independent loading on one screen

@@ -32,7 +32,6 @@ import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -227,8 +226,6 @@ interface StakingFeatureDependencies {
     fun gson(): Gson
 
     fun addressxDisplayUseCase(): AddressDisplayUseCase
-
-    fun extrinsicSubmissionRecovery(): ExtrinsicSubmissionRecovery
 
     fun extrinsicService(): ExtrinsicService
 

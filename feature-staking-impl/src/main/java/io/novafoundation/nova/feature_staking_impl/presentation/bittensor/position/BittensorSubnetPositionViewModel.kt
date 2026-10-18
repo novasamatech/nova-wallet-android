@@ -16,8 +16,6 @@ import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
@@ -44,7 +42,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
-import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
@@ -71,7 +68,6 @@ class BittensorSubnetPositionViewModel(
     private val resources: ResourceManager,
     private val tokenFormatter: TokenFormatter,
     private val addressIconGenerator: AddressIconGenerator,
-    recovery: ExtrinsicSubmissionRecovery,
     private val externalActions: ExternalActions.Presentation,
     private val logger: Logger,
     private val fiatFormatter: FiatFormatter,
@@ -107,23 +103,13 @@ class BittensorSubnetPositionViewModel(
     }
         .shareInBackground()
 
-    private val pending = portfolio.flatMapLatest { data ->
-        if (data == null) {
-            kotlinx.coroutines.flow.flowOf(ExtrinsicRecoveryState.None)
-        } else {
-            recovery.observe(data.metaId, ChainGeneses.BITTENSOR)
-        }
-    }
-        .shareInBackground()
-
     val canAct = combine(
         portfolio,
         held,
-        pending,
         metadataState
-    ) { data, held, state, subnetMetadataInteractor ->
+    ) { data, held, subnetMetadataInteractor ->
         data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh &&
-            held.isNotEmpty() && state !is ExtrinsicRecoveryState.Pending && subnetMetadataInteractor.dataOrNull != null
+            held.isNotEmpty() && subnetMetadataInteractor.dataOrNull != null
     }
         .shareInBackground()
 
@@ -345,13 +331,8 @@ class BittensorSubnetPositionViewModel(
     }
         .shareInBackground()
 
-    val positionError = combine(
-        portfolioState,
-        metadataState,
-        pending
-    ) { portfolio, subnetMetadataInteractor, pending ->
+    val positionError = portfolioState.map { portfolio ->
         when {
-            pending is ExtrinsicRecoveryState.Pending -> resources.getString(R.string.bittensor_submission_unknown_description)
             portfolio.dataOrNull?.supportsImmediateOperations == false -> resources.getString(R.string.bittensor_multisig_unavailable)
             portfolio.dataOrNull?.dataStatus is BittensorDataStatus.Stale -> resources.getString(R.string.common_retry_message)
             else -> null

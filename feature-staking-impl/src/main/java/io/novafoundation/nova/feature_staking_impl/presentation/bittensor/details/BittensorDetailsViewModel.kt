@@ -15,9 +15,6 @@ import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
@@ -34,9 +31,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorRecoveryRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorWalletRecovery
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -48,7 +42,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartTextInjectors
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPricePriceTextInjector
-import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
@@ -73,8 +66,6 @@ class BittensorDetailsViewModel(
     private val retryController: BittensorRetryController,
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
     private val fiatFormatter: FiatFormatter,
-    private val recovery: ExtrinsicSubmissionRecovery,
-    private val accountRepository: AccountRepository
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     val retryEvents = retryController.events
@@ -92,26 +83,7 @@ class BittensorDetailsViewModel(
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
         .shareInBackground()
 
-    private val recoveryState = accountRepository.selectedMetaAccountFlow().map { BittensorRecoveryRequest(it.id, ChainGeneses.BITTENSOR) }
-        .distinctUntilChanged().flatMapLatest { (metaId, chainId) ->
-            recovery.observe(metaId, chainId).map { BittensorWalletRecovery(metaId, it) }
-                .onStart { emit(BittensorWalletRecovery(metaId, ExtrinsicRecoveryState.None)) }
-        }
-        .onStart { emit(BittensorWalletRecovery(0L, ExtrinsicRecoveryState.None)) }
-        .shareInBackground()
-
-    val recoveryResult = recoveryState.map { (metaId, state) ->
-        (state as? ExtrinsicRecoveryState.Resolved)
-            ?.result?.takeUnless { it.acknowledged }
-            ?.toUi(resources, metaId)
-    }
-        .shareInBackground()
-
-    fun recoveryResultDismissed(metaId: Long, hash: String) = launchUnit {
-        recovery.acknowledge(metaId, hash)
-    }
-
-    private val portfolioWarning = portfolioState.map { state ->
+    val warning = portfolioState.map { state ->
         val portfolio = state.dataOrNull
         when {
             portfolio == null || portfolio.dataStatus is BittensorDataStatus.Loading -> null
@@ -125,21 +97,9 @@ class BittensorDetailsViewModel(
     val totalStake = portfolio.map { data -> formatAmount(data.positions?.totalStake, data) }
         .shareInBackground()
 
-    val warning = combine(
-        portfolioWarning,
-        recoveryState
-    ) { warning, recovery ->
-        if (recovery.state is ExtrinsicRecoveryState.Pending) resources.getString(R.string.bittensor_submission_unknown_description) else warning
-    }
-        .shareInBackground()
-
-    val canAddStake = combine(
-        portfolioState,
-        recoveryState
-    ) { portfolio, recovery ->
+    val canAddStake = portfolioState.map { portfolio ->
         val data = portfolio.dataOrNull
-        data?.supportsImmediateOperations == true && data.metaId == recovery.metaId &&
-            data.dataStatus is BittensorDataStatus.Fresh && recovery.state !is ExtrinsicRecoveryState.Pending
+        data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh
     }
         .onStart { emit(false) }
         .shareInBackground()

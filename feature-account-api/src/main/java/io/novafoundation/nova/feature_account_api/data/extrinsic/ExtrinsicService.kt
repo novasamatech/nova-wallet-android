@@ -47,8 +47,6 @@ interface ExtrinsicService {
     class SubmissionOptions(
         val feePaymentCurrency: FeePaymentCurrency = FeePaymentCurrency.Native,
         val batchMode: BatchMode = DEFAULT_BATCH_MODE,
-        /** Journal a mortal, immediately executable transaction before broadcasting. */
-        val recoverable: Boolean = false,
     )
 
     class FeePaymentConfig(

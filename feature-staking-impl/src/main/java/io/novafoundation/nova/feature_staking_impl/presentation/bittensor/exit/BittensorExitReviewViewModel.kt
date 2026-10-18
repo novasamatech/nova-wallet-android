@@ -19,8 +19,6 @@ import io.novafoundation.nova.common.utils.lazyAsync
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
@@ -42,7 +40,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -58,26 +55,22 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigInteger
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 
 private sealed interface ExitExecution {
     data object Idle : ExitExecution
-    data class Running(val startedAt: Long) : ExitExecution
-    data class Success(val hash: String, val at: Long) : ExitExecution
-    data class Failure(val model: BittensorStakeResultUi.Failure, val hash: String? = null) : ExitExecution
-    data class Recovered(val model: BittensorStakeResultUi.Recovered) : ExitExecution
+    data class Running(val startedAt: Long, val estimatedDuration: Duration) : ExitExecution
+    data class Success(val at: Long) : ExitExecution
+    data class Failure(val model: BittensorStakeResultUi.Failure) : ExitExecution
 }
 
 class BittensorExitReviewViewModel(
@@ -89,14 +82,12 @@ class BittensorExitReviewViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val tokenFormatter: TokenFormatter,
     private val fiatFormatter: FiatFormatter,
-    private val recovery: ExtrinsicSubmissionRecovery,
     chainRegistry: ChainRegistry,
     walletUiUseCase: WalletUiUseCase,
     accountRepository: AccountRepository,
-    chainStateRepository: ChainStateRepository,
+    private val chainStateRepository: ChainStateRepository,
     private val externalActions: ExternalActions.Presentation,
     estimatesRepository: BittensorEstimatesRepository,
-    private val logger: Logger,
     private val retryController: BittensorRetryController,
     private val validationExecutor: ValidationExecutor,
     private val exitValidationSystem: BittensorExitValidationSystem,
@@ -188,44 +179,6 @@ class BittensorExitReviewViewModel(
             }
         }
     }
-
-    private val estimatedDuration = flowOf { chainStateRepository.expectedBlockTime(ChainGeneses.BITTENSOR) }
-        .catch { cause ->
-            logger.log("[BittensorExit] Execution duration unavailable")
-            logger.log(cause)
-        }
-        .shareInBackground()
-
-    private var recoveringHash: String? = null
-
-    private val pending = recovery.observe(payload.position.metaId, ChainGeneses.BITTENSOR).onEach { state ->
-        if (execution.value !is ExitExecution.Running) {
-            when (state) {
-                is ExtrinsicRecoveryState.Pending -> {
-                    recoveringHash = state.hash
-                    execution.value = ExitExecution.Failure(
-                        BittensorStakeResultUi.Failure(
-                            resources.getString(R.string.bittensor_submission_unknown_title),
-                            resources.getString(R.string.bittensor_submission_unknown_description),
-                            state.hash,
-                            canRetry = false
-                        )
-                    )
-                }
-                is ExtrinsicRecoveryState.Resolved -> {
-                    val shown = (execution.value as? ExitExecution.Failure)
-                        ?.model?.error
-                    if (recoveringHash == state.result.hash || shown == state.result.hash) {
-                        execution.value = ExitExecution.Recovered(state.result.toUi(resources, payload.position.metaId))
-                        recoveringHash = null
-                        sheetDismissed.value = false
-                    }
-                }
-                ExtrinsicRecoveryState.None -> Unit
-            }
-        }
-    }
-        .shareInBackground()
 
     val position = prepared.map { it.dataOrNull?.position }
         .shareInBackground()
@@ -381,28 +334,23 @@ class BittensorExitReviewViewModel(
     }
         .shareInBackground()
 
-    fun remainingExecutionTime(): Duration? {
-        val duration = estimatedDuration.replayCache.lastOrNull() ?: return null
-        val started = (execution.value as? ExitExecution.Running)
-            ?.startedAt ?: return null
-        return (
-            duration - (SystemClock.elapsedRealtime() - started).milliseconds
-            )
-            .coerceAtLeast(Duration.ZERO)
+    fun remainingExecutionTime(): Duration {
+        val running = execution.value as? ExitExecution.Running ?: return Duration.ZERO
+        val elapsed = (SystemClock.elapsedRealtime() - running.startedAt).milliseconds
+        return (running.estimatedDuration - elapsed).coerceAtLeast(Duration.ZERO)
     }
 
     val confirmButtonState = combine(
         prepared,
-        pending,
         execution,
         validating
-    ) { prepared, pending, state, validating ->
+    ) { prepared, state, validating ->
         val label = resources.getString(R.string.common_confirm)
-        val blocked = state is ExitExecution.Running || state is ExitExecution.Success || state is ExitExecution.Recovered && state.model.successful ||
+        val blocked = state is ExitExecution.Running || state is ExitExecution.Success ||
             state is ExitExecution.Failure && !state.model.canRetry
         if (validating) {
             DescriptiveButtonState.Loading
-        } else if (prepared.dataOrNull == null || blocked || pending is ExtrinsicRecoveryState.Pending) {
+        } else if (prepared.dataOrNull == null || blocked) {
             DescriptiveButtonState.Disabled(label)
         } else {
             DescriptiveButtonState.Enabled(label)
@@ -418,7 +366,6 @@ class BittensorExitReviewViewModel(
         if (dismissed) return@combine null
         when (state) {
             is ExitExecution.Failure -> state.model
-            is ExitExecution.Recovered -> state.model
             is ExitExecution.Running -> if (isRoot) {
                 BittensorStakeResultUi.Progress(
                     resources.getString(R.string.bittensor_exit_unstaking_progress),
@@ -450,6 +397,7 @@ class BittensorExitReviewViewModel(
             if (confirmButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
             val draft = prepared.first().dataOrNull ?: return@launchUnit
             validating.value = true
+            val estimatedDuration = chainStateRepository.expectedBlockTime(ChainGeneses.BITTENSOR)
             val validationPayload = bittensorExitInteractor.validationPayload(
                 draft.position,
                 draft.quote,
@@ -461,7 +409,7 @@ class BittensorExitReviewViewModel(
                 payload = validationPayload,
                 validationFailureTransformer = { resources.getString(R.string.common_error_general_title) to it.message(resources) }
             ) {
-                execution.value = ExitExecution.Running(SystemClock.elapsedRealtime())
+                execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
                 launchUnit { submit(draft) }
             }
         } catch (e: CancellationException) {
@@ -475,18 +423,16 @@ class BittensorExitReviewViewModel(
     }
 
     private suspend fun submit(draft: BittensorExitDraft) {
-        execution.value = ExitExecution.Running(SystemClock.elapsedRealtime())
         sheetDismissed.value = false
         try {
             when (val result = bittensorExitInteractor.execute(draft)) {
-                is BittensorOperationResult.Success -> execution.value = ExitExecution.Success(result.transactionHash, System.currentTimeMillis())
+                is BittensorOperationResult.Success -> execution.value = ExitExecution.Success(System.currentTimeMillis())
                 is BittensorOperationResult.Failure -> execution.value = ExitExecution.Failure(
                     BittensorStakeResultUi.Failure(
                         resources.getString(R.string.common_failed),
                         resources.getString(R.string.bittensor_staking_failed_description),
                         result.cause.message ?: resources.getString(R.string.common_retry_message)
-                    ),
-                    result.transactionHash
+                    )
                 )
                 is BittensorOperationResult.Unknown -> execution.value = ExitExecution.Failure(
                     BittensorStakeResultUi.Failure(
@@ -523,25 +469,13 @@ class BittensorExitReviewViewModel(
 
     fun resultDismissed() {
         sheetDismissed.value = true
-        launchUnit { acknowledgeResult() }
     }
 
     fun doneClicked() = launchUnit {
-        acknowledgeResult()
         router.openBittensorPortfolio()
     }
 
     fun back() {
         if (execution.value !is ExitExecution.Running) router.back()
-    }
-
-    private suspend fun acknowledgeResult() {
-        val hash = when (val state = execution.value) {
-            is ExitExecution.Success -> state.hash
-            is ExitExecution.Recovered -> state.model.transactionHash
-            is ExitExecution.Failure -> state.hash
-            else -> null
-        }
-        hash?.let { recovery.acknowledge(payload.position.metaId, it) }
     }
 }

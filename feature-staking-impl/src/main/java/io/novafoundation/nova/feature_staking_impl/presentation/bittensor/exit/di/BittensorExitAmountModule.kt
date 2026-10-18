@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
@@ -40,7 +39,6 @@ class BittensorExitAmountModule {
         addressIconGenerator: AddressIconGenerator,
         tokenFormatter: TokenFormatter,
         fiatFormatter: FiatFormatter,
-        recovery: ExtrinsicSubmissionRecovery,
         externalActions: ExternalActions.Presentation,
         estimatesRepository: BittensorEstimatesRepository,
         retryController: BittensorRetryController,
@@ -58,7 +56,6 @@ class BittensorExitAmountModule {
             addressIconGenerator,
             tokenFormatter,
             fiatFormatter,
-            recovery,
             externalActions,
             estimatesRepository,
             retryController,

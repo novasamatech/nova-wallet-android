@@ -13,8 +13,6 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -31,7 +29,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -48,16 +45,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
 
 private sealed interface ClaimExecution {
     data object Idle : ClaimExecution
     data object Running : ClaimExecution
-    data class Result(val metaId: Long, val hash: String?, val model: BittensorStakeResultUi) : ClaimExecution
+    data class Result(val model: BittensorStakeResultUi) : ClaimExecution
 }
 
 class BittensorRootClaimViewModel(
@@ -67,7 +62,6 @@ class BittensorRootClaimViewModel(
     private val resources: ResourceManager,
     private val tokenFormatter: TokenFormatter,
     private val addressIconGenerator: AddressIconGenerator,
-    private val recovery: ExtrinsicSubmissionRecovery,
     private val externalActions: ExternalActions.Presentation,
     private val logger: Logger,
     private val walletUiUseCase: WalletUiUseCase,
@@ -122,25 +116,8 @@ class BittensorRootClaimViewModel(
     }
         .shareInBackground()
 
-    private val pending = state.flatMapLatest { state ->
-        state.dataOrNull?.let { recovery.observe(it.metaId, it.chain.id) } ?: kotlinx.coroutines.flow.flowOf(ExtrinsicRecoveryState.None)
-    }
-        .onEach { pending ->
-            val current = execution.value as? ClaimExecution.Result
-            if (pending !is ExtrinsicRecoveryState.Resolved || current?.hash != pending.result.hash) return@onEach
-            if (current.model !is BittensorStakeResultUi.Failure || current.model.canRetry) return@onEach
-
-            execution.value = current.copy(model = pending.result.toUi(resources, current.metaId))
-        }
-        .shareInBackground()
-
-    val warning = combine(
-        state,
-        prepared,
-        pending
-    ) { state, prepared, pending ->
+    val warning = state.map { state ->
         when {
-            pending is ExtrinsicRecoveryState.Pending -> resources.getString(R.string.bittensor_submission_unknown_description)
             state.dataOrNull?.claims?.claimable?.isEmpty() == true -> resources.getString(R.string.bittensor_claim_none)
             else -> null
         }
@@ -222,18 +199,17 @@ class BittensorRootClaimViewModel(
 
     val confirmButtonState = combine(
         prepared,
-        pending,
         execution,
         validating
-    ) { prepared, pending, execution, validating ->
+    ) { prepared, execution, validating ->
         val label = resources.getString(R.string.bittensor_claim_action)
         val result = (execution as? ClaimExecution.Result)
             ?.model
         val blocked = execution is ClaimExecution.Running || result is BittensorStakeResultUi.Success ||
-            result is BittensorStakeResultUi.Recovered && result.successful || result is BittensorStakeResultUi.Failure && !result.canRetry
+            result is BittensorStakeResultUi.Failure && !result.canRetry
         if (validating) {
             DescriptiveButtonState.Loading
-        } else if (prepared.dataOrNull == null || blocked || pending is ExtrinsicRecoveryState.Pending) {
+        } else if (prepared.dataOrNull == null || blocked) {
             DescriptiveButtonState.Disabled(label)
         } else {
             DescriptiveButtonState.Enabled(label)
@@ -261,7 +237,6 @@ class BittensorRootClaimViewModel(
         .shareInBackground()
 
     init {
-        pending.launchIn(this)
         feeLoaderMixin.connectWith(claimState) { _, state ->
             state?.let { claimState ->
                 bittensorRootClaimInteractor.estimateFee(claimState)
@@ -301,8 +276,6 @@ class BittensorRootClaimViewModel(
         try {
             execution.value = when (val result = bittensorRootClaimInteractor.execute(draft)) {
                 is BittensorOperationResult.Success -> ClaimExecution.Result(
-                    draft.state.metaId,
-                    result.transactionHash,
                     BittensorStakeResultUi.Success(
                         resources.getString(R.string.bittensor_claim_completed),
                         resources.getString(R.string.bittensor_claim_completed_description),
@@ -310,10 +283,8 @@ class BittensorRootClaimViewModel(
                         BittensorFeeUi("≈ " + tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol), "—")
                     )
                 )
-                is BittensorOperationResult.Failure -> ClaimExecution.Result(draft.state.metaId, result.transactionHash, failure(result.cause.message))
+                is BittensorOperationResult.Failure -> ClaimExecution.Result(failure(result.cause.message))
                 is BittensorOperationResult.Unknown -> ClaimExecution.Result(
-                    draft.state.metaId,
-                    result.transactionHash,
                     BittensorStakeResultUi.Failure(
                         resources.getString(R.string.bittensor_submission_unknown_title),
                         resources.getString(R.string.bittensor_submission_unknown_description),
@@ -325,7 +296,7 @@ class BittensorRootClaimViewModel(
         } catch (e: CancellationException) { throw e } catch (e: Exception) {
             logger.log("[BittensorClaim] Claim failed")
             logger.log(e)
-            execution.value = ClaimExecution.Result(draft.state.metaId, null, failure(e.message))
+            execution.value = ClaimExecution.Result(failure(e.message))
         }
     }
 
@@ -335,18 +306,12 @@ class BittensorRootClaimViewModel(
         message ?: resources.getString(R.string.common_retry_message)
     )
 
-    fun resultDismissed() = launchUnit {
-        acknowledgeResult()
-    }
-
-    private suspend fun acknowledgeResult() {
+    fun resultDismissed() {
         dismissed.value = true
-        val result = execution.value as? ClaimExecution.Result ?: return
-        result.hash?.let { recovery.acknowledge(result.metaId, it) }
     }
 
-    fun done() = launchUnit {
-        acknowledgeResult()
+    fun done() {
+        resultDismissed()
         router.openBittensorPortfolio()
     }
 

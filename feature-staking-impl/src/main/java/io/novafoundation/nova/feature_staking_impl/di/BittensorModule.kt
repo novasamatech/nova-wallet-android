@@ -9,7 +9,6 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.BuildConfig
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigApi
@@ -350,8 +349,8 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService, recovery: ExtrinsicSubmissionRecovery) =
-        BittensorSubmissionExecutor(extrinsics, recovery)
+    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService) =
+        BittensorSubmissionExecutor(extrinsics)
 
     @Provides
     fun provideBittensorRootClaimSource(

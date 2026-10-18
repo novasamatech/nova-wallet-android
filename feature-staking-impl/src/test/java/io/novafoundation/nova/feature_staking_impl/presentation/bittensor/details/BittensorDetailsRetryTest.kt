@@ -3,8 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -28,7 +26,6 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
-import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
@@ -61,8 +58,6 @@ import org.mockito.Mockito.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorDetailsRetryTest {
-
-    private val recovery = mock(ExtrinsicSubmissionRecovery::class.java)
 
     private val accountRepository = mock(AccountRepository::class.java)
 
@@ -143,7 +138,6 @@ class BittensorDetailsRetryTest {
     fun prepare(): Unit = runBlocking {
         `when`(metaAccount.id).thenReturn(1L)
         `when`(accountRepository.selectedMetaAccountFlow()).thenReturn(flowOf(metaAccount))
-        `when`(recovery.observe(1L, ChainGeneses.BITTENSOR)).thenReturn(flowOf(ExtrinsicRecoveryState.None))
         Dispatchers.setMain(UnconfinedTestDispatcher())
         `when`(resources.getString(anyInt())).thenReturn("Message")
         `when`(asset.token).thenReturn(token)
@@ -245,9 +239,7 @@ class BittensorDetailsRetryTest {
             bittensorPriceChartInteractor = priceChartInteractor,
             retryController = retryController,
             chartAxisFormatterFactory = axisFormatterFactory,
-            fiatFormatter = fiatFormatter,
-            recovery = recovery,
-            accountRepository = accountRepository
+            fiatFormatter = fiatFormatter
         )
     }
 }

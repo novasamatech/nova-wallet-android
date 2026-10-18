@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -56,7 +55,6 @@ class BittensorSubnetReviewModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         estimatesRepository: BittensorEstimatesRepository,
         tokenFormatter: TokenFormatter,
-        recovery: ExtrinsicSubmissionRecovery,
         chainStateRepository: ChainStateRepository
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
@@ -81,7 +79,6 @@ class BittensorSubnetReviewModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             estimatesRepository = estimatesRepository,
             tokenFormatter = tokenFormatter,
-            recovery = recovery,
             chainStateRepository = chainStateRepository
         )
     }

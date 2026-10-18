@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -29,7 +28,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.repository.ChainStateRepository
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 @Module(includes = [ViewModelModule::class])
 class BittensorExitReviewModule {
@@ -45,14 +43,12 @@ class BittensorExitReviewModule {
         addressIconGenerator: AddressIconGenerator,
         tokenFormatter: TokenFormatter,
         fiatFormatter: FiatFormatter,
-        recovery: ExtrinsicSubmissionRecovery,
         chainRegistry: ChainRegistry,
         walletUiUseCase: WalletUiUseCase,
         accountRepository: AccountRepository,
         chainStateRepository: ChainStateRepository,
         externalActions: ExternalActions.Presentation,
         estimatesRepository: BittensorEstimatesRepository,
-        logger: Logger,
         retryController: BittensorRetryController,
         validationExecutor: ValidationExecutor,
         exitValidationSystem: BittensorExitValidationSystem,
@@ -68,14 +64,12 @@ class BittensorExitReviewModule {
             addressIconGenerator,
             tokenFormatter,
             fiatFormatter,
-            recovery,
             chainRegistry,
             walletUiUseCase,
             accountRepository,
             chainStateRepository,
             externalActions,
             estimatesRepository,
-            logger,
             retryController,
             validationExecutor,
             exitValidationSystem,

@@ -2946,13 +2946,8 @@
     <string name="bittensor_subnet_execution_buying">Buying %1$s %2$s with TAO</string>
     <string name="bittensor_subnet_execution_operation">1 of 1 operation</string>
     <string name="bittensor_position_details">Position details</string>
-    <string name="bittensor_recovery_success_title">Transaction confirmed</string>
-    <string name="bittensor_recovery_success_description">Your previous transaction was confirmed in a finalized block. You can start another operation.</string>
-    <string name="bittensor_recovery_failure_description">Your previous transaction failed in a finalized block. A network fee may have been charged. You can start another operation.</string>
-    <string name="bittensor_recovery_expired_title">Transaction expired</string>
-    <string name="bittensor_recovery_expired_description">Your previous transaction expired without inclusion in the finalized chain. You can start another operation.</string>
     <string name="bittensor_submission_unknown_title">Transaction status unknown</string>
-    <string name="bittensor_submission_unknown_description">The transaction may have been included. Another staking transaction is blocked until the original outcome is verified.</string>
+    <string name="bittensor_submission_unknown_description">The transaction may have been included, but its result could not be verified. Check your positions and transaction history before starting another operation.</string>
     <string name="bittensor_exit_position_changed">The full position amount has changed. Review the withdrawal again.</string>
     <string name="bittensor_exit_below_minimum">Amount is below the minimum withdrawal.</string>
     <string name="bittensor_exit_remainder_below_minimum">The remaining stake would be below the chain minimum. Choose Max to exit the full position.</string>

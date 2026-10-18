@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.di
 
-import android.content.SharedPreferences
 import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
@@ -34,7 +33,6 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.multisig.MultisigDetailsRepository
@@ -86,10 +84,6 @@ import io.novafoundation.nova.feature_account_impl.data.events.RealMetaAccountCh
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicService
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicServiceFactory
 import io.novafoundation.nova.feature_account_impl.data.extrinsic.RealExtrinsicSplitter
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.ExtrinsicRecoverySource
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.ExtrinsicSubmissionJournal
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.RealExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.RpcExtrinsicRecoverySource
 import io.novafoundation.nova.feature_account_impl.data.fee.capability.RealCustomCustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_impl.data.mappers.AccountMappers
 import io.novafoundation.nova.feature_account_impl.data.multisig.MultisigRepository
@@ -186,7 +180,6 @@ import io.novasama.substrate_sdk_android.encrypt.MultiChainEncryption
 import io.novasama.substrate_sdk_android.encrypt.json.JsonDecoder
 import io.novasama.substrate_sdk_android.encrypt.json.JsonEncoder
 import io.novasama.substrate_sdk_android.encrypt.junction.BIP32JunctionDecoder
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 @Module(
@@ -234,22 +227,6 @@ class AccountFeatureModule {
 
     @Provides
     @FeatureScope
-    fun provideSubmissionJournal(preferences: SharedPreferences, gson: Gson) = ExtrinsicSubmissionJournal(preferences, gson)
-
-    @Provides
-    @FeatureScope
-    fun provideRecoverySource(rpc: RpcCalls, events: EventsRepository): ExtrinsicRecoverySource = RpcExtrinsicRecoverySource(rpc, events)
-
-    @Provides
-    @FeatureScope
-    fun provideSubmissionRecovery(journal: ExtrinsicSubmissionJournal, source: ExtrinsicRecoverySource, logger: Logger) =
-        RealExtrinsicSubmissionRecovery(journal, source, logger)
-
-    @Provides
-    fun provideSubmissionRecoveryApi(recovery: RealExtrinsicSubmissionRecovery): ExtrinsicSubmissionRecovery = recovery
-
-    @Provides
-    @FeatureScope
     fun provideMetaAccountsUpdatesRegistry(
         preferences: Preferences
     ): MetaAccountsUpdatesRegistry = RealMetaAccountsUpdatesRegistry(preferences)
@@ -275,7 +252,6 @@ class AccountFeatureModule {
         feePaymentProviderRegistry: FeePaymentProviderRegistry,
         eventsRepository: EventsRepository,
         signingContextFactory: SigningContext.Factory,
-        submissionRecovery: RealExtrinsicSubmissionRecovery
     ): ExtrinsicService.Factory = RealExtrinsicServiceFactory(
         rpcCalls,
         chainRegistry,
@@ -286,7 +262,6 @@ class AccountFeatureModule {
         eventsRepository,
         feePaymentProviderRegistry,
         signingContextFactory,
-        submissionRecovery
     )
 
     @Provides
@@ -301,7 +276,6 @@ class AccountFeatureModule {
         feePaymentProviderRegistry: FeePaymentProviderRegistry,
         eventsRepository: EventsRepository,
         signingContextFactory: SigningContext.Factory,
-        submissionRecovery: RealExtrinsicSubmissionRecovery
     ): ExtrinsicService = RealExtrinsicService(
         rpcCalls,
         chainRegistry,
@@ -312,7 +286,6 @@ class AccountFeatureModule {
         feePaymentProviderRegistry,
         eventsRepository,
         signingContextFactory,
-        submissionRecovery = submissionRecovery,
         coroutineScope = null
     )
 

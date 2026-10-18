@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
@@ -47,9 +46,7 @@ class BittensorDetailsModule {
         bittensorPriceChartInteractor: BittensorPriceChartInteractor,
         retryController: BittensorRetryController,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
-        fiatFormatter: FiatFormatter,
-        recovery: ExtrinsicSubmissionRecovery,
-        accountRepository: AccountRepository
+        fiatFormatter: FiatFormatter
     ): ViewModel = BittensorDetailsViewModel(
         bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
@@ -60,9 +57,7 @@ class BittensorDetailsModule {
         bittensorPriceChartInteractor = bittensorPriceChartInteractor,
         retryController = retryController,
         chartAxisFormatterFactory = chartAxisFormatterFactory,
-        fiatFormatter = fiatFormatter,
-        recovery = recovery,
-        accountRepository = accountRepository
+        fiatFormatter = fiatFormatter
     )
 
     @Provides
@@ -78,7 +73,6 @@ class BittensorDetailsModule {
         amountFormatter: BittensorAmountFormatter,
         retryController: BittensorRetryController,
         rootClaimInteractor: BittensorRootClaimInteractor,
-        recovery: ExtrinsicSubmissionRecovery,
         accountRepository: AccountRepository
     ): ViewModel = BittensorRootDetailsViewModel(
         interactor,
@@ -90,7 +84,6 @@ class BittensorDetailsModule {
         amountFormatter,
         retryController,
         rootClaimInteractor = rootClaimInteractor,
-        recovery = recovery,
         accountRepository = accountRepository
     )
 

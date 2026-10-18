@@ -20,8 +20,6 @@ import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -50,7 +48,6 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.conne
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountInputModel
 import io.novafoundation.nova.feature_wallet_api.presentation.model.ChooseAmountModel
-import io.novafoundation.nova.runtime.ext.ChainGeneses
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
@@ -77,7 +74,6 @@ class BittensorExitAmountViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val tokenFormatter: TokenFormatter,
     private val fiatFormatter: FiatFormatter,
-    recovery: ExtrinsicSubmissionRecovery,
     private val externalActions: ExternalActions.Presentation,
     estimatesRepository: BittensorEstimatesRepository,
     private val retryController: BittensorRetryController,
@@ -179,9 +175,6 @@ class BittensorExitAmountViewModel(
             }
         }
     }
-
-    private val pending = recovery.observe(payload.metaId, ChainGeneses.BITTENSOR)
-        .shareInBackground()
 
     val title = position.map {
         if (isRoot) {
@@ -305,13 +298,12 @@ class BittensorExitAmountViewModel(
     val continueButtonState = combine(
         positionState,
         prepared,
-        pending,
         validating
-    ) { position, prepared, pending, validating ->
+    ) { position, prepared, validating ->
         val label = resources.getString(R.string.common_continue)
         when {
             validating || position.isLoading() || prepared.isLoading() -> DescriptiveButtonState.Loading
-            prepared.dataOrNull == null || pending is ExtrinsicRecoveryState.Pending -> DescriptiveButtonState.Disabled(label)
+            prepared.dataOrNull == null -> DescriptiveButtonState.Disabled(label)
             else -> DescriptiveButtonState.Enabled(label)
         }
     }

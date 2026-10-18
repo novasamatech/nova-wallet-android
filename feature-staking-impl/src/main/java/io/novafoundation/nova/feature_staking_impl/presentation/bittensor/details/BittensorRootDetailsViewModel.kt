@@ -16,8 +16,6 @@ import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
@@ -31,20 +29,15 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorRecoveryRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorWalletRecovery
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
-import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -64,7 +57,6 @@ class BittensorRootDetailsViewModel(
     private val amountFormatter: BittensorAmountFormatter,
     private val retryController: BittensorRetryController,
     private val rootClaimInteractor: BittensorRootClaimInteractor,
-    private val recovery: ExtrinsicSubmissionRecovery,
     private val accountRepository: AccountRepository
 ) : BaseViewModel(), ExternalActions by externalActions {
 
@@ -82,25 +74,6 @@ class BittensorRootDetailsViewModel(
 
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
         .shareInBackground()
-
-    private val recoveryState = accountRepository.selectedMetaAccountFlow().map { BittensorRecoveryRequest(it.id, ChainGeneses.BITTENSOR) }
-        .distinctUntilChanged().flatMapLatest { (metaId, chainId) ->
-            recovery.observe(metaId, chainId).map { BittensorWalletRecovery(metaId, it) }
-                .onStart { emit(BittensorWalletRecovery(metaId, ExtrinsicRecoveryState.None)) }
-        }
-        .onStart { emit(BittensorWalletRecovery(0L, ExtrinsicRecoveryState.None)) }
-        .shareInBackground()
-
-    val recoveryResult = recoveryState.map { (metaId, state) ->
-        (state as? ExtrinsicRecoveryState.Resolved)
-            ?.result?.takeUnless { it.acknowledged }
-            ?.toUi(resources, metaId)
-    }
-        .shareInBackground()
-
-    fun recoveryResultDismissed(metaId: Long, hash: String) = launchUnit {
-        recovery.acknowledge(metaId, hash)
-    }
 
     private val claimState = retryController.observe(
         step = "claimable root rewards",
@@ -149,12 +122,8 @@ class BittensorRootDetailsViewModel(
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
-    val canClaim = combine(
-        claimState,
-        recoveryState
-    ) { state, recovery ->
-        state.dataOrNull?.let { it.supportsImmediateOperations && it.metaId == recovery.metaId && it.claims.claimable.isNotEmpty() } == true &&
-            recovery.state !is ExtrinsicRecoveryState.Pending
+    val canClaim = claimState.map { state ->
+        state.dataOrNull?.let { it.supportsImmediateOperations && it.claims.claimable.isNotEmpty() } == true
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
@@ -201,13 +170,9 @@ class BittensorRootDetailsViewModel(
         )
     }
 
-    val canAddStake = combine(
-        portfolioState,
-        recoveryState
-    ) { portfolio, recovery ->
+    val canAddStake = portfolioState.map { portfolio ->
         val data = portfolio.dataOrNull
-        data?.supportsImmediateOperations == true && data.metaId == recovery.metaId &&
-            data.dataStatus is BittensorDataStatus.Fresh && recovery.state !is ExtrinsicRecoveryState.Pending
+        data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh
     }
         .shareInBackground()
 

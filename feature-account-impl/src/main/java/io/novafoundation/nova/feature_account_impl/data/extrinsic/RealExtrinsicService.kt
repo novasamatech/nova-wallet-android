@@ -41,7 +41,6 @@ import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.RealExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.withSequenceSigning
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -76,24 +75,8 @@ class RealExtrinsicService(
     private val feePaymentProviderRegistry: FeePaymentProviderRegistry,
     private val eventsRepository: EventsRepository,
     private val signingContextFactory: SigningContext.Factory,
-    private val submissionRecovery: RealExtrinsicSubmissionRecovery,
     private val coroutineScope: CoroutineScope? // TODO: Make it non-nullable
 ) : ExtrinsicService {
-
-    private suspend fun recordRecoverableSubmission(
-        chain: Chain,
-        origin: TransactionOrigin,
-        options: SubmissionOptions,
-        extrinsic: SendableExtrinsic
-    ) {
-        if (!options.recoverable) return
-        val metaId = when (origin) {
-            is TransactionOrigin.WalletWithId -> origin.metaId
-            is TransactionOrigin.Wallet -> origin.metaAccount.id
-            else -> error("Recoverable submissions require an explicit wallet")
-        }
-        submissionRecovery.recordSigned(metaId, chain.id, extrinsic)
-    }
 
     override suspend fun submitExtrinsic(
         chain: Chain,
@@ -102,7 +85,6 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<ExtrinsicSubmission> = runCatching {
         val (extrinsic, submissionOrigin, _, callExecutionType, signingHierarchy) = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
-        recordRecoverableSubmission(chain, origin, submissionOptions, extrinsic)
         val hash = rpcCalls.submitExtrinsic(chain.id, extrinsic)
 
         ExtrinsicSubmission(hash, submissionOrigin, callExecutionType, signingHierarchy)
@@ -114,7 +96,6 @@ class RealExtrinsicService(
         submissionOptions: SubmissionOptions,
         formExtrinsic: FormMultiExtrinsicWithOrigin
     ): RetriableMultiResult<ExtrinsicWatchResult<ExtrinsicStatus.InBlock>> {
-        require(!submissionOptions.recoverable) { "Recoverable submissions support a single extrinsic" }
         return runMultiCatching(
             intermediateListLoading = {
                 val submission = constructSplitExtrinsics(chain, origin, formExtrinsic, submissionOptions, SigningMode.SUBMISSION)
@@ -138,7 +119,6 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> = runCatching {
         val singleSubmission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
-        recordRecoverableSubmission(chain, origin, submissionOptions, singleSubmission.extrinsic)
 
         rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic).map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }
             .takeWhileInclusive { !it.status.terminal }

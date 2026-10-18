@@ -40,8 +40,6 @@ class ExecutionTimerView @JvmOverloads constructor(
 
         object Error : State
 
-        object Waiting : State
-
         class CountdownTimer(val duration: Duration) : State
     }
 
@@ -74,15 +72,6 @@ class ExecutionTimerView @JvmOverloads constructor(
                 hideTimerWithAnimation()
                 binder.executionResult.setImageResource(R.drawable.ic_execution_result_error)
                 binder.executionResult.fadeInWithScale()
-            }
-
-            State.Waiting -> {
-                binder.executionResult.makeGone()
-                binder.executionTimeSwitcher.makeGone()
-                binder.executionTimeSeconds.makeGone()
-                binder.executionProgress.makeVisible()
-                binder.executionProgress.alpha = 1f
-                binder.executionProgress.runInfinityRotationAnimation()
             }
 
             is State.CountdownTimer -> {

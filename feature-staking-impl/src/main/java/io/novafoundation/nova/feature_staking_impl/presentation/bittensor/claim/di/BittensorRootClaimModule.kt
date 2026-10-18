@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationSystem
@@ -36,7 +35,6 @@ class BittensorRootClaimModule {
         resources: ResourceManager,
         tokenFormatter: TokenFormatter,
         addressIconGenerator: AddressIconGenerator,
-        recovery: ExtrinsicSubmissionRecovery,
         externalActions: ExternalActions.Presentation,
         logger: Logger,
         walletUiUseCase: WalletUiUseCase,
@@ -52,7 +50,6 @@ class BittensorRootClaimModule {
             resources,
             tokenFormatter,
             addressIconGenerator,
-            recovery,
             externalActions,
             logger,
             walletUiUseCase,

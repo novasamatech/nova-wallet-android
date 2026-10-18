@@ -120,7 +120,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         viewModel.isExecuting.observe { running ->
             if (running && !viewModel.isRoot) {
                 val remaining = viewModel.remainingExecutionTime()
-                execution.timer.setState(remaining?.let(ExecutionTimerView.State::CountdownTimer) ?: ExecutionTimerView.State.Waiting)
+                execution.timer.setState(ExecutionTimerView.State.CountdownTimer(remaining))
                 execution.title.setText(R.string.common_do_not_close_app)
             }
         }

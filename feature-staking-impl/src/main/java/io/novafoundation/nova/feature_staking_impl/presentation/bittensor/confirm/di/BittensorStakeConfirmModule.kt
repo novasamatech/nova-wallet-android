@@ -11,7 +11,6 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -50,7 +49,6 @@ class BittensorStakeConfirmModule {
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-        recovery: ExtrinsicSubmissionRecovery
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
             payload = payload,
@@ -69,7 +67,6 @@ class BittensorStakeConfirmModule {
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            recovery = recovery
         )
     }
 

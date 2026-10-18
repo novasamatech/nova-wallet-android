@@ -45,8 +45,8 @@ class BittensorStakeResultBottomSheet(
         val inProgress = state is BittensorStakeResultUi.Progress
 
         binder.bittensorStakeResultProgress.setVisible(inProgress)
-        binder.bittensorStakeResultSuccess.setVisible(state is BittensorStakeResultUi.Success || state is BittensorStakeResultUi.Recovered && state.successful)
-        binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure || state is BittensorStakeResultUi.Recovered && !state.successful)
+        binder.bittensorStakeResultSuccess.setVisible(state is BittensorStakeResultUi.Success)
+        binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure)
         binder.bittensorStakeResultValidator.isVisible = state is BittensorStakeResultUi.Success
         binder.bittensorStakeResultFee.isVisible = state is BittensorStakeResultUi.Success
         (binder.bittensorStakeResultFee.parent as View).isVisible = state is BittensorStakeResultUi.Success
@@ -64,21 +64,6 @@ class BittensorStakeResultBottomSheet(
             is BittensorStakeResultUi.Progress -> showProgress(state)
             is BittensorStakeResultUi.Success -> showSuccess(state)
             is BittensorStakeResultUi.Failure -> showFailure(state)
-            is BittensorStakeResultUi.Recovered -> {
-                if (state.successful) {
-                    binder.bittensorStakeResultSuccessTitle.text = state.title
-                    binder.bittensorStakeResultSuccessDescription.text = state.description
-                } else {
-                    showFailure(
-                        BittensorStakeResultUi.Failure(
-                            state.title,
-                            state.description,
-                            state.transactionHash,
-                            canRetry = false
-                        )
-                    )
-                }
-            }
         }
     }
 
