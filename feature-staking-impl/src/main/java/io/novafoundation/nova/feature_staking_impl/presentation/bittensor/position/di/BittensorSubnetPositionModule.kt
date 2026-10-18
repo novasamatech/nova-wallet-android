@@ -11,7 +11,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
@@ -40,7 +40,7 @@ class BittensorSubnetPositionModule {
         externalActions: ExternalActions.Presentation,
         logger: Logger,
         fiatFormatter: FiatFormatter,
-        estimatesRepository: BittensorEstimatesRepository,
+        estimatesMixin: BittensorEstimatesMixin,
         retryController: BittensorRetryController
     ): ViewModel =
         BittensorSubnetPositionViewModel(
@@ -55,7 +55,7 @@ class BittensorSubnetPositionModule {
             externalActions,
             logger,
             fiatFormatter,
-            estimatesRepository,
+            estimatesMixin,
             retryController
         )
 

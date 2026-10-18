@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -48,7 +48,7 @@ class BittensorExitReviewModule {
         accountRepository: AccountRepository,
         chainStateRepository: ChainStateRepository,
         externalActions: ExternalActions.Presentation,
-        estimatesRepository: BittensorEstimatesRepository,
+        estimatesMixin: BittensorEstimatesMixin,
         retryController: BittensorRetryController,
         validationExecutor: ValidationExecutor,
         exitValidationSystem: BittensorExitValidationSystem,
@@ -69,7 +69,7 @@ class BittensorExitReviewModule {
             accountRepository,
             chainStateRepository,
             externalActions,
-            estimatesRepository,
+            estimatesMixin,
             retryController,
             validationExecutor,
             exitValidationSystem,

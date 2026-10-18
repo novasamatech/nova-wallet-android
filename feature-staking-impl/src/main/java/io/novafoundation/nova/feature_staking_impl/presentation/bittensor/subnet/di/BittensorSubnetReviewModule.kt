@@ -15,7 +15,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -53,7 +53,7 @@ class BittensorSubnetReviewModule {
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-        estimatesRepository: BittensorEstimatesRepository,
+        estimatesMixin: BittensorEstimatesMixin,
         tokenFormatter: TokenFormatter,
         chainStateRepository: ChainStateRepository
     ): ViewModel {
@@ -77,7 +77,7 @@ class BittensorSubnetReviewModule {
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            estimatesRepository = estimatesRepository,
+            estimatesMixin = estimatesMixin,
             tokenFormatter = tokenFormatter,
             chainStateRepository = chainStateRepository
         )

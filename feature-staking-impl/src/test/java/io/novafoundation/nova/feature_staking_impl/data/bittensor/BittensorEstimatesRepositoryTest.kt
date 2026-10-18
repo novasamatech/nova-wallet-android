@@ -1,13 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
@@ -18,9 +14,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import retrofit2.Response
 
@@ -30,47 +24,32 @@ class BittensorEstimatesRepositoryTest {
 
     private val infrastructureUrls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
 
-    private val accountRepository = mock(AccountRepository::class.java)
-
-    private val walletRepository = mock(WalletRepository::class.java)
-
-    private val logger = mock(Logger::class.java)
-
     private val chain = mock(Chain::class.java)
 
-    private val account = mock(MetaAccount::class.java)
+    private val remoteSource = BittensorEstimatesRemoteSource(api, spacingMillis = 0L)
 
-    private val repository = BittensorEstimatesRepository(
-        api,
-        infrastructureUrls,
-        0L,
-        accountRepository,
-        walletRepository,
-        logger
-    )
+    private val historyRepository = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls)
 
-    @Before
-    fun setup(): Unit = runBlocking {
-        `when`(accountRepository.getMetaAccount(7L)).thenReturn(account)
-        `when`(account.accountIdIn(chain)).thenReturn(ByteArray(32) { 1 })
-    }
+    private val yieldRepository = BittensorAlphaYieldRepository(remoteSource, infrastructureUrls)
+
+    private val address = "test-account"
 
     @Test
     fun `history stops at the last page and caches the completed result`() = runBlocking {
         api.nextHistoryPage = { if (it == 1) 2 else null }
 
-        val first = repository.costBasis(7L, chain, BigInteger.ONE)
-        val second = repository.costBasis(7L, chain, BigInteger.ONE)
+        val first = historyRepository.history(address, BigInteger.ONE)
+        val second = historyRepository.history(address, BigInteger.ONE)
 
-        assertTrue(first.canEstimate(1))
+        assertTrue(first.allProviderPagesRead)
         assertSame(first, second)
         assertEquals(listOf(1, 2), api.historyPages)
     }
 
     @Test
     fun `balance revision invalidates otherwise fresh history`() = runBlocking {
-        repository.costBasis(7L, chain, BigInteger.ONE)
-        repository.costBasis(7L, chain, BigInteger.TEN)
+        historyRepository.history(address, BigInteger.ONE)
+        historyRepository.history(address, BigInteger.TEN)
 
         assertEquals(listOf(1, 1), api.historyPages)
     }
@@ -79,9 +58,9 @@ class BittensorEstimatesRepositoryTest {
     fun `history capped at ten pages remains incomplete`() = runBlocking {
         api.nextHistoryPage = { it + 1 }
 
-        val history = repository.costBasis(7L, chain)
+        val history = historyRepository.history(address)
 
-        assertFalse(history.canEstimate(1))
+        assertFalse(history.allProviderPagesRead)
         assertEquals(
             (1..10)
                 .toList(),
@@ -94,8 +73,8 @@ class BittensorEstimatesRepositoryTest {
         api.nextHistoryPage = { if (it == 1) 2 else null }
         api.historyCacheControl = { if (it == 2) "no-store" else "max-age=60" }
 
-        repository.costBasis(7L, chain)
-        repository.costBasis(7L, chain)
+        historyRepository.history(address)
+        historyRepository.history(address)
 
         assertEquals(
             listOf(
@@ -112,14 +91,14 @@ class BittensorEstimatesRepositoryTest {
     fun `stale history is rejected and never cached`() = runBlocking {
         api.freshness = "STALE"
         assertTrue(
-            runCatching { repository.costBasis(7L, chain) }
+            runCatching { historyRepository.history(address) }
                 .isFailure
         )
         api.freshness = "FRESH"
 
         assertTrue(
-            repository.costBasis(7L, chain)
-                .canEstimate(1)
+            historyRepository.history(address)
+                .allProviderPagesRead
         )
         assertEquals(listOf(1, 1), api.historyPages)
     }
@@ -128,12 +107,12 @@ class BittensorEstimatesRepositoryTest {
     fun `repeated and out of range pagination are rejected`() = runBlocking {
         api.nextHistoryPage = { it }
         assertTrue(
-            runCatching { repository.costBasis(7L, chain) }
+            runCatching { historyRepository.history(address) }
                 .isFailure
         )
         api.nextHistoryPage = { 101 }
         assertTrue(
-            runCatching { repository.costBasis(7L, chain) }
+            runCatching { historyRepository.history(address) }
                 .isFailure
         )
     }
@@ -142,14 +121,14 @@ class BittensorEstimatesRepositoryTest {
     fun `cancelled history request does not cache partial data`() = runBlocking {
         api.failure = CancellationException("Cancelled")
         assertTrue(
-            runCatching { repository.costBasis(7L, chain) }
+            runCatching { historyRepository.history(address) }
                 .exceptionOrNull() is CancellationException
         )
         api.failure = null
 
         assertTrue(
-            repository.costBasis(7L, chain)
-                .canEstimate(1)
+            historyRepository.history(address)
+                .allProviderPagesRead
         )
         assertEquals(listOf(1, 1), api.historyPages)
     }
@@ -175,7 +154,7 @@ class BittensorEstimatesRepositoryTest {
             )
         }
 
-        val yields = repository.alphaYields(chain, BittensorNetuid.Subnet(1))
+        val yields = yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
 
         assertEquals(listOf(BigDecimal("12.5")), yields.values.toList())
         assertEquals(listOf(1, 2), api.yieldPages)
@@ -185,7 +164,7 @@ class BittensorEstimatesRepositoryTest {
     fun `yield loading preserves the three page limit`() = runBlocking {
         api.nextYieldPage = { it + 1 }
 
-        repository.alphaYields(chain, BittensorNetuid.Subnet(1))
+        yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
 
         assertEquals(listOf(1, 2, 3), api.yieldPages)
     }
@@ -204,7 +183,7 @@ class BittensorEstimatesRepositoryTest {
         }
 
         assertTrue(
-            runCatching { repository.alphaYields(chain, BittensorNetuid.Subnet(1)) }
+            runCatching { yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1)) }
                 .isFailure
         )
     }

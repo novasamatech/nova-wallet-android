@@ -30,7 +30,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
@@ -99,7 +99,7 @@ class BittensorSubnetReviewViewModel(
     private val validationSystem: BittensorStakePreflightSystem,
     private val validationExecutor: ValidationExecutor,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-    private val estimatesRepository: BittensorEstimatesRepository,
+    private val estimatesMixin: BittensorEstimatesMixin,
     private val tokenFormatter: TokenFormatter,
     private val chainStateRepository: ChainStateRepository
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
@@ -184,13 +184,13 @@ class BittensorSubnetReviewViewModel(
     ) { walletContext, preparation -> walletContext.isError() || preparation.isError() }
         .shareInBackground()
 
-    private val yieldState = estimatesRepository.observeAlphaYields(
+    private val yieldState = estimatesMixin.observeAlphaYields(
         walletContext.map { it.chain },
         subnetId
     )
         .shareInBackground()
 
-    private val costBasisState = estimatesRepository.observeCostBasis(
+    private val costBasisState = estimatesMixin.observeCostBasis(
         walletContext.map {
             it.takeIf { it.metaId == metaId }
                 ?.let { BittensorEstimateContext(metaId, it.chain) }

@@ -13,7 +13,7 @@ import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -40,7 +40,7 @@ class BittensorExitAmountModule {
         tokenFormatter: TokenFormatter,
         fiatFormatter: FiatFormatter,
         externalActions: ExternalActions.Presentation,
-        estimatesRepository: BittensorEstimatesRepository,
+        estimatesMixin: BittensorEstimatesMixin,
         retryController: BittensorRetryController,
         validationExecutor: ValidationExecutor,
         exitValidationSystem: BittensorExitValidationSystem,
@@ -57,7 +57,7 @@ class BittensorExitAmountModule {
             tokenFormatter,
             fiatFormatter,
             externalActions,
-            estimatesRepository,
+            estimatesMixin,
             retryController,
             validationExecutor,
             exitValidationSystem,

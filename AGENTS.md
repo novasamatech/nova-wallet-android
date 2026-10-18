@@ -86,6 +86,8 @@ Generate a validator's icon from its hotkey with `AddressIconGenerator`, as for 
 
 ## Self-review and refactoring
 
+Keep responsibilities separated when a class spans several workflows: data sources own transport and pagination; repositories own data access and caches; interactors own wallet-context orchestration and financial calculations; presentation owns UI loading states and formatting. Do not move an overloaded repository wholesale into a mixin. Preserve cache keys, invalidation, incomplete-data semantics, and cancellation when extracting responsibilities. Existing shared contracts should be assessed in context rather than replaced solely because of their type names.
+
 Use existing numeric sign extensions (`isPositive`, `isNegative`, `isZero`, `isNonNegative`, and `isNonPositive`) instead of inline `signum()` comparisons or local duplicates. Respect their existing property/function syntax for each numeric type. Apply the established project conventions proactively when reviewing nearby code, not only to explicitly reported lines.
 
 Give variables, classes, and functions clear, descriptive names that convey their purpose. Balance name length with the context it provides: avoid ambiguous abbreviations, but do not repeat information already clear from the surrounding scope.

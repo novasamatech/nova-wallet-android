@@ -26,7 +26,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
@@ -87,7 +87,7 @@ class BittensorExitReviewViewModel(
     accountRepository: AccountRepository,
     private val chainStateRepository: ChainStateRepository,
     private val externalActions: ExternalActions.Presentation,
-    estimatesRepository: BittensorEstimatesRepository,
+    estimatesMixin: BittensorEstimatesMixin,
     private val retryController: BittensorRetryController,
     private val validationExecutor: ValidationExecutor,
     private val exitValidationSystem: BittensorExitValidationSystem,
@@ -241,7 +241,7 @@ class BittensorExitReviewViewModel(
     val rate = prepared.map { exitFormatter.exchangeRate(it.dataOrNull) }
         .shareInBackground()
 
-    private val costBasisState = estimatesRepository.observeCostBasis(
+    private val costBasisState = estimatesMixin.observeCostBasis(
         position.map {
             it?.takeUnless { it.isRoot }
                 ?.let { BittensorEstimateContext(it.metaId, it.chain) }

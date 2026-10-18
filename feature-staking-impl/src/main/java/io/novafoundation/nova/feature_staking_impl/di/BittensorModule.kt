@@ -14,7 +14,11 @@ import io.novafoundation.nova.feature_staking_impl.BuildConfig
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRemoteSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorOperationHistoryRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorCostBasisInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
@@ -329,23 +333,42 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorEstimates(
-        @Attested apiCreator: NetworkApiCreator,
-        infrastructureUrls: InfrastructureUrls,
+    fun provideBittensorEstimatesApi(@Attested apiCreator: NetworkApiCreator): BittensorEstimatesApi =
+        apiCreator.create(BittensorEstimatesApi::class.java)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorEstimatesSource(api: BittensorEstimatesApi): BittensorEstimatesRemoteSource =
+        BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorHistoryRepository(
+        remoteSource: BittensorEstimatesRemoteSource,
+        infrastructureUrls: InfrastructureUrls
+    ) = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorAlphaYieldRepository(
+        remoteSource: BittensorEstimatesRemoteSource,
+        infrastructureUrls: InfrastructureUrls
+    ) = BittensorAlphaYieldRepository(remoteSource, infrastructureUrls)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorCostBasisInteractor(
+        historyRepository: BittensorOperationHistoryRepository,
         accounts: AccountRepository,
-        wallets: WalletRepository,
+        wallets: WalletRepository
+    ) = BittensorCostBasisInteractor(historyRepository, accounts, wallets)
+
+    @Provides
+    fun provideBittensorEstimatesMixin(
+        costBasisInteractor: BittensorCostBasisInteractor,
+        alphaYieldRepository: BittensorAlphaYieldRepository,
         logger: Logger
-    ): BittensorEstimatesRepository {
-        val api = apiCreator.create(BittensorEstimatesApi::class.java)
-        return BittensorEstimatesRepository(
-            api,
-            infrastructureUrls,
-            12_000L,
-            accounts,
-            wallets,
-            logger
-        )
-    }
+    ) = BittensorEstimatesMixin(costBasisInteractor, alphaYieldRepository, logger)
 
     @Provides
     @FeatureScope

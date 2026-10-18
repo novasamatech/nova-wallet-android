@@ -20,7 +20,7 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
@@ -83,7 +83,7 @@ class BittensorSubnetAmountViewModel(
     private val validationExecutor: ValidationExecutor,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val existingPosition: Boolean,
-    private val estimatesRepository: BittensorEstimatesRepository
+    private val estimatesMixin: BittensorEstimatesMixin
 ) : BaseViewModel(), Validatable by validationExecutor {
 
     val retryEvents = retryController.events
@@ -187,13 +187,13 @@ class BittensorSubnetAmountViewModel(
     private val draft = currentQuote.map { it?.draft }
         .shareInBackground()
 
-    private val yieldState = estimatesRepository.observeAlphaYields(
+    private val yieldState = estimatesMixin.observeAlphaYields(
         walletContext.map { it.chain },
         initialSubnetId
     )
         .shareInBackground()
 
-    private val costBasisState = estimatesRepository.observeCostBasis(walletContext.map { BittensorEstimateContext(it.metaId, it.chain) })
+    private val costBasisState = estimatesMixin.observeCostBasis(walletContext.map { BittensorEstimateContext(it.metaId, it.chain) })
         .shareInBackground()
 
     val annualYield = combine(

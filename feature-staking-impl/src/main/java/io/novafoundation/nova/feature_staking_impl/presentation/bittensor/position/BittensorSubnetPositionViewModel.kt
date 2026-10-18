@@ -19,7 +19,7 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
@@ -71,7 +71,7 @@ class BittensorSubnetPositionViewModel(
     private val externalActions: ExternalActions.Presentation,
     private val logger: Logger,
     private val fiatFormatter: FiatFormatter,
-    estimatesRepository: BittensorEstimatesRepository,
+    estimatesMixin: BittensorEstimatesMixin,
     private val retryController: BittensorRetryController
 ) : BaseViewModel(), ExternalActions by externalActions {
 
@@ -119,12 +119,12 @@ class BittensorSubnetPositionViewModel(
     }
         .shareInBackground()
 
-    private val costBasisState = estimatesRepository.observeCostBasis(
+    private val costBasisState = estimatesMixin.observeCostBasis(
         portfolio.map { it?.let { BittensorEstimateContext(it.metaId, it.chain) } }
     )
         .shareInBackground()
 
-    private val yieldState = estimatesRepository.observeAlphaYields(
+    private val yieldState = estimatesMixin.observeAlphaYields(
         portfolio.map { it?.chain },
         subnetId
     )

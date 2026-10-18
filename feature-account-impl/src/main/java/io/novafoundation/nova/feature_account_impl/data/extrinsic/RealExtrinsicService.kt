@@ -120,7 +120,8 @@ class RealExtrinsicService(
     ): Result<Flow<ExtrinsicWatchResult<ExtrinsicStatus>>> = runCatching {
         val singleSubmission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
 
-        rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic).map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }
+        rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic)
+            .map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }
             .takeWhileInclusive { !it.status.terminal }
     }
 
@@ -131,7 +132,8 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<ExtrinsicExecutionResult> {
         return submitAndWatchExtrinsic(chain, origin, submissionOptions, formExtrinsic)
-            .awaitInBlock().map { determineExtrinsicOutcome(it, chain) }
+            .awaitInBlock()
+            .map { determineExtrinsicOutcome(it, chain) }
     }
 
     override suspend fun paymentInfo(
