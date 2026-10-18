@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -12,7 +14,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
 class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel, FragmentBittensorRootDetailsBinding>() {
 
-    private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+    private val imageLoader by lazy {
+        FeatureUtils.getCommonApi(requireContext())
+            .imageLoader()
+    }
 
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::positionClicked) }
 
@@ -20,7 +25,9 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
 
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorDetailsComponentFactory().create(this).inject(this)
+            .bittensorDetailsComponentFactory()
+            .create(this)
+            .inject(this)
     }
 
     override fun initViews() = with(binder) {
@@ -28,18 +35,34 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
         onBackPressed { viewModel.back() }
         addStake.setOnClickListener { viewModel.addStake() }
         addStake.setBadge(null)
+        claim.setBadge(null)
+        claim.setOnClickListener { viewModel.claimClicked() }
         unstake.setBadge(null)
+        unstake.setOnClickListener { viewModel.unstakeRoot() }
         validators.adapter = adapter
     }
 
     override fun subscribe(viewModel: BittensorRootDetailsViewModel) = with(binder) {
-        setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
-        viewModel.isLoading.observe { loading.isVisible = it }
+        setupExternalActions(viewModel)
+        viewModel.isLoading.observe {
+            loading.isVisible = it
+            stakeAmount.isVisible = !it
+            stakeFiat.isVisible = !it
+        }
         viewModel.canAddStake.observe {
+            unstake.isEnabled = it
+            unstake.alpha = if (it) 1f else 0.48f
             addStake.isEnabled = it
             addStake.alpha = if (it) 1f else 0.48f
         }
+        viewModel.canClaim.observe { claim.isEnabled = it; claim.alpha = if (it) 1f else 0.48f }
+        viewModel.minimumClaimHint.observe {
+            minimumClaimHint.text = it
+            minimumClaimHint.isVisible = it != null
+        }
+        viewModel.receivedRootRewards.observe(receivedRewards::showBittensorLoadingValue)
+        viewModel.claimableRewards.observe(rewards::showBittensorLoadingAmount)
         viewModel.rootStake.observe {
             stakeAmount.text = it.token
             stakeFiat.text = it.fiat

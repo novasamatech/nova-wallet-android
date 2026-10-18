@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
@@ -57,6 +59,10 @@ import org.mockito.Mockito.mock
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorDetailsRetryTest {
 
+    private val accountRepository = mock(AccountRepository::class.java)
+
+    private val metaAccount = mock(MetaAccount::class.java)
+
     private val resources = mock(ResourceManager::class.java)
 
     private val logger = mock(Logger::class.java)
@@ -77,7 +83,15 @@ class BittensorDetailsRetryTest {
 
     private val currency = mock(Currency::class.java)
 
-    private val portfolioUpdates = MutableStateFlow(BittensorPortfolio(1L, chain, asset, null, BittensorDataStatus.Fresh))
+    private val portfolioUpdates = MutableStateFlow(
+        BittensorPortfolio(
+            1L,
+            chain,
+            asset,
+            null,
+            BittensorDataStatus.Fresh
+        )
+    )
 
     private val portfolioLoads = AtomicInteger()
 
@@ -122,6 +136,8 @@ class BittensorDetailsRetryTest {
 
     @Before
     fun prepare(): Unit = runBlocking {
+        `when`(metaAccount.id).thenReturn(1L)
+        `when`(accountRepository.selectedMetaAccountFlow()).thenReturn(flowOf(metaAccount))
         Dispatchers.setMain(UnconfinedTestDispatcher())
         `when`(resources.getString(anyInt())).thenReturn("Message")
         `when`(asset.token).thenReturn(token)

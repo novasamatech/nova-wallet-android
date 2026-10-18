@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import coil.load
 import io.novafoundation.nova.common.base.BaseFragment
@@ -35,7 +37,9 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
     override fun inject() {
         val payload = argument<BittensorSubnetAmountPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetAmountComponentFactory().create(this, payload).inject(this)
+            .bittensorSubnetAmountComponentFactory()
+            .create(this, payload)
+            .inject(this)
     }
 
     override fun initViews() = with(binder) {
@@ -52,6 +56,12 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
             }
         )
         subnet.setOnClickListener { viewModel.chooseSubnetClicked() }
+        subnet.isClickable = !viewModel.existingPosition
+        subnetArrow.isVisible = !viewModel.existingPosition
+        if (viewModel.existingPosition) {
+            toolbar.setTitle(getString(R.string.bittensor_buy_more))
+            amount.setTitle(getString(R.string.bittensor_you_pay))
+        }
         rate.title.setOnClickListener { showInfo(R.string.bittensor_exchange_rate, getString(R.string.swap_rate_description)) }
         continueButton.prepareForProgress(viewLifecycleOwner)
         continueButton.setOnClickListener { viewModel.continueClicked() }
@@ -61,6 +71,8 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         observeValidations(viewModel)
         observeRetries(viewModel.feeLoaderMixin)
         observeBittensorRetries(viewModel.retryEvents)
+        viewModel.monthlyEstimate.observe(monthlyTokens::showBittensorLoadingValue)
+        viewModel.projectedAveragePrice.observe(projectedAveragePrice::showBittensorLoadingValue)
         viewModel.fee.observe(networkFee::setFeeStatus)
         viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.amountModel.observe(amount::setChooseAmountModel)
@@ -77,16 +89,29 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
                 val name = it.name.ifBlank { getString(R.string.bittensor_subnet_number, it.id.value) }
                 "\u200e" + it.displayName(name)
             } ?: "—"
-            subnetIcon.load(it?.logoUrl, FeatureUtils.getCommonApi(requireContext()).imageLoader()) {
+            subnetIcon.load(
+                it?.logoUrl,
+                FeatureUtils.getCommonApi(requireContext())
+                    .imageLoader()
+            ) {
                 bittensorSubnetIcon()
             }
         }
-        viewModel.alphaAmount.observe(receive::showValue)
-        viewModel.rate.observe(rate::showValue)
+        viewModel.validator.observe(validator::showBittensorLoadingValue)
+        viewModel.apy.observe {
+            subnetApy.text = it
+            subnetApy.isVisible = it != null
+        }
+        viewModel.alphaAmount.observe(receive::showBittensorLoadingValue)
+        viewModel.rate.observe(rate::showBittensorLoadingValue)
         viewModel.continueButtonState.observe(continueButton::setState)
     }
 
-    private fun showInfo(title: Int, message: String) {
-        DescriptionBottomSheet(requireContext(), getString(title), message).show()
+    private fun showInfo(
+        title: Int,
+        message: String
+    ) {
+        DescriptionBottomSheet(requireContext(), getString(title), message)
+            .show()
     }
 }

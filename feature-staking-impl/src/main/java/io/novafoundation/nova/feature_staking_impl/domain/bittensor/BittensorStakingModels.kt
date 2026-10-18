@@ -1,6 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigDecimal
@@ -12,7 +14,9 @@ data class BittensorRootStakingDetails(
     val asset: Asset,
     val validator: BittensorValidator?,
     val annualPercentageYield: BigDecimal?,
-    val dataStatus: BittensorDataStatus
+    val dataStatus: BittensorDataStatus,
+    val position: BittensorRootPosition? = null,
+    val positions: List<BittensorRootPosition> = listOfNotNull(position)
 )
 
 data class BittensorValidator(
@@ -39,4 +43,19 @@ sealed interface BittensorDataStatus {
     data object Fresh : BittensorDataStatus
 
     data class Stale(val cause: Throwable) : BittensorDataStatus
+}
+
+sealed interface BittensorOperationResult {
+
+    data class Success(val transactionHash: String) : BittensorOperationResult
+
+    data class Failure(val cause: Throwable, val transactionHash: String? = null) : BittensorOperationResult
+
+    data class Unknown(val transactionHash: String) : BittensorOperationResult
+}
+
+internal fun requireBittensorImmediateWallet(wallet: MetaAccount) {
+    require(wallet.type != LightMetaAccount.Type.MULTISIG) {
+        "Bittensor multisig approval flows are not supported yet"
+    }
 }

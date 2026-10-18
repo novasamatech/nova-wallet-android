@@ -14,7 +14,8 @@ data class BittensorSubnet(
     val symbol: String,
     val logoUrl: String?,
     val priceInRao: BigInteger? = null,
-    val taoReserveInPlanks: BigInteger? = null
+    val taoReserveInPlanks: BigInteger? = null,
+    val registrationBlock: BigInteger? = null
 )
 
 class BittensorSubnetInteractor(
@@ -44,5 +45,10 @@ class BittensorSubnetInteractor(
     suspend fun toggleFavorite(metaId: Long, subnetId: BittensorNetuid.Subnet) = favorites.toggle(metaId, subnetId)
 
     suspend fun quote(subnetId: BittensorNetuid.Subnet, amount: BigInteger): BittensorSubnetBuyQuote =
-        bittensorSubnetQuoteInteractor.quoteBuy(ChainGeneses.BITTENSOR, subnetId, amount, slippage)
+        bittensorSubnetQuoteInteractor.quoteBuy(
+            ChainGeneses.BITTENSOR,
+            subnetId,
+            amount,
+            slippage
+        )
 }

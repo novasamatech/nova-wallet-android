@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.view.MotionEvent
 import android.view.View
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -51,6 +52,21 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     fun showYAxis(show: Boolean) {
         chart.axisRight.setDrawLabels(show)
+        chart.invalidate()
+    }
+
+    fun setReferencePrice(value: Float?, label: String) {
+        chart.axisRight.removeAllLimitLines()
+        if (value != null && value > 0 && !value.isInfinite() && !value.isNaN()) {
+            val line = LimitLine(value, label)
+            line.lineWidth = 1f
+            line.lineColor = context.getColor(R.color.text_secondary)
+            line.textColor = context.getColor(R.color.text_secondary)
+            line.textSize = 11f
+            line.enableDashedLine(4.dpF(context), 4.dpF(context), 0f)
+            line.labelPosition = LimitLine.LimitLabelPosition.RIGHT_TOP
+            chart.axisRight.addLimitLine(line)
+        }
         chart.invalidate()
     }
 
@@ -214,8 +230,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     private fun LineChart.getEntryByTouchPoint(event: MotionEvent): Entry? {
         val xTouch = chart.getTransformer(YAxis.AxisDependency.RIGHT)
-            .getValuesByTouchPoint(event.x, event.y)
-            .x
+            .getValuesByTouchPoint(event.x, event.y).x
 
         val foundIndex = currentEntries.binarySearchFloor { it.x.compareTo(xTouch) }
         if (foundIndex >= 0 && foundIndex < currentEntries.size) {

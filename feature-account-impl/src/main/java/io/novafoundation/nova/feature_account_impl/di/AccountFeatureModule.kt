@@ -251,7 +251,7 @@ class AccountFeatureModule {
         extrinsicSplitter: ExtrinsicSplitter,
         feePaymentProviderRegistry: FeePaymentProviderRegistry,
         eventsRepository: EventsRepository,
-        signingContextFactory: SigningContext.Factory
+        signingContextFactory: SigningContext.Factory,
     ): ExtrinsicService.Factory = RealExtrinsicServiceFactory(
         rpcCalls,
         chainRegistry,
@@ -261,7 +261,7 @@ class AccountFeatureModule {
         extrinsicSplitter,
         eventsRepository,
         feePaymentProviderRegistry,
-        signingContextFactory
+        signingContextFactory,
     )
 
     @Provides

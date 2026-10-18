@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amoun
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.filterLoaded
@@ -11,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.Icon
+import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
@@ -19,12 +22,14 @@ import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBittensorStake
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
@@ -93,9 +98,17 @@ class BittensorStakeAmountViewModel(
 
     private val selectedValidator = MutableStateFlow<SelectedValidator?>(null)
 
-    private val stakingDetails = combine(stakingDetailsState.filterLoaded(), selectedValidator) { details, selected ->
-        if (selected?.metaId == details.metaId) details.copy(validator = selected.validator) else details
+    private val selectedStakingDetailsState = combine(
+        stakingDetailsState,
+        selectedValidator
+    ) { state, selected ->
+        state.map { details ->
+            if (selected?.metaId == details.metaId) bittensorStakingInteractor.detailsForValidator(details, selected.validator) else details
+        }
     }
+        .shareInBackground()
+
+    private val stakingDetails = selectedStakingDetailsState.filterLoaded()
         .shareInBackground()
 
     private val amountChooser = amountChooserFactory.create(
@@ -111,8 +124,12 @@ class BittensorStakeAmountViewModel(
 
     private var initializedMetaId: Long? = null
 
-    private val amountInPlanks = combine(stakingDetails, amount) { details, amount ->
-        amount.toBigDecimalOrNull()?.let(details.asset.token.configuration::planksFromAmount)
+    private val amountInPlanks = combine(
+        stakingDetails,
+        amount
+    ) { details, amount ->
+        amount.toBigDecimalOrNull()
+            ?.let(details.asset.token.configuration::planksFromAmount)
     }
         .distinctUntilChanged()
         .shareInBackground()
@@ -130,21 +147,53 @@ class BittensorStakeAmountViewModel(
         feeContext = feeContext
     )
 
-    val fee = combine(feeRequest, feeLoaderMixin.fee) { request, status ->
+    val fee = combine(
+        feeRequest,
+        feeLoaderMixin.fee
+    ) { request, status ->
         status.forRequest(request)
     }
         .shareInBackground()
 
     val amountModel = amountChooser.assetModel
 
-    val fiatAmount = combine(stakingDetails, amount) { details, amount ->
+    val fiatAmount = combine(
+        stakingDetails,
+        amount
+    ) { details, amount ->
         amount.toBigDecimalOrNull()
             ?.let(details.asset.token::toFiatOrNull)
             ?.let { formatFiat(it, details.asset.token.currency) }
     }
         .shareInBackground()
 
-    val maxAmount = combine(stakingDetails, fee) { details, fee ->
+    val currentStake = selectedStakingDetailsState.mapLoading { details ->
+        if (details.dataStatus !is BittensorDataStatus.Fresh) {
+            "—"
+        } else {
+            formatToken(details.asset.token.amountFromPlanks(details.position?.stakeInPlanks ?: BigInteger.ZERO), details.asset.token.configuration.symbol)
+        }
+    }
+        .shareInBackground()
+
+    val monthlyEstimate = combine(
+        selectedStakingDetailsState,
+        amount
+    ) { state, text ->
+        state.map { details ->
+            val annual = details.annualPercentageYield ?: return@map "—"
+            val principal = text.toBigDecimalOrNull()
+                ?.takeIf { it.isPositive } ?: return@map "—"
+            val estimate = bittensorMonthlyProjection(principal, annual)
+            "≈ " + formatToken(estimate, details.asset.token.configuration.symbol)
+        }
+    }
+        .shareInBackground()
+
+    val maxAmount = combine(
+        stakingDetails,
+        fee
+    ) { details, fee ->
         val available = maxAvailableInPlanks(details, fee.loadedFeeOrNull())
         formatToken(details.asset.token.amountFromPlanks(available), details.asset.token.configuration.symbol)
     }
@@ -166,15 +215,23 @@ class BittensorStakeAmountViewModel(
         }
         .shareInBackground()
 
-    val apy = stakingDetails
-        .map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
+    val apy = selectedStakingDetailsState
+        .mapLoading { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
         .shareInBackground()
 
-    private val loadedContinueButtonState = combine(stakingDetails, amountInPlanks, fee, preparing) { details, amount, fee, preparing ->
+    private val loadedContinueButtonState = combine(
+        stakingDetails,
+        amountInPlanks,
+        fee,
+        preparing
+    ) { details, amount, fee, preparing ->
         if (preparing) DescriptiveButtonState.Loading else continueButtonState(details, amount, fee)
     }
 
-    val continueButtonState = combine(loadedContinueButtonState, stakingDetailsState) { button, state ->
+    val continueButtonState = combine(
+        loadedContinueButtonState,
+        stakingDetailsState
+    ) { button, state ->
         when (state) {
             is ExtendedLoadingState.Error -> DescriptiveButtonState.Disabled(resourceManager.getString(R.string.common_continue))
             is ExtendedLoadingState.Loading -> DescriptiveButtonState.Loading
@@ -198,7 +255,9 @@ class BittensorStakeAmountViewModel(
             .launchIn(viewModelScope)
 
         validatorCommunicator.responseFlow
-            .filter { BittensorNetuid.from(it.subnetId).isRoot() }
+            .filter {
+                BittensorNetuid.from(it.subnetId).isRoot()
+            }
             .onEach { selectValidator(it.address) }
             .launchIn(viewModelScope)
     }
@@ -217,7 +276,9 @@ class BittensorStakeAmountViewModel(
         try {
             val details = stakingDetails.first()
             val maximum = bittensorStakingInteractor.maximumStake(details)
-            amountChooser.setAmountInput(details.asset.token.amountFromPlanks(maximum).toStripTrailingZerosString())
+            amountChooser.setAmountInput(
+                details.asset.token.amountFromPlanks(maximum).toStripTrailingZerosString()
+            )
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -231,7 +292,10 @@ class BittensorStakeAmountViewModel(
         if (preparing.value) return@launchUnit
         val details = stakingDetails.first()
         validatorCommunicator.openRequest(
-            BittensorSelectValidatorCommunicator.Request(BittensorNetuid.Root.value, details.validator?.let { details.chain.addressOf(it.hotkey) })
+            BittensorSelectValidatorCommunicator.Request(
+                BittensorNetuid.Root.value,
+                details.validator?.let { details.chain.addressOf(it.hotkey) }
+            )
         )
     }
 
@@ -275,7 +339,12 @@ class BittensorStakeAmountViewModel(
             ?.let(details.asset.token.configuration::planksFromAmount) ?: return null
         if (!amount.isPositive() || amount.bitLength() > 64) return null
 
-        return BittensorRootStakeRequest(details.metaId, details.chain, validator, amount)
+        return BittensorRootStakeRequest(
+            details.metaId,
+            details.chain,
+            validator,
+            amount
+        )
     }
 
     private suspend fun selectValidator(address: String) {
@@ -312,7 +381,10 @@ class BittensorStakeAmountViewModel(
 
         if (fee is FeeStatus.Loading) return DescriptiveButtonState.Loading
         val loadedFee = fee.loadedFeeOrNull() ?: return DescriptiveButtonState.Disabled(label)
-        if (loadedFee.request != BittensorRootStakeRequest(details.metaId, details.chain, validator, amount)) return DescriptiveButtonState.Loading
+        val currentRequest = BittensorRootStakeRequest(details.metaId, details.chain, validator, amount)
+        if (loadedFee.request != currentRequest) {
+            return DescriptiveButtonState.Loading
+        }
         val enoughBalance = amount <= maxAvailableInPlanks(details, loadedFee)
 
         return if (enoughBalance) DescriptiveButtonState.Enabled(label) else DescriptiveButtonState.Disabled(label)
@@ -324,12 +396,10 @@ class BittensorStakeAmountViewModel(
     }
 
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =
-        tokenFormatter.formatToken(amount, symbol)
-            .toString()
+        tokenFormatter.formatToken(amount, symbol).toString()
 
     private fun formatFiat(amount: BigDecimal, currency: Currency): String {
-        return fiatFormatter.formatFiat(amount, currency)
-            .toString()
+        return fiatFormatter.formatFiat(amount, currency).toString()
     }
 
     private data class SelectedValidator(val metaId: Long, val validator: BittensorValidator)

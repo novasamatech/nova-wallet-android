@@ -25,7 +25,9 @@ class BittensorRootValidatorSourceTest {
 
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
 
-    private val source = RemoteBittensorRootValidatorSource(backend, validators)
+    private val logger = mock(io.novasama.substrate_sdk_android.wsrpc.logging.Logger::class.java)
+
+    private val source = RemoteBittensorRootValidatorSource(backend, validators, logger)
 
     private val first = validator(1)
 
@@ -73,11 +75,23 @@ class BittensorRootValidatorSourceTest {
         val failure = IllegalStateException("Recommendations unavailable")
         `when`(backend.recommendedHotkeys(0)).thenThrow(failure)
 
-        assertSame(failure, runCatching { source.preferredValidator(chain, emptyList()) }.exceptionOrNull())
+        assertSame(
+            failure,
+            runCatching { source.preferredValidator(chain, emptyList()) }
+                .exceptionOrNull()
+        )
     }
 
     private fun validator(seed: Byte): BittensorSubnetValidator {
-        val validator = BittensorValidator(AccountIdKey(ByteArray(32) { seed }), "Validator $seed")
-        return BittensorSubnetValidator(validator, chain.addressOf(validator.hotkey), BigDecimal.ZERO, true)
+        val validator = BittensorValidator(
+            AccountIdKey(ByteArray(32) { seed }),
+            "Validator $seed"
+        )
+        return BittensorSubnetValidator(
+            validator,
+            chain.addressOf(validator.hotkey),
+            BigDecimal.ZERO,
+            true
+        )
     }
 }

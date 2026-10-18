@@ -6,5 +6,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class BittensorSubnetAmountPayload(
     val subnetId: Int,
-    val validatorAddress: String
+    val validatorAddress: String,
+    val existingPosition: Boolean = false
 ) : Parcelable

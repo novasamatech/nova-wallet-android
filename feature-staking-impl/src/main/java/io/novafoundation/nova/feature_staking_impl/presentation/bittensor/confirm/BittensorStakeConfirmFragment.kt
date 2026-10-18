@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -55,7 +56,8 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
         viewModel.fee.observe(binder.bittensorStakeConfirmExtrinsicInformation::setFeeStatus)
         binder.bittensorStakeConfirmStakingType.showValue(viewModel.stakingType)
         viewModel.validator.observe(::showValidator)
-        viewModel.apy.observe(binder.bittensorStakeConfirmApy::showValue)
+        viewModel.stakeAfter.observe(binder.stakeAfter::showBittensorLoadingValue)
+        viewModel.apy.observe(binder.bittensorStakeConfirmApy::showBittensorLoadingValue)
         viewModel.confirmButtonState.observe(binder.bittensorStakeConfirmButton::setState)
         bindBittensorStakeResults(
             results = viewModel.resultState,

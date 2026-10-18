@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.network.runtime.binding.bindAccountIdKey
+import io.novafoundation.nova.common.data.network.runtime.binding.bindBoolean
 import io.novafoundation.nova.common.data.network.runtime.binding.bindList
 import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
@@ -21,12 +22,13 @@ class RealBittensorPositionSource(
 ) : BittensorPositionSource {
 
     override suspend fun positions(chainId: String, coldKey: AccountId): BittensorStakePositions {
-        return runtimeCallsApi.forChain(chainId).call(
-            section = "StakeInfoRuntimeApi",
-            method = "get_stake_info_for_coldkey",
-            arguments = mapOf("coldkey_account" to coldKey),
-            returnBinding = ::bindBittensorPositions
-        )
+        return runtimeCallsApi.forChain(chainId)
+            .call(
+                section = "StakeInfoRuntimeApi",
+                method = "get_stake_info_for_coldkey",
+                arguments = mapOf("coldkey_account" to coldKey),
+                returnBinding = ::bindBittensorPositions
+            )
     }
 }
 
@@ -41,7 +43,13 @@ internal fun bindBittensorPositions(decoded: Any?): BittensorStakePositions {
             val hotkey = bindAccountIdKey(value["hotkey"])
             when (netuid) {
                 BittensorNetuid.Root -> root += BittensorRootPosition(hotkey, stake)
-                is BittensorNetuid.Subnet -> subnets += BittensorSubnetPosition(netuid, hotkey, stake)
+                is BittensorNetuid.Subnet -> subnets += BittensorSubnetPosition(
+                    netuid,
+                    hotkey,
+                    stake,
+                    value.get<Any?>("isRegistered")
+                        ?.let(::bindBoolean)
+                )
             }
         }
     }

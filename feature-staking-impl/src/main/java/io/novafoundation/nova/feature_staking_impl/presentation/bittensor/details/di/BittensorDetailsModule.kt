@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -11,9 +12,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPriceChartInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
@@ -69,7 +72,10 @@ class BittensorDetailsModule {
         addressIconGenerator: AddressIconGenerator,
         externalActions: ExternalActions.Presentation,
         amountFormatter: BittensorAmountFormatter,
-        retryController: BittensorRetryController
+        retryController: BittensorRetryController,
+        unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
+        rootClaimInteractor: BittensorRootClaimInteractor,
+        accountRepository: AccountRepository
     ): ViewModel = BittensorRootDetailsViewModel(
         interactor,
         router,
@@ -78,7 +84,10 @@ class BittensorDetailsModule {
         addressIconGenerator,
         externalActions,
         amountFormatter,
-        retryController
+        retryController,
+        unstakePositionCommunicator = unstakePositionCommunicator,
+        rootClaimInteractor = rootClaimInteractor,
+        accountRepository = accountRepository
     )
 
     @Provides

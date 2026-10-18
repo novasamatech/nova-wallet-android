@@ -19,6 +19,7 @@ sealed interface BittensorStakeResultUi {
     data class Failure(
         val title: String,
         val description: String,
-        val error: String
+        val error: String,
+        val canRetry: Boolean = true
     ) : BittensorStakeResultUi
 }

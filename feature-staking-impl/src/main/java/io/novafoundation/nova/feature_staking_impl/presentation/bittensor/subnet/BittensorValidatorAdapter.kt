@@ -33,9 +33,17 @@ class BittensorValidatorAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
         Holder(ItemBittensorValidatorBinding.inflate(LayoutInflater.from(parent.context), parent, false))
 
-    override fun onBindViewHolder(holder: Holder, position: Int) {
+    override fun onBindViewHolder(
+        holder: Holder,
+        position: Int
+    ) {
         val row = getItem(position)
-        holder.bind(row, row.eligibility.address == selectedAddress, onSelected, onInfo)
+        holder.bind(
+            row,
+            row.eligibility.address == selectedAddress,
+            onSelected,
+            onInfo
+        )
     }
 
     class Holder(private val binder: ItemBittensorValidatorBinding) : RecyclerView.ViewHolder(binder.root) {
@@ -63,7 +71,10 @@ class BittensorValidatorAdapter(
             ViewCompat.setAccessibilityDelegate(
                 binder.root,
                 object : AccessibilityDelegateCompat() {
-                    override fun onInitializeAccessibilityNodeInfo(host: View, info: AccessibilityNodeInfoCompat) {
+                    override fun onInitializeAccessibilityNodeInfo(
+                        host: View,
+                        info: AccessibilityNodeInfoCompat
+                    ) {
                         super.onInitializeAccessibilityNodeInfo(host, info)
                         info.className = android.widget.RadioButton::class.java.name
                         info.isCheckable = true
@@ -76,10 +87,13 @@ class BittensorValidatorAdapter(
         private fun formatSubtitle(validator: BittensorSubnetValidator): String {
             val context = binder.root.context
             val commissionPercentage = validator.commissionRate.movePointRight(2)
-                .setScale(2, RoundingMode.HALF_EVEN)
-                .toStripTrailingZerosString()
+                .setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
             val fee = context.getString(R.string.bittensor_validator_take, commissionPercentage)
-            return if (validator.selectable) fee else fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
+            return when {
+                !validator.selectable -> fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
+                validator.recommended -> context.getString(R.string.bittensor_recommended_validator) + " · " + fee
+                else -> fee
+            }
         }
     }
 

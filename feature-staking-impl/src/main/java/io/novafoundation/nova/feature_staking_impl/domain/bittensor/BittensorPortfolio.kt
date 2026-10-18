@@ -9,7 +9,8 @@ data class BittensorPortfolio(
     val chain: Chain,
     val asset: Asset,
     val positions: BittensorPortfolioPositions?,
-    val dataStatus: BittensorDataStatus
+    val dataStatus: BittensorDataStatus,
+    val supportsImmediateOperations: Boolean = true
 )
 
 data class BittensorStakePositions(
@@ -25,17 +26,13 @@ data class BittensorPortfolioPositions(
 
     val rootStake: BigInteger = root.fold(BigInteger.ZERO) { total, position -> total + position.stakeInPlanks }
 
-    private val alphaBySubnet = subnets.groupBy { it.subnetId }.mapValues { (_, positions) ->
-        positions.fold(BigInteger.ZERO) { total, position -> total + position.alphaInPlanks }
-    }
-
-    fun subnetStake(subnetId: BittensorNetuid.Subnet): BigInteger? {
-        val price = subnetPrices[subnetId] ?: return null
-        val alpha = alphaBySubnet[subnetId] ?: BigInteger.ZERO
-        return alpha * price / ALPHA_PRECISION
-    }
+    private val alphaBySubnet = subnets.groupBy { it.subnetId }
+        .mapValues { (_, positions) ->
+            positions.fold(BigInteger.ZERO) { total, position -> total + position.alphaInPlanks }
+        }
 
     // Never report a partial portfolio as the user's total when a subnet price is unavailable.
+
     val totalStake: BigInteger?
         get() {
             var total = rootStake
@@ -44,6 +41,12 @@ data class BittensorPortfolioPositions(
             }
             return total
         }
+
+    fun subnetStake(subnetId: BittensorNetuid.Subnet): BigInteger? {
+        val price = subnetPrices[subnetId] ?: return null
+        val alpha = alphaBySubnet[subnetId] ?: BigInteger.ZERO
+        return alpha * price / ALPHA_PRECISION
+    }
 
     private companion object {
         val ALPHA_PRECISION: BigInteger = BigInteger.TEN.pow(9)

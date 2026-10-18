@@ -10,7 +10,8 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
     results: Flow<BittensorStakeResultUi?>,
     onDismiss: () -> Unit,
     onTryAgain: () -> Unit,
-    onViewPosition: () -> Unit
+    onViewPosition: () -> Unit,
+    onDiscoverSubnets: () -> Unit = {}
 ) {
     var resultSheet: BittensorStakeResultBottomSheet? = null
     lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
@@ -25,8 +26,14 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
             val sheet = resultSheet ?: BittensorStakeResultBottomSheet(
                 context = fragment.requireContext(),
                 onClose = { resultSheet?.dismiss() },
-                onTryAgain = onTryAgain,
-                onDiscoverSubnets = { resultSheet?.dismiss() },
+                onTryAgain = {
+                    resultSheet?.dismiss()
+                    onTryAgain()
+                },
+                onDiscoverSubnets = {
+                    resultSheet?.dismiss()
+                    onDiscoverSubnets()
+                },
                 onViewPosition = {
                     resultSheet?.dismiss()
                     onViewPosition()

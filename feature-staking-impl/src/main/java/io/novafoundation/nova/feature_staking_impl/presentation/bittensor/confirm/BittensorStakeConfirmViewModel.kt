@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confi
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -24,6 +26,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
@@ -51,6 +54,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -74,7 +78,7 @@ class BittensorStakeConfirmViewModel(
     private val retryController: BittensorRetryController,
     private val validationSystem: BittensorStakePreflightSystem,
     private val validationExecutor: ValidationExecutor,
-    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
+    feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
@@ -92,7 +96,15 @@ class BittensorStakeConfirmViewModel(
     }
         .shareInBackground()
 
-    private val stakingDetails = stakingDetailsState.filterLoaded()
+    private val selectedStakingDetailsState = combine(
+        stakingDetailsState,
+        stakeRequest
+    ) { state, request ->
+        state.map { bittensorStakingInteractor.detailsForValidator(it, request.validator) }
+    }
+        .shareInBackground()
+
+    private val stakingDetails = selectedStakingDetailsState.filterLoaded()
         .shareInBackground()
 
     val amount = combine(stakingDetails, stakeRequest, ::mapAmount)
@@ -114,8 +126,24 @@ class BittensorStakeConfirmViewModel(
         feeContext = feeContext
     )
 
-    val fee = combine(stakeRequest, feeLoaderMixin.fee) { request, status ->
+    val fee = combine(
+        stakeRequest,
+        feeLoaderMixin.fee
+    ) { request, status ->
         status.forRequest(request)
+    }
+        .shareInBackground()
+
+    val stakeAfter = combine(
+        selectedStakingDetailsState,
+        stakeRequest
+    ) { state, request ->
+        state.map { details ->
+            val before = details.position?.stakeInPlanks ?: BigInteger.ZERO
+            val token = details.asset.token
+            formatToken(token.amountFromPlanks(before), token.configuration.symbol) + " → " +
+                formatToken(token.amountFromPlanks(before + request.amountInPlanks), token.configuration.symbol)
+        }
     }
         .shareInBackground()
 
@@ -124,7 +152,7 @@ class BittensorStakeConfirmViewModel(
     val validator = stakeRequest.map(::mapValidator)
         .shareInBackground()
 
-    val apy = stakingDetails.map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
+    val apy = selectedStakingDetailsState.mapLoading { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
         .shareInBackground()
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
@@ -134,7 +162,12 @@ class BittensorStakeConfirmViewModel(
 
     private val validating = MutableStateFlow(false)
 
-    val confirmButtonState = combine(stakingDetailsState, validating, submission, fee) { state, validating, submission, fee ->
+    val confirmButtonState = combine(
+        stakingDetailsState,
+        validating,
+        submission,
+        fee
+    ) { state, validating, submission, fee ->
         val details = state.dataOrNull
         val label = resourceManager.getString(R.string.common_confirm)
         if (!submission.canSubmit || details == null || validating || fee.loadedFeeOrNull() == null) {
@@ -153,16 +186,31 @@ class BittensorStakeConfirmViewModel(
         }
     }
 
+    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
+        hash,
+        BittensorStakeResultUi.Failure(
+            resourceManager.getString(R.string.bittensor_submission_unknown_title),
+            resourceManager.getString(R.string.bittensor_submission_unknown_description),
+            hash,
+            canRetry = false
+        )
+    )
+
     fun back() {
         if (submission.value !is BittensorSubmissionState.Submitting) router.back()
     }
 
     fun accountClicked() = launchUnit {
-        externalActions.showAddressActions(account.first().address, chain.await())
+        externalActions.showAddressActions(
+            account.first().address,
+            chain.await()
+        )
     }
 
     fun confirmClicked() = launchUnit {
-        if (!submission.value.canSubmit || validating.value || stakingDetailsState.first().dataOrNull == null) return@launchUnit
+        if (!submission.value.canSubmit || validating.value || stakingDetailsState.first().dataOrNull == null) {
+            return@launchUnit
+        }
         validating.value = true
         try {
             val request = stakeRequest.first()
@@ -190,8 +238,15 @@ class BittensorStakeConfirmViewModel(
         try {
             val details = stakingDetails.first()
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
-            bittensorStakingInteractor.executeRootStake(request).getOrThrow()
-            submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee))
+            when (val result = bittensorStakingInteractor.executeRootStake(request)) {
+                is BittensorOperationResult.Success -> {
+                    submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee))
+                }
+                is BittensorOperationResult.Failure -> {
+                    submission.value = BittensorSubmissionState.Failed(mapFailure(result.cause))
+                }
+                is BittensorOperationResult.Unknown -> submission.value = unresolved(result.transactionHash)
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -206,14 +261,16 @@ class BittensorStakeConfirmViewModel(
     }
 
     fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) router.openBittensorRootDetails()
+        if (submission.value is BittensorSubmissionState.Completed) {
+            router.openBittensorRootDetails()
+        }
     }
 
     private fun mapAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): AmountModel {
         val amount = details.asset.token.amountFromPlanks(request.amountInPlanks)
         return AmountModel(
             token = formatToken(amount, details.asset.token.configuration.symbol),
-            fiat = formatFiatOrDash(details.asset.token.toFiatOrNull(amount), details.asset.token.currency)
+            fiat = formatFiatOrNull(details.asset.token.toFiatOrNull(amount), details.asset.token.currency)
         )
     }
 
@@ -246,7 +303,7 @@ class BittensorStakeConfirmViewModel(
             validator = request.validator.name,
             fee = BittensorFeeUi(
                 amount = formatToken(fee.decimalAmount, fee.asset.symbol),
-                fiatAmount = formatFiatOrDash(details.asset.token.toFiatOrNull(fee.decimalAmount), details.asset.token.currency)
+                fiatAmount = formatFiatOrNull(details.asset.token.toFiatOrNull(fee.decimalAmount), details.asset.token.currency)
             )
         )
     }
@@ -265,13 +322,11 @@ class BittensorStakeConfirmViewModel(
     }
 
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =
-        tokenFormatter.formatToken(amount, symbol)
-            .toString()
+        tokenFormatter.formatToken(amount, symbol).toString()
 
-    private fun formatFiatOrDash(amount: BigDecimal?, currency: Currency): String {
-        if (amount == null) return "—"
+    private fun formatFiatOrNull(amount: BigDecimal?, currency: Currency): String? {
+        if (amount == null) return null
 
-        return fiatFormatter.formatFiat(amount, currency)
-            .toString()
+        return fiatFormatter.formatFiat(amount, currency).toString()
     }
 }

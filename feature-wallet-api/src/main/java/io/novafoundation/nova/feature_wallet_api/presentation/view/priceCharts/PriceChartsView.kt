@@ -110,6 +110,8 @@ class PriceChartsView @JvmOverloads constructor(
         binder.priceChart.layoutParams = binder.priceChart.layoutParams.apply { height = heightDp.dpF.toInt() }
     }
 
+    fun setReferencePrice(value: Float?, label: String) = controller.setReferencePrice(value, label)
+
     fun setAxisLabelFormatter(formatter: ChartAxisFormatter) = controller.setAxisLabelFormatter(formatter)
 
     private val controller: ChartController
@@ -231,8 +233,7 @@ class PriceChartsView @JvmOverloads constructor(
 
     private fun getButtons(): List<TextView> {
         return binder.priceChartButtons.children
-            .toList()
-            .filterIsInstance<TextView>()
+            .toList().filterIsInstance<TextView>()
     }
 
     private fun createButton(text: String, index: Int): View {

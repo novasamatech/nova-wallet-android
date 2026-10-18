@@ -2,10 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.filterLoaded
-import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -31,7 +31,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -46,11 +46,11 @@ import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -65,7 +65,7 @@ class BittensorDetailsViewModel(
     private val bittensorPriceChartInteractor: BittensorPriceChartInteractor,
     private val retryController: BittensorRetryController,
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
-    private val fiatFormatter: FiatFormatter
+    private val fiatFormatter: FiatFormatter,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     val retryEvents = retryController.events
@@ -97,7 +97,10 @@ class BittensorDetailsViewModel(
     val totalStake = portfolio.map { data -> formatAmount(data.positions?.totalStake, data) }
         .shareInBackground()
 
-    val canAddStake = portfolioState.map { it.dataOrNull?.dataStatus is BittensorDataStatus.Fresh }
+    val canAddStake = portfolioState.map { portfolio ->
+        val data = portfolio.dataOrNull
+        data?.supportsImmediateOperations == true && data.dataStatus is BittensorDataStatus.Fresh
+    }
         .onStart { emit(false) }
         .shareInBackground()
 
@@ -142,7 +145,10 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
-    val priceChartFormatters = combine(chartAsset, chartPeriod) { asset, period ->
+    val priceChartFormatters = combine(
+        chartAsset,
+        chartPeriod
+    ) { asset, period ->
         val token = asset.token
         val priceTextInjector = RealPricePriceTextInjector(token.currency, token.coinRate?.rate, fiatFormatter)
         val changeTextInjector = BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(period)])
@@ -178,16 +184,27 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
+    private val subnetMetadata = retryController.observe(
+        step = "subnet metadata",
+        transform = { it.catch { } }
+    ) {
+        flowOf { bittensorPortfolioInteractor.subnets() }
+            .map { subnets -> subnets.associateBy { it.id } }
+    }
+        .onStart { emit(emptyMap()) }
+        .shareInBackground()
+
+    val positions = combine(portfolio, subnetMetadata, ::mapPositions)
+        .shareInBackground()
+
     private fun observePriceChart(priceId: String, currency: Currency, period: PricePeriod): Flow<AssetPriceChart> {
         return retryController.observe(
             step = "price chart",
             transform = { prices ->
-                prices.withSafeLoading()
-                    .map { AssetPriceChart(period, it) }
+                prices.withSafeLoading().map { AssetPriceChart(period, it) }
             }
         ) {
-            bittensorPriceChartInteractor.observe(priceId, currency, period)
-                .map { it.chart }
+            bittensorPriceChartInteractor.observe(priceId, currency, period).map { it.chart }
                 .onError { throw IllegalStateException("Price chart request failed", it) }
                 .filterLoaded()
         }
@@ -203,34 +220,26 @@ class BittensorDetailsViewModel(
                 if (state.data.isEmpty()) return PriceChartModel.Empty(button, resources.getString(R.string.price_chart_no_data))
 
                 val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
-                PriceChartModel.Chart(button, button, period != PricePeriod.YEAR && period != PricePeriod.MAX, prices)
+                PriceChartModel.Chart(
+                    button,
+                    button,
+                    period != PricePeriod.YEAR && period != PricePeriod.MAX,
+                    prices
+                )
             }
         }
     }
 
     fun selectChartPeriod(index: Int) {
-        periods.getOrNull(index)?.let { chartPeriod.value = it }
+        periods.getOrNull(index)
+            ?.let { chartPeriod.value = it }
     }
-
-    private val subnetMetadata = retryController.observe(
-        step = "subnet metadata",
-        transform = { it.catch { } }
-    ) {
-        flowOf { bittensorPortfolioInteractor.subnets() }
-            .map { subnets -> subnets.associateBy { it.id } }
-    }
-        .onStart { emit(emptyMap()) }
-        .shareInBackground()
-
-    val positions = combine(portfolio, subnetMetadata, ::mapPositions)
-        .shareInBackground()
 
     private fun mapPositions(portfolio: BittensorPortfolio, metadata: Map<BittensorNetuid.Subnet, BittensorSubnet>): List<BittensorPositionUi> {
         val positions = portfolio.positions ?: return emptyList()
         val subnetIds = positions.subnets
             .map { it.subnetId }
-            .distinct()
-            .sortedBy { it.value }
+            .distinct().sortedBy { it.value }
 
         return buildList {
             if (positions.rootStake.isPositive()) add(mapRootPosition(portfolio, positions.rootStake))
@@ -269,19 +278,29 @@ class BittensorDetailsViewModel(
         when (val action = position.action) {
             BittensorPositionAction.RootDetails -> router.openBittensorRootDetails()
             is BittensorPositionAction.ValidatorDetails -> validatorClicked(action.address)
-            is BittensorPositionAction.SubnetDetails -> router.openBittensorSubnetDetails(BittensorSubnetDetailsPayload(action.subnetId.value))
+            is BittensorPositionAction.SubnetDetails -> router.openBittensorSubnetPosition(
+                BittensorSubnetPositionPayload(action.subnetId.value)
+            )
         }
     }
 
     fun validatorClicked(address: String) = launchUnit {
-        externalActions.showAddressActions(address, portfolio.first().chain)
+        externalActions.showAddressActions(
+            address,
+            portfolio.first().chain
+        )
     }
 
     private fun formatAmount(amount: BigInteger?, portfolio: BittensorPortfolio): AmountModel {
         if (amount == null) return AmountModel("—", null)
         val token = portfolio.asset.token
         val decimalAmount = token.amountFromPlanks(amount)
-        return amountFormatter.amount(decimalAmount, token.configuration.symbol, token.toFiatOrNull(decimalAmount), token.currency)
+        return amountFormatter.amount(
+            decimalAmount,
+            token.configuration.symbol,
+            token.toFiatOrNull(decimalAmount),
+            token.currency
+        )
     }
 }
 

@@ -37,7 +37,7 @@ class BittensorAmountFormatter(
         val fiat = token.toFiatOrNull(fee.decimalAmount)
         return BittensorFeeUi(
             amount = tokenFormatter.formatToken(fee.decimalAmount, fee.asset.symbol).toString(),
-            fiatAmount = fiat?.let { fiatFormatter.formatFiat(it, token.currency).toString() } ?: "—"
+            fiatAmount = fiat?.let { fiatFormatter.formatFiat(it, token.currency).toString() }
         )
     }
 

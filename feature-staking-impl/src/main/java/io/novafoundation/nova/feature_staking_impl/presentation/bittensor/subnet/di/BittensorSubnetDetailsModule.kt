@@ -13,6 +13,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetSafetyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
@@ -43,7 +44,8 @@ class BittensorSubnetDetailsModule {
         validatorCommunicator: BittensorSelectValidatorCommunicator,
         fiatFormatter: FiatFormatter,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
-        retryController: BittensorRetryController
+        retryController: BittensorRetryController,
+        subnetSafetyInteractor: BittensorSubnetSafetyInteractor
     ): ViewModel = BittensorSubnetDetailsViewModel(
         subnetId = BittensorNetuid.Subnet(payload.subnetId),
         bittensorSubnetInteractor = bittensorSubnetInteractor,
@@ -57,7 +59,8 @@ class BittensorSubnetDetailsModule {
         validatorCommunicator = validatorCommunicator,
         fiatFormatter = fiatFormatter,
         chartAxisFormatterFactory = chartAxisFormatterFactory,
-        retryController = retryController
+        retryController = retryController,
+        subnetSafetyInteractor = subnetSafetyInteractor
     )
 
     @Provides

@@ -26,6 +26,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -63,17 +64,34 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val submissionHierarchy = SubmissionHierarchy(emptyList())
 
-    private val successfulExecution = ExtrinsicExecutionResult("0x1234", "0xabcd", ExtrinsicDispatch.Ok(emptyList()), submissionHierarchy)
+    private val successfulExecution = ExtrinsicExecutionResult(
+        "0x1234",
+        "0xabcd",
+        ExtrinsicDispatch.Ok(emptyList()),
+        submissionHierarchy
+    )
 
     private val unusedExtrinsicService = mock(ExtrinsicService::class.java)
 
     private val extrinsicService = RecordingExtrinsicService(unusedExtrinsicService, fee, Result.success(successfulExecution))
 
-    private val validator = BittensorValidator(AccountIdKey(ByteArray(32) { 1 }), "Validator")
+    private val submission = BittensorSubmissionExecutor(extrinsicService)
+
+    private val validator = BittensorValidator(
+        AccountIdKey(ByteArray(32) { 1 }),
+        "Validator"
+    )
 
     private val amount = BigInteger.valueOf(1000)
 
-    private val rootDetails = BittensorRootStakingDetails(1L, chain, asset, validator, null, BittensorDataStatus.Fresh)
+    private val rootDetails = BittensorRootStakingDetails(
+        1L,
+        chain,
+        asset,
+        validator,
+        null,
+        BittensorDataStatus.Fresh
+    )
 
     private val rootRepository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = flowOf(rootDetails)
@@ -83,7 +101,13 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val rootValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
-    private val rootInteractor = BittensorStakingInteractor(rootRepository, extrinsicService, wallets, rootValidators)
+    private val rootInteractor = BittensorStakingInteractor(
+        rootRepository,
+        extrinsicService,
+        wallets,
+        rootValidators,
+        submission
+    )
 
     private val subnetValidators = mock(BittensorSubnetValidatorRepository::class.java)
 
@@ -95,7 +119,8 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         subnetValidators,
         subnetInteractor,
         extrinsicService,
-        "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq"
+        "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq",
+        submission
     )
 
     private val subnetId = BittensorNetuid.Subnet(1)
@@ -128,6 +153,7 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     @Before
     fun prepare(): Unit = runBlocking {
+        `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(selectedAccount.id).thenReturn(1L)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selectedAccount)
         `when`(chainRegistry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
@@ -143,7 +169,12 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `validation uses the displayed fee without estimating again`() = runBlocking {
         val payload = when (stakingType) {
             StakingType.ROOT -> {
-                val request = BittensorRootStakeRequest(1L, chain, validator, amount)
+                val request = BittensorRootStakeRequest(
+                    1L,
+                    chain,
+                    validator,
+                    amount
+                )
                 rootInteractor.validationPayload(request, fee)
             }
             StakingType.SUBNET -> subnetStakingInteractor.validationPayload(subnetDraft, fee)
@@ -158,7 +189,12 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `fee estimation uses the operation wallet and does not refresh the quote`() = runBlocking {
         val estimatedFee = when (stakingType) {
             StakingType.ROOT -> {
-                val request = BittensorRootStakeRequest(1L, chain, validator, amount)
+                val request = BittensorRootStakeRequest(
+                    1L,
+                    chain,
+                    validator,
+                    amount
+                )
                 rootInteractor.estimateRootStakeFee(request)
             }
             StakingType.SUBNET -> subnetStakingInteractor.estimateFee(subnetDraft)
@@ -166,44 +202,55 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
         assertSame(fee, estimatedFee)
         assertEquals(1, extrinsicService.feeEstimates)
-        assertEquals(1L, (extrinsicService.feeOrigin as TransactionOrigin.WalletWithId).metaId)
+        assertEquals(
+            1L,
+            (extrinsicService.feeOrigin as TransactionOrigin.WalletWithId).metaId
+        )
         assertEquals(BatchMode.BATCH_ALL, extrinsicService.feeOptions?.batchMode)
         verifyNoInteractions(subnetInteractor, accounts)
     }
 
     @Test
     fun `successful execution uses standard submission with explicit operation parameters`() = runBlocking {
-        assertSame(successfulExecution, execute().getOrThrow())
+        assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
         assertEquals(1, extrinsicService.submissions)
-        assertEquals(1L, (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId)
+        assertEquals(
+            1L,
+            (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId
+        )
         assertEquals(BatchMode.BATCH_ALL, extrinsicService.submissionOptions?.batchMode)
         assertSame(chain, extrinsicService.submissionChain)
         if (stakingType == StakingType.ROOT) {
-            verify(rootValidators).validateRoot(chain, validator)
+            verify(rootValidators)
+                .validateRoot(chain, validator)
         } else {
-            verify(subnetValidators).validate(chain, subnetId, validator)
+            verify(subnetValidators)
+                .validate(chain, subnetId, validator)
             verifyNoInteractions(subnetInteractor)
         }
     }
 
     @Test
-    fun `network failure is returned without an automatic resubmission or persistent lock`() = runBlocking {
+    fun `submission error is propagated without a persistent lock`() = runBlocking {
         val failure = IOException("Connection lost")
         extrinsicService.result = Result.failure(failure)
 
-        assertSame(failure, execute().exceptionOrNull())
+        assertSame(
+            failure,
+            (execute() as BittensorOperationResult.Failure).cause
+        )
         assertEquals(1, extrinsicService.submissions)
 
         extrinsicService.result = Result.success(successfulExecution)
-        assertSame(successfulExecution, execute().getOrThrow())
+        assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
         assertEquals(2, extrinsicService.submissions)
     }
 
     @Test
-    fun `unknown execution outcome is not reported as success`() = runBlocking {
+    fun `unknown execution outcome is not reported as success`() = runTest {
         extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Unknown))
 
-        assertTrue(execute().isFailure)
+        assertEquals(BittensorOperationResult.Unknown(successfulExecution.extrinsicHash), execute())
         assertEquals(1, extrinsicService.submissions)
     }
 
@@ -211,7 +258,10 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `on chain failure is propagated`() = runBlocking {
         extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Failed(DispatchError.Token)))
 
-        assertSame(DispatchError.Token, execute().exceptionOrNull())
+        assertSame(
+            DispatchError.Token,
+            (execute() as BittensorOperationResult.Failure).cause
+        )
         assertEquals(1, extrinsicService.submissions)
     }
 
@@ -219,14 +269,37 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     fun `wallet switch keeps the original submission wallet`() = runBlocking {
         `when`(selectedAccount.id).thenReturn(2L)
 
-        assertTrue(execute().isSuccess)
+        assertTrue(execute() is BittensorOperationResult.Success)
         assertEquals(1, extrinsicService.submissions)
-        assertEquals(1L, (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId)
+        assertEquals(
+            1L,
+            (extrinsicService.submissionOrigin as TransactionOrigin.WalletWithId).metaId
+        )
         verifyNoInteractions(accounts)
     }
 
-    private suspend fun execute(): Result<ExtrinsicExecutionResult> = when (stakingType) {
-        StakingType.ROOT -> rootInteractor.executeRootStake(BittensorRootStakeRequest(1L, chain, validator, amount))
+    @Test
+    fun `cancellation is propagated without converting it to failure`() = runBlocking {
+        val cancellation = kotlinx.coroutines.CancellationException("Cancelled")
+        extrinsicService.result = Result.failure(cancellation)
+
+        try {
+            execute()
+            org.junit.Assert.fail("Expected cancellation")
+        } catch (error: kotlinx.coroutines.CancellationException) {
+            assertSame(cancellation, error)
+        }
+    }
+
+    private suspend fun execute(): BittensorOperationResult = when (stakingType) {
+        StakingType.ROOT -> rootInteractor.executeRootStake(
+            BittensorRootStakeRequest(
+                1L,
+                chain,
+                validator,
+                amount
+            )
+        )
         StakingType.SUBNET -> subnetStakingInteractor.execute(subnetDraft)
     }
 

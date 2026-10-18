@@ -26,6 +26,8 @@ import kotlinx.coroutines.flow.map
 
 interface BittensorStakingRepository {
 
+    suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal? = null
+
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails>
 
     fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails>
@@ -35,7 +37,7 @@ interface BittensorRootValidatorSource {
 
     suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator?
 
-    suspend fun annualPercentageYield(): BigDecimal?
+    suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal?
 }
 
 class RealBittensorStakingRepository(
@@ -46,6 +48,9 @@ class RealBittensorStakingRepository(
     private val validatorSource: BittensorRootValidatorSource,
     private val logger: Logger
 ) : BittensorStakingRepository {
+
+    override suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator) =
+        validatorSource.annualPercentageYield(chain, validator)
 
     override fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> =
         observeRootStakingDetails(accountRepository.selectedMetaAccountFlow())
@@ -60,14 +65,16 @@ class RealBittensorStakingRepository(
             .flatMapLatest { metaAccount ->
                 combine(
                     walletRepository.assetFlow(metaAccount.id, chain.utilityAsset),
-                    observePosition(chain, metaAccount.requireAccountIdIn(chain)),
+                    observePosition(chain, metaAccount.requireAccountIdIn(chain))
                 ) { asset, position ->
                     BittensorRootStakingDetails(
                         metaId = metaAccount.id,
                         chain = chain,
                         asset = asset,
                         validator = position.validator,
-                        annualPercentageYield = validatorSource.annualPercentageYield(),
+                        annualPercentageYield = position.annualPercentageYield,
+                        position = position.positions.firstOrNull { it.validatorHotkey == position.validator?.hotkey },
+                        positions = position.positions,
                         dataStatus = position.status
                     )
                 }
@@ -76,8 +83,7 @@ class RealBittensorStakingRepository(
 
     private fun observePosition(chain: Chain, coldKey: AccountId): Flow<PositionState> = flowOfAll {
         var defaultValidatorSelection: DefaultValidatorSelection? = null
-        positionRepository.observePositions(chain.id, coldKey)
-            .filter { it.status !is BittensorDataStatus.Loading }
+        positionRepository.observePositions(chain.id, coldKey).filter { it.status !is BittensorDataStatus.Loading }
             .map { positionsState ->
                 val validator = try {
                     val selection = selectDefaultValidator(chain, positionsState.positions?.root.orEmpty(), defaultValidatorSelection)
@@ -90,7 +96,13 @@ class RealBittensorStakingRepository(
                     logger.log(e)
                     null
                 }
-                PositionState(positionsState.status, validator)
+                val annualPercentageYield = validator?.let { validatorSource.annualPercentageYield(chain, it) }
+                PositionState(
+                    positionsState.status,
+                    validator,
+                    positionsState.positions?.root.orEmpty(),
+                    annualPercentageYield
+                )
             }
     }
 
@@ -99,7 +111,8 @@ class RealBittensorStakingRepository(
         positions: List<BittensorRootPosition>,
         cachedSelection: DefaultValidatorSelection?
     ): DefaultValidatorSelection {
-        val largestPositionHotkey = positions.maxByOrNull { it.stakeInPlanks }?.validatorHotkey
+        val largestPositionHotkey = positions.maxByOrNull { it.stakeInPlanks }
+            ?.validatorHotkey
         if (cachedSelection != null && cachedSelection.positionHotkey == largestPositionHotkey) return cachedSelection
 
         val validator = validatorSource.preferredValidator(chain, positions)
@@ -108,5 +121,10 @@ class RealBittensorStakingRepository(
 
     private data class DefaultValidatorSelection(val positionHotkey: AccountIdKey?, val validator: BittensorValidator?)
 
-    private data class PositionState(val status: BittensorDataStatus, val validator: BittensorValidator?)
+    private data class PositionState(
+        val status: BittensorDataStatus,
+        val validator: BittensorValidator?,
+        val positions: List<BittensorRootPosition>,
+        val annualPercentageYield: BigDecimal?
+    )
 }

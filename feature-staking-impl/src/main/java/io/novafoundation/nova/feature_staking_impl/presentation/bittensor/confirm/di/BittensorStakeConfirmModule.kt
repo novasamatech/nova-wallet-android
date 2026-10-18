@@ -48,7 +48,7 @@ class BittensorStakeConfirmModule {
         retryController: BittensorRetryController,
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     ): ViewModel {
         return BittensorStakeConfirmViewModel(
             payload = payload,
@@ -66,7 +66,7 @@ class BittensorStakeConfirmModule {
             retryController = retryController,
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
-            feeLoaderMixinFactory = feeLoaderMixinFactory
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
         )
     }
 

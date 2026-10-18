@@ -54,7 +54,10 @@ class BittensorStakingRepositoryTest {
 
     private val blockNumbers = MutableStateFlow(BigInteger.ONE)
 
-    private val validator = BittensorValidator(AccountIdKey(ByteArray(32) { 1 }), "Validator")
+    private val validator = BittensorValidator(
+        AccountIdKey(ByteArray(32) { 1 }),
+        "Validator"
+    )
 
     private var positionRequests = 0
 
@@ -80,7 +83,7 @@ class BittensorStakingRepositoryTest {
             return validator
         }
 
-        override suspend fun annualPercentageYield(): BigDecimal? = null
+        override suspend fun annualPercentageYield(chain: Chain, validator: BittensorValidator): BigDecimal? = null
     }
 
     private val commonModule = CommonModule()
@@ -91,7 +94,13 @@ class BittensorStakingRepositoryTest {
 
     private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
 
-    private val positionRepository = RealBittensorPositionRepository(positions, portfolioLoader, chainStateRepository, computationalCache, logger)
+    private val positionRepository = RealBittensorPositionRepository(
+        positions,
+        portfolioLoader,
+        chainStateRepository,
+        computationalCache,
+        logger
+    )
 
     private val repository = RealBittensorStakingRepository(
         chainRegistry,
@@ -107,8 +116,7 @@ class BittensorStakingRepositoryTest {
         prepare()
 
         withTimeout(3_000L) {
-            repository.observeRootStakingDetails()
-                .onEach { if (blockNumbers.value == BigInteger.ONE) blockNumbers.value += BigInteger.ONE }
+            repository.observeRootStakingDetails().onEach { if (blockNumbers.value == BigInteger.ONE) blockNumbers.value += BigInteger.ONE }
                 .take(2)
                 .toList()
         }
@@ -122,18 +130,24 @@ class BittensorStakingRepositoryTest {
         prepare()
 
         val states = withTimeout(3_000L) {
-            repository.observeRootStakingDetails()
-                .onEach {
-                    failPositions = true
-                    blockNumbers.value += BigInteger.ONE
-                }
+            repository.observeRootStakingDetails().onEach {
+                failPositions = true
+                blockNumbers.value += BigInteger.ONE
+            }
                 .take(2)
                 .toList()
         }
 
-        assertTrue(states.first().dataStatus is BittensorDataStatus.Fresh)
-        assertTrue(states.last().dataStatus is BittensorDataStatus.Stale)
-        assertEquals(validator, states.last().validator)
+        assertTrue(
+            states.first().dataStatus is BittensorDataStatus.Fresh
+        )
+        assertTrue(
+            states.last().dataStatus is BittensorDataStatus.Stale
+        )
+        assertEquals(
+            validator,
+            states.last().validator
+        )
         assertEquals(1, validatorRequests)
     }
 
@@ -143,17 +157,21 @@ class BittensorStakingRepositoryTest {
         failValidatorSelection = true
 
         val states = withTimeout(3_000L) {
-            repository.observeRootStakingDetails()
-                .onEach {
-                    failValidatorSelection = false
-                    blockNumbers.value += BigInteger.ONE
-                }
+            repository.observeRootStakingDetails().onEach {
+                failValidatorSelection = false
+                blockNumbers.value += BigInteger.ONE
+            }
                 .take(2)
                 .toList()
         }
 
-        assertNull(states.first().validator)
-        assertEquals(validator, states.last().validator)
+        assertNull(
+            states.first().validator
+        )
+        assertEquals(
+            validator,
+            states.last().validator
+        )
         assertEquals(2, validatorRequests)
     }
 

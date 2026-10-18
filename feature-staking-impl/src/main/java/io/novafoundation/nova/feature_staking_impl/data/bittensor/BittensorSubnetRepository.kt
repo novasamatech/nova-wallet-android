@@ -79,8 +79,8 @@ class RealBittensorSubnetRepository(
 
 internal fun bindBittensorSubnets(decoded: Any?): List<BittensorSubnet> {
     val subnets = bindList(decoded, ::bindBittensorSubnet)
-        .filterNotNull()
-        .sortedBy { it.id.value }
+        .filterNotNull().sortedBy { it.id.value }
+
     val subnetIds = subnets.map { it.id }
         .distinct()
     require(subnetIds.size == subnets.size) { "Duplicate subnet ids" }
@@ -89,12 +89,15 @@ internal fun bindBittensorSubnets(decoded: Any?): List<BittensorSubnet> {
 
 private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
     if (decoded == null) return null
+
     val value = decoded.castToStruct()
     val netuid = BittensorNetuid.from(bindBittensorU16(value["netuid"]))
     if (netuid !is BittensorNetuid.Subnet) return null
     // The SDK normalizes composite fields from metadata to camelCase.
+
     val identity = value.get<Any?>("subnetIdentity")
         ?.castToStruct()
+
     val logoUrl = identity?.get<Any?>("logoUrl")
         ?.let(::bindBittensorText)
         ?.takeIf { it.startsWith("https://") }
@@ -104,7 +107,10 @@ private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
         symbol = bindBittensorText(requireNotNull(value.get<Any?>("tokenSymbol")) { "Subnet symbol field is missing" }),
         logoUrl = logoUrl,
         priceInRao = bindBittensorSubnetPrice(value.get<Any?>("taoIn"), value.get<Any?>("alphaIn")),
-        taoReserveInPlanks = value.get<Any?>("taoIn")?.let(::bindBittensorU64)
+        taoReserveInPlanks = value.get<Any?>("taoIn")
+            ?.let(::bindBittensorU64),
+        registrationBlock = value.get<Any?>("networkRegisteredAt")
+            ?.let(::bindBittensorU64)
     )
 }
 
@@ -112,7 +118,9 @@ private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
 internal fun bindBittensorText(decoded: Any?): String {
     val bytes = when (decoded) {
         is ByteArray -> decoded
-        else -> bindList(decoded) { bindBittensorU8(it).toByte() }
+        else -> bindList(decoded) {
+            bindBittensorU8(it).toByte()
+        }
             .toByteArray()
     }
     return bytes.decodeToString(throwOnInvalidSequence = true)
@@ -121,6 +129,7 @@ internal fun bindBittensorText(decoded: Any?): String {
 
 internal fun bindBittensorSubnetPrice(tao: Any?, alpha: Any?): BigInteger? {
     if (tao == null || alpha == null) return null
+
     val taoReserve = bindBittensorU64(tao)
     val alphaReserve = bindBittensorU64(alpha)
     if (taoReserve.isZero || alphaReserve.isZero) return null

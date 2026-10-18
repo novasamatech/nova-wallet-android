@@ -32,15 +32,21 @@ Preserve navigation XML organization: keep the leading include block together, g
 
 ## Operation confirmation
 
+Operation confirmation does not support switching wallets from another screen. Preserve the explicit-wallet operation contract without introducing UI for that unsupported scenario.
+
 Use `FeeLoaderMixinV2` for transaction fee loading, presentation, and retry handling, following existing `createDefault`/`createDefaultBy` and `connectWith` usages. Do not build a parallel fee-loading state machine in a feature ViewModel. Keep estimates associated with their operation inputs, and use the same loaded fee for display and validation. Retrying a fee estimate must not silently replace a confirmed quote, amount, or price limit.
 
 Fee estimation and submission must use the same call builder, including service fees and batch mode. Do not replace confirmed amounts or protective price limits with a fresh quote just before signing. Bind confirmation data and signing to the explicit operation wallet, not the globally selected wallet. Do not reject an operation merely because the selected meta-account changed. Recheck that operation wallet's available balance and applicable permissions before submission. Do not substitute a root validator for a subnet validator without explicit configuration and eligibility checks in that subnet.
 
 Before extending shared transaction APIs or introducing feature-specific submission tracking, inspect existing transfer, swap, and staking flows. Reuse their established submission and error-handling path. Cross-cutting reliability changes belong in shared infrastructure, not feature-specific signing callbacks or persistent pending locks.
 
+Bittensor uses the standard `submitExtrinsicAndAwaitExecution` path, like on-chain swaps. Do not add a durable submission journal, finalized-block recovery scanner, or wallet-wide pending lock without an explicit requirement. An unknown dispatch outcome must not be presented as success; do not promise automatic outcome recovery when none is implemented.
+
 Implement each validation rule as a separate Validation with one responsibility; keep data loading outside rule logic and let ValidationSystem compose the rules. Reuse existing amount and balance validations. Use the existing Validation/ValidationSystem and ValidationExecutor pipeline for expected transaction validation failures and warnings. Map failures through the established validation UI formatters; do not route them through custom exceptions or separate confirmation-dialog mechanisms. Revalidate time-sensitive data when continuing after a warning.
 
 ## Independent loading on one screen
+
+Keep loading, missing data, and failed reads distinct in Bittensor presentation. Preserve loading states through formatting and use existing Android loading components while requests are pending; an em dash is a settled unavailable value, not a loading placeholder. Reset account-dependent loading on wallet changes. Hide optional values when the corresponding iOS presentation hides them, rather than displaying placeholder rows. Keep retries and unrelated field loading independent.
 
 Load interactor data with `flowOf { ... }` or an interactor-provided Flow and share it with `shareInBackground()` when reused. Derive loading and presentation values with the established flow operators instead of copying them into `MutableStateFlow` from `init`. Keep mutable flows for user-editable state and explicit operation/retry controls, not redundant copies of loaded data. Name selections after the selected entity. Keep entity lookup by ID in the interactor rather than filtering its catalogue in the ViewModel.
 
@@ -82,6 +88,8 @@ Generate a validator's icon from its hotkey with `AddressIconGenerator`, as for 
 
 ## Self-review and refactoring
 
+Keep responsibilities separated when a class spans several workflows: data sources own transport and pagination; repositories own data access and caches; interactors own wallet-context orchestration and financial calculations; presentation owns UI loading states and formatting. Do not move an overloaded repository wholesale into a mixin. Preserve cache keys, invalidation, incomplete-data semantics, and cancellation when extracting responsibilities. Existing shared contracts should be assessed in context rather than replaced solely because of their type names.
+
 Use existing numeric sign extensions (`isPositive`, `isNegative`, `isZero`, `isNonNegative`, and `isNonPositive`) instead of inline `signum()` comparisons or local duplicates. Respect their existing property/function syntax for each numeric type. Apply the established project conventions proactively when reviewing nearby code, not only to explicitly reported lines.
 
 Give variables, classes, and functions clear, descriptive names that convey their purpose. Balance name length with the context it provides: avoid ambiguous abbreviations, but do not repeat information already clear from the surrounding scope.
@@ -92,9 +100,13 @@ Keep domain invariants in their owning types. Do not repeat constructor range ch
 
 Separate class property declarations with a blank line, following existing ViewModel references. Apply this to both single-line properties and multi-line flow declarations.
 
+Order class members as properties, init blocks, then functions. Do not interleave methods or init blocks with property declarations. When moving init blocks, check initialization dependencies and side effects first; preserve property initialization order and the relative order of multiple init blocks.
+
 For calls with multiple arguments that include a lambda or are followed by a trailing lambda, put each parenthesized argument on its own line. Keep the closing parenthesis on a separate line; do not compress such calls just because they fit the line-length limit.
 
-Put each successive call in a method chain on a new line. Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
+Put successive transformation calls in a method chain on separate lines when this improves readability. Keep short expressions, simple property access, and short predicate calls together; do not mechanically split expressions such as `finalizedBlock(chainId).number` or `hash.equals(transactionHash, ignoreCase = true)`. Keep a short call and its arguments on one line when they fit naturally. When an `if` condition contains a multi-line collection predicate or nested transformation, extract a descriptively named Boolean before the `if` so the control flow remains immediately visible.
+
+Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
 
 Do not repeat filtering already guaranteed by a backend resource contract. Verify that contract before removing a filter; keep client-owned validation, such as address decoding and on-chain eligibility checks.
 
@@ -109,3 +121,9 @@ Keep read and mapping methods free of hidden workflow state changes. Pass an exp
 Prefer named models for meaningful requests and load results over positional `Pair`/`Triple` values. Use scope functions for short transformations; keep validation, mutation and operation sequencing explicit. Do not manufacture zero-valued data merely to call a formatter and erase the result afterwards.
 
 Share subscriptions, decoding, and loading when multiple consumers need different parts of the same runtime response. Key shared streams by chain and account identity, bind their lifetime to active consumers, and keep dashboard and screen state derived from the same source. Keep recovery independent for unrelated reads, and keep screen-specific sources out of screens that do not consume them.
+
+## Bittensor position actions
+
+Subnet buy/sell execution uses the same swap-style screen for progress, success, and failure; do not open the root-staking result sheet for subnet failures. Keep operation details visible on failure. Try again returns to review rather than silently resubmitting, and unknown transaction outcomes must not offer retry.
+
+Keep root staking and subnet trading as separate flows. Root positions use Add stake and Unstake. Subnet positions have their own position-details screen with Buy more and Sell actions; do not route an existing subnet position to the discovery screen or label its trading flow as root staking. Use the corresponding Figma amount, confirmation, waiting, and result frames.

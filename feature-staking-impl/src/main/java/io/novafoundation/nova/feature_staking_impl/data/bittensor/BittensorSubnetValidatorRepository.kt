@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
 import io.novafoundation.nova.runtime.ext.accountIdOf
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
@@ -32,21 +33,51 @@ class RealBittensorSubnetValidatorRepository(
 
     override suspend fun validateRoot(chain: Chain, validator: BittensorValidator) = validate(chain, BittensorNetuid.Root, validator)
 
-    override suspend fun validators(chain: Chain, netuid: BittensorNetuid): List<BittensorSubnetValidator> = withTimeout(45_000L) {
-        val gates = backend.gates()
+    override suspend fun validators(chain: Chain, netuid: BittensorNetuid): List<BittensorSubnetValidator> = withTimeout(REQUEST_TIMEOUT_MILLIS) {
+        val ranking = backend.rankedValidators(netuid.value)
+        val gates = mapBittensorValidatorGates(BittensorRecommendationsRemote(ranking.meta))
+        val rankedRows = requireNotNull(ranking.items)
+        val recommendedHotkeys = recommendedHotkeys(rankedRows)
         val response = backend.validators(netuid.value)
         val candidates = mapCandidates(chain, response)
-        enrich(chain, netuid, candidates, gates)
+        val namedCandidates = applyRankedNames(chain, candidates, rankedRows)
+        enrich(
+            chain,
+            netuid,
+            namedCandidates,
+            gates
+        ).map { row -> row.copy(recommended = row.selectable && row.address in recommendedHotkeys) }
             .sortedWith(
                 compareByDescending<BittensorSubnetValidator> { it.selectable }
+                    .thenByDescending { it.recommended }
                     .thenBy { it.validator.name }
             )
+    }
+
+    private fun recommendedHotkeys(rows: List<BittensorRankedValidatorsRemote.Item>): Set<String> = rows
+        .filter { it.eligible == true && it.recommendationClass in RECOMMENDATION_CLASSES }
+        .mapNotNull { it.hotkey }
+        .toSet()
+
+    private fun applyRankedNames(
+        chain: Chain,
+        candidates: List<BittensorValidator>,
+        rows: List<BittensorRankedValidatorsRemote.Item>
+    ): List<BittensorValidator> {
+        val rankedNames = rows.associateBy { it.hotkey }
+        return candidates.map { validator ->
+            val address = chain.addressOf(validator.hotkey.value)
+            val name = rankedNames[address]?.validatorName
+                ?.trim()
+                ?.takeIf(String::isNotBlank)
+            validator.copy(name = name ?: validator.name)
+        }
     }
 
     private fun mapCandidates(chain: Chain, response: BittensorValidatorsRemote): List<BittensorValidator> = requireNotNull(response.items)
         .mapNotNull { mapValidator(chain, it) }
         .distinctBy { it.hotkey }
-        .take(512)
+        .take(MAX_VALIDATORS)
 
     private fun mapValidator(chain: Chain, remote: BittensorValidatorsRemote.Item): BittensorValidator? {
         val address = remote.hotkey ?: return null
@@ -62,9 +93,14 @@ class RealBittensorSubnetValidatorRepository(
         return BittensorValidator(AccountIdKey(hotkey), identityName ?: stakeName ?: address)
     }
 
-    override suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator) = withTimeout(45_000L) {
+    override suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator) = withTimeout(REQUEST_TIMEOUT_MILLIS) {
         val gates = backend.gates()
-        val row = enrich(chain, netuid, listOf(validator), gates)
+        val row = enrich(
+            chain,
+            netuid,
+            listOf(validator),
+            gates
+        )
             .singleOrNull()
         require(row?.selectable == true) { "Validator is no longer eligible in this subnet" }
     }
@@ -77,9 +113,27 @@ class RealBittensorSubnetValidatorRepository(
     ): List<BittensorSubnetValidator> {
         if (validators.isEmpty()) return emptyList()
         val hash = rpc.getBlockHash(chain.id)
-        val snapshot = storage.query(chain.id, at = hash, applyStorageDefault = true) {
+        val snapshot = storage.query(
+            chain.id,
+            at = hash,
+            applyStorageDefault = true
+        ) {
             loadBittensorValidatorSnapshot(netuid, validators)
         }
-        return mapBittensorValidators(chain, netuid, validators, gates, snapshot)
+        return mapBittensorValidators(
+            chain,
+            netuid,
+            validators,
+            gates,
+            snapshot
+        )
+    }
+    private companion object {
+
+        val RECOMMENDATION_CLASSES = setOf("stable", "balanced", "higherUpside")
+
+        const val MAX_VALIDATORS = 512
+
+        const val REQUEST_TIMEOUT_MILLIS = 45_000L
     }
 }

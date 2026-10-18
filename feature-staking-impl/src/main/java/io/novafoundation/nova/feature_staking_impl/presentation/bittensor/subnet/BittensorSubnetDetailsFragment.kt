@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -26,14 +27,20 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             putParcelable(PAYLOAD_KEY, payload)
         }
     }
-    private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+
+    private val imageLoader by lazy {
+        FeatureUtils.getCommonApi(requireContext())
+            .imageLoader()
+    }
 
     override fun createBinding() = FragmentBittensorSubnetDetailsBinding.inflate(layoutInflater)
 
     override fun inject() {
         val payload = argument<BittensorSubnetDetailsPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetDetailsComponentFactory().create(this, payload).inject(this)
+            .bittensorSubnetDetailsComponentFactory()
+            .create(this, payload)
+            .inject(this)
     }
 
     override fun initViews() = with(binder) {
@@ -75,14 +82,20 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             priceTitle.text = getString(R.string.price_chart_title, name)
             subnetNumber.showValue(subnet.id.value.toString())
             imageLoader.enqueue(
-                ImageRequest.Builder(requireContext()).data(subnet.logoUrl)
-                    .size(28.dp(requireContext()))
-                    .apply { bittensorSubnetIcon() }
+                ImageRequest.Builder(requireContext())
+                    .data(subnet.logoUrl)
+                    .size(28.dp(requireContext())).apply { bittensorSubnetIcon() }
                     .target {
                         val size = 28.dp(requireContext())
-                        it.setBounds(0, 0, size, size)
+                        it.setBounds(
+                            0,
+                            0,
+                            size,
+                            size
+                        )
                         toolbar.setTitleIcon(it)
-                    }.build()
+                    }
+                    .build()
             )
         }
         viewModel.price.observe { price.text = it }
@@ -97,8 +110,11 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         viewModel.charts.observe(chart::setCharts)
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.estimatedAlpha.observe { estimate.text = it }
-        viewModel.pool.observe(pool::showValue)
-        viewModel.validatorCount.observe(validatorCount::showValue)
+        viewModel.pool.observe(pool::showBittensorLoadingValue)
+        viewModel.age.observe(age::showBittensorLoadingValue)
+        viewModel.priceHistory.observe(priceHistory::showBittensorLoadingValue)
+        viewModel.priceRange.observe(priceRange::showBittensorLoadingValue)
+        viewModel.validatorCount.observe(validatorCount::showBittensorLoadingValue)
         viewModel.selectedPreset.observe { selected ->
             preset1.isSelected = selected == BittensorStakeAmountPreset.ONE
             preset5.isSelected = selected == BittensorStakeAmountPreset.FIVE

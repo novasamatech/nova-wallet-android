@@ -5,6 +5,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.animation.LinearInterpolator
+import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_staking_impl.databinding.BottomSheetBittensorStakeResultBinding
@@ -22,7 +23,12 @@ class BittensorStakeResultBottomSheet(
 
     override val binder = BottomSheetBittensorStakeResultBinding.inflate(LayoutInflater.from(context))
 
-    private val spinnerAnimator = ObjectAnimator.ofFloat(binder.bittensorStakeResultSpinner, View.ROTATION, 0f, 360f).apply {
+    private val spinnerAnimator = ObjectAnimator.ofFloat(
+        binder.bittensorStakeResultSpinner,
+        View.ROTATION,
+        0f,
+        360f
+    ).apply {
         duration = SPINNER_ANIMATION_DURATION
         interpolator = LinearInterpolator()
         repeatCount = ObjectAnimator.INFINITE
@@ -41,6 +47,9 @@ class BittensorStakeResultBottomSheet(
         binder.bittensorStakeResultProgress.setVisible(inProgress)
         binder.bittensorStakeResultSuccess.setVisible(state is BittensorStakeResultUi.Success)
         binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure)
+        binder.bittensorStakeResultValidator.isVisible = state is BittensorStakeResultUi.Success
+        binder.bittensorStakeResultFee.isVisible = state is BittensorStakeResultUi.Success
+        (binder.bittensorStakeResultFee.parent as View).isVisible = state is BittensorStakeResultUi.Success
 
         setCancelable(!inProgress)
         setCanceledOnTouchOutside(!inProgress)
@@ -76,6 +85,7 @@ class BittensorStakeResultBottomSheet(
     }
 
     private fun showFailure(state: BittensorStakeResultUi.Failure) {
+        binder.bittensorStakeResultTryAgain.isVisible = state.canRetry
         binder.bittensorStakeResultFailureTitle.text = state.title
         binder.bittensorStakeResultFailureDescription.text = state.description
         binder.bittensorStakeResultError.setMessage(state.error)

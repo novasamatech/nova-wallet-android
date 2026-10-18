@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
 import androidx.core.widget.doAfterTextChanged
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -48,9 +49,11 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
         viewModel.amountModel.observe(binder.bittensorStakeAmount::setChooseAmountModel)
         viewModel.amount.observe(::showAmount)
         viewModel.fiatAmount.observe(binder.bittensorStakeAmount::setFiatAmount)
+        viewModel.currentStake.observe(binder.currentStake::showBittensorLoadingValue)
+        viewModel.monthlyEstimate.observe(binder.monthlyEstimate::showBittensorLoadingValue)
         viewModel.maxAmount.observe(binder.bittensorStakeAmount::setMaxAmountDisplay)
         viewModel.validator.observe(::showValidator)
-        viewModel.apy.observe(binder.bittensorStakeAmountApy::showValue)
+        viewModel.apy.observe(binder.bittensorStakeAmountApy::showBittensorLoadingValue)
         viewModel.fee.observe(binder.bittensorStakeAmountFee::setFeeStatus)
         viewModel.continueButtonState.observe(binder.bittensorStakeAmountContinue::setState)
     }

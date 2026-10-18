@@ -12,6 +12,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setCurrentText
 import io.novafoundation.nova.common.utils.setText
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable

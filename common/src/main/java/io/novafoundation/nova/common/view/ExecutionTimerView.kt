@@ -1,4 +1,4 @@
-package io.novafoundation.nova.feature_swap_impl.presentation.execution
+package io.novafoundation.nova.common.view
 
 import android.content.Context
 import android.os.CountDownTimer
@@ -14,13 +14,13 @@ import android.view.animation.RotateAnimation
 import android.widget.TextSwitcher
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import io.novafoundation.nova.common.R
+import io.novafoundation.nova.common.databinding.ViewExecutionTimerBinding
 import io.novafoundation.nova.common.utils.WithContextExtensions
 import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.makeGone
 import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setTextColorRes
-import io.novafoundation.nova.feature_swap_impl.R
-import io.novafoundation.nova.feature_swap_impl.databinding.ViewExecutionTimerBinding
 import kotlin.math.cos
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -45,21 +45,21 @@ class ExecutionTimerView @JvmOverloads constructor(
 
     private val binder = ViewExecutionTimerBinding.inflate(inflater(), this)
 
-    private var currentState: State? = null
-
     private val slideTopInAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_slide_bottom_in)
+
     private val slideTopOutAnimation = AnimationUtils.loadAnimation(context, R.anim.fade_slide_bottom_out)
 
     private var currentTimer: CountDownTimer? = null
+
+    private var pendingTimerStart: Runnable? = null
 
     init {
         setupTimerSwitcher()
     }
 
     fun setState(state: State) {
-        currentState = state
-
-        currentTimer?.cancel()
+        stopTimer()
+        clearAnimations()
 
         when (state) {
             State.Success -> {
@@ -103,13 +103,42 @@ class ExecutionTimerView @JvmOverloads constructor(
         binder.executionTimeSeconds.fadeInWithScale()
     }
 
-    private fun runTimerWithDelay(delay: Long, timer: CountDownTimer) {
-        postDelayed({ timer.start() }, delay)
+    private fun runTimerWithDelay(
+        delay: Long,
+        timer: CountDownTimer
+    ) {
+        pendingTimerStart = Runnable { timer.start() }
+            .also { postDelayed(it, delay) }
+    }
+
+    private fun stopTimer() {
+        pendingTimerStart?.let(::removeCallbacks)
+        pendingTimerStart = null
+        currentTimer?.cancel()
+        currentTimer = null
+    }
+
+    override fun onDetachedFromWindow() {
+        stopTimer()
+        clearAnimations()
+        super.onDetachedFromWindow()
+    }
+
+    private fun clearAnimations() {
+        listOf(binder.executionProgress, binder.executionResult, binder.executionTimeSwitcher, binder.executionTimeSeconds).forEach { view ->
+            view.animate().cancel()
+            view.clearAnimation()
+        }
     }
 
     private fun setupTimerSwitcher() {
         binder.executionTimeSwitcher.setFactory {
-            val textView = TextView(context, null, 0, R.style.TextAppearance_NovaFoundation_Bold_Title3)
+            val textView = TextView(
+                context,
+                null,
+                0,
+                R.style.TextAppearance_NovaFoundation_Bold_Title3
+            )
             textView.setGravity(Gravity.CENTER)
             textView.setTextColorRes(R.color.text_primary)
             textView.includeFontPadding = false
@@ -139,8 +168,7 @@ class ExecutionTimerView @JvmOverloads constructor(
     private fun View.fadeOut() {
         animate()
             .alpha(0f)
-            .setDuration(400)
-            .withEndAction { makeGone() }
+            .setDuration(400).withEndAction { makeGone() }
             .setInterpolator(DecelerateInterpolator())
             .start()
     }
@@ -160,8 +188,7 @@ class ExecutionTimerView @JvmOverloads constructor(
             .alpha(0f)
             .scaleX(HIDE_SCALE)
             .scaleY(HIDE_SCALE)
-            .setDuration(400)
-            .withEndAction { makeGone() }
+            .setDuration(400).withEndAction { makeGone() }
             .setInterpolator(DecelerateInterpolator())
             .start()
     }
@@ -192,7 +219,8 @@ private class StartSpeedAccelerateDecelerateInterpolator : BaseInterpolator() {
 
 private class CountdownSwitcherTimer(val switcher: TextSwitcher, duration: Duration) :
     CountDownTimer(
-        duration.inWholeMilliseconds + SECOND_MILLIS, // Add a seconds to show max value to user
+        duration.inWholeMilliseconds + SECOND_MILLIS,
+        // Add a seconds to show max value to user
         SECOND_MILLIS
     ) {
 

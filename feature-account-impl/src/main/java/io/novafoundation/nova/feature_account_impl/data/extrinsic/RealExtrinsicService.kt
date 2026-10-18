@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
 import io.novafoundation.nova.common.data.network.runtime.model.FeeResponse
 import io.novafoundation.nova.common.utils.LOG_TAG
+import io.novafoundation.nova.common.utils.extrinsicHash
 import io.novafoundation.nova.common.utils.mapAsync
 import io.novafoundation.nova.common.utils.multiResult.RetriableMultiResult
 import io.novafoundation.nova.common.utils.multiResult.runMultiCatching
@@ -34,8 +35,8 @@ import io.novafoundation.nova.feature_account_api.data.signer.CallExecutionType
 import io.novafoundation.nova.feature_account_api.data.signer.NovaSigner
 import io.novafoundation.nova.feature_account_api.data.signer.SignerProvider
 import io.novafoundation.nova.feature_account_api.data.signer.SigningContext
-import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.SigningMode
+import io.novafoundation.nova.feature_account_api.data.signer.SubmissionHierarchy
 import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
@@ -102,8 +103,7 @@ class RealExtrinsicService(
                 submission.extrinsics.map { it to submission }
             },
             listProcessing = { (extrinsic, submission) ->
-                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
-                    .filterIsInstance<ExtrinsicStatus.InBlock>()
+                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic).filterIsInstance<ExtrinsicStatus.InBlock>()
                     .map { ExtrinsicWatchResult(it, submission.submissionHierarchy) }
                     .first()
             }

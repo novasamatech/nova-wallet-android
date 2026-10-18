@@ -10,12 +10,15 @@ sealed class BittensorSubmissionState(val result: BittensorStakeResultUi?) {
 
     class Failed(result: BittensorStakeResultUi.Failure? = null) : BittensorSubmissionState(result)
 
+    class Unresolved(val hash: String, result: BittensorStakeResultUi.Failure? = null) : BittensorSubmissionState(result)
+
     val canSubmit: Boolean
         get() = this is Ready || this is Failed
 
     fun dismissResult(): BittensorSubmissionState = when (this) {
         is Completed -> Completed()
         is Failed -> Failed()
+        is Unresolved -> Unresolved(hash)
         else -> this
     }
 }

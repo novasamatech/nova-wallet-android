@@ -5,13 +5,16 @@ import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorPortfolioBinding
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
 
 class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorPortfolioBinding>() {
 
-    private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+    private val imageLoader by lazy {
+        FeatureUtils.getCommonApi(requireContext())
+            .imageLoader()
+    }
 
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::positionClicked) }
 
@@ -19,7 +22,9 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
 
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorDetailsComponentFactory().create(this).inject(this)
+            .bittensorDetailsComponentFactory()
+            .create(this)
+            .inject(this)
     }
 
     override fun initViews() = with(binder) {
@@ -43,7 +48,11 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         }
         viewModel.priceChartModels.observe(priceChart::setCharts)
         viewModel.chartAxisFormatter.observe(priceChart::setAxisLabelFormatter)
-        viewModel.isLoading.observe { loading.isVisible = it }
+        viewModel.isLoading.observe {
+            loading.isVisible = it
+            totalAmount.isVisible = !it
+            totalFiat.isVisible = !it
+        }
         viewModel.canAddStake.observe { addPosition.isEnabled = it }
         viewModel.totalStake.observe {
             totalAmount.text = it.token

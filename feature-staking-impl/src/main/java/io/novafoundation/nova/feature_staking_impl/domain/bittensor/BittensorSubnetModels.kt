@@ -6,7 +6,8 @@ import java.math.BigInteger
 data class BittensorSubnetPosition(
     val subnetId: BittensorNetuid.Subnet,
     val validatorHotkey: AccountIdKey,
-    val alphaInPlanks: BigInteger
+    val alphaInPlanks: BigInteger,
+    val isRegistered: Boolean? = null
 )
 
 enum class BittensorSwapDirection {
@@ -18,6 +19,7 @@ data class BittensorSwapSimulation(
     val subnetId: BittensorNetuid.Subnet,
     val direction: BittensorSwapDirection,
     /** Net pool input, excluding the runtime fee in the input token. */
+
     val amountIn: BigInteger,
     val amountOut: BigInteger,
     val taoFee: BigInteger,
