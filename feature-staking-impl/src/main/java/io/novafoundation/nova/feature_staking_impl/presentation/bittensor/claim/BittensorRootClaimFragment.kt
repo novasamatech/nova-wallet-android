@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim
 
 import androidx.core.os.bundleOf
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.base.BaseFragment
@@ -52,9 +53,9 @@ class BittensorRootClaimFragment : BaseFragment<BittensorRootClaimViewModel, Fra
         observeRetries(viewModel.feeLoaderMixin)
         observeValidations(viewModel)
         viewModel.feeCaption.observe { feeCaption.text = it }
-        viewModel.amount.observe(amount::showValue)
-        viewModel.forfeited.observe(forfeited::showValue)
-        viewModel.validator.observe(validator::showValue)
+        viewModel.amount.observe(amount::showBittensorLoadingValue)
+        viewModel.forfeited.observe(forfeited::showBittensorLoadingValue)
+        viewModel.validator.observe(validator::showBittensorLoadingValue)
         viewModel.validatorIcon.observe {
             validator.image.isVisible = it != null
             validator.image.setImageDrawable(it)

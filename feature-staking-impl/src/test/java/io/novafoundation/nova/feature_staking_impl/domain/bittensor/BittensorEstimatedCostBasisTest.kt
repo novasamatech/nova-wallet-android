@@ -12,6 +12,52 @@ class BittensorEstimatedCostBasisTest {
 
     private val precision = BigInteger.TEN.pow(9)
 
+    @Test
+    fun `price tolerance includes both boundaries`() {
+        val amounts = listOf("2", "4.5")
+        amounts.forEach { amount ->
+            val purchase = operation(amount, "30", "0.1", "1")
+            val ledger = BittensorEstimatedCostBasis(listOf(purchase), true)
+
+            assertTrue(ledger.canEstimate(64))
+            assertEquals(BigDecimal(amount).movePointRight(9).toBigInteger(), ledger.forSubnet(64)?.paidTao)
+        }
+    }
+
+    @Test
+    fun `price outside tolerance is unclassified`() {
+        val amounts = listOf("1.999999999", "4.500000001")
+        amounts.forEach { amount ->
+            val purchase = operation(amount, "30", "0.1", "1")
+            val ledger = BittensorEstimatedCostBasis(listOf(purchase), true)
+
+            assertFalse(ledger.canEstimate(64))
+        }
+    }
+
+    @Test
+    fun `non trade labels support separators camel case and acronyms`() {
+        val labels = listOf("move", "TRANSFER", "stake_transfer", "moveStake", "stakeTransfer", "TAOTransfer", "stake-move")
+        labels.forEach { label ->
+            val movement = operation("10", "100", "0.1", "1").copy(type = label)
+            val ledger = BittensorEstimatedCostBasis(listOf(movement), true)
+
+            assertTrue(label, ledger.canEstimate(64))
+            assertNull(label, ledger.forSubnet(64))
+        }
+    }
+
+    @Test
+    fun `non trade matching requires a whole word`() {
+        val labels = listOf(null, "", "removeStake", "transferable", "movement")
+        labels.forEach { label ->
+            val purchase = operation("10", "100", "0.1", "1").copy(type = label)
+            val ledger = BittensorEstimatedCostBasis(listOf(purchase), true)
+
+            assertEquals(precision * BigInteger.TEN, ledger.forSubnet(64)?.paidTao)
+        }
+    }
+
     @Test fun `purchase and partial sale retain proportional cost then combine a new purchase`() {
         val ledger = BittensorEstimatedCostBasis(
             listOf(

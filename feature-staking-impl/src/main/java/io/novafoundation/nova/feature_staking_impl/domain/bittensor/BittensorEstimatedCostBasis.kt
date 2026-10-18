@@ -56,7 +56,7 @@ class BittensorEstimatedCostBasis(
         val seen = mutableSetOf<BittensorReportedOperation>()
         operations.asReversed().forEach { row ->
             if (row.eventId.isNotEmpty() && !seen.add(row)) return@forEach
-            if (BittensorNetuid.from(row.netuid).isRoot() || nonTrade(row.type)) {
+            if (BittensorNetuid.from(row.netuid).isRoot() || isNonTradeOperation(row.type)) {
                 return@forEach
             }
             applyOperation(row)
@@ -70,8 +70,8 @@ class BittensorEstimatedCostBasis(
             return
         }
         if (trade.amountIn.isZero || trade.amountOut.isZero || trade.price.isZero) return
-        val buy = fits(trade.amountIn, trade.amountOut, trade.price)
-        val sell = fits(trade.amountOut, trade.amountIn, trade.price)
+        val buy = matchesReportedPrice(trade.amountIn, trade.amountOut, trade.price)
+        val sell = matchesReportedPrice(trade.amountOut, trade.amountIn, trade.price)
         when {
             buy && !sell -> addPurchase(operation.netuid, trade)
             sell && !buy -> reducePurchase(operation.netuid, trade.amountIn)
@@ -117,15 +117,40 @@ class BittensorEstimatedCostBasis(
         return totals[netuid]
     }
 
-    private fun fits(tao: BigInteger, alpha: BigInteger, price: BigDecimal): Boolean {
-        val taoValue = tao.toBigDecimal()
-        val alphaValue = alpha.toBigDecimal() * price
-        return taoValue * BigDecimal(3) >= alphaValue * BigDecimal(2) && taoValue * BigDecimal(2) <= alphaValue * BigDecimal(3)
+    private fun matchesReportedPrice(tao: BigInteger, alpha: BigInteger, price: BigDecimal): Boolean {
+        val reportedTao = tao.toBigDecimal()
+        val pricedAlpha = alpha.toBigDecimal() * price
+        val meetsLowerBound = reportedTao * PRICE_TOLERANCE_FACTOR >= pricedAlpha
+        val meetsUpperBound = reportedTao <= pricedAlpha * PRICE_TOLERANCE_FACTOR
+
+        return meetsLowerBound && meetsUpperBound
     }
 
-    private fun nonTrade(label: String?): Boolean {
-        val separated = label?.replace(Regex("([a-z])([A-Z])"), "$1 $2")
-            ?.replace(Regex("([A-Z])([A-Z][a-z])"), "$1 $2") ?: return false
-        return separated.split(Regex("[^A-Za-z]+")).any { it.equals("move", true) || it.equals("transfer", true) }
+    private fun isNonTradeOperation(operationType: String?): Boolean {
+        if (operationType == null) return false
+
+        return operationTypeWords(operationType)
+            .any { it.lowercase() in NON_TRADE_WORDS }
+    }
+
+    private fun operationTypeWords(operationType: String): List<String> {
+        val separatedWords = operationType
+            .replace(CAMEL_CASE_BOUNDARY, "$1 $2")
+            .replace(ACRONYM_WORD_BOUNDARY, "$1 $2")
+
+        return separatedWords.split(NON_LETTER_SEPARATOR)
+    }
+
+    private companion object {
+        // Matches the iOS ledger heuristic: accept ratios from 1 / 1.5 through 1.5.
+        val PRICE_TOLERANCE_FACTOR = 1.5.toBigDecimal()
+
+        val NON_TRADE_WORDS = setOf("move", "transfer")
+
+        val CAMEL_CASE_BOUNDARY = Regex("([a-z])([A-Z])")
+
+        val ACRONYM_WORD_BOUNDARY = Regex("([A-Z])([A-Z][a-z])")
+
+        val NON_LETTER_SEPARATOR = Regex("[^A-Za-z]+")
     }
 }

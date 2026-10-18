@@ -206,11 +206,7 @@ class BittensorEstimatesRepositoryTest {
 
         var failure: Exception? = null
 
-        override suspend fun operations(url: String): Response<BittensorOperationsRemote> {
-            val page = requireNotNull(
-                url.toHttpUrl()
-                    .queryParameter("page")
-            ).toInt()
+        override suspend fun operations(url: String, address: String, page: Int): Response<BittensorOperationsRemote> {
             historyPages += page
             failure?.let { throw it }
             val component = BittensorRecommendationsRemote.Component("AVAILABLE", freshness)
@@ -227,11 +223,7 @@ class BittensorEstimatesRepositoryTest {
             return Response.success(body, headers)
         }
 
-        override suspend fun alphaYields(url: String): Response<BittensorAlphaYieldsRemote> {
-            val page = requireNotNull(
-                url.toHttpUrl()
-                    .queryParameter("page")
-            ).toInt()
+        override suspend fun alphaYields(url: String, page: Int): Response<BittensorAlphaYieldsRemote> {
             yieldPages += page
             val component = BittensorRecommendationsRemote.Component("AVAILABLE", freshness)
             val components = BittensorAlphaYieldsRemote.Components(component)

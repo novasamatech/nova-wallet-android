@@ -163,6 +163,15 @@
                     app:label="@string/bittensor_claim_action"
                     app:icon="@drawable/ic_arrow_down" />
             </io.novafoundation.nova.common.view.TableView>
+            <TextView
+                android:id="@+id/minimumClaimHint"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/validators"
                 android:layout_width="match_parent"

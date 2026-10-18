@@ -58,6 +58,12 @@
             android:textColor="@color/text_secondary" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/positionAmountProgress"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:visibility="gone" />
+
     <ImageView
         android:id="@+id/positionChevron"
         android:layout_width="20dp"

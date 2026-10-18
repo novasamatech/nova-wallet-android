@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.createSubstrateAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -151,27 +152,30 @@ class BittensorRootClaimViewModel(
     }
         .shareInBackground()
 
-    val amount = prepared.map {
-        it.dataOrNull?.let { draft ->
+    val amount = state.mapLoading { claim ->
+        claim.claims.claimable.firstOrNull()?.let { preview ->
             tokenFormatter.formatToken(
-                draft.state.asset.token.amountFromPlanks(draft.preview.redeemable),
-                draft.state.asset.token.configuration.symbol
+                claim.asset.token.amountFromPlanks(preview.redeemable),
+                claim.asset.token.configuration.symbol
             )
         } ?: "—"
     }
         .shareInBackground()
 
-    val forfeited = prepared.map {
-        it.dataOrNull?.let { draft ->
+    val forfeited = state.mapLoading { claim ->
+        claim.claims.claimable.firstOrNull()?.let { preview ->
             tokenFormatter.formatToken(
-                draft.state.asset.token.amountFromPlanks(draft.preview.forfeitedEstimate),
-                draft.state.asset.token.configuration.symbol
+                claim.asset.token.amountFromPlanks(preview.forfeitedEstimate),
+                claim.asset.token.configuration.symbol
             )
         } ?: "—"
     }
         .shareInBackground()
 
-    val validator = prepared.map { it.dataOrNull?.let { draft -> draft.state.chain.addressOf(draft.preview.hotkey.value) } ?: "—" }
+    val validator = state.mapLoading { claim ->
+        claim.claims.claimable.firstOrNull()
+            ?.let { claim.chain.addressOf(it.hotkey.value) } ?: "—"
+    }
         .shareInBackground()
 
     val validatorIcon = prepared.map {
@@ -280,7 +284,7 @@ class BittensorRootClaimViewModel(
                         resources.getString(R.string.bittensor_claim_completed),
                         resources.getString(R.string.bittensor_claim_completed_description),
                         draft.state.chain.addressOf(draft.preview.hotkey.value),
-                        BittensorFeeUi("≈ " + tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol), "—")
+                        BittensorFeeUi("≈ " + tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol), null)
                     )
                 )
                 is BittensorOperationResult.Failure -> ClaimExecution.Result(failure(result.cause.message))

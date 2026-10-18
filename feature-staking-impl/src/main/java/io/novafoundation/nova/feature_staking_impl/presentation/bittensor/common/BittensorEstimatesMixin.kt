@@ -13,11 +13,9 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 
 /** Optional estimates must not block the operation or hide its independently loaded data. */
 class BittensorEstimatesMixin(
@@ -36,14 +34,13 @@ class BittensorEstimatesMixin(
                     }
             }
 
-    fun observeAlphaYields(context: Flow<Chain?>, subnetId: BittensorNetuid.Subnet): Flow<Map<AccountIdKey, BigDecimal>?> =
+    fun observeAlphaYields(context: Flow<Chain?>, subnetId: BittensorNetuid.Subnet): Flow<ExtendedLoadingState<Map<AccountIdKey, BigDecimal>?>> =
         context.distinctUntilChanged()
             .flatMapLatest { chain ->
                 flowOf { chain?.let { alphaYieldRepository.alphaYields(it, subnetId) } }
-                    .onStart { emit(null) }
-                    .catch { cause ->
-                        reportUnavailable(cause)
-                        emit(null)
+                    .withSafeLoading()
+                    .onEach { state ->
+                        if (state is ExtendedLoadingState.Error) reportUnavailable(state.exception)
                     }
             }
 

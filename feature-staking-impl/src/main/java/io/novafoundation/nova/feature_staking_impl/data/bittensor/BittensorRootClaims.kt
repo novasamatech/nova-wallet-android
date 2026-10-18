@@ -19,6 +19,9 @@ data class BittensorRootClaims(
     val safeModeActive: Boolean = false
 ) {
 
+    val hasRewardsBelowMinimum: Boolean
+        get() = previews.any { it.accrued.isPositive() } && claimable.isEmpty()
+
     val claimable: List<BittensorRootClaimPreview>
         get() = previews.filter { it.redeemable.isPositive() && it.redeemable >= minimum }
             .sortedWith(

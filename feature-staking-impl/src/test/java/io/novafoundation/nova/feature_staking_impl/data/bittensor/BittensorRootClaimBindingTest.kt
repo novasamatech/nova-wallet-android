@@ -3,12 +3,53 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BittensorRootClaimBindingTest {
 
     private val unit = BigInteger.ONE.shiftLeft(32)
+
+    @Test
+    fun `distributed rewards cannot be combined to reach the minimum`() {
+        val claims = claimsWithRewards(200_000, 300_000)
+
+        assertTrue(claims.claimable.isEmpty())
+        assertTrue(claims.hasRewardsBelowMinimum)
+    }
+
+    @Test
+    fun `exact minimum is claimable without a minimum hint`() {
+        val claims = claimsWithRewards(500_000)
+
+        assertEquals(1, claims.claimable.size)
+        assertFalse(claims.hasRewardsBelowMinimum)
+    }
+
+    @Test
+    fun `eligible validator allows claiming despite another below minimum`() {
+        val claims = claimsWithRewards(200_000, 600_000)
+
+        assertEquals(listOf(BigInteger.valueOf(600_000)), claims.claimable.map { it.redeemable })
+        assertFalse(claims.hasRewardsBelowMinimum)
+    }
+
+    @Test
+    fun `no rewards do not require a minimum hint`() {
+        assertFalse(claimsWithRewards().hasRewardsBelowMinimum)
+        assertFalse(claimsWithRewards(0).hasRewardsBelowMinimum)
+    }
+
+    private fun claimsWithRewards(vararg amounts: Long): BittensorRootClaims {
+        val previews = amounts.mapIndexed { index, amount ->
+            preview((index + 1).toByte(), amount, amount, 0)
+        }
+        return BittensorRootClaims(
+            previews = bindBittensorRootClaimPreviews(previews),
+            minimum = BigInteger.valueOf(500_000)
+        )
+    }
 
     @Test fun `unset threshold uses runtime default`() {
         assertEquals(BigInteger.valueOf(500_000), bittensorMinimumRootClaim(null))

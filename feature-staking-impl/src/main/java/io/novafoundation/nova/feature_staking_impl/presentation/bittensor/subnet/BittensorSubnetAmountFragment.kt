@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import coil.load
@@ -10,7 +11,6 @@ import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
 import io.novafoundation.nova.common.view.setState
-import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetAmountBinding
@@ -71,8 +71,8 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         observeValidations(viewModel)
         observeRetries(viewModel.feeLoaderMixin)
         observeBittensorRetries(viewModel.retryEvents)
-        viewModel.monthlyEstimate.observe(monthlyTokens::showValue)
-        viewModel.projectedAveragePrice.observe(projectedAveragePrice::showLoadingValue)
+        viewModel.monthlyEstimate.observe(monthlyTokens::showBittensorLoadingValue)
+        viewModel.projectedAveragePrice.observe(projectedAveragePrice::showBittensorLoadingValue)
         viewModel.fee.observe(networkFee::setFeeStatus)
         viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.amountModel.observe(amount::setChooseAmountModel)
@@ -97,10 +97,13 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
                 bittensorSubnetIcon()
             }
         }
-        viewModel.validator.observe(validator::showValue)
-        viewModel.apy.observe { subnetApy.text = it }
-        viewModel.alphaAmount.observe(receive::showValue)
-        viewModel.rate.observe(rate::showValue)
+        viewModel.validator.observe(validator::showBittensorLoadingValue)
+        viewModel.apy.observe {
+            subnetApy.text = it
+            subnetApy.isVisible = it != null
+        }
+        viewModel.alphaAmount.observe(receive::showBittensorLoadingValue)
+        viewModel.rate.observe(rate::showBittensorLoadingValue)
         viewModel.continueButtonState.observe(continueButton::setState)
     }
 

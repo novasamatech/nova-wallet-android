@@ -1,8 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoaded
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -37,7 +40,6 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -46,7 +48,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 
 class BittensorSubnetDetailsViewModel(
     private val subnetId: BittensorNetuid.Subnet,
@@ -162,14 +163,22 @@ class BittensorSubnetDetailsViewModel(
     }
         .shareInBackground()
 
-    val validatorCount = validators.map { it.size.toString() }
+    val validatorCount = validatorsState.mapLoading { it.size.toString() }
         .shareInBackground()
 
     val pool = combine(
-        subnet,
-        asset
-    ) { subnet, asset ->
-        subnet.taoReserveInPlanks?.let { tokenFormatter.formatToken(it, asset) } ?: "—"
+        subnetState,
+        assetState
+    ) { subnetState, assetState ->
+        bittensorLoadingValue(subnetState, assetState) {
+            val subnet = subnetState.dataOrNull
+            val asset = assetState.dataOrNull
+            if (subnet?.taoReserveInPlanks == null || asset == null) {
+                "—"
+            } else {
+                tokenFormatter.formatToken(subnet.taoReserveInPlanks, asset)
+            }
+        }
     }
         .shareInBackground()
 
@@ -306,21 +315,22 @@ class BittensorSubnetDetailsViewModel(
         }
     }
 
-    private val ageState = retryController.observe(
-        step = "subnet age",
-        transform = { source ->
-            source.onStart { emit(null) }
-                .catch { emit(null) }
-        }
-    ) {
-        subnet.flatMapLatest { subnet ->
-            flowOf { subnetSafetyInteractor.ageInDays(subnet) }
-                .onStart { emit(null) }
+    private val ageState = subnetState.flatMapLatest { state ->
+        val subnet = state.dataOrNull
+        if (subnet == null) {
+            flowOf { state.map { null } }
+        } else {
+            retryController.observe(
+                step = "subnet age",
+                transform = { it.withSafeLoading() }
+            ) {
+                flowOf { subnetSafetyInteractor.ageInDays(subnet) }
+            }
         }
     }
         .shareInBackground()
 
-    val age = ageState.map {
+    val age = ageState.mapLoading {
         it?.let { days ->
             resources.getString(
                 R.string.bittensor_safety_age_days,
@@ -330,29 +340,30 @@ class BittensorSubnetDetailsViewModel(
     }
         .shareInBackground()
 
-    private val safetyHistory = retryController.observe(
-        step = "subnet safety history",
-        transform = { source ->
-            source.onStart { emit(null) }
-                .catch { emit(null) }
-        }
-    ) {
-        asset.flatMapLatest { asset ->
-            flowOf<List<BittensorSubnetPricePoint>?> {
-                val priceId = asset.token.configuration.priceId ?: return@flowOf emptyList()
-                bittensorSubnetDetailsInteractor.history(
-                    subnetId,
-                    priceId,
-                    asset.token.currency,
-                    BittensorSubnetChartPeriod.MONTH
-                )
+    private val safetyHistory = assetState.flatMapLatest { state ->
+        val asset = state.dataOrNull
+        if (asset == null) {
+            flowOf { state.map { emptyList<BittensorSubnetPricePoint>() } }
+        } else {
+            retryController.observe(
+                step = "subnet safety history",
+                transform = { it.withSafeLoading() }
+            ) {
+                flowOf {
+                    val priceId = asset.token.configuration.priceId ?: return@flowOf emptyList()
+                    bittensorSubnetDetailsInteractor.history(
+                        subnetId,
+                        priceId,
+                        asset.token.currency,
+                        BittensorSubnetChartPeriod.MONTH
+                    )
+                }
             }
-                .onStart { emit(null) }
         }
     }
         .shareInBackground()
 
-    val priceHistory = safetyHistory.map { state ->
+    val priceHistory = safetyHistory.mapLoading { state ->
         state?.takeIf { it.size >= 2 }
             ?.let { points ->
                 val days = (points.last().timestamp - points.first().timestamp) / 86_400
@@ -363,20 +374,24 @@ class BittensorSubnetDetailsViewModel(
 
     val priceRange = combine(
         safetyHistory,
-        asset
-    ) { state, asset ->
-        state?.takeIf { it.size >= 2 }
-            ?.let { points ->
-                val low = tokenFormatter.formatToken(
-                    points.minOf { it.tao },
-                    asset.token.configuration.symbol
-                )
-                val high = tokenFormatter.formatToken(
-                    points.maxOf { it.tao },
-                    asset.token.configuration.symbol
-                )
-                "$low – $high"
-            } ?: "—"
+        assetState
+    ) { state, assetState ->
+        bittensorLoadingValue(state, assetState) {
+            val asset = assetState.dataOrNull ?: return@bittensorLoadingValue "—"
+            val history = state.dataOrNull
+            history?.takeIf { it.size >= 2 }
+                ?.let { points ->
+                    val low = tokenFormatter.formatToken(
+                        points.minOf { it.tao },
+                        asset.token.configuration.symbol
+                    )
+                    val high = tokenFormatter.formatToken(
+                        points.maxOf { it.tao },
+                        asset.token.configuration.symbol
+                    )
+                    "$low – $high"
+                } ?: "—"
+        }
     }
         .shareInBackground()
 

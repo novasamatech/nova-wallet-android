@@ -14,7 +14,7 @@ class BittensorChartChangeTextInjector(private val period: String) : PriceChange
             val number = NumberFormat.getNumberInstance().apply { maximumFractionDigits = 1 }.format(it)
             if (it > 0) "+$number" else number
         }
-        textView.text = if (formatted != null) "$formatted% · $period" else "— · $period"
+        textView.text = if (formatted != null) "$formatted% · $period" else ""
         textView.setTextColorRes(
             when {
                 change == null -> R.color.text_secondary

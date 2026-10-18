@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amoun
 
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.filterLoaded
@@ -96,12 +98,17 @@ class BittensorStakeAmountViewModel(
 
     private val selectedValidator = MutableStateFlow<SelectedValidator?>(null)
 
-    private val stakingDetails = combine(
-        stakingDetailsState.filterLoaded(),
+    private val selectedStakingDetailsState = combine(
+        stakingDetailsState,
         selectedValidator
-    ) { details, selected ->
-        if (selected?.metaId == details.metaId) bittensorStakingInteractor.detailsForValidator(details, selected.validator) else details
+    ) { state, selected ->
+        state.map { details ->
+            if (selected?.metaId == details.metaId) bittensorStakingInteractor.detailsForValidator(details, selected.validator) else details
+        }
     }
+        .shareInBackground()
+
+    private val stakingDetails = selectedStakingDetailsState.filterLoaded()
         .shareInBackground()
 
     private val amountChooser = amountChooserFactory.create(
@@ -160,7 +167,7 @@ class BittensorStakeAmountViewModel(
     }
         .shareInBackground()
 
-    val currentStake = stakingDetails.map { details ->
+    val currentStake = selectedStakingDetailsState.mapLoading { details ->
         if (details.dataStatus !is BittensorDataStatus.Fresh) {
             "—"
         } else {
@@ -170,14 +177,16 @@ class BittensorStakeAmountViewModel(
         .shareInBackground()
 
     val monthlyEstimate = combine(
-        stakingDetails,
+        selectedStakingDetailsState,
         amount
-    ) { details, text ->
-        val annual = details.annualPercentageYield ?: return@combine "—"
-        val principal = text.toBigDecimalOrNull()
-            ?.takeIf { it.isPositive } ?: return@combine "—"
-        val estimate = bittensorMonthlyProjection(principal, annual)
-        "≈ " + formatToken(estimate, details.asset.token.configuration.symbol)
+    ) { state, text ->
+        state.map { details ->
+            val annual = details.annualPercentageYield ?: return@map "—"
+            val principal = text.toBigDecimalOrNull()
+                ?.takeIf { it.isPositive } ?: return@map "—"
+            val estimate = bittensorMonthlyProjection(principal, annual)
+            "≈ " + formatToken(estimate, details.asset.token.configuration.symbol)
+        }
     }
         .shareInBackground()
 
@@ -206,8 +215,8 @@ class BittensorStakeAmountViewModel(
         }
         .shareInBackground()
 
-    val apy = stakingDetails
-        .map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
+    val apy = selectedStakingDetailsState
+        .mapLoading { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
         .shareInBackground()
 
     private val loadedContinueButtonState = combine(

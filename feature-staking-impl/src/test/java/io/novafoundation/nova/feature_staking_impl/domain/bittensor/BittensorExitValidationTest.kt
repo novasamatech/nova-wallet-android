@@ -5,9 +5,12 @@ import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitAvailability
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorExitValidationsModule
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitFeeBalanceValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitFeeRemainderValidation
 import java.math.BigInteger
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Test
 
@@ -16,6 +19,67 @@ class BittensorExitValidationTest {
     private val validationsModule = BittensorExitValidationsModule()
 
     private val validationSystem = validationsModule.provideExitValidationSystem()
+
+    private val feeBalanceValidation = BittensorExitFeeBalanceValidation()
+
+    private val feeRemainderValidation = BittensorExitFeeRemainderValidation()
+
+    @Test
+    fun `withdrawal must exceed fee and deposit when fee comes from stake`() = runBlocking {
+        val payload = validationPayload(quote = quote(BigInteger.valueOf(2)))
+            .copy(transferable = BigInteger.ZERO)
+
+        val result = feeBalanceValidation.validate(payload) as ValidationStatus.NotValid
+        assertEquals(BittensorExitValidationFailure.INSUFFICIENT_FEE_BALANCE, result.reason)
+        assertTrue(
+            feeBalanceValidation.validate(payload.copy(quote = quote(BigInteger.valueOf(3)))) is ValidationStatus.Valid
+        )
+    }
+
+    @Test
+    fun `partial withdrawal plus fee can equal but not exceed stake`() = runBlocking {
+        val payload = validationPayload(quote = quote(stake - BigInteger.ONE))
+            .copy(transferable = BigInteger.ZERO)
+
+        assertTrue(feeBalanceValidation.validate(payload) is ValidationStatus.Valid)
+        val result = feeBalanceValidation.validate(payload.copy(quote = quote(stake))) as ValidationStatus.NotValid
+        assertEquals(BittensorExitValidationFailure.INSUFFICIENT_FEE_BALANCE, result.reason)
+        assertTrue(feeBalanceValidation.validate(payload.copy(quote = quote(stake, full = true))) is ValidationStatus.Valid)
+    }
+
+    @Test
+    fun `remaining stake after fee can equal but not fall below minimum`() = runBlocking {
+        val amount = stake - precision - BigInteger.ONE
+        val payload = validationPayload(quote = quote(amount))
+            .copy(transferable = BigInteger.ZERO)
+
+        assertTrue(feeRemainderValidation.validate(payload) is ValidationStatus.Valid)
+        val result = feeRemainderValidation.validate(payload.copy(quote = quote(amount + BigInteger.ONE))) as ValidationStatus.NotValid
+        assertEquals(BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM, result.reason)
+    }
+
+    @Test
+    fun `zero remainder full exit and own hotkey bypass fee remainder minimum`() = runBlocking {
+        val payload = validationPayload(quote = quote(stake - BigInteger.ONE))
+            .copy(transferable = BigInteger.ZERO)
+
+        assertTrue(feeRemainderValidation.validate(payload) is ValidationStatus.Valid)
+        assertTrue(feeRemainderValidation.validate(payload.copy(quote = quote(stake, full = true))) is ValidationStatus.Valid)
+        assertTrue(
+            feeRemainderValidation.validate(
+                payload.copy(preflight = preflight(own = true), quote = quote(stake - precision))
+            ) is ValidationStatus.Valid
+        )
+    }
+
+    @Test
+    fun `fee paid from free balance bypasses both stake fee checks`() = runBlocking {
+        val payload = validationPayload(quote = quote(BigInteger.ONE, netuid = BittensorNetuid.Subnet(1)))
+            .copy(preflight = preflight(minimum = stake), supportsFeeFromStake = false)
+
+        assertTrue(feeBalanceValidation.validate(payload) is ValidationStatus.Valid)
+        assertTrue(feeRemainderValidation.validate(payload) is ValidationStatus.Valid)
+    }
 
     private fun validateBittensorExit(preflight: BittensorExitPreflight, quote: BittensorExitQuote) = runBlocking {
         val payload = validationPayload(preflight, quote)

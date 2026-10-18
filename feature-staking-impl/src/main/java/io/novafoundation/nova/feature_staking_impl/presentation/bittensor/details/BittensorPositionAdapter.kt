@@ -40,7 +40,9 @@ class BittensorPositionAdapter(
             positionSubtitle.text = item.subtitle
             positionAmount.text = item.amount.token
             positionFiat.text = item.amount.fiat
-            positionFiat.isVisible = item.amount.fiat != null
+            positionAmount.isVisible = !item.isAmountLoading && item.amount.token.isNotEmpty()
+            positionAmountProgress.isVisible = item.isAmountLoading
+            positionFiat.isVisible = !item.isAmountLoading && item.amount.token.isNotEmpty() && item.amount.fiat != null
             positionChevron.isVisible = true
             root.setOnClickListener { onClick(item) }
         }

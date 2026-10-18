@@ -3,6 +3,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.posit
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import coil.transform.RoundedCornersTransformation
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -14,7 +16,6 @@ import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
-import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -82,8 +83,8 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             }
             priceTitle.text = getString(R.string.price_chart_title, name)
         }
-        viewModel.averagePrice.observe(averagePrice::showLoadingValue)
-        viewModel.earned.observe(earned::showLoadingValue)
+        viewModel.averagePrice.observe(averagePrice::showBittensorLoadingValue)
+        viewModel.earned.observe(earned::showBittensorLoadingValue)
         viewModel.price.observe { price.text = it }
         viewModel.priceChange.observe { change.text = it }
         viewModel.averageChartPrice.observe { value ->
@@ -91,7 +92,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         }
         viewModel.holding.observe { holding.text = it }
         viewModel.hasStake.observe { activeStatus.isVisible = it }
-        viewModel.worth.observe { worth.showValue(it.token, it.fiat) }
+        viewModel.worth.observe(worth::showBittensorLoadingAmount)
         viewModel.validators.observe(adapter::submitList)
         viewModel.canAct.observe {
             sell.isEnabled = it

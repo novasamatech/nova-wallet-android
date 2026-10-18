@@ -15,6 +15,7 @@
         android:paddingBottom="24dp">
 
         <io.novafoundation.nova.common.view.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:dividerVisible="false"
@@ -26,6 +27,18 @@
             android:layout_height="64dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="16dp" />
+
+        <ImageView
+            android:id="@+id/failureIcon"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:padding="10dp"
+            android:src="@drawable/ic_close"
+            app:tint="@color/text_negative"
+            android:importantForAccessibility="no"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/title"
@@ -51,11 +64,13 @@
         <FrameLayout
             android:id="@+id/stepContainer"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="24dp">
 
             <ImageView
+                android:id="@+id/operationIcon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="start|center_vertical"
@@ -67,7 +82,9 @@
                 android:id="@+id/operationLabel"
                 style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:paddingVertical="12dp"
                 android:paddingHorizontal="48dp"
                 android:gravity="center"
                 android:text="@string/bittensor_subnet_execution_operation"

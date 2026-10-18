@@ -1,8 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.map
@@ -41,6 +43,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
@@ -152,6 +155,7 @@ class BittensorExitAmountViewModel(
         val estimate = status.loadedFeeOrNull()
         when {
             request == null -> state.map { null }
+            status is FeeStatus.Error || status is FeeStatus.NoFee -> ExtendedLoadingState.Loaded(null)
             estimate == null || estimate.request != request -> ExtendedLoadingState.Loading
             else -> {
                 val fromStake = bittensorExitInteractor.feeFromStake(request.position, estimate)
@@ -238,7 +242,11 @@ class BittensorExitAmountViewModel(
         state.map { basis ->
             val average = basis?.forSubnet(payload.netuid)
                 ?.averagePrice
-            if (average == null || position == null) "—" else "≈ " + tokenFormatter.formatToken(average, position.asset.token.configuration.symbol)
+            when {
+                average != null && position != null -> "≈ " + tokenFormatter.formatToken(average, position.asset.token.configuration.symbol)
+                basis?.canEstimate(payload.netuid) == true -> resources.getString(R.string.common_not_available)
+                else -> "—"
+            }
         }
     }
         .shareInBackground()
@@ -247,7 +255,8 @@ class BittensorExitAmountViewModel(
         costBasisState,
         prepared
     ) { state, prepared ->
-        state.map { basis ->
+        bittensorLoadingValue(state, prepared) {
+            val basis = state.dataOrNull
             val draft = prepared.dataOrNull
             val totals = basis?.forSubnet(payload.netuid)
             if (draft == null || totals == null) {
@@ -267,19 +276,19 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    val received = prepared.map {
-        it.dataOrNull?.let { draft ->
+    val received = prepared.mapLoading {
+        it?.let { draft ->
             val received = draft.quote.estimatedTaoOut - draft.quote.serviceFee
             "≈ " + tokenFormatter.formatToken(draft.position.asset.token.amountFromPlanks(received), draft.position.asset.token.configuration.symbol)
         } ?: "—"
     }
         .shareInBackground()
 
-    val rate = prepared.map { exitFormatter.exchangeRate(it.dataOrNull) }
+    val rate = prepared.mapLoading { exitFormatter.exchangeRate(it) }
         .shareInBackground()
 
-    val fee = prepared.map {
-        it.dataOrNull?.let { draft ->
+    val fee = prepared.mapLoading {
+        it?.let { draft ->
             tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol).toString()
         } ?: "—"
     }

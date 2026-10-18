@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confi
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.mixin.api.Validatable
@@ -94,12 +96,15 @@ class BittensorStakeConfirmViewModel(
     }
         .shareInBackground()
 
-    private val stakingDetails = combine(
-        stakingDetailsState.filterLoaded(),
+    private val selectedStakingDetailsState = combine(
+        stakingDetailsState,
         stakeRequest
-    ) { details, request ->
-        bittensorStakingInteractor.detailsForValidator(details, request.validator)
+    ) { state, request ->
+        state.map { bittensorStakingInteractor.detailsForValidator(it, request.validator) }
     }
+        .shareInBackground()
+
+    private val stakingDetails = selectedStakingDetailsState.filterLoaded()
         .shareInBackground()
 
     val amount = combine(stakingDetails, stakeRequest, ::mapAmount)
@@ -130,13 +135,15 @@ class BittensorStakeConfirmViewModel(
         .shareInBackground()
 
     val stakeAfter = combine(
-        stakingDetails,
+        selectedStakingDetailsState,
         stakeRequest
-    ) { details, request ->
-        val before = details.position?.stakeInPlanks ?: BigInteger.ZERO
-        val token = details.asset.token
-        formatToken(token.amountFromPlanks(before), token.configuration.symbol) + " → " +
-            formatToken(token.amountFromPlanks(before + request.amountInPlanks), token.configuration.symbol)
+    ) { state, request ->
+        state.map { details ->
+            val before = details.position?.stakeInPlanks ?: BigInteger.ZERO
+            val token = details.asset.token
+            formatToken(token.amountFromPlanks(before), token.configuration.symbol) + " → " +
+                formatToken(token.amountFromPlanks(before + request.amountInPlanks), token.configuration.symbol)
+        }
     }
         .shareInBackground()
 
@@ -145,7 +152,7 @@ class BittensorStakeConfirmViewModel(
     val validator = stakeRequest.map(::mapValidator)
         .shareInBackground()
 
-    val apy = stakingDetails.map { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
+    val apy = selectedStakingDetailsState.mapLoading { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
         .shareInBackground()
 
     private val submission = MutableStateFlow<BittensorSubmissionState>(BittensorSubmissionState.Ready)
@@ -263,7 +270,7 @@ class BittensorStakeConfirmViewModel(
         val amount = details.asset.token.amountFromPlanks(request.amountInPlanks)
         return AmountModel(
             token = formatToken(amount, details.asset.token.configuration.symbol),
-            fiat = formatFiatOrDash(details.asset.token.toFiatOrNull(amount), details.asset.token.currency)
+            fiat = formatFiatOrNull(details.asset.token.toFiatOrNull(amount), details.asset.token.currency)
         )
     }
 
@@ -296,7 +303,7 @@ class BittensorStakeConfirmViewModel(
             validator = request.validator.name,
             fee = BittensorFeeUi(
                 amount = formatToken(fee.decimalAmount, fee.asset.symbol),
-                fiatAmount = formatFiatOrDash(details.asset.token.toFiatOrNull(fee.decimalAmount), details.asset.token.currency)
+                fiatAmount = formatFiatOrNull(details.asset.token.toFiatOrNull(fee.decimalAmount), details.asset.token.currency)
             )
         )
     }
@@ -317,8 +324,8 @@ class BittensorStakeConfirmViewModel(
     private fun formatToken(amount: BigDecimal, symbol: TokenSymbol): String =
         tokenFormatter.formatToken(amount, symbol).toString()
 
-    private fun formatFiatOrDash(amount: BigDecimal?, currency: Currency): String {
-        if (amount == null) return "—"
+    private fun formatFiatOrNull(amount: BigDecimal?, currency: Currency): String? {
+        if (amount == null) return null
 
         return fiatFormatter.formatFiat(amount, currency).toString()
     }

@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.posit
 
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
@@ -164,7 +166,11 @@ class BittensorSubnetPositionViewModel(
             val average = basis?.forSubnet(subnetId.value)
                 ?.averagePrice
             val asset = assetState.dataOrNull
-            if (average == null || asset == null) "—" else "≈ " + tokenFormatter.formatToken(average, asset.token.configuration.symbol)
+            when {
+                average != null && asset != null -> "≈ " + tokenFormatter.formatToken(average, asset.token.configuration.symbol)
+                basis?.canEstimate(subnetId.value) == true -> resources.getString(R.string.common_not_available)
+                else -> "—"
+            }
         }
     }
         .shareInBackground()
@@ -206,9 +212,9 @@ class BittensorSubnetPositionViewModel(
     }
         .shareInBackground()
 
-    val worth = portfolio.map { data ->
-        val planks = data?.positions?.subnetStake(subnetId)
-        if (planks == null || data == null) {
+    val worth = portfolioState.mapLoading { data ->
+        val planks = data.positions?.subnetStake(subnetId)
+        if (planks == null) {
             AmountModel("—", null)
         } else {
             val tao = data.asset.token.amountFromPlanks(planks)
@@ -236,13 +242,14 @@ class BittensorSubnetPositionViewModel(
                     address.take(6) + "…" + address.takeLast(6),
                     resources.getString(R.string.bittensor_validator),
                     AmountModel(
-                        yields?.get(position.validatorHotkey)
-                            ?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } ?: "—",
+                        yields.dataOrNull?.get(position.validatorHotkey)
+                            ?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } ?: "",
                         resources.getString(R.string.bittensor_apy)
                     ),
                     Icon.FromDrawable(addressIconGenerator.createAddressIcon(position.validatorHotkey.value, 32)),
                     BittensorPositionAction.ValidatorDetails(address),
-                    32
+                    32,
+                    isAmountLoading = yields is ExtendedLoadingState.Loading
                 )
             }
         }
@@ -290,7 +297,7 @@ class BittensorSubnetPositionViewModel(
     val priceChange = chartState.map { state ->
         val points = state.dataOrNull.orEmpty()
         if (points.size < 2 || !points.first().tao.isPositive) {
-            "—"
+            ""
         } else {
             val priceDifference = points.last().tao - points.first().tao
             val percent = priceDifference.multiply(BigDecimal(100))

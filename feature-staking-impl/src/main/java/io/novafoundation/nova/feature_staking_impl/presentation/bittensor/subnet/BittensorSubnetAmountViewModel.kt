@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isError
@@ -202,32 +203,36 @@ class BittensorSubnetAmountViewModel(
     ) { state, walletContext ->
         val key = runCatching { AccountIdKey(walletContext.chain.accountIdOf(validatorAddress)) }
             .getOrNull()
-        key?.let { state?.get(it) }
+        key?.let { state.dataOrNull?.get(it) }
     }
         .shareInBackground()
 
-    val validator = draft.map { it?.validator?.name ?: "—" }
+    val validator = quoteState.map { state -> state.map { it?.draft?.validator?.name ?: validatorAddress } }
         .shareInBackground()
 
-    val apy = annualYield.map { it?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } ?: "—" }
+    val apy = annualYield.map { it?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } }
         .shareInBackground()
 
     val monthlyEstimate = combine(
         draft.map { it?.operation?.quote },
         annualYield,
-        subnet
-    ) { quote, annual, subnet ->
-        if (quote == null || annual == null || subnet == null) {
-            "—"
-        } else {
-            val alpha = bittensorMonthlyProjection(
-                BigDecimal(quote.alphaOutInPlanks, BittensorProtocolUnits.ALPHA_PRECISION),
-                annual
-            )
-            "≈ " + tokenFormatter.formatToken(
-                alpha,
-                TokenSymbol(subnet.symbol.ifBlank { "—" })
-            )
+        subnet,
+        yieldState,
+        quoteState
+    ) { quote, annual, subnet, yields, quoteLoading ->
+        bittensorLoadingValue(yields, quoteLoading) {
+            if (quote == null || annual == null || subnet == null) {
+                "—"
+            } else {
+                val alpha = bittensorMonthlyProjection(
+                    BigDecimal(quote.alphaOutInPlanks, BittensorProtocolUnits.ALPHA_PRECISION),
+                    annual
+                )
+                "≈ " + tokenFormatter.formatToken(
+                    alpha,
+                    TokenSymbol(subnet.symbol.ifBlank { "—" })
+                )
+            }
         }
     }
         .shareInBackground()
@@ -235,12 +240,14 @@ class BittensorSubnetAmountViewModel(
     val projectedAveragePrice = combine(
         costBasisState,
         draft.map { it?.operation?.quote },
-        walletContext
-    ) { state, quote, walletContext ->
-        state.map { basis ->
+        walletContext,
+        quoteState
+    ) { state, quote, walletContext, quoteLoading ->
+        bittensorLoadingValue(state, quoteLoading) {
+            val basis = state.dataOrNull
             val current = basis?.forSubnet(initialSubnetId.value)
             if (current == null || quote == null) {
-                "—"
+                if (basis?.canEstimate(initialSubnetId.value) == true && current == null) resources.getString(R.string.common_not_available) else "—"
             } else {
                 val projected = current.adding(quote.totalTaoInPlanks, quote.alphaOutInPlanks)
                 "≈ " + tokenFormatter.formatToken(projected.averagePrice, walletContext.asset.token.configuration.symbol)
@@ -282,24 +289,30 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     val alphaAmount = combine(
+        quoteState,
         subnet,
         currentQuote
-    ) { subnet, result ->
-        if (subnet == null || result == null) return@combine "—"
-        val amount = BigDecimal(result.quote.alphaOutInPlanks, BITTENSOR_ALPHA_DECIMALS)
-        "≈ \u200e" + tokenFormatter.formatToken(
-            amount,
-            TokenSymbol(subnet.symbol.ifBlank { "—" })
-        )
+    ) { state, subnet, result ->
+        state.map {
+            if (subnet == null || result == null) return@map "—"
+            val amount = BigDecimal(result.quote.alphaOutInPlanks, BITTENSOR_ALPHA_DECIMALS)
+            "≈ \u200e" + tokenFormatter.formatToken(
+                amount,
+                TokenSymbol(subnet.symbol.ifBlank { "—" })
+            )
+        }
     }
         .shareInBackground()
 
     val rate = combine(
+        quoteState,
         subnet,
         currentQuote,
         walletContext
-    ) { subnet, result, wallet ->
-        if (subnet == null || result == null) "—" else bittensorAmountFormatter.exchangeRate(result.quote, subnet, wallet.asset.token)
+    ) { state, subnet, result, wallet ->
+        state.map {
+            if (subnet == null || result == null) "—" else bittensorAmountFormatter.exchangeRate(result.quote, subnet, wallet.asset.token)
+        }
     }
         .shareInBackground()
 

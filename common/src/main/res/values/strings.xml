@@ -2937,6 +2937,7 @@
     <string name="bittensor_claim_forfeited">Estimated forfeiture</string>
     <string name="bittensor_claim_other_hotkeys">Other hotkeys with claimable rewards: %1$d. Each claim is a separate transaction.</string>
     <string name="bittensor_claim_none">No root rewards meet the minimum claim amount.</string>
+    <string name="bittensor_claim_minimum_per_validator">Minimum claim is %1$s per validator</string>
     <string name="bittensor_claim_progress">Claiming root rewards</string>
     <string name="bittensor_claim_completed">Rewards claimed</string>
     <string name="bittensor_claim_completed_description">The claim was confirmed in a finalized block.</string>

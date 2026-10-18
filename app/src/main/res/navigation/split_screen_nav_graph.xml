@@ -98,6 +98,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_bittensor_select_unstake_position"
+        app:destination="@id/bittensorSelectUnstakePosition"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_bittensor_select_validator"
         app:destination="@id/bittensorSelectValidator"
         app:enterAnim="@anim/fragment_open_enter"
@@ -1208,6 +1216,10 @@
     <fragment
         android:id="@+id/bittensorChooseSubnet"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment" />
+
+    <fragment
+        android:id="@+id/bittensorSelectUnstakePosition"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionFragment" />
 
     <fragment
         android:id="@+id/bittensorSelectValidator"

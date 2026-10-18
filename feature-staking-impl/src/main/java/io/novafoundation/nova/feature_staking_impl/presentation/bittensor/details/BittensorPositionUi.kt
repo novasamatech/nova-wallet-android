@@ -11,7 +11,8 @@ data class BittensorPositionUi(
     val amount: AmountModel,
     val icon: Icon,
     val action: BittensorPositionAction,
-    val iconSizeDp: Int = 40
+    val iconSizeDp: Int = 40,
+    val isAmountLoading: Boolean = false
 )
 
 sealed interface BittensorPositionAction {

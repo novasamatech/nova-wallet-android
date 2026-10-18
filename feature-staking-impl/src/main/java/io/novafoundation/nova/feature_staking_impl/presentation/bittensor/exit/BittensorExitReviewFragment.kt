@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
@@ -11,12 +12,12 @@ import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorExitReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showFailure
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.bindBittensorStakeResults
 
@@ -40,6 +41,8 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
 
     override fun initViews() = with(binder) {
         toolbar.setTitle(viewModel.title)
+        retryExecution.setOnClickListener { viewModel.retryClicked() }
+        execution.toolbar.setHomeButtonListener { viewModel.back() }
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
         primaryAmount.isVisible = viewModel.isRoot
@@ -97,18 +100,18 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         }
         validator.showValue(viewModel.validator)
         execution.validator.showValue(viewModel.validator)
-        viewModel.averagePrice.observe(averagePrice::showLoadingValue)
-        viewModel.earned.observe(earned::showLoadingValue)
+        viewModel.averagePrice.observe(averagePrice::showBittensorLoadingValue)
+        viewModel.earned.observe(earned::showBittensorLoadingValue)
         viewModel.validatorIcon.observe {
             validator.image.isVisible = it != null
             validator.image.setImageDrawable(it)
             execution.validator.image.isVisible = it != null
             execution.validator.image.setImageDrawable(it)
         }
-        viewModel.stakeAfter.observe(stakeAfter::showValue)
+        viewModel.stakeAfter.observe(stakeAfter::showBittensorLoadingValue)
         viewModel.rate.observe {
-            rate.showValue(it)
-            execution.rate.showValue(it)
+            rate.showBittensorLoadingValue(it)
+            execution.rate.showBittensorLoadingValue(it)
         }
         viewModel.commissionCaption.observe { commissionCaption.text = it }
         viewModel.feeCaption.observe { feeCaption.text = it }
@@ -122,6 +125,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
                 val remaining = viewModel.remainingExecutionTime()
                 execution.timer.setState(ExecutionTimerView.State.CountdownTimer(remaining))
                 execution.title.setText(R.string.common_do_not_close_app)
+                execution.operationLabel.setText(R.string.bittensor_subnet_execution_operation)
             }
         }
         viewModel.isCompleted.observe { complete ->
@@ -133,6 +137,10 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             }
         }
         viewModel.executionSubtitle.observe { execution.subtitle.text = it }
+        viewModel.executionFailure.observe {
+            execution.showFailure(it)
+            retryExecution.isVisible = it?.canRetry == true
+        }
         bindBittensorStakeResults(
             results = viewModel.resultState,
             onDismiss = viewModel::resultDismissed,

@@ -154,4 +154,14 @@
         android:layout_marginBottom="16dp"
         android:text="@string/common_done"
         android:visibility="gone" />
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/retryExecution"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_gravity="bottom"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/common_try_again"
+        android:visibility="gone" />
 </FrameLayout>

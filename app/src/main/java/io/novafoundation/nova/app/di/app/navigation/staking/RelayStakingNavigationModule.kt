@@ -1,5 +1,7 @@
 package io.novafoundation.nova.app.di.app.navigation.staking
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
+import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.BittensorSelectUnstakePositionCommunicatorImpl
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
@@ -14,6 +16,11 @@ import io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain.
 
 @Module
 class RelayStakingNavigationModule {
+
+    @Provides
+    @ApplicationScope
+    fun provideUnstakePositionCommunicator(registry: NavigationHoldersRegistry): BittensorSelectUnstakePositionCommunicator =
+        BittensorSelectUnstakePositionCommunicatorImpl(registry)
 
     @Provides
     @ApplicationScope

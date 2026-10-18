@@ -1,16 +1,17 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
-import androidx.lifecycle.MutableLiveData
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.common.utils.Event
-import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.launchUnit
@@ -37,15 +38,11 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
-
-data class BittensorExitChoice(val payload: BittensorExitPositionPayload, val address: String, val amount: AmountModel)
 
 class BittensorRootDetailsViewModel(
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
@@ -57,7 +54,8 @@ class BittensorRootDetailsViewModel(
     private val amountFormatter: BittensorAmountFormatter,
     private val retryController: BittensorRetryController,
     private val rootClaimInteractor: BittensorRootClaimInteractor,
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     val retryEvents = retryController.events
@@ -75,52 +73,65 @@ class BittensorRootDetailsViewModel(
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
         .shareInBackground()
 
-    private val claimState = retryController.observe(
-        step = "claimable root rewards",
-        transform = { it.withSafeLoading() }
-    ) {
-        accountRepository.selectedMetaAccountFlow().map { it.id }
-            .distinctUntilChanged().flatMapLatest { metaId -> flowOf { rootClaimInteractor.load(metaId) } }
-    }
-        .shareInBackground(SharingStarted.WhileSubscribed(5_000))
+    private val selectedMetaId = accountRepository.selectedMetaAccountFlow()
+        .map { it.id }
+        .distinctUntilChanged()
 
-    val receivedRootRewards = retryController.observe(
-        step = "received root rewards",
-        transform = { source ->
-            source.onStart { emit("—") }
-                .catch { emit("—") }
+    private val claimState = selectedMetaId.flatMapLatest { metaId ->
+        retryController.observe(
+            step = "claimable root rewards",
+            transform = { it.withSafeLoading() }
+        ) {
+            flowOf { rootClaimInteractor.load(metaId) }
         }
-    ) {
-        accountRepository.selectedMetaAccountFlow().map { it.id }
-            .distinctUntilChanged().flatMapLatest {
-                flowOf {
-                    val (asset, amount) = rootClaimInteractor.receivedRewards(it)
-                    val token = asset.token
-                    amountFormatter.amount(
-                        amount,
-                        token.configuration.symbol,
-                        token.toFiatOrNull(amount),
-                        token.currency
-                    ).token
-                }
-                    .onStart { emit("—") }
-            }
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
-    val claimableRewards = claimState.map { state ->
-        state.dataOrNull?.let { claim ->
-            val amount = claim.claims.claimable.fold(BigInteger.ZERO) { sum, preview -> sum + preview.redeemable }
-            val tokenAmount = claim.asset.token.amountFromPlanks(amount)
-            amountFormatter.amount(
-                tokenAmount,
-                claim.asset.token.configuration.symbol,
-                claim.asset.token.toFiatOrNull(tokenAmount),
-                claim.asset.token.currency
-            )
-        } ?: AmountModel("—", null)
+    val receivedRootRewards = selectedMetaId.flatMapLatest { metaId ->
+        retryController.observe(
+            step = "received root rewards",
+            transform = { it.withSafeLoading() }
+        ) {
+            flowOf {
+                val (asset, amount) = rootClaimInteractor.receivedRewards(metaId)
+                val token = asset.token
+                amountFormatter.amount(
+                    amount,
+                    token.configuration.symbol,
+                    token.toFiatOrNull(amount),
+                    token.currency
+                ).token
+            }
+        }
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
+
+    val claimableRewards = claimState.mapLoading { claim ->
+        val amount = claim.claims.claimable.fold(BigInteger.ZERO) { sum, preview -> sum + preview.redeemable }
+        val tokenAmount = claim.asset.token.amountFromPlanks(amount)
+        amountFormatter.amount(
+            tokenAmount,
+            claim.asset.token.configuration.symbol,
+            claim.asset.token.toFiatOrNull(tokenAmount),
+            claim.asset.token.currency
+        )
+    }
+        .shareInBackground(SharingStarted.WhileSubscribed(5_000))
+
+    val minimumClaimHint = claimState.map { state ->
+        val claim = state.dataOrNull ?: return@map null
+        if (!claim.claims.hasRewardsBelowMinimum) return@map null
+
+        val token = claim.asset.token
+        val minimum = amountFormatter.amount(
+            token.amountFromPlanks(claim.claims.minimum),
+            token.configuration.symbol,
+            null,
+            token.currency
+        ).token
+        resources.getString(R.string.bittensor_claim_minimum_per_validator, minimum)
+    }
+        .shareInBackground()
 
     val canClaim = claimState.map { state ->
         state.dataOrNull?.let { it.supportsImmediateOperations && it.claims.claimable.isNotEmpty() } == true
@@ -133,7 +144,11 @@ class BittensorRootDetailsViewModel(
         router.openBittensorRootClaim(BittensorRootClaimPayload(claim.metaId))
     }
 
-    val exitChoices = MutableLiveData<Event<List<BittensorExitChoice>>>()
+    init {
+        unstakePositionCommunicator.responseFlow
+            .onEach { selectExit(it.position) }
+            .launchIn(this)
+    }
 
     fun unstakeRoot() = launchUnit {
         if (!canAddStake.first()) return@launchUnit
@@ -141,21 +156,31 @@ class BittensorRootDetailsViewModel(
         val choices = data.positions?.root.orEmpty().filter { it.stakeInPlanks.isPositive() }
             .map {
                 val address = data.chain.addressOf(it.validatorHotkey.value)
-                BittensorExitChoice(BittensorExitPositionPayload(data.metaId, 0, address), address, formatExitAmount(it.stakeInPlanks, data))
+                val amount = formatExitAmount(it.stakeInPlanks, data)
+                BittensorSelectUnstakePositionCommunicator.Option(
+                    position = BittensorExitPositionPayload(data.metaId, 0, address),
+                    address = address,
+                    amount = amount.token.toString(),
+                    fiat = amount.fiat?.toString()
+                )
             }
-        if (choices.size == 1) selectExit(choices.single()) else if (choices.isNotEmpty()) exitChoices.value = choices.event()
+        when (choices.size) {
+            0 -> Unit
+            1 -> selectExit(choices.single().position)
+            else -> unstakePositionCommunicator.openRequest(BittensorSelectUnstakePositionCommunicator.Request(choices))
+        }
     }
 
-    fun selectExit(choice: BittensorExitChoice) = launchUnit {
+    private fun selectExit(position: BittensorExitPositionPayload) = launchUnit {
         val data = portfolio.first()
-        if (!canAddStake.first() || data.metaId != choice.payload.metaId) return@launchUnit
+        if (!canAddStake.first() || data.metaId != position.metaId) return@launchUnit
 
         val containsPosition = data.positions?.root.orEmpty().any {
-            data.chain.addressOf(it.validatorHotkey.value) == choice.address && it.stakeInPlanks.isPositive()
+            data.chain.addressOf(it.validatorHotkey.value) == position.hotkeyAddress && it.stakeInPlanks.isPositive()
         }
 
         if (containsPosition) {
-            router.openBittensorExitAmount(choice.payload)
+            router.openBittensorExitAmount(position)
         }
     }
 
@@ -202,7 +227,7 @@ class BittensorRootDetailsViewModel(
                 id = address,
                 title = address.ellipsizeAddress(),
                 subtitle = resources.getString(R.string.bittensor_validator),
-                amount = AmountModel("—", resources.getString(R.string.bittensor_validator_apr_period)),
+                amount = AmountModel("", null),
                 icon = Icon.FromDrawable(iconGenerator.createAddressIcon(position.validatorHotkey.value, 32)),
                 action = BittensorPositionAction.ValidatorDetails(address),
                 iconSizeDp = 32

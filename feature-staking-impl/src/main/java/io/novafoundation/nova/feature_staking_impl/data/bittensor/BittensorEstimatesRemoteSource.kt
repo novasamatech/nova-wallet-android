@@ -22,8 +22,8 @@ class BittensorEstimatesRemoteSource(
         loadPages(YIELD_PAGE_LIMIT) { page -> loadYieldPage(baseUrl, chain, subnet, page) }
 
     private suspend fun loadHistoryPage(baseUrl: HttpUrl, address: String, page: Int): EstimatePage<BittensorReportedOperation> {
-        val url = endpoint(baseUrl, "operations/search", mapOf("accountSubject" to address, "page" to page.toString()))
-        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.operations(url) }
+        val url = endpoint(baseUrl, "operations/search")
+        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.operations(url, address, page) }
         val validUntilNanos = deadline(response)
         val body = requireBody(response)
         requireFreshComponent(body.meta?.components?.operationHistory)
@@ -39,8 +39,8 @@ class BittensorEstimatesRemoteSource(
         subnetId: BittensorNetuid.Subnet,
         page: Int
     ): EstimatePage<BittensorValidatorYield> {
-        val url = endpoint(baseUrl, "subnets/${subnetId.value}/yields/alpha", mapOf("page" to page.toString()))
-        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url) }
+        val url = endpoint(baseUrl, "subnets/${subnetId.value}/yields/alpha")
+        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url, page) }
         val validUntilNanos = deadline(response)
         val body = requireBody(response)
         requireFreshComponent(body.meta?.components?.alphaYield)
@@ -96,12 +96,9 @@ class BittensorEstimatesRemoteSource(
         return requireNotNull(response.body())
     }
 
-    private fun endpoint(base: HttpUrl, path: String, query: Map<String, String>): String {
+    private fun endpoint(base: HttpUrl, path: String): String {
         require(base.isHttps)
-        val target = requireNotNull(base.resolve("/v1/bittensor/$path"))
-            .newBuilder()
-        query.forEach { (key, value) -> target.addQueryParameter(key, value) }
-        return target.build().toString()
+        return requireNotNull(base.resolve("/v1/bittensor/$path")).toString()
     }
 
     data class EstimatePage<T>(val items: List<T>, val nextPage: Int?, val validUntilNanos: Long)

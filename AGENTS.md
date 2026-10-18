@@ -46,6 +46,8 @@ Implement each validation rule as a separate Validation with one responsibility;
 
 ## Independent loading on one screen
 
+Keep loading, missing data, and failed reads distinct in Bittensor presentation. Preserve loading states through formatting and use existing Android loading components while requests are pending; an em dash is a settled unavailable value, not a loading placeholder. Reset account-dependent loading on wallet changes. Hide optional values when the corresponding iOS presentation hides them, rather than displaying placeholder rows. Keep retries and unrelated field loading independent.
+
 Load interactor data with `flowOf { ... }` or an interactor-provided Flow and share it with `shareInBackground()` when reused. Derive loading and presentation values with the established flow operators instead of copying them into `MutableStateFlow` from `init`. Keep mutable flows for user-editable state and explicit operation/retry controls, not redundant copies of loaded data. Name selections after the selected entity. Keep entity lookup by ID in the interactor rather than filtering its catalogue in the ViewModel.
 
 Use `withSafeLoading()` only when its loading state is consumed by the UI, including disabling actions while data is loading. Do not add loading wrappers solely to catch exceptions; use `catch` with appropriate error reporting when no loading state is needed. Retry infrastructure must not impose UI loading states; apply loading-state transformations at the consuming ViewModel, per attempt when retries must reset the UI.
@@ -119,5 +121,7 @@ Prefer named models for meaningful requests and load results over positional `Pa
 Share subscriptions, decoding, and loading when multiple consumers need different parts of the same runtime response. Key shared streams by chain and account identity, bind their lifetime to active consumers, and keep dashboard and screen state derived from the same source. Keep recovery independent for unrelated reads, and keep screen-specific sources out of screens that do not consume them.
 
 ## Bittensor position actions
+
+Subnet buy/sell execution uses the same swap-style screen for progress, success, and failure; do not open the root-staking result sheet for subnet failures. Keep operation details visible on failure. Try again returns to review rather than silently resubmitting, and unknown transaction outcomes must not offer retry.
 
 Keep root staking and subnet trading as separate flows. Root positions use Add stake and Unstake. Subnet positions have their own position-details screen with Buy more and Sell actions; do not route an existing subnet position to the discovery screen or label its trading flow as root staking. Use the corresponding Figma amount, confirmation, waiting, and result frames.

@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking
 import io.novafoundation.nova.feature_wallet_api.di.WalletFeatureApi
 import io.novafoundation.nova.runtime.di.RuntimeApi
 import javax.inject.Inject
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 
 @ApplicationScope
@@ -40,6 +41,7 @@ class StakingFeatureHolder @Inject constructor(
     private val selectCollatorSettingsInterScreenCommunicator: SelectCollatorSettingsInterScreenCommunicator,
     private val selectMythosCollatorInterScreenCommunicator: SelectMythosInterScreenCommunicator,
     private val selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
+    private val unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
     private val bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
@@ -70,6 +72,7 @@ class StakingFeatureHolder @Inject constructor(
                 stakingDashboardRouter = stakingDashboardRouter,
                 selectMythosCollatorInterScreenCommunicator = selectMythosCollatorInterScreenCommunicator,
                 selectMythosCollatorSettingsInterScreenCommunicator = selectMythosCollatorSettingsInterScreenCommunicator,
+                unstakePositionCommunicator = unstakePositionCommunicator,
                 bittensorValidatorCommunicator = bittensorValidatorCommunicator,
                 deps = dependencies
             )

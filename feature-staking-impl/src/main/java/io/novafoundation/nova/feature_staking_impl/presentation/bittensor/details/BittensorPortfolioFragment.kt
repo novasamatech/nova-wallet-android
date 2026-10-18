@@ -48,7 +48,11 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         }
         viewModel.priceChartModels.observe(priceChart::setCharts)
         viewModel.chartAxisFormatter.observe(priceChart::setAxisLabelFormatter)
-        viewModel.isLoading.observe { loading.isVisible = it }
+        viewModel.isLoading.observe {
+            loading.isVisible = it
+            totalAmount.isVisible = !it
+            totalFiat.isVisible = !it
+        }
         viewModel.canAddStake.observe { addPosition.isEnabled = it }
         viewModel.totalStake.observe {
             totalAmount.text = it.token
@@ -61,5 +65,4 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
             warning.isVisible = it != null
         }
     }
-
 }

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -72,6 +73,7 @@ class BittensorDetailsModule {
         externalActions: ExternalActions.Presentation,
         amountFormatter: BittensorAmountFormatter,
         retryController: BittensorRetryController,
+        unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
         rootClaimInteractor: BittensorRootClaimInteractor,
         accountRepository: AccountRepository
     ): ViewModel = BittensorRootDetailsViewModel(
@@ -83,6 +85,7 @@ class BittensorDetailsModule {
         externalActions,
         amountFormatter,
         retryController,
+        unstakePositionCommunicator = unstakePositionCommunicator,
         rootClaimInteractor = rootClaimInteractor,
         accountRepository = accountRepository
     )
