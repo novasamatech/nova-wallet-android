@@ -11,9 +11,12 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPriceChartInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
@@ -45,8 +48,8 @@ class BittensorDetailsModule {
         retryController: BittensorRetryController,
         chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
         fiatFormatter: FiatFormatter,
-        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
-        accountRepository: io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+        recovery: ExtrinsicSubmissionRecovery,
+        accountRepository: AccountRepository
     ): ViewModel = BittensorDetailsViewModel(
         bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
@@ -74,9 +77,9 @@ class BittensorDetailsModule {
         externalActions: ExternalActions.Presentation,
         amountFormatter: BittensorAmountFormatter,
         retryController: BittensorRetryController,
-        claims: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor,
-        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
-        accountRepository: io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+        rootClaimInteractor: BittensorRootClaimInteractor,
+        recovery: ExtrinsicSubmissionRecovery,
+        accountRepository: AccountRepository
     ): ViewModel = BittensorRootDetailsViewModel(
         interactor,
         router,
@@ -86,7 +89,7 @@ class BittensorDetailsModule {
         externalActions,
         amountFormatter,
         retryController,
-        claims = claims,
+        rootClaimInteractor = rootClaimInteractor,
         recovery = recovery,
         accountRepository = accountRepository
     )

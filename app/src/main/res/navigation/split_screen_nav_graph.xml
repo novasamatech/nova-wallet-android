@@ -130,6 +130,38 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_bittensor_exit_amount"
+        app:destination="@id/bittensorExitAmount"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_bittensor_exit_review"
+        app:destination="@id/bittensorExitReview"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_bittensor_subnet_position"
+        app:destination="@id/bittensorSubnetPosition"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_open_bittensor_root_claim"
+        app:destination="@id/bittensorRootClaim"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_returnToMainScreen"
         app:destination="@id/mainFragment"
         app:enterAnim="@anim/fragment_open_enter"
@@ -1148,6 +1180,22 @@
         android:label="StakingPeriodFragment" />
 
     <fragment
+        android:id="@+id/bittensorExitAmount"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitAmountFragment" />
+
+    <fragment
+        android:id="@+id/bittensorExitReview"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitReviewFragment" />
+
+    <fragment
+        android:id="@+id/bittensorSubnetPosition"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionFragment" />
+
+    <fragment
+        android:id="@+id/bittensorRootClaim"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimFragment" />
+
+    <fragment
         android:id="@+id/bittensorPortfolioFragment"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment"
         tools:layout="@layout/fragment_bittensor_portfolio" />
@@ -1543,52 +1591,5 @@
         android:name="io.novafoundation.nova.feature_account_impl.presentation.seedScan.ScanSeedFragment"
         android:label="ScanSeedFragment" />
 
-    <action
-        android:id="@+id/action_open_bittensor_exit_amount"
-        app:destination="@id/bittensorExitAmount"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
-        android:id="@+id/action_open_bittensor_exit_review"
-        app:destination="@id/bittensorExitReview"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
-        android:id="@+id/action_open_bittensor_subnet_position"
-        app:destination="@id/bittensorSubnetPosition"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <action
-        android:id="@+id/action_open_bittensor_root_claim"
-        app:destination="@id/bittensorRootClaim"
-        app:enterAnim="@anim/fragment_open_enter"
-        app:exitAnim="@anim/fragment_open_exit"
-        app:popEnterAnim="@anim/fragment_close_enter"
-        app:popExitAnim="@anim/fragment_close_exit" />
-
-    <fragment
-        android:id="@+id/bittensorExitAmount"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitAmountFragment" />
-
-    <fragment
-        android:id="@+id/bittensorExitReview"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitReviewFragment" />
-
-    <fragment
-        android:id="@+id/bittensorSubnetPosition"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionFragment" />
-
-    <fragment
-        android:id="@+id/bittensorRootClaim"
-        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimFragment" />
 
 </navigation>

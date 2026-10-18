@@ -9,14 +9,19 @@ import io.novafoundation.nova.common.di.scope.FeatureScope
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_staking_impl.BuildConfig
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigApi
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakePreflightRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
@@ -28,9 +33,11 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubne
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorsApi
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorExitRuntimeSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPositionSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorStakePreflightRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorSubnetRepository
@@ -38,21 +45,30 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorS
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorSwapSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RemoteBittensorConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RemoteBittensorRootValidatorSource
+import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorClaimValidationsModule
+import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorExitValidationsModule
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetQuoteInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetSafetyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitFormatter
 import io.novafoundation.nova.feature_wallet_api.data.network.priceApi.PRICE_API_BASE_URL
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -67,23 +83,19 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorExitRuntimeSource
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorRootClaimSource
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesApi
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
 
 private const val SERVICE_FEE_BENEFICIARY = "BittensorServiceFeeBeneficiary"
 
-@Module(includes = [BittensorStakeValidationsModule::class])
+@Module(includes = [BittensorStakeValidationsModule::class, BittensorExitValidationsModule::class, BittensorClaimValidationsModule::class])
 class BittensorModule {
+
+    @Provides
+    fun provideBittensorExitFormatter(tokenFormatter: TokenFormatter, fiatFormatter: FiatFormatter) =
+        BittensorExitFormatter(tokenFormatter, fiatFormatter)
+
+    @Provides
+    fun provideBittensorSubnetSafetyInteractor(rpcCalls: RpcCalls, chainStateRepository: ChainStateRepository) =
+        BittensorSubnetSafetyInteractor(rpcCalls, chainStateRepository)
 
     @Provides
     fun provideBittensorStakePreflightRepository(
@@ -98,7 +110,13 @@ class BittensorModule {
         wallets: WalletRepository,
         balanceValidationSystem: BittensorStakeValidationSystem,
         bittensorSubnetInteractor: BittensorSubnetInteractor
-    ) = BittensorStakePreflightValidation(repository, accounts, wallets, balanceValidationSystem, bittensorSubnetInteractor)
+    ) = BittensorStakePreflightValidation(
+        repository,
+        accounts,
+        wallets,
+        balanceValidationSystem,
+        bittensorSubnetInteractor
+    )
 
     @Provides
     fun provideBittensorStakePreflightSystem(validation: BittensorStakePreflightValidation) = ValidationSystem(validation)
@@ -165,7 +183,13 @@ class BittensorModule {
         bittensorSubnetQuoteInteractor: BittensorSubnetQuoteInteractor,
         favorites: BittensorSubnetFavoritesRepository,
         configRepository: BittensorConfigRepository
-    ) = BittensorSubnetInteractor(repository, portfolioRepository, bittensorSubnetQuoteInteractor, favorites, configRepository)
+    ) = BittensorSubnetInteractor(
+        repository,
+        portfolioRepository,
+        bittensorSubnetQuoteInteractor,
+        favorites,
+        configRepository
+    )
 
     @Provides
     fun provideBittensorSubnetValidators(
@@ -296,7 +320,13 @@ class BittensorModule {
         walletRepository: WalletRepository,
         validators: BittensorSubnetValidatorRepository,
         submission: BittensorSubmissionExecutor
-    ) = BittensorStakingInteractor(repository, extrinsicService, walletRepository, validators, submission)
+    ) = BittensorStakingInteractor(
+        repository,
+        extrinsicService,
+        walletRepository,
+        validators,
+        submission
+    )
 
     @Provides
     @FeatureScope
@@ -308,7 +338,14 @@ class BittensorModule {
         logger: Logger
     ): BittensorEstimatesRepository {
         val api = apiCreator.create(BittensorEstimatesApi::class.java)
-        return BittensorEstimatesRepository(api, infrastructureUrls, 12_000L, accounts, wallets, logger)
+        return BittensorEstimatesRepository(
+            api,
+            infrastructureUrls,
+            12_000L,
+            accounts,
+            wallets,
+            logger
+        )
     }
 
     @Provides
@@ -335,15 +372,24 @@ class BittensorModule {
         constants: WalletConstants,
         backend: BittensorValidatorBackend
     ) =
-        BittensorRootClaimInteractor(chains, accounts, wallets, source, extrinsics, submission, constants, backend)
+        BittensorRootClaimInteractor(
+            chains,
+            accounts,
+            wallets,
+            source,
+            extrinsics,
+            submission,
+            constants,
+            backend
+        )
 
     @Provides
     fun provideBittensorExitSource(@Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource, rpc: RpcCalls, chains: ChainRegistry): BittensorExitRuntimeSource =
         RealBittensorExitRuntimeSource(storage, rpc, chains)
 
     @Provides
-    fun provideBittensorSubnetMetadata(subnets: BittensorSubnetRepository, config: BittensorConfigRepository) =
-        BittensorSubnetMetadataInteractor(subnets, config)
+    fun provideBittensorSubnetMetadata(subnets: BittensorSubnetRepository) =
+        BittensorSubnetMetadataInteractor(subnets)
 
     @Provides
     fun provideBittensorExit(
@@ -358,9 +404,21 @@ class BittensorModule {
         extrinsics: ExtrinsicService,
         submission: BittensorSubmissionExecutor,
         constants: WalletConstants,
-        logger: Logger
+        logger: Logger,
+        @Named(SERVICE_FEE_BENEFICIARY) beneficiaryAddress: String
     ) = BittensorExitInteractor(
-        chains, accounts, wallets, source, subnets, swaps, config, subnetInteractor.slippage,
-        extrinsics, submission, constants, "5EAjYyJ8JaxyvHTSNuFp8fqjerTETjqhoM7MdZux2Ehzjxdq", logger
+        chains,
+        accounts,
+        wallets,
+        source,
+        subnets,
+        swaps,
+        config,
+        subnetInteractor.slippage,
+        extrinsics,
+        submission,
+        constants,
+        beneficiaryAddress,
+        logger
     )
 }

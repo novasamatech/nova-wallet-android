@@ -1,18 +1,18 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery
 
-import org.mockito.Mockito.`when`
+import android.content.SharedPreferences
+import com.google.gson.Gson
 import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
 import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionResolution
 import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
-import android.content.SharedPreferences
-import com.google.gson.Gson
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Era
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Extrinsic
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
-import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
-import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
+import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
+import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -20,8 +20,8 @@ import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import java.math.BigInteger
 
 class ExtrinsicSubmissionRecoveryTest {
 
@@ -53,11 +53,13 @@ class ExtrinsicSubmissionRecoveryTest {
             org.mockito.Mockito.doAnswer { call ->
                 additions[call.getArgument(0)] = call.getArgument(1)
                 editor
-            }.`when`(editor).putString(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any())
+            }.`when`(editor)
+                .putString(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any())
             org.mockito.Mockito.doAnswer { call ->
                 additions[call.getArgument(0)] = null
                 editor
-            }.`when`(editor).remove(org.mockito.ArgumentMatchers.anyString())
+            }.`when`(editor)
+                .remove(org.mockito.ArgumentMatchers.anyString())
             `when`(editor.commit()).thenAnswer {
                 if (allowCommit) additions.forEach { (key, value) -> if (value == null) values.remove(key) else values[key] = value }
                 allowCommit
@@ -93,7 +95,11 @@ class ExtrinsicSubmissionRecoveryTest {
         record()
         source.finalized = 106
         assertTrue(recovery.reconcile(1, "chain") is ExtrinsicRecoveryState.Pending)
-        assertEquals(BigInteger.valueOf(107), pending.pending(1)?.nextBlock)
+        assertEquals(
+            BigInteger.valueOf(107),
+            pending.pending(1)
+                ?.nextBlock
+        )
     }
 
     @Test
@@ -102,7 +108,11 @@ class ExtrinsicSubmissionRecoveryTest {
         source.finalized = 110
         val state = recovery.reconcile(1, "chain") as ExtrinsicRecoveryState.Resolved
         assertEquals(RecoveredExtrinsicOutcome.EXPIRED, state.result.outcome)
-        assertEquals((101..109).toList(), source.visited)
+        assertEquals(
+            (101..109)
+                .toList(),
+            source.visited
+        )
         assertNull(pending.pending(1))
     }
 
@@ -121,7 +131,11 @@ class ExtrinsicSubmissionRecoveryTest {
         record()
         source.failAt = 104
         assertTrue(recovery.reconcile(1, "chain") is ExtrinsicRecoveryState.Pending)
-        assertEquals(BigInteger.valueOf(104), pending.pending(1)?.nextBlock)
+        assertEquals(
+            BigInteger.valueOf(104),
+            pending.pending(1)
+                ?.nextBlock
+        )
         source.failAt = null
         source.visited.clear()
         source.includedAt = 105
@@ -137,7 +151,11 @@ class ExtrinsicSubmissionRecoveryTest {
         source.finalized = 110
         source.failAt = 102
         assertTrue(recovery.reconcile(1, "chain") is ExtrinsicRecoveryState.Pending)
-        assertEquals(BigInteger.valueOf(102), pending.pending(1)?.nextBlock)
+        assertEquals(
+            BigInteger.valueOf(102),
+            pending.pending(1)
+                ?.nextBlock
+        )
         assertNotNull(pending.pending(1))
     }
 
@@ -147,7 +165,11 @@ class ExtrinsicSubmissionRecoveryTest {
         source.finalized = 300
         assertTrue(recovery.reconcile(1, "chain") is ExtrinsicRecoveryState.Pending)
         assertEquals(64, source.visited.size)
-        assertEquals(BigInteger.valueOf(165), pending.pending(1)?.nextBlock)
+        assertEquals(
+            BigInteger.valueOf(165),
+            pending.pending(1)
+                ?.nextBlock
+        )
     }
 
     @Test
@@ -181,14 +203,20 @@ class ExtrinsicSubmissionRecoveryTest {
     @Test
     fun `pending record requires a successful durable commit`() = runBlocking {
         allowCommit = false
-        assertTrue(runCatching { record() }.exceptionOrNull() is IllegalStateException)
+        assertTrue(
+            runCatching { record() }
+                .exceptionOrNull() is IllegalStateException
+        )
         assertNull(pending.pending(1))
     }
 
     @Test
     fun `second submission cannot overwrite the unresolved first`() = runBlocking {
         record()
-        assertTrue(runCatching { record() }.exceptionOrNull() is IllegalStateException)
+        assertTrue(
+            runCatching { record() }
+                .exceptionOrNull() is IllegalStateException
+        )
         assertEquals("hash", pending.pendingHash(1))
     }
 
@@ -196,7 +224,10 @@ class ExtrinsicSubmissionRecoveryTest {
     fun `cancellation preserves pending and propagates`() = runBlocking {
         record()
         source.cancel = true
-        assertTrue(runCatching { recovery.reconcile(1, "chain") }.exceptionOrNull() is CancellationException)
+        assertTrue(
+            runCatching { recovery.reconcile(1, "chain") }
+                .exceptionOrNull() is CancellationException
+        )
         assertNotNull(pending.pending(1))
     }
 
@@ -207,7 +238,11 @@ class ExtrinsicSubmissionRecoveryTest {
         recovery.acknowledge(1, "another-hash")
         assertNotNull(pending.resolution(1))
         recovery.acknowledge(1, "hash")
-        assertEquals(true, pending.resolution(1)?.acknowledged)
+        assertEquals(
+            true,
+            pending.resolution(1)
+                ?.acknowledged
+        )
     }
 
     @Test
@@ -223,36 +258,73 @@ class ExtrinsicSubmissionRecoveryTest {
         val signed = signedExtrinsic()
         recovery.recordSigned(1, "chain", signed)
         assertNotNull(pending.pendingHash(1))
-        assertEquals(BigInteger.valueOf(106), pending.pending(1)?.nextBlock)
-        assertEquals(BigInteger.valueOf(110), pending.pending(1)?.expiresAt)
-        assertTrue(runCatching { recovery.recordSigned(1, "chain", signed) }.isFailure)
+        assertEquals(
+            BigInteger.valueOf(106),
+            pending.pending(1)
+                ?.nextBlock
+        )
+        assertEquals(
+            BigInteger.valueOf(110),
+            pending.pending(1)
+                ?.expiresAt
+        )
+        assertTrue(
+            runCatching { recovery.recordSigned(1, "chain", signed) }
+                .isFailure
+        )
     }
 
     @Test
     fun `failed persistence prevents creation of recovery record`() = runBlocking {
         allowCommit = false
         val signed = signedExtrinsic()
-        assertTrue(runCatching { recovery.recordSigned(1, "chain", signed) }.isFailure)
+        assertTrue(
+            runCatching { recovery.recordSigned(1, "chain", signed) }
+                .isFailure
+        )
     }
 
     @Test
     fun `approval only transaction is rejected before persistence`() = runBlocking {
         val signed = signedExtrinsic("Multisig")
-        assertTrue(runCatching { recovery.recordSigned(1, "chain", signed) }.isFailure)
+        assertTrue(
+            runCatching { recovery.recordSigned(1, "chain", signed) }
+                .isFailure
+        )
         assertNull(pending.pending(1))
     }
 
     @Test
     fun `a scan cursor cannot skip unchecked blocks`() = runBlocking {
         record()
-        assertTrue(runCatching { pending.advance(1, "hash", BigInteger.valueOf(110)) }.exceptionOrNull() is IllegalArgumentException)
-        assertEquals(BigInteger.valueOf(101), pending.pending(1)?.nextBlock)
+        assertTrue(
+            runCatching { pending.advance(1, "hash", BigInteger.valueOf(110)) }
+                .exceptionOrNull() is IllegalArgumentException
+        )
+        assertEquals(
+            BigInteger.valueOf(101),
+            pending.pending(1)
+                ?.nextBlock
+        )
     }
 
     private fun signedExtrinsic(moduleName: String = "SubtensorModule"): SendableExtrinsic {
         val signed = mock(SendableExtrinsic::class.java)
-        val module = Module(moduleName, null, emptyMap(), null, emptyMap(), emptyMap(), BigInteger.ZERO)
-        val function = MetadataFunction("call", emptyList(), emptyList(), 0 to 0)
+        val module = Module(
+            moduleName,
+            null,
+            emptyMap(),
+            null,
+            emptyMap(),
+            emptyMap(),
+            BigInteger.ZERO
+        )
+        val function = MetadataFunction(
+            "call",
+            emptyList(),
+            emptyList(),
+            0 to 0
+        )
         val call = GenericCall.Instance(module, function, emptyMap())
         val extrinsic = Extrinsic.Instance(Extrinsic.ExtrinsicType.Bare, call)
         `when`(signed.extrinsic).thenReturn(extrinsic)
@@ -262,7 +334,13 @@ class ExtrinsicSubmissionRecoveryTest {
 
     private suspend fun record(expiresAt: Long = 110) {
         val anchor = FinalizedBlockReference(BigInteger.valueOf(100), "block-100")
-        val record = PendingExtrinsicSubmission("hash", "chain", anchor, BigInteger.valueOf(101), BigInteger.valueOf(expiresAt))
+        val record = PendingExtrinsicSubmission(
+            "hash",
+            "chain",
+            anchor,
+            BigInteger.valueOf(101),
+            BigInteger.valueOf(expiresAt)
+        )
         pending.record(1, record)
     }
 

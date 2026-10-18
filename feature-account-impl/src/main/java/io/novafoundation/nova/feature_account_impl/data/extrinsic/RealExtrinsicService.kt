@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic
 
-import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.RealExtrinsicSubmissionRecovery
 import android.util.Log
 import io.novafoundation.nova.common.data.network.runtime.binding.DispatchError
 import io.novafoundation.nova.common.data.network.runtime.binding.bindDispatchError
@@ -42,6 +41,7 @@ import io.novafoundation.nova.feature_account_api.data.signer.setSignerData
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.interfaces.requireMetaAccountFor
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery.RealExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.withSequenceSigning
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
@@ -122,8 +122,7 @@ class RealExtrinsicService(
                 submission.extrinsics.map { it to submission }
             },
             listProcessing = { (extrinsic, submission) ->
-                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
-                    .filterIsInstance<ExtrinsicStatus.InBlock>()
+                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic).filterIsInstance<ExtrinsicStatus.InBlock>()
                     .map { ExtrinsicWatchResult(it, submission.submissionHierarchy) }
                     .first()
             }
@@ -141,8 +140,7 @@ class RealExtrinsicService(
         val singleSubmission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
         recordRecoverableSubmission(chain, origin, submissionOptions, singleSubmission.extrinsic)
 
-        rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic)
-            .map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }
+        rpcCalls.submitAndWatchExtrinsic(chain.id, singleSubmission.extrinsic).map { ExtrinsicWatchResult(it, singleSubmission.submissionHierarchy) }
             .takeWhileInclusive { !it.status.terminal }
     }
 
@@ -153,8 +151,7 @@ class RealExtrinsicService(
         formExtrinsic: FormExtrinsicWithOrigin
     ): Result<ExtrinsicExecutionResult> {
         return submitAndWatchExtrinsic(chain, origin, submissionOptions, formExtrinsic)
-            .awaitInBlock()
-            .map { determineExtrinsicOutcome(it, chain) }
+            .awaitInBlock().map { determineExtrinsicOutcome(it, chain) }
     }
 
     override suspend fun paymentInfo(

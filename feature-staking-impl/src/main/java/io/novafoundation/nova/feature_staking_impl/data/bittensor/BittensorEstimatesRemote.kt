@@ -1,14 +1,28 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-class BittensorAlphaYieldsRemote(val items: List<Item>?, val meta: Meta?, val pageInfo: BittensorHistoryPageInfo?) {
-    class Item(val netuid: Int?, val hotkey: String?, val reportedRate: String?, val metricKind: String?)
+class BittensorAlphaYieldsRemote(
+    val items: List<Item>?,
+    val meta: Meta?,
+    val pageInfo: BittensorHistoryPageInfo?
+) {
+    class Item(
+        val netuid: Int?,
+        val hotkey: String?,
+        val reportedRate: String?,
+        val metricKind: String?
+    )
     class Meta(val components: Components?)
     class Components(val alphaYield: BittensorRecommendationsRemote.Component?)
 }
 
 class BittensorHistoryPageInfo(val page: Int?, val nextPage: Int?)
 
-class BittensorOperationsRemote(val items: List<Item>?, val historyScope: String?, val meta: Meta?, val pageInfo: BittensorHistoryPageInfo?) {
+class BittensorOperationsRemote(
+    val items: List<Item>?,
+    val historyScope: String?,
+    val meta: Meta?,
+    val pageInfo: BittensorHistoryPageInfo?
+) {
     class Item(
         val netuid: Int?,
         val hotkey: String?,

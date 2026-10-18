@@ -12,9 +12,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -24,8 +26,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewViewModel
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
 
 @Module(includes = [ViewModelModule::class])
 class BittensorSubnetReviewModule {
@@ -50,10 +54,10 @@ class BittensorSubnetReviewModule {
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-        estimates: io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository,
-        tokenFormatter: io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter,
-        recovery: io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery,
-        chainStateRepository: io.novafoundation.nova.runtime.repository.ChainStateRepository
+        estimatesRepository: BittensorEstimatesRepository,
+        tokenFormatter: TokenFormatter,
+        recovery: ExtrinsicSubmissionRecovery,
+        chainStateRepository: ChainStateRepository
     ): ViewModel {
         return BittensorSubnetReviewViewModel(
             BittensorNetuid.Subnet(payload.subnetId),
@@ -75,7 +79,7 @@ class BittensorSubnetReviewModule {
             validationSystem = validationSystem,
             validationExecutor = validationExecutor,
             feeLoaderMixinFactory = feeLoaderMixinFactory,
-            estimates = estimates,
+            estimatesRepository = estimatesRepository,
             tokenFormatter = tokenFormatter,
             recovery = recovery,
             chainStateRepository = chainStateRepository

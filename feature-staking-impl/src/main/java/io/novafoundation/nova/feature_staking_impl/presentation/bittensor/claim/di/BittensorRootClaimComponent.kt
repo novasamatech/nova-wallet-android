@@ -5,6 +5,7 @@ import dagger.BindsInstance
 import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.BittensorRootClaimPayload
 
 @ScreenScope
 @Subcomponent(modules = [BittensorRootClaimModule::class])
@@ -13,7 +14,7 @@ interface BittensorRootClaimComponent {
     @Subcomponent.Factory
     interface Factory {
 
-        fun create(@BindsInstance fragment: Fragment): BittensorRootClaimComponent
+        fun create(@BindsInstance fragment: Fragment, @BindsInstance payload: BittensorRootClaimPayload): BittensorRootClaimComponent
     }
 
     fun inject(fragment: BittensorRootClaimFragment)

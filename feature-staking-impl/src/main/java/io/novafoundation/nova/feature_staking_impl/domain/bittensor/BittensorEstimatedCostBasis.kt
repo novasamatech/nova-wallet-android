@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novafoundation.nova.common.utils.isZero
+import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -18,11 +18,17 @@ data class BittensorReportedOperation(
     val type: String?
 )
 
-data class BittensorEstimatedPurchaseTotals(val paidTao: BigInteger, val receivedAlpha: BigInteger) {
-    init { require(paidTao.isPositive() && receivedAlpha.isPositive()) }
+data class BittensorEstimatedPurchaseTotals(
+    val paidTao: BigInteger,
+    val receivedAlpha: BigInteger
+) {
+    init {
+        require(paidTao.isPositive() && receivedAlpha.isPositive())
+    }
 
     val averagePrice: BigDecimal
-        get() = paidTao.toBigDecimal().divide(receivedAlpha.toBigDecimal(), 18, RoundingMode.DOWN)
+        get() = paidTao.toBigDecimal()
+            .divide(receivedAlpha.toBigDecimal(), 18, RoundingMode.DOWN)
 
     fun adding(tao: BigInteger, alpha: BigInteger) = BittensorEstimatedPurchaseTotals(paidTao + tao, receivedAlpha + alpha)
 
@@ -37,7 +43,11 @@ data class BittensorEstimatedPurchaseTotals(val paidTao: BigInteger, val receive
 }
 
 /** Operator-approved parity with the iOS ledger, not an authoritative accounting history. */
-class BittensorEstimatedCostBasis(operations: List<BittensorReportedOperation>, private val allProviderPagesRead: Boolean) {
+class BittensorEstimatedCostBasis(
+    operations: List<BittensorReportedOperation>,
+    private val allProviderPagesRead: Boolean
+) {
+
     private val totals = mutableMapOf<Int, BittensorEstimatedPurchaseTotals>()
 
     private val unclassified = mutableSetOf<Int>()
@@ -46,25 +56,59 @@ class BittensorEstimatedCostBasis(operations: List<BittensorReportedOperation>, 
         val seen = mutableSetOf<BittensorReportedOperation>()
         operations.asReversed().forEach { row ->
             if (row.eventId.isNotEmpty() && !seen.add(row)) return@forEach
-            if (row.netuid == 0 || nonTrade(row.type)) return@forEach
-            val amountIn = row.amountIn.toBigDecimalOrNull()?.abs()?.movePointRight(BittensorProtocolUnits.ALPHA_PRECISION)?.toBigInteger()
-            val amountOut = row.amountOut.toBigDecimalOrNull()?.abs()?.movePointRight(BittensorProtocolUnits.ALPHA_PRECISION)?.toBigInteger()
-            val price = row.price.toBigDecimalOrNull()?.abs()
-            if (amountIn == null || amountOut == null || price == null) {
-                unclassified += row.netuid
+            if (BittensorNetuid.from(row.netuid).isRoot() || nonTrade(row.type)) {
                 return@forEach
             }
-            if (amountIn.isZero || amountOut.isZero || price.isZero) return@forEach
-            val buy = fits(amountIn, amountOut, price)
-            val sell = fits(amountOut, amountIn, price)
-            when {
-                buy && !sell -> totals[row.netuid] = totals[row.netuid]?.adding(amountIn, amountOut)
-                    ?: BittensorEstimatedPurchaseTotals(amountIn, amountOut)
-                sell && !buy -> totals[row.netuid]?.reducing(amountIn)?.let { totals[row.netuid] = it } ?: totals.remove(row.netuid)
-                else -> unclassified += row.netuid
-            }
+            applyOperation(row)
         }
     }
+
+    private fun applyOperation(operation: BittensorReportedOperation) {
+        val trade = parseTrade(operation)
+        if (trade == null) {
+            unclassified += operation.netuid
+            return
+        }
+        if (trade.amountIn.isZero || trade.amountOut.isZero || trade.price.isZero) return
+        val buy = fits(trade.amountIn, trade.amountOut, trade.price)
+        val sell = fits(trade.amountOut, trade.amountIn, trade.price)
+        when {
+            buy && !sell -> addPurchase(operation.netuid, trade)
+            sell && !buy -> reducePurchase(operation.netuid, trade.amountIn)
+            else -> unclassified += operation.netuid
+        }
+    }
+
+    private fun parseTrade(operation: BittensorReportedOperation): ReportedTrade? {
+        val amountIn = parseAmount(operation.amountIn) ?: return null
+        val amountOut = parseAmount(operation.amountOut) ?: return null
+        val price = operation.price.toBigDecimalOrNull()
+            ?.abs() ?: return null
+        return ReportedTrade(amountIn, amountOut, price)
+    }
+
+    private fun parseAmount(value: String): BigInteger? = value.toBigDecimalOrNull()
+        ?.abs()
+        ?.movePointRight(BittensorProtocolUnits.ALPHA_PRECISION)
+        ?.toBigInteger()
+
+    private fun addPurchase(
+        netuid: Int,
+        trade: ReportedTrade
+    ) {
+        totals[netuid] = totals[netuid]?.adding(trade.amountIn, trade.amountOut)
+            ?: BittensorEstimatedPurchaseTotals(trade.amountIn, trade.amountOut)
+    }
+
+    private fun reducePurchase(
+        netuid: Int,
+        alpha: BigInteger
+    ) {
+        val remaining = totals[netuid]?.reducing(alpha)
+        if (remaining == null) totals.remove(netuid) else totals[netuid] = remaining
+    }
+
+    private data class ReportedTrade(val amountIn: BigInteger, val amountOut: BigInteger, val price: BigDecimal)
 
     fun canEstimate(netuid: Int): Boolean = allProviderPagesRead && netuid !in unclassified
 

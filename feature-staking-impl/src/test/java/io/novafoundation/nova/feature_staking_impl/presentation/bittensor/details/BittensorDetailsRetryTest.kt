@@ -1,13 +1,12 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
-import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
@@ -29,6 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartModel
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
@@ -88,7 +88,15 @@ class BittensorDetailsRetryTest {
 
     private val currency = mock(Currency::class.java)
 
-    private val portfolioUpdates = MutableStateFlow(BittensorPortfolio(1L, chain, asset, null, BittensorDataStatus.Fresh))
+    private val portfolioUpdates = MutableStateFlow(
+        BittensorPortfolio(
+            1L,
+            chain,
+            asset,
+            null,
+            BittensorDataStatus.Fresh
+        )
+    )
 
     private val portfolioLoads = AtomicInteger()
 

@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolio
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
@@ -36,16 +37,13 @@ class RealBittensorPortfolioRepository(
     private val positionRepository: BittensorPositionRepository
 ) : BittensorPortfolioRepository {
 
-    override fun observeAsset(): Flow<Asset> = observeWallet()
-        .map { it.asset }
+    override fun observeAsset(): Flow<Asset> = observeWallet().map { it.asset }
 
     override fun observeWallet(): Flow<BittensorWalletContext> = flowOfAll {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { account ->
-                walletRepository.assetFlow(account.id, chain.utilityAsset)
-                    .map { asset -> BittensorWalletContext(account.id, chain, asset) }
-            }
+        accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
+            walletRepository.assetFlow(account.id, chain.utilityAsset).map { asset -> BittensorWalletContext(account.id, chain, asset) }
+        }
     }
 
     override fun observeRootPortfolio(): Flow<BittensorPortfolio> = observePortfolio(rootOnly = true)
@@ -54,31 +52,29 @@ class RealBittensorPortfolioRepository(
 
     private fun observePortfolio(rootOnly: Boolean): Flow<BittensorPortfolio> = flowOfAll {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        accountRepository.selectedMetaAccountFlow()
-            .flatMapLatest { account ->
-                combine(
-                    walletRepository.assetFlow(account.id, chain.utilityAsset),
-                    observePositions(chain, account.requireAccountIdIn(chain), rootOnly)
-                ) { asset, positionState ->
-                    BittensorPortfolio(
-                        account.id,
-                        chain,
-                        asset,
-                        positionState.positions,
-                        positionState.status,
-                        supportsImmediateOperations = account.type != io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.MULTISIG
-                    )
-                }
+        accountRepository.selectedMetaAccountFlow().flatMapLatest { account ->
+            combine(
+                walletRepository.assetFlow(account.id, chain.utilityAsset),
+                observePositions(chain, account.requireAccountIdIn(chain), rootOnly)
+            ) { asset, positionState ->
+                BittensorPortfolio(
+                    account.id,
+                    chain,
+                    asset,
+                    positionState.positions,
+                    positionState.status,
+                    supportsImmediateOperations = account.type != LightMetaAccount.Type.MULTISIG
+                )
             }
+        }
     }
 
     private fun observePositions(chain: Chain, coldKey: AccountId, rootOnly: Boolean): Flow<BittensorPortfolioState> {
         return if (rootOnly) {
-            positionRepository.observePositions(chain.id, coldKey)
-                .map { state ->
-                    val positions = state.positions?.let { BittensorPortfolioPositions(it.root, emptyList(), emptyMap()) }
-                    BittensorPortfolioState(positions, state.status)
-                }
+            positionRepository.observePositions(chain.id, coldKey).map { state ->
+                val positions = state.positions?.let { BittensorPortfolioPositions(it.root, emptyList(), emptyMap()) }
+                BittensorPortfolioState(positions, state.status)
+            }
         } else {
             positionRepository.observePortfolio(chain.id, coldKey)
         }

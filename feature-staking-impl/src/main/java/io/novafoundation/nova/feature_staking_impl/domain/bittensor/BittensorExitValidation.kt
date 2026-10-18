@@ -1,20 +1,37 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novafoundation.nova.common.utils.isZero
+import io.novafoundation.nova.common.validation.Validation
+import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
 import java.math.BigInteger
 
-internal fun validateBittensorExit(preflight: BittensorExitPreflight, quote: BittensorExitQuote) {
-    require(preflight.rootHoldRemaining.isZero) { "Root stake is still locked" }
-    require(quote.amount <= preflight.stake && quote.amount <= preflight.availability.available) { "Amount exceeds available stake" }
-    if (quote.fullExit) require(preflight.stake == quote.amount) { "The full position amount has changed. Review the withdrawal again" }
-    if (quote.fullExit) require(preflight.stake <= preflight.availability.available) { "Some of this stake is locked" }
-    if (!quote.fullExit) {
-        require(quote.minimumTaoOut >= preflight.minStake) { "Amount is below the chain's minimum withdrawal" }
-        val remainder = preflight.stake - quote.amount
-        val remainderTao = if (quote.netuid.isRoot()) remainder else remainder * requireNotNull(quote.limitPrice) / BittensorProtocolUnits.RAO_PER_TAO
-        require(remainder == BigInteger.ZERO || preflight.isOwnHotkey || remainderTao >= preflight.minNominatorStake) {
-            "The remainder would be swept or locked by the chain. Choose Max to exit the full position"
-        }
-    }
+data class BittensorExitValidationPayload(
+    val preflight: BittensorExitPreflight,
+    val quote: BittensorExitQuote,
+    val transferable: BigInteger,
+    val fee: BigInteger,
+    val existentialDeposit: BigInteger,
+    val supportsFeeFromStake: Boolean,
+    val expectedFeeFromStake: Boolean? = null
+) {
+
+    val feeFromStake: Boolean
+        get() = transferable < fee + existentialDeposit
 }
+
+enum class BittensorExitValidationFailure {
+    ROOT_LOCKED,
+    SUBNET_TRADING_DISABLED,
+    COLDKEY_SWAP_PENDING,
+    SAFE_MODE_ACTIVE,
+    INSUFFICIENT_STAKE,
+    FULL_POSITION_CHANGED,
+    BELOW_MINIMUM,
+    REMAINDER_BELOW_MINIMUM,
+    INSUFFICIENT_FEE_BALANCE,
+    FEE_SOURCE_CHANGED
+}
+
+typealias BittensorExitValidation = Validation<BittensorExitValidationPayload, BittensorExitValidationFailure>
+
+typealias BittensorExitValidationSystem = ValidationSystem<BittensorExitValidationPayload, BittensorExitValidationFailure>

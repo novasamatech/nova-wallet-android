@@ -1,22 +1,24 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import androidx.core.os.bundleOf
-import io.novafoundation.nova.common.view.showLoadingValue
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.setState
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorExitReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeResultBottomSheet
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.bindBittensorStakeResults
 
 class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, FragmentBittensorExitReviewBinding>() {
 
@@ -26,8 +28,6 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
 
         fun getBundle(payload: BittensorExitReviewPayload) = bundleOf(PAYLOAD to payload)
     }
-
-    private var resultSheet: BittensorStakeResultBottomSheet? = null
 
     override fun createBinding() = FragmentBittensorExitReviewBinding.inflate(layoutInflater)
 
@@ -51,15 +51,27 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         earned.isVisible = !viewModel.isRoot
         slippage.isVisible = !viewModel.isRoot
         commissionCaption.isVisible = !viewModel.isRoot
-        validator.image.updateLayoutParams { width = 18.dp(requireContext()); height = 18.dp(requireContext()) }
+        validator.image.updateLayoutParams {
+            width = 18.dp(requireContext())
+            height = 18.dp(requireContext())
+        }
         validator.setOnClickListener { viewModel.validatorClicked() }
         information.setOnAccountClickedListener { viewModel.accountClicked() }
-        execution.stepContainer.background = requireContext().getBlockDrawable()
-        execution.validator.image.updateLayoutParams { width = 18.dp(requireContext()); height = 18.dp(requireContext()) }
-        execution.root.setPadding(0, 0, 0, 84.dp(requireContext()))
+        execution.stepContainer.background = requireContext()
+            .getBlockDrawable()
+        execution.validator.image.updateLayoutParams {
+            width = 18.dp(requireContext())
+            height = 18.dp(requireContext())
+        }
+        execution.root.setPadding(
+            0,
+            0,
+            0,
+            84.dp(requireContext())
+        )
         execution.validator.setOnClickListener { viewModel.validatorClicked() }
-        execution.slippage.showValue("0.5%")
-        retry.setOnClickListener { viewModel.retry() }
+        execution.slippage.showValue(viewModel.slippage)
+        slippage.showValue(viewModel.slippage)
         confirm.prepareForProgress(viewLifecycleOwner)
         confirm.setOnClickListener { viewModel.confirmClicked() }
         done.setOnClickListener { viewModel.doneClicked() }
@@ -67,6 +79,9 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
 
     override fun subscribe(viewModel: BittensorExitReviewViewModel) = with(binder) {
         setupExternalActions(viewModel)
+        observeBittensorRetries(viewModel.retryEvents)
+        observeRetries(viewModel.feeLoaderMixin)
+        observeValidations(viewModel)
         viewModel.primaryAmount.observe { it?.let(primaryAmount::setAmount) }
         viewModel.assets.observe {
             it?.let {
@@ -98,11 +113,6 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
         viewModel.commissionCaption.observe { commissionCaption.text = it }
         viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.confirmButtonState.observe(confirm::setState)
-        viewModel.error.observe {
-            error.text = it
-            error.isVisible = it != null
-            retry.isVisible = it != null
-        }
         viewModel.showExecution.observe {
             reviewContent.isVisible = !it
             execution.root.isVisible = it
@@ -123,40 +133,12 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             }
         }
         viewModel.executionSubtitle.observe { execution.subtitle.text = it }
-        viewModel.resultState.observe { it?.let(::showResult) }
-    }
-
-    private fun showResult(state: BittensorStakeResultUi) {
-        val sheet = resultSheet ?: BittensorStakeResultBottomSheet(
-            requireContext(),
-            onClose = { resultSheet?.dismiss() },
-            onTryAgain = {
-                resultSheet?.dismiss()
-                viewModel.retry()
-            },
-            onDiscoverSubnets = {
-                resultSheet?.dismiss()
-                viewModel.doneClicked()
-            },
-            onViewPosition = {
-                resultSheet?.dismiss()
-                viewModel.doneClicked()
-            }
-        ).also {
-            resultSheet = it
-            it.setOnDismissListener {
-                resultSheet = null
-                viewModel.resultDismissed()
-            }
-            it.show()
-        }
-        sheet.setState(state)
-    }
-
-    override fun onDestroyView() {
-        resultSheet?.setOnDismissListener(null)
-        resultSheet?.dismiss()
-        resultSheet = null
-        super.onDestroyView()
+        bindBittensorStakeResults(
+            results = viewModel.resultState,
+            onDismiss = viewModel::resultDismissed,
+            onTryAgain = viewModel::confirmClicked,
+            onViewPosition = viewModel::doneClicked,
+            onDiscoverSubnets = viewModel::doneClicked
+        )
     }
 }

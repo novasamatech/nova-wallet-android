@@ -1,7 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
-import io.novasama.substrate_sdk_android.hash.isPositive
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
@@ -9,6 +7,7 @@ import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorConfigRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitRuntimeSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstants
@@ -18,24 +17,25 @@ import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.runtime.extrinsic.BatchMode
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
-import java.math.BigInteger
 
 class BittensorExitInteractor(
-    private val chains: ChainRegistry,
-    private val accounts: AccountRepository,
-    private val wallets: WalletRepository,
-    private val source: BittensorExitRuntimeSource,
-    private val subnets: BittensorSubnetMetadataInteractor,
-    private val swaps: BittensorSwapSource,
-    private val config: BittensorConfigRepository,
-    private val slippage: BittensorSlippage,
-    private val extrinsics: ExtrinsicService,
-    private val submission: BittensorSubmissionExecutor,
-    private val constants: WalletConstants,
+    private val chainRegistry: ChainRegistry,
+    private val accountRepository: AccountRepository,
+    private val walletRepository: WalletRepository,
+    private val exitRuntimeSource: BittensorExitRuntimeSource,
+    private val subnetMetadataInteractor: BittensorSubnetMetadataInteractor,
+    private val swapSource: BittensorSwapSource,
+    private val configRepository: BittensorConfigRepository,
+    val slippage: BittensorSlippage,
+    private val extrinsicService: ExtrinsicService,
+    private val submissionExecutor: BittensorSubmissionExecutor,
+    private val walletConstants: WalletConstants,
     private val beneficiaryAddress: String,
     private val logger: Logger
 ) {
@@ -43,18 +43,123 @@ class BittensorExitInteractor(
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
 
     suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition {
-        val wallet = accounts.getMetaAccount(metaId)
+        val wallet = accountRepository.getMetaAccount(metaId)
         requireBittensorImmediateWallet(wallet)
-        val chain = chains.getChain(ChainGeneses.BITTENSOR)
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val coldkey = AccountIdKey(wallet.requireAccountIdIn(chain))
         val hotkey = AccountIdKey(chain.accountIdOf(hotkeyAddress))
-        val preflight = source.preflight(chain.id, coldkey.value, hotkey.value, netuid)
-        val asset = wallets.assetFlow(metaId, chain.utilityAsset).first()
-        val subnet = if (netuid.isRoot()) {
-            null
-        } else {
-            try {
-                subnets.subnet(netuid as BittensorNetuid.Subnet)
+        val preflight = exitRuntimeSource.preflight(
+            chain.id,
+            coldkey.value,
+            hotkey.value,
+            netuid
+        )
+        val asset = walletRepository.assetFlow(metaId, chain.utilityAsset)
+            .first()
+        val subnet = loadSubnetMetadata(netuid)
+        val directSigner = wallet.type != LightMetaAccount.Type.PROXIED && wallet.type != LightMetaAccount.Type.MULTISIG
+        requireWallet(metaId, coldkey, chain)
+        return BittensorExitPosition(
+            metaId = metaId,
+            chain = chain,
+            coldkey = coldkey,
+            hotkey = hotkey,
+            validatorAddress = hotkeyAddress,
+            netuid = netuid,
+            asset = asset,
+            subnet = subnet,
+            preflight = preflight,
+            supportsFeeFromStake = directSigner && !preflight.rootHoldEnabled,
+            existentialDeposit = walletConstants.existentialDeposit(chain.id)
+        )
+    }
+
+    suspend fun quote(position: BittensorExitPosition, amount: BigInteger, fullExit: Boolean): BittensorExitQuote {
+        require(amount.isPositive() && amount.bitLength() <= 64)
+        val exitAmount = if (fullExit) position.preflight.stake else amount
+        val quote = when (val netuid = position.netuid) {
+            BittensorNetuid.Root -> rootQuote(exitAmount, fullExit)
+            is BittensorNetuid.Subnet -> subnetQuote(
+                position.chain,
+                netuid,
+                exitAmount,
+                fullExit
+            )
+        }
+        return quote
+    }
+
+    suspend fun estimateFee(position: BittensorExitPosition, quote: BittensorExitQuote): Fee {
+        return estimateFee(position, operation(position, quote))
+    }
+
+    fun prepare(
+        position: BittensorExitPosition,
+        quote: BittensorExitQuote,
+        fee: Fee,
+        feeFromStake: Boolean
+    ): BittensorExitDraft {
+        return BittensorExitDraft(
+            position,
+            quote,
+            operation(position, quote),
+            fee,
+            feeFromStake
+        )
+    }
+
+    suspend fun validationPayload(
+        position: BittensorExitPosition,
+        quote: BittensorExitQuote,
+        fee: Fee,
+        expectedFeeFromStake: Boolean? = null
+    ): BittensorExitValidationPayload {
+        requireWallet(position.metaId, position.coldkey, position.chain)
+        val preflight = exitRuntimeSource.preflight(
+            position.chain.id,
+            position.coldkey.value,
+            position.hotkey.value,
+            position.netuid
+        )
+        val asset = walletRepository.assetFlow(position.metaId, position.chain.utilityAsset)
+            .first()
+        val existentialDeposit = walletConstants.existentialDeposit(position.chain.id)
+        return BittensorExitValidationPayload(
+            preflight = preflight,
+            quote = quote,
+            transferable = asset.transferableInPlanks,
+            fee = fee.maxAmountDeductionFor(asset.token.configuration),
+            existentialDeposit = existentialDeposit,
+            supportsFeeFromStake = position.supportsFeeFromStake && !preflight.rootHoldEnabled,
+            expectedFeeFromStake = expectedFeeFromStake
+        )
+    }
+
+    fun feeFromStake(position: BittensorExitPosition, fee: Fee): Boolean {
+        return position.asset.transferableInPlanks < fee.maxAmountDeductionFor(position.asset.token.configuration) + position.existentialDeposit
+    }
+
+    suspend fun execute(draft: BittensorExitDraft): BittensorOperationResult {
+        val position = draft.position
+        requireWallet(position.metaId, position.coldkey, position.chain)
+        // Submit the exact reviewed amount, price limit and service-fee transfer.
+        return submissionExecutor.execute(
+            position.metaId,
+            position.chain
+        ) { draft.operation.build(this) }
+    }
+
+    private fun operation(position: BittensorExitPosition, quote: BittensorExitQuote): BittensorExitOperation {
+        require(quote.netuid == position.netuid) { "Withdrawal network does not match the position" }
+        val beneficiary = AccountIdKey(position.chain.accountIdOf(beneficiaryAddress))
+        return BittensorExitOperation(quote, position.hotkey, beneficiary)
+    }
+
+    private suspend fun loadSubnetMetadata(netuid: BittensorNetuid): BittensorSubnet? {
+        return when (netuid) {
+            BittensorNetuid.Root -> null
+            is BittensorNetuid.Subnet -> try {
+                subnetMetadataInteractor.subnet(netuid)
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -63,85 +168,68 @@ class BittensorExitInteractor(
                 null
             }
         }
-        val directSigner = wallet.type != LightMetaAccount.Type.PROXIED && wallet.type != LightMetaAccount.Type.MULTISIG
-        requireWallet(metaId, coldkey, chain)
-        return BittensorExitPosition(
-            metaId, chain, coldkey, hotkey, hotkeyAddress, netuid, asset, subnet, preflight,
-            supportsFeeFromStake = directSigner && !preflight.rootHoldEnabled
+    }
+
+    private fun rootQuote(amount: BigInteger, fullExit: Boolean): BittensorExitQuote = BittensorExitQuote(
+        netuid = BittensorNetuid.Root,
+        amount = amount,
+        fullExit = fullExit,
+        estimatedTaoOut = amount,
+        minimumTaoOut = amount,
+        serviceFee = BigInteger.ZERO,
+        limitPrice = null
+    )
+
+    private suspend fun subnetQuote(
+        chain: Chain,
+        subnetId: BittensorNetuid.Subnet,
+        amount: BigInteger,
+        fullExit: Boolean
+    ): BittensorExitQuote {
+        val simulation = swapSource.simulate(
+            chain.id,
+            subnetId,
+            BittensorSwapDirection.ALPHA_TO_TAO,
+            amount
+        )
+        require(simulation.direction == BittensorSwapDirection.ALPHA_TO_TAO && simulation.subnetId == subnetId)
+        require(simulation.amountIn + simulation.alphaFee == amount && simulation.amountOut.isPositive())
+
+        val spotPrice = swapSource.currentAlphaPrice(chain.id, subnetId)
+        val limitPrice = slippage.limitPrice(spotPrice, BittensorSwapDirection.ALPHA_TO_TAO)
+        val minimumTaoOut = simulation.amountIn * limitPrice / BittensorProtocolUnits.RAO_PER_TAO
+        val commission = configRepository.config().commission
+        val serviceFee = commission.feeFor(simulation.amountOut)
+        require(minimumTaoOut.isPositive() && simulation.amountOut >= minimumTaoOut)
+
+        return BittensorExitQuote(
+            netuid = subnetId,
+            amount = amount,
+            fullExit = fullExit,
+            estimatedTaoOut = simulation.amountOut,
+            minimumTaoOut = minimumTaoOut,
+            serviceFee = serviceFee,
+            limitPrice = limitPrice
         )
     }
 
-    suspend fun quote(position: BittensorExitPosition, amount: BigInteger, fullExit: Boolean): BittensorExitQuote {
-        require(amount.isPositive() && amount.bitLength() <= 64)
-        val actual = if (fullExit) position.preflight.stake else amount
-        val quote = if (position.isRoot) {
-            BittensorExitQuote(BittensorNetuid.Root, actual, fullExit, actual, actual, BigInteger.ZERO, null)
-        } else {
-            val subnetId = BittensorNetuid.Subnet(position.netuid.value)
-            val simulated = swaps.simulate(position.chain.id, subnetId, BittensorSwapDirection.ALPHA_TO_TAO, actual)
-            require(simulated.direction == BittensorSwapDirection.ALPHA_TO_TAO && simulated.subnetId == subnetId)
-            require(simulated.amountIn + simulated.alphaFee == actual && simulated.amountOut.isPositive())
-            val price = swaps.currentAlphaPrice(position.chain.id, subnetId)
-            val limit = slippage.limitPrice(price, BittensorSwapDirection.ALPHA_TO_TAO)
-            val minimum = simulated.amountIn * limit / BittensorProtocolUnits.RAO_PER_TAO
-            val commission = config.config().commission
-            val serviceFee = commission.feeFor(simulated.amountOut)
-            require(minimum.isPositive() && simulated.amountOut >= minimum)
-            BittensorExitQuote(position.netuid, actual, fullExit, simulated.amountOut, minimum, serviceFee, limit)
-        }
-        validateBittensorExit(position.preflight, quote)
-        return quote
+    private suspend fun estimateFee(position: BittensorExitPosition, operation: BittensorExitOperation): Fee {
+        return extrinsicService.estimateFee(
+            position.chain,
+            TransactionOrigin.WalletWithId(position.metaId),
+            options
+        ) { operation.build(this) }
     }
 
-    suspend fun prepare(position: BittensorExitPosition, quote: BittensorExitQuote): BittensorExitDraft {
-        requireWallet(position.metaId, position.coldkey, position.chain)
-        require(position.netuid == quote.netuid)
-        validateBittensorExit(position.preflight, quote)
-        val beneficiary = AccountIdKey(position.chain.accountIdOf(beneficiaryAddress))
-        val operation = BittensorExitOperation(quote, position.hotkey, beneficiary)
-        val fee = extrinsics.estimateFee(position.chain, TransactionOrigin.WalletWithId(position.metaId), options) { operation.build(this) }
-        val fromStake = checkFee(position, quote, fee)
-        requireWallet(position.metaId, position.coldkey, position.chain)
-        return BittensorExitDraft(position, quote, operation, fee, fromStake)
-    }
-
-    suspend fun execute(draft: BittensorExitDraft): BittensorOperationResult {
-        val position = draft.position
-        requireWallet(position.metaId, position.coldkey, position.chain)
-        val current = source.preflight(position.chain.id, position.coldkey.value, position.hotkey.value, position.netuid)
-        validateBittensorExit(current, draft.quote)
-        val fee = extrinsics.estimateFee(position.chain, TransactionOrigin.WalletWithId(position.metaId), options) { draft.operation.build(this) }
-        val feeFromStake = checkFee(
-            position.copy(preflight = current, supportsFeeFromStake = position.supportsFeeFromStake && !current.rootHoldEnabled),
-            draft.quote,
-            fee
-        )
-        require(feeFromStake == draft.feeFromStake) { "The source of the network fee changed. Review the withdrawal again" }
-        requireWallet(position.metaId, position.coldkey, position.chain)
-        // The confirmed amount, limit and service-fee transfer are never requoted before signing.
-        return submission.execute(position.metaId, position.chain) { draft.operation.build(this) }
-    }
-
-    private suspend fun checkFee(position: BittensorExitPosition, quote: BittensorExitQuote, fee: Fee): Boolean {
-        val asset = wallets.assetFlow(position.metaId, position.chain.utilityAsset).first()
-        val deduction = fee.maxAmountDeductionFor(asset.token.configuration)
-        val deposit = constants.existentialDeposit(position.chain.id)
-        if (asset.transferableInPlanks >= deduction + deposit) return false
-        require(position.isRoot && position.supportsFeeFromStake) { "Free balance is required for the network fee and minimum account balance" }
-        require(quote.amount > deduction + deposit) { "Unstaked amount cannot cover the network fee and minimum account balance" }
-        if (!quote.fullExit) {
-            require(quote.amount + deduction <= position.preflight.stake) { "Stake cannot cover the amount and network fee" }
-            val remainder = position.preflight.stake - quote.amount - deduction
-            require(remainder == BigInteger.ZERO || position.preflight.isOwnHotkey || remainder >= position.preflight.minNominatorStake) {
-                "The network fee would leave a stake below the chain minimum. Review a full withdrawal"
-            }
-        }
-        return true
-    }
-
-    private suspend fun requireWallet(metaId: Long, coldkey: AccountIdKey, chain: Chain) {
-        val wallet = accounts.getMetaAccount(metaId)
+    private suspend fun requireWallet(
+        metaId: Long,
+        coldkey: AccountIdKey,
+        chain: Chain
+    ) {
+        val wallet = accountRepository.getMetaAccount(metaId)
         requireBittensorImmediateWallet(wallet)
-        check(wallet.id == metaId && wallet.requireAccountIdIn(chain).contentEquals(coldkey.value)) { "The staking wallet has changed" }
+        check(
+            wallet.id == metaId && wallet.requireAccountIdIn(chain).contentEquals(coldkey.value)
+        ) { "The staking wallet has changed" }
     }
 }

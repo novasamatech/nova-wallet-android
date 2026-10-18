@@ -1,21 +1,119 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitAvailability
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitPreflight
+import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorExitValidationsModule
+import java.math.BigInteger
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
 import org.junit.Assert.fail
 import org.junit.Test
-import java.math.BigInteger
 
 class BittensorExitValidationTest {
+
+    private val validationsModule = BittensorExitValidationsModule()
+
+    private val validationSystem = validationsModule.provideExitValidationSystem()
+
+    private fun validateBittensorExit(preflight: BittensorExitPreflight, quote: BittensorExitQuote) = runBlocking {
+        val payload = validationPayload(preflight, quote)
+        require(
+            validationSystem.validate(payload)
+                .getOrThrow() is ValidationStatus.Valid
+        )
+    }
+
+    private fun validationPayload(
+        preflight: BittensorExitPreflight = preflight(),
+        quote: BittensorExitQuote = quote()
+    ) = BittensorExitValidationPayload(
+        preflight,
+        quote,
+        stake,
+        BigInteger.ONE,
+        BigInteger.ONE,
+        true
+    )
+
+    private fun assertFailure(payload: BittensorExitValidationPayload, expected: BittensorExitValidationFailure) = runBlocking {
+        val result = validationSystem.validate(payload)
+            .getOrThrow() as ValidationStatus.NotValid
+        assertEquals(expected, result.reason)
+    }
+
+    @Test
+    fun `fee cannot come from subnet stake`() {
+        val payload = validationPayload(quote = quote(netuid = BittensorNetuid.Subnet(1)))
+            .copy(transferable = BigInteger.ZERO)
+        assertFailure(payload, BittensorExitValidationFailure.INSUFFICIENT_FEE_BALANCE)
+    }
+
+    @Test
+    fun `fee source must match review`() {
+        val payload = validationPayload()
+            .copy(expectedFeeFromStake = true)
+        assertFailure(payload, BittensorExitValidationFailure.FEE_SOURCE_CHANGED)
+    }
+
+    @Test
+    fun `root fee cannot use stake with hold enabled`() {
+        val payload = validationPayload()
+            .copy(transferable = BigInteger.ZERO, supportsFeeFromStake = false)
+        assertFailure(payload, BittensorExitValidationFailure.INSUFFICIENT_FEE_BALANCE)
+    }
+
+    @Test
+    fun `root fee must leave minimum stake`() {
+        val payload = validationPayload(quote = quote(stake - precision))
+            .copy(transferable = BigInteger.ZERO)
+        assertFailure(payload, BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM)
+    }
+
+    @Test
+    fun `coldkey swap blocks exit`() {
+        assertFailure(
+            validationPayload(
+                preflight()
+                    .copy(coldkeySwapPending = true)
+            ),
+            BittensorExitValidationFailure.COLDKEY_SWAP_PENDING
+        )
+    }
+
+    @Test
+    fun `safe mode blocks exit`() {
+        assertFailure(
+            validationPayload(
+                preflight()
+                    .copy(safeModeActive = true)
+            ),
+            BittensorExitValidationFailure.SAFE_MODE_ACTIVE
+        )
+    }
+
+    @Test
+    fun `disabled subnet blocks exit`() {
+        assertFailure(
+            validationPayload(
+                preflight()
+                    .copy(subnetTradingEnabled = false)
+            ),
+            BittensorExitValidationFailure.SUBNET_TRADING_DISABLED
+        )
+    }
+
     private fun expectIllegal(block: () -> Unit) {
         try { block() } catch (expected: IllegalArgumentException) { return }
         fail("Expected an IllegalArgumentException")
     }
 
     private val precision = BigInteger.TEN.pow(9)
+
     private val stake = precision * BigInteger.TEN
     private val hotkey = AccountIdKey(ByteArray(32) { 1 })
+
     private val beneficiary = AccountIdKey(ByteArray(32) { 2 })
 
     private fun preflight(
@@ -77,7 +175,8 @@ class BittensorExitValidationTest {
     }
 
     @Test fun `small full withdrawal bypasses partial minimum`() {
-        val small = preflight().copy(stake = BigInteger.ONE, availability = BittensorExitAvailability(BigInteger.ONE, BigInteger.ZERO, BigInteger.ONE))
+        val small = preflight()
+            .copy(stake = BigInteger.ONE, availability = BittensorExitAvailability(BigInteger.ONE, BigInteger.ZERO, BigInteger.ONE))
         validateBittensorExit(small, quote(BigInteger.ONE, true))
     }
 
@@ -96,12 +195,33 @@ class BittensorExitValidationTest {
     }
 
     @Test fun `root cannot carry service fee or limit`() {
-        expectIllegal { BittensorExitOperation(quote().copy(serviceFee = BigInteger.ONE), hotkey, beneficiary) }
-        expectIllegal { BittensorExitOperation(quote().copy(limitPrice = precision), hotkey, beneficiary) }
+        expectIllegal {
+            BittensorExitOperation(
+                quote()
+                    .copy(serviceFee = BigInteger.ONE),
+                hotkey,
+                beneficiary
+            )
+        }
+        expectIllegal {
+            BittensorExitOperation(
+                quote()
+                    .copy(limitPrice = precision),
+                hotkey,
+                beneficiary
+            )
+        }
     }
 
     @Test fun `sell minimum proceeds must cover service fee`() {
-        expectIllegal { BittensorExitOperation(quote(netuid = BittensorNetuid.Subnet(1)).copy(serviceFee = stake), hotkey, beneficiary) }
+        expectIllegal {
+            BittensorExitOperation(
+                quote(netuid = BittensorNetuid.Subnet(1))
+                    .copy(serviceFee = stake),
+                hotkey,
+                beneficiary
+            )
+        }
     }
 
     @Test fun `sell requires positive price and valid u64 amount`() {

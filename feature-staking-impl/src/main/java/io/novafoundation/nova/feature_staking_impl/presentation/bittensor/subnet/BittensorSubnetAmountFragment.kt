@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
-import io.novafoundation.nova.common.view.showLoadingValue
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -11,6 +10,7 @@ import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
 import io.novafoundation.nova.common.view.setState
+import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetAmountBinding
@@ -37,7 +37,9 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
     override fun inject() {
         val payload = argument<BittensorSubnetAmountPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetAmountComponentFactory().create(this, payload).inject(this)
+            .bittensorSubnetAmountComponentFactory()
+            .create(this, payload)
+            .inject(this)
     }
 
     override fun initViews() = with(binder) {
@@ -87,7 +89,11 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
                 val name = it.name.ifBlank { getString(R.string.bittensor_subnet_number, it.id.value) }
                 "\u200e" + it.displayName(name)
             } ?: "—"
-            subnetIcon.load(it?.logoUrl, FeatureUtils.getCommonApi(requireContext()).imageLoader()) {
+            subnetIcon.load(
+                it?.logoUrl,
+                FeatureUtils.getCommonApi(requireContext())
+                    .imageLoader()
+            ) {
                 bittensorSubnetIcon()
             }
         }
@@ -98,7 +104,11 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         viewModel.continueButtonState.observe(continueButton::setState)
     }
 
-    private fun showInfo(title: Int, message: String) {
-        DescriptionBottomSheet(requireContext(), getString(title), message).show()
+    private fun showInfo(
+        title: Int,
+        message: String
+    ) {
+        DescriptionBottomSheet(requireContext(), getString(title), message)
+            .show()
     }
 }

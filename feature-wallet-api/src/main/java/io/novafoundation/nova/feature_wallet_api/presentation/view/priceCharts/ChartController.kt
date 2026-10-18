@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts
 
-import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.Typeface
@@ -17,6 +16,7 @@ import io.novafoundation.nova.common.utils.binarySearchFloor
 import io.novafoundation.nova.common.utils.dpF
 import io.novafoundation.nova.common.utils.vibrate
 import io.novafoundation.nova.feature_wallet_api.R
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 
 class ChartController(private val chart: LineChart, private val callback: Callback) : View.OnTouchListener {
 
@@ -230,8 +230,7 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     private fun LineChart.getEntryByTouchPoint(event: MotionEvent): Entry? {
         val xTouch = chart.getTransformer(YAxis.AxisDependency.RIGHT)
-            .getValuesByTouchPoint(event.x, event.y)
-            .x
+            .getValuesByTouchPoint(event.x, event.y).x
 
         val foundIndex = currentEntries.binarySearchFloor { it.x.compareTo(xTouch) }
         if (foundIndex >= 0 && foundIndex < currentEntries.size) {

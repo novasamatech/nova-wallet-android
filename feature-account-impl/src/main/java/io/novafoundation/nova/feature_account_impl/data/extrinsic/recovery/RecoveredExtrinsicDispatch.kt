@@ -1,7 +1,7 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery
 
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
 import io.novafoundation.nova.common.data.network.runtime.binding.castToDictEnum
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.ExtrinsicStatus
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericCall
 import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.GenericEvent
@@ -25,29 +25,48 @@ internal fun recoveredExtrinsicDispatch(
     events: List<GenericEvent.Instance>
 ): RecoveredExtrinsicOutcome {
     if (systemStatus == ExtrinsicStatus.FAILURE) return RecoveredExtrinsicOutcome.FAILURE
+
     val tree = extrinsicCallTree(call)
-    val proxies = tree.count { it.module.name == "Proxy" }
-    val proxyEvents = events.filter { it.module.name == "Proxy" && it.event.name == "ProxyExecuted" }
-    require(proxyEvents.size >= proxies) { "Proxy execution evidence is unavailable" }
-    proxyEvents.forEach { event ->
-        when (event.arguments.first().castToDictEnum().name) {
-            "Err" -> return RecoveredExtrinsicOutcome.FAILURE
-            "Ok" -> Unit
-            else -> error("Unknown proxy dispatch result")
-        }
-    }
-    val multisigs = tree.count { it.module.name == "Multisig" }
-    val multisigEvents = events.filter { it.module.name == "Multisig" && it.event.name == "MultisigExecuted" }
-    require(multisigEvents.size >= multisigs) { "Multisig approval is not proof of staking execution" }
-    multisigEvents.forEach { event ->
-        when (event.arguments[4].castToDictEnum().name) {
-            "Err" -> return RecoveredExtrinsicOutcome.FAILURE
-            "Ok" -> Unit
-            else -> error("Unknown multisig dispatch result")
-        }
-    }
+    val proxyResult = nestedDispatchOutcome(
+        tree,
+        events,
+        "Proxy",
+        "ProxyExecuted",
+        resultIndex = 0
+    )
+    if (proxyResult == RecoveredExtrinsicOutcome.FAILURE) return proxyResult
+
+    val multisigResult = nestedDispatchOutcome(
+        tree,
+        events,
+        "Multisig",
+        "MultisigExecuted",
+        resultIndex = 4
+    )
+    if (multisigResult == RecoveredExtrinsicOutcome.FAILURE) return multisigResult
     if (events.any { it.module.name == "Utility" && it.event.name in setOf("BatchInterrupted", "ItemFailed") }) {
         return RecoveredExtrinsicOutcome.FAILURE
+    }
+    return RecoveredExtrinsicOutcome.SUCCESS
+}
+
+private fun nestedDispatchOutcome(
+    calls: List<GenericCall.Instance>,
+    events: List<GenericEvent.Instance>,
+    module: String,
+    eventName: String,
+    resultIndex: Int
+): RecoveredExtrinsicOutcome {
+    val expectedExecutions = calls.count { it.module.name == module }
+    val executionEvents = events.filter { it.module.name == module && it.event.name == eventName }
+    require(executionEvents.size >= expectedExecutions) { "$module execution evidence is unavailable" }
+    for (event in executionEvents) {
+        val result = event.arguments[resultIndex].castToDictEnum()
+        when (result.name) {
+            "Err" -> return RecoveredExtrinsicOutcome.FAILURE
+            "Ok" -> Unit
+            else -> error("Unknown $module dispatch result")
+        }
     }
     return RecoveredExtrinsicOutcome.SUCCESS
 }

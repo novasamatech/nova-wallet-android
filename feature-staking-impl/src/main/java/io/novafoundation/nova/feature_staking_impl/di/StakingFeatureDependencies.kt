@@ -1,13 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.di
 
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import android.content.SharedPreferences
 import coil.ImageLoader
 import com.google.gson.Gson
 import io.novafoundation.nova.analytics.AnalyticsService
-import io.novafoundation.nova.infrastructure.di.Attested
-import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.data.announcements.AnnouncementsRepository
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
@@ -36,6 +32,7 @@ import io.novafoundation.nova.core_db.dao.StakingRewardPeriodDao
 import io.novafoundation.nova.core_db.dao.StakingTotalRewardDao
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.repository.OnChainIdentityRepository
 import io.novafoundation.nova.feature_account_api.domain.account.identity.IdentityProvider
 import io.novafoundation.nova.feature_account_api.domain.account.identity.LocalIdentity
@@ -59,6 +56,8 @@ import io.novafoundation.nova.feature_wallet_api.data.cache.AssetCache
 import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.AssetSourceRegistry
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 import io.novafoundation.nova.feature_wallet_api.domain.ArbitraryAssetUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.AssetVisibilityUseCase
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.TokenRepository
@@ -66,11 +65,14 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletConstan
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.validation.EnoughTotalToStayAboveEDValidationFactory
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.FeeLoaderMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.maxAction.MaxActionProviderFactory
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.infrastructure.di.Attested
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.di.LOCAL_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
@@ -86,7 +88,6 @@ import io.novafoundation.nova.runtime.storage.SampledBlockTimeStorage
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
-import io.novafoundation.nova.feature_wallet_api.data.repository.UsdRateRepository
 
 interface StakingFeatureDependencies {
 
@@ -95,7 +96,7 @@ interface StakingFeatureDependencies {
     @get:Attested
     val attestedNetworkApiCreator: NetworkApiCreator
 
-    val coinPriceRepository: io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
+    val coinPriceRepository: CoinPriceRepository
 
     fun analyticsService(): AnalyticsService
 

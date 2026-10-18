@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isError
 import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -16,14 +18,19 @@ import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
+import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BITTENSOR_ALPHA_DECIMALS
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetBuyQuote
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakeDraft
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
@@ -37,12 +44,13 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.asFeeContextFromSelf
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.connectWith
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.createDefaultBy
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
@@ -57,12 +65,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
-import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.domain.map
-import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 
 class BittensorSubnetAmountViewModel(
     private val initialSubnetId: BittensorNetuid.Subnet,
@@ -81,7 +83,7 @@ class BittensorSubnetAmountViewModel(
     private val validationExecutor: ValidationExecutor,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     val existingPosition: Boolean,
-    private val estimates: BittensorEstimatesRepository
+    private val estimatesRepository: BittensorEstimatesRepository
 ) : BaseViewModel(), Validatable by validationExecutor {
 
     val retryEvents = retryController.events
@@ -135,8 +137,7 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     val maxAmount = walletContext.map { wallet ->
-        tokenFormatter.formatToken(wallet.asset.transferable, wallet.asset.token.configuration.symbol)
-            .toString()
+        tokenFormatter.formatToken(wallet.asset.transferable, wallet.asset.token.configuration.symbol).toString()
     }
         .shareInBackground()
 
@@ -186,32 +187,56 @@ class BittensorSubnetAmountViewModel(
     private val draft = currentQuote.map { it?.draft }
         .shareInBackground()
 
-    private val yieldState = estimates.observeAlphaYields(walletContext.map { it.chain }, initialSubnetId).shareInBackground()
+    private val yieldState = estimatesRepository.observeAlphaYields(
+        walletContext.map { it.chain },
+        initialSubnetId
+    )
+        .shareInBackground()
 
-    private val costBasisState = estimates.observeCostBasis(walletContext.map { BittensorEstimateContext(it.metaId, it.chain) }).shareInBackground()
+    private val costBasisState = estimatesRepository.observeCostBasis(walletContext.map { BittensorEstimateContext(it.metaId, it.chain) })
+        .shareInBackground()
 
-    val annualYield = combine(yieldState, walletContext) { state, walletContext ->
-        val key = runCatching { AccountIdKey(walletContext.chain.accountIdOf(validatorAddress)) }.getOrNull()
+    val annualYield = combine(
+        yieldState,
+        walletContext
+    ) { state, walletContext ->
+        val key = runCatching { AccountIdKey(walletContext.chain.accountIdOf(validatorAddress)) }
+            .getOrNull()
         key?.let { state?.get(it) }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val validator = draft.map { it?.validator?.name ?: "—" }.shareInBackground()
+    val validator = draft.map { it?.validator?.name ?: "—" }
+        .shareInBackground()
 
-    val apy = annualYield.map { it?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } ?: "—" }.shareInBackground()
+    val apy = annualYield.map { it?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } ?: "—" }
+        .shareInBackground()
 
-    val monthlyEstimate = combine(draft.map { it?.operation?.quote }, annualYield, subnet) { quote, annual, subnet ->
+    val monthlyEstimate = combine(
+        draft.map { it?.operation?.quote },
+        annualYield,
+        subnet
+    ) { quote, annual, subnet ->
         if (quote == null || annual == null || subnet == null) {
             "—"
         } else {
-            val alpha = io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection(
-                BigDecimal(quote.alphaOutInPlanks, 9),
+            val alpha = bittensorMonthlyProjection(
+                BigDecimal(quote.alphaOutInPlanks, BittensorProtocolUnits.ALPHA_PRECISION),
                 annual
             )
-            "≈ " + tokenFormatter.formatToken(alpha, TokenSymbol(subnet.symbol.ifBlank { "—" }))
+            "≈ " + tokenFormatter.formatToken(
+                alpha,
+                TokenSymbol(subnet.symbol.ifBlank { "—" })
+            )
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val projectedAveragePrice = combine(costBasisState, draft.map { it?.operation?.quote }, walletContext) { state, quote, walletContext ->
+    val projectedAveragePrice = combine(
+        costBasisState,
+        draft.map { it?.operation?.quote },
+        walletContext
+    ) { state, quote, walletContext ->
         state.map { basis ->
             val current = basis?.forSubnet(initialSubnetId.value)
             if (current == null || quote == null) {
@@ -221,7 +246,8 @@ class BittensorSubnetAmountViewModel(
                 "≈ " + tokenFormatter.formatToken(projected.averagePrice, walletContext.asset.token.configuration.symbol)
             }
         }
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
     private val feeContext = walletContext
         .map { it.asset.token.configuration }
@@ -242,8 +268,7 @@ class BittensorSubnetAmountViewModel(
 
     val slippageDescription = resources.getString(
         R.string.bittensor_slippage_fixed,
-        bittensorSubnetInteractor.slippage.fraction.movePointRight(2)
-            .toStripTrailingZerosString()
+        bittensorSubnetInteractor.slippage.fraction.movePointRight(2).toStripTrailingZerosString()
     )
 
     val feeCaption = combine(
@@ -251,8 +276,7 @@ class BittensorSubnetAmountViewModel(
         flowOf { bittensorSubnetInteractor.commissionRate() }
     ) { quote, configuredRate ->
         val rate = quote?.quote?.serviceFeeRate ?: configuredRate
-        val percentage = rate.movePointRight(2)
-            .toStripTrailingZerosString()
+        val percentage = rate.movePointRight(2).toStripTrailingZerosString()
         resources.getString(R.string.bittensor_subnet_fee_caption, percentage)
     }
         .shareInBackground()
@@ -263,7 +287,10 @@ class BittensorSubnetAmountViewModel(
     ) { subnet, result ->
         if (subnet == null || result == null) return@combine "—"
         val amount = BigDecimal(result.quote.alphaOutInPlanks, BITTENSOR_ALPHA_DECIMALS)
-        "≈ \u200e" + tokenFormatter.formatToken(amount, TokenSymbol(subnet.symbol.ifBlank { "—" }))
+        "≈ \u200e" + tokenFormatter.formatToken(
+            amount,
+            TokenSymbol(subnet.symbol.ifBlank { "—" })
+        )
     }
         .shareInBackground()
 
@@ -328,8 +355,7 @@ class BittensorSubnetAmountViewModel(
         try {
             val wallet = walletContext.first()
             val maximum = bittensorSubnetStakingInteractor.maximumStake(wallet.metaId, initialSubnetId, validatorAddress)
-            val maximumAmount = wallet.asset.token.amountFromPlanks(maximum)
-                .toStripTrailingZerosString()
+            val maximumAmount = wallet.asset.token.amountFromPlanks(maximum).toStripTrailingZerosString()
             amountChooser.setAmountInput(maximumAmount)
         } catch (e: TimeoutCancellationException) {
             reportFailure(e)
@@ -381,7 +407,12 @@ class BittensorSubnetAmountViewModel(
         validating.value = false
         if (quoteRequest.first() != request) return@launchUnit
         router.openBittensorSubnetReview(
-            BittensorSubnetReviewPayload(request.subnetId.value, request.amount, request.metaId, validatorAddress)
+            BittensorSubnetReviewPayload(
+                request.subnetId.value,
+                request.amount,
+                request.metaId,
+                validatorAddress
+            )
         )
     }
 
@@ -402,7 +433,10 @@ class BittensorSubnetAmountViewModel(
 
     private data class QuoteRequest(val metaId: Long, val subnetId: BittensorNetuid.Subnet, val amount: BigInteger)
 
-    private data class QuoteResult(val request: QuoteRequest, val draft: BittensorSubnetStakeDraft) {
+    private data class QuoteResult(
+        val request: QuoteRequest,
+        val draft: BittensorSubnetStakeDraft
+    ) {
 
         val quote: BittensorSubnetBuyQuote get() = draft.operation.quote
     }

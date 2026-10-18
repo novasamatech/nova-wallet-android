@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts
 
-import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -18,6 +17,7 @@ import io.novafoundation.nova.common.utils.inflater
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.feature_wallet_api.databinding.LayoutPriceChartButtonBinding
 import io.novafoundation.nova.feature_wallet_api.databinding.ViewPriceChartsBinding
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.ChartAxisFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.DateChartTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.PriceChangeTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.PriceTextInjector
@@ -233,8 +233,7 @@ class PriceChartsView @JvmOverloads constructor(
 
     private fun getButtons(): List<TextView> {
         return binder.priceChartButtons.children
-            .toList()
-            .filterIsInstance<TextView>()
+            .toList().filterIsInstance<TextView>()
     }
 
     private fun createButton(text: String, index: Int): View {

@@ -1,14 +1,16 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import android.os.Parcelable
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class BittensorExitPositionPayload(val metaId: Long, val netuid: Int, val hotkeyAddress: String) : Parcelable {
 
-    init { require(hotkeyAddress.isNotBlank()) }
+    init {
+        require(hotkeyAddress.isNotBlank())
+    }
 
     fun netuid(): BittensorNetuid = BittensorNetuid.from(netuid)
 }

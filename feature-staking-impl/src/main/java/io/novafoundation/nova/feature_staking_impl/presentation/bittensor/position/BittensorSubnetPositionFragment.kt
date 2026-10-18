@@ -1,26 +1,28 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position
 
 import androidx.core.os.bundleOf
-import io.novafoundation.nova.common.view.showLoadingValue
+import androidx.core.view.isVisible
+import coil.transform.RoundedCornersTransformation
+import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
+import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.presentation.AssetIconProvider
+import io.novafoundation.nova.common.presentation.fallbackIcon
+import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.images.setIcon
-import io.novafoundation.nova.common.presentation.AssetIconProvider
-import io.novafoundation.nova.common.presentation.fallbackIcon
-import coil.transform.RoundedCornersTransformation
-import androidx.core.view.isVisible
-import io.novafoundation.nova.common.base.BaseFragment
-import io.novafoundation.nova.common.di.FeatureUtils
-import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.view.TableCellView
 import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
-import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
+import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetPositionBinding
+import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
 
 class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionViewModel, FragmentBittensorSubnetPositionBinding>() {
 
@@ -31,7 +33,10 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         fun getBundle(payload: BittensorSubnetPositionPayload) = bundleOf(PAYLOAD to payload)
     }
 
-    private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+    private val imageLoader by lazy {
+        FeatureUtils.getCommonApi(requireContext())
+            .imageLoader()
+    }
 
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::validatorClicked) }
 
@@ -51,10 +56,8 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         onBackPressed { viewModel.back() }
         sell.setOnClickListener { viewModel.sellClicked() }
         buy.setOnClickListener { viewModel.buyClicked() }
-        retryPosition.setOnClickListener { viewModel.retryPosition() }
-        retryChart.setOnClickListener { viewModel.retryChart() }
         validators.adapter = adapter
-        chart.setPresentation(io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView.Presentation.PLOT_ONLY)
+        chart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPlotHeight(208)
         chart.onPeriodSelected = viewModel::selectPeriod
@@ -62,12 +65,20 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
 
     override fun subscribe(viewModel: BittensorSubnetPositionViewModel) = with(binder) {
         setupExternalActions(viewModel)
+        observeBittensorRetries(viewModel.retryEvents)
         viewModel.subnet.observe { subnet ->
             val name = subnet?.name?.ifBlank { subnet.symbol } ?: getString(R.string.bittensor_exit_position)
             toolbar.setTitle(name)
             subnetCaption.text = name
-            subnetIcon.setIcon(subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon, imageLoader) {
-                transformations(RoundedCornersTransformation(16.dp(requireContext()).toFloat()))
+            subnetIcon.setIcon(
+                subnet?.logoUrl?.asUrlIcon() ?: AssetIconProvider.fallbackIcon,
+                imageLoader
+            ) {
+                transformations(
+                    RoundedCornersTransformation(
+                        16.dp(requireContext()).toFloat()
+                    )
+                )
             }
             priceTitle.text = getString(R.string.price_chart_title, name)
         }
@@ -92,12 +103,6 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         viewModel.positionError.observe {
             positionError.text = it
             positionError.isVisible = it != null
-            retryPosition.isVisible = it != null
-        }
-        viewModel.chartError.observe {
-            chartError.text = it
-            chartError.isVisible = it != null
-            retryChart.isVisible = it != null
         }
         viewModel.choices.observe(
             viewLifecycleOwner,

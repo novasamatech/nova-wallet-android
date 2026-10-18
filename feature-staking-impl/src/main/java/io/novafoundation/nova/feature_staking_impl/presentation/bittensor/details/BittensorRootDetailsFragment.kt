@@ -1,19 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
-import io.novafoundation.nova.common.utils.EventObserver
-import io.novafoundation.nova.common.view.TableCellView
-import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
-import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
-import io.novafoundation.nova.feature_staking_impl.R
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
+import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.EventObserver
 import io.novafoundation.nova.common.utils.images.setIcon
+import io.novafoundation.nova.common.view.TableCellView
+import io.novafoundation.nova.common.view.bottomSheet.list.fixed.FixedListBottomSheet
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorRootDetailsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeResultBottomSheet
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 
@@ -23,14 +23,20 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
 
     private var recoverySheet: BittensorStakeResultBottomSheet? = null
 
-    private val imageLoader by lazy { FeatureUtils.getCommonApi(requireContext()).imageLoader() }
+    private val imageLoader by lazy {
+        FeatureUtils.getCommonApi(requireContext())
+            .imageLoader()
+    }
+
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::positionClicked) }
 
     override fun createBinding() = FragmentBittensorRootDetailsBinding.inflate(layoutInflater)
 
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorDetailsComponentFactory().create(this).inject(this)
+            .bittensorDetailsComponentFactory()
+            .create(this)
+            .inject(this)
     }
 
     override fun initViews() = with(binder) {
@@ -49,7 +55,10 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
         observeBittensorRetries(viewModel.retryEvents)
         setupExternalActions(viewModel)
         viewModel.isLoading.observe { loading.isVisible = it }
-        viewModel.exitChoices.observe(viewLifecycleOwner, EventObserver { choices -> showExitChoices(choices) })
+        viewModel.exitChoices.observe(
+            viewLifecycleOwner,
+            EventObserver { choices -> showExitChoices(choices) }
+        )
         viewModel.canAddStake.observe {
             unstake.isEnabled = it
             unstake.alpha = if (it) 1f else 0.48f

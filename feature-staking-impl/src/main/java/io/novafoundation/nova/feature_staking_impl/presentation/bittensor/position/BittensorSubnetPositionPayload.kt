@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position
 
 import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class BittensorSubnetPositionPayload(val subnetId: Int) : Parcelable {

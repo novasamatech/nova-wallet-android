@@ -23,7 +23,12 @@ class BittensorStakeResultBottomSheet(
 
     override val binder = BottomSheetBittensorStakeResultBinding.inflate(LayoutInflater.from(context))
 
-    private val spinnerAnimator = ObjectAnimator.ofFloat(binder.bittensorStakeResultSpinner, View.ROTATION, 0f, 360f).apply {
+    private val spinnerAnimator = ObjectAnimator.ofFloat(
+        binder.bittensorStakeResultSpinner,
+        View.ROTATION,
+        0f,
+        360f
+    ).apply {
         duration = SPINNER_ANIMATION_DURATION
         interpolator = LinearInterpolator()
         repeatCount = ObjectAnimator.INFINITE
@@ -64,7 +69,14 @@ class BittensorStakeResultBottomSheet(
                     binder.bittensorStakeResultSuccessTitle.text = state.title
                     binder.bittensorStakeResultSuccessDescription.text = state.description
                 } else {
-                    showFailure(BittensorStakeResultUi.Failure(state.title, state.description, state.transactionHash, canRetry = false))
+                    showFailure(
+                        BittensorStakeResultUi.Failure(
+                            state.title,
+                            state.description,
+                            state.transactionHash,
+                            canRetry = false
+                        )
+                    )
                 }
             }
         }

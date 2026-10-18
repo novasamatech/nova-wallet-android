@@ -1,11 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import java.math.BigDecimal
+import java.math.BigInteger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.math.BigDecimal
-import java.math.BigInteger
 
 class BittensorConfigMappingTest {
 
@@ -18,7 +18,10 @@ class BittensorConfigMappingTest {
     @Test fun `invalid commission uses established fallback`() {
         for (fraction in listOf(null, BigDecimal.ONE, BigDecimal("-0.1"))) {
             val remote = BittensorConfigRemote(fraction, emptyList())
-            assertEquals(BigDecimal("0.003"), mapBittensorConfig(remote).commission.fraction)
+            assertEquals(
+                BigDecimal("0.003"),
+                mapBittensorConfig(remote).commission.fraction
+            )
         }
     }
 

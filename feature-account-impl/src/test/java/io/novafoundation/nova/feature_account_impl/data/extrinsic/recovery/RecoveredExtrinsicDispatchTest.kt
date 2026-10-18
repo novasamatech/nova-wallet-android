@@ -8,13 +8,14 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Event
 import io.novasama.substrate_sdk_android.runtime.metadata.module.MetadataFunction
 import io.novasama.substrate_sdk_android.runtime.metadata.module.Module
+import java.math.BigInteger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.math.BigInteger
 
 class RecoveredExtrinsicDispatchTest {
+
     private val stake = call("SubtensorModule", "add_stake")
 
     @Test fun `failed system dispatch is failure even without wrapper events`() {
@@ -49,12 +50,32 @@ class RecoveredExtrinsicDispatchTest {
     }
 
     @Test fun `a rejected final multisig dispatch is failure`() {
-        val event = event("Multisig", "MultisigExecuted", listOf(null, null, null, null, DictEnum.Entry("Err", null)))
+        val event = event(
+            "Multisig",
+            "MultisigExecuted",
+            listOf(
+                null,
+                null,
+                null,
+                null,
+                DictEnum.Entry("Err", null)
+            )
+        )
         assertEquals(RecoveredExtrinsicOutcome.FAILURE, recoveredExtrinsicDispatch(call("Multisig", "as_multi", stake), ExtrinsicStatus.SUCCESS, listOf(event)))
     }
 
     @Test fun `a fully executed legacy multisig can be recovered`() {
-        val event = event("Multisig", "MultisigExecuted", listOf(null, null, null, null, DictEnum.Entry("Ok", null)))
+        val event = event(
+            "Multisig",
+            "MultisigExecuted",
+            listOf(
+                null,
+                null,
+                null,
+                null,
+                DictEnum.Entry("Ok", null)
+            )
+        )
         assertEquals(RecoveredExtrinsicOutcome.SUCCESS, recoveredExtrinsicDispatch(call("Multisig", "as_multi", stake), ExtrinsicStatus.SUCCESS, listOf(event)))
     }
 
@@ -69,14 +90,40 @@ class RecoveredExtrinsicDispatchTest {
     }
 
     private fun call(moduleName: String, name: String, child: GenericCall.Instance? = null): GenericCall.Instance {
-        val module = Module(moduleName, null, emptyMap(), null, emptyMap(), emptyMap(), BigInteger.ZERO)
-        val function = MetadataFunction(name, emptyList(), emptyList(), 0 to 0)
+        val module = Module(
+            moduleName,
+            null,
+            emptyMap(),
+            null,
+            emptyMap(),
+            emptyMap(),
+            BigInteger.ZERO
+        )
+        val function = MetadataFunction(
+            name,
+            emptyList(),
+            emptyList(),
+            0 to 0
+        )
         return GenericCall.Instance(module, function, if (child == null) emptyMap() else mapOf("call" to child))
     }
 
     private fun event(moduleName: String, name: String, arguments: List<Any?>): GenericEvent.Instance {
-        val module = Module(moduleName, null, emptyMap(), null, emptyMap(), emptyMap(), BigInteger.ZERO)
-        val event = Event(name, index = 0 to 0, documentation = emptyList(), arguments = emptyList())
+        val module = Module(
+            moduleName,
+            null,
+            emptyMap(),
+            null,
+            emptyMap(),
+            emptyMap(),
+            BigInteger.ZERO
+        )
+        val event = Event(
+            name,
+            index = 0 to 0,
+            documentation = emptyList(),
+            arguments = emptyList()
+        )
         return GenericEvent.Instance(module, event, arguments)
     }
 }

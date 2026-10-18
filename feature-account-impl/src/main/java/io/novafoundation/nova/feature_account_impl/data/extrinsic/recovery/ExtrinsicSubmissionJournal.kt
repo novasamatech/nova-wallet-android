@@ -1,14 +1,14 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery
 
-import io.novafoundation.nova.common.utils.isNonNegative
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionResolution
 import android.content.SharedPreferences
 import com.google.gson.Gson
+import io.novafoundation.nova.common.utils.isNonNegative
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionResolution
+import java.math.BigInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import java.math.BigInteger
 
 data class PendingExtrinsicSubmission(
     val hash: String,
@@ -38,38 +38,60 @@ class ExtrinsicSubmissionJournal(
         }
     }
 
-    fun pendingHash(metaId: Long): String? = pending(metaId)?.hash
+    fun pendingHash(metaId: Long): String? = pending(metaId)
+        ?.hash
 
     fun resolution(metaId: Long): ExtrinsicSubmissionResolution? =
-        preferences.getString(resultKey(metaId), null)?.let { gson.fromJson(it, ExtrinsicSubmissionResolution::class.java) }
+        preferences.getString(resultKey(metaId), null)
+            ?.let { gson.fromJson(it, ExtrinsicSubmissionResolution::class.java) }
 
     suspend fun record(metaId: Long, submission: PendingExtrinsicSubmission) = withContext(Dispatchers.IO) {
         mutex.withLock {
             check(pending(metaId) == null) { "A recoverable submission is already pending" }
             // apply() cannot confirm durability before broadcasting. A failed commit aborts submission.
-            check(preferences.edit().putString(key(metaId), gson.toJson(submission)).remove(resultKey(metaId)).commit())
+            check(
+                preferences.edit()
+                    .putString(key(metaId), gson.toJson(submission))
+                    .remove(resultKey(metaId))
+                    .commit()
+            )
         }
     }
 
     suspend fun advance(metaId: Long, hash: String, nextBlock: BigInteger) = withContext(Dispatchers.IO) {
         mutex.withLock {
-            val submission = pending(metaId)?.takeIf { it.hash == hash } ?: return@withLock
+            val submission = pending(metaId)
+                ?.takeIf { it.hash == hash } ?: return@withLock
             require(nextBlock == requireNotNull(submission.nextBlock) + BigInteger.ONE)
-            check(preferences.edit().putString(key(metaId), gson.toJson(submission.copy(nextBlock = nextBlock))).commit())
+            check(
+                preferences.edit()
+                    .putString(key(metaId), gson.toJson(submission.copy(nextBlock = nextBlock)))
+                    .commit()
+            )
         }
     }
 
     suspend fun resolved(metaId: Long, result: ExtrinsicSubmissionResolution) = withContext(Dispatchers.IO) {
         mutex.withLock {
             if (pendingHash(metaId) != result.hash) return@withLock
-            check(preferences.edit().remove(key(metaId)).putString(resultKey(metaId), gson.toJson(result)).commit())
+            check(
+                preferences.edit()
+                    .remove(key(metaId))
+                    .putString(resultKey(metaId), gson.toJson(result))
+                    .commit()
+            )
         }
     }
 
     suspend fun acknowledge(metaId: Long, hash: String) = withContext(Dispatchers.IO) {
         mutex.withLock {
-            val result = resolution(metaId)?.takeIf { it.hash == hash } ?: return@withLock
-            check(preferences.edit().putString(resultKey(metaId), gson.toJson(result.copy(acknowledged = true))).commit())
+            val result = resolution(metaId)
+                ?.takeIf { it.hash == hash } ?: return@withLock
+            check(
+                preferences.edit()
+                    .putString(resultKey(metaId), gson.toJson(result.copy(acknowledged = true)))
+                    .commit()
+            )
         }
     }
 

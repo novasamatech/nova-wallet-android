@@ -11,5 +11,8 @@ data class BittensorExitPreflight(
     val rootHoldEnabled: Boolean,
     val minStake: BigInteger,
     val minNominatorStake: BigInteger,
-    val isOwnHotkey: Boolean
+    val isOwnHotkey: Boolean,
+    val subnetTradingEnabled: Boolean = true,
+    val coldkeySwapPending: Boolean = false,
+    val safeModeActive: Boolean = false
 )

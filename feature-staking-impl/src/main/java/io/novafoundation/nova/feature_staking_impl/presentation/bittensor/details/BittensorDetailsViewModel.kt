@@ -2,10 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
-import io.novafoundation.nova.common.domain.filterLoaded
-import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.onError
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -15,6 +15,9 @@ import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.launchUnit
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
@@ -31,6 +34,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorChartAxisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorRecoveryRequest
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorWalletRecovery
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
 import io.novafoundation.nova.feature_wallet_api.data.repository.PricePeriod
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -41,26 +48,19 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartTextInjectors
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealPricePriceTextInjector
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorRecoveryRequest
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorWalletRecovery
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.runtime.ext.ChainGeneses
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.toUi
 
 class BittensorDetailsViewModel(
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
@@ -92,10 +92,8 @@ class BittensorDetailsViewModel(
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
         .shareInBackground()
 
-    private val recoveryState = accountRepository.selectedMetaAccountFlow()
-        .map { BittensorRecoveryRequest(it.id, ChainGeneses.BITTENSOR) }
-        .distinctUntilChanged()
-        .flatMapLatest { (metaId, chainId) ->
+    private val recoveryState = accountRepository.selectedMetaAccountFlow().map { BittensorRecoveryRequest(it.id, ChainGeneses.BITTENSOR) }
+        .distinctUntilChanged().flatMapLatest { (metaId, chainId) ->
             recovery.observe(metaId, chainId).map { BittensorWalletRecovery(metaId, it) }
                 .onStart { emit(BittensorWalletRecovery(metaId, ExtrinsicRecoveryState.None)) }
         }
@@ -103,7 +101,9 @@ class BittensorDetailsViewModel(
         .shareInBackground()
 
     val recoveryResult = recoveryState.map { (metaId, state) ->
-        (state as? ExtrinsicRecoveryState.Resolved)?.result?.takeUnless { it.acknowledged }?.toUi(resources, metaId)
+        (state as? ExtrinsicRecoveryState.Resolved)
+            ?.result?.takeUnless { it.acknowledged }
+            ?.toUi(resources, metaId)
     }
         .shareInBackground()
 
@@ -125,11 +125,18 @@ class BittensorDetailsViewModel(
     val totalStake = portfolio.map { data -> formatAmount(data.positions?.totalStake, data) }
         .shareInBackground()
 
-    val warning = combine(portfolioWarning, recoveryState) { warning, recovery ->
+    val warning = combine(
+        portfolioWarning,
+        recoveryState
+    ) { warning, recovery ->
         if (recovery.state is ExtrinsicRecoveryState.Pending) resources.getString(R.string.bittensor_submission_unknown_description) else warning
-    }.shareInBackground()
+    }
+        .shareInBackground()
 
-    val canAddStake = combine(portfolioState, recoveryState) { portfolio, recovery ->
+    val canAddStake = combine(
+        portfolioState,
+        recoveryState
+    ) { portfolio, recovery ->
         val data = portfolio.dataOrNull
         data?.supportsImmediateOperations == true && data.metaId == recovery.metaId &&
             data.dataStatus is BittensorDataStatus.Fresh && recovery.state !is ExtrinsicRecoveryState.Pending
@@ -178,7 +185,10 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
-    val priceChartFormatters = combine(chartAsset, chartPeriod) { asset, period ->
+    val priceChartFormatters = combine(
+        chartAsset,
+        chartPeriod
+    ) { asset, period ->
         val token = asset.token
         val priceTextInjector = RealPricePriceTextInjector(token.currency, token.coinRate?.rate, fiatFormatter)
         val changeTextInjector = BittensorChartChangeTextInjector(chartButtonTexts[periods.indexOf(period)])
@@ -218,12 +228,10 @@ class BittensorDetailsViewModel(
         return retryController.observe(
             step = "price chart",
             transform = { prices ->
-                prices.withSafeLoading()
-                    .map { AssetPriceChart(period, it) }
+                prices.withSafeLoading().map { AssetPriceChart(period, it) }
             }
         ) {
-            bittensorPriceChartInteractor.observe(priceId, currency, period)
-                .map { it.chart }
+            bittensorPriceChartInteractor.observe(priceId, currency, period).map { it.chart }
                 .onError { throw IllegalStateException("Price chart request failed", it) }
                 .filterLoaded()
         }
@@ -239,13 +247,19 @@ class BittensorDetailsViewModel(
                 if (state.data.isEmpty()) return PriceChartModel.Empty(button, resources.getString(R.string.price_chart_no_data))
 
                 val prices = state.data.map { PriceChartModel.Chart.Price(it.timestamp, it.rate) }
-                PriceChartModel.Chart(button, button, period != PricePeriod.YEAR && period != PricePeriod.MAX, prices)
+                PriceChartModel.Chart(
+                    button,
+                    button,
+                    period != PricePeriod.YEAR && period != PricePeriod.MAX,
+                    prices
+                )
             }
         }
     }
 
     fun selectChartPeriod(index: Int) {
-        periods.getOrNull(index)?.let { chartPeriod.value = it }
+        periods.getOrNull(index)
+            ?.let { chartPeriod.value = it }
     }
 
     private val subnetMetadata = retryController.observe(
@@ -265,8 +279,7 @@ class BittensorDetailsViewModel(
         val positions = portfolio.positions ?: return emptyList()
         val subnetIds = positions.subnets
             .map { it.subnetId }
-            .distinct()
-            .sortedBy { it.value }
+            .distinct().sortedBy { it.value }
 
         return buildList {
             if (positions.rootStake.isPositive()) add(mapRootPosition(portfolio, positions.rootStake))
@@ -312,14 +325,22 @@ class BittensorDetailsViewModel(
     }
 
     fun validatorClicked(address: String) = launchUnit {
-        externalActions.showAddressActions(address, portfolio.first().chain)
+        externalActions.showAddressActions(
+            address,
+            portfolio.first().chain
+        )
     }
 
     private fun formatAmount(amount: BigInteger?, portfolio: BittensorPortfolio): AmountModel {
         if (amount == null) return AmountModel("—", null)
         val token = portfolio.asset.token
         val decimalAmount = token.amountFromPlanks(amount)
-        return amountFormatter.amount(decimalAmount, token.configuration.symbol, token.toFiatOrNull(decimalAmount), token.currency)
+        return amountFormatter.amount(
+            decimalAmount,
+            token.configuration.symbol,
+            token.toFiatOrNull(decimalAmount),
+            token.currency
+        )
     }
 }
 

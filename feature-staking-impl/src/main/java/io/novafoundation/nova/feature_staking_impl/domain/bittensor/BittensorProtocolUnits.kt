@@ -4,7 +4,7 @@ import java.math.BigInteger
 
 internal object BittensorProtocolUnits {
 
-    const val ALPHA_PRECISION = 9
+    const val ALPHA_PRECISION = BITTENSOR_ALPHA_DECIMALS
 
     const val FIXED_POINT_FRACTION_BITS = 32
 

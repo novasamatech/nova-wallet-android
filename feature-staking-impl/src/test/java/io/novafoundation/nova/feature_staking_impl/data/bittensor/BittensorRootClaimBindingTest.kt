@@ -1,12 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
+import java.math.BigInteger
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import java.math.BigInteger
 
 class BittensorRootClaimBindingTest {
+
     private val unit = BigInteger.ONE.shiftLeft(32)
 
     @Test fun `unset threshold uses runtime default`() {
@@ -25,7 +26,17 @@ class BittensorRootClaimBindingTest {
     }
 
     @Test fun `decoded normalized preview preserves accrued and redeemable separately`() {
-        val preview = bindBittensorRootClaimPreviews(listOf(preview(1, 1_000_000, 600_000, 400_000))).single()
+        val preview = bindBittensorRootClaimPreviews(
+            listOf(
+                preview(
+                    1,
+                    1_000_000,
+                    600_000,
+                    400_000
+                )
+            )
+        )
+            .single()
         assertEquals(BigInteger.valueOf(1_000_000), preview.accrued)
         assertEquals(BigInteger.valueOf(600_000), preview.redeemable)
         assertEquals(BigInteger.valueOf(400_000), preview.forfeitedEstimate)
@@ -35,24 +46,69 @@ class BittensorRootClaimBindingTest {
         val claims = BittensorRootClaims(
             bindBittensorRootClaimPreviews(
                 listOf(
-                    preview(1, 1_000_000, 499_999, 500_001),
-                    preview(2, 500_000, 500_000, 0),
-                    preview(3, 600_000, 600_000, 0)
+                    preview(
+                        1,
+                        1_000_000,
+                        499_999,
+                        500_001
+                    ),
+                    preview(
+                        2,
+                        500_000,
+                        500_000,
+                        0
+                    ),
+                    preview(
+                        3,
+                        600_000,
+                        600_000,
+                        0
+                    )
                 )
             ),
             BigInteger.valueOf(500_000)
         )
-        assertEquals(listOf(BigInteger.valueOf(600_000), BigInteger.valueOf(500_000)), claims.claimable.map { it.redeemable })
+        assertEquals(
+            listOf(BigInteger.valueOf(600_000), BigInteger.valueOf(500_000)),
+            claims.claimable.map { it.redeemable }
+        )
     }
 
     @Test fun `zero remains unclaimable when threshold is zero`() {
-        val claims = BittensorRootClaims(bindBittensorRootClaimPreviews(listOf(preview(1, 0, 0, 0))), BigInteger.ZERO)
+        val claims = BittensorRootClaims(
+            bindBittensorRootClaimPreviews(
+                listOf(
+                    preview(
+                        1,
+                        0,
+                        0,
+                        0
+                    )
+                )
+            ),
+            BigInteger.ZERO
+        )
         assertTrue(claims.claimable.isEmpty())
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun `duplicate hotkeys do not double rewards`() {
-        bindBittensorRootClaimPreviews(listOf(preview(1, 1, 1, 0), preview(1, 1, 1, 0)))
+        bindBittensorRootClaimPreviews(
+            listOf(
+                preview(
+                    1,
+                    1,
+                    1,
+                    0
+                ),
+                preview(
+                    1,
+                    1,
+                    1,
+                    0
+                )
+            )
+        )
     }
 
     @Test(expected = Exception::class)
@@ -87,7 +143,16 @@ class BittensorRootClaimBindingTest {
 
     @Test(expected = Exception::class)
     fun `availability cannot be read for another wallet`() {
-        bindBittensorExitAvailability(listOf(listOf(ByteArray(32) { 2 }, emptyList<Any>())), ByteArray(32) { 1 }, 64)
+        bindBittensorExitAvailability(
+            listOf(
+                listOf(
+                    ByteArray(32) { 2 },
+                    emptyList<Any>()
+                )
+            ),
+            ByteArray(32) { 1 },
+            64
+        )
     }
 
     @Test(expected = IllegalArgumentException::class)
@@ -118,13 +183,40 @@ class BittensorRootClaimBindingTest {
 
     @Test fun `equal claim values use ascending hotkey order like iOS`() {
         val previews = bindBittensorRootClaimPreviews(
-            listOf(preview(3, 600_000, 600_000, 0), preview(2, 600_000, 600_000, 0), preview(1, 500_000, 500_000, 0))
+            listOf(
+                preview(
+                    3,
+                    600_000,
+                    600_000,
+                    0
+                ),
+                preview(
+                    2,
+                    600_000,
+                    600_000,
+                    0
+                ),
+                preview(
+                    1,
+                    500_000,
+                    500_000,
+                    0
+                )
+            )
         )
         val claims = BittensorRootClaims(previews, BigInteger.valueOf(500_000))
-        assertEquals(listOf<Byte>(2, 3, 1), claims.claimable.map { it.hotkey.value.first() })
+        assertEquals(
+            listOf<Byte>(2, 3, 1),
+            claims.claimable.map { it.hotkey.value.first() }
+        )
     }
 
-    private fun preview(key: Byte, accrued: Long, redeemable: Long, forfeited: Long) = Struct.Instance(
+    private fun preview(
+        key: Byte,
+        accrued: Long,
+        redeemable: Long,
+        forfeited: Long
+    ) = Struct.Instance(
         mapOf(
             "hotkey" to ByteArray(32) { key },
             "accruedTao" to BigInteger.valueOf(accrued),

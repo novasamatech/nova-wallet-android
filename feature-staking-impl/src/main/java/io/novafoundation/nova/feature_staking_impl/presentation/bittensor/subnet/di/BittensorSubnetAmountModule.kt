@@ -10,6 +10,7 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -46,7 +47,7 @@ class BittensorSubnetAmountModule {
         validationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-        estimates: io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorEstimatesRepository
+        estimatesRepository: BittensorEstimatesRepository
     ): ViewModel = BittensorSubnetAmountViewModel(
         initialSubnetId = BittensorNetuid.Subnet(payload.subnetId),
         validatorAddress = payload.validatorAddress,
@@ -64,7 +65,7 @@ class BittensorSubnetAmountModule {
         validationExecutor = validationExecutor,
         feeLoaderMixinFactory = feeLoaderMixinFactory,
         existingPosition = payload.existingPosition,
-        estimates = estimates
+        estimatesRepository = estimatesRepository
     )
 
     @Provides

@@ -5,7 +5,6 @@ import android.view.Gravity
 import android.view.animation.AnimationUtils
 import android.widget.TextSwitcher
 import android.widget.TextView
-import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.makeGone
@@ -13,6 +12,7 @@ import io.novafoundation.nova.common.utils.makeVisible
 import io.novafoundation.nova.common.utils.setCurrentText
 import io.novafoundation.nova.common.utils.setText
 import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.bottomSheet.description.observeDescription
 import io.novafoundation.nova.common.view.shape.getBlockDrawable
 import io.novafoundation.nova.common.view.shape.getRoundedCornerDrawable

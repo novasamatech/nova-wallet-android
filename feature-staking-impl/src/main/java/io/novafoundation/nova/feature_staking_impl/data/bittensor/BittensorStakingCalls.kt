@@ -12,7 +12,10 @@ import java.math.BigInteger
 private const val SUBTENSOR_MODULE = "SubtensorModule"
 private val ROOT_NETUID = BigInteger.ZERO
 
-fun ExtrinsicBuilder.addBittensorRootStake(hotkey: AccountId, amount: Balance) {
+fun ExtrinsicBuilder.addBittensorRootStake(
+    hotkey: AccountId,
+    amount: Balance
+) {
     require(amount.isPositive()) { "Stake amount must be positive" }
     require(amount <= MAX_U64) { "Stake amount must fit into u64" }
 
@@ -27,14 +30,21 @@ fun ExtrinsicBuilder.addBittensorRootStake(hotkey: AccountId, amount: Balance) {
     )
 }
 
-fun ExtrinsicBuilder.removeBittensorRootStake(hotkey: AccountId, amount: Balance) {
-    require(hotkey.size == 32 && amount.signum() > 0 && amount <= MAX_U64)
+fun ExtrinsicBuilder.removeBittensorRootStake(
+    hotkey: AccountId,
+    amount: Balance
+) {
+    require(hotkey.size == 32 && amount.isPositive() && amount <= MAX_U64)
     call(SUBTENSOR_MODULE, "remove_stake", mapOf("hotkey" to hotkey, "netuid" to ROOT_NETUID, "amount_unstaked" to amount))
 }
 
-fun ExtrinsicBuilder.removeFullBittensorStake(hotkey: AccountId, netuid: BittensorNetuid, limitPrice: BigInteger?) {
+fun ExtrinsicBuilder.removeFullBittensorStake(
+    hotkey: AccountId,
+    netuid: BittensorNetuid,
+    limitPrice: BigInteger?
+) {
     require(hotkey.size == 32)
-    require(if (netuid.isRoot()) limitPrice == null else limitPrice != null && limitPrice.signum() > 0 && limitPrice <= MAX_U64)
+    require(if (netuid.isRoot()) limitPrice == null else limitPrice != null && limitPrice.isPositive() && limitPrice <= MAX_U64)
     call(
         SUBTENSOR_MODULE,
         "remove_stake_full_limit",
@@ -48,7 +58,14 @@ fun ExtrinsicBuilder.addBittensorSubnetStake(
     taoAmount: Balance,
     limitPrice: BigInteger
 ) {
-    bittensorSubnetStakeCall("add_stake_limit", "amount_staked", subnetId, hotkey, taoAmount, limitPrice)
+    bittensorSubnetStakeCall(
+        "add_stake_limit",
+        "amount_staked",
+        subnetId,
+        hotkey,
+        taoAmount,
+        limitPrice
+    )
 }
 
 fun ExtrinsicBuilder.removeBittensorSubnetStake(
@@ -57,7 +74,14 @@ fun ExtrinsicBuilder.removeBittensorSubnetStake(
     alphaAmount: Balance,
     limitPrice: BigInteger
 ) {
-    bittensorSubnetStakeCall("remove_stake_limit", "amount_unstaked", subnetId, hotkey, alphaAmount, limitPrice)
+    bittensorSubnetStakeCall(
+        "remove_stake_limit",
+        "amount_unstaked",
+        subnetId,
+        hotkey,
+        alphaAmount,
+        limitPrice
+    )
 }
 
 private fun ExtrinsicBuilder.bittensorSubnetStakeCall(

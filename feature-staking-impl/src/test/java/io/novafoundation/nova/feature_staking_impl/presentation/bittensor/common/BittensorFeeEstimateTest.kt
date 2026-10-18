@@ -2,6 +2,10 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.model.Fee
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitRequest
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
@@ -77,5 +81,30 @@ class BittensorFeeEstimateTest {
             assertNull(status.forRequest(request).loadedFeeOrNull())
             assertSame(FeeStatus.NoFee, status.forRequest(null))
         }
+    }
+
+    @Test
+    fun `exit estimate remains associated with the reviewed quote and position`() {
+        val position = mock(BittensorExitPosition::class.java)
+        val quote = BittensorExitQuote(
+            netuid = BittensorNetuid.Subnet(1),
+            amount = BigInteger.TEN,
+            fullExit = false,
+            estimatedTaoOut = BigInteger.TEN,
+            minimumTaoOut = BigInteger.ONE,
+            serviceFee = BigInteger.ZERO,
+            limitPrice = BigInteger.ONE
+        )
+        val exitRequest = BittensorExitRequest(position, quote)
+        val exitEstimate = BittensorFeeEstimate(exitRequest, fee)
+        val feeModel = FeeModel(exitEstimate, display)
+        val status = FeeStatus.Loaded(feeModel)
+        val anotherPosition = mock(BittensorExitPosition::class.java)
+
+        assertSame(status, status.forRequest(exitRequest.copy()))
+        assertSame(FeeStatus.NoFee, status.forRequest(null))
+        assertNull(status.forRequest(exitRequest.copy(position = anotherPosition)).loadedFeeOrNull())
+        assertNull(status.forRequest(exitRequest.copy(quote = quote.copy(fullExit = true))).loadedFeeOrNull())
+        assertNull(status.forRequest(exitRequest.copy(quote = quote.copy(limitPrice = BigInteger.TEN))).loadedFeeOrNull())
     }
 }

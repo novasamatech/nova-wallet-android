@@ -90,24 +90,7 @@
                 android:layout_marginTop="12dp"
                 android:textColor="@color/text_secondary" />
 
-            <TextView
-                android:id="@+id/error"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textColor="@color/text_negative"
-                android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/retry"
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center"
-                android:text="@string/common_retry"
-                android:textColor="@color/text_primary"
-                android:visibility="gone" />
         </LinearLayout>
     </ScrollView>
 

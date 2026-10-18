@@ -96,7 +96,9 @@ Separate class property declarations with a blank line, following existing ViewM
 
 For calls with multiple arguments that include a lambda or are followed by a trailing lambda, put each parenthesized argument on its own line. Keep the closing parenthesis on a separate line; do not compress such calls just because they fit the line-length limit.
 
-Put each successive call in a method chain on a new line. Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
+Put successive transformation calls in a method chain on separate lines when this improves readability. Keep short expressions, simple property access, and short predicate calls together; do not mechanically split expressions such as `finalizedBlock(chainId).number` or `hash.equals(transactionHash, ignoreCase = true)`. Keep a short call and its arguments on one line when they fit naturally. When an `if` condition contains a multi-line collection predicate or nested transformation, extract a descriptively named Boolean before the `if` so the control flow remains immediately visible.
+
+Separate fetching a remote response from transforming its contents. Extract nested transformations and error handling into focused, named functions. Use the existing `mapAsync` helper for concurrent collection mapping instead of manually combining `async` and `awaitAll`; preserve required concurrency limits and cancellation propagation.
 
 Do not repeat filtering already guaranteed by a backend resource contract. Verify that contract before removing a filter; keep client-owned validation, such as address decoding and on-chain eligibility checks.
 

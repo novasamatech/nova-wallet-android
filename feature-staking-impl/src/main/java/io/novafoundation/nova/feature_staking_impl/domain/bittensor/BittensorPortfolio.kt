@@ -26,9 +26,10 @@ data class BittensorPortfolioPositions(
 
     val rootStake: BigInteger = root.fold(BigInteger.ZERO) { total, position -> total + position.stakeInPlanks }
 
-    private val alphaBySubnet = subnets.groupBy { it.subnetId }.mapValues { (_, positions) ->
-        positions.fold(BigInteger.ZERO) { total, position -> total + position.alphaInPlanks }
-    }
+    private val alphaBySubnet = subnets.groupBy { it.subnetId }
+        .mapValues { (_, positions) ->
+            positions.fold(BigInteger.ZERO) { total, position -> total + position.alphaInPlanks }
+        }
 
     fun subnetStake(subnetId: BittensorNetuid.Subnet): BigInteger? {
         val price = subnetPrices[subnetId] ?: return null
@@ -37,6 +38,7 @@ data class BittensorPortfolioPositions(
     }
 
     // Never report a partial portfolio as the user's total when a subnet price is unavailable.
+
     val totalStake: BigInteger?
         get() {
             var total = rootStake

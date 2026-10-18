@@ -1,8 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
-import io.novafoundation.nova.common.view.showLoadingValue
 import android.os.Bundle
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import io.novafoundation.nova.common.base.BaseFragment
@@ -10,8 +8,11 @@ import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.mixin.impl.observeRetries
 import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
+import io.novafoundation.nova.common.view.ExecutionTimerView
 import io.novafoundation.nova.common.view.bottomSheet.description.DescriptionBottomSheet
 import io.novafoundation.nova.common.view.setState
+import io.novafoundation.nova.common.view.shape.getBlockDrawable
+import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_account_api.view.showAddress
 import io.novafoundation.nova.feature_account_api.view.showWallet
@@ -20,9 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSubnetReviewBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
-import io.novafoundation.nova.common.view.ExecutionTimerView
-import io.novafoundation.nova.common.view.shape.getBlockDrawable
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeResultBottomSheet
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.bindBittensorStakeResults
 
 private const val PAYLOAD_KEY = "payload"
 
@@ -35,18 +34,19 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         }
     }
 
-    private var resultBottomSheet: BittensorStakeResultBottomSheet? = null
-
     override fun createBinding() = FragmentBittensorSubnetReviewBinding.inflate(layoutInflater)
 
     override fun inject() {
         val payload = argument<BittensorSubnetReviewPayload>(PAYLOAD_KEY)
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
-            .bittensorSubnetReviewComponentFactory().create(this, payload).inject(this)
+            .bittensorSubnetReviewComponentFactory()
+            .create(this, payload)
+            .inject(this)
     }
 
     override fun initViews() {
-        binder.execution.stepContainer.background = requireContext().getBlockDrawable()
+        binder.execution.stepContainer.background = requireContext()
+            .getBlockDrawable()
         binder.confirm.prepareForProgress(viewLifecycleOwner)
         binder.validator.image.updateLayoutParams {
             width = 18.dp(requireContext())
@@ -86,7 +86,12 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         }
         viewModel.isCompleted.observe { complete ->
             done.isVisible = complete
-            execution.root.setPadding(0, 0, 0, if (complete) 84.dp(requireContext()) else 0)
+            execution.root.setPadding(
+                0,
+                0,
+                0,
+                if (complete) 84.dp(requireContext()) else 0
+            )
             if (complete) {
                 execution.timer.setState(ExecutionTimerView.State.Success)
                 execution.title.setText(R.string.common_completed)
@@ -116,31 +121,19 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             execution.networkFee.setFeeStatus(it)
         }
         viewModel.confirmButtonState.observe(confirm::setState)
-        viewModel.resultState.observe { it?.let(::showResult) }
+        bindBittensorStakeResults(
+            results = viewModel.resultState,
+            onDismiss = viewModel::resultDismissed,
+            onTryAgain = viewModel::confirmClicked,
+            onViewPosition = viewModel::viewPositionClicked
+        )
     }
 
-    private fun showDescription(titleRes: Int, descriptionRes: Int) {
-        DescriptionBottomSheet(requireContext(), getString(titleRes), getString(descriptionRes)).show()
-    }
-    private fun showResult(state: BittensorStakeResultUi) {
-        val sheet = resultBottomSheet ?: BittensorStakeResultBottomSheet(
-            requireContext(),
-            onClose = { resultBottomSheet?.dismiss() },
-            onTryAgain = { resultBottomSheet?.dismiss(); viewModel.confirmClicked() },
-            onDiscoverSubnets = { resultBottomSheet?.dismiss() },
-            onViewPosition = { resultBottomSheet?.dismiss(); viewModel.viewPositionClicked() }
-        ).also {
-            resultBottomSheet = it
-            it.setOnDismissListener { resultBottomSheet = null; viewModel.resultDismissed() }
-            it.show()
-        }
-        sheet.setState(state)
-    }
-
-    override fun onDestroyView() {
-        resultBottomSheet?.setOnDismissListener(null)
-        resultBottomSheet?.dismiss()
-        resultBottomSheet = null
-        super.onDestroyView()
+    private fun showDescription(
+        titleRes: Int,
+        descriptionRes: Int
+    ) {
+        DescriptionBottomSheet(requireContext(), getString(titleRes), getString(descriptionRes))
+            .show()
     }
 }

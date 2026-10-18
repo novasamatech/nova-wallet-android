@@ -1,48 +1,53 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.onStart
-import io.novafoundation.nova.common.utils.isNonNegative
-import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
-import io.novafoundation.nova.runtime.ext.utilityAsset
-import kotlinx.coroutines.flow.map
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedCostBasis
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorReportedOperation
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
-import io.novafoundation.nova.runtime.ext.accountIdOf
-import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
-import okhttp3.CacheControl
-import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
-import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
-import io.novafoundation.nova.runtime.ext.addressOf
-import retrofit2.Response
-import retrofit2.HttpException
-import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.withSafeLoading
+import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedCostBasis
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorReportedOperation
+import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.runtime.ext.addressOf
+import io.novafoundation.nova.runtime.ext.utilityAsset
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigDecimal
+import java.math.BigInteger
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
-import java.math.BigDecimal
+import okhttp3.CacheControl
+import okhttp3.HttpUrl
+import retrofit2.HttpException
+import retrofit2.Response
 
 class BittensorEstimatesRepository(
     private val api: BittensorEstimatesApi,
-    private val infrastructureUrls: io.novafoundation.nova.infrastructure.InfrastructureUrls,
+    private val infrastructureUrls: InfrastructureUrls,
     private val spacingMillis: Long,
-    private val accounts: AccountRepository,
-    private val wallets: WalletRepository,
+    private val accountRepository: AccountRepository,
+    private val walletRepository: WalletRepository,
     private val logger: Logger
 ) {
-    private data class Cached<T>(val value: T, val until: Long, val revision: java.math.BigInteger? = null)
+
+    private data class Cached<T>(val value: T, val validUntilNanos: Long, val balanceRevision: BigInteger? = null) {
+
+        fun isFresh(): Boolean = System.nanoTime() < validUntilNanos
+    }
 
     private val historyMutex = Mutex()
 
@@ -56,20 +61,26 @@ class BittensorEstimatesRepository(
         context: Flow<BittensorEstimateContext?>,
         retry: Flow<Long> = kotlinx.coroutines.flow.flowOf(0L)
     ): Flow<ExtendedLoadingState<BittensorEstimatedCostBasis?>> =
-        combine(context.distinctUntilChanged(), retry) { context, _ -> context }
-            .flatMapLatest(::costBasisFlow)
+        combine(
+            context.distinctUntilChanged(),
+            retry
+        ) { context, _ -> context }
+            .flatMapLatest(::observeContextCostBasis)
 
-    private fun costBasisFlow(context: BittensorEstimateContext?): Flow<ExtendedLoadingState<BittensorEstimatedCostBasis?>> {
-        val balance = context?.let { wallets.assetFlow(it.metaId, it.chain.utilityAsset).map { it.transferableInPlanks } }
-            ?: kotlinx.coroutines.flow.flowOf(null)
-        return balance.distinctUntilChanged()
-            .flatMapLatest { revision ->
+    private fun observeContextCostBasis(context: BittensorEstimateContext?): Flow<ExtendedLoadingState<BittensorEstimatedCostBasis?>> {
+        return observeBalanceRevision(context)
+            .distinctUntilChanged().flatMapLatest { revision ->
                 flowOf { context?.let { costBasis(it.metaId, it.chain, revision) } }
-                    .withSafeLoading()
-                    .onEach { state ->
+                    .withSafeLoading().onEach { state ->
                         if (state is ExtendedLoadingState.Error) reportUnavailable(state.exception)
                     }
             }
+    }
+
+    private fun observeBalanceRevision(context: BittensorEstimateContext?): Flow<BigInteger?> {
+        if (context == null) return kotlinx.coroutines.flow.flowOf(null)
+
+        return walletRepository.assetFlow(context.metaId, context.chain.utilityAsset).map { it.transferableInPlanks }
     }
 
     fun observeAlphaYields(
@@ -77,7 +88,10 @@ class BittensorEstimatesRepository(
         subnetId: BittensorNetuid.Subnet,
         retry: Flow<Long> = kotlinx.coroutines.flow.flowOf(0L)
     ): Flow<Map<AccountIdKey, BigDecimal>?> =
-        combine(context.distinctUntilChanged(), retry) { chain, _ -> chain }
+        combine(
+            context.distinctUntilChanged(),
+            retry
+        ) { chain, _ -> chain }
             .flatMapLatest { chain ->
                 flowOf { chain?.let { alphaYields(it, subnetId) } }
                     .onStart { emit(null) }
@@ -92,44 +106,20 @@ class BittensorEstimatesRepository(
         logger.log(cause)
     }
 
-    suspend fun costBasis(metaId: Long, chain: Chain, revision: java.math.BigInteger? = null): BittensorEstimatedCostBasis {
-        val account = accounts.getMetaAccount(metaId)
+    suspend fun costBasis(metaId: Long, chain: Chain, revision: BigInteger? = null): BittensorEstimatedCostBasis {
+        val account = accountRepository.getMetaAccount(metaId)
         return costBasis(chain.addressOf(account.requireAccountIdIn(chain)), revision)
     }
 
-    private suspend fun costBasis(account: String, revision: java.math.BigInteger?): BittensorEstimatedCostBasis = historyMutex.withLock {
+    private suspend fun costBasis(account: String, revision: BigInteger?): BittensorEstimatedCostBasis = historyMutex.withLock {
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         val cacheKey = "$baseUrl:$account"
-        histories[cacheKey]?.takeIf { System.nanoTime() < it.until && revision == it.revision }?.let { return@withLock it.value }
-        var validUntil = Long.MAX_VALUE
-        val rows = mutableListOf<BittensorReportedOperation>()
-        var page: Int? = 1
-        repeat(10) {
-            val current = page ?: return@repeat
-            if (it > 0) delay(spacingMillis)
-            val response = withTimeout(25_000) {
-                api.operations(
-                    url(baseUrl, "operations/search", mapOf("accountSubject" to account, "page" to current.toString()))
-                )
-            }
-            validUntil = minOf(validUntil, deadline(response))
-            val body = body(response)
-            fresh(body.meta?.components?.operationHistory)
-            require(body.historyScope == "TAO_APP_PARTIAL" && body.pageInfo?.page == current)
-            rows += requireNotNull(body.items).map { row ->
-                val netuid = requireNotNull(row.netuid)
-                require(netuid in 0..65535)
-                BittensorReportedOperation(
-                    netuid, requireNotNull(row.hotkey), requireNotNull(row.reportedAmountIn), requireNotNull(row.reportedAmountOut),
-                    requireNotNull(row.reportedPrice), requireNotNull(row.sourceEventId), requireNotNull(row.sourceTimestamp),
-                    requireNotNull(row.sourceExtrinsicReference), row.sourceOperationType
-                )
-            }
-            page = next(body.pageInfo, current)
-        }
-        val result = BittensorEstimatedCostBasis(rows, allProviderPagesRead = page == null)
-        if (histories.size >= 8) histories.clear()
-        histories[cacheKey] = Cached(result, validUntil, revision)
+        val cached = histories[cacheKey]
+        if (cached != null && cached.isFresh() && revision == cached.balanceRevision) return@withLock cached.value
+        val history = loadPages(HISTORY_PAGE_LIMIT) { page -> loadHistoryPage(baseUrl, account, page) }
+        val result = BittensorEstimatedCostBasis(history.items, allProviderPagesRead = history.allPagesRead)
+        if (histories.size >= HISTORY_CACHE_LIMIT) histories.clear()
+        histories[cacheKey] = Cached(result, history.validUntilNanos, revision)
         result
     }
 
@@ -137,57 +127,131 @@ class BittensorEstimatesRepository(
     suspend fun alphaYields(chain: Chain, subnet: BittensorNetuid.Subnet): Map<AccountIdKey, BigDecimal> = yieldMutex.withLock {
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         val cacheKey = "$baseUrl:${subnet.value}"
-        yields[cacheKey]?.takeIf { System.nanoTime() < it.until }?.let { return@withLock it.value }
-        var validUntil = Long.MAX_VALUE
-        val result = mutableMapOf<AccountIdKey, BigDecimal>()
-        var page: Int? = 1
-        repeat(3) {
-            val current = page ?: return@repeat
-            if (it > 0) delay(spacingMillis)
-            val response = withTimeout(25_000) { api.alphaYields(url(baseUrl, "subnets/${subnet.value}/yields/alpha", mapOf("page" to current.toString()))) }
-            validUntil = minOf(validUntil, deadline(response))
-            val body = body(response)
-            fresh(body.meta?.components?.alphaYield)
-            require(body.pageInfo?.page == current)
-            requireNotNull(body.items).forEach { row ->
-                require(row.netuid == subnet.value && row.metricKind == "ALPHA_VALIDATOR_APY")
-                val key = row.hotkey?.let { runCatching { AccountIdKey(chain.accountIdOf(it)) }.getOrNull() } ?: return@forEach
-                val percent = row.reportedRate?.toBigDecimalOrNull()?.takeIf { it.isNonNegative } ?: return@forEach
-                if (key !in result) result[key] = percent
-            }
-            page = next(body.pageInfo, current)
+        val cached = yields[cacheKey]
+        if (cached != null && cached.isFresh()) return@withLock cached.value
+        val pages = loadPages(YIELD_PAGE_LIMIT) { page ->
+            loadYieldPage(
+                baseUrl,
+                chain,
+                subnet,
+                page
+            )
         }
-        if (yields.size >= 64) yields.clear()
-        yields[cacheKey] = Cached(result, validUntil)
+        val result = buildMap {
+            pages.items.forEach { yield ->
+                if (yield.hotkey !in this) put(yield.hotkey, yield.annualPercentageYield)
+            }
+        }
+        if (yields.size >= YIELD_CACHE_LIMIT) yields.clear()
+        yields[cacheKey] = Cached(result, pages.validUntilNanos)
         result
+    }
+
+    private suspend fun loadHistoryPage(baseUrl: HttpUrl, address: String, page: Int): EstimatePage<BittensorReportedOperation> {
+        val url = endpoint(baseUrl, "operations/search", mapOf("accountSubject" to address, "page" to page.toString()))
+        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.operations(url) }
+        val validUntilNanos = deadline(response)
+        val body = requireBody(response)
+        requireFreshComponent(body.meta?.components?.operationHistory)
+        require(body.historyScope == "TAO_APP_PARTIAL" && body.pageInfo?.page == page)
+        val items = requireNotNull(body.items)
+            .map(::mapBittensorReportedOperation)
+        return EstimatePage(items, nextPage(body.pageInfo, page), validUntilNanos)
+    }
+
+    private suspend fun loadYieldPage(
+        baseUrl: HttpUrl,
+        chain: Chain,
+        subnetId: BittensorNetuid.Subnet,
+        page: Int
+    ): EstimatePage<BittensorValidatorYield> {
+        val url = endpoint(baseUrl, "subnets/${subnetId.value}/yields/alpha", mapOf("page" to page.toString()))
+        val response = withTimeout(REQUEST_TIMEOUT_MILLIS) { api.alphaYields(url) }
+        val validUntilNanos = deadline(response)
+        val body = requireBody(response)
+        requireFreshComponent(body.meta?.components?.alphaYield)
+        require(body.pageInfo?.page == page)
+        val items = requireNotNull(body.items).mapNotNull { mapBittensorValidatorYield(it, chain, subnetId) }
+        return EstimatePage(items, nextPage(body.pageInfo, page), validUntilNanos)
+    }
+
+    private suspend fun <T> loadPages(pageLimit: Int, loadPage: suspend (Int) -> EstimatePage<T>): EstimatePages<T> {
+        val items = mutableListOf<T>()
+        var nextPage: Int? = FIRST_PAGE
+        var validUntilNanos = Long.MAX_VALUE
+        var pagesRead = 0
+
+        while (nextPage != null && pagesRead < pageLimit) {
+            if (pagesRead > 0) delay(spacingMillis)
+            val page = loadPage(nextPage)
+            items += page.items
+            validUntilNanos = minOf(validUntilNanos, page.validUntilNanos)
+            nextPage = page.nextPage
+            pagesRead += 1
+        }
+
+        return EstimatePages(items, validUntilNanos, allPagesRead = nextPage == null)
     }
 
     private fun deadline(response: Response<*>): Long {
         val cache = CacheControl.parse(response.headers())
-        val age = response.headers()["Age"]?.toLongOrNull()?.coerceAtLeast(0) ?: 0L
-        val seconds = if (cache.noStore || cache.noCache) 0L else (cache.maxAgeSeconds.toLong() - age).coerceIn(0, 60)
-        return System.nanoTime() + seconds * 1_000_000_000L
+        val age = response.headers()["Age"]
+            ?.toLongOrNull()
+            ?.coerceAtLeast(0) ?: 0L
+        val seconds = if (cache.noStore || cache.noCache) {
+            0L
+        } else {
+            (cache.maxAgeSeconds.toLong() - age)
+                .coerceIn(0, MAX_CACHE_AGE_SECONDS)
+        }
+        return System.nanoTime() + seconds * NANOS_PER_SECOND
     }
 
-    private fun fresh(component: BittensorRecommendationsRemote.Component?) {
+    private fun requireFreshComponent(component: BittensorRecommendationsRemote.Component?) {
         require(component?.availability == "AVAILABLE" && component.freshness == "FRESH") { "Estimate source is unavailable or stale" }
     }
 
-    private fun next(info: BittensorHistoryPageInfo?, current: Int): Int? {
+    private fun nextPage(info: BittensorHistoryPageInfo?, current: Int): Int? {
         val value = requireNotNull(info).nextPage
-        require(value == null || value in (current + 1)..100)
+        require(value == null || value in (current + 1)..MAX_PROVIDER_PAGE)
         return value
     }
 
-    private fun <T> body(response: Response<T>): T {
+    private fun <T> requireBody(response: Response<T>): T {
         if (!response.isSuccessful) throw HttpException(response)
         return requireNotNull(response.body())
     }
 
-    private fun url(base: okhttp3.HttpUrl, path: String, query: Map<String, String>): String {
+    private fun endpoint(base: HttpUrl, path: String, query: Map<String, String>): String {
         require(base.isHttps)
-        val target = requireNotNull(base.resolve("/v1/bittensor/$path")).newBuilder()
+        val target = requireNotNull(base.resolve("/v1/bittensor/$path"))
+            .newBuilder()
         query.forEach { (key, value) -> target.addQueryParameter(key, value) }
         return target.build().toString()
+    }
+
+    private data class EstimatePage<T>(val items: List<T>, val nextPage: Int?, val validUntilNanos: Long)
+
+    private data class EstimatePages<T>(val items: List<T>, val validUntilNanos: Long, val allPagesRead: Boolean)
+
+    private companion object {
+
+        const val FIRST_PAGE = 1
+
+        const val HISTORY_PAGE_LIMIT = 10
+
+        const val YIELD_PAGE_LIMIT = 3
+
+        const val MAX_PROVIDER_PAGE = 100
+
+        const val HISTORY_CACHE_LIMIT = 8
+
+        const val YIELD_CACHE_LIMIT = 64
+
+        const val REQUEST_TIMEOUT_MILLIS = 25_000L
+
+        const val MAX_CACHE_AGE_SECONDS = 60L
+
+        const val NANOS_PER_SECOND = 1_000_000_000L
     }
 }

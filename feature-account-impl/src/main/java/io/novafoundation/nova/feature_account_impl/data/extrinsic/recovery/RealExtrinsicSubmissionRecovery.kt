@@ -1,7 +1,15 @@
 package io.novafoundation.nova.feature_account_impl.data.extrinsic.recovery
 
+import io.novafoundation.nova.common.utils.extrinsicHash
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionResolution
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
+import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -9,95 +17,123 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeout
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicRecoveryState
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionResolution
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
-import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
-import io.novafoundation.nova.common.utils.extrinsicHash
-import java.math.BigInteger
 
 class RealExtrinsicSubmissionRecovery(
-    private val pending: ExtrinsicSubmissionJournal,
-    private val source: ExtrinsicRecoverySource,
+    private val submissionJournal: ExtrinsicSubmissionJournal,
+    private val recoverySource: ExtrinsicRecoverySource,
     private val logger: Logger
 ) : ExtrinsicSubmissionRecovery {
 
     private val mutex = Mutex()
 
-    override fun pendingHash(metaId: Long): String? = pending.pendingHash(metaId)
+    override fun pendingHash(metaId: Long): String? = submissionJournal.pendingHash(metaId)
 
-    suspend fun recordSigned(metaId: Long, chainId: String, extrinsic: SendableExtrinsic) {
+    suspend fun recordSigned(
+        metaId: Long,
+        chainId: String,
+        extrinsic: SendableExtrinsic
+    ) {
         require(!containsMultisigCall(extrinsic.extrinsic.call)) { "Approval-only transactions require a multisig execution tracker" }
-        val anchor = source.finalizedBlock(chainId)
-        val expiry = source.expiry(chainId, extrinsic)
-        val submission = PendingExtrinsicSubmission(
+        val anchor = recoverySource.finalizedBlock(chainId)
+        val expiry = recoverySource.expiry(chainId, extrinsic)
+        val pendingSubmission = PendingExtrinsicSubmission(
             extrinsic.extrinsicHex.extrinsicHash(),
             chainId,
             anchor,
             anchor.number + BigInteger.ONE,
             expiry
         )
-        pending.record(metaId, submission)
+        submissionJournal.record(metaId, pendingSubmission)
     }
 
     override fun observe(metaId: Long, chainId: String): Flow<ExtrinsicRecoveryState> = flow {
         while (true) {
             emit(reconcile(metaId, chainId))
-            delay(6_000)
+            delay(POLL_INTERVAL_MILLIS)
         }
-    }.distinctUntilChanged()
+    }
+        .distinctUntilChanged()
 
     override suspend fun reconcile(metaId: Long, chainId: String): ExtrinsicRecoveryState = mutex.withLock {
-        val submission = pending.pending(metaId)
-            ?: return@withLock pending.resolution(metaId)?.let(ExtrinsicRecoveryState::Resolved)
+        val pendingSubmission = submissionJournal.pending(metaId)
+            ?: return@withLock submissionJournal.resolution(metaId)
+                ?.let(ExtrinsicRecoveryState::Resolved)
                 ?: ExtrinsicRecoveryState.None
         // A hash alone cannot prove absence. Never silently clear a legacy or different-chain record.
-        if (submission.chainId != chainId || submission.anchor == null || submission.nextBlock == null || submission.expiresAt == null) {
-            return@withLock ExtrinsicRecoveryState.Pending(submission.hash)
+        if (
+            pendingSubmission.chainId != chainId ||
+            pendingSubmission.anchor == null ||
+            pendingSubmission.nextBlock == null ||
+            pendingSubmission.expiresAt == null
+        ) {
+            return@withLock ExtrinsicRecoveryState.Pending(pendingSubmission.hash)
         }
         try {
-            withTimeout(25_000) {
-                val finalized = source.finalizedBlock(chainId)
-                check(finalized.number >= submission.anchor.number) { "Finalized head is behind submission anchor" }
-                check(source.blockHash(chainId, submission.anchor.number) == submission.anchor.hash) { "Finalized anchor changed" }
-                val end = finalized.number.min(submission.expiresAt - BigInteger.ONE)
-                var next: BigInteger = submission.nextBlock
-                repeat(64) {
-                    if (next > end) return@repeat
-                    val hash = source.blockHash(chainId, next)
-                    val outcome = source.outcome(chainId, hash, submission.hash)
-                    if (outcome != null) {
-                        check(outcome != RecoveredExtrinsicOutcome.EXPIRED)
-                        val result = ExtrinsicSubmissionResolution(submission.hash, outcome)
-                        pending.resolved(metaId, result)
-                        return@withTimeout ExtrinsicRecoveryState.Resolved(result)
-                    }
-                    next += BigInteger.ONE
-                    pending.advance(metaId, submission.hash, next)
-                }
-                if (finalized.number >= submission.expiresAt && next >= submission.expiresAt) {
-                    val result = ExtrinsicSubmissionResolution(submission.hash, RecoveredExtrinsicOutcome.EXPIRED)
-                    pending.resolved(metaId, result)
-                    ExtrinsicRecoveryState.Resolved(result)
-                } else {
-                    ExtrinsicRecoveryState.Pending(submission.hash)
-                }
+            withTimeout(RECONCILIATION_TIMEOUT_MILLIS) {
+                scanFinalizedBlocks(metaId, chainId, pendingSubmission)
             }
         } catch (e: CancellationException) {
-            if (e !is kotlinx.coroutines.TimeoutCancellationException) throw e
+            if (e !is TimeoutCancellationException) throw e
             reportFailure(e)
-            ExtrinsicRecoveryState.Pending(submission.hash)
+            ExtrinsicRecoveryState.Pending(pendingSubmission.hash)
         } catch (e: Exception) {
             reportFailure(e)
-            ExtrinsicRecoveryState.Pending(submission.hash)
+            ExtrinsicRecoveryState.Pending(pendingSubmission.hash)
         }
     }
 
-    override suspend fun acknowledge(metaId: Long, hash: String) = pending.acknowledge(metaId, hash)
+    override suspend fun acknowledge(metaId: Long, hash: String) = submissionJournal.acknowledge(metaId, hash)
+
+    private suspend fun scanFinalizedBlocks(
+        metaId: Long,
+        chainId: String,
+        pendingSubmission: PendingExtrinsicSubmission
+    ): ExtrinsicRecoveryState {
+        val anchor = requireNotNull(pendingSubmission.anchor)
+        val expiresAt = requireNotNull(pendingSubmission.expiresAt)
+        val finalized = recoverySource.finalizedBlock(chainId)
+        check(finalized.number >= anchor.number) { "Finalized head is behind submission anchor" }
+        check(recoverySource.blockHash(chainId, anchor.number) == anchor.hash) { "Finalized anchor changed" }
+        val end = finalized.number.min(expiresAt - BigInteger.ONE)
+        var nextBlock = requireNotNull(pendingSubmission.nextBlock)
+        var scannedBlocks = 0
+
+        while (nextBlock <= end && scannedBlocks < MAX_BLOCKS_PER_SCAN) {
+            val blockHash = recoverySource.blockHash(chainId, nextBlock)
+            val outcome = recoverySource.outcome(chainId, blockHash, pendingSubmission.hash)
+            if (outcome != null) {
+                check(outcome != RecoveredExtrinsicOutcome.EXPIRED)
+                return resolve(metaId, pendingSubmission.hash, outcome)
+            }
+
+            nextBlock += BigInteger.ONE
+            scannedBlocks += 1
+            submissionJournal.advance(metaId, pendingSubmission.hash, nextBlock)
+        }
+
+        return if (finalized.number >= expiresAt && nextBlock >= expiresAt) {
+            resolve(metaId, pendingSubmission.hash, RecoveredExtrinsicOutcome.EXPIRED)
+        } else {
+            ExtrinsicRecoveryState.Pending(pendingSubmission.hash)
+        }
+    }
+
+    private suspend fun resolve(metaId: Long, hash: String, outcome: RecoveredExtrinsicOutcome): ExtrinsicRecoveryState.Resolved {
+        val resolution = ExtrinsicSubmissionResolution(hash, outcome)
+        submissionJournal.resolved(metaId, resolution)
+        return ExtrinsicRecoveryState.Resolved(resolution)
+    }
 
     private fun reportFailure(cause: Throwable) {
         logger.log("[ExtrinsicRecovery] Unable to verify previous submission; keeping it blocked")
         logger.log(cause)
+    }
+    private companion object {
+
+        const val POLL_INTERVAL_MILLIS = 6_000L
+
+        const val RECONCILIATION_TIMEOUT_MILLIS = 25_000L
+
+        const val MAX_BLOCKS_PER_SCAN = 64
     }
 }

@@ -130,14 +130,6 @@
                 android:textColor="@color/text_negative"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/retryPosition"
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="@string/common_retry"
-                android:gravity="center"
-                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/priceTitle"
@@ -167,22 +159,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />
 
-            <TextView
-                android:id="@+id/chartError"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="@color/text_negative"
-                android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/retryChart"
-                style="@style/TextAppearance.NovaFoundation.SemiBold.Body"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="@string/common_retry"
-                android:gravity="center"
-                android:visibility="gone" />
 
             <TextView
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"

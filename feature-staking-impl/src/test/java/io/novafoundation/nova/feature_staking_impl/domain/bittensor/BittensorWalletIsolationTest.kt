@@ -24,6 +24,7 @@ import org.mockito.Mockito.verifyNoInteractions
 class BittensorWalletIsolationTest {
 
     private val accounts = mock(AccountRepository::class.java)
+
     private val extrinsics = mock(ExtrinsicService::class.java)
     private val wallets = mock(WalletRepository::class.java)
 
@@ -32,6 +33,7 @@ class BittensorWalletIsolationTest {
     private val validators = mock(BittensorSubnetValidatorRepository::class.java)
 
     private val fee = mock(Fee::class.java)
+
     private val validator = BittensorValidator(AccountIdKey(ByteArray(32)), "Validator")
     private val details = BittensorRootStakingDetails(
         metaId = 1,
@@ -41,6 +43,7 @@ class BittensorWalletIsolationTest {
         annualPercentageYield = null,
         dataStatus = BittensorDataStatus.Fresh
     )
+
     private val selectedValidatorYield = BigDecimal("6.5")
 
     private val repository = object : BittensorStakingRepository {
@@ -53,8 +56,16 @@ class BittensorWalletIsolationTest {
 
     @Test
     fun `fee estimation does not depend on globally selected wallet`() = runBlocking {
-        val request = BittensorRootStakeRequest(1L, details.chain, validator, BigInteger.ONE)
-        runCatching { interactor().estimateRootStakeFee(request) }
+        val request = BittensorRootStakeRequest(
+            1L,
+            details.chain,
+            validator,
+            BigInteger.ONE
+        )
+        runCatching {
+            interactor()
+                .estimateRootStakeFee(request)
+        }
         verifyNoInteractions(accounts, validators)
     }
 
@@ -63,21 +74,36 @@ class BittensorWalletIsolationTest {
         val selected = mock(MetaAccount::class.java)
         `when`(selected.id).thenReturn(1L)
         `when`(accounts.getSelectedMetaAccount()).thenReturn(selected)
-        val chosenValidator = BittensorValidator(AccountIdKey(ByteArray(32) { 2 }), "Chosen validator")
-        val row = BittensorSubnetValidator(chosenValidator, "chosen-address", BigDecimal.ZERO, true)
+        val chosenValidator = BittensorValidator(
+            AccountIdKey(ByteArray(32) { 2 }),
+            "Chosen validator"
+        )
+        val row = BittensorSubnetValidator(
+            chosenValidator,
+            "chosen-address",
+            BigDecimal.ZERO,
+            true
+        )
         `when`(validators.rootValidators(details.chain)).thenReturn(listOf(row))
         val interactor = interactor()
 
         val selectedValidator = interactor.rootValidator(details.chain, row.address)
 
         assertEquals(chosenValidator, selectedValidator)
-        assertEquals(validator, interactor.observeRootStakingDetails().first().validator)
+        assertEquals(
+            validator,
+            interactor.observeRootStakingDetails()
+                .first().validator
+        )
         verifyNoInteractions(extrinsics)
     }
 
     @Test
     fun `selected validator uses its own yield and existing stake`() = runBlocking {
-        val selected = BittensorValidator(AccountIdKey(ByteArray(32) { 2 }), "Selected")
+        val selected = BittensorValidator(
+            AccountIdKey(ByteArray(32) { 2 }),
+            "Selected"
+        )
         val defaultPosition = BittensorRootPosition(validator.hotkey, BigInteger.TEN)
         val selectedPosition = BittensorRootPosition(selected.hotkey, BigInteger.ONE)
         val initial = details.copy(
@@ -96,5 +122,11 @@ class BittensorWalletIsolationTest {
         assertEquals(initial.metaId, displayed.metaId)
     }
 
-    private fun interactor() = BittensorStakingInteractor(repository, extrinsics, wallets, validators, submission)
+    private fun interactor() = BittensorStakingInteractor(
+        repository,
+        extrinsics,
+        wallets,
+        validators,
+        submission
+    )
 }

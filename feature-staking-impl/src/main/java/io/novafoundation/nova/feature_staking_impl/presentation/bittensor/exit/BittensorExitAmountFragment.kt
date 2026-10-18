@@ -1,19 +1,22 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
 import androidx.core.os.bundleOf
-import io.novafoundation.nova.common.view.showLoadingValue
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeRetries
+import io.novafoundation.nova.common.mixin.impl.observeValidations
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.common.view.setState
+import io.novafoundation.nova.common.view.showLoadingValue
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorExitAmountBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.MaxActionAvailability
 import io.novafoundation.nova.feature_wallet_api.presentation.view.amount.setChooseAmountModel
 
@@ -45,15 +48,20 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         rate.isVisible = !viewModel.isRoot
         averagePrice.isVisible = !viewModel.isRoot
         earned.isVisible = !viewModel.isRoot
-        validator.image.updateLayoutParams { width = 18.dp(requireContext()); height = 18.dp(requireContext()) }
+        validator.image.updateLayoutParams {
+            width = 18.dp(requireContext())
+            height = 18.dp(requireContext())
+        }
         validator.setOnClickListener { viewModel.validatorClicked() }
-        retry.setOnClickListener { viewModel.retry() }
         continueButton.prepareForProgress(viewLifecycleOwner)
         continueButton.setOnClickListener { viewModel.continueClicked() }
     }
 
     override fun subscribe(viewModel: BittensorExitAmountViewModel) = with(binder) {
         setupExternalActions(viewModel)
+        observeBittensorRetries(viewModel.retryEvents)
+        observeRetries(viewModel.feeLoaderMixin)
+        observeValidations(viewModel)
         viewModel.title.observe(toolbar::setTitle)
         viewModel.amountModel.observe { it?.let(amount::setChooseAmountModel) }
         viewModel.amount.observe { if (amount.amountInput.text.toString() != it) amount.amountInput.setText(it) }
@@ -71,10 +79,5 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         viewModel.fee.observe(fee::showValue)
         viewModel.feeCaption.observe { caption.text = it }
         viewModel.continueButtonState.observe(continueButton::setState)
-        viewModel.error.observe {
-            error.text = it
-            error.isVisible = it != null
-            retry.isVisible = it != null
-        }
     }
 }

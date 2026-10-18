@@ -1,9 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model
 
 import io.novafoundation.nova.common.resources.ResourceManager
-import io.novafoundation.nova.feature_staking_impl.R
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
 import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionResolution
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.RecoveredExtrinsicOutcome
+import io.novafoundation.nova.feature_staking_impl.R
 
 fun ExtrinsicSubmissionResolution.toUi(resources: ResourceManager, metaId: Long): BittensorStakeResultUi.Recovered {
     val (title, description) = when (outcome) {

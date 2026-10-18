@@ -1,6 +1,5 @@
 package io.novafoundation.nova.feature_account_api.di
 
-import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.common.sequrity.TwoFactorVerificationExecutor
 import io.novafoundation.nova.common.sequrity.biometry.BiometricServiceFactory
 import io.novafoundation.nova.feature_account_api.data.cloudBackup.LocalAccountsCloudBackupFacade
@@ -9,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.data.events.MetaAccountChanges
 import io.novafoundation.nova.feature_account_api.data.externalAccounts.ExternalAccountsSyncService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicSplitter
+import io.novafoundation.nova.feature_account_api.data.extrinsic.recovery.ExtrinsicSubmissionRecovery
 import io.novafoundation.nova.feature_account_api.data.fee.FeePaymentProviderRegistry
 import io.novafoundation.nova.feature_account_api.data.fee.capability.CustomFeeCapabilityFacade
 import io.novafoundation.nova.feature_account_api.data.fee.types.hydra.HydrationFeeInjector

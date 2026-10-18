@@ -45,5 +45,10 @@ class BittensorSubnetInteractor(
     suspend fun toggleFavorite(metaId: Long, subnetId: BittensorNetuid.Subnet) = favorites.toggle(metaId, subnetId)
 
     suspend fun quote(subnetId: BittensorNetuid.Subnet, amount: BigInteger): BittensorSubnetBuyQuote =
-        bittensorSubnetQuoteInteractor.quoteBuy(ChainGeneses.BITTENSOR, subnetId, amount, slippage)
+        bittensorSubnetQuoteInteractor.quoteBuy(
+            ChainGeneses.BITTENSOR,
+            subnetId,
+            amount,
+            slippage
+        )
 }

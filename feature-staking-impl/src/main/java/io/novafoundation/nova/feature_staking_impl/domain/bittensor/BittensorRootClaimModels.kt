@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootC
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import java.math.BigDecimal
 
 data class BittensorRootClaimState(
     val metaId: Long,
@@ -23,4 +24,4 @@ data class BittensorRootClaimDraft(
     val fee: Fee
 )
 
-data class BittensorReceivedRootRewards(val asset: Asset, val amount: java.math.BigDecimal)
+data class BittensorReceivedRootRewards(val asset: Asset, val amount: BigDecimal)

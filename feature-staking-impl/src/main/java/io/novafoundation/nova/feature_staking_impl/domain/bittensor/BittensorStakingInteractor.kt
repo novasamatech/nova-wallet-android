@@ -19,7 +19,7 @@ class BittensorStakingInteractor(
     private val extrinsicService: ExtrinsicService,
     private val walletRepository: WalletRepository,
     private val validatorRepository: BittensorSubnetValidatorRepository,
-    private val submission: BittensorSubmissionExecutor
+    private val submissionExecutor: BittensorSubmissionExecutor
 ) {
 
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails> = repository.observeRootStakingDetails()
@@ -36,18 +36,26 @@ class BittensorStakingInteractor(
     }
 
     suspend fun rootValidator(chain: Chain, address: String): BittensorValidator {
-        val validators = validatorRepository.rootValidators(chain)
-        val selectedValidator = validators
+        val validatorRepository = validatorRepository.rootValidators(chain)
+        val selectedValidator = validatorRepository
             .firstOrNull { it.address == address && it.selectable }
-        return requireNotNull(selectedValidator) { "Validator is no longer eligible for root staking" }.validator
+        return requireNotNull(selectedValidator) { "Validator is no longer eligible for root staking" }
+            .validator
     }
 
     suspend fun maximumStake(details: BittensorRootStakingDetails): BigInteger {
         val validator = requireNotNull(details.validator) { "Select a root validator" }
         val asset = walletRepository.assetFlow(details.metaId, details.chain.utilityAsset)
             .first()
-        if (maximumBittensorStake(asset.transferableInPlanks, BigInteger.ZERO).isZero) return BigInteger.ZERO
-        val request = BittensorRootStakeRequest(details.metaId, details.chain, validator, asset.transferableInPlanks)
+        if (maximumBittensorStake(asset.transferableInPlanks, BigInteger.ZERO).isZero) {
+            return BigInteger.ZERO
+        }
+        val request = BittensorRootStakeRequest(
+            details.metaId,
+            details.chain,
+            validator,
+            asset.transferableInPlanks
+        )
         val networkFee = estimateRootStakeFee(request)
             .maxAmountDeductionFor(asset.token.configuration)
         val maximum = maximumBittensorStake(asset.transferableInPlanks, networkFee)
@@ -55,14 +63,20 @@ class BittensorStakingInteractor(
     }
 
     suspend fun estimateRootStakeFee(request: BittensorRootStakeRequest): Fee {
-        return extrinsicService.estimateFee(request.chain, TransactionOrigin.WalletWithId(request.metaId)) {
+        return extrinsicService.estimateFee(
+            request.chain,
+            TransactionOrigin.WalletWithId(request.metaId)
+        ) {
             addBittensorRootStake(request.validator.hotkey.value, request.amountInPlanks)
         }
     }
 
     suspend fun executeRootStake(request: BittensorRootStakeRequest): BittensorOperationResult {
         validatorRepository.validateRoot(request.chain, request.validator)
-        return submission.execute(request.metaId, request.chain) {
+        return submissionExecutor.execute(
+            request.metaId,
+            request.chain
+        ) {
             addBittensorRootStake(request.validator.hotkey.value, request.amountInPlanks)
         }
     }

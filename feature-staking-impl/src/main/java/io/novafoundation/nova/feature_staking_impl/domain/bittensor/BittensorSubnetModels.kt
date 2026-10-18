@@ -19,6 +19,7 @@ data class BittensorSwapSimulation(
     val subnetId: BittensorNetuid.Subnet,
     val direction: BittensorSwapDirection,
     /** Net pool input, excluding the runtime fee in the input token. */
+
     val amountIn: BigInteger,
     val amountOut: BigInteger,
     val taoFee: BigInteger,
