@@ -88,7 +88,7 @@
                 </com.facebook.shimmer.ShimmerFrameLayout>
             </FrameLayout>
 
-            <io.novafoundation.nova.feature_swap_api.presentation.view.SwapAssetsView
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.swap.SwapAssetsView
                 android:id="@+id/swapExecutionAssets"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

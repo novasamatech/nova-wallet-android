@@ -38,8 +38,8 @@ import io.novafoundation.nova.feature_assets.domain.assets.search.AssetViewModeA
 import io.novafoundation.nova.feature_assets.domain.networks.AssetNetworksInteractor
 import io.novafoundation.nova.feature_assets.domain.novaCard.NovaCardInteractor
 import io.novafoundation.nova.feature_assets.domain.novaCard.RealNovaCardInteractor
-import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
-import io.novafoundation.nova.feature_assets.domain.price.RealChartsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.price.RealChartsInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ExpandableAssetsMixinFactory

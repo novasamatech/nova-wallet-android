@@ -10,6 +10,7 @@ android {
 
         buildConfigField "String", "GLOBAL_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/global_config_dev.json\""
         buildConfigField "String", "RECOMMENDED_VALIDATORS_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/staking/validators/v1/nova_validators_dev.json\""
+        buildConfigField "String", "BITTENSOR_CONFIG_URL", "\"https://raw.githubusercontent.com/novasamatech/nova-utils/master/bittensor/v1/config.json\""
     }
 
     buildTypes {
@@ -32,6 +33,7 @@ dependencies {
     implementation project(':core-db')
     implementation project(':common')
     implementation project(':analytics')
+    implementation project(':infrastructure')
     implementation project(':feature-staking-api')
     implementation project(':feature-account-api')
     implementation project(':feature-wallet-api')
@@ -72,6 +74,7 @@ dependencies {
 
     testImplementation jUnitDep
     testImplementation mockitoDep
+    testImplementation coroutinesTestDep
 
     implementation substrateSdkDep
     compileOnly wsDep

@@ -139,7 +139,7 @@ class SubqueryHistoryRequest(
             StakingTypeGroup.MYTHOS -> "reward"
 
             StakingTypeGroup.NOMINATION_POOL -> "poolReward"
-            StakingTypeGroup.UNSUPPORTED -> null
+            StakingTypeGroup.UNSUPPORTED, StakingTypeGroup.BITTENSOR -> null
         }
     }
 

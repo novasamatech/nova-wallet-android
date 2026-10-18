@@ -19,7 +19,7 @@ import io.novafoundation.nova.feature_assets.domain.WalletInteractor
 import io.novafoundation.nova.feature_assets.domain.assets.ExternalBalancesInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractor
 import io.novafoundation.nova.feature_assets.domain.locks.BalanceLocksInteractorImpl
-import io.novafoundation.nova.feature_assets.domain.price.ChartsInteractor
+import io.novafoundation.nova.feature_wallet_api.domain.price.ChartsInteractor
 import io.novafoundation.nova.feature_assets.domain.send.SendInteractor
 import io.novafoundation.nova.feature_assets.presentation.AssetsRouter
 import io.novafoundation.nova.feature_assets.presentation.balance.common.ControllableAssetCheckMixin
@@ -37,6 +37,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.assets.A
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceHoldsRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AssetPayload
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
@@ -111,6 +112,7 @@ class BalanceDetailModule {
         chainMigrationInfoUseCase: ChainMigrationInfoUseCase,
         giftsAvailableGiftAssetsUseCase: AvailableGiftAssetsUseCase,
         giftsRestrictionCheckMixin: GiftsRestrictionCheckMixin,
+        fiatFormatter: FiatFormatter,
     ): ViewModel {
         return BalanceDetailViewModel(
             walletInteractor = walletInteractor,
@@ -131,7 +133,8 @@ class BalanceDetailModule {
             amountFormatter = amountFormatter,
             chainMigrationInfoUseCase = chainMigrationInfoUseCase,
             giftsRestrictionCheckMixin = giftsRestrictionCheckMixin,
-            giftsAvailableGiftAssetsUseCase = giftsAvailableGiftAssetsUseCase
+            giftsAvailableGiftAssetsUseCase = giftsAvailableGiftAssetsUseCase,
+            fiatFormatter = fiatFormatter
         )
     }
 

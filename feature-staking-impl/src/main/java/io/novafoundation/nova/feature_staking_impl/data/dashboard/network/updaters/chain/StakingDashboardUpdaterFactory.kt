@@ -3,9 +3,10 @@ package io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updat
 import io.novafoundation.nova.core.storage.StorageCache
 import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
-import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
@@ -22,6 +23,7 @@ class StakingDashboardUpdaterFactory(
     private val poolAccountDerivation: PoolAccountDerivation,
     private val storageCache: StorageCache,
     private val balanceLocksRepository: BalanceLocksRepository,
+    private val bittensorPositionRepository: BittensorPositionRepository,
 ) {
 
     fun createUpdater(
@@ -35,6 +37,13 @@ class StakingDashboardUpdaterFactory(
             StakingTypeGroup.PARACHAIN -> parachain(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.NOMINATION_POOL -> nominationPools(chain, stakingType, metaAccount, stakingStatsFlow)
             StakingTypeGroup.MYTHOS -> mythos(chain, stakingType, metaAccount, stakingStatsFlow)
+            StakingTypeGroup.BITTENSOR -> StakingDashboardBittensorUpdater(
+                chain,
+                chain.utilityAsset,
+                metaAccount,
+                bittensorPositionRepository,
+                stakingDashboardCache
+            )
             StakingTypeGroup.UNSUPPORTED -> null
         }
     }

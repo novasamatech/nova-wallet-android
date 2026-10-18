@@ -14,6 +14,8 @@ interface StartMultiStakingRouter : ReturnableRouter {
 
     fun openStartMythosStaking()
 
+    fun openBittensorRootStaking()
+
     fun openStartMultiStaking(payload: SetupAmountMultiStakingPayload)
 
     fun openSetupStakingType(payload: SetupStakingTypePayload)

@@ -1,5 +1,12 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetDetailsPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetReviewPayload
+
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.app.root.navigation.navigators.BaseNavigator
 import io.novafoundation.nova.app.root.navigation.navigators.NavigationHoldersRegistry
@@ -9,6 +16,8 @@ import io.novafoundation.nova.feature_dapp_impl.presentation.DAppRouter
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingDashboardRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.ConfirmPayoutFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.confirm.model.ConfirmPayoutPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.payouts.detail.PayoutDetailsFragment
@@ -289,5 +298,46 @@ class RelayStakingNavigator(
         }
 
         stakingDashboardRouter.openStakingDashboard()
+    }
+
+    override fun openBittensorRootStaking() {
+        navigationBuilder().action(R.id.action_open_bittensor_root_staking)
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorChooseSubnet() {
+        navigationBuilder().action(R.id.action_open_bittensor_choose_subnet).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorSubnetDetails(payload: BittensorSubnetDetailsPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_subnet_details)
+            .setArgs(BittensorSubnetDetailsFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorSubnetAmount(payload: BittensorSubnetAmountPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_subnet_amount)
+            .setArgs(BittensorSubnetAmountFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorSubnetReview(payload: BittensorSubnetReviewPayload) {
+        navigationBuilder().action(R.id.action_open_bittensor_subnet_review)
+            .setArgs(BittensorSubnetReviewFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorPortfolio() {
+        navigationBuilder().action(R.id.action_open_bittensor_portfolio).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorRootDetails() {
+        navigationBuilder().action(R.id.action_open_bittensor_root_details).navigateInFirstAttachedContext()
+    }
+
+    override fun openBittensorStakeConfirm(payload: BittensorStakeConfirmPayload) {
+        navigationBuilder().action(R.id.action_bittensorStakeAmount_to_bittensorStakeConfirm)
+            .setArgs(BittensorStakeConfirmFragment.getBundle(payload))
+            .navigateInFirstAttachedContext()
     }
 }
