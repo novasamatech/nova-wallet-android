@@ -49,9 +49,20 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.combine
+import io.novafoundation.nova.feature_staking_api.domain.dashboard.model.AggregatedStakingDashboardOption.NotYetResolved
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDashboardPendingNavigation
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.FullChainAssetId
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.common.domain.dataOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+
+private const val DASHBOARD_ANALYTICS_SOURCE = "dashboard"
+private const val DEEP_LINK_ANALYTICS_SOURCE = "deep_link"
 
 private class DashboardFormatters(
     val maskableValueFormatter: MaskableValueFormatter,
@@ -67,6 +78,7 @@ class StakingDashboardViewModel(
     private val router: StakingRouter,
     private val startMultiStakingRouter: StartMultiStakingRouter,
     private val stakingSharedState: StakingSharedState,
+    private val pendingNavigation: StakingDashboardPendingNavigation,
     private val presentationMapperFactory: StakingDashboardPresentationMapperFactory,
     private val dashboardUpdatePeriod: Duration = 200.milliseconds,
     private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
@@ -108,6 +120,11 @@ class StakingDashboardViewModel(
         stakingDashboardUpdateSystem.start()
             .inBackground()
             .launchIn(this)
+
+        pendingNavigation.target
+            .filterNotNull()
+            .onEach { openPendingStaking(it) }
+            .launchIn(this)
     }
 
     fun onHasStakeItemClicked(index: Int) = launch {
@@ -126,24 +143,12 @@ class StakingDashboardViewModel(
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
         val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
 
-        val stakingTypes = noStakeItemState.flowType.allStakingTypes
-        val chain = withoutStakeItem.chain
-        val chainAsset = withoutStakeItem.token.configuration
-
-        if (stakingTypes.singleOrNull() == Chain.Asset.StakingType.BITTENSOR_ROOT) {
-            router.openBittensorRootStaking()
-            return@launch
-        }
-
-        stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
-
-        analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = "dashboard"))
-
-        val payload = StartStakingLandingPayload(
-            availableStakingOptions = AvailableStakingOptionsPayload(chain.id, chainAsset.id, stakingTypes)
+        openStartStaking(
+            chain = withoutStakeItem.chain,
+            chainAsset = withoutStakeItem.token.configuration,
+            noStake = noStakeItemState,
+            analyticsSource = DASHBOARD_ANALYTICS_SOURCE
         )
-
-        startMultiStakingRouter.openStartStakingLanding(payload)
     }
 
     fun onMoreOptionsClicked() {
@@ -255,6 +260,59 @@ class StakingDashboardViewModel(
                 textColorRes = R.color.text_primary
             )
         }
+    }
+
+    /**
+     * A staking deep link lands on the dashboard first. Its asset opens once the dashboard has
+     * resolved it, because until then an existing stake is still reported as [NotYetResolved].
+     */
+    private suspend fun openPendingStaking(target: FullChainAssetId) {
+        val option = stakingDashboardFlow
+            .mapNotNull { it.dataOrNull?.findResolvedOption(target) }
+            .first()
+
+        pendingNavigation.consume(target)
+
+        when (val stakingState = option.stakingState) {
+            is HasStake -> openChainStaking(option.chain, option.token.configuration, stakingState.stakingType)
+            is NoStake -> openStartStaking(option.chain, option.token.configuration, stakingState, DEEP_LINK_ANALYTICS_SOURCE)
+            else -> {}
+        }
+    }
+
+    private fun StakingDashboard.findResolvedOption(target: FullChainAssetId): AggregatedStakingDashboardOption<*>? {
+        hasStake.find { it.matches(target) }?.let { return it }
+
+        return withoutStake.find { it.matches(target) }
+            ?.takeIf { it.stakingState is NoStake }
+    }
+
+    private fun AggregatedStakingDashboardOption<*>.matches(target: FullChainAssetId): Boolean {
+        return chain.id == target.chainId && token.configuration.id == target.assetId
+    }
+
+    private suspend fun openStartStaking(
+        chain: Chain,
+        chainAsset: Chain.Asset,
+        noStake: NoStake,
+        analyticsSource: String
+    ) {
+        val stakingTypes = noStake.flowType.allStakingTypes
+
+        if (stakingTypes.singleOrNull() == Chain.Asset.StakingType.BITTENSOR_ROOT) {
+            router.openBittensorRootStaking()
+            return
+        }
+
+        stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
+
+        analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = analyticsSource))
+
+        val payload = StartStakingLandingPayload(
+            availableStakingOptions = AvailableStakingOptionsPayload(chain.id, chainAsset.id, stakingTypes)
+        )
+
+        startMultiStakingRouter.openStartStakingLanding(payload)
     }
 
     private suspend fun openChainStaking(

@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardViewModel
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDashboardPendingNavigation
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.main.di.components.ComponentsModule
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
 import io.novafoundation.nova.common.presentation.masking.formatter.MaskableValueFormatterProvider
@@ -39,6 +40,7 @@ class StakingDashboardModule {
         dashboardRouter: StakingDashboardRouter,
         router: StakingRouter,
         stakingSharedState: StakingSharedState,
+        pendingNavigation: StakingDashboardPendingNavigation,
         presentationMapperFactory: StakingDashboardPresentationMapperFactory,
         startMultiStakingRouter: StartMultiStakingRouter,
         valueFormatterProvider: MaskableValueFormatterProvider,
@@ -55,6 +57,7 @@ class StakingDashboardModule {
             dashboardRouter = dashboardRouter,
             router = router,
             stakingSharedState = stakingSharedState,
+            pendingNavigation = pendingNavigation,
             presentationMapperFactory = presentationMapperFactory,
             startMultiStakingRouter = startMultiStakingRouter,
             maskableValueFormatterProvider = valueFormatterProvider,
