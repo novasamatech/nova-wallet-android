@@ -12,7 +12,9 @@ data class BittensorExitValidationPayload(
     val fee: BigInteger,
     val existentialDeposit: BigInteger,
     val supportsFeeFromStake: Boolean,
-    val expectedFeeFromStake: Boolean? = null
+    val expectedFeeFromStake: Boolean? = null,
+    val latestQuote: BittensorExitQuote? = null,
+    val priceImpactAccepted: Boolean = false
 ) {
 
     val feeFromStake: Boolean
@@ -29,7 +31,10 @@ enum class BittensorExitValidationFailure {
     BELOW_MINIMUM,
     REMAINDER_BELOW_MINIMUM,
     INSUFFICIENT_FEE_BALANCE,
-    FEE_SOURCE_CHANGED
+    FEE_SOURCE_CHANGED,
+    REMAINDER_CAN_EXIT_ALL,
+    QUOTE_CHANGED,
+    PRICE_IMPACT_TOO_HIGH
 }
 
 typealias BittensorExitValidation = Validation<BittensorExitValidationPayload, BittensorExitValidationFailure>

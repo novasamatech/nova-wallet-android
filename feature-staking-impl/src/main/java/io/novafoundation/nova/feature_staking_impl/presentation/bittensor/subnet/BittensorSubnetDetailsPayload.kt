@@ -4,4 +4,8 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class BittensorSubnetDetailsPayload(val subnetId: Int) : Parcelable
+class BittensorSubnetDetailsPayload(
+    val subnetId: Int,
+    val replaceAmount: Boolean = false,
+    val validatorAddress: String? = null
+) : Parcelable

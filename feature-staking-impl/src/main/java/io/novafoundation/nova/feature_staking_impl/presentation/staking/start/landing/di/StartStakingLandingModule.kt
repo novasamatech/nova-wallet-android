@@ -17,16 +17,19 @@ import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.SelectedAccountUseCase
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingLandingInfoUpdateSystemFactory
 import io.novafoundation.nova.feature_staking_impl.data.network.blockhain.updaters.StakingUpdaters
+import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRecommendedYieldInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.common.StakingStartedDetectionService
 import io.novafoundation.nova.feature_staking_impl.domain.staking.start.landing.StakingTypeDetailsCompoundInteractorFactory
+import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
-import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
-import io.novafoundation.nova.feature_staking_impl.domain.announcements.StakingAnnouncementsUseCase
-import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.AmountFormatter
-import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
+import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 
 @Module(includes = [ViewModelModule::class])
 class StartStakingLandingModule {
@@ -63,7 +66,10 @@ class StartStakingLandingModule {
         contextManager: ContextManager,
         amountFormatter: AmountFormatter,
         stakingAnnouncementsUseCase: StakingAnnouncementsUseCase,
-        analyticsService: AnalyticsService
+        analyticsService: AnalyticsService,
+        bittensorSubnetInteractor: BittensorSubnetInteractor,
+        bittensorRecommendedYieldInteractor: BittensorRecommendedYieldInteractor,
+        bittensorRetryController: BittensorRetryController
     ): ViewModel {
         return StartStakingLandingViewModel(
             router = router,
@@ -81,7 +87,10 @@ class StartStakingLandingModule {
             contextManager = contextManager,
             amountFormatter = amountFormatter,
             stakingAnnouncementsUseCase = stakingAnnouncementsUseCase,
-            analyticsService = analyticsService
+            analyticsService = analyticsService,
+            bittensorSubnetInteractor = bittensorSubnetInteractor,
+            bittensorRecommendedYieldInteractor = bittensorRecommendedYieldInteractor,
+            bittensorRetryController = bittensorRetryController
         )
     }
 

@@ -19,7 +19,6 @@ import io.novafoundation.nova.common.utils.withSafeLoading
 import io.novafoundation.nova.common.validation.ValidationExecutor
 import io.novafoundation.nova.common.validation.progressConsumer
 import io.novafoundation.nova.feature_account_api.data.model.Fee
-import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
@@ -27,6 +26,11 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddr
 import io.novafoundation.nova.feature_currency_api.domain.model.Currency
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationOutcome
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatNetworkFee
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.formatBittensorNativeResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorPreSubmissionError
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.mapBittensorSubmissionError
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
@@ -37,9 +41,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.toSubmissionState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorFeeUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -186,16 +191,6 @@ class BittensorStakeConfirmViewModel(
         }
     }
 
-    private fun unresolved(hash: String) = BittensorSubmissionState.Unresolved(
-        hash,
-        BittensorStakeResultUi.Failure(
-            resourceManager.getString(R.string.bittensor_submission_unknown_title),
-            resourceManager.getString(R.string.bittensor_submission_unknown_description),
-            hash,
-            canRetry = false
-        )
-    )
-
     fun back() {
         if (submission.value !is BittensorSubmissionState.Submitting) router.back()
     }
@@ -227,7 +222,7 @@ class BittensorStakeConfirmViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            showError(e)
+            submission.value = e.mapBittensorPreSubmissionError().mapResult(resourceManager).toSubmissionState()
         } finally {
             validating.value = false
         }
@@ -240,17 +235,17 @@ class BittensorStakeConfirmViewModel(
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
             when (val result = bittensorStakingInteractor.executeRootStake(request)) {
                 is BittensorOperationResult.Success -> {
-                    submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee))
+                    submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    submission.value = BittensorSubmissionState.Failed(mapFailure(result.cause))
+                    submission.value = result.mapResult(resourceManager).toSubmissionState()
                 }
-                is BittensorOperationResult.Unknown -> submission.value = unresolved(result.transactionHash)
+                is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resourceManager).toSubmissionState()
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            submission.value = BittensorSubmissionState.Failed(mapFailure(e))
+            submission.value = e.mapBittensorSubmissionError().mapResult(resourceManager).toSubmissionState()
         } finally {
             validating.value = false
         }
@@ -295,24 +290,20 @@ class BittensorStakeConfirmViewModel(
         )
     }
 
-    private fun mapSuccess(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest, fee: Fee): BittensorStakeResultUi.Success {
-        val amount = formatStakeAmount(details, request)
+    private fun mapSuccess(
+        details: BittensorRootStakingDetails,
+        request: BittensorRootStakeRequest,
+        fee: Fee,
+        outcome: BittensorOperationOutcome?
+    ): BittensorStakeResultUi.Success {
+        val amount = outcome?.tao?.let { formatToken(details.asset.token.amountFromPlanks(it), details.asset.token.configuration.symbol) }
+            ?: ("≈ " + formatStakeAmount(details, request))
         return BittensorStakeResultUi.Success(
             title = resourceManager.getString(R.string.bittensor_staking_success_title, amount),
             description = resourceManager.getString(R.string.bittensor_staking_success_description),
             validator = request.validator.name,
-            fee = BittensorFeeUi(
-                amount = formatToken(fee.decimalAmount, fee.asset.symbol),
-                fiatAmount = formatFiatOrNull(details.asset.token.toFiatOrNull(fee.decimalAmount), details.asset.token.currency)
-            )
-        )
-    }
-
-    private fun mapFailure(cause: Throwable): BittensorStakeResultUi.Failure {
-        return BittensorStakeResultUi.Failure(
-            title = resourceManager.getString(R.string.bittensor_staking_failed_title),
-            description = resourceManager.getString(R.string.bittensor_staking_failed_description),
-            error = cause.message ?: resourceManager.getString(R.string.common_error_general_title)
+            fee = outcome.formatNetworkFee(fee, request.chain, resourceManager, tokenFormatter),
+            amount = formatBittensorNativeResult(outcome?.tao, request.amountInPlanks, request.chain, tokenFormatter)
         )
     }
 

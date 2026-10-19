@@ -5,6 +5,7 @@ import java.util.UUID
 
 private const val PREFS_CLIENT_ID = "attestation_client_id"
 private const val PREFS_ATTESTED_CLIENT_ID = "attestation_attested_client_id"
+private const val PREFS_ATTESTED_ORIGIN = "attestation_attested_origin"
 
 interface AttestationIdentity {
 
@@ -15,7 +16,9 @@ interface AttestationIdentity {
 
     fun isAttested(): Boolean
 
-    fun markAttested()
+    fun markAttested(origin: String? = null)
+
+    fun attestedOrigin(): String?
 
     /** Forgets that the current id is registered while keeping the id itself - the next use registers it again. */
     fun clearAttested()
@@ -45,12 +48,20 @@ class RealAttestationIdentity(
 
     override fun isAttested(): Boolean = preferences.getString(PREFS_ATTESTED_CLIENT_ID) == clientId()
 
-    override fun markAttested() = preferences.putString(PREFS_ATTESTED_CLIENT_ID, clientId())
+    override fun markAttested(origin: String?) {
+        preferences.putString(PREFS_ATTESTED_ORIGIN, origin)
+        preferences.putString(PREFS_ATTESTED_CLIENT_ID, clientId())
+    }
 
-    override fun clearAttested() = preferences.removeField(PREFS_ATTESTED_CLIENT_ID)
+    override fun attestedOrigin(): String? = preferences.getString(PREFS_ATTESTED_ORIGIN)
+
+    override fun clearAttested() {
+        preferences.removeField(PREFS_ATTESTED_CLIENT_ID)
+        preferences.removeField(PREFS_ATTESTED_ORIGIN)
+    }
 
     override fun reset() {
-        preferences.removeField(PREFS_ATTESTED_CLIENT_ID)
+        clearAttested()
         preferences.removeField(PREFS_CLIENT_ID)
     }
 }

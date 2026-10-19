@@ -17,7 +17,6 @@ fun BittensorStakeValidationFailure.message(resources: ResourceManager): String 
         BittensorStakeValidationFailure.BELOW_MINIMUM_STAKE -> R.string.bittensor_validation_minimum_stake
         BittensorStakeValidationFailure.HOTKEY_NOT_REGISTERED -> R.string.bittensor_validation_hotkey
         BittensorStakeValidationFailure.SUBNET_STAKING_DISABLED -> R.string.bittensor_validation_staking_disabled
-        BittensorStakeValidationFailure.ROOT_STAKE_LOCKED -> R.string.bittensor_validation_root_locked
         BittensorStakeValidationFailure.COLDKEY_SWAP_PENDING -> R.string.bittensor_validation_coldkey_swap
         BittensorStakeValidationFailure.SAFE_MODE_ACTIVE -> R.string.bittensor_validation_safe_mode
         BittensorStakeValidationFailure.QUOTE_UNAVAILABLE -> R.string.bittensor_validation_quote_unavailable

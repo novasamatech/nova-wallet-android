@@ -23,6 +23,7 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWi
 import io.novafoundation.nova.feature_account_api.data.extrinsic.FormMultiExtrinsicWithOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.SubmissionOrigin
 import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitInBlock
+import io.novafoundation.nova.feature_account_api.data.extrinsic.awaitStatus
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicDispatch
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
 import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.watch.ExtrinsicWatchResult
@@ -61,8 +62,6 @@ import io.novasama.substrate_sdk_android.runtime.definitions.types.generics.Gene
 import io.novasama.substrate_sdk_android.runtime.extrinsic.signer.SendableExtrinsic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 class RealExtrinsicService(
@@ -103,9 +102,9 @@ class RealExtrinsicService(
                 submission.extrinsics.map { it to submission }
             },
             listProcessing = { (extrinsic, submission) ->
-                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic).filterIsInstance<ExtrinsicStatus.InBlock>()
+                rpcCalls.submitAndWatchExtrinsic(chain.id, extrinsic)
                     .map { ExtrinsicWatchResult(it, submission.submissionHierarchy) }
-                    .first()
+                    .awaitStatus<ExtrinsicStatus.InBlock>()
             }
         )
     }
@@ -234,7 +233,7 @@ class RealExtrinsicService(
             val errorEvent = events.findExtrinsicFailureOrThrow()
             val dispatchError = parseErrorEvent(errorEvent, runtimeSnapshot)
 
-            ExtrinsicDispatch.Failed(dispatchError)
+            ExtrinsicDispatch.Failed(dispatchError, events)
         }
     }
 

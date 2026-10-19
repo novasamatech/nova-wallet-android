@@ -9,6 +9,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import retrofit2.HttpException
 
 private const val PLATFORM_ANDROID = "android"
@@ -34,6 +37,7 @@ class AnalyticsUploader(
      */
     suspend fun flush(maxBatches: Int): Result<Unit> {
         repeat(maxBatches) {
+            currentCoroutineContext().ensureActive()
             val batch = queue.peek(batchSize)
             if (batch.isEmpty()) {
                 analyticsLog("flush: queue empty")
@@ -42,7 +46,20 @@ class AnalyticsUploader(
 
             analyticsLog("sending ${batch.size} events: ${batch.joinToString { it.name }}")
 
-            val error = runCatching { api.sendEvents(urls.resolve(EVENTS_PATH).toString(), createEnvelope(batch)) }.exceptionOrNull()
+            val error = try {
+                val url = urls.resolve(EVENTS_PATH).toString()
+                currentCoroutineContext().ensureActive()
+                val envelope = createEnvelope(batch)
+                currentCoroutineContext().ensureActive()
+                api.sendEvents(url, envelope)
+                null
+            } catch (cancelled: CancellationException) {
+                throw cancelled
+            } catch (failure: Exception) {
+                failure
+            }
+
+            currentCoroutineContext().ensureActive()
 
             when {
                 error == null -> analyticsLog("delivered ${batch.size} events")

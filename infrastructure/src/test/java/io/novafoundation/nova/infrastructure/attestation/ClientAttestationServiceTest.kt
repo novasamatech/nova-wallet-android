@@ -5,6 +5,11 @@ import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.base
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.requestDigest
 import io.novafoundation.nova.infrastructure.attestation.AttestationSigning.sha256
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import okhttp3.HttpUrl
@@ -41,7 +46,19 @@ private class RecordingKeyPairStore : AttestationKeyPairStore {
 
     val deleted = mutableListOf<String>()
 
-    override fun publicKey(alias: String) = PUBLIC_KEY
+    var missing = false
+
+    var lookupFailure: Exception? = null
+
+    override fun contains(alias: String): Boolean {
+        lookupFailure?.let { throw it }
+        return !missing
+    }
+
+    override fun publicKey(alias: String): ByteArray {
+        missing = false
+        return PUBLIC_KEY
+    }
 
     // Echoing the payload lets a test read back exactly which digest got signed
     override fun sign(alias: String, payload: ByteArray) = payload
@@ -62,18 +79,24 @@ private class FakeAttestationApi : AttestationApi {
     val challengeFailures = ArrayDeque<HttpException>()
     val registerFailures = ArrayDeque<HttpException>()
 
+    var registerStatus = 204
+
+    var beforeChallenge: () -> Unit = {}
+
     override suspend fun challenge(url: String, request: AttestationChallengeRequest): AttestationChallengeResponse {
         challengeUrls += url
         challengeRequests += request
+        beforeChallenge()
         challengeFailures.removeFirstOrNull()?.let { throw it }
 
         return AttestationChallengeResponse(CHALLENGE)
     }
 
-    override suspend fun register(url: String, request: AttestationRegisterRequest) {
+    override suspend fun register(url: String, request: AttestationRegisterRequest): Response<Unit> {
         registerUrls += url
         registrations += request
         registerFailures.removeFirstOrNull()?.let { throw it }
+        return Response.success<Unit>(registerStatus, null)
     }
 }
 
@@ -89,23 +112,24 @@ class ClientAttestationServiceTest {
     private lateinit var requestedHashes: MutableList<String>
     private var infraUrl: HttpUrl? = INFRA_URL
 
+    private var nowNanos = 0L
+
     @Before
     fun setUp() {
-        identity = RealAttestationIdentity(InMemoryPreferences())
+        val preferences = InMemoryPreferences()
+        identity = RealAttestationIdentity(preferences)
         keyPairStore = RecordingKeyPairStore()
         api = FakeAttestationApi()
         requestedHashes = mutableListOf()
         infraUrl = INFRA_URL
     }
 
-    private fun service() = RealClientAttestationService(
-        api = api,
-        identity = identity,
-        keyPairStore = keyPairStore,
-        integrityTokens = IntegrityTokenSource { requestHash -> INTEGRITY_TOKEN.also { requestedHashes += requestHash } },
-        appPackage = APP_PACKAGE,
-        urls = InfrastructureUrls { infraUrl }
-    )
+    private fun service(tokens: IntegrityTokenSource? = null): RealClientAttestationService {
+        val integrityTokens = tokens ?: IntegrityTokenSource { requestHash -> INTEGRITY_TOKEN.also { requestedHashes += requestHash } }
+        val urls = InfrastructureUrls { infraUrl }
+        val clock = { nowNanos }
+        return RealClientAttestationService(api, identity, keyPairStore, integrityTokens, APP_PACKAGE, urls, clock)
+    }
 
     @Test
     fun `registration and the proof follow profile 2`() = runBlocking<Unit> {
@@ -167,7 +191,7 @@ class ClientAttestationServiceTest {
 
     @Test
     fun `a registered installation only spends a request challenge`() = runBlocking<Unit> {
-        identity.markAttested()
+        identity.markAttested("https://api.example.test")
 
         service().proofHeaders(REQUEST_CONTEXT, BODY)
 
@@ -219,7 +243,7 @@ class ClientAttestationServiceTest {
     @Test
     fun `a backend that forgot the installation gets the same identity registered again`() = runBlocking<Unit> {
         val original = identity.clientId()
-        identity.markAttested()
+        identity.markAttested("https://api.example.test")
         api.challengeFailures += httpError(401, "unknown_client")
 
         service().proofHeaders(REQUEST_CONTEXT, BODY)
@@ -231,7 +255,7 @@ class ClientAttestationServiceTest {
 
     @Test
     fun `a refused challenge stops further attempts`() = runBlocking<Unit> {
-        identity.markAttested()
+        identity.markAttested("https://api.example.test")
         api.challengeFailures += httpError(403, "binding_not_allowed")
         val service = service()
 
@@ -302,6 +326,170 @@ class ClientAttestationServiceTest {
         service.proofHeaders(REQUEST_CONTEXT, BODY)
 
         assertEquals(identity.clientId(), api.registrations.single().client_id)
+    }
+
+    @Test
+    fun `bootstrap rate limit recovers on the same instance after cooldown`() = runBlocking<Unit> {
+        for (failures in listOf(api.challengeFailures, api.registerFailures)) {
+            identity.reset()
+            val service = service()
+            failures += httpError(429, "rate_limited")
+            assertFailsWith<AttestationUnavailableException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+            val clientId = identity.existingClientId()
+            val sent = api.challengeRequests.size
+            assertFailsWith<AttestationUnavailableException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+            assertEquals(sent, api.challengeRequests.size)
+            nowNanos += 31_000_000_000L
+            service.proofHeaders(REQUEST_CONTEXT, BODY)
+            assertEquals(clientId, identity.existingClientId())
+            assertTrue(identity.isAttested())
+        }
+    }
+
+    @Test
+    fun `business throttling honors retry after but dataset errors do not throttle`() = runBlocking<Unit> {
+        val service = service()
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        service.recordResponse(REQUEST_CONTEXT, 503, "dataset_unavailable", "60")
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        service.recordResponse(REQUEST_CONTEXT, 429, null, "60")
+        nowNanos += 59_000_000_000L
+        assertFailsWith<AttestationUnavailableException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+        nowNanos += 2_000_000_000L
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        assertEquals(1, api.registrations.size)
+    }
+
+    @Test
+    fun `lost registered key rotates installation before obtaining a request proof`() = runBlocking<Unit> {
+        val service = service()
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        val previous = identity.existingClientId()
+        keyPairStore.missing = true
+        val headers = service.proofHeaders(REQUEST_CONTEXT, BODY)
+        assertNotEquals(previous, headers[HEADER_CLIENT_ID])
+        assertEquals(headers[HEADER_CLIENT_ID], api.registrations.last().client_id)
+        assertEquals(2, api.registrations.size)
+    }
+
+    @Test
+    fun `unavailable keystore does not retire a registered identity`() = runBlocking<Unit> {
+        val service = service()
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        val previous = identity.existingClientId()
+        keyPairStore.lookupFailure = IllegalStateException("keystore unavailable")
+        assertFailsWith<IllegalStateException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+        assertEquals(previous, identity.existingClientId())
+        assertTrue(identity.isAttested())
+        keyPairStore.lookupFailure = null
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        assertEquals(1, api.registrations.size)
+    }
+
+    @Test
+    fun `bootstrap captures one URL despite config change during challenge`() = runBlocking<Unit> {
+        val service = service()
+        api.beforeChallenge = { infraUrl = "https://other.example.test/".toHttpUrl() }
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        assertTrue(api.challengeUrls.all { it.startsWith(INFRA_URL.toString()) })
+        assertTrue(api.registerUrls.all { it.startsWith(INFRA_URL.toString()) })
+        assertEquals("https://api.example.test", identity.attestedOrigin())
+        assertFailsWith<AttestationUnavailableException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+    }
+
+    @Test
+    fun `legacy binding adopts acknowledged origin without registering or rotating keys`() = runBlocking<Unit> {
+        identity.markAttested()
+        val previous = identity.existingClientId()
+        api.registerFailures += httpError(409, "client_already_registered")
+        val service = service()
+        api.beforeChallenge = { infraUrl = "https://other.example.test/".toHttpUrl() }
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        assertEquals(previous, identity.existingClientId())
+        assertEquals("https://api.example.test", identity.attestedOrigin())
+        assertEquals(listOf("request"), api.challengeRequests.map { it.purpose })
+        assertEquals(listOf("https://api.example.test/v1/attestation/challenges"), api.challengeUrls)
+        assertTrue(api.registrations.isEmpty())
+        assertTrue(requestedHashes.isEmpty())
+        assertTrue(keyPairStore.deleted.isEmpty())
+        assertEquals(1, api.registerFailures.size)
+    }
+
+    @Test
+    fun `legacy unknown client registers the same key and identity`() = runBlocking<Unit> {
+        identity.markAttested()
+        val previous = identity.existingClientId()
+        api.challengeFailures += httpError(401, "unknown_client")
+        service().proofHeaders(REQUEST_CONTEXT, BODY)
+        assertEquals(listOf("request", "register", "request"), api.challengeRequests.map { it.purpose })
+        assertEquals(previous, api.registrations.single().client_id)
+        assertEquals(previous, identity.existingClientId())
+        assertEquals("https://api.example.test", identity.attestedOrigin())
+        assertTrue(keyPairStore.deleted.isEmpty())
+    }
+
+    @Test
+    fun `failed legacy probe does not adopt origin or rotate identity`() = runBlocking<Unit> {
+        for (status in listOf(403, 429, 503)) {
+            identity.markAttested()
+            val previous = identity.existingClientId()
+            api.challengeFailures += httpError(status, "attestation_unavailable")
+            val service = service()
+            assertFailsWith<java.io.IOException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+            assertEquals(null, identity.attestedOrigin())
+            assertEquals(previous, identity.existingClientId())
+            assertTrue(identity.isAttested())
+            assertTrue(api.registrations.isEmpty())
+            assertTrue(keyPairStore.deleted.isEmpty())
+        }
+    }
+
+    @Test
+    fun `known origin change requires registration at the new origin`() = runBlocking<Unit> {
+        val service = service()
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        val previous = identity.existingClientId()
+        val other = "https://other.example.test/".toHttpUrl()
+        infraUrl = other
+        val context = signedContext("GET", other, "")
+        service.proofHeaders(context, ByteArray(0))
+        assertEquals(2, api.registrations.size)
+        assertEquals(previous, identity.existingClientId())
+        assertEquals("https://other.example.test", identity.attestedOrigin())
+    }
+
+    @Test
+    fun `unexpected successful registration status never marks installation attested`() = runBlocking<Unit> {
+        val service = service()
+        for (status in listOf(200, 201, 202)) {
+            api.registerStatus = status
+            assertFailsWith<AttestationUnavailableException> { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+            assertFalse(identity.isAttested())
+        }
+        api.registerStatus = 204
+        service.proofHeaders(REQUEST_CONTEXT, BODY)
+        assertTrue(identity.isAttested())
+    }
+
+    @Test
+    fun `cancelling a native wait releases registration for the next caller`() = runBlocking<Unit> {
+        val started = CompletableDeferred<Unit>()
+        var calls = 0
+        val tokens = IntegrityTokenSource {
+            calls++
+            if (calls == 1) {
+                started.complete(Unit)
+                awaitCancellation()
+            }
+            INTEGRITY_TOKEN
+        }
+        val service = service(tokens)
+        val first = launch { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+        withTimeout(2_000) { started.await() }
+        first.cancelAndJoin()
+        assertFalse(identity.isAttested())
+        withTimeout(2_000) { service.proofHeaders(REQUEST_CONTEXT, BODY) }
+        assertEquals(1, api.registrations.size)
     }
 
     private inline fun <reified T : Throwable> assertFailsWith(block: () -> Unit): T {

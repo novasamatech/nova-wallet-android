@@ -1,9 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position
 
+import io.novafoundation.nova.common.domain.map
+import io.novafoundation.nova.common.domain.dataOrNull
+import io.novafoundation.nova.common.utils.setTextColorRes
 import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import coil.transform.RoundedCornersTransformation
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.databinding.BottomSheeetFixedListBinding
@@ -23,6 +25,7 @@ import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensor
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
 
 class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionViewModel, FragmentBittensorSubnetPositionBinding>() {
@@ -62,6 +65,15 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPlotHeight(208)
         chart.onPeriodSelected = viewModel::selectPeriod
+        chart.selectionListener = PriceChartSelectionListener { selection ->
+            viewModel.selectChartPoint(selection)
+            chartDate.isVisible = selection != null
+            if (selection != null) {
+                viewModel.chartDateFormatter.format(selection.point.timestamp, true, chartDate, selection.chart)
+            } else {
+                chartDate.text = null
+            }
+        }
     }
 
     override fun subscribe(viewModel: BittensorSubnetPositionViewModel) = with(binder) {
@@ -83,10 +95,15 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             }
             priceTitle.text = getString(R.string.price_chart_title, name)
         }
-        viewModel.averagePrice.observe(averagePrice::showBittensorLoadingValue)
-        viewModel.earned.observe(earned::showBittensorLoadingValue)
+        viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
+        viewModel.earned.observe { state ->
+            earned.showBittensorLoadingAmount(state.map { it.amount })
+            earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+        }
         viewModel.price.observe { price.text = it }
-        viewModel.priceChange.observe { change.text = it }
+        viewModel.priceChangeFormatter.observe { formatter ->
+            chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
+        }
         viewModel.averageChartPrice.observe { value ->
             chart.setReferencePrice(value?.toFloat(), getString(R.string.bittensor_exit_avg_buy_price))
         }
@@ -95,8 +112,13 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         viewModel.worth.observe(worth::showBittensorLoadingAmount)
         viewModel.validators.observe(adapter::submitList)
         viewModel.canAct.observe {
-            sell.isEnabled = it
             buy.isEnabled = it
+        }
+        viewModel.canSell.observe { sell.isEnabled = it }
+        viewModel.withdrawalLoading.observe { withdrawalLoading.isVisible = it }
+        viewModel.withdrawalHint.observe {
+            withdrawalHint.text = it
+            withdrawalHint.isVisible = it != null
         }
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.charts.observe(chart::setCharts)

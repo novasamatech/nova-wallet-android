@@ -25,7 +25,6 @@ data class BittensorStakePreflightPayload(
     val amount: BigInteger,
     val fee: Fee,
     val quote: BittensorSubnetBuyQuote? = null,
-    val checkRootHold: Boolean = false,
     val priceImpactAccepted: Boolean = false
 )
 
@@ -57,7 +56,6 @@ class BittensorStakePreflightValidation(
             preflight = preflight.await(),
             quote = value.quote,
             netuid = value.netuid,
-            checkRootHold = value.checkRootHold,
             priceImpactAccepted = value.priceImpactAccepted,
             checkedAtMillis = System.currentTimeMillis(),
             latestQuote = currentQuote

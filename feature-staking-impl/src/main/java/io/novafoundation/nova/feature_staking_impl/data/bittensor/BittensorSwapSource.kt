@@ -5,10 +5,22 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapDirection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwapSimulation
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
+import io.novafoundation.nova.runtime.call.RuntimeCallsApi
+import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigInteger
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 interface BittensorSwapSource {
+
+    /** Simulation and marginal price from one captured best block. */
+    suspend fun quote(
+        chainId: String,
+        subnetId: BittensorNetuid.Subnet,
+        direction: BittensorSwapDirection,
+        amountIn: BigInteger
+    ): BittensorSwapQuote
 
     suspend fun simulate(
         chainId: String,
@@ -21,9 +33,30 @@ interface BittensorSwapSource {
     suspend fun currentAlphaPrice(chainId: String, subnetId: BittensorNetuid.Subnet): BigInteger
 }
 
+data class BittensorSwapQuote(
+    val blockHash: String,
+    val simulation: BittensorSwapSimulation,
+    val spotPrice: BigInteger
+)
+
 class RealBittensorSwapSource(
-    private val runtimeCallsApi: MultiChainRuntimeCallsApi
+    private val runtimeCallsApi: MultiChainRuntimeCallsApi,
+    private val rpcCalls: RpcCalls
 ) : BittensorSwapSource {
+
+    override suspend fun quote(
+        chainId: String,
+        subnetId: BittensorNetuid.Subnet,
+        direction: BittensorSwapDirection,
+        amountIn: BigInteger
+    ): BittensorSwapQuote = coroutineScope {
+        require(amountIn.isPositive() && amountIn.bitLength() <= 64) { "Swap input must be a positive u64" }
+        val blockHash = rpcCalls.getBlockHash(chainId)
+        val runtimeApi = runtimeCallsApi.forChain(chainId)
+        val price = async { priceAtBlock(runtimeApi, blockHash, subnetId) }
+        val simulation = simulateAtBlock(runtimeApi, blockHash, subnetId, direction, amountIn)
+        BittensorSwapQuote(blockHash, simulation, price.await())
+    }
 
     override suspend fun simulate(
         chainId: String,
@@ -37,10 +70,7 @@ class RealBittensorSwapSource(
         return runtimeCallsApi.forChain(chainId).call(
             section = "SwapRuntimeApi",
             method = if (buying) "sim_swap_tao_for_alpha" else "sim_swap_alpha_for_tao",
-            arguments = mapOf(
-                "netuid" to BigInteger.valueOf(subnetId.value.toLong()),
-                (if (buying) "tao" else "alpha") to amountIn
-            ),
+            arguments = simulationArguments(subnetId, direction, amountIn),
             returnBinding = { bindBittensorSwapSimulation(it, subnetId, direction, amountIn) }
         )
     }
@@ -58,6 +88,49 @@ class RealBittensorSwapSource(
         val price = bindBittensorU64(decoded)
         require(price.isPositive()) { "Subnet has no valid alpha price" }
         return price
+    }
+
+    private suspend fun simulateAtBlock(
+        runtimeApi: RuntimeCallsApi,
+        blockHash: String,
+        subnetId: BittensorNetuid.Subnet,
+        direction: BittensorSwapDirection,
+        amountIn: BigInteger
+    ): BittensorSwapSimulation {
+        val buying = direction == BittensorSwapDirection.TAO_TO_ALPHA
+        return runtimeApi.callAt(
+            blockHash = blockHash,
+            section = "SwapRuntimeApi",
+            method = if (buying) "sim_swap_tao_for_alpha" else "sim_swap_alpha_for_tao",
+            arguments = simulationArguments(subnetId, direction, amountIn),
+            returnBinding = { bindBittensorSwapSimulation(it, subnetId, direction, amountIn) }
+        )
+    }
+
+    private suspend fun priceAtBlock(
+        runtimeApi: RuntimeCallsApi,
+        blockHash: String,
+        subnetId: BittensorNetuid.Subnet
+    ): BigInteger {
+        return runtimeApi.callAt(
+            blockHash = blockHash,
+            section = "SwapRuntimeApi",
+            method = "current_alpha_price",
+            arguments = mapOf("netuid" to BigInteger.valueOf(subnetId.value.toLong())),
+            returnBinding = ::bindAlphaPrice
+        )
+    }
+
+    private fun simulationArguments(
+        subnetId: BittensorNetuid.Subnet,
+        direction: BittensorSwapDirection,
+        amountIn: BigInteger
+    ): Map<String, Any?> {
+        val buying = direction == BittensorSwapDirection.TAO_TO_ALPHA
+        return mapOf(
+            "netuid" to BigInteger.valueOf(subnetId.value.toLong()),
+            (if (buying) "tao" else "alpha") to amountIn
+        )
     }
 }
 
@@ -88,7 +161,7 @@ internal fun bindBittensorSwapSimulation(
         amountOut = amountOut,
         taoFee = taoFee,
         alphaFee = alphaFee,
-        taoSlippage = bindBittensorU64(value["taoSlippage"]),
-        alphaSlippage = bindBittensorU64(value["alphaSlippage"])
+        taoSlippage = value.get<Any?>("taoSlippage")?.let(::bindBittensorU64),
+        alphaSlippage = value.get<Any?>("alphaSlippage")?.let(::bindBittensorU64)
     )
 }

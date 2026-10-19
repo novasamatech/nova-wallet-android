@@ -5,11 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.AccessibilityDelegateCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.isVisible
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
+import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorValidatorBinding
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
@@ -59,8 +61,11 @@ class BittensorValidatorAdapter(
             choice.isChecked = selected
             choice.isEnabled = row.selectable
             bindAccessibility(selected)
-            name.text = row.validator.name.ifBlank { row.address }
-            subtitle.text = formatSubtitle(row)
+            name.text = bittensorValidatorDisplayName(row)
+            subtitle.text = model.subtitle ?: formatSubtitle(row)
+            apy.text = model.apy
+            apy.isVisible = model.apy != null
+            apy.setTextColorRes(model.apyColorRes)
             icon.setImageDrawable(model.icon)
             info.contentDescription = root.context.getString(R.string.bittensor_validator_address_info, name.text)
             info.setOnClickListener { onInfo(model) }

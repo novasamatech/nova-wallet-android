@@ -11,9 +11,11 @@ import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
@@ -22,6 +24,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
 
 @Module(includes = [ViewModelModule::class])
 class BittensorStakeAmountModule {
@@ -42,7 +45,10 @@ class BittensorStakeAmountModule {
         amountChooserFactory: AmountChooserMixin.Factory,
         stakeValidationSystem: BittensorStakePreflightSystem,
         validationExecutor: ValidationExecutor,
-        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        externalActions: ExternalActions.Presentation,
+        getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
+        payload: BittensorStakeAmountPayload?
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             resourceManager = resourceManager,
@@ -57,7 +63,10 @@ class BittensorStakeAmountModule {
             amountChooserFactory = amountChooserFactory,
             stakeValidationSystem = stakeValidationSystem,
             validationExecutor = validationExecutor,
-            feeLoaderMixinFactory = feeLoaderMixinFactory
+            feeLoaderMixinFactory = feeLoaderMixinFactory,
+            externalActions = externalActions,
+            getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
+            payload = payload
         )
     }
 

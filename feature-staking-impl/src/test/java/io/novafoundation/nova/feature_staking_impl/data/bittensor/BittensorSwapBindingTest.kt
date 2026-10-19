@@ -5,10 +5,37 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSwa
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BittensorSwapBindingTest {
+
+    @Test
+    fun `four required runtime fields are sufficient for buy and sell`() {
+        val decoded = Struct.Instance(
+            mapOf("taoAmount" to 100.bi(), "alphaAmount" to 200.bi(), "taoFee" to 2.bi(), "alphaFee" to 3.bi())
+        )
+        for (direction in BittensorSwapDirection.entries) {
+            val buying = direction == BittensorSwapDirection.TAO_TO_ALPHA
+            val requested = if (buying) 102.bi() else 203.bi()
+            val result = bindBittensorSwapSimulation(decoded, BittensorNetuid.Subnet(64), direction, requested)
+            assertEquals(if (buying) 100.bi() else 200.bi(), result.amountIn)
+            assertEquals(if (buying) 200.bi() else 100.bi(), result.amountOut)
+            assertNull(result.taoSlippage)
+            assertNull(result.alphaSlippage)
+        }
+    }
+
+    @Test
+    fun `amounts and fees remain required and validated`() {
+        val fields = mapOf("taoAmount" to 100.bi(), "alphaAmount" to 200.bi(), "taoFee" to 0.bi(), "alphaFee" to 0.bi())
+        for (field in fields.keys) {
+            assertRejected(Struct.Instance(fields - field))
+            assertRejected(Struct.Instance(fields + (field to -BigInteger.ONE)))
+            assertRejected(Struct.Instance(fields + (field to BigInteger.ONE.shiftLeft(64))))
+        }
+    }
 
     @Test
     fun `buy uses tao input and alpha output without subtracting runtime fees again`() {

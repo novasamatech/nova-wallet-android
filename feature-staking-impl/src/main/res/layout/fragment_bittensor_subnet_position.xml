@@ -6,12 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/secondary_screen_background">
+    android:background="@drawable/drawable_background_image">
 
     <io.novafoundation.nova.common.view.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:contentBackground="@android:color/transparent"
+        app:dividerVisible="false" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -93,11 +95,21 @@
                     </LinearLayout>
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/divider" />
+
                 <io.novafoundation.nova.common.view.TableView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:showBackground="false"
-                    android:layout_marginTop="12dp">
+                    app:drawDividers="true"
+                    app:childrenPaddingStart="0dp"
+                    app:childrenPaddingEnd="0dp"
+                    app:childrenPaddingTop="0dp"
+                    app:childrenPaddingBottom="0dp">
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/averagePrice"
@@ -117,10 +129,25 @@
                         android:id="@+id/earned"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="@string/bittensor_estimated_profit"
+                        app:title="@string/bittensor_exit_earned"
                         app:primaryValue="—" />
                 </io.novafoundation.nova.common.view.TableView>
             </LinearLayout>
+
+            <ProgressBar
+                android:id="@+id/withdrawalLoading"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/withdrawalHint"
+                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/positionError"
@@ -153,6 +180,14 @@
                 android:text="—"
                 android:textColor="@color/text_secondary" />
 
+            <TextView
+                android:id="@+id/chartDate"
+                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_secondary"
+                android:visibility="gone" />
+
             <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
                 android:id="@+id/chart"
                 android:layout_width="match_parent"
@@ -183,6 +218,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
+        android:background="@drawable/bg_bittensor_bottom_button_container"
         android:orientation="horizontal">
 
         <io.novafoundation.nova.common.view.PrimaryButton

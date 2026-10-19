@@ -42,7 +42,11 @@ internal fun bindBittensorPositions(decoded: Any?): BittensorStakePositions {
         if (stake.isPositive()) {
             val hotkey = bindAccountIdKey(value["hotkey"])
             when (netuid) {
-                BittensorNetuid.Root -> root += BittensorRootPosition(hotkey, stake)
+                BittensorNetuid.Root -> root += BittensorRootPosition(
+                    hotkey,
+                    stake,
+                    value.get<Any?>("isRegistered")?.let(::bindBoolean)
+                )
                 is BittensorNetuid.Subnet -> subnets += BittensorSubnetPosition(
                     netuid,
                     hotkey,

@@ -55,6 +55,13 @@ class BittensorRootClaimFragment : BaseFragment<BittensorRootClaimViewModel, Fra
         viewModel.feeCaption.observe { feeCaption.text = it }
         viewModel.amount.observe(amount::showBittensorLoadingValue)
         viewModel.forfeited.observe(forfeited::showBittensorLoadingValue)
+        viewModel.stakeAfterClaim.observe { state ->
+            stakeAfterClaim.showBittensorLoadingValue(state)
+        }
+        viewModel.disclosure.observe {
+            disclosure.text = it
+            disclosure.isVisible = it != null
+        }
         viewModel.validator.observe(validator::showBittensorLoadingValue)
         viewModel.validatorIcon.observe {
             validator.image.isVisible = it != null
@@ -72,7 +79,7 @@ class BittensorRootClaimFragment : BaseFragment<BittensorRootClaimViewModel, Fra
         bindBittensorStakeResults(
             results = viewModel.resultState,
             onDismiss = viewModel::resultDismissed,
-            onTryAgain = viewModel::confirmClicked,
+            onTryAgain = viewModel::resultDismissed,
             onViewPosition = viewModel::done,
             onDiscoverSubnets = viewModel::done
         )

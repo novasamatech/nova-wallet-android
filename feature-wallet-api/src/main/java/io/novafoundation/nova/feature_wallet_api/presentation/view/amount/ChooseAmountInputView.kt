@@ -67,6 +67,10 @@ class ChooseAmountInputView @JvmOverloads constructor(
         binder.chooseAmountInputImage.setTokenIcon(icon, imageLoader)
     }
 
+    fun setAssetIconRounded(rounded: Boolean) {
+        binder.chooseAmountInputImage.clipToOutline = rounded
+    }
+
     fun setAssetName(name: String) {
         binder.chooseAmountInputToken.text = name
     }

@@ -44,12 +44,26 @@
                 app:primaryValue="—" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/stakeAfterClaim"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/bittensor_claim_stake_after" />
+
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/validator"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:title="@string/bittensor_validator"
                 app:primaryValueEndIcon="@drawable/ic_info" />
         </io.novafoundation.nova.common.view.TableView>
+
+        <TextView
+            android:id="@+id/disclosure"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/text_secondary" />
 
         <TextView
             android:id="@+id/remaining"

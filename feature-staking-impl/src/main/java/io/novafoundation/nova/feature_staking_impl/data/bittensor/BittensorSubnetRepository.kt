@@ -14,13 +14,15 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 
 interface BittensorSubnetRepository {
 
     suspend fun subnets(): List<BittensorSubnet>
 
     suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet
+
+    suspend fun quickPickSubnets(): List<BittensorSubnet>
 }
 
 class RealBittensorSubnetRepository(
@@ -46,29 +48,33 @@ class RealBittensorSubnetRepository(
         catalogue
     }
 
-    override suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = withTimeout(20_000L) {
+    override suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = withTimeoutOrNull(20_000L) {
         val catalogue = subnets()
         val subnet = catalogue.firstOrNull { it.id == subnetId }
             ?: throw NoSuchElementException("Subnet ${subnetId.value} is unavailable")
         val price = swapSource.currentAlphaPrice(ChainGeneses.BITTENSOR, subnetId)
         subnet.copy(priceInRao = price)
-    }
+    } ?: error("Subnet details timed out")
 
-    private suspend fun loadCatalogue(): List<BittensorSubnet> = withTimeout(20_000L) {
+    override suspend fun quickPickSubnets(): List<BittensorSubnet> = withTimeoutOrNull(20_000L) {
+        loadDynamicSubnets(requireComplete = true)
+    } ?: error("Subnet quick-pick catalogue timed out")
+
+    private suspend fun loadCatalogue(): List<BittensorSubnet> = withTimeoutOrNull(20_000L) {
         coroutineScope {
-            val config = async { configRepository.config() }
+            val subnetLogos = async { configRepository.subnetLogos() }
             val subnets = loadDynamicSubnets()
-            val logos = config.await().subnetLogos
+            val logos = subnetLogos.await()
             subnets.map { it.copy(logoUrl = logos[it.id] ?: it.logoUrl) }
         }
-    }
+    } ?: error("Subnet catalogue timed out")
 
-    private suspend fun loadDynamicSubnets(): List<BittensorSubnet> = runtimeCalls.forChain(ChainGeneses.BITTENSOR)
+    private suspend fun loadDynamicSubnets(requireComplete: Boolean = false): List<BittensorSubnet> = runtimeCalls.forChain(ChainGeneses.BITTENSOR)
         .call(
             section = "SubnetInfoRuntimeApi",
             method = "get_all_dynamic_info",
             arguments = emptyMap(),
-            returnBinding = ::bindBittensorSubnets
+            returnBinding = { decoded -> bindBittensorSubnets(decoded, requireComplete) }
         )
 
     private companion object {
@@ -77,7 +83,12 @@ class RealBittensorSubnetRepository(
     }
 }
 
-internal fun bindBittensorSubnets(decoded: Any?): List<BittensorSubnet> {
+internal fun bindBittensorSubnets(decoded: Any?, requireComplete: Boolean = false): List<BittensorSubnet> {
+    if (requireComplete) {
+        val rows = bindList(decoded) { it }
+        require(rows.none { it == null }) { "Subnet catalogue is incomplete" }
+    }
+
     val subnets = bindList(decoded, ::bindBittensorSubnet)
         .filterNotNull().sortedBy { it.id.value }
 
@@ -110,6 +121,8 @@ private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
         taoReserveInPlanks = value.get<Any?>("taoIn")
             ?.let(::bindBittensorU64),
         registrationBlock = value.get<Any?>("networkRegisteredAt")
+            ?.let(::bindBittensorU64),
+        alphaReserveInPlanks = value.get<Any?>("alphaIn")
             ?.let(::bindBittensorU64)
     )
 }

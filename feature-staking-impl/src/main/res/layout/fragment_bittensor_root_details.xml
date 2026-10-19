@@ -113,24 +113,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="36dp"
-                    app:title="@string/bittensor_claim_available"
+                    app:title="@string/staking_your_rewards"
                     app:primaryValue="—"
                     app:dividerVisible="false"
                     app:titleValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                     app:primaryValueTextAppearance="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
                     app:secondaryValueTextAppearance="@style/TextAppearance.NovaFoundation.Regular.Caption1" />
-                <io.novafoundation.nova.common.view.TableCellView
-                    android:id="@+id/receivedRewards"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:title="@string/bittensor_reported_claims"
-                    app:primaryValue="—" />
-                <TextView
-                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/bittensor_reported_claims_scope"
-                    android:textColor="@color/text_secondary" />
             </LinearLayout>
 
             <io.novafoundation.nova.common.view.TableView
@@ -163,14 +151,6 @@
                     app:label="@string/bittensor_claim_action"
                     app:icon="@drawable/ic_arrow_down" />
             </io.novafoundation.nova.common.view.TableView>
-            <TextView
-                android:id="@+id/minimumClaimHint"
-                style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textColor="@color/text_secondary"
-                android:visibility="gone" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/validators"
@@ -179,13 +159,56 @@
                 android:layout_marginTop="16dp"
                 android:nestedScrollingEnabled="false"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+
+            <LinearLayout
+                android:id="@+id/rootHoldCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:text="@string/bittensor_statistics_unavailable"
-                android:textColor="@color/text_secondary" />
+                android:background="@drawable/bg_block_12"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginEnd="8dp"
+                        android:text="@string/bittensor_root_hold_title"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/holdTimeLeft"
+                        style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_warning" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="6dp"
+                        android:src="@drawable/ic_time_filled"
+                        android:importantForAccessibility="no"
+                        app:tint="@color/icon_warning" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/holdDescription"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:textColor="@color/text_secondary" />
+            </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

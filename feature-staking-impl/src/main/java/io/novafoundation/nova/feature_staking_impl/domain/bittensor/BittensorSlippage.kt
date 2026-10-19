@@ -17,8 +17,12 @@ class BittensorSlippage(val fraction: BigDecimal) {
         require(currentAlphaPrice.isPositive() && currentAlphaPrice.bitLength() <= 64) { "Alpha price must be a positive u64" }
         val buying = direction == BittensorSwapDirection.TAO_TO_ALPHA
         val multiplier = if (buying) BigDecimal.ONE + fraction else BigDecimal.ONE - fraction
-        val rounding = if (buying) RoundingMode.CEILING else RoundingMode.FLOOR
-        val limit = currentAlphaPrice.toBigDecimal().multiply(multiplier).setScale(0, rounding).toBigIntegerExact()
+        val rounding = if (buying) RoundingMode.FLOOR else RoundingMode.CEILING
+        val rounded = currentAlphaPrice.toBigDecimal()
+            .multiply(multiplier)
+            .setScale(0, rounding)
+            .toBigIntegerExact()
+        val limit = if (buying) rounded.max(currentAlphaPrice + BigInteger.ONE) else rounded.min(currentAlphaPrice - BigInteger.ONE)
 
         require(limit.isPositive() && limit.bitLength() <= 64) { "Slippage limit must be a positive u64" }
         return limit

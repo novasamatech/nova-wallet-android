@@ -88,6 +88,14 @@
                         android:ellipsize="end" />
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/chartDate"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_secondary"
+                    android:visibility="gone" />
+
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
                     android:id="@+id/priceChart"
                     android:layout_width="match_parent"
@@ -100,6 +108,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
+                    android:text="@string/bittensor_portfolio_chart_disclaimer"
                     android:textColor="@color/text_secondary" />
 
             </LinearLayout>
@@ -136,13 +145,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:background="@color/bottom_sheet_background">
+        android:background="@drawable/bg_bittensor_bottom_button_container">
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/addPosition"
             style="@style/Widget.Nova.Button.Primary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:appearance="secondary"
+            android:layout_height="52dp"
+            android:enabled="false"
             android:text="@string/bittensor_add_position" />
     </LinearLayout>
 </LinearLayout>

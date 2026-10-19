@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import coil.ImageLoader
 import coil.clear
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -79,6 +80,10 @@ class StakingDashboardNoStakeView @JvmOverloads constructor(
 
     fun setStakingTypeBadge(model: StakingTypeModel?) {
         binder.itemDashboardNoStakeStakingType.setModelOrHide(model)
+    }
+
+    fun setNewFeature(isNew: Boolean) {
+        binder.newFeature.isVisible = isNew
     }
 
     fun unbind() {

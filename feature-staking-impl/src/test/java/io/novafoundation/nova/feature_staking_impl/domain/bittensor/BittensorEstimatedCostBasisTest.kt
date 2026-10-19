@@ -37,7 +37,10 @@ class BittensorEstimatedCostBasisTest {
 
     @Test
     fun `non trade labels support separators camel case and acronyms`() {
-        val labels = listOf("move", "TRANSFER", "stake_transfer", "moveStake", "stakeTransfer", "TAOTransfer", "stake-move")
+        val labels = listOf(
+            "move", "TRANSFER", "stake_transfer", "moveStake", "stakeTransfer", "TAOTransfer", "stake-move",
+            "moved", "stakeMoved", "transferred", "STAKETransferred", " stake--transferred "
+        )
         labels.forEach { label ->
             val movement = operation("10", "100", "0.1", "1").copy(type = label)
             val ledger = BittensorEstimatedCostBasis(listOf(movement), true)
@@ -110,6 +113,59 @@ class BittensorEstimatedCostBasisTest {
             true
         )
         assertFalse(ledger.canEstimate(64))
+        assertNull(ledger.forSubnet(64))
+    }
+
+    @Test
+    fun `purchase labels disambiguate matching buy and sell prices`() {
+        for (label in listOf("addStake", "stake_added", "BUY", "bought", "TAOBought")) {
+            val purchase = operation("1", "1", "1", "1").copy(type = label)
+            val ledger = BittensorEstimatedCostBasis(listOf(purchase), true)
+
+            assertTrue(label, ledger.canEstimate(64))
+            assertEquals(label, precision, ledger.forSubnet(64)?.paidTao)
+            assertEquals(label, precision, ledger.forSubnet(64)?.receivedAlpha)
+        }
+    }
+
+    @Test
+    fun `sale labels disambiguate matching buy and sell prices`() {
+        val purchase = operation("10", "10", "1", "1").copy(type = "buy")
+        for (label in listOf("removeStake", "stake_removed", "unstake", "SELL", "sold", "TAOSold")) {
+            val sale = operation("1", "1", "1", "2").copy(type = label)
+            val ledger = BittensorEstimatedCostBasis(listOf(sale, purchase), true)
+
+            assertTrue(label, ledger.canEstimate(64))
+            assertEquals(label, precision * BigInteger.valueOf(9), ledger.forSubnet(64)?.paidTao)
+            assertEquals(label, precision * BigInteger.valueOf(9), ledger.forSubnet(64)?.receivedAlpha)
+        }
+    }
+
+    @Test
+    fun `conflicting and partial labels cannot disambiguate a trade`() {
+        for (label in listOf("buySell", "added_removed", "buyer", "reseller", "unstaked")) {
+            val trade = operation("1", "1", "1", "1").copy(type = label)
+            val ledger = BittensorEstimatedCostBasis(listOf(trade), true)
+
+            assertFalse(label, ledger.canEstimate(64))
+            assertNull(label, ledger.forSubnet(64))
+        }
+    }
+
+    @Test
+    fun `trade label cannot override an incompatible price`() {
+        val trade = operation("1", "1", "100", "1").copy(type = "buy")
+        val ledger = BittensorEstimatedCostBasis(listOf(trade), true)
+
+        assertFalse(ledger.canEstimate(64))
+    }
+
+    @Test
+    fun `non trade label takes priority over trade labels and malformed amounts`() {
+        val movement = operation("invalid", "invalid", "invalid", "1").copy(type = "stakeTransferredBuy")
+        val ledger = BittensorEstimatedCostBasis(listOf(movement), true)
+
+        assertTrue(ledger.canEstimate(64))
         assertNull(ledger.forSubnet(64))
     }
 

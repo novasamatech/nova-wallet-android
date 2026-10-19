@@ -17,6 +17,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.BittensorSubnetPositionViewModel
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -41,7 +42,11 @@ class BittensorSubnetPositionModule {
         logger: Logger,
         fiatFormatter: FiatFormatter,
         estimatesMixin: BittensorEstimatesMixin,
-        retryController: BittensorRetryController
+        retryController: BittensorRetryController,
+        withdrawalInteractor: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor,
+        withdrawalFormatter: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWithdrawalFormatter,
+        slippageSettings: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings,
+        costBasisFormatter: BittensorSaleCostBasisFormatter
     ): ViewModel =
         BittensorSubnetPositionViewModel(
             payload.subnetId(),
@@ -56,7 +61,11 @@ class BittensorSubnetPositionModule {
             logger,
             fiatFormatter,
             estimatesMixin,
-            retryController
+            retryController,
+            withdrawalInteractor,
+            withdrawalFormatter,
+            slippageSettings,
+            costBasisFormatter
         )
 
     @Provides

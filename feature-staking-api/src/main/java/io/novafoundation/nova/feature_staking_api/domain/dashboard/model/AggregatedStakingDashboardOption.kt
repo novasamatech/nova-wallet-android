@@ -12,7 +12,8 @@ class AggregatedStakingDashboardOption<out S>(
     val chain: Chain,
     val token: Token,
     val stakingState: S,
-    val syncingStage: SyncingStage
+    val syncingStage: SyncingStage,
+    val bittensorDetails: BittensorDashboardDetails? = null
 ) {
 
     class HasStake(

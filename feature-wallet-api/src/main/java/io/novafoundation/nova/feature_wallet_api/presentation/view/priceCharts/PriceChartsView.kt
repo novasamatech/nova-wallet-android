@@ -99,6 +99,8 @@ class PriceChartsView @JvmOverloads constructor(
 
     var onPriceChange: ((Float, Float) -> Unit)? = null
 
+    var selectionListener: PriceChartSelectionListener? = null
+
     var onContentVisibilityChanged: ((Boolean) -> Unit)? = null
 
     fun setSelectedPeriod(index: Int) {
@@ -132,6 +134,7 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     fun setCharts(charts: List<PriceChartModel>) {
+        selectionListener?.onSelectionChanged(null)
         val periodLabelsChanged = this.charts.map { it.buttonText } != charts.map { it.buttonText }
         this.charts = charts
 
@@ -169,6 +172,10 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     override fun onSelectEntry(startEntry: Entry, selectedEntry: Entry, isEntrySelected: Boolean) {
+        val chart = charts.getOrNull(selectedChartIndex)
+        val point = selectedEntry.data as? PriceChartModel.Chart.Price
+        val selection = PriceChartSelection.from(chart, point, isEntrySelected)
+        selectionListener?.onSelectionChanged(selection)
         onPriceChange?.invoke(startEntry.y, selectedEntry.y)
         if (presentation == Presentation.FULL) {
             priceChangeTextInjector?.format(startEntry.y, selectedEntry.y, binder.priceChartPriceChange)
@@ -212,6 +219,7 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun selectChart(index: Int) {
+        selectionListener?.onSelectionChanged(null)
         selectedChartIndex = index
 
         getButtons().forEachIndexed { i, view ->
@@ -266,6 +274,11 @@ class PriceChartsView @JvmOverloads constructor(
     }
 
     private fun PriceChartModel.Chart.asEntries() = priceChart.map {
-        Entry(it.timestamp.toFloat(), it.price.toFloat())
+        Entry(it.timestamp.toFloat(), it.price.toFloat(), it)
+    }
+
+    override fun onDetachedFromWindow() {
+        selectionListener?.onSelectionChanged(null)
+        super.onDetachedFromWindow()
     }
 }

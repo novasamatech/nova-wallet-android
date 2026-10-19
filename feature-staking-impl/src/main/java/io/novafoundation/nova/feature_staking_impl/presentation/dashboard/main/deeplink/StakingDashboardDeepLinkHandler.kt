@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_deep_linking.presentation.handling.DeepLin
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.CancellationException
 
 private const val STAKING_DASHBOARD_DEEP_LINK_PREFIX = "/open/staking"
 
@@ -20,12 +21,15 @@ class StakingDashboardDeepLinkHandler(
 
     override suspend fun matches(data: Uri): Boolean {
         val path = data.path ?: return false
-        return path.startsWith(STAKING_DASHBOARD_DEEP_LINK_PREFIX)
+        return path == STAKING_DASHBOARD_DEEP_LINK_PREFIX
     }
 
     override suspend fun handleDeepLink(data: Uri) = runCatching {
+        val target = parseStakingDeepLinkTarget(data.getQueryParameter("chainId"), data.getQueryParameter("assetId"))
         automaticInteractionGate.awaitInteractionAllowed()
 
-        stakingRouter.openStakingDashboard()
+        stakingRouter.openStakingDashboard(target)
+    }.onFailure {
+        if (it is CancellationException) throw it
     }
 }

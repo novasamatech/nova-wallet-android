@@ -8,6 +8,7 @@ import android.view.animation.LinearInterpolator
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.utils.setVisible
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.BottomSheetBittensorStakeResultBinding
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 
@@ -46,8 +47,10 @@ class BittensorStakeResultBottomSheet(
 
         binder.bittensorStakeResultProgress.setVisible(inProgress)
         binder.bittensorStakeResultSuccess.setVisible(state is BittensorStakeResultUi.Success)
-        binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure)
+        binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure || state is BittensorStakeResultUi.Unconfirmed)
+        binder.bittensorStakeResultError.isVisible = state is BittensorStakeResultUi.Failure
         binder.bittensorStakeResultValidator.isVisible = state is BittensorStakeResultUi.Success
+        binder.bittensorStakeResultAmount.isVisible = state is BittensorStakeResultUi.Success && state.amount != null
         binder.bittensorStakeResultFee.isVisible = state is BittensorStakeResultUi.Success
         (binder.bittensorStakeResultFee.parent as View).isVisible = state is BittensorStakeResultUi.Success
 
@@ -64,6 +67,7 @@ class BittensorStakeResultBottomSheet(
             is BittensorStakeResultUi.Progress -> showProgress(state)
             is BittensorStakeResultUi.Success -> showSuccess(state)
             is BittensorStakeResultUi.Failure -> showFailure(state)
+            is BittensorStakeResultUi.Unconfirmed -> showUnconfirmed(state)
         }
     }
 
@@ -80,14 +84,28 @@ class BittensorStakeResultBottomSheet(
     private fun showSuccess(state: BittensorStakeResultUi.Success) {
         binder.bittensorStakeResultSuccessTitle.text = state.title
         binder.bittensorStakeResultSuccessDescription.text = state.description
+        state.amount?.let { binder.bittensorStakeResultAmount.showValue(it.token, it.fiat) }
         binder.bittensorStakeResultValidator.showValue(state.validator)
         binder.bittensorStakeResultFee.showValue(state.fee.amount, state.fee.fiatAmount)
     }
 
     private fun showFailure(state: BittensorStakeResultUi.Failure) {
+        binder.bittensorStakeResultStatusIcon.setImageResource(R.drawable.ic_bittensor_staking_error)
+        binder.bittensorStakeResultClose.setText(R.string.common_close)
         binder.bittensorStakeResultTryAgain.isVisible = state.canRetry
         binder.bittensorStakeResultFailureTitle.text = state.title
         binder.bittensorStakeResultFailureDescription.text = state.description
         binder.bittensorStakeResultError.setMessage(state.error)
+    }
+
+    private fun showUnconfirmed(state: BittensorStakeResultUi.Unconfirmed) {
+        binder.bittensorStakeResultStatusIcon.setImageResource(R.drawable.ic_time_24)
+        binder.bittensorStakeResultClose.setText(R.string.common_done)
+        binder.bittensorStakeResultTryAgain.isVisible = false
+        binder.bittensorStakeResultFailureTitle.text = state.title
+        binder.bittensorStakeResultFailureDescription.text = listOfNotNull(
+            state.description,
+            state.transactionHash?.let { context.getString(R.string.bittensor_result_transaction_hash, it) }
+        ).joinToString("\n\n")
     }
 }

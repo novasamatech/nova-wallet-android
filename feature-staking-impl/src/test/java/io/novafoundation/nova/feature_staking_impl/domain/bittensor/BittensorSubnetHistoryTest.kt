@@ -38,4 +38,22 @@ class BittensorSubnetHistoryTest {
     }
 
     private fun point(timestamp: Long, price: String) = HistoricalCoinRate(timestamp, price.toBigDecimal())
+
+    @Test
+    fun `matches the nearest native sample including a newer sample`() {
+        val alpha = listOf(point(490, "12"))
+        val native = listOf(point(100, "2"), point(500, "4"))
+
+        val history = convertBittensorSubnetHistory(alpha, native, BittensorSubnetChartPeriod.DAY)
+
+        assertEquals(BigDecimal("3.000000000000"), history.single().tao)
+    }
+
+    @Test
+    fun `daily history never matches a native sample more than five minutes away`() {
+        val alpha = listOf(point(1000, "12"))
+
+        assertTrue(convertBittensorSubnetHistory(alpha, listOf(point(699, "4")), BittensorSubnetChartPeriod.DAY).isEmpty())
+        assertEquals(1, convertBittensorSubnetHistory(alpha, listOf(point(700, "4")), BittensorSubnetChartPeriod.DAY).size)
+    }
 }

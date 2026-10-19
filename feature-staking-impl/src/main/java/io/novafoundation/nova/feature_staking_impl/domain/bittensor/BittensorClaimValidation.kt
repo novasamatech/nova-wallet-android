@@ -12,16 +12,20 @@ data class BittensorClaimValidationPayload(
     val fee: BigInteger,
     val existentialDeposit: BigInteger,
     val coldkeySwapPending: Boolean = false,
-    val safeModeActive: Boolean = false
+    val safeModeActive: Boolean = false,
+    val uneconomicClaimAccepted: Boolean = false,
+    val claimPending: Boolean = false
 )
 
 enum class BittensorClaimValidationFailure {
+    CLAIM_PENDING,
     NOT_CLAIMABLE,
     COLDKEY_SWAP_PENDING,
     SAFE_MODE_ACTIVE,
     REWARDS_DECREASED,
     FORFEITURE_INCREASED,
-    INSUFFICIENT_FEE_BALANCE
+    INSUFFICIENT_FEE_BALANCE,
+    UNECONOMIC_CLAIM
 }
 
 typealias BittensorClaimValidation = Validation<BittensorClaimValidationPayload, BittensorClaimValidationFailure>

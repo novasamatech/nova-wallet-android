@@ -7,6 +7,8 @@ import java.io.IOException
 import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
@@ -63,12 +65,15 @@ class BittensorConfigRepositoryTest {
     }
 
     @Test
-    fun `failed request falls back and can recover on the next load`() = runBlocking {
+    fun `failed request propagates and can recover on the next load`() = runBlocking {
         val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
-        api.failure = IOException("Unavailable")
+        val unavailable = IOException("Unavailable")
+        api.failure = unavailable
         val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
 
-        assertEquals(BigDecimal("0.003"), repository.config().commission.fraction)
+        val failure = runCatching { repository.config() }.exceptionOrNull()
+        assertTrue(failure is IOException)
+        assertEquals(unavailable.message, failure?.message)
         api.failure = null
         assertEquals(BigDecimal("0.004"), repository.config().commission.fraction)
         assertEquals(2, api.urls.size)
@@ -92,11 +97,13 @@ class BittensorConfigRepositoryTest {
     }
 
     @Test
-    fun `invalid field types trigger fallback and do not poison the config cache`() = runBlocking {
+    fun `config decode failures propagate and do not poison the config cache`() = runBlocking {
         val malformedResponses = listOf(
-            """{"swapFee":{},"subnets":[]}""",
-            """{"swapFee":true,"subnets":[]}""",
-            """{"swapFee":"invalid","subnets":[]}""",
+            """{"swapFee":0.004}""",
+            """{"swapFee":0.004,"subnets":null}""",
+            """{"swapFee":0.004,"subnets":[""",
+            "null",
+            "[]",
             """{"swapFee":0.004,"subnets":{}}""",
             """{"swapFee":0.004,"subnets":[123]}""",
             """{"swapFee":0.004,"subnets":[{"netuid":1,"logo":{}}]}"""
@@ -105,11 +112,77 @@ class BittensorConfigRepositoryTest {
             val api = Api(gson, response)
             val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
 
-            assertEquals(BigDecimal("0.003"), repository.config().commission.fraction)
+            assertTrue(response, runCatching { repository.config() }.isFailure)
             api.json = """{"swapFee":0.004,"subnets":[]}"""
             assertEquals(BigDecimal("0.004"), repository.config().commission.fraction)
             assertEquals(2, api.urls.size)
         }
+    }
+
+    @Test
+    fun `invalid fee field alone defaults after successful config decoding`() = runBlocking {
+        for (fee in listOf("{}", "[]", "true", "\"invalid\"", "null", "-0.1", "1", "2")) {
+            val api = Api(gson, """{"swapFee":$fee,"subnets":[{"netuid":1,"logo":"https://logos.test/1.png"}]}""")
+            val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+            val config = repository.config()
+
+            assertEquals(BigDecimal("0.003"), config.commission.fraction)
+            assertEquals(mapOf(BittensorNetuid.Subnet(1) to "https://logos.test/1.png"), config.subnetLogos)
+            assertSame(config, repository.config())
+            assertEquals(1, api.urls.size)
+        }
+    }
+
+    @Test
+    fun `logo fallback does not mask commission failure or cache a default`() = runBlocking {
+        val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
+        val unavailable = IOException("Unavailable")
+        api.failure = unavailable
+        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+        assertTrue(repository.subnetLogos().isEmpty())
+        val failure = runCatching { repository.config() }.exceptionOrNull()
+        assertTrue(failure is IOException)
+        assertEquals(unavailable.message, failure?.message)
+        api.failure = null
+        assertEquals(BigDecimal("0.004"), repository.config().commission.fraction)
+        assertEquals(3, api.urls.size)
+    }
+
+    @Test
+    fun `logo fallback preserves decode failure for fee consumers`() = runBlocking {
+        val api = Api(gson, """{"swapFee":0.004,"subnets":{}}""")
+        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+        assertTrue(repository.subnetLogos().isEmpty())
+        assertTrue(runCatching { repository.config() }.isFailure)
+    }
+
+    @Test
+    fun `logo loading propagates caller cancellation`() = runBlocking {
+        val api = Api(gson, """{"subnets":[]}""")
+        val cancellation = CancellationException("Screen closed")
+        api.failure = cancellation
+        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+        val failure = runCatching { repository.subnetLogos() }.exceptionOrNull()
+
+        assertTrue(failure is CancellationException)
+        assertEquals(cancellation.message, failure?.message)
+    }
+
+    @Test
+    fun `config timeout fails while optional logos fall back and next request recovers`() = runTest {
+        val api = Api(gson, """{"swapFee":0.004,"subnets":[]}""")
+        api.delayMillis = 15_001L
+        val repository = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+
+        assertTrue(runCatching { repository.config() }.exceptionOrNull() is IOException)
+        assertTrue(repository.subnetLogos().isEmpty())
+        api.delayMillis = 0L
+        assertEquals(BigDecimal("0.004"), repository.config().commission.fraction)
+        assertEquals(3, api.urls.size)
     }
 
     private fun document(json: String): BittensorConfigRemote = gson.fromJson(json, BittensorConfigRemote::class.java)
@@ -120,8 +193,11 @@ class BittensorConfigRepositoryTest {
 
         var failure: Exception? = null
 
+        var delayMillis = 0L
+
         override suspend fun config(url: String): BittensorConfigRemote {
             urls += url
+            delay(delayMillis)
             failure?.let { throw it }
             return gson.fromJson(json, BittensorConfigRemote::class.java)
         }

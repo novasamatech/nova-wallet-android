@@ -32,7 +32,7 @@ class RealBittensorStakePreflightRepository(
         hotkey: AccountId
     ): BittensorStakePreflight {
         val blockHash = rpc.getBlockHash(chainId)
-        return storage.query(chainId, at = blockHash) {
+        return storage.query(chainId, at = blockHash, applyStorageDefault = false) {
             loadPreflight(netuid, coldKey, hotkey)
         }
     }

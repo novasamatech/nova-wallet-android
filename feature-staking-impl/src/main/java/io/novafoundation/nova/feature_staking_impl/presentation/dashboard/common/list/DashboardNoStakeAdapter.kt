@@ -72,6 +72,7 @@ class DashboardNoStakeViewHolder(
 
     fun bindStakingType(model: NoStakeItem) {
         containerView.setStakingTypeBadge(model.stakingTypeBadge)
+        containerView.setNewFeature(model.isNew)
     }
 
     fun bindAssetIcon(model: NoStakeItem) {

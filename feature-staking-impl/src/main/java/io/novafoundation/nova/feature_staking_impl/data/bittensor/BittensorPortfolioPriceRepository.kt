@@ -1,0 +1,99 @@
+package io.novafoundation.nova.feature_staking_impl.data.bittensor
+
+import io.novafoundation.nova.common.utils.isNonNegative
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
+import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
+import io.novafoundation.nova.infrastructure.InfrastructureUrls
+import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
+import io.novasama.substrate_sdk_android.hash.isPositive
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigInteger
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withTimeout
+import retrofit2.HttpException
+
+interface BittensorPortfolioPriceRepository {
+
+    suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger>
+}
+
+class RealBittensorPortfolioPriceRepository(
+    private val api: BittensorSubnetCatalogueApi,
+    private val infrastructureUrls: InfrastructureUrls,
+    private val runtimePrices: BittensorRuntimePriceSource,
+    private val logger: Logger
+) : BittensorPortfolioPriceRepository {
+
+    override suspend fun prices(chainId: ChainId, heldSubnets: Set<BittensorNetuid.Subnet>): Map<BittensorNetuid.Subnet, BigInteger> {
+        if (heldSubnets.isEmpty()) return emptyMap()
+        val backend = loadPrices("backend") { backendPrices() }
+            .filterKeys { it in heldSubnets }
+        val missing = heldSubnets - backend.keys
+        if (missing.isEmpty()) return backend
+
+        val fallback = loadPrices("runtime") { runtimePrices.prices(chainId) }
+            .filterKeys { it in missing }
+        return backend + fallback
+    }
+
+    private suspend fun backendPrices(): Map<BittensorNetuid.Subnet, BigInteger> {
+        val baseUrl = infrastructureUrls.baseUrl() ?: throw InfrastructureUrlMissingException()
+        require(baseUrl.isHttps) { "Infrastructure requires HTTPS" }
+        val url = requireNotNull(baseUrl.resolve("/v1/bittensor/subnets"))
+        val response = api.subnets(url.toString())
+        if (!response.isSuccessful) throw HttpException(response)
+
+        return mapBittensorPortfolioPrices(requireNotNull(response.body()))
+    }
+
+    private suspend fun loadPrices(
+        source: String,
+        load: suspend () -> Map<BittensorNetuid.Subnet, BigInteger>
+    ): Map<BittensorNetuid.Subnet, BigInteger> = try {
+        withTimeout(SOURCE_TIMEOUT_MILLIS) { load() }
+    } catch (e: TimeoutCancellationException) {
+        currentCoroutineContext().ensureActive()
+        logFailure(source, e)
+        emptyMap()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        logFailure(source, e)
+        emptyMap()
+    }
+
+    private fun logFailure(source: String, cause: Throwable) {
+        logger.log("[BittensorPortfolio] Failed to load $source prices")
+        logger.log(cause)
+    }
+
+    private companion object {
+        const val SOURCE_TIMEOUT_MILLIS = 20_000L
+    }
+}
+
+internal fun mapBittensorPortfolioPrices(response: BittensorSubnetCatalogueRemote): Map<BittensorNetuid.Subnet, BigInteger> {
+    val component = requireNotNull(response.meta?.components?.alphaPrices)
+    require(component.availability == "AVAILABLE" && component.freshness == "FRESH") { "Portfolio prices are unavailable or stale" }
+    val subnets = requireNotNull(response.items)
+    val seenSubnets = mutableSetOf<BittensorNetuid.Subnet>()
+
+    return buildMap {
+        for (subnet in subnets) {
+            val netuid = BittensorNetuid.from(requireNotNull(subnet.netuid))
+            if (netuid !is BittensorNetuid.Subnet || !seenSubnets.add(netuid)) continue
+
+            val reportedPrice = subnet.taoPerAlpha ?: continue
+            val price = reportedPrice
+                .toBigDecimal()
+                .multiply(BittensorProtocolUnits.RAO_PER_TAO.toBigDecimal())
+                .toBigIntegerExact()
+            require(price.isNonNegative) { "Negative subnet price" }
+            if (price.isPositive()) put(netuid, price)
+        }
+    }
+}

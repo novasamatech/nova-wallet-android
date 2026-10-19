@@ -62,7 +62,7 @@ class BittensorStakeConfirmFragment : BaseFragment<BittensorStakeConfirmViewMode
         bindBittensorStakeResults(
             results = viewModel.resultState,
             onDismiss = viewModel::resultDismissed,
-            onTryAgain = viewModel::confirmClicked,
+            onTryAgain = viewModel::resultDismissed,
             onViewPosition = viewModel::viewPositionClicked
         )
     }

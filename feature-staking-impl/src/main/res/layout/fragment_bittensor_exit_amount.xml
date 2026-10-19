@@ -12,6 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:iconRight="@drawable/ic_settings_outline"
         app:dividerVisible="false" />
 
     <ScrollView
@@ -81,6 +82,14 @@
                     app:title="@string/network_fee"
                     app:shouldDrawDivider="false" />
             </io.novafoundation.nova.common.view.TableView>
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/saleFeeWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:alertMode="warning" />
 
             <TextView
                 android:id="@+id/caption"

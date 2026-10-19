@@ -12,6 +12,19 @@ import org.junit.Test
 class BittensorSubmissionStateTest {
 
     @Test
+    fun `unconfirmed with or without hash cannot retry even after dismissal`() {
+        listOf("hash", null).forEach { hash ->
+            val model = BittensorStakeResultUi.Unconfirmed("Unconfirmed", "Check activity", hash)
+            val state = BittensorSubmissionState.Unconfirmed(hash, model)
+            assertFalse(state.canSubmit)
+            val dismissed = state.dismissResult() as BittensorSubmissionState.Unconfirmed
+            assertFalse(dismissed.canSubmit)
+            assertNull(dismissed.result)
+            org.junit.Assert.assertEquals(hash, dismissed.hash)
+        }
+    }
+
+    @Test
     fun `closing success does not allow the confirmed operation to be submitted again`() {
         val success = BittensorStakeResultUi.Success("Done", "", "Validator", BittensorFeeUi("1", ""))
         val completed = BittensorSubmissionState.Completed(success).dismissResult()

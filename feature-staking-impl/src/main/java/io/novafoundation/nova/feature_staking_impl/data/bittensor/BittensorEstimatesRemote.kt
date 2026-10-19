@@ -15,7 +15,11 @@ class BittensorAlphaYieldsRemote(
     class Components(val alphaYield: BittensorRecommendationsRemote.Component?)
 }
 
-class BittensorHistoryPageInfo(val page: Int?, val nextPage: Int?)
+class BittensorHistoryPageInfo(
+    val page: Int?,
+    val nextPage: Int?,
+    val pageSize: Int?
+)
 
 class BittensorOperationsRemote(
     val items: List<Item>?,

@@ -37,3 +37,9 @@ data class BittensorSubnetValidator(
     val selectable: Boolean,
     val recommended: Boolean = false
 )
+
+internal fun initialBittensorValidatorAddress(selectedAddress: String?, validators: List<BittensorSubnetValidator>): String? {
+    if (selectedAddress != null) return selectedAddress
+    return validators.firstOrNull { it.selectable && it.recommended }?.address
+        ?: validators.firstOrNull { it.selectable }?.address
+}

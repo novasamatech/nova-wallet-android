@@ -37,6 +37,11 @@
             android:textColor="@color/text_secondary"
             android:maxLines="1"
             android:ellipsize="end" />
+        <ProgressBar
+            android:id="@+id/positionSubtitleProgress"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
@@ -56,6 +61,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/text_secondary" />
+        <TextView
+            android:id="@+id/positionChange"
+            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <ProgressBar
+            android:id="@+id/positionChangeProgress"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <ProgressBar

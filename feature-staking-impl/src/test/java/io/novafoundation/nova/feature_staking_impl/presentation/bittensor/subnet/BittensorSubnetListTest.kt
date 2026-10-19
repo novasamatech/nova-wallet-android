@@ -14,33 +14,33 @@ class BittensorSubnetListTest {
     private val symbol = TokenSymbol("TEST")
 
     @Test
-    fun `root and subnet sections belong to one ordered list`() {
+    fun `root and subnet rows belong to one list without group headers`() {
         val row = row(5)
         assertEquals(
-            listOf(BittensorSubnetGroup.ROOT, BittensorSubnetListItem.Root(icon, symbol), BittensorSubnetGroup.SUBNETS, BittensorSubnetListItem.Subnet(row)),
-            bittensorSubnetList(icon, listOf(row), symbol)
+            listOf(BittensorSubnetListItem.Root(icon), BittensorSubnetListItem.Subnet(row)),
+            bittensorSubnetList(icon, listOf(row))
         )
     }
 
     @Test
     fun `empty subnet search keeps root entry in the list`() {
         assertEquals(
-            listOf(BittensorSubnetGroup.ROOT, BittensorSubnetListItem.Root(icon, symbol), BittensorSubnetGroup.SUBNETS),
-            bittensorSubnetList(icon, emptyList(), symbol)
+            listOf(BittensorSubnetListItem.Root(icon)),
+            bittensorSubnetList(icon, emptyList())
         )
     }
 
     @Test
     fun `grouping preserves the sorted subnet rows and wallet identity`() {
         val rows = listOf(row(9), row(1))
-        assertEquals(rows, bittensorSubnetList(icon, rows, symbol).filterIsInstance<BittensorSubnetListItem.Subnet>().map { it.row })
+        assertEquals(rows, bittensorSubnetList(icon, rows).filterIsInstance<BittensorSubnetListItem.Subnet>().map { it.row })
     }
 
     @Test
-    fun `root entry carries the supplied asset symbol`() {
-        val root = bittensorSubnetList(icon, emptyList(), symbol).filterIsInstance<BittensorSubnetListItem.Root>().single()
+    fun `root entry is available before native asset or subnet metadata`() {
+        val root = bittensorSubnetList(icon, emptyList()).filterIsInstance<BittensorSubnetListItem.Root>().single()
 
-        assertEquals(symbol, root.tokenSymbol)
+        assertEquals(icon, root.icon)
     }
 
     private fun row(id: Int) = BittensorSubnetRowUi(

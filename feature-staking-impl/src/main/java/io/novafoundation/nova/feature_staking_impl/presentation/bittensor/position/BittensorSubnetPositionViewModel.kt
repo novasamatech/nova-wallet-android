@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position
 
+import io.novasama.substrate_sdk_android.extensions.toHexString
+
 import androidx.lifecycle.MutableLiveData
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -13,6 +15,8 @@ import io.novafoundation.nova.common.utils.Event
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.event
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
@@ -26,6 +30,11 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDat
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimateContext
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorWithdrawalRequest
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorWithdrawalFormatter
+import kotlinx.coroutines.flow.distinctUntilChanged
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartPeriod
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -36,6 +45,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAction
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -47,6 +57,9 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.hash.isPositive
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelection
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.formatters.RealDateChartTextInjector
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorChartChangeTextInjector
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
@@ -74,8 +87,16 @@ class BittensorSubnetPositionViewModel(
     private val logger: Logger,
     private val fiatFormatter: FiatFormatter,
     estimatesMixin: BittensorEstimatesMixin,
-    private val retryController: BittensorRetryController
+    private val retryController: BittensorRetryController,
+    private val withdrawalInteractor: BittensorPositionWithdrawalInteractor,
+    private val withdrawalFormatter: BittensorWithdrawalFormatter,
+    slippageSettings: BittensorSlippageSettings,
+    private val costBasisFormatter: BittensorSaleCostBasisFormatter
 ) : BaseViewModel(), ExternalActions by externalActions {
+
+    private val chartSelection = MutableStateFlow<PriceChartSelection?>(null)
+
+    val chartDateFormatter = RealDateChartTextInjector(resources)
 
     val retryEvents = retryController.events
 
@@ -121,6 +142,33 @@ class BittensorSubnetPositionViewModel(
     }
         .shareInBackground()
 
+    private val withdrawalState = combine(portfolio, held, slippageSettings.observe()) { data, positions, slippage ->
+        val primary = positions.sortedBy { it.validatorHotkey.value.toHexString() }.maxByOrNull { it.alphaInPlanks }
+        if (data == null || data.dataStatus !is BittensorDataStatus.Fresh || primary == null) {
+            null
+        } else {
+            BittensorWithdrawalRequest(data.metaId, data.chain.id, subnetId, primary.validatorHotkey, slippage)
+        }
+    }.distinctUntilChanged().flatMapLatest { request ->
+        retryController.observe(
+            step = "subnet withdrawal availability",
+            transform = { it.withSafeLoading() }
+        ) {
+            if (request == null) kotlinx.coroutines.flow.flowOf(null) else withdrawalInteractor.observe(request)
+        }
+    }.shareInBackground()
+
+    val withdrawalLoading = withdrawalState.map { it.isLoading() }.shareInBackground()
+
+    val withdrawalHint = combine(withdrawalState, subnet) { state, subnet ->
+        val withdrawal = state.dataOrNull ?: return@combine null
+        val symbol = subnet?.symbol?.takeIf { it.isNotBlank() } ?: return@combine null
+        withdrawalFormatter.format(withdrawal, BittensorProtocolUnits.ALPHA_PRECISION, TokenSymbol(symbol))
+    }.shareInBackground()
+
+    val canSell = combine(canAct, withdrawalState) { allowed, state -> allowed && state.dataOrNull?.canWithdraw == true }
+        .shareInBackground()
+
     private val costBasisState = estimatesMixin.observeCostBasis(
         portfolio.map { it?.let { BittensorEstimateContext(it.metaId, it.chain) } }
     )
@@ -147,29 +195,35 @@ class BittensorSubnetPositionViewModel(
 
     val price = combine(
         subnet,
-        chartAssetState
-    ) { subnet, assetState ->
+        chartAssetState,
+        chartSelection
+    ) { subnet, assetState, selection ->
         val asset = assetState.dataOrNull
-        if (subnet?.priceInRao == null || asset == null) {
+        val price = selection?.point?.price ?: subnet?.priceInRao?.let { asset?.token?.amountFromPlanks(it) }
+        if (price == null || asset == null) {
             "—"
         } else {
-            tokenFormatter.formatToken(asset.token.amountFromPlanks(subnet.priceInRao), asset.token.configuration.symbol)
+            tokenFormatter.formatToken(price, asset.token.configuration.symbol)
         }
     }
         .shareInBackground()
 
     val averagePrice = combine(
         costBasisState,
-        chartAssetState
-    ) { state, assetState ->
+        chartAssetState,
+        subnet
+    ) { state, assetState, subnet ->
         state.map { basis ->
             val average = basis?.forSubnet(subnetId.value)
                 ?.averagePrice
             val asset = assetState.dataOrNull
             when {
-                average != null && asset != null -> "≈ " + tokenFormatter.formatToken(average, asset.token.configuration.symbol)
-                basis?.canEstimate(subnetId.value) == true -> resources.getString(R.string.common_not_available)
-                else -> "—"
+                average != null && asset != null -> AmountModel(
+                    tokenFormatter.formatToken(average, asset.token.configuration.symbol),
+                    subnet?.symbol?.takeIf { it.isNotBlank() }?.let { resources.getString(R.string.bittensor_avg_buy_price_per, it) }
+                )
+                basis?.canEstimate(subnetId.value) == true -> AmountModel(resources.getString(R.string.common_not_available), null)
+                else -> AmountModel("—", null)
             }
         }
     }
@@ -184,12 +238,12 @@ class BittensorSubnetPositionViewModel(
             val totals = basis?.forSubnet(subnetId.value)
             val worth = data?.positions?.subnetStake(subnetId)
             if (totals == null || worth == null) {
-                "—"
+                costBasisFormatter.profit(null, null)
             } else {
                 val alpha = positions.fold(BigInteger.ZERO) { sum, position -> sum + position.alphaInPlanks }
-                "≈ " + tokenFormatter.formatToken(
+                costBasisFormatter.profit(
                     data.asset.token.amountFromPlanks(totals.estimatedProfit(alpha, worth)),
-                    data.asset.token.configuration.symbol
+                    data.asset.token
                 )
             }
         }
@@ -237,19 +291,20 @@ class BittensorSubnetPositionViewModel(
         } else {
             held.map { position ->
                 val address = data.chain.addressOf(position.validatorHotkey.value)
+                val annualYield = yields.dataOrNull?.get(position.validatorHotkey)
                 BittensorPositionUi(
                     address,
                     address.take(6) + "…" + address.takeLast(6),
                     resources.getString(R.string.bittensor_validator),
                     AmountModel(
-                        yields.dataOrNull?.get(position.validatorHotkey)
-                            ?.let { "≈ ${it.stripTrailingZeros().toPlainString()}%" } ?: "",
-                        resources.getString(R.string.bittensor_apy)
+                        annualYield?.formatAsPercentage() ?: "",
+                        resources.getString(R.string.bittensor_estimated_apy)
                     ),
                     Icon.FromDrawable(addressIconGenerator.createAddressIcon(position.validatorHotkey.value, 32)),
                     BittensorPositionAction.ValidatorDetails(address),
                     32,
-                    isAmountLoading = yields is ExtendedLoadingState.Loading
+                    isAmountLoading = yields is ExtendedLoadingState.Loading,
+                    amountColorRes = bittensorYieldColor(annualYield)
                 )
             }
         }
@@ -257,6 +312,9 @@ class BittensorSubnetPositionViewModel(
         .shareInBackground()
 
     private val period = MutableStateFlow(BittensorSubnetChartPeriod.WEEK)
+
+    val priceChangeFormatter = period.map { BittensorChartChangeTextInjector(resources.getString(it.labelRes())) }
+        .shareInBackground()
 
     private data class ChartRequest(val asset: Asset?, val period: BittensorSubnetChartPeriod)
 
@@ -349,7 +407,16 @@ class BittensorSubnetPositionViewModel(
         }
     }
 
-    fun sellClicked() = choose(BittensorPositionTradeAction.SELL)
+    fun sellClicked() = launchUnit {
+        if (!canSell.first()) return@launchUnit
+        val data = portfolio.first() ?: return@launchUnit
+        val primary = held.first()
+            .sortedBy { it.validatorHotkey.value.toHexString() }
+            .sortedByDescending { it.alphaInPlanks }
+            .firstOrNull() ?: return@launchUnit
+        val address = data.chain.addressOf(primary.validatorHotkey.value)
+        router.openBittensorExitAmount(BittensorExitPositionPayload(data.metaId, subnetId.value, address))
+    }
 
     fun buyClicked() = choose(BittensorPositionTradeAction.BUY)
 
@@ -366,6 +433,7 @@ class BittensorSubnetPositionViewModel(
 
     fun selectPosition(action: BittensorPositionTradeAction, payload: BittensorExitPositionPayload) = launchUnit {
         if (!canAct.first()) return@launchUnit
+        if (action == BittensorPositionTradeAction.SELL && !canSell.first()) return@launchUnit
         val data = portfolio.first() ?: return@launchUnit
         if (data.metaId != payload.metaId) return@launchUnit
 
@@ -392,7 +460,12 @@ class BittensorSubnetPositionViewModel(
             ?.let { externalActions.showAddressActions(row.id, it.chain) }
     }
 
+    fun selectChartPoint(selection: PriceChartSelection?) {
+        chartSelection.value = selection
+    }
+
     fun selectPeriod(index: Int) {
+        chartSelection.value = null
         BittensorSubnetChartPeriod.entries.getOrNull(index)
             ?.let { period.value = it }
     }

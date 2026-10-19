@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdI
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootValidatorDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.runtime.ext.ChainGeneses
@@ -31,9 +32,13 @@ interface BittensorStakingRepository {
     fun observeRootStakingDetails(): Flow<BittensorRootStakingDetails>
 
     fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails>
+
+    fun observeRootAccountDetails(metaId: Long): Flow<BittensorRootStakingDetails>
 }
 
 interface BittensorRootValidatorSource {
+
+    suspend fun validatorDetails(chain: Chain): Map<AccountIdKey, BittensorRootValidatorDetails>
 
     suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator?
 
@@ -58,14 +63,20 @@ class RealBittensorStakingRepository(
     override fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails> =
         observeRootStakingDetails(accountRepository.metaAccountFlow(metaId))
 
-    private fun observeRootStakingDetails(accounts: Flow<MetaAccount>): Flow<BittensorRootStakingDetails> = flowOfAll {
+    override fun observeRootAccountDetails(metaId: Long): Flow<BittensorRootStakingDetails> =
+        observeRootStakingDetails(accountRepository.metaAccountFlow(metaId), selectDefault = false)
+
+    private fun observeRootStakingDetails(
+        accounts: Flow<MetaAccount>,
+        selectDefault: Boolean = true
+    ): Flow<BittensorRootStakingDetails> = flowOfAll {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
 
         accounts
             .flatMapLatest { metaAccount ->
                 combine(
                     walletRepository.assetFlow(metaAccount.id, chain.utilityAsset),
-                    observePosition(chain, metaAccount.requireAccountIdIn(chain))
+                    observePosition(chain, metaAccount.requireAccountIdIn(chain), selectDefault)
                 ) { asset, position ->
                     BittensorRootStakingDetails(
                         metaId = metaAccount.id,
@@ -81,10 +92,13 @@ class RealBittensorStakingRepository(
             }
     }
 
-    private fun observePosition(chain: Chain, coldKey: AccountId): Flow<PositionState> = flowOfAll {
+    private fun observePosition(chain: Chain, coldKey: AccountId, selectDefault: Boolean): Flow<PositionState> = flowOfAll {
         var defaultValidatorSelection: DefaultValidatorSelection? = null
-        positionRepository.observePositions(chain.id, coldKey).filter { it.status !is BittensorDataStatus.Loading }
+        positionRepository.observePositions(chain.id, coldKey).filter { !selectDefault || it.status !is BittensorDataStatus.Loading }
             .map { positionsState ->
+                if (!selectDefault) {
+                    return@map PositionState(positionsState.status, null, positionsState.positions?.root.orEmpty(), null)
+                }
                 val validator = try {
                     val selection = selectDefaultValidator(chain, positionsState.positions?.root.orEmpty(), defaultValidatorSelection)
                     defaultValidatorSelection = selection

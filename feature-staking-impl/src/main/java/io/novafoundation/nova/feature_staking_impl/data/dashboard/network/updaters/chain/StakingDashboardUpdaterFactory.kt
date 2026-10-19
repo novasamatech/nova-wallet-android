@@ -5,6 +5,7 @@ import io.novafoundation.nova.core.updater.GlobalScopeUpdater
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.updaters.MultiChainOffChainSyncResult
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
@@ -14,6 +15,7 @@ import io.novafoundation.nova.runtime.ext.group
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.flow.Flow
 
 class StakingDashboardUpdaterFactory(
@@ -24,6 +26,8 @@ class StakingDashboardUpdaterFactory(
     private val storageCache: StorageCache,
     private val balanceLocksRepository: BalanceLocksRepository,
     private val bittensorPositionRepository: BittensorPositionRepository,
+    private val bittensorRootClaims: BittensorRootClaimSource,
+    private val logger: Logger,
 ) {
 
     fun createUpdater(
@@ -42,7 +46,9 @@ class StakingDashboardUpdaterFactory(
                 chain.utilityAsset,
                 metaAccount,
                 bittensorPositionRepository,
-                stakingDashboardCache
+                stakingDashboardCache,
+                bittensorRootClaims,
+                logger
             )
             StakingTypeGroup.UNSUPPORTED -> null
         }

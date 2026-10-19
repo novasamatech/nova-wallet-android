@@ -8,7 +8,8 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.ExternalBalance
 
 fun mapBalanceIdToUi(resourceManager: ResourceManager, id: String): String {
     return when (id.trim()) {
-        "staking" -> resourceManager.getString(R.string.assets_balance_details_locks_staking)
+        "staking",
+        BalanceBreakdownIds.BITTENSOR -> resourceManager.getString(R.string.assets_balance_details_locks_staking)
         "democrac" -> resourceManager.getString(R.string.assets_balance_details_locks_democrac_v1)
         "pyconvot" -> resourceManager.getString(R.string.assets_balance_details_locks_democrac_v2)
         "vesting" -> resourceManager.getString(R.string.assets_balance_details_locks_vesting)
@@ -25,4 +26,5 @@ val ExternalBalance.Type.balanceId: String
     get() = when (this) {
         ExternalBalance.Type.CROWDLOAN -> BalanceBreakdownIds.CROWDLOAN
         ExternalBalance.Type.NOMINATION_POOL -> BalanceBreakdownIds.NOMINATION_POOL
+        ExternalBalance.Type.BITTENSOR -> BalanceBreakdownIds.BITTENSOR
     }

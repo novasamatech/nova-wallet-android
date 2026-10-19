@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="12dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/nativeShare"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="12dp"
+            app:title="@string/bittensor_native_pool"
+            app:primaryValue="—" />
+
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/alphaShare"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:title="@string/bittensor_alpha_pool"
+            app:primaryValue="—" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/bars"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <View
+            android:id="@+id/nativeBar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+
+        <Space
+            android:id="@+id/gap"
+            android:layout_width="6dp"
+            android:layout_height="match_parent" />
+
+        <View
+            android:id="@+id/alphaBar"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+</LinearLayout>

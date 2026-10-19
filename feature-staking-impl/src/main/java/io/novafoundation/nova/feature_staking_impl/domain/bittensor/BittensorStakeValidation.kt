@@ -15,7 +15,6 @@ data class BittensorStakeValidationPayload(
     val preflight: BittensorStakePreflight,
     val quote: BittensorSubnetBuyQuote?,
     val netuid: BittensorNetuid,
-    val checkRootHold: Boolean,
     val priceImpactAccepted: Boolean,
     val checkedAtMillis: Long,
     val latestQuote: BittensorSubnetBuyQuote? = null
@@ -28,7 +27,6 @@ enum class BittensorStakeValidationFailure {
     BELOW_MINIMUM_STAKE,
     HOTKEY_NOT_REGISTERED,
     SUBNET_STAKING_DISABLED,
-    ROOT_STAKE_LOCKED,
     COLDKEY_SWAP_PENDING,
     SAFE_MODE_ACTIVE,
     QUOTE_UNAVAILABLE,

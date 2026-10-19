@@ -1,8 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.utils.images.setIcon
@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorRootDetailsBinding
 import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingAmount
 
 class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel, FragmentBittensorRootDetailsBinding>() {
 
@@ -40,6 +41,7 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
         unstake.setBadge(null)
         unstake.setOnClickListener { viewModel.unstakeRoot() }
         validators.adapter = adapter
+        rewards.valueSecondary.setTextColorRes(R.color.text_secondary)
     }
 
     override fun subscribe(viewModel: BittensorRootDetailsViewModel) = with(binder) {
@@ -51,24 +53,29 @@ class BittensorRootDetailsFragment : BaseFragment<BittensorRootDetailsViewModel,
             stakeFiat.isVisible = !it
         }
         viewModel.canAddStake.observe {
-            unstake.isEnabled = it
-            unstake.alpha = if (it) 1f else 0.48f
             addStake.isEnabled = it
             addStake.alpha = if (it) 1f else 0.48f
         }
-        viewModel.canClaim.observe { claim.isEnabled = it; claim.alpha = if (it) 1f else 0.48f }
-        viewModel.minimumClaimHint.observe {
-            minimumClaimHint.text = it
-            minimumClaimHint.isVisible = it != null
+        viewModel.canUnstake.observe {
+            unstake.isEnabled = it
+            unstake.alpha = if (it) 1f else 0.48f
         }
-        viewModel.receivedRootRewards.observe(receivedRewards::showBittensorLoadingValue)
-        viewModel.claimableRewards.observe(rewards::showBittensorLoadingAmount)
+        viewModel.rootHold.observe { hold ->
+            rootHoldCard.isVisible = hold != null
+            holdTimeLeft.text = hold?.timeLeft
+            holdDescription.text = hold?.description
+        }
+        viewModel.canClaim.observe { canClaim ->
+            claim.isEnabled = canClaim
+            claim.alpha = if (canClaim) 1f else 0.48f
+        }
+        viewModel.redeemableRewards.observe(rewards::showBittensorLoadingAmount)
         viewModel.rootStake.observe {
             stakeAmount.text = it.token
             stakeFiat.text = it.fiat
         }
         viewModel.assetIcon.observe { assetIcon.setIcon(it, imageLoader) }
-        viewModel.hasRootStake.observe { activeStatus.isVisible = it }
+        viewModel.isActive.observe { activeStatus.isVisible = it }
         viewModel.validators.observe(adapter::submitList)
         viewModel.warning.observe {
             warning.text = it

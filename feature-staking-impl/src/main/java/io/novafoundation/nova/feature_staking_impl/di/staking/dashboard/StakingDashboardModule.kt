@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_staking_api.data.dashboard.StakingDashboar
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_staking_api.domain.dashboard.StakingDashboardInteractor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionRepository
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.RealStakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.network.stats.RealStakingStatsDataSource
@@ -25,6 +26,7 @@ import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.Rea
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.StakingDashboardRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.repository.TotalStakeChainComparatorProvider
 import io.novafoundation.nova.feature_staking_impl.data.nominationPools.repository.NominationPoolStateRepository
+import io.novafoundation.nova.feature_staking_impl.domain.dashboard.BittensorDashboardDetailsSource
 import io.novafoundation.nova.feature_staking_impl.domain.dashboard.RealStakingDashboardInteractor
 import io.novafoundation.nova.feature_wallet_api.data.repository.BalanceLocksRepository
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
@@ -32,6 +34,7 @@ import io.novafoundation.nova.runtime.di.REMOTE_STORAGE_SOURCE
 import io.novafoundation.nova.runtime.ethereum.StorageSharedRequestsBuilderFactory
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import javax.inject.Named
 
 @Module
@@ -73,6 +76,8 @@ class StakingDashboardModule {
         storageCache: StorageCache,
         balanceLocksRepository: BalanceLocksRepository,
         bittensorPositionRepository: BittensorPositionRepository,
+        bittensorRootClaims: BittensorRootClaimSource,
+        logger: Logger,
     ) = StakingDashboardUpdaterFactory(
         stakingDashboardCache = stakingDashboardCache,
         remoteStorageSource = remoteStorageSource,
@@ -80,7 +85,9 @@ class StakingDashboardModule {
         poolAccountDerivation = poolAccountDerivation,
         storageCache = storageCache,
         balanceLocksRepository = balanceLocksRepository,
-        bittensorPositionRepository = bittensorPositionRepository
+        bittensorPositionRepository = bittensorPositionRepository,
+        bittensorRootClaims = bittensorRootClaims,
+        logger = logger
     )
 
     @Provides
@@ -114,7 +121,8 @@ class StakingDashboardModule {
         stakingDashboardUpdateSystem: StakingDashboardUpdateSystem,
         dAppMetadataRepository: DAppMetadataRepository,
         walletRepository: WalletRepository,
-        totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider
+        totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
+        bittensorDetailsSource: BittensorDashboardDetailsSource
     ): StakingDashboardInteractor = RealStakingDashboardInteractor(
         dashboardRepository = dashboardRepository,
         chainRegistry = chainRegistry,
@@ -122,6 +130,7 @@ class StakingDashboardModule {
         stakingDashboardSyncTracker = stakingDashboardUpdateSystem,
         walletRepository = walletRepository,
         dAppMetadataRepository = dAppMetadataRepository,
-        totalStakeChainComparatorProvider = totalStakeChainComparatorProvider
+        totalStakeChainComparatorProvider = totalStakeChainComparatorProvider,
+        bittensorDetailsSource = bittensorDetailsSource
     )
 }

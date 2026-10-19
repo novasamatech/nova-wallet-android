@@ -36,17 +36,28 @@ class BittensorSubnetStakingInteractor(
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val extrinsicService: ExtrinsicService,
     private val beneficiaryAddress: String,
-    private val submissionExecutor: BittensorSubmissionExecutor
+    private val submissionExecutor: BittensorSubmissionExecutor,
+    private val costBasisInteractor: BittensorCostBasisInteractor
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+
+    suspend fun validatorCount(subnetId: BittensorNetuid.Subnet): Int {
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
+        return validatorRepository.validatorCount(chain, subnetId)
+    }
 
     fun observeWallet(metaId: Long): Flow<BittensorWalletContext> = flowOfAll {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         walletRepository.assetFlow(metaId, chain.utilityAsset).map { BittensorWalletContext(metaId, chain, it) }
     }
 
-    suspend fun maximumStake(metaId: Long, subnetId: BittensorNetuid.Subnet, validatorAddress: String): BigInteger = withTimeout(60_000L) {
+    suspend fun maximumStake(
+        metaId: Long,
+        subnetId: BittensorNetuid.Subnet,
+        validatorAddress: String,
+        slippage: BittensorSlippage = bittensorSubnetInteractor.slippage
+    ): BigInteger = withTimeout(60_000L) {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val asset = walletRepository.assetFlow(metaId, chain.utilityAsset)
             .first()
@@ -55,7 +66,7 @@ class BittensorSubnetStakingInteractor(
         }
         val validator = requireEligibleValidator(chain, subnetId, validatorAddress)
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
-        val quote = bittensorSubnetInteractor.quote(subnetId, asset.transferableInPlanks)
+        val quote = bittensorSubnetInteractor.quote(subnetId, asset.transferableInPlanks, slippage)
         val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
         val networkFee = estimateFee(chain, metaId, operation)
             .maxAmountDeductionFor(asset.token.configuration)
@@ -67,10 +78,11 @@ class BittensorSubnetStakingInteractor(
         metaId: Long,
         subnetId: BittensorNetuid.Subnet,
         amount: BigInteger,
-        validatorAddress: String
+        validatorAddress: String,
+        slippage: BittensorSlippage = bittensorSubnetInteractor.slippage
     ): BittensorPreparedSubnetStake = withTimeout(60_000L) {
         val subnet = bittensorSubnetInteractor.subnet(subnetId)
-        val quote = bittensorSubnetInteractor.quote(subnetId, amount)
+        val quote = bittensorSubnetInteractor.quote(subnetId, amount, slippage)
         val draft = prepareDraft(metaId, quote, validatorAddress)
         BittensorPreparedSubnetStake(subnet, draft)
     }
@@ -82,6 +94,12 @@ class BittensorSubnetStakingInteractor(
     ): BittensorSubnetStakeDraft {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val validator = requireEligibleValidator(chain, quote.subnetId, validatorAddress)
+        return previewDraft(metaId, quote, validator)
+    }
+
+    /** A display/fee draft from an already checked preset; review and submission revalidate eligibility. */
+    suspend fun previewDraft(metaId: Long, quote: BittensorSubnetBuyQuote, validator: BittensorValidator): BittensorSubnetStakeDraft {
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
         val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
         return BittensorSubnetStakeDraft(metaId, validator, operation)
@@ -90,10 +108,19 @@ class BittensorSubnetStakingInteractor(
     suspend fun execute(draft: BittensorSubnetStakeDraft): BittensorOperationResult {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         validatorRepository.validate(chain, draft.operation.quote.subnetId, draft.validator)
-        return submissionExecutor.execute(
+        val historyRequest = costBasisInteractor.ownTradeRequest(draft.metaId, chain)
+        val result = submissionExecutor.execute(
             draft.metaId,
-            chain
+            chain,
+            BittensorOutcomeTarget(
+                BittensorOperationKind.STAKE,
+                draft.operation.quote.subnetId,
+                setOf(draft.operation.hotkey),
+                draft.operation.beneficiary
+            )
         ) { draft.operation.build(this) }
+        costBasisInteractor.onTradeResult(historyRequest, result)
+        return result
     }
 
     suspend fun validationPayload(draft: BittensorSubnetStakeDraft, fee: Fee): BittensorStakePreflightPayload {

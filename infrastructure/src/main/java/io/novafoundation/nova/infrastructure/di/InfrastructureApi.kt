@@ -2,11 +2,11 @@ package io.novafoundation.nova.infrastructure.di
 
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
-import io.novafoundation.nova.infrastructure.attestation.ClientAttestationService
+import io.novafoundation.nova.infrastructure.attestation.profile3.Profile3AccessTokenProvider
 
 interface InfrastructureApi {
 
-    val clientAttestationService: ClientAttestationService
+    val profile3AccessTokenProvider: Profile3AccessTokenProvider
 
     val infrastructureUrls: InfrastructureUrls
 

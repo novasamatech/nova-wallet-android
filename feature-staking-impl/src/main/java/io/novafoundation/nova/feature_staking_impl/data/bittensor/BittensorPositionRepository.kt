@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePositions
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.ChainId
@@ -11,18 +12,25 @@ import io.novasama.substrate_sdk_android.extensions.toHexString
 import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.retryWhen
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
 
 data class BittensorPositionState(val positions: BittensorStakePositions?, val status: BittensorDataStatus)
@@ -43,6 +51,11 @@ class RealBittensorPositionRepository(
     private val computationalCache: ComputationalCache,
     private val logger: Logger
 ) : BittensorPositionRepository {
+
+    private data class PortfolioPrices(
+        val heldSubnets: Set<BittensorNetuid.Subnet>,
+        val prices: Map<BittensorNetuid.Subnet, BigInteger>
+    )
 
     override fun observePositions(chainId: ChainId, coldKey: AccountId): Flow<BittensorPositionState> = flow {
         coroutineScope {
@@ -110,16 +123,46 @@ class RealBittensorPositionRepository(
     }
 
     private fun valuePositions(chainId: ChainId, coldKey: AccountId): Flow<BittensorPortfolioState> = flow {
-        var cachedPortfolio: BittensorPortfolioPositions? = null
-        observePositions(chainId, coldKey)
-            .conflate()
-            .map { state ->
-                if (state.positions != null && (state.status is BittensorDataStatus.Fresh || cachedPortfolio == null)) {
-                    cachedPortfolio = portfolioLoader.load(chainId, state.positions)
-                }
-                BittensorPortfolioState(cachedPortfolio, state.status)
+        coroutineScope {
+            val positions = observePositions(chainId, coldKey)
+                .shareIn(this, SharingStarted.Eagerly, replay = 1)
+            val prices = observePrices(chainId, positions)
+            emitAll(combine(positions, prices, ::valueLatestPositions))
+        }
+    }
+
+    private fun observePrices(chainId: ChainId, positions: Flow<BittensorPositionState>): Flow<PortfolioPrices> = channelFlow {
+        var requestedSubnets = emptySet<BittensorNetuid.Subnet>()
+        var priceJob: Job? = null
+        send(PortfolioPrices(emptySet(), emptyMap()))
+
+        positions.collect { state ->
+            val heldSubnets = portfolioLoader.heldSubnets(state.positions)
+            if (heldSubnets != requestedSubnets) {
+                priceJob?.cancel()
+                priceJob = null
+                requestedSubnets = heldSubnets
+                send(PortfolioPrices(heldSubnets, emptyMap()))
             }
-            .collect { emit(it) }
+
+            // Keep an in-flight request for the same held set. Amount/status updates
+            // reach the independent combine immediately, without waiting for prices.
+            if (state.status is BittensorDataStatus.Fresh && heldSubnets.isNotEmpty() && priceJob?.isActive != true) {
+                priceJob = launch {
+                    val loaded = portfolioLoader.loadPrices(chainId, heldSubnets)
+                    ensureActive()
+                    send(PortfolioPrices(heldSubnets, loaded))
+                }
+            }
+        }
+    }
+
+    private fun valueLatestPositions(state: BittensorPositionState, prices: PortfolioPrices): BittensorPortfolioState {
+        val positions = state.positions?.let {
+            val matchingPrices = if (portfolioLoader.heldSubnets(it) == prices.heldSubnets) prices.prices else emptyMap()
+            portfolioLoader.value(it, matchingPrices)
+        }
+        return BittensorPortfolioState(positions, state.status)
     }
 
     private companion object {

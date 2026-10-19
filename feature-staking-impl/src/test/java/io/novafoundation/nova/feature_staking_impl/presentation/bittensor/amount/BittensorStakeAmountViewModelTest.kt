@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import android.graphics.drawable.Drawable
+import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
+import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.Precision
 import io.novafoundation.nova.common.utils.TokenSymbol
@@ -10,6 +13,7 @@ import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
 import io.novafoundation.nova.feature_account_api.data.model.SubmissionFee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
+import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakePreflightRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
@@ -17,11 +21,14 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubne
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakingDetails
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
@@ -38,9 +45,12 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChoose
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeModel
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeContext
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.getAsset.GetAssetOptionsMixin
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
@@ -48,12 +58,15 @@ import java.math.BigInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.job
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -61,10 +74,13 @@ import kotlinx.coroutines.test.setMain
 import kotlinx.coroutines.withTimeout
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorStakeAmountViewModelTest {
@@ -79,10 +95,25 @@ class BittensorStakeAmountViewModelTest {
 
     private val assets = MutableSharedFlow<BittensorRootStakingDetails>(replay = 1)
 
+    private val explicitAssets = MutableSharedFlow<BittensorRootStakingDetails>(replay = 1)
+
+    private val explicitWallets = mutableListOf<Long>()
+
+    private var rawBalanceLoads = 0
+
     private val repository = object : BittensorStakingRepository {
         override fun observeRootStakingDetails() = assets
 
-        override fun observeRootStakingDetails(metaId: Long) = assets
+        override fun observeRootStakingDetails(metaId: Long): Flow<BittensorRootStakingDetails> {
+            explicitWallets += metaId
+            return explicitAssets
+        }
+
+        override fun observeRootAccountDetails(metaId: Long): Flow<BittensorRootStakingDetails> = flow {
+            explicitWallets += metaId
+            rawBalanceLoads++
+            emitAll(explicitAssets)
+        }
     }
 
     private val extrinsics = mock(ExtrinsicService::class.java)
@@ -158,6 +189,12 @@ class BittensorStakeAmountViewModelTest {
 
     private val feeLoader = mock(FeeLoaderMixinV2.Presentation::class.java)
 
+    private val estimateFee = mock(SubmissionFee::class.java)
+
+    private val estimateValidator = BittensorValidator(AccountIdKey(ByteArray(32) { 1 }), "Validator")
+
+    private val estimateIcon = mock(Drawable::class.java)
+
     private val unusedFeeLoaderFactory = mock(FeeLoaderMixinV2.Factory::class.java)
 
     private val feeLoaderFactory = object : FeeLoaderMixinV2.Factory by unusedFeeLoaderFactory {
@@ -171,12 +208,25 @@ class BittensorStakeAmountViewModelTest {
 
     private lateinit var viewModel: BittensorStakeAmountViewModel
 
+    private val getAssetOptions = mock(GetAssetOptionsMixin::class.java)
+
+    private val getAssetOptionsFactory = object : GetAssetOptionsMixin.Factory {
+        override fun create(
+            assetFlow: Flow<Chain.Asset?>,
+            scope: CoroutineScope,
+            additionalButtonFilter: Flow<Boolean>,
+            showWhenNoOptions: Boolean
+        ) = getAssetOptions
+    }
+
     @Before
     fun prepare() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         `when`(resources.getString(R.string.bittensor_select_validator)).thenReturn("Choose validator")
         `when`(resources.getString(R.string.common_continue)).thenReturn("Continue")
         `when`(resources.getString(R.string.common_enter_amount)).thenReturn("Enter amount")
+        `when`(resources.getString(R.string.common_error_general_title)).thenReturn("Error")
+        `when`(resources.getString(R.string.common_retry_message)).thenReturn("Retry")
         `when`(token.configuration).thenReturn(chainAsset)
         `when`(chainAsset.precision).thenReturn(Precision(9))
         `when`(chainAsset.symbol).thenReturn(TokenSymbol("NATIVE"))
@@ -184,6 +234,20 @@ class BittensorStakeAmountViewModelTest {
         `when`(chooser.inputState).thenReturn(input)
         `when`(chooser.assetModel).thenReturn(emptyFlow())
         `when`(feeLoader.fee).thenReturn(feeState)
+        runBlocking {
+            `when`(
+                addressIcons.createAddressIcon(estimateValidator.hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT)
+            )
+                .thenReturn(estimateIcon)
+        }
+        createViewModel()
+    }
+
+    private fun createViewModel(payload: BittensorStakeAmountPayload? = null) {
+        if (::viewModel.isInitialized) {
+            runBlocking { viewModel.coroutineContext.job.cancelAndJoin() }
+        }
+        val externalActions = mock(ExternalActions.Presentation::class.java)
         viewModel = BittensorStakeAmountViewModel(
             resourceManager = resources,
             router = router,
@@ -197,14 +261,80 @@ class BittensorStakeAmountViewModelTest {
             amountChooserFactory = chooserFactory,
             stakeValidationSystem = validationSystem,
             validationExecutor = validationExecutor,
-            feeLoaderMixinFactory = feeLoaderFactory
+            feeLoaderMixinFactory = feeLoaderFactory,
+            externalActions = externalActions,
+            getAssetOptionsMixinFactory = getAssetOptionsFactory,
+            payload = payload
         )
     }
 
     @After
-    fun cleanUp() {
-        viewModel.cancel()
+    fun cleanUp() = runBlocking<Unit> {
+        if (::viewModel.isInitialized) viewModel.coroutineContext.job.cancelAndJoin()
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `add stake caption requires an existing positive stake`() = runBlocking<Unit> {
+        createViewModel(BittensorStakeAmountPayload(1L, null))
+        val position = BittensorRootPosition(estimateValidator.hotkey, BigInteger("10000000"))
+        val details = details(10).copy(validator = estimateValidator, position = position)
+        `when`(resources.getString(R.string.bittensor_adds_to_position, "0.010000000", "Validator"))
+            .thenReturn("Adds to your 0.01 staked with Validator")
+
+        withTimeout(3_000L) {
+            explicitAssets.emit(details)
+            assertEquals("Adds to your 0.01 staked with Validator", viewModel.addStakeCaption.first { it != null })
+            explicitAssets.emit(details.copy(position = position.copy(stakeInPlanks = BigInteger.ZERO)))
+            assertEquals(null, viewModel.addStakeCaption.first { it == null })
+        }
+    }
+
+    @Test
+    fun `fresh staking does not show the add stake caption`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            val position = BittensorRootPosition(estimateValidator.hotkey, BigInteger("10000000"))
+            assets.emit(details(10).copy(validator = estimateValidator, position = position))
+            viewModel.amount.first { it == "5" }
+            assertEquals(null, viewModel.addStakeCaption.first())
+        }
+    }
+
+    @Test
+    fun `zero input retains a placeholder fee without enabling continue`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            assets.emit(details(10).copy(validator = estimateValidator))
+            viewModel.amount.first { it == "5" }
+            viewModel.amountChanged("0")
+            val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
+            val estimate = BittensorFeeEstimate(request, estimateFee)
+            val display = FeeDisplay("network fee", null)
+            feeState.value = FeeStatus.Loaded(FeeModel(estimate, display))
+
+            viewModel.fee.first { it is FeeStatus.Loaded }
+            assertEquals("0", viewModel.amount.first())
+            assertTrue(viewModel.continueButtonState.first { it is DescriptiveButtonState.Disabled } is DescriptiveButtonState.Disabled)
+        }
+    }
+
+    @Test
+    fun `cleared input retains a placeholder fee and a new amount invalidates it`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            assets.emit(details(10).copy(validator = estimateValidator))
+            viewModel.amount.first { it == "5" }
+            viewModel.amountChanged("")
+            val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
+            val estimate = BittensorFeeEstimate(request, estimateFee)
+            val display = FeeDisplay("network fee", null)
+            feeState.value = FeeStatus.Loaded(FeeModel(estimate, display))
+
+            viewModel.fee.first { it is FeeStatus.Loaded }
+            assertEquals("", viewModel.amount.first())
+            viewModel.continueButtonState.first { it is DescriptiveButtonState.Disabled }
+
+            viewModel.amountChanged("2")
+            assertTrue(viewModel.fee.first { it is FeeStatus.Loading } is FeeStatus.Loading)
+        }
     }
 
     @Test
@@ -234,6 +364,67 @@ class BittensorStakeAmountViewModelTest {
             }
 
             assertEquals("3", viewModel.amount.first())
+        }
+    }
+
+    @Test
+    fun `rewards only payload stays on explicit wallet when globally selected wallet changes`() = runBlocking<Unit> {
+        createViewModel(BittensorStakeAmountPayload(1L, null))
+        withTimeout(3_000L) {
+            explicitAssets.emit(details(10))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("9.99")) == 0 }
+            assets.emit(details(100).copy(metaId = 2L))
+            explicitAssets.emit(details(11))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("10.99")) == 0 }
+            assertEquals(listOf(1L), explicitWallets)
+            assertEquals(getAssetOptions, viewModel.getAssetOptionsMixin)
+        }
+    }
+
+    @Test
+    fun `fixed validator retry preserves reactive balances and resolves only once per attempt`() = runBlocking<Unit> {
+        `when`(chain.addressPrefix).thenReturn(42)
+        val hotkey = AccountIdKey(ByteArray(32) { 3 })
+        val fixed = BittensorValidator(hotkey, "Fixed validator")
+        val address = chain.addressOf(hotkey)
+        val candidate = BittensorSubnetValidator(fixed, address, BigDecimal.ZERO, selectable = true)
+        val icon = mock(Drawable::class.java)
+        `when`(addressIcons.createAddressIcon(hotkey.value, AddressIconGenerator.SIZE_MEDIUM, AddressIconGenerator.BACKGROUND_TRANSPARENT))
+            .thenReturn(icon)
+        `when`(validators.rootValidators(chain))
+            .thenThrow(IllegalStateException("Eligibility unavailable"))
+            .thenReturn(listOf(candidate))
+        createViewModel(BittensorStakeAmountPayload(1L, address))
+
+        withTimeout(3_000L) {
+            explicitAssets.emit(details(10))
+            val retry = viewModel.retryEvents.first()
+            viewModel.continueButtonState.first { it is DescriptiveButtonState.Disabled }
+            viewModel.amountChanged("3")
+            explicitAssets.emit(details(11))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("10.99")) == 0 }
+            assertEquals(1, rawBalanceLoads)
+            verify(validators, times(1)).rootValidators(chain)
+
+            retry.onRetry()
+            viewModel.validator.first { it.name == "Fixed validator" }
+            explicitAssets.emit(details(12))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("11.99")) == 0 }
+            assertEquals("3", viewModel.amount.first())
+            assertEquals(1, rawBalanceLoads)
+            verify(validators, times(2)).rootValidators(chain)
+            assertEquals(getAssetOptions, viewModel.getAssetOptionsMixin)
+        }
+    }
+
+    @Test
+    fun `empty wallet shows funding then restores amount after replenishment`() = runBlocking {
+        withTimeout(3_000L) {
+            assets.emit(details(0))
+            viewModel.needsFunding.first { it }
+            assets.emit(details(10))
+            viewModel.needsFunding.first { !it }
+            assertEquals(getAssetOptions, viewModel.getAssetOptionsMixin)
         }
     }
 

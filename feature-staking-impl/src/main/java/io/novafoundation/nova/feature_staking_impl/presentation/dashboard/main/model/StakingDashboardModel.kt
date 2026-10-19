@@ -25,6 +25,7 @@ class StakingDashboardModel(
         val status: ExtendedLoadingState<SyncingData<StakeStatusModel>>,
         val earnings: ExtendedLoadingState<SyncingData<String>>,
         val announcement: AnnouncementModel?,
+        val stakeTitle: String? = null,
     ) : BaseItem
 
     data class NoStakeItem(
@@ -34,6 +35,7 @@ class StakingDashboardModel(
         val tokenName: SyncingData<String>,
         val availableBalance: CharSequence?,
         val earnings: ExtendedLoadingState<SyncingData<String>>,
+        val isNew: Boolean = false,
     ) : BaseItem
 
     interface BaseItem {

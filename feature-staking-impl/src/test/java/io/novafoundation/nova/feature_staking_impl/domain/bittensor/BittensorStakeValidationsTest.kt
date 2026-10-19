@@ -13,7 +13,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteFreshnessValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorQuoteTermsValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRegisteredValidatorValidation
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorRootStakeHoldValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorSafeModeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorSlippageValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorStakeFeeReserveValidation
@@ -66,7 +65,6 @@ class BittensorStakeValidationsTest {
         preflight = snapshot,
         quote = null,
         netuid = BittensorNetuid.Root,
-        checkRootHold = true,
         priceImpactAccepted = false,
         checkedAtMillis = 15_000L
     )
@@ -103,21 +101,6 @@ class BittensorStakeValidationsTest {
         val validation = BittensorSubnetStakingEnabledValidation()
         assertFailure(validation, payload.copy(preflight = snapshot.copy(subnetExists = false)), BittensorStakeValidationFailure.SUBNET_STAKING_DISABLED)
         assertFailure(validation, payload.copy(preflight = snapshot.copy(stakingEnabled = false)), BittensorStakeValidationFailure.SUBNET_STAKING_DISABLED)
-    }
-
-    @Test
-    fun `root hold allows exact boundary and missing previous stake`() = runBlocking {
-        val validation = BittensorRootStakeHoldValidation()
-        assertNull(validation.validate(payload).notValidOrNull())
-        assertNull(validation.validate(payload.copy(preflight = snapshot.copy(lastStakeBlock = null))).notValidOrNull())
-        assertFailure(
-            validation,
-            payload.copy(preflight = snapshot.copy(lastStakeBlock = BigInteger.valueOf(91))),
-            BittensorStakeValidationFailure.ROOT_STAKE_LOCKED
-        )
-        assertNull(
-            validation.validate(payload.copy(checkRootHold = false, preflight = snapshot.copy(lastStakeBlock = BigInteger.valueOf(99)))).notValidOrNull()
-        )
     }
 
     @Test
@@ -218,7 +201,6 @@ class BittensorStakeValidationsTest {
     @Test
     fun `root top up is allowed during the withdrawal hold`() = runBlocking {
         val topUp = payload.copy(
-            checkRootHold = false,
             preflight = snapshot.copy(lastStakeBlock = snapshot.currentBlock)
         )
 

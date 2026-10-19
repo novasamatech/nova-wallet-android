@@ -38,7 +38,7 @@ class ExternalBalanceLocal(
     }
 
     enum class Type {
-        CROWDLOAN, NOMINATION_POOL
+        CROWDLOAN, NOMINATION_POOL, BITTENSOR
     }
 }
 

@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPosition
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitQuote
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorProtocolUnits
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -32,10 +33,14 @@ class BittensorExitFormatter(
 
     fun exchangeRate(draft: BittensorExitDraft?): String {
         draft ?: return "—"
-        val ratio = draft.quote.estimatedTaoOut.toBigDecimal()
-            .divide(draft.quote.amount.toBigDecimal(), BittensorProtocolUnits.ALPHA_PRECISION, RoundingMode.DOWN)
-        val nativeAmount = tokenFormatter.formatToken(ratio, draft.position.asset.token.configuration.symbol)
-        val alphaSymbol = draft.position.subnet?.symbol?.ifBlank { "—" } ?: "—"
+        return exchangeRate(draft.position, draft.quote)
+    }
+
+    fun exchangeRate(position: BittensorExitPosition, quote: BittensorExitQuote): String {
+        val ratio = quote.estimatedTaoOut.toBigDecimal()
+            .divide(quote.amount.toBigDecimal(), BittensorProtocolUnits.ALPHA_PRECISION, RoundingMode.DOWN)
+        val nativeAmount = tokenFormatter.formatToken(ratio, position.asset.token.configuration.symbol)
+        val alphaSymbol = position.subnet?.symbol?.ifBlank { "—" } ?: "—"
         return "1 $alphaSymbol ≈ $nativeAmount"
     }
 }

@@ -1,5 +1,9 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking
 
+import android.os.Bundle
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.StakingDashboardFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
+
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import io.novafoundation.nova.app.R
@@ -14,15 +18,15 @@ class StakingDashboardNavigator(
 ) : BaseNavigator(navigationHoldersRegistry), StakingDashboardRouter {
 
     private var stakingTabNavController: NavController? = null
-    private var pendingAction: Int? = null
+    private var pendingAction: PendingNavigation? = null
 
     override val scrollToDashboardTopEvent = MutableLiveData<Event<Unit>>()
 
     fun setStakingTabNavController(navController: NavController) {
         stakingTabNavController = navController
 
-        if (pendingAction != null) {
-            navController.navigate(pendingAction!!)
+        pendingAction?.let { action ->
+            navController.navigate(action.actionId, action.arguments)
             pendingAction = null
         }
     }
@@ -48,21 +52,23 @@ class StakingDashboardNavigator(
         scrollToDashboardTopEvent.value = Unit.event()
     }
 
-    override fun openStakingDashboard() {
-        stakingTabNavController.performNavigationOrDelay(R.id.action_open_staking)
+    override fun openStakingDashboard(target: StakingDeepLinkTarget?) {
+        stakingTabNavController.performNavigationOrDelay(R.id.action_open_staking, StakingDashboardFragment.getBundle(target))
     }
 
     private fun returnToStakingTabRoot() {
         stakingTabNavController.performNavigationOrDelay(R.id.return_to_staking_dashboard)
     }
 
-    private fun NavController?.performNavigationOrDelay(actionId: Int) {
+    private fun NavController?.performNavigationOrDelay(actionId: Int, arguments: Bundle? = null) {
         val controller = this
 
         if (controller != null) {
-            controller.navigate(actionId)
+            controller.navigate(actionId, arguments)
         } else {
-            pendingAction = actionId
+            pendingAction = PendingNavigation(actionId, arguments)
         }
     }
+
+    private class PendingNavigation(val actionId: Int, val arguments: Bundle?)
 }

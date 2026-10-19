@@ -66,6 +66,14 @@
     <include app:graph="@navigation/gifts_nav_graph" />
 
     <action
+        android:id="@+id/action_open_slippage_settings"
+        app:destination="@id/slippageSettingsFragment"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_bittensor_root_staking"
         app:destination="@id/bittensor_root_staking_graph"
         app:enterAnim="@anim/fragment_open_enter"
@@ -98,6 +106,14 @@
         app:popExitAnim="@anim/fragment_close_exit" />
 
     <action
+        android:id="@+id/action_open_bittensor_where_to_stake"
+        app:destination="@id/bittensorWhereToStake"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
         android:id="@+id/action_open_bittensor_select_unstake_position"
         app:destination="@id/bittensorSelectUnstakePosition"
         app:enterAnim="@anim/fragment_open_enter"
@@ -116,6 +132,26 @@
     <action
         android:id="@+id/action_open_bittensor_subnet_details"
         app:destination="@id/bittensorSubnetDetails"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_replace_bittensor_subnet_amount"
+        app:destination="@id/bittensorSubnetAmount"
+        app:popUpTo="@id/bittensorSubnetAmount"
+        app:popUpToInclusive="true"
+        app:enterAnim="@anim/fragment_open_enter"
+        app:exitAnim="@anim/fragment_open_exit"
+        app:popEnterAnim="@anim/fragment_close_enter"
+        app:popExitAnim="@anim/fragment_close_exit" />
+
+    <action
+        android:id="@+id/action_replace_bittensor_subnet_amount_with_root"
+        app:destination="@id/bittensor_root_staking_graph"
+        app:popUpTo="@id/bittensorSubnetAmount"
+        app:popUpToInclusive="true"
         app:enterAnim="@anim/fragment_open_enter"
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
@@ -554,6 +590,11 @@
         app:exitAnim="@anim/fragment_open_exit"
         app:popEnterAnim="@anim/fragment_close_enter"
         app:popExitAnim="@anim/fragment_close_exit" />
+
+    <fragment
+        android:id="@+id/slippageSettingsFragment"
+        android:name="io.novafoundation.nova.feature_swap_impl.presentation.options.SwapOptionsFragment"
+        android:label="SwapOptionsFragment" />
 
     <fragment
         android:id="@+id/mainFragment"
@@ -1216,6 +1257,10 @@
     <fragment
         android:id="@+id/bittensorChooseSubnet"
         android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment" />
+
+    <fragment
+        android:id="@+id/bittensorWhereToStake"
+        android:name="io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorWhereToStakeFragment" />
 
     <fragment
         android:id="@+id/bittensorSelectUnstakePosition"

@@ -10,8 +10,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 class BittensorExitHoldValidation : BittensorExitValidation {
 
     override suspend fun validate(value: BittensorExitValidationPayload): ValidationStatus<BittensorExitValidationFailure> {
+        val remaining = value.quote.plan?.slices?.mapNotNull { value.preflight.groupMembers[it.hotkey]?.holdRemaining }
+            ?.maxOrNull() ?: if (value.quote.fullExit) value.preflight.groupRootHoldRemaining else value.preflight.rootHoldRemaining
         return validOrError(
-            value.preflight.rootHoldRemaining.isZero
+            remaining.isZero
         ) { BittensorExitValidationFailure.ROOT_LOCKED }
     }
 }

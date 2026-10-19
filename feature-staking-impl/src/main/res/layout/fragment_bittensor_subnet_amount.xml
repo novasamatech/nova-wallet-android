@@ -26,12 +26,28 @@
             android:paddingHorizontal="16dp"
             android:paddingBottom="16dp"
             android:orientation="vertical" >
+            <include
+                android:id="@+id/fundingCard"
+                layout="@layout/view_bittensor_get_asset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="28dp"
+                android:visibility="gone" />
+
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
                 android:id="@+id/amount"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="28dp"
                 app:title="@string/bittensor_you_stake" />
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/reserveWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:alertMode="warning" />
 
             <TextView
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
@@ -42,6 +58,38 @@
                 android:textColor="@color/text_secondary" />
 
             <LinearLayout
+                android:id="@+id/selectionLoading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <ProgressBar
+                    style="@style/Widget.Nova.ProgressBar.Indeterminate"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp" />
+
+                <TextView
+                    style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline.Secondary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/bittensor_quick_selection_loading" />
+
+            </LinearLayout>
+
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/selectionError"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:visibility="gone"
+                app:alertMode="warning" />
+
+            <LinearLayout
+                android:id="@+id/selectedSubnetCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
@@ -94,6 +142,15 @@
                         android:importantForAccessibility="no" />
                 </LinearLayout>
 
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/subnetChips"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:visibility="gone"
+                    app:chipSpacingHorizontal="6dp"
+                    app:chipSpacingVertical="6dp" />
+
                 <io.novafoundation.nova.common.view.TableView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -126,7 +183,7 @@
                         android:id="@+id/monthlyTokens"
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
-                        app:title="@string/bittensor_monthly_projection" />
+                        app:title="@string/bittensor_monthly_tokens" />
                     <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                         android:id="@+id/networkFee"
                         android:layout_width="match_parent"
@@ -135,40 +192,37 @@
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/projectedAveragePrice"
                         android:layout_width="match_parent"
-                        android:layout_height="44dp"
-                        app:title="@string/bittensor_exit_avg_buy_price" />
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:title="@string/bittensor_exit_avg_buy_price"
+                        app:titleIcon="@drawable/ic_info" />
                 </io.novafoundation.nova.common.view.TableView>
+
+                <TextView
+                    android:id="@+id/manualSubnet"
+                    style="@style/TextAppearance.NovaFoundation.SemiBold.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:layout_marginTop="12dp"
+                    android:drawablePadding="2dp"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="4dp"
+                    android:text="@string/bittensor_see_all_subnets"
+                    android:textColor="@color/button_text_accent"
+                    android:visibility="gone"
+                    app:drawableEndCompat="@drawable/ic_chevron_right_16"
+                    app:drawableTint="@color/icon_accent" />
 
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/feeCaption"
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:gravity="center"
-                android:text="@string/bittensor_subnet_fee_caption"
-                android:textColor="@color/text_secondary" />
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:gravity="center"
-                android:text="@string/bittensor_review_before_sending"
-                android:textColor="@color/text_secondary" />
         </LinearLayout>
     </ScrollView>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="84dp"
-        android:background="@color/block_background"
+        android:background="@drawable/bg_bittensor_bottom_button_container"
         android:padding="16dp" >
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/continueButton"

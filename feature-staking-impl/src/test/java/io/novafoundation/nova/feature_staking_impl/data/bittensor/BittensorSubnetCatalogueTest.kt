@@ -7,6 +7,8 @@ import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.runtime.RuntimeSnapshot
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
+import java.io.IOException
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -31,6 +33,35 @@ class BittensorSubnetCatalogueTest {
 
     private val repository = RealBittensorSubnetRepository(runtimeCalls, config, swaps)
 
+    @Test(expected = IllegalArgumentException::class)
+    fun `quick pick rejects missing runtime rows`() {
+        bindBittensorSubnets(listOf(null), requireComplete = true)
+    }
+
+    @Test
+    fun `quick pick bypasses the browsing catalogue cache`() = runBlocking<Unit> {
+        repository.subnets()
+        repository.quickPickSubnets()
+        repository.quickPickSubnets()
+
+        assertEquals(3, calls.requests)
+    }
+
+    @Test
+    fun `optional config failure does not block the runtime catalogue`() = runBlocking<Unit> {
+        val api = object : BittensorConfigApi {
+            override suspend fun config(url: String): BittensorConfigRemote = throw IOException("Config unavailable")
+        }
+        val logger = mock(Logger::class.java)
+        val remoteConfig = RemoteBittensorConfigRepository(api, "https://config.test/config.json", logger)
+        val catalogueRepository = RealBittensorSubnetRepository(runtimeCalls, remoteConfig, swaps)
+
+        val subnets = catalogueRepository.subnets()
+
+        assertEquals(listOf(BittensorNetuid.Subnet(1)), subnets.map { it.id })
+        assertEquals(1, calls.requests)
+    }
+
     @Test
     fun `reuses catalogue metadata but fetches a current price for individual subnet lookups`() = runBlocking<Unit> {
         val subnetId = BittensorNetuid.Subnet(1)
@@ -54,6 +85,14 @@ class BittensorSubnetCatalogueTest {
         var requests = 0
 
         override fun isSupported(section: String, method: String) = true
+
+        override suspend fun <R> callAt(
+            blockHash: String,
+            section: String,
+            method: String,
+            arguments: Map<String, Any?>,
+            returnBinding: (Any?) -> R
+        ): R = error("Unexpected block-pinned request")
 
         override suspend fun <R> call(
             section: String,

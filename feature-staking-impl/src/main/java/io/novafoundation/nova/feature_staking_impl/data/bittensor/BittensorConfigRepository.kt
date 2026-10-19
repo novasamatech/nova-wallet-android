@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetCommission
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
+import java.io.IOException
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
@@ -15,6 +16,8 @@ data class BittensorConfig(val commission: BittensorSubnetCommission, val subnet
 fun interface BittensorConfigRepository {
 
     suspend fun config(): BittensorConfig
+
+    suspend fun subnetLogos(): Map<BittensorNetuid.Subnet, String> = config().subnetLogos
 }
 
 class RemoteBittensorConfigRepository(
@@ -27,15 +30,26 @@ class RemoteBittensorConfigRepository(
 
     override suspend fun config(): BittensorConfig {
         try {
-            withTimeoutOrNull(15_000L) { cachedConfig() }?.let { return it }
-            logger.log("[BittensorConfig] Config request timed out; using fallback fee and chain logos")
+            return withTimeoutOrNull(15_000L) { cachedConfig() }
+                ?: throw IOException("Bittensor config request timed out")
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            logger.log("[BittensorConfig] Config unavailable; using fallback fee and chain logos")
+            logger.log("[BittensorConfig] Config unavailable; commission cannot be resolved")
             logger.log(e)
+            throw e
         }
-        return fallbackBittensorConfig()
+    }
+
+    override suspend fun subnetLogos(): Map<BittensorNetuid.Subnet, String> {
+        return try {
+            config().subnetLogos
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logger.log("[BittensorConfig] Optional subnet logos unavailable; retaining chain logos")
+            emptyMap()
+        }
     }
 }
 

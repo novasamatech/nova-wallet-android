@@ -4,12 +4,19 @@ import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.AnalyticsFlushReason
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.analytics.analyticsLog
-import io.novafoundation.nova.infrastructure.attestation.ClientAttestationService
 import java.util.UUID
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * Flush schedule mirrors the iOS client. There is no timer: every tracked event checks whether a flush is due -
@@ -29,40 +36,52 @@ class RealAnalyticsService(
     private val queue: AnalyticsEventQueue,
     private val uploader: AnalyticsUploader,
     private val identity: AnalyticsIdentity,
-    private val attestation: ClientAttestationService,
     private val flushThreshold: Int,
-    private val clock: () -> Long = System::currentTimeMillis
+    private val clock: () -> Long = System::currentTimeMillis,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : AnalyticsService {
 
     private val flushMutex = Mutex()
 
+    private val queueMutex = Mutex()
+
+    private val consentLock = Any()
+
+    private var session: ConsentSession? = null
+
+    private var erasure: Deferred<Unit>? = null
+
     @Volatile
     private var lastFlushAt = 0L
 
-    @Volatile
-    override var isEnabled: Boolean = false
+    override var isEnabled: Boolean
+        get() = synchronized(consentLock) { session != null }
         set(value) {
-            field = value
-            analyticsLog("enabled=$value" + if (!value) " - install id and attestation client reset, queue cleared" else "")
+            synchronized(consentLock) {
+                if (value) {
+                    if (session == null) {
+                        val job = Job()
+                        session = ConsentSession(job, erasure)
+                    }
+                } else {
+                    session?.job?.cancel()
+                    session = null
 
-            // Set right away, before any coroutine runs: a flush already in flight must not register a new client
-            attestation.setClientCreationAllowed(value)
-
-            if (!value) {
-                identity.resetInstallId()
-                scope.launch(Dispatchers.IO) {
-                    queue.clear()
-                    // Same as iOS: after opting out, the X-Client-Id of the old consent is never used again
-                    attestation.forgetClient()
+                    // A later consent waits for erasure. Shared authentication is never reset here.
+                    val previousErasure = erasure
+                    erasure = scope.async(dispatcher, start = CoroutineStart.LAZY) {
+                        previousErasure?.await()
+                        queueMutex.withLock {
+                            queue.clear()
+                            identity.resetInstallId()
+                        }
+                    }.also { it.start() }
                 }
             }
         }
 
     override fun track(event: AnalyticsEvent) {
-        if (!isEnabled) {
-            analyticsLog("dropped ${event.name}: analytics is disabled (no consent yet, or opted out)")
-            return
-        }
+        val consent = synchronized(consentLock) { session } ?: return
 
         // The identity is minted here, not at upload time: a retried upload must carry
         // the same id, or the backend would store the same event twice.
@@ -73,22 +92,26 @@ class RealAnalyticsService(
             props = event.properties
         )
 
-        scope.launch(Dispatchers.IO) {
-            queue.enqueue(queued)
-
-            val size = queue.size()
-            analyticsLog("queued ${event.name}, queue=$size")
-
-            dueFlushReason(size)?.let { flush(it) }
+        scope.launch(dispatcher) {
+            withConsent(consent) {
+                val size = queueMutex.withLock {
+                    consent.job.ensureActive()
+                    queue.enqueue(queued)
+                    queue.size()
+                }
+                dueFlushReason(size)?.let { flushWithConsent(consent, it) }
+            }
         }
     }
 
     override suspend fun flush(reason: AnalyticsFlushReason) {
-        if (!isEnabled) {
-            analyticsLog("flush skipped: analytics is disabled")
-            return
+        val consent = synchronized(consentLock) { session } ?: return
+        withConsent(consent) {
+            flushWithConsent(consent, reason)
         }
+    }
 
+    private suspend fun flushWithConsent(consent: ConsentSession, reason: AnalyticsFlushReason) {
         // One flush at a time; a flush already running sends whatever this one would have
         if (!flushMutex.tryLock()) {
             analyticsLog("flush ($reason) skipped: another flush is running")
@@ -100,9 +123,27 @@ class RealAnalyticsService(
             analyticsLog("flush: $reason")
 
             val maxBatches = if (reason == AnalyticsFlushReason.BACKGROUND) MAX_BATCHES_IN_BACKGROUND else MAX_BATCHES_PER_FLUSH
-            uploader.flush(maxBatches)
+            queueMutex.withLock {
+                consent.job.ensureActive()
+                uploader.flush(maxBatches)
+            }
         } finally {
             flushMutex.unlock()
+        }
+    }
+
+    private suspend fun withConsent(consent: ConsentSession, action: suspend () -> Unit) = coroutineScope {
+        val work = async(start = CoroutineStart.LAZY) {
+            consent.erasure?.await()
+            consent.job.ensureActive()
+            action()
+        }
+        // Cancelling this work cancels Retrofit's in-flight Call without disabling shared auth.
+        val cancellation = consent.job.invokeOnCompletion { work.cancel() }
+        try {
+            work.await()
+        } finally {
+            cancellation.dispose()
         }
     }
 
@@ -115,4 +156,6 @@ class RealAnalyticsService(
             else -> null
         }
     }
+
+    private class ConsentSession(val job: Job, val erasure: Deferred<Unit>?)
 }

@@ -52,6 +52,8 @@ class BittensorWalletIsolationTest {
         override fun observeRootStakingDetails() = flowOf(details)
 
         override fun observeRootStakingDetails(metaId: Long) = flowOf(details)
+
+        override fun observeRootAccountDetails(metaId: Long) = flowOf(details)
     }
 
     @Test

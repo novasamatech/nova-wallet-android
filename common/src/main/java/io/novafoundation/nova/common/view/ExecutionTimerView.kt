@@ -111,7 +111,7 @@ class ExecutionTimerView @JvmOverloads constructor(
             .also { postDelayed(it, delay) }
     }
 
-    private fun stopTimer() {
+    fun stopTimer() {
         pendingTimerStart?.let(::removeCallbacks)
         pendingTimerStart = null
         currentTimer?.cancel()

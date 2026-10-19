@@ -1,6 +1,7 @@
 package io.novafoundation.nova.infrastructure.di
 
 import android.content.Context
+import com.google.gson.Gson
 import io.novafoundation.nova.common.data.config.GlobalConfigDataSource
 import io.novafoundation.nova.common.data.network.NetworkApiCreator
 import io.novafoundation.nova.common.data.storage.Preferences
@@ -20,4 +21,6 @@ interface InfrastructureDependencies {
     fun integrityService(): IntegrityService
 
     fun globalConfigDataSource(): GlobalConfigDataSource
+
+    fun provideJsonMapper(): Gson
 }

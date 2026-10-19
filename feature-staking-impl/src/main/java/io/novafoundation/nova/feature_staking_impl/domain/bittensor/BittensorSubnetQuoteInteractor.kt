@@ -7,8 +7,6 @@ import io.novasama.substrate_sdk_android.hash.isPositive
 import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withTimeout
 
 /**
@@ -61,22 +59,19 @@ class BittensorSubnetQuoteInteractor(
         val commission = configRepository.config().commission
         val serviceFee = commission.feeFor(totalTaoInPlanks)
         val stakeAmount = totalTaoInPlanks - serviceFee
-        coroutineScope {
-            val price = async { swapSource.currentAlphaPrice(chainId, subnetId) }
-            val simulation = swapSource.simulate(chainId, subnetId, BittensorSwapDirection.TAO_TO_ALPHA, stakeAmount)
-            requireValidBuySimulation(simulation, subnetId, stakeAmount)
+        val quote = swapSource.quote(chainId, subnetId, BittensorSwapDirection.TAO_TO_ALPHA, stakeAmount)
+        requireValidBuySimulation(quote.simulation, subnetId, stakeAmount)
 
-            BittensorSubnetBuyQuote(
-                subnetId = subnetId,
-                totalTaoInPlanks = totalTaoInPlanks,
-                serviceFeeTaoInPlanks = serviceFee,
-                simulation = simulation,
-                limitPrice = slippage.limitPrice(price.await(), BittensorSwapDirection.TAO_TO_ALPHA),
-                serviceFeeRate = commission.fraction,
-                spotPrice = price.await(),
-                capturedAtMillis = System.currentTimeMillis()
-            )
-        }
+        BittensorSubnetBuyQuote(
+            subnetId = subnetId,
+            totalTaoInPlanks = totalTaoInPlanks,
+            serviceFeeTaoInPlanks = serviceFee,
+            simulation = quote.simulation,
+            limitPrice = slippage.limitPrice(quote.spotPrice, BittensorSwapDirection.TAO_TO_ALPHA),
+            serviceFeeRate = commission.fraction,
+            spotPrice = quote.spotPrice,
+            capturedAtMillis = System.currentTimeMillis()
+        )
     }
 
     private fun requireValidBuySimulation(simulation: BittensorSwapSimulation, subnetId: BittensorNetuid.Subnet, stakeAmount: BigInteger) {

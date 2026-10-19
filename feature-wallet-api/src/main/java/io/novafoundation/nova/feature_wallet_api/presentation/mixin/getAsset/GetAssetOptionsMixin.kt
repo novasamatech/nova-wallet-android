@@ -14,7 +14,8 @@ interface GetAssetOptionsMixin {
         fun create(
             assetFlow: Flow<Chain.Asset?>,
             scope: CoroutineScope,
-            additionalButtonFilter: Flow<Boolean> = flowOf(true)
+            additionalButtonFilter: Flow<Boolean> = flowOf(true),
+            showWhenNoOptions: Boolean = false
         ): GetAssetOptionsMixin
     }
 

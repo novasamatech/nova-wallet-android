@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import androidx.core.widget.doAfterTextChanged
+import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorSelectValidatorBinding
@@ -23,6 +25,8 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
 
     private val adapter by lazy { BittensorValidatorAdapter(viewModel::select, viewModel::infoClicked) }
 
+    private var filtersSheet: BittensorValidatorFiltersBottomSheet? = null
+
     override fun createBinding() = FragmentBittensorSelectValidatorBinding.inflate(layoutInflater)
 
     override fun inject() {
@@ -35,14 +39,23 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
 
     override fun initViews() {
         binder.toolbar.setHomeButtonListener { viewModel.back() }
+        binder.toolbar.toolbar.setHomeButtonIcon(R.drawable.ic_arrow_back)
         onBackPressed { viewModel.back() }
         binder.list.adapter = adapter
         binder.confirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.toolbar.toolbar.setRightIconRes(R.drawable.ic_filter)
+        binder.toolbar.toolbar.setRightActionClickListener { showFilters() }
+        binder.toolbar.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
     }
 
     override fun subscribe(viewModel: BittensorSelectValidatorViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
+        viewModel.filters.observe { toolbar.toolbar.setRightActionTint(if (it.hideUnusualApy) R.color.icon_accent else R.color.icon_primary) }
         setupExternalActions(viewModel)
+        viewModel.header.observe {
+            count.text = it.count
+            sortLabel.text = it.sorting
+        }
         viewModel.rows.observe(adapter::submitList)
         viewModel.selectedAddress.observe(adapter::select)
         viewModel.buttonState.observe(confirm::setState)
@@ -54,7 +67,15 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
     }
 
     override fun onDestroyView() {
+        filtersSheet?.dismiss()
+        filtersSheet = null
         binder.list.adapter = null
         super.onDestroyView()
+    }
+
+    private fun showFilters() {
+        filtersSheet?.dismiss()
+        filtersSheet = BittensorValidatorFiltersBottomSheet(requireContext(), viewModel.filters.value, viewModel::applyFilters)
+            .also { it.show() }
     }
 }

@@ -92,6 +92,12 @@
             app:childrenPaddingTop="0dp"
             app:drawDividers="true">
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/common_amount" />
+
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/bittensorStakeResultValidator"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"
@@ -146,6 +152,7 @@
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:layout_marginTop="20dp"
+            android:id="@+id/bittensorStakeResultStatusIcon"
             android:src="@drawable/ic_bittensor_staking_error" />
 
         <TextView

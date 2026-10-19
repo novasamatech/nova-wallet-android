@@ -34,6 +34,48 @@ class BittensorRootValidatorSourceTest {
     private val second = validator(2)
 
     @Test
+    fun `details return validator names and already annualized percentages`() = runBlocking {
+        val rows = listOf(
+            BittensorRootValidatorRemote.Validator(
+                first.address,
+                "Nova",
+                BittensorRootValidatorRemote.Yield(BittensorRootValidatorRemote.Window("7.25")),
+                "100"
+            ),
+            BittensorRootValidatorRemote.Validator(second.address, "Other", null, "100"),
+            BittensorRootValidatorRemote.Validator("invalid", "Invalid", null, null)
+        )
+        `when`(backend.rootValidators()).thenReturn(BittensorRootValidatorRemote(rows, null))
+
+        val details = source.validatorDetails(chain)
+
+        assertEquals(2, details.size)
+        assertEquals("Nova", details[first.validator.hotkey]?.validator?.name)
+        assertEquals(BigDecimal("7.25"), details[first.validator.hotkey]?.annualPercentageYield)
+        assertNull(details[second.validator.hotkey]?.annualPercentageYield)
+    }
+
+    @Test
+    fun `missing zero stake and negative yield remain unknown rather than zero`() {
+        listOf(null, "0", "-1").forEach { stake ->
+            val row = BittensorRootValidatorRemote.Validator(
+                first.address,
+                "Nova",
+                BittensorRootValidatorRemote.Yield(BittensorRootValidatorRemote.Window("7")),
+                stake
+            )
+            assertNull(mapRootValidatorDetails(chain, listOf(row))[first.validator.hotkey]?.annualPercentageYield)
+        }
+        val row = BittensorRootValidatorRemote.Validator(
+            first.address,
+            "Nova",
+            BittensorRootValidatorRemote.Yield(BittensorRootValidatorRemote.Window("-1")),
+            "10"
+        )
+        assertNull(mapRootValidatorDetails(chain, listOf(row))[first.validator.hotkey]?.annualPercentageYield)
+    }
+
+    @Test
     fun `eligible primary root position takes priority over backend recommendations`() = runBlocking {
         `when`(validators.rootValidators(chain)).thenReturn(listOf(first, second))
         val positions = listOf(

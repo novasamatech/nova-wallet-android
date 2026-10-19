@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.data.network.runtime.binding.bindNumberOrZero
 import io.novasama.substrate_sdk_android.runtime.definitions.types.composite.Struct
 import java.math.BigInteger
 import org.junit.Assert.assertEquals
@@ -12,11 +13,23 @@ class BittensorRootClaimBindingTest {
     private val unit = BigInteger.ONE.shiftLeft(32)
 
     @Test
+    fun `unset root hold interval and last stake block mean no hold`() {
+        assertEquals(BigInteger.ZERO, bindNumberOrZero(null))
+        assertEquals(BigInteger.valueOf(42), bindNumberOrZero(BigInteger.valueOf(42)))
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun `malformed nonempty root hold does not silently become zero`() {
+        bindNumberOrZero("42")
+    }
+
+    @Test
     fun `distributed rewards cannot be combined to reach the minimum`() {
         val claims = claimsWithRewards(200_000, 300_000)
 
         assertTrue(claims.claimable.isEmpty())
         assertTrue(claims.hasRewardsBelowMinimum)
+        assertEquals(BigInteger.valueOf(500_000), claims.totalRedeemable)
     }
 
     @Test
@@ -49,6 +62,16 @@ class BittensorRootClaimBindingTest {
             previews = bindBittensorRootClaimPreviews(previews),
             minimum = BigInteger.valueOf(500_000)
         )
+    }
+
+    @Test
+    fun `accrued but entirely forfeited rewards do not show a minimum hint`() {
+        val previews = bindBittensorRootClaimPreviews(listOf(preview(1, 100_000, 0, 100_000)))
+        val claims = BittensorRootClaims(previews, BigInteger.valueOf(500_000))
+
+        assertFalse(claims.hasRewardsBelowMinimum)
+        assertTrue(claims.claimable.isEmpty())
+        assertEquals(BigInteger.ZERO, claims.totalRedeemable)
     }
 
     @Test fun `unset threshold uses runtime default`() {

@@ -26,6 +26,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" >
 
+            <include
+                android:id="@+id/fundingCard"
+                layout="@layout/view_bittensor_get_asset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="28dp"
+                android:visibility="gone" />
+
             <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
                 android:id="@+id/bittensorStakeAmount"
                 android:layout_width="match_parent"
@@ -35,12 +44,14 @@
                 android:layout_marginEnd="16dp"
                 app:title="@string/bittensor_you_stake" />
 
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/currentStake"
+            <io.novafoundation.nova.common.view.AlertView
+                android:id="@+id/reserveWarning"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
-                app:title="@string/bittensor_adds_to_current" />
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:alertMode="warning" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:id="@+id/bittensorStakeAmountDetails"
@@ -86,10 +97,22 @@
         </LinearLayout>
     </ScrollView>
 
+    <TextView
+        android:id="@+id/addStakeCaption"
+        style="@style/TextAppearance.NovaFoundation.Regular.Footnote.Secondary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:visibility="gone" />
+
     <FrameLayout
+        android:id="@+id/continueContainer"
         android:layout_width="match_parent"
         android:layout_height="84dp"
-        android:background="@color/block_background"
+        android:background="@drawable/bg_bittensor_bottom_button_container"
         android:paddingStart="16dp"
         android:paddingTop="16dp"
         android:paddingEnd="16dp"

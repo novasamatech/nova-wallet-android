@@ -16,7 +16,7 @@ sealed interface ExtrinsicDispatch {
 
     data class Ok(val emittedEvents: List<GenericEvent.Instance>) : ExtrinsicDispatch
 
-    data class Failed(val error: DispatchError) : ExtrinsicDispatch
+    data class Failed(val error: DispatchError, val emittedEvents: List<GenericEvent.Instance> = emptyList()) : ExtrinsicDispatch
 
     object Unknown : ExtrinsicDispatch
 }

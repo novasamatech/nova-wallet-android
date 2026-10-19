@@ -10,7 +10,11 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
 import io.novafoundation.nova.common.di.viewmodel.ViewModelModule
 import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.common.resources.ContextManager
 import io.novafoundation.nova.common.validation.ValidationExecutor
+import io.novafoundation.nova.common.utils.formatting.baseDurationFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
+import javax.inject.Named
 import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.WalletUiUseCase
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationSystem
@@ -25,6 +29,12 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 
 @Module(includes = [ViewModelModule::class])
 class BittensorRootClaimModule {
+
+    @Provides
+    @Named("BittensorClaimDuration")
+    fun durationFormatter(contextManager: ContextManager): DurationFormatter =
+        baseDurationFormatter(contextManager.getApplicationContext())
+
     @Provides
     @IntoMap
     @ViewModelKey(BittensorRootClaimViewModel::class)
@@ -41,7 +51,8 @@ class BittensorRootClaimModule {
         retryController: BittensorRetryController,
         validationExecutor: ValidationExecutor,
         claimValidationSystem: BittensorClaimValidationSystem,
-        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory
+        feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
+        @Named("BittensorClaimDuration") durationFormatter: DurationFormatter
     ): ViewModel =
         BittensorRootClaimViewModel(
             payload,
@@ -56,7 +67,8 @@ class BittensorRootClaimModule {
             retryController,
             validationExecutor,
             claimValidationSystem,
-            feeLoaderMixinFactory
+            feeLoaderMixinFactory,
+            durationFormatter
         )
 
     @Provides

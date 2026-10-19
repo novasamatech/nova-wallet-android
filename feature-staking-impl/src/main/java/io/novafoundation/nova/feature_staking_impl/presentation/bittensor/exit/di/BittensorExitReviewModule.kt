@@ -18,6 +18,9 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationSystem
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
+import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitFormatter
@@ -53,7 +56,10 @@ class BittensorExitReviewModule {
         validationExecutor: ValidationExecutor,
         exitValidationSystem: BittensorExitValidationSystem,
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-        exitFormatter: BittensorExitFormatter
+        exitFormatter: BittensorExitFormatter,
+        saleCostBasisFormatter: BittensorSaleCostBasisFormatter,
+        validatorInteractor: BittensorValidatorInteractor,
+        logger: Logger
     ): ViewModel {
         return BittensorExitReviewViewModel(
             payload,
@@ -74,7 +80,10 @@ class BittensorExitReviewModule {
             validationExecutor,
             exitValidationSystem,
             feeLoaderMixinFactory,
-            exitFormatter
+            exitFormatter,
+            saleCostBasisFormatter,
+            validatorInteractor,
+            logger
         )
     }
 

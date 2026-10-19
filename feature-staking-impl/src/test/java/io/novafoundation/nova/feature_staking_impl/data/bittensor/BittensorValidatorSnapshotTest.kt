@@ -47,14 +47,17 @@ class BittensorValidatorSnapshotTest {
     }
 
     @Test
-    fun `subnet permit and activity remain required when backend flags are disabled`() {
+    fun `subnet permit and activity are optional when backend flags are disabled`() {
         val disabledGates = gates.copy(requirePermit = false, requireActive = false)
         val withoutPermit = snapshot.copy(permits = listOf(false))
         val inactive = snapshot.copy(lastUpdates = listOf(BigInteger.ZERO))
         val subnet = BittensorNetuid.Subnet(1)
 
-        assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, withoutPermit).isEmpty())
-        assertFalse(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, inactive).single().selectable)
+        assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, withoutPermit).single().selectable)
+        assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, inactive).single().selectable)
+        assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, snapshot.copy(uids = emptyMap())).isEmpty())
+        val excessiveTake = snapshot.copy(commissionsInU16 = mapOf(validator.hotkey to BigInteger.valueOf(65535)))
+        assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, excessiveTake).isEmpty())
     }
 
     @Test

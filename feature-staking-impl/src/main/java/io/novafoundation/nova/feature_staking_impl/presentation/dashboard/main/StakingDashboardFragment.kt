@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import android.view.View
+import android.os.Bundle
 import androidx.recyclerview.widget.ConcatAdapter
 
 import io.novafoundation.nova.common.base.BaseFragment
@@ -20,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.l
 import io.novafoundation.nova.feature_staking_impl.presentation.announcements.AnnouncementsAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.DashboardHeaderAdapter
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.list.MoreStakingOptionsAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
 
 class StakingDashboardFragment :
     BaseFragment<StakingDashboardViewModel, FragmentStakingDashboardBinding>(),
@@ -27,6 +29,15 @@ class StakingDashboardFragment :
     DashboardNoStakeAdapter.Handler,
     DashboardHeaderAdapter.Handler,
     MoreStakingOptionsAdapter.Handler {
+
+    companion object {
+
+        private const val DEEP_LINK_TARGET = "deep_link_target"
+
+        fun getBundle(target: StakingDeepLinkTarget?) = Bundle().apply {
+            putParcelable(DEEP_LINK_TARGET, target)
+        }
+    }
 
     override fun createBinding() = FragmentStakingDashboardBinding.inflate(layoutInflater)
 
@@ -54,6 +65,7 @@ class StakingDashboardFragment :
     }
 
     override fun initViews() {
+        viewModel.setDeepLinkTarget(argumentOrNull(DEEP_LINK_TARGET))
         binder.stakingDashboardContent.setHasFixedSize(true)
 
         binder.stakingDashboardContent.adapter = ConcatAdapter(
@@ -71,6 +83,13 @@ class StakingDashboardFragment :
     }
 
     override fun subscribe(viewModel: StakingDashboardViewModel) {
+        viewModel.deepLinkDestination.observe { destination ->
+            if (destination != null) {
+                arguments?.remove(DEEP_LINK_TARGET)
+                viewModel.openDeepLinkDestination(destination)
+            }
+        }
+
         viewModel.stakingDashboardUiFlow.observe { dashboardLoading ->
             dashboardLoading.onLoaded {
                 hasStakeAdapter.submitListPreservingViewPoint(it.hasStakeItems, binder.stakingDashboardContent)
@@ -94,18 +113,27 @@ class StakingDashboardFragment :
     }
 
     override fun onHasStakeItemClicked(index: Int) {
+        cancelDeepLink()
         viewModel.onHasStakeItemClicked(index)
     }
 
     override fun onNoStakeItemClicked(index: Int) {
+        cancelDeepLink()
         viewModel.onNoStakeItemClicked(index)
     }
 
     override fun avatarClicked() {
+        cancelDeepLink()
         viewModel.avatarClicked()
     }
 
     override fun onMoreOptionsClicked() {
+        cancelDeepLink()
         viewModel.onMoreOptionsClicked()
+    }
+
+    private fun cancelDeepLink() {
+        arguments?.remove(DEEP_LINK_TARGET)
+        viewModel.setDeepLinkTarget(null)
     }
 }

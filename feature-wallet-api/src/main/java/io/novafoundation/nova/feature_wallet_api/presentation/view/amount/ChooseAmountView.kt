@@ -37,6 +37,10 @@ class ChooseAmountView @JvmOverloads constructor(
         binder.chooseAmountInput.loadAssetImage(icon)
     }
 
+    fun setAssetIconRounded(rounded: Boolean) {
+        binder.chooseAmountInput.setAssetIconRounded(rounded)
+    }
+
     fun setTitle(title: String?) {
         binder.chooseAmountTitle.setTextOrHide(title)
     }

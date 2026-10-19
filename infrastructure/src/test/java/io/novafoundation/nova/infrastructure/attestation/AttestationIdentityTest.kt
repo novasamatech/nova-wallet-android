@@ -46,4 +46,14 @@ class AttestationIdentityTest {
         assertTrue(identity.isAttested())
         assertTrue(RealAttestationIdentity(preferences).isAttested())
     }
+
+    @Test
+    fun `registration origin persists and is cleared with registration`() {
+        identity.markAttested("https://api.example.test")
+        val restored = RealAttestationIdentity(preferences)
+        assertEquals("https://api.example.test", restored.attestedOrigin())
+        restored.clearAttested()
+        assertEquals(null, restored.attestedOrigin())
+        assertFalse(restored.isAttested())
+    }
 }

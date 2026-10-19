@@ -15,7 +15,7 @@ class BittensorExitFeeRemainderValidation : BittensorExitValidation {
         if (value.quote.fullExit) return valid()
         if (value.preflight.isOwnHotkey) return valid()
 
-        val remainingStakeAfterFee = value.preflight.stake - value.quote.amount - value.fee
+        val remainingStakeAfterFee = value.preflight.stake - value.quote.amount
         if (remainingStakeAfterFee.isZero) return valid()
 
         return validOrError(remainingStakeAfterFee >= value.preflight.minNominatorStake) {

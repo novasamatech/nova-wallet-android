@@ -9,7 +9,8 @@ interface BittensorEstimatesApi {
     @GET
     suspend fun alphaYields(
         @Url url: String,
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("pageSize") pageSize: Int
     ): Response<BittensorAlphaYieldsRemote>
 
     @GET

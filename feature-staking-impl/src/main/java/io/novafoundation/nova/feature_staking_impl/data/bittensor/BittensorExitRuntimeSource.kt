@@ -7,7 +7,7 @@ import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import io.novasama.substrate_sdk_android.runtime.metadata.storage
-import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 
 interface BittensorExitRuntimeSource {
 
@@ -30,7 +30,7 @@ class RealBittensorExitRuntimeSource(
         coldkey: AccountId,
         hotkey: AccountId,
         netuid: BittensorNetuid
-    ): BittensorExitPreflight = withTimeout(
+    ): BittensorExitPreflight = withTimeoutOrNull(
         25_000
     ) {
         val hash = rpcCalls.getBlockHash(chainId)
@@ -38,7 +38,7 @@ class RealBittensorExitRuntimeSource(
         storage.query(
             chainId,
             at = hash,
-            applyStorageDefault = true
+            applyStorageDefault = false
         ) {
             loadBittensorExitSnapshot(
                 coldkey,
@@ -48,5 +48,5 @@ class RealBittensorExitRuntimeSource(
                 hash
             )
         }
-    }
+    } ?: error("Exit preflight timed out")
 }

@@ -1,7 +1,5 @@
-// Every build attests with Play Integrity - the backend accepts nothing else for Android, and there is
-// no development shortcut. Debug builds therefore need a physical device with Google Play and a dev
-// backend that allows the debug package: an emulator never meets device integrity. Where the
-// infrastructure lives comes from the global remote config (infraUrl).
+// Profile 3 still uses Play Integrity for registration; it does not bypass the backend's
+// device, app and certificate policy. The environment comes from remote config (infraUrl).
 android {
 
     buildFeatures {
@@ -27,7 +25,9 @@ dependencies {
 
     implementation retrofitDep
 
+    implementation gsonDep
+
     testImplementation jUnitDep
     testImplementation mockitoDep
-    testImplementation gsonDep
+    testImplementation coroutinesTestDep
 }

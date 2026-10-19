@@ -1,42 +1,179 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
+import io.novafoundation.nova.common.data.memory.ComputationalCache
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
-import java.math.BigInteger
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import io.novasama.substrate_sdk_android.extensions.toHexString
+import io.novasama.substrate_sdk_android.hash.Hasher.blake2b256
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.takeWhile
+import okhttp3.HttpUrl
+
+data class BittensorHistoryRequest internal constructor(
+    val address: String,
+    val baseUrl: HttpUrl,
+    internal val generation: Long
+)
 
 class BittensorOperationHistoryRepository(
     private val remoteSource: BittensorEstimatesRemoteSource,
-    private val infrastructureUrls: InfrastructureUrls
+    private val infrastructureUrls: InfrastructureUrls,
+    private val computationalCache: ComputationalCache,
+    private val nowNanos: () -> Long = System::nanoTime
 ) {
 
-    private data class CachedHistory(
-        val history: BittensorOperationHistory,
-        val validUntilNanos: Long,
-        val balanceRevision: BigInteger?
-    )
+    private data class CachedHistory(val history: BittensorOperationHistory, val validUntilNanos: Long)
 
-    private val mutex = Mutex()
+    private class AccountHistory {
+        val generation = MutableStateFlow(0L)
 
-    private val histories = mutableMapOf<String, CachedHistory>()
+        var seedBlockedUntilNanos: Long? = null
 
-    suspend fun history(address: String, balanceRevision: BigInteger? = null): BittensorOperationHistory = mutex.withLock {
-        val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
-        val cacheKey = "$baseUrl:$address"
-        val cached = histories[cacheKey]
-        if (cached != null && System.nanoTime() < cached.validUntilNanos && balanceRevision == cached.balanceRevision) {
-            return@withLock cached.history
-        }
-
-        val pages = remoteSource.history(baseUrl, address)
-        val history = BittensorOperationHistory(pages.items, pages.allPagesRead)
-        if (histories.size >= HISTORY_CACHE_LIMIT) histories.clear()
-        histories[cacheKey] = CachedHistory(history, pages.validUntilNanos, balanceRevision)
-        history
+        var latestFlight = 0L
     }
+
+    private data class CacheAdmission(val mayCache: Boolean, val flight: Long)
+
+    private data class HistoryKey(val baseUrl: HttpUrl, val address: String)
+
+    private val lock = Any()
+
+    private val histories = mutableMapOf<HistoryKey, AccountHistory>()
+
+    private val cachedHistories = linkedMapOf<HistoryKey, CachedHistory>()
+
+    internal data class Snapshot(val request: BittensorHistoryRequest, val result: Result<BittensorOperationHistory>?)
+
+    /** Capture before submission so an origin/account switch cannot invalidate another wallet's cache. */
+    suspend fun request(address: String): BittensorHistoryRequest? {
+        val origin = infrastructureUrls.baseUrl() ?: return null
+        return synchronized(lock) {
+            val state = histories.getOrPut(HistoryKey(origin, address)) { AccountHistory() }
+            BittensorHistoryRequest(address, origin, state.generation.value)
+        }
+    }
+
+    /** Explicit cache command after a submitted own trade (success or unknown), never on signing. */
+    fun ownTradeSubmitted(request: BittensorHistoryRequest) = synchronized(lock) {
+        val state = histories.getOrPut(HistoryKey(request.baseUrl, request.address)) { AccountHistory() }
+        cachedHistories.remove(HistoryKey(request.baseUrl, request.address))
+        state.seedBlockedUntilNanos = nowNanos() + SETTLEMENT_NANOS
+        state.generation.value += 1
+    }
+
+    /** Shared while observed. Null means loading, never an unavailable or empty ledger. */
+    fun observe(address: String): Flow<Result<BittensorOperationHistory>?> = flow {
+        while (true) {
+            val request = request(address)
+            if (request == null) {
+                emit(Result.failure(IllegalStateException("Cost basis origin is unavailable")))
+                delay(REFRESH_INTERVAL_MILLIS)
+                continue
+            }
+            coroutineScope {
+                // ComputationalCache logs keys. Neither the account nor the origin belongs in those logs.
+                val identity = (request.baseUrl.toString() + "|" + address).encodeToByteArray()
+                    .blake2b256()
+                    .toHexString()
+                val shared = computationalCache.useSharedFlow("Bittensor.History.$identity", this) {
+                    observeHistory(request)
+                }
+                val state = synchronized(lock) { histories.getValue(HistoryKey(request.baseUrl, address)) }
+                combine(shared, state.generation) { snapshot, generation ->
+                    // Clear immediately even if a cancelled old transport is slow to finish.
+                    if (snapshot.request.generation == generation) snapshot.result else null
+                }
+                    .takeWhile { infrastructureUrls.baseUrl() == request.baseUrl }
+                    .collect { emit(it) }
+            }
+            emit(null)
+        }
+    }
+
+    internal fun observeHistory(request: BittensorHistoryRequest): Flow<Snapshot> {
+        val state = synchronized(lock) { histories.getValue(HistoryKey(request.baseUrl, request.address)) }
+        return state.generation.flatMapLatest { generation ->
+            refreshHistory(request.copy(generation = generation))
+        }
+    }
+
+    private fun refreshHistory(request: BittensorHistoryRequest): Flow<Snapshot> = flow {
+        emit(Snapshot(request, null))
+        while (true) {
+            val result = try {
+                Result.success(history(request))
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+            emit(Snapshot(request, result))
+            // A shared stream never migrates to another origin under its original cache key.
+            if (result.exceptionOrNull() is OriginChanged) awaitCancellation()
+            // Delay after completion: a ten-page request is not cancelled by a refresh tick.
+            delay(REFRESH_INTERVAL_MILLIS)
+        }
+    }
+
+    suspend fun history(request: BittensorHistoryRequest): BittensorOperationHistory {
+        checkOrigin(request)
+        val key = HistoryKey(request.baseUrl, request.address)
+        val admission = synchronized(lock) {
+            val state = requireCurrent(key, request)
+            val now = nowNanos()
+            val blockedUntil = state.seedBlockedUntilNanos
+            val seedAllowed = blockedUntil == null || now >= blockedUntil
+            val cached = cachedHistories[key]
+            if (seedAllowed && cached != null && now < cached.validUntilNanos) {
+                cachedHistories.remove(key)
+                cachedHistories[key] = cached
+                return cached.history
+            }
+            state.latestFlight += 1
+            CacheAdmission(seedAllowed, state.latestFlight)
+        }
+        val pages = remoteSource.history(request.baseUrl, request.address)
+        currentCoroutineContext().ensureActive()
+        checkOrigin(request)
+        val history = BittensorOperationHistory(pages.items, pages.allPagesRead)
+        synchronized(lock) {
+            val state = requireCurrent(key, request)
+            // Settlement responses may be displayed, but never seed a later subscription.
+            // Admission uses eligibility at request start and the remote request-start TTL.
+            if (admission.mayCache && state.latestFlight == admission.flight && nowNanos() < pages.validUntilNanos) {
+                cachedHistories.remove(key)
+                cachedHistories[key] = CachedHistory(history, pages.validUntilNanos)
+                if (cachedHistories.size > HISTORY_CACHE_LIMIT) cachedHistories.remove(cachedHistories.keys.first())
+            }
+        }
+        return history
+    }
+
+    private fun requireCurrent(key: HistoryKey, request: BittensorHistoryRequest): AccountHistory {
+        val state = histories.getValue(key)
+        check(state.generation.value == request.generation) { "Cost basis history was invalidated" }
+        return state
+    }
+
+    private suspend fun checkOrigin(request: BittensorHistoryRequest) {
+        if (infrastructureUrls.baseUrl() != request.baseUrl) throw OriginChanged()
+    }
+
+    private class OriginChanged : IllegalStateException("Cost basis origin has changed")
 
     private companion object {
         const val HISTORY_CACHE_LIMIT = 8
+        const val SETTLEMENT_NANOS = 300_000_000_000L
+        const val REFRESH_INTERVAL_MILLIS = 60_000L
     }
 }

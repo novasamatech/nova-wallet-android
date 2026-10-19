@@ -63,6 +63,7 @@ import io.novafoundation.nova.feature_nft_api.data.repository.NftRepository
 import io.novafoundation.nova.feature_staking_api.data.mythos.MythosMainPotMatcherFactory
 import io.novafoundation.nova.feature_swap_api.data.history.SwapTransferFilterFactory
 import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.PooledBalanceUpdaterFactory
+import io.novafoundation.nova.feature_staking_api.data.network.blockhain.updaters.BittensorBalanceUpdaterFactory
 import io.novafoundation.nova.feature_staking_api.data.nominationPools.pool.PoolAccountDerivation
 import io.novafoundation.nova.feature_swap_api.domain.swap.SwapService
 import io.novafoundation.nova.feature_swap_api.presentation.state.SwapSettingsStateProvider
@@ -186,22 +187,26 @@ class AssetsFeatureModule {
         paymentUpdaterFactory: PaymentUpdaterFactory,
         balanceLocksUpdater: BalanceLocksUpdaterFactory,
         pooledBalanceUpdaterFactory: PooledBalanceUpdaterFactory,
+        bittensorBalanceUpdaterFactory: BittensorBalanceUpdaterFactory,
         accountUpdateScope: AccountUpdateScope,
         storageSharedRequestsBuilderFactory: StorageSharedRequestsBuilderFactory,
         walletRepository: WalletRepository,
         assetVisibilityRepository: AssetVisibilityRepository,
         autoEnableTokensRepository: AutoEnableTokensRepository,
+        externalBalanceRepository: ExternalBalanceRepository,
     ): BalancesUpdateSystem {
         return BalancesUpdateSystem(
             chainRegistry = chainRegistry,
             paymentUpdaterFactory = paymentUpdaterFactory,
             balanceLocksUpdater = balanceLocksUpdater,
             pooledBalanceUpdaterFactory = pooledBalanceUpdaterFactory,
+            bittensorBalanceUpdaterFactory = bittensorBalanceUpdaterFactory,
             accountUpdateScope = accountUpdateScope,
             storageSharedRequestsBuilderFactory = storageSharedRequestsBuilderFactory,
             walletRepository = walletRepository,
             assetVisibilityRepository = assetVisibilityRepository,
-            autoEnableTokensRepository = autoEnableTokensRepository
+            autoEnableTokensRepository = autoEnableTokensRepository,
+            externalBalanceRepository = externalBalanceRepository
         )
     }
 

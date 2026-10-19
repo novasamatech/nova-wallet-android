@@ -67,6 +67,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
                     app:title="@string/bittensor_monthly_tokens"
+                    app:titleIcon="@drawable/ic_info"
                     app:primaryValue="—" />
                 <io.novafoundation.nova.common.view.TableCellView
                     android:id="@+id/projectedAveragePrice"
@@ -103,14 +104,6 @@
                     app:shouldDrawDivider="false" />
             </io.novafoundation.nova.common.view.TableView>
 
-            <TextView
-                style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="@string/bittensor_return_disclaimer"
-                android:textColor="@color/text_secondary" />
             <TextView
                 android:id="@+id/feeCaption"
                 style="@style/TextAppearance.NovaFoundation.Regular.Caption1"

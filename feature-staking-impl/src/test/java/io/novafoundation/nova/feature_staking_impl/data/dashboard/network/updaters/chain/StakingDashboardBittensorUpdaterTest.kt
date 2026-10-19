@@ -7,7 +7,10 @@ import io.novafoundation.nova.core_db.model.StakingDashboardItemLocal
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioLoader
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPositionSource
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSwapSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimPreview
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioPriceRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.RealBittensorPositionRepository
 import io.novafoundation.nova.feature_staking_impl.data.dashboard.cache.StakingDashboardCache
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
@@ -27,6 +30,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
@@ -42,7 +46,9 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val positionSource = mock(BittensorPositionSource::class.java)
 
-    private val swapSource = mock(BittensorSwapSource::class.java)
+    private val rootClaims = mock(BittensorRootClaimSource::class.java)
+
+    private val priceRepository = mock(BittensorPortfolioPriceRepository::class.java)
 
     private val chainStateRepository = mock(ChainStateRepository::class.java)
 
@@ -70,7 +76,7 @@ class StakingDashboardBittensorUpdaterTest {
 
         assertEquals(listOf(BigInteger.TEN, null), stakes)
         assertFalse(requireNotNull(cache.item).hasStake)
-        verifyNoInteractions(swapSource)
+        verifyNoInteractions(priceRepository)
     }
 
     @Test
@@ -81,13 +87,14 @@ class StakingDashboardBittensorUpdaterTest {
         updater().listenForUpdates(subscriptionBuilder).first()
 
         assertFalse(requireNotNull(cache.item).hasStake)
-        verifyNoInteractions(chainStateRepository, positionSource, swapSource)
+        verifyNoInteractions(chainStateRepository, positionSource, priceRepository)
     }
 
     private suspend fun prepare() {
         `when`(chain.id).thenReturn(ChainGeneses.BITTENSOR)
         `when`(metaAccount.id).thenReturn(1L)
         `when`(metaAccount.accountIdIn(chain)).thenReturn(coldKey)
+        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(BittensorRootClaims(emptyList(), BigInteger.ONE))
         `when`(chainStateRepository.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blockNumbers)
         `when`(positionSource.positions(chain.id, coldKey)).thenReturn(
             BittensorStakePositions(listOf(BittensorRootPosition(AccountIdKey(ByteArray(32)), BigInteger.TEN)), emptyList())
@@ -96,7 +103,7 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val logger = mock(Logger::class.java)
 
-    private val portfolioLoader = BittensorPortfolioLoader(swapSource, logger)
+    private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
 
     private val commonModule = CommonModule()
 
@@ -109,8 +116,24 @@ class StakingDashboardBittensorUpdaterTest {
         chainAsset,
         metaAccount,
         positionRepository,
-        cache
+        cache,
+        rootClaims,
+        logger
     )
+
+    @Test
+    fun `redeemable rewards keep zero stake wallet in staking dashboard`() = runBlocking {
+        prepare()
+        `when`(positionSource.positions(chain.id, coldKey)).thenReturn(BittensorStakePositions(emptyList(), emptyList()))
+        val preview = BittensorRootClaimPreview(AccountIdKey(ByteArray(32)), BigInteger.TEN, BigInteger.ONE, BigInteger.ZERO)
+        val claims = BittensorRootClaims(listOf(preview), BigInteger.TEN)
+        `when`(rootClaims.claims(chain.id, coldKey)).thenReturn(claims)
+
+        withTimeout(3_000L) { updater().listenForUpdates(subscriptionBuilder).first() }
+
+        assertTrue(requireNotNull(cache.item).hasStake)
+        assertEquals(BigInteger.ZERO, cache.item?.stake)
+    }
 
     private class RecordingCache : StakingDashboardCache {
 

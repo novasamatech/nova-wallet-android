@@ -2,6 +2,7 @@ package io.novafoundation.nova.infrastructure.attestation
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import java.io.IOException
 import java.security.KeyPairGenerator
 import java.security.KeyStore
 import java.security.PrivateKey
@@ -14,6 +15,8 @@ private const val SIGNATURE_ALGORITHM = "SHA256withECDSA"
 
 interface AttestationKeyPairStore {
 
+    fun contains(alias: String): Boolean
+
     fun publicKey(alias: String): ByteArray
 
     fun sign(alias: String, payload: ByteArray): ByteArray
@@ -23,6 +26,8 @@ interface AttestationKeyPairStore {
 
 class RealAttestationKeyPairStore : AttestationKeyPairStore {
 
+    override fun contains(alias: String): Boolean = keyStore().containsAlias(alias)
+
     override fun publicKey(alias: String): ByteArray {
         ensureGenerated(alias)
 
@@ -30,9 +35,7 @@ class RealAttestationKeyPairStore : AttestationKeyPairStore {
     }
 
     override fun sign(alias: String, payload: ByteArray): ByteArray {
-        ensureGenerated(alias)
-
-        val privateKey = keyStore().getKey(alias, null) as PrivateKey
+        val privateKey = keyStore().getKey(alias, null) as? PrivateKey ?: throw AttestationKeyMissingException()
 
         return Signature.getInstance(SIGNATURE_ALGORITHM).run {
             initSign(privateKey)
@@ -65,3 +68,6 @@ class RealAttestationKeyPairStore : AttestationKeyPairStore {
 
     private fun keyStore() = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
 }
+
+/** Only proven absence permits identity replacement; transient keystore errors must propagate. */
+class AttestationKeyMissingException : IOException("Attestation signing key is missing")

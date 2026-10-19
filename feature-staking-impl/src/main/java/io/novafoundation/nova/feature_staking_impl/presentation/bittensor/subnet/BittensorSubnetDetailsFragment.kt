@@ -1,9 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.core.view.updateLayoutParams
+import androidx.recyclerview.widget.ConcatAdapter
+import io.novafoundation.nova.common.list.CustomPlaceholderAdapter
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
 import coil.request.ImageRequest
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -15,6 +16,8 @@ import io.novafoundation.nova.feature_staking_impl.di.StakingFeatureComponent
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorSubnetIcon
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.displayName
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.observeBittensorRetries
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
+import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
 
 private const val PAYLOAD_KEY = "payload"
@@ -33,6 +36,10 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             .imageLoader()
     }
 
+    private val validatorAdapter by lazy { BittensorPositionAdapter(imageLoader) { viewModel.validatorClicked() } }
+
+    private val validatorShimmer = CustomPlaceholderAdapter(R.layout.item_bittensor_subnet_shimmering)
+
     override fun createBinding() = FragmentBittensorSubnetDetailsBinding.inflate(layoutInflater)
 
     override fun inject() {
@@ -46,36 +53,35 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
     override fun initViews() = with(binder) {
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
-        validator.image.updateLayoutParams {
-            width = 18.dp(requireContext())
-            height = 18.dp(requireContext())
-        }
-        validator.setOnClickListener { viewModel.validatorClicked() }
         useSubnet.setOnClickListener { viewModel.continueClicked() }
         favorite.setOnClickListener { viewModel.toggleFavorite() }
-        preset1.setOnClickListener { viewModel.selectPreset(BittensorStakeAmountPreset.ONE) }
-        preset5.setOnClickListener { viewModel.selectPreset(BittensorStakeAmountPreset.FIVE) }
-        preset10.setOnClickListener { viewModel.selectPreset(BittensorStakeAmountPreset.TEN) }
-        presetMax.setOnClickListener { viewModel.selectPreset(BittensorStakeAmountPreset.MAX) }
+        availableValidators.adapter = ConcatAdapter(validatorShimmer, validatorAdapter)
+        chooseValidator.setOnClickListener { viewModel.validatorClicked() }
         tao.setOnClickListener { viewModel.showFiat(false) }
         fiat.setOnClickListener { viewModel.showFiat(true) }
         chart.onContentVisibilityChanged = { change.isVisible = it }
         chart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         chart.setPlotHeight(208)
         chart.onPeriodSelected = viewModel::selectPeriod
-        more.setOnClickListener { subnetNumber.isVisible = !subnetNumber.isVisible }
+        chart.selectionListener = PriceChartSelectionListener { selection ->
+            viewModel.selectChartPoint(selection)
+            chartDate.isVisible = selection != null
+            if (selection != null) {
+                viewModel.chartDateFormatter.format(selection.point.timestamp, true, chartDate, selection.chart)
+            } else {
+                chartDate.text = null
+            }
+        }
+        more.setOnClickListener {
+            moreDetails.isVisible = !moreDetails.isVisible
+            moreArrow.setImageResource(if (moreDetails.isVisible) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down)
+        }
     }
 
     override fun subscribe(viewModel: BittensorSubnetDetailsViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.selectedChartIndex.observe(chart::setSelectedPeriod)
         viewModel.nativeTokenSymbol.observe { tao.text = it }
-        viewModel.presetLabels.observe { labels ->
-            preset1.text = labels.getValue(BittensorStakeAmountPreset.ONE)
-            preset5.text = labels.getValue(BittensorStakeAmountPreset.FIVE)
-            preset10.text = labels.getValue(BittensorStakeAmountPreset.TEN)
-            presetMax.text = labels.getValue(BittensorStakeAmountPreset.MAX)
-        }
         viewModel.subnet.observe { subnet ->
             val name = subnet.displayName(getString(R.string.bittensor_subnet_number, subnet.id.value))
             toolbar.setTitle("\u200e$name")
@@ -109,23 +115,14 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         }
         viewModel.charts.observe(chart::setCharts)
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
-        viewModel.estimatedAlpha.observe { estimate.text = it }
-        viewModel.pool.observe(pool::showBittensorLoadingValue)
         viewModel.age.observe(age::showBittensorLoadingValue)
-        viewModel.priceHistory.observe(priceHistory::showBittensorLoadingValue)
-        viewModel.priceRange.observe(priceRange::showBittensorLoadingValue)
+        viewModel.parameters.observe { bindSubnetParameters(it) }
         viewModel.validatorCount.observe(validatorCount::showBittensorLoadingValue)
-        viewModel.selectedPreset.observe { selected ->
-            preset1.isSelected = selected == BittensorStakeAmountPreset.ONE
-            preset5.isSelected = selected == BittensorStakeAmountPreset.FIVE
-            preset10.isSelected = selected == BittensorStakeAmountPreset.TEN
-            presetMax.isSelected = selected == BittensorStakeAmountPreset.MAX
+        viewModel.isValidatorLoading.observe {
+            validatorShimmer.show(it)
         }
-        viewModel.selectedValidator.observe { validator.showValue(it?.validator?.name ?: getString(R.string.bittensor_select_validator)) }
-        viewModel.validatorIcon.observe {
-            validator.image.isVisible = it != null
-            validator.image.setImageDrawable(it)
-        }
+        viewModel.availableValidators.observe(validatorAdapter::submitList)
+        viewModel.canChooseValidator.observe { chooseValidator.isVisible = it }
         viewModel.canContinue.observe { useSubnet.isEnabled = it }
         viewModel.favorite.observe {
             favorite.setImageResource(if (it) R.drawable.ic_favorite_heart_filled else R.drawable.ic_favorite_heart_outline)

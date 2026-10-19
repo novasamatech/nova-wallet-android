@@ -16,7 +16,8 @@ internal data class BittensorValidatorSnapshot(
     val commissionsInU16: Map<AccountIdKey, BigInteger?>,
     val permits: List<Boolean>,
     val lastUpdates: List<BigInteger>,
-    val activeThreshold: BigInteger
+    val activeThreshold: BigInteger,
+    val registeredAt: BigInteger? = null
 )
 
 internal fun mapBittensorValidators(
@@ -39,13 +40,13 @@ private fun mapBittensorValidator(
     val uid = snapshot.uids[validator.hotkey] ?: return null
     val commissionInU16 = snapshot.commissionsInU16[validator.hotkey] ?: return null
     if (!gates.allowsCommission(commissionInU16)) return null
-    if (!netuid.isRoot() && snapshot.permits.getOrNull(uid) != true) return null
+    if (!netuid.isRoot() && gates.requirePermit && snapshot.permits.getOrNull(uid) != true) return null
 
     return BittensorSubnetValidator(
         validator = validator,
         address = chain.addressOf(validator.hotkey),
         commissionRate = validatorCommissionRateFromU16(commissionInU16),
-        selectable = isValidatorActive(netuid, uid, snapshot)
+        selectable = !gates.requireActive || isValidatorActive(netuid, uid, snapshot)
     )
 }
 

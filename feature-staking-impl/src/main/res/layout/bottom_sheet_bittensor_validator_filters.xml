@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingHorizontal="16dp"
+    android:paddingBottom="24dp">
+
+    <View style="@style/Widget.Nova.Puller" android:layout_gravity="center_horizontal" android:layout_marginTop="8dp" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/common_filters" />
+
+    <io.novafoundation.nova.common.view.Switch
+        android:id="@+id/hideUnusual"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:title="@string/bittensor_hide_unusual_apy" />
+
+    <TextView
+        style="@style/TextAppearance.NovaFoundation.SemiBold.Title3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/common_sort_by" />
+
+    <RadioGroup
+        android:id="@+id/sorting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <RadioButton
+            android:id="@+id/apy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:buttonTint="@color/tint_radio_button"
+            android:text="@string/bittensor_sort_apy" />
+
+        <RadioButton
+            android:id="@+id/stake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:buttonTint="@color/tint_radio_button"
+            android:text="@string/staking_validator_total_stake" />
+
+        <RadioButton
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:buttonTint="@color/tint_radio_button"
+            android:text="@string/common_name" />
+    </RadioGroup>
+
+    <io.novafoundation.nova.common.view.PrimaryButton
+        android:id="@+id/apply"
+        style="@style/Widget.Nova.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/common_apply" />
+</LinearLayout>

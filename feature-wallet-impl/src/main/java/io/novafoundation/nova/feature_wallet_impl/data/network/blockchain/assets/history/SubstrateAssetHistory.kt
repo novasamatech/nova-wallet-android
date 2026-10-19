@@ -147,7 +147,8 @@ abstract class SubstrateAssetHistory(
 
         val assetsBySubQueryId = chain.assetsBySubQueryId()
 
-        val operations = subqueryResponse.historyElements.nodes.mapNotNull { node ->
+        val visibleNodes = filterBittensorTechnicalTransfers(subqueryResponse.historyElements.nodes.toList(), chain, chainAsset)
+        val operations = visibleNodes.mapNotNull { node ->
             val coinRate = priceHistory.findNearestCoinRate(node.timestamp)
             mapNodeToOperation(node, coinRate, chainAsset, assetsBySubQueryId)
         }

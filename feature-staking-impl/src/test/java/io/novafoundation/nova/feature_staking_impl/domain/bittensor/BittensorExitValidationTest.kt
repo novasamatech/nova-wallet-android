@@ -7,6 +7,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorExitP
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorExitValidationsModule
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitFeeBalanceValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitFeeRemainderValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorExitFeeSourceValidation
 import java.math.BigInteger
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
@@ -37,19 +38,18 @@ class BittensorExitValidationTest {
     }
 
     @Test
-    fun `partial withdrawal plus fee can equal but not exceed stake`() = runBlocking {
+    fun `gross withdrawal already includes stake funded fee`() = runBlocking {
         val payload = validationPayload(quote = quote(stake - BigInteger.ONE))
             .copy(transferable = BigInteger.ZERO)
 
         assertTrue(feeBalanceValidation.validate(payload) is ValidationStatus.Valid)
-        val result = feeBalanceValidation.validate(payload.copy(quote = quote(stake))) as ValidationStatus.NotValid
-        assertEquals(BittensorExitValidationFailure.INSUFFICIENT_FEE_BALANCE, result.reason)
+        assertTrue(feeBalanceValidation.validate(payload.copy(quote = quote(stake))) is ValidationStatus.Valid)
         assertTrue(feeBalanceValidation.validate(payload.copy(quote = quote(stake, full = true))) is ValidationStatus.Valid)
     }
 
     @Test
     fun `remaining stake after fee can equal but not fall below minimum`() = runBlocking {
-        val amount = stake - precision - BigInteger.ONE
+        val amount = stake - precision
         val payload = validationPayload(quote = quote(amount))
             .copy(transferable = BigInteger.ZERO)
 
@@ -60,7 +60,7 @@ class BittensorExitValidationTest {
 
     @Test
     fun `zero remainder full exit and own hotkey bypass fee remainder minimum`() = runBlocking {
-        val payload = validationPayload(quote = quote(stake - BigInteger.ONE))
+        val payload = validationPayload(quote = quote(stake))
             .copy(transferable = BigInteger.ZERO)
 
         assertTrue(feeRemainderValidation.validate(payload) is ValidationStatus.Valid)
@@ -122,6 +122,24 @@ class BittensorExitValidationTest {
     }
 
     @Test
+    fun `fee source transitions in either direction invalidate prepared root amount`() = runBlocking {
+        val validation = BittensorExitFeeSourceValidation()
+        val boundary = validationPayload().copy(transferable = BigInteger.TWO, expectedFeeFromStake = false)
+        assertTrue(validation.validate(boundary) is ValidationStatus.Valid) // fee + ED is exactly covered.
+        val nowStakeFunded = boundary.copy(transferable = BigInteger.ONE)
+        assertEquals(
+            BittensorExitValidationFailure.FEE_SOURCE_CHANGED,
+            (validation.validate(nowStakeFunded) as ValidationStatus.NotValid).reason
+        )
+        val nowFreeFunded = boundary.copy(expectedFeeFromStake = true)
+        assertEquals(
+            BittensorExitValidationFailure.FEE_SOURCE_CHANGED,
+            (validation.validate(nowFreeFunded) as ValidationStatus.NotValid).reason
+        )
+        assertTrue(validation.validate(nowStakeFunded.copy(expectedFeeFromStake = true)) is ValidationStatus.Valid)
+    }
+
+    @Test
     fun `root fee cannot use stake with hold enabled`() {
         val payload = validationPayload()
             .copy(transferable = BigInteger.ZERO, supportsFeeFromStake = false)
@@ -129,10 +147,10 @@ class BittensorExitValidationTest {
     }
 
     @Test
-    fun `root fee must leave minimum stake`() {
+    fun `root fee is not deducted twice from remaining stake`() = runBlocking {
         val payload = validationPayload(quote = quote(stake - precision))
             .copy(transferable = BigInteger.ZERO)
-        assertFailure(payload, BittensorExitValidationFailure.REMAINDER_BELOW_MINIMUM)
+        assertTrue(validationSystem.validate(payload).getOrThrow() is ValidationStatus.Valid)
     }
 
     @Test

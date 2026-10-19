@@ -56,22 +56,28 @@ class BittensorEstimatedCostBasis(
         val seen = mutableSetOf<BittensorReportedOperation>()
         operations.asReversed().forEach { row ->
             if (row.eventId.isNotEmpty() && !seen.add(row)) return@forEach
-            if (BittensorNetuid.from(row.netuid).isRoot() || isNonTradeOperation(row.type)) {
+            val operationWords = operationTypeWords(row.type)
+            val isNonTrade = operationWords.any { it in NON_TRADE_WORDS }
+            if (BittensorNetuid.from(row.netuid).isRoot() || isNonTrade) {
                 return@forEach
             }
-            applyOperation(row)
+            applyOperation(row, operationWords)
         }
     }
 
-    private fun applyOperation(operation: BittensorReportedOperation) {
+    private fun applyOperation(operation: BittensorReportedOperation, operationWords: Set<String>) {
         val trade = parseTrade(operation)
         if (trade == null) {
             unclassified += operation.netuid
             return
         }
         if (trade.amountIn.isZero || trade.amountOut.isZero || trade.price.isZero) return
-        val buy = matchesReportedPrice(trade.amountIn, trade.amountOut, trade.price)
-        val sell = matchesReportedPrice(trade.amountOut, trade.amountIn, trade.price)
+        val fitsPurchase = matchesReportedPrice(trade.amountIn, trade.amountOut, trade.price)
+        val fitsSale = matchesReportedPrice(trade.amountOut, trade.amountIn, trade.price)
+        val hasPurchaseLabel = operationWords.any { it in PURCHASE_WORDS }
+        val hasSaleLabel = operationWords.any { it in SALE_WORDS }
+        val buy = fitsPurchase && (!fitsSale || hasPurchaseLabel)
+        val sell = fitsSale && (!fitsPurchase || hasSaleLabel)
         when {
             buy && !sell -> addPurchase(operation.netuid, trade)
             sell && !buy -> reducePurchase(operation.netuid, trade.amountIn)
@@ -126,31 +132,36 @@ class BittensorEstimatedCostBasis(
         return meetsLowerBound && meetsUpperBound
     }
 
-    private fun isNonTradeOperation(operationType: String?): Boolean {
-        if (operationType == null) return false
+    private fun operationTypeWords(operationType: String?): Set<String> = buildSet {
+        if (operationType == null) return@buildSet
 
-        return operationTypeWords(operationType)
-            .any { it.lowercase() in NON_TRADE_WORDS }
+        var wordStart = 0
+        for (index in operationType.indices) {
+            if (!operationType[index].isLetter()) {
+                if (index > wordStart) add(operationType.substring(wordStart, index).lowercase())
+                wordStart = index + 1
+            } else if (index > wordStart && startsCamelCaseWord(operationType, index)) {
+                add(operationType.substring(wordStart, index).lowercase())
+                wordStart = index
+            }
+        }
+        if (wordStart < operationType.length) add(operationType.substring(wordStart).lowercase())
     }
 
-    private fun operationTypeWords(operationType: String): List<String> {
-        val separatedWords = operationType
-            .replace(CAMEL_CASE_BOUNDARY, "$1 $2")
-            .replace(ACRONYM_WORD_BOUNDARY, "$1 $2")
-
-        return separatedWords.split(NON_LETTER_SEPARATOR)
+    private fun startsCamelCaseWord(value: String, index: Int): Boolean {
+        val previous = value[index - 1]
+        val precedesLowercase = value.getOrNull(index + 1)?.isLowerCase() == true
+        return value[index].isUpperCase() && (previous.isLowerCase() || previous.isUpperCase() && precedesLowercase)
     }
 
     private companion object {
         // Matches the iOS ledger heuristic: accept ratios from 1 / 1.5 through 1.5.
         val PRICE_TOLERANCE_FACTOR = 1.5.toBigDecimal()
 
-        val NON_TRADE_WORDS = setOf("move", "transfer")
+        val NON_TRADE_WORDS = setOf("move", "moved", "transfer", "transferred")
 
-        val CAMEL_CASE_BOUNDARY = Regex("([a-z])([A-Z])")
+        val PURCHASE_WORDS = setOf("add", "added", "buy", "bought")
 
-        val ACRONYM_WORD_BOUNDARY = Regex("([A-Z])([A-Z][a-z])")
-
-        val NON_LETTER_SEPARATOR = Regex("[^A-Za-z]+")
+        val SALE_WORDS = setOf("remove", "removed", "unstake", "sell", "sold")
     }
 }

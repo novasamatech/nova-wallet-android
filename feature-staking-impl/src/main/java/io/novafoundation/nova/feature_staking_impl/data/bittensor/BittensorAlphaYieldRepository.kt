@@ -20,11 +20,11 @@ class BittensorAlphaYieldRepository(
     private val yields = mutableMapOf<String, CachedYields>()
 
     /** The reported rate is an annual percent; validator commission is already accounted for. */
-    suspend fun alphaYields(chain: Chain, subnet: BittensorNetuid.Subnet): Map<AccountIdKey, BigDecimal> = mutex.withLock {
+    suspend fun alphaYields(chain: Chain, subnet: BittensorNetuid.Subnet): Map<AccountIdKey, BigDecimal> {
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
         val cacheKey = "$baseUrl:${subnet.value}"
-        val cached = yields[cacheKey]
-        if (cached != null && System.nanoTime() < cached.validUntilNanos) return@withLock cached.yields
+        val cached = mutex.withLock { yields[cacheKey] }
+        if (cached != null && System.nanoTime() < cached.validUntilNanos) return cached.yields
 
         val pages = remoteSource.yields(baseUrl, chain, subnet)
         val rates = buildMap {
@@ -32,9 +32,11 @@ class BittensorAlphaYieldRepository(
                 if (yield.hotkey !in this) put(yield.hotkey, yield.annualPercentageYield)
             }
         }
-        if (yields.size >= YIELD_CACHE_LIMIT) yields.clear()
-        yields[cacheKey] = CachedYields(rates, pages.validUntilNanos)
-        rates
+        mutex.withLock {
+            if (yields.size >= YIELD_CACHE_LIMIT) yields.clear()
+            yields[cacheKey] = CachedYields(rates, pages.validUntilNanos)
+        }
+        return rates
     }
 
     private companion object {

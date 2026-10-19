@@ -65,6 +65,7 @@ class RealStakingDashboardInteractor(
     private val dAppMetadataRepository: DAppMetadataRepository,
     private val walletRepository: WalletRepository,
     private val totalStakeChainComparatorProvider: TotalStakeChainComparatorProvider,
+    private val bittensorDetailsSource: BittensorDashboardDetailsSource,
 ) : StakingDashboardInteractor {
 
     override suspend fun syncDapps() {
@@ -92,7 +93,10 @@ class RealStakingDashboardInteractor(
 
                 val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
 
-                combine(noPriceDashboardFlow, assetsFlow, ::addPricesToDashboard)
+                val pricedDashboard = combine(noPriceDashboardFlow, assetsFlow, ::addPricesToDashboard)
+                combine(pricedDashboard, bittensorDetailsSource.observe(metaAccount, stakingChains.values)) { dashboard, details ->
+                    dashboard.map { it.withBittensorDetails(details) }
+                }
             }
 
             emitAll(dashboardFlow)
@@ -103,27 +107,23 @@ class RealStakingDashboardInteractor(
         return flow {
             val stakingChains = chainRegistry.stakingChainsById()
             val knownStakingAssets = stakingChains.knownStakingAssets()
-            val metaAccount = accountRepository.getSelectedMetaAccount()
-
-            val noPriceDashboardFlow = combine(
-                dashboardRepository.dashboardItemsFlow(metaAccount.id),
-                stakingDashboardSyncTracker.syncedItemsFlow,
-            ) { dashboardItems, syncedItems ->
-                constructMoreStakingOptions(stakingChains, dashboardItems, syncedItems)
-            }
-
-            val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
             val dApps = dAppMetadataRepository.stakingDAppsFlow()
                 .mapLoading { dapps -> dapps.sortedBy { it.name } }
 
-            val dashboardFlow = combine(
-                noPriceDashboardFlow,
-                assetsFlow,
-                dApps,
-                ::combineNoMoreOptionsInfo
-            )
-
-            emitAll(dashboardFlow)
+            val accountOptions = accountRepository.selectedMetaAccountFlow().flatMapLatest { metaAccount ->
+                val noPriceDashboardFlow = combine(
+                    dashboardRepository.dashboardItemsFlow(metaAccount.id),
+                    stakingDashboardSyncTracker.syncedItemsFlow,
+                ) { dashboardItems, syncedItems ->
+                    constructMoreStakingOptions(stakingChains, dashboardItems, syncedItems)
+                }
+                val assetsFlow = walletRepository.supportedAssetsByIdFlow(metaAccount.id, knownStakingAssets)
+                val dashboardFlow = combine(noPriceDashboardFlow, assetsFlow, dApps, ::combineNoMoreOptionsInfo)
+                combine(dashboardFlow, bittensorDetailsSource.observe(metaAccount, stakingChains.values)) { options, details ->
+                    MoreStakingOptions(options.inAppStaking.map { it.withBittensorDetails(details) }, options.browserStaking)
+                }
+            }
+            emitAll(accountOptions)
         }
     }
 

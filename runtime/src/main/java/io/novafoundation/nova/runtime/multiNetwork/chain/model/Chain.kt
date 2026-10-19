@@ -64,8 +64,13 @@ data class Chain(
         val disabledCheckMetadataHash: Boolean?,
         val sessionLength: Int?,
         val sessionsPerEra: Int?,
-        val timelineChain: ChainId?
+        val timelineChain: ChainId?,
+        val newFeatures: Set<NewFeature>? = null
     )
+
+    enum class NewFeature {
+        STAKING
+    }
 
     data class Types(
         val url: String?,
