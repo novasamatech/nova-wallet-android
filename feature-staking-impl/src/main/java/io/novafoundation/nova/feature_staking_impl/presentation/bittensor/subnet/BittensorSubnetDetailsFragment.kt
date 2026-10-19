@@ -7,6 +7,7 @@ import androidx.core.view.updateLayoutParams
 import coil.request.ImageRequest
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -27,6 +28,10 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             putParcelable(PAYLOAD_KEY, payload)
         }
     }
+
+    private var moreDetailsExpanded = false
+    private var websiteLabel: String? = null
+    private var githubLabel: String? = null
 
     private val imageLoader by lazy {
         FeatureUtils.getCommonApi(requireContext())
@@ -63,11 +68,33 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         chart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         chart.setPlotHeight(208)
         chart.onPeriodSelected = viewModel::selectPeriod
-        more.setOnClickListener { subnetNumber.isVisible = !subnetNumber.isVisible }
+        more.setOnClickListener {
+            moreDetailsExpanded = !moreDetailsExpanded
+            updateMoreDetails()
+        }
+        website.setOnClickListener { viewModel.websiteClicked() }
+        github.setOnClickListener { viewModel.githubClicked() }
+    }
+
+    private fun updateMoreDetails() = with(binder) {
+        subnetNumber.isVisible = moreDetailsExpanded
+        website.isVisible = moreDetailsExpanded && websiteLabel != null
+        github.isVisible = moreDetailsExpanded && githubLabel != null
     }
 
     override fun subscribe(viewModel: BittensorSubnetDetailsViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
+        observeBrowserEvents(viewModel)
+        viewModel.website.observe { label ->
+            websiteLabel = label
+            label?.let { website.showValue(it) }
+            updateMoreDetails()
+        }
+        viewModel.github.observe { label ->
+            githubLabel = label
+            label?.let { github.showValue(it) }
+            updateMoreDetails()
+        }
         viewModel.selectedChartIndex.observe(chart::setSelectedPeriod)
         viewModel.nativeTokenSymbol.observe { tao.text = it }
         viewModel.presetLabels.observe { labels ->

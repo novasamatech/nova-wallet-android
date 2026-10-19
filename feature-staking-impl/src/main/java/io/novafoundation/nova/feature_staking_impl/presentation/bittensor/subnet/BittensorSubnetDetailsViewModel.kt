@@ -8,6 +8,7 @@ import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoaded
+import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
@@ -21,6 +22,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChartRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetLinks
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetPricePoint
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetSafetyInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
@@ -64,7 +66,7 @@ class BittensorSubnetDetailsViewModel(
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
     private val retryController: BittensorRetryController,
     private val subnetSafetyInteractor: BittensorSubnetSafetyInteractor
-) : BaseViewModel() {
+) : BaseViewModel(), Browserable.Presentation by Browserable() {
 
     val retryEvents = retryController.events
 
@@ -145,6 +147,12 @@ class BittensorSubnetDetailsViewModel(
         .shareInBackground()
 
     val favorite = bittensorSubnetInteractor.observeFavorites().map { subnetId.value in it.subnetIds }
+        .shareInBackground()
+
+    val website = subnet.map { it.websiteUrl?.let(BittensorSubnetLinks::websiteLabel) }
+        .shareInBackground()
+
+    val github = subnet.map { it.githubUrl?.let(BittensorSubnetLinks::githubLabel) }
         .shareInBackground()
 
     val canContinue = combine(
@@ -393,6 +401,14 @@ class BittensorSubnetDetailsViewModel(
         } else if (canContinue.first()) {
             router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(subnetId.value, selected.address))
         }
+    }
+
+    fun websiteClicked() = launchUnit {
+        subnet.first().websiteUrl?.let(::showBrowser)
+    }
+
+    fun githubClicked() = launchUnit {
+        subnet.first().githubUrl?.let(::showBrowser)
     }
 
     fun back() = router.back()
