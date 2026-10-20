@@ -245,6 +245,34 @@ class BittensorEstimatesRepositoryTest {
     }
 
     @Test
+    fun `unreliable yields are skipped so the next reliable row of the hotkey wins`() = runBlocking {
+        val address = chain.addressOf(ByteArray(32) { 2 })
+        api.nextYieldPage = { null }
+        api.yieldItems = {
+            listOf(
+                BittensorAlphaYieldsRemote.Item(
+                    1,
+                    address,
+                    "669990.45",
+                    "ALPHA_VALIDATOR_APY",
+                    rateReliability = "UNRELIABLE"
+                ),
+                BittensorAlphaYieldsRemote.Item(
+                    1,
+                    address,
+                    "52.1",
+                    "ALPHA_VALIDATOR_APY",
+                    rateReliability = "RELIABLE"
+                )
+            )
+        }
+
+        val yields = yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
+
+        assertEquals(listOf(BigDecimal("52.1")), yields.values.toList())
+    }
+
+    @Test
     fun `yield loading preserves the three page limit`() = runBlocking {
         api.nextYieldPage = { it + 1 }
 

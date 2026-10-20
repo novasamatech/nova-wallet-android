@@ -9,7 +9,9 @@ class BittensorAlphaYieldsRemote(
         val netuid: Int?,
         val hotkey: String?,
         val reportedRate: String?,
-        val metricKind: String?
+        val metricKind: String?,
+        /** The server's verdict on [reportedRate] (ADR-0045); only `RELIABLE` is accepted by the mapper, absent on an older backend. */
+        val rateReliability: String? = null
     )
     class Meta(val components: Components?)
     class Components(val alphaYield: BittensorRecommendationsRemote.Component?)
