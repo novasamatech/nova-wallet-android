@@ -23,6 +23,7 @@ fun BittensorStakeValidationFailure.message(resources: ResourceManager): String 
         BittensorStakeValidationFailure.QUOTE_EXPIRED -> R.string.bittensor_validation_quote_expired
         BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED -> R.string.bittensor_validation_slippage
         BittensorStakeValidationFailure.HIGH_PRICE_IMPACT -> R.string.bittensor_validation_price_impact
+        BittensorStakeValidationFailure.INACTIVE_VALIDATOR -> R.string.bittensor_inactive_validator_message
     }
 )
 
@@ -33,6 +34,18 @@ fun bittensorStakeValidationFailureUi(
     refreshQuote: () -> Unit
 ): TransformedFailure {
     val reason = failure.reason
+    if (reason == BittensorStakeValidationFailure.INACTIVE_VALIDATOR) {
+        return TransformedFailure.Custom(
+            CustomDialogDisplayer.Payload(
+                title = resources.getString(R.string.bittensor_inactive_validator_title),
+                message = reason.message(resources),
+                okAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_continue)) {
+                    actions.revalidate { it.copy(inactiveValidatorAccepted = true) }
+                },
+                cancelAction = CustomDialogDisplayer.Payload.DialogAction.noOp(resources.getString(R.string.common_cancel))
+            )
+        )
+    }
     if (reason == BittensorStakeValidationFailure.QUOTE_EXPIRED || reason == BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED) {
         return TransformedFailure.Custom(
             CustomDialogDisplayer.Payload(

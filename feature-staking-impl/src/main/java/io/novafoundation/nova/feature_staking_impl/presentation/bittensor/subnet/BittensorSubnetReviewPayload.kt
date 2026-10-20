@@ -12,5 +12,6 @@ class BittensorSubnetReviewPayload(
     val metaId: Long,
     val validatorAddress: String,
     val slippage: BigDecimal,
-    val existingPosition: Boolean = false
+    val existingPosition: Boolean = false,
+    val inactiveValidatorAccepted: Boolean = false
 ) : Parcelable

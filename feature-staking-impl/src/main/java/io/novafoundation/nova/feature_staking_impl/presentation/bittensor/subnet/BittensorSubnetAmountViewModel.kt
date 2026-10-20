@@ -12,7 +12,6 @@ import io.novafoundation.nova.common.presentation.DescriptiveButtonState
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
@@ -39,10 +38,12 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.initialBittensorValidatorAddress
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBittensorStake
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
@@ -57,6 +58,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.loadedFeeOrNull
@@ -71,7 +75,6 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
@@ -120,8 +123,6 @@ class BittensorSubnetAmountViewModel(
 
     val isQuickPick = quickPickOrder != null
 
-    private val calculatingMax = MutableStateFlow(false)
-
     private val validating = MutableStateFlow(false)
 
     private val quoteRefresh = MutableStateFlow(0)
@@ -162,7 +163,7 @@ class BittensorSubnetAmountViewModel(
                         presetValidatorInteractor.validators(subnet.id)
                     } else {
                         val validators = bittensorSubnetStakingInteractor.validators(subnet.id)
-                        require(validators.any { it.address == explicitAddress && it.selectable }) { "Selected validator is unavailable" }
+                        require(validators.any { it.address == explicitAddress && it.canSelect }) { "Selected validator is unavailable" }
                         validators
                     }
                 }.withSafeLoading()
@@ -173,7 +174,13 @@ class BittensorSubnetAmountViewModel(
                 step = "subnet validators",
                 transform = { it.withSafeLoading() }
             ) {
-                flowOf { bittensorSubnetStakingInteractor.validators(subnet.id) }
+                flowOf {
+                    if (existingPosition) {
+                        listOf(bittensorSubnetStakingInteractor.existingPositionValidator(subnet.id, requireNotNull(validatorAddress)))
+                    } else {
+                        bittensorSubnetStakingInteractor.validators(subnet.id)
+                    }
+                }
             }
         }
     }
@@ -186,7 +193,9 @@ class BittensorSubnetAmountViewModel(
 
     private val selectedValidator = combine(validatorsState, selectedValidatorAddress) { state, address ->
         address?.let { selectedAddress ->
-            val validator = state.dataOrNull?.firstOrNull { it.address == selectedAddress && it.selectable }?.validator
+            val validator = state.dataOrNull?.firstOrNull {
+                it.address == selectedAddress && (if (existingPosition) it.canAddToExistingPosition else it.canSelect)
+            }?.validator
             QuoteValidator(selectedAddress, validator)
         }
     }.shareInBackground()
@@ -218,10 +227,25 @@ class BittensorSubnetAmountViewModel(
     private val walletContext = walletState.mapNotNull { it.dataOrNull }
         .shareInBackground()
 
+    private val feeContext = walletContext
+        .map { it.asset.token.configuration }
+        .asFeeContextFromSelf()
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorSubnetStakeDraft>>(
+        scope = this,
+        feeContext = feeContext
+    )
+
+    private val maxActionProvider = MaxActionProvider.create(this) {
+        walletContext.map { it.asset }
+            .providingMaxOf { maximumBittensorStake(it.transferableInPlanks, BigInteger.ZERO) }
+            .deductFee(feeLoaderMixin)
+    }
+
     private val amountChooser = amountChooserFactory.create(
         scope = this,
         assetFlow = walletContext.map { it.asset },
-        maxActionProvider = null
+        maxActionProvider = maxActionProvider
     )
 
     val amount = amountChooser.inputState.map { it.value }
@@ -239,11 +263,6 @@ class BittensorSubnetAmountViewModel(
     }
         .shareInBackground()
 
-    val maxAmount = walletContext.map { wallet ->
-        tokenFormatter.formatToken(wallet.asset.transferable, wallet.asset.token.configuration.symbol).toString()
-    }
-        .shareInBackground()
-
     private val estimateQuoteRequest = combine(
         walletState,
         subnetState,
@@ -254,7 +273,7 @@ class BittensorSubnetAmountViewModel(
         val wallet = walletState.dataOrNull ?: return@combine null
         val subnet = subnetState.dataOrNull ?: return@combine null
         val selected = validator ?: return@combine null
-        if (quickPickOrder != null && selected.validator == null) return@combine null
+        if (selected.validator == null) return@combine null
         val decimalAmount = amount.toBigDecimalOrNull()
             ?.takeIf { it.isPositive } ?: BigDecimal.ONE
         val planks = wallet.asset.token.configuration.planksFromAmount(decimalAmount)
@@ -391,15 +410,6 @@ class BittensorSubnetAmountViewModel(
     }
         .shareInBackground()
 
-    private val feeContext = walletContext
-        .map { it.asset.token.configuration }
-        .asFeeContextFromSelf()
-
-    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorSubnetStakeDraft>>(
-        scope = this,
-        feeContext = feeContext
-    )
-
     val fee = combine(
         feeDraft,
         quoteState,
@@ -415,6 +425,13 @@ class BittensorSubnetAmountViewModel(
         bittensorNeedsFunding(wallet?.asset?.transferableInPlanks, networkFee, existingPosition)
     }
         .distinctUntilChanged()
+        .shareInBackground()
+
+    private val maximumAmount = maxActionProvider.maxAvailableBalance
+        .map { BittensorMaxAmount(it.actualAmount, it.chainAsset.symbol) }
+        .shareInBackground()
+
+    val maxAmount = maximumAmount.map { tokenFormatter.formatToken(it.amount, it.symbol).toString() }
         .shareInBackground()
 
     val getAssetOptionsMixin = getAssetOptionsMixinFactory.create(
@@ -500,13 +517,12 @@ class BittensorSubnetAmountViewModel(
         quoteRequest,
         currentQuote,
         walletState,
-        quoteState,
-        calculatingMax
+        quoteState
     ) {
-            request, quote, wallet, quoteState, calculatingMax ->
+            request, quote, wallet, quoteState ->
         val label = resources.getString(R.string.common_continue)
         when {
-            calculatingMax || wallet.isLoading() -> DescriptiveButtonState.Loading
+            wallet.isLoading() -> DescriptiveButtonState.Loading
             request == null || wallet.isError() || quoteState.isError() -> DescriptiveButtonState.Disabled(label)
             wallet.dataOrNull?.let { request.amount > it.asset.transferableInPlanks } == true -> DescriptiveButtonState.Disabled(label)
             quote == null -> DescriptiveButtonState.Loading
@@ -556,6 +572,7 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun amountChanged(value: String) {
+        if (amountChooser.inputState.value.value == value) return
         amountChooser.setAmountInput(value, initiatedByUser = true)
     }
 
@@ -578,40 +595,19 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun validatorClicked() = launchUnit {
-        if (existingPosition || calculatingMax.value || validating.value) return@launchUnit
+        if (existingPosition || validating.value) return@launchUnit
         val subnetId = subnet.first()?.id ?: return@launchUnit
         val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, selectedValidatorAddress.first())
         validatorCommunicator.openRequest(request)
     }
 
     fun maxClicked() = launchUnit {
-        if (calculatingMax.value || validating.value) return@launchUnit
-        calculatingMax.value = true
-        try {
-            val wallet = walletContext.first()
-            val subnetId = subnet.first()?.id ?: return@launchUnit
-            val validatorAddress = selectedValidatorAddress.first() ?: return@launchUnit
-            val maximum = bittensorSubnetStakingInteractor.maximumStake(
-                wallet.metaId,
-                subnetId,
-                validatorAddress,
-                BittensorSlippage(selectedSlippage.first())
-            )
-            val maximumAmount = wallet.asset.token.amountFromPlanks(maximum).toStripTrailingZerosString()
-            amountChooser.setAmountInput(maximumAmount)
-        } catch (e: TimeoutCancellationException) {
-            reportFailure(e)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            reportFailure(e)
-        } finally {
-            calculatingMax.value = false
-        }
+        if (validating.value) return@launchUnit
+        amountChooser.maxAction.maxClick.first()?.invoke()
     }
 
     fun subnetClicked() = launchUnit {
-        if (existingPosition || calculatingMax.value || validating.value) return@launchUnit
+        if (existingPosition || validating.value) return@launchUnit
         val selectedSubnet = subnet.first() ?: return@launchUnit
         val payload = BittensorSubnetDetailsPayload(
             subnetId = selectedSubnet.id.value,
@@ -624,7 +620,7 @@ class BittensorSubnetAmountViewModel(
     fun chooseSubnetClicked() = router.openBittensorChooseSubnet(BittensorChooseSubnetPayload(replaceAmount = true))
 
     fun continueClicked() = launchUnit {
-        if (calculatingMax.value || validating.value) return@launchUnit
+        if (validating.value) return@launchUnit
         val request = quoteRequest.first() ?: return@launchUnit
         val quote = currentQuote.first() ?: return@launchUnit
         if (quote.request != request) return@launchUnit
@@ -646,7 +642,7 @@ class BittensorSubnetAmountViewModel(
                         resources
                     ) { quoteRefresh.value += 1 }
                 }
-            ) { openReview(request) }
+            ) { validated -> openReview(request, validated.inactiveValidatorAccepted) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -656,7 +652,7 @@ class BittensorSubnetAmountViewModel(
         }
     }
 
-    private fun openReview(request: QuoteRequest) = launchUnit {
+    private fun openReview(request: QuoteRequest, inactiveValidatorAccepted: Boolean) = launchUnit {
         validating.value = false
         if (quoteRequest.first() != request) return@launchUnit
         router.openBittensorSubnetReview(
@@ -666,7 +662,8 @@ class BittensorSubnetAmountViewModel(
                 request.metaId,
                 request.validatorAddress,
                 request.slippage,
-                existingPosition = existingPosition
+                existingPosition = existingPosition,
+                inactiveValidatorAccepted = inactiveValidatorAccepted
             )
         )
     }
@@ -677,7 +674,7 @@ class BittensorSubnetAmountViewModel(
         val draft = if (quickPickOrder != null) {
             bittensorSubnetStakingInteractor.previewDraft(request.metaId, quote, requireNotNull(request.validator))
         } else {
-            bittensorSubnetStakingInteractor.prepareDraft(request.metaId, quote, request.validatorAddress)
+            bittensorSubnetStakingInteractor.prepareDraft(request.metaId, quote, request.validatorAddress, existingPosition)
         }
         return QuoteResult(request, draft)
     }

@@ -22,14 +22,15 @@ internal fun sortBittensorValidators(
     includeUnavailable: Boolean = false
 ): List<BittensorSubnetValidator> {
     val nameComparator = Collator.getInstance(locale)
-    val comparator = compareByDescending<BittensorSubnetValidator> { it.address == preselectedAddress }
+    val comparator = compareBy<BittensorSubnetValidator> { it.inactive }
+        .thenByDescending { it.address == preselectedAddress }
         .thenByDescending { if (sorting == BittensorValidatorSorting.APY) yields[it.validator.hotkey] else null }
         .thenByDescending { if (sorting != BittensorValidatorSorting.NAME) it.validator.reportedStake else null }
         .thenComparator { first, second -> nameComparator.compare(first.validator.name, second.validator.name) }
         .thenBy { it.address }
 
     return validators
-        .filter { it.selectable || includeUnavailable }
-        .filter { !hideUnusualApy || it.recommended || it.address == selectedAddress || it.address == preselectedAddress || !it.selectable }
+        .filter { it.canSelect || includeUnavailable }
+        .filter { !hideUnusualApy || it.recommended || it.address == selectedAddress || it.address == preselectedAddress || !it.recommendationsAvailable }
         .sortedWith(comparator)
 }

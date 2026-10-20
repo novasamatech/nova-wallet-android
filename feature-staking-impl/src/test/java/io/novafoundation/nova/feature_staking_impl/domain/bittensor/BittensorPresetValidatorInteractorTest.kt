@@ -56,6 +56,13 @@ class BittensorPresetValidatorInteractorTest {
     }
 
     @Test
+    fun `inactive highest yield is skipped even when recommendation and gates allow it`() = runBlocking<Unit> {
+        `when`(repository.validators(chain, subnet)).thenReturn(listOf(second.copy(inactive = true), first, third))
+        assertEquals(first, interactor.validators(subnet).first())
+        verify(repository, never()).validate(chain, subnet, second.validator)
+    }
+
+    @Test
     fun `unavailable automatic candidate falls back once`() = runBlocking<Unit> {
         doThrow(IllegalStateException("inactive")).`when`(repository).validate(chain, subnet, second.validator)
 

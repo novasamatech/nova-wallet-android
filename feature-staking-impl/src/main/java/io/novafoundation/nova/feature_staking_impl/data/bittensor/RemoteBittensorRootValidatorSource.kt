@@ -32,7 +32,7 @@ class RemoteBittensorRootValidatorSource(
     }
 
     override suspend fun preferredValidator(chain: Chain, positions: List<BittensorRootPosition>): BittensorValidator? {
-        val eligible = validators.rootValidators(chain).filter { it.selectable }
+        val eligible = validators.rootValidators(chain).filter { it.canSelect }
         val existing = positions.filter { it.stakeInPlanks.isPositive() }
             .maxByOrNull { it.stakeInPlanks }
             ?.validatorHotkey

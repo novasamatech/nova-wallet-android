@@ -53,6 +53,7 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
     override fun initViews(): Unit = with(binder) {
         toolbar.setHomeButtonListener { viewModel.back() }
         onBackPressed { viewModel.back() }
+        subnets.itemAnimator = null
         subnets.adapter = ConcatAdapter(rootAdapter, shimmeringAdapter, adapter)
         toolbar.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
         sorting.setDrawableEnd(R.drawable.ic_chevron_right_16, widthInDp = 16, tint = R.color.icon_accent)
@@ -83,18 +84,20 @@ class BittensorChooseSubnetFragment : BaseFragment<BittensorChooseSubnetViewMode
         viewModel.hideThinPools.observe { filters.setImageTintRes(if (it) R.color.icon_accent else R.color.icon_secondary) }
         viewModel.filterDescription.observe { filterDescription = it }
         viewModel.subnetCount.observe { subnetCount.text = it }
-        viewModel.list.observe { list ->
-            rootAdapter.submitList(list.filterIsInstance<BittensorSubnetListItem.Root>())
-            adapter.submitList(list.filterIsInstance<BittensorSubnetListItem.Subnet>())
+        viewModel.listState.observe { state ->
+            rootAdapter.submitList(state.items.filterIsInstance<BittensorSubnetListItem.Root>())
+            adapter.submitList(state.items.filterIsInstance<BittensorSubnetListItem.Subnet>()) {
+                shimmeringAdapter.show(state.loading)
+            }
         }
         viewModel.isEmpty.observe { empty.isVisible = it }
         viewModel.emptyMessage.observe { empty.text = it }
-        viewModel.isLoading.observe(shimmeringAdapter::show)
     }
 
     override fun onDestroyView() {
         filterSheet?.dismiss()
         filterSheet = null
+        binder.subnets.adapter = null
         super.onDestroyView()
     }
 }

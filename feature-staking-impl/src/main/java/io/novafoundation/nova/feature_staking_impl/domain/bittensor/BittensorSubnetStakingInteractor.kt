@@ -24,7 +24,9 @@ import kotlinx.coroutines.withTimeout
 data class BittensorSubnetStakeDraft(
     val metaId: Long,
     val validator: BittensorValidator,
-    val operation: BittensorSubnetStakeOperation
+    val operation: BittensorSubnetStakeOperation,
+    val existingPosition: Boolean = false,
+    val inactiveValidatorAccepted: Boolean = false
 )
 
 data class BittensorPreparedSubnetStake(val subnet: BittensorSubnet, val draft: BittensorSubnetStakeDraft)
@@ -56,7 +58,8 @@ class BittensorSubnetStakingInteractor(
         metaId: Long,
         subnetId: BittensorNetuid.Subnet,
         validatorAddress: String,
-        slippage: BittensorSlippage = bittensorSubnetInteractor.slippage
+        slippage: BittensorSlippage = bittensorSubnetInteractor.slippage,
+        existingPosition: Boolean = false
     ): BigInteger = withTimeout(60_000L) {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
         val asset = walletRepository.assetFlow(metaId, chain.utilityAsset)
@@ -64,7 +67,7 @@ class BittensorSubnetStakingInteractor(
         if (maximumBittensorStake(asset.transferableInPlanks, BigInteger.ZERO).isZero) {
             return@withTimeout BigInteger.ZERO
         }
-        val validator = requireEligibleValidator(chain, subnetId, validatorAddress)
+        val validator = resolveValidator(chain, subnetId, validatorAddress, existingPosition)
         val beneficiary = AccountIdKey(chain.accountIdOf(beneficiaryAddress))
         val quote = bittensorSubnetInteractor.quote(subnetId, asset.transferableInPlanks, slippage)
         val operation = BittensorSubnetStakeOperation(quote, validator.hotkey, beneficiary)
@@ -79,22 +82,24 @@ class BittensorSubnetStakingInteractor(
         subnetId: BittensorNetuid.Subnet,
         amount: BigInteger,
         validatorAddress: String,
-        slippage: BittensorSlippage = bittensorSubnetInteractor.slippage
+        slippage: BittensorSlippage = bittensorSubnetInteractor.slippage,
+        existingPosition: Boolean = false
     ): BittensorPreparedSubnetStake = withTimeout(60_000L) {
         val subnet = bittensorSubnetInteractor.subnet(subnetId)
         val quote = bittensorSubnetInteractor.quote(subnetId, amount, slippage)
-        val draft = prepareDraft(metaId, quote, validatorAddress)
+        val draft = prepareDraft(metaId, quote, validatorAddress, existingPosition)
         BittensorPreparedSubnetStake(subnet, draft)
     }
 
     suspend fun prepareDraft(
         metaId: Long,
         quote: BittensorSubnetBuyQuote,
-        validatorAddress: String
+        validatorAddress: String,
+        existingPosition: Boolean = false
     ): BittensorSubnetStakeDraft {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        val validator = requireEligibleValidator(chain, quote.subnetId, validatorAddress)
-        return previewDraft(metaId, quote, validator)
+        val validator = resolveValidator(chain, quote.subnetId, validatorAddress, existingPosition)
+        return previewDraft(metaId, quote, validator).copy(existingPosition = existingPosition)
     }
 
     /** A display/fee draft from an already checked preset; review and submission revalidate eligibility. */
@@ -107,7 +112,12 @@ class BittensorSubnetStakingInteractor(
 
     suspend fun execute(draft: BittensorSubnetStakeDraft): BittensorOperationResult {
         val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
-        validatorRepository.validate(chain, draft.operation.quote.subnetId, draft.validator)
+        if (draft.existingPosition) {
+            val row = validatorRepository.existingPositionValidator(chain, draft.operation.quote.subnetId, draft.validator)
+            require(!row.inactive || draft.inactiveValidatorAccepted) { "Inactive validator warning must be accepted" }
+        } else {
+            validatorRepository.validate(chain, draft.operation.quote.subnetId, draft.validator)
+        }
         val historyRequest = costBasisInteractor.ownTradeRequest(draft.metaId, chain)
         val result = submissionExecutor.execute(
             draft.metaId,
@@ -133,7 +143,9 @@ class BittensorSubnetStakingInteractor(
             hotkey = draft.validator.hotkey.value,
             amount = quote.totalTaoInPlanks,
             fee = fee,
-            quote = quote
+            quote = quote,
+            existingPosition = draft.existingPosition,
+            inactiveValidatorAccepted = draft.inactiveValidatorAccepted
         )
     }
 
@@ -154,9 +166,26 @@ class BittensorSubnetStakingInteractor(
 
     private suspend fun requireEligibleValidator(chain: Chain, subnetId: BittensorNetuid.Subnet, address: String): BittensorValidator {
         val candidates = validatorRepository.validators(chain, subnetId)
-        val eligibleValidator = candidates.firstOrNull { it.address == address && it.selectable }
+        val eligibleValidator = candidates.firstOrNull { it.address == address && it.canSelect }
         return requireNotNull(eligibleValidator) { "Validator is no longer eligible in this subnet" }
             .validator
+    }
+
+    private suspend fun resolveValidator(
+        chain: Chain,
+        subnetId: BittensorNetuid.Subnet,
+        address: String,
+        existingPosition: Boolean
+    ): BittensorValidator {
+        if (!existingPosition) return requireEligibleValidator(chain, subnetId, address)
+        val validator = BittensorValidator(AccountIdKey(chain.accountIdOf(address)), address)
+        return validatorRepository.existingPositionValidator(chain, subnetId, validator).validator
+    }
+
+    suspend fun existingPositionValidator(subnetId: BittensorNetuid.Subnet, address: String): BittensorSubnetValidator {
+        val chain = chainRegistry.getChain(ChainGeneses.BITTENSOR)
+        val validator = BittensorValidator(AccountIdKey(chain.accountIdOf(address)), address)
+        return validatorRepository.existingPositionValidator(chain, subnetId, validator)
     }
 
     suspend fun validators(subnetId: BittensorNetuid.Subnet): List<BittensorSubnetValidator> {

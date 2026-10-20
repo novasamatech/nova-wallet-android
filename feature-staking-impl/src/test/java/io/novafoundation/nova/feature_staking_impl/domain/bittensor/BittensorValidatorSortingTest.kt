@@ -89,8 +89,26 @@ class BittensorValidatorSortingTest {
     }
 
     @Test
+    fun `inactive preselected validator sorts after every active validator`() {
+        val inactive = validator("Inactive", "999", recommended = true).copy(inactive = true)
+        val active = validator("Active", "1")
+        BittensorValidatorSorting.entries.forEach { sorting ->
+            val rows = sortBittensorValidators(
+                listOf(inactive, active),
+                sorting,
+                inactive.address,
+                Locale.US,
+                includeUnavailable = true
+            )
+            assertEquals(listOf(active, inactive), rows)
+        }
+        assertEquals(active.address, initialBittensorValidatorAddress(null, listOf(inactive, active)))
+        assertEquals(inactive.address, initialBittensorValidatorAddress(inactive.address, listOf(inactive, active)))
+    }
+
+    @Test
     fun `unavailable directory stays readable during recommendation recovery`() {
-        val row = validator("Unavailable", "10", selectable = false)
+        val row = validator("Unavailable", "10", selectable = false).copy(recommendationsAvailable = false)
         val rows = sortBittensorValidators(
             listOf(row),
             BittensorValidatorSorting.APY,
@@ -100,6 +118,29 @@ class BittensorValidatorSortingTest {
             includeUnavailable = true
         )
         assertEquals(listOf(row), rows)
+    }
+
+    @Test
+    fun `inactive rows respect the unusual filter and return after removing it`() {
+        val row = validator("Inactive", "10", selectable = false).copy(inactive = true)
+        val filtered = sortBittensorValidators(
+            listOf(row),
+            BittensorValidatorSorting.APY,
+            null,
+            Locale.US,
+            hideUnusualApy = true,
+            includeUnavailable = true
+        )
+        assertEquals(emptyList<BittensorSubnetValidator>(), filtered)
+        val unfiltered = sortBittensorValidators(
+            listOf(row),
+            BittensorValidatorSorting.APY,
+            null,
+            Locale.US,
+            hideUnusualApy = false,
+            includeUnavailable = true
+        )
+        assertEquals(listOf(row), unfiltered)
     }
 
     private fun sort(

@@ -117,7 +117,8 @@ class BittensorSubnetReviewViewModel(
     private val tokenFormatter: TokenFormatter,
     private val chainStateRepository: ChainStateRepository,
     private val selectedSlippage: BigDecimal,
-    val existingPosition: Boolean = false
+    val existingPosition: Boolean = false,
+    private val inactiveValidatorAccepted: Boolean = false
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     val retryEvents = retryController.events
@@ -163,7 +164,8 @@ class BittensorSubnetReviewViewModel(
                     subnetId,
                     totalInPlanks,
                     validatorAddress,
-                    BittensorSlippage(selectedSlippage)
+                    BittensorSlippage(selectedSlippage),
+                    existingPosition = existingPosition
                 )
             }
         }
@@ -421,6 +423,7 @@ class BittensorSubnetReviewViewModel(
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
+                .copy(inactiveValidatorAccepted = inactiveValidatorAccepted)
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
@@ -432,7 +435,9 @@ class BittensorSubnetReviewViewModel(
                         resources
                     ) { preparationRefresh.value += 1 }
                 }
-            ) { executeStake(prepared, fee.fee) }
+            ) { validated ->
+                executeStake(prepared.copy(inactiveValidatorAccepted = validated.inactiveValidatorAccepted), fee.fee)
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

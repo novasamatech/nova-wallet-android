@@ -81,7 +81,8 @@ class BittensorSubnetReviewModule {
             tokenFormatter = tokenFormatter,
             chainStateRepository = chainStateRepository,
             selectedSlippage = payload.slippage,
-            existingPosition = payload.existingPosition
+            existingPosition = payload.existingPosition,
+            inactiveValidatorAccepted = payload.inactiveValidatorAccepted
         )
     }
 

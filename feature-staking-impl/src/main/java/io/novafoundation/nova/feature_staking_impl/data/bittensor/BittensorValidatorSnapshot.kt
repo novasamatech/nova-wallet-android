@@ -37,21 +37,31 @@ private fun mapBittensorValidator(
     gates: BittensorValidatorGates,
     snapshot: BittensorValidatorSnapshot
 ): BittensorSubnetValidator? {
-    val uid = snapshot.uids[validator.hotkey] ?: return null
+    val uid = snapshot.uids[validator.hotkey]
+    if (netuid.isRoot() && uid == null) return null
     val commissionInU16 = snapshot.commissionsInU16[validator.hotkey] ?: return null
     if (!gates.allowsCommission(commissionInU16)) return null
-    if (!netuid.isRoot() && gates.requirePermit && snapshot.permits.getOrNull(uid) != true) return null
+    val hasPermit = uid?.let { snapshot.permits.getOrNull(it) }
+    val active = uid?.let { snapshot.lastUpdates.getOrNull(it) }?.let { it >= snapshot.activeThreshold }
+    val inactive = snapshot.isInactive(netuid, validator.hotkey)
+    val eligible = uid != null &&
+        (netuid.isRoot() || !gates.requirePermit || hasPermit == true) &&
+        (netuid.isRoot() || !gates.requireActive || active == true)
 
     return BittensorSubnetValidator(
         validator = validator,
         address = chain.addressOf(validator.hotkey),
         commissionRate = validatorCommissionRateFromU16(commissionInU16),
-        selectable = !gates.requireActive || isValidatorActive(netuid, uid, snapshot)
+        selectable = eligible,
+        inactive = inactive,
+        canAddToExistingPosition = eligible || inactive
     )
 }
 
-private fun isValidatorActive(netuid: BittensorNetuid, uid: Int, snapshot: BittensorValidatorSnapshot): Boolean {
-    if (netuid.isRoot()) return true
-    val lastUpdate = snapshot.lastUpdates.getOrNull(uid) ?: return false
-    return lastUpdate >= snapshot.activeThreshold
+internal fun BittensorValidatorSnapshot.isInactive(netuid: BittensorNetuid, hotkey: AccountIdKey): Boolean {
+    if (netuid.isRoot()) return false
+    val uid = uids[hotkey] ?: return true
+    val hasPermit = permits.getOrNull(uid) ?: return false
+    val lastUpdate = lastUpdates.getOrNull(uid) ?: return false
+    return !hasPermit || lastUpdate < activeThreshold
 }

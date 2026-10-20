@@ -414,6 +414,22 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         }
     }
 
+    @Test
+    fun `additional subnet stake requires accepted inactivity warning before signing`() = runBlocking {
+        org.junit.Assume.assumeTrue(stakingType == StakingType.SUBNET)
+        val row = BittensorSubnetValidator(validator, "address", BigDecimal.ZERO, false, inactive = true, canAddToExistingPosition = true)
+        `when`(subnetValidators.existingPositionValidator(chain, subnetId, validator)).thenReturn(row)
+        val existing = subnetDraft.copy(existingPosition = true)
+
+        val rejected = runCatching { subnetStakingInteractor.execute(existing) }
+        assertTrue(rejected.exceptionOrNull() is IllegalArgumentException)
+        verifyNoInteractions(costBasis)
+
+        assertTrue(subnetStakingInteractor.execute(existing.copy(inactiveValidatorAccepted = true)) is BittensorOperationResult.Success)
+        verify(subnetValidators, org.mockito.Mockito.times(2)).existingPositionValidator(chain, subnetId, validator)
+        verify(subnetValidators, org.mockito.Mockito.never()).validate(chain, subnetId, validator)
+    }
+
     private suspend fun execute(): BittensorOperationResult = when (stakingType) {
         StakingType.ROOT -> rootInteractor.executeRootStake(
             BittensorRootStakeRequest(

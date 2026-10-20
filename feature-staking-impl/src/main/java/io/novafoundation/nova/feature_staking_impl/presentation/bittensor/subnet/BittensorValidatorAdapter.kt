@@ -57,19 +57,19 @@ class BittensorValidatorAdapter(
             onInfo: (BittensorValidatorUi) -> Unit
         ) = with(binder) {
             val row = model.eligibility
-            root.alpha = if (row.selectable) 1f else 0.5f
-            choice.isChecked = selected
-            choice.isEnabled = row.selectable
-            bindAccessibility(selected)
+            root.alpha = if (row.canSelect) 1f else 0.5f
+            choice.isChecked = selected && row.canSelect
+            choice.isEnabled = row.canSelect
+            bindAccessibility(selected && row.canSelect)
             name.text = bittensorValidatorDisplayName(row)
             subtitle.text = model.subtitle ?: formatSubtitle(row)
-            apy.text = model.apy
-            apy.isVisible = model.apy != null
-            apy.setTextColorRes(model.apyColorRes)
+            apy.text = if (row.inactive) root.context.getString(R.string.staking_nominator_status_inactive) else model.apy
+            apy.isVisible = row.inactive || model.apy != null
+            apy.setTextColorRes(if (row.inactive) R.color.text_secondary else model.apyColorRes)
             icon.setImageDrawable(model.icon)
             info.contentDescription = root.context.getString(R.string.bittensor_validator_address_info, name.text)
             info.setOnClickListener { onInfo(model) }
-            root.setOnClickListener { if (row.selectable) onSelected(model) }
+            root.setOnClickListener { if (row.canSelect) onSelected(model) }
         }
 
         private fun bindAccessibility(selected: Boolean) {
@@ -95,7 +95,6 @@ class BittensorValidatorAdapter(
                 .setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
             val fee = context.getString(R.string.bittensor_validator_take, commissionPercentage)
             return when {
-                !validator.selectable -> fee + " · " + context.getString(R.string.staking_nominator_status_inactive)
                 validator.recommended -> context.getString(R.string.bittensor_recommended_validator) + " · " + fee
                 else -> fee
             }

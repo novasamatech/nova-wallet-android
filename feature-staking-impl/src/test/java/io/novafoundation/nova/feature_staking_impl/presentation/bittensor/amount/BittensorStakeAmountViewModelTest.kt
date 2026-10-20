@@ -41,7 +41,7 @@ import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
-import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.BaseAmountChooserProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixinBase.InputState.InputKind
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
@@ -165,7 +165,8 @@ class BittensorStakeAmountViewModelTest {
         accounts,
         wallets,
         balanceValidationSystem,
-        subnetInteractor
+        subnetInteractor,
+        validators
     )
 
     private val validationSystem = ValidationSystem(preflightValidation)
@@ -174,15 +175,18 @@ class BittensorStakeAmountViewModelTest {
 
     private val chooser = mock(AmountChooserMixin.Presentation::class.java)
 
-    private val input = MutableStateFlow(InputState("", true, InputKind.REGULAR))
-
     private val chooserFactory = object : AmountChooserMixin.Factory {
         override fun create(
             scope: CoroutineScope,
             assetFlow: Flow<Asset>,
             maxActionProvider: MaxActionProvider?,
             fieldValidator: FieldValidator?
-        ) = chooser
+        ): AmountChooserMixin.Presentation {
+            val base = BaseAmountChooserProvider(scope, emptyFlow(), maxActionProvider)
+            `when`(chooser.inputState).thenReturn(base.inputState)
+            `when`(chooser.maxAction).thenReturn(base.maxAction)
+            return chooser
+        }
     }
 
     private val feeState = MutableStateFlow<FeeStatus<BittensorFeeEstimate<BittensorRootStakeRequest>, FeeDisplay>>(FeeStatus.NoFee)
@@ -229,9 +233,10 @@ class BittensorStakeAmountViewModelTest {
         `when`(resources.getString(R.string.common_retry_message)).thenReturn("Retry")
         `when`(token.configuration).thenReturn(chainAsset)
         `when`(chainAsset.precision).thenReturn(Precision(9))
+        `when`(chainAsset.chainId).thenReturn("bittensor")
         `when`(chainAsset.symbol).thenReturn(TokenSymbol("NATIVE"))
+        `when`(estimateFee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger.ZERO)
         `when`(communicator.responseFlow).thenReturn(emptyFlow())
-        `when`(chooser.inputState).thenReturn(input)
         `when`(chooser.assetModel).thenReturn(emptyFlow())
         `when`(feeLoader.fee).thenReturn(feeState)
         runBlocking {
@@ -272,6 +277,76 @@ class BittensorStakeAmountViewModelTest {
     fun cleanUp() = runBlocking<Unit> {
         if (::viewModel.isInitialized) viewModel.coroutineContext.job.cancelAndJoin()
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `selected max follows late fee while manual edits stop following`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            val lowBalance = details(1)
+            `when`(lowBalance.asset.transferableInPlanks).thenReturn(BigInteger("10010000"))
+            assets.emit(lowBalance)
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("0.00001")) == 0 }
+            viewModel.maxClicked()
+            viewModel.amount.first { it == "0.00001" }
+            // The view's text listener also observes programmatic updates.
+            viewModel.amountChanged("0.00001")
+            assertEquals(InputKind.MAX_ACTION, chooser.inputState.value.inputKind)
+
+            `when`(estimateFee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger("930000"))
+            val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.ONE)
+            val estimate = BittensorFeeEstimate(request, estimateFee)
+            val display = FeeDisplay("network fee", null)
+            feeState.value = FeeStatus.Loaded(FeeModel(estimate, display))
+            viewModel.amount.first { it == "0" }
+
+            viewModel.amountChanged("2")
+            assets.emit(details(11))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("10.98907")) == 0 }
+            assertEquals("2", chooser.inputState.value.value)
+            assertEquals(InputKind.REGULAR, chooser.inputState.value.inputKind)
+        }
+    }
+
+    @Test
+    fun `max label and input use the same loaded fee and retain it during refresh`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            assets.emit(details(10))
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("9.99")) == 0 }
+            `when`(estimateFee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger("930000"))
+            val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.TEN.pow(9))
+            val estimate = BittensorFeeEstimate(request, estimateFee)
+            val display = FeeDisplay("network fee", null)
+            feeState.value = FeeStatus.Loaded(FeeModel(estimate, display))
+            val maximum = viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal("9.98907")) == 0 }
+
+            viewModel.maxClicked()
+            val entered = viewModel.amount.first { it == "9.98907" }
+            assertEquals(0, maximum.toBigDecimal().compareTo(entered.toBigDecimal()))
+
+            feeState.value = FeeStatus.Loading(visibleDuringProgress = true)
+            viewModel.amountChanged("1")
+            viewModel.maxClicked()
+            val refreshed = viewModel.amount.first { it == "9.98907" }
+            assertEquals(0, maximum.toBigDecimal().compareTo(refreshed.toBigDecimal()))
+        }
+    }
+
+    @Test
+    fun `max clamps to zero when fee and reserve exceed transferable balance`() = runBlocking<Unit> {
+        withTimeout(3_000L) {
+            val details = details(1)
+            `when`(details.asset.transferableInPlanks).thenReturn(BigInteger("10010000"))
+            assets.emit(details)
+            `when`(estimateFee.maxAmountDeductionFor(chainAsset)).thenReturn(BigInteger("930000"))
+            val request = BittensorRootStakeRequest(1L, chain, estimateValidator, BigInteger.ONE)
+            val estimate = BittensorFeeEstimate(request, estimateFee)
+            val display = FeeDisplay("network fee", null)
+            feeState.value = FeeStatus.Loaded(FeeModel(estimate, display))
+
+            viewModel.maxAmount.first { it.toBigDecimal().compareTo(BigDecimal.ZERO) == 0 }
+            viewModel.maxClicked()
+            assertEquals("0", viewModel.amount.first { it == "0" })
+        }
     }
 
     @Test

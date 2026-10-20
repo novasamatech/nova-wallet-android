@@ -1,6 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.validation.Validation
+import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.common.validation.ValidationStatus
 import io.novafoundation.nova.common.validation.ValidationSystem
 import io.novafoundation.nova.feature_account_api.data.model.Fee
@@ -25,7 +28,9 @@ data class BittensorStakePreflightPayload(
     val amount: BigInteger,
     val fee: Fee,
     val quote: BittensorSubnetBuyQuote? = null,
-    val priceImpactAccepted: Boolean = false
+    val priceImpactAccepted: Boolean = false,
+    val existingPosition: Boolean = false,
+    val inactiveValidatorAccepted: Boolean = false
 )
 
 typealias BittensorStakePreflightSystem = ValidationSystem<BittensorStakePreflightPayload, BittensorStakeValidationFailure>
@@ -35,7 +40,8 @@ class BittensorStakePreflightValidation(
     private val accountRepository: AccountRepository,
     private val walletRepository: WalletRepository,
     private val stakeValidationSystem: BittensorStakeValidationSystem,
-    private val bittensorSubnetInteractor: BittensorSubnetInteractor
+    private val bittensorSubnetInteractor: BittensorSubnetInteractor,
+    private val validatorRepository: BittensorSubnetValidatorRepository
 ) : Validation<BittensorStakePreflightPayload, BittensorStakeValidationFailure> {
 
     override suspend fun validate(value: BittensorStakePreflightPayload): ValidationStatus<BittensorStakeValidationFailure> = coroutineScope {
@@ -45,6 +51,16 @@ class BittensorStakePreflightValidation(
         }
         val latestQuote = async {
             value.quote?.let { bittensorSubnetInteractor.quote(it.subnetId, it.totalTaoInPlanks) }
+        }
+        val inactiveValidator = async {
+            val netuid = value.netuid
+            if (value.existingPosition && netuid is BittensorNetuid.Subnet) {
+                val hotkey = AccountIdKey(value.hotkey)
+                val validator = BittensorValidator(hotkey, value.chain.addressOf(hotkey))
+                validatorRepository.existingPositionValidator(value.chain, netuid, validator).inactive
+            } else {
+                false
+            }
         }
         val asset = walletRepository.assetFlow(value.metaId, value.chain.utilityAsset)
             .first()
@@ -58,7 +74,9 @@ class BittensorStakePreflightValidation(
             netuid = value.netuid,
             priceImpactAccepted = value.priceImpactAccepted,
             checkedAtMillis = System.currentTimeMillis(),
-            latestQuote = currentQuote
+            latestQuote = currentQuote,
+            inactiveValidator = inactiveValidator.await(),
+            inactiveValidatorAccepted = value.inactiveValidatorAccepted
         )
         stakeValidationSystem.validate(payload)
             .getOrThrow()

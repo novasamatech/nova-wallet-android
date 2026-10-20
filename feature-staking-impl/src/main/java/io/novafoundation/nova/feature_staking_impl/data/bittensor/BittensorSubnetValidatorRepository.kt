@@ -42,6 +42,10 @@ interface BittensorSubnetValidatorRepository {
     suspend fun rankDirectory(chain: Chain, netuid: BittensorNetuid, directory: BittensorValidatorDirectory): BittensorValidatorDirectory
 
     suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator)
+
+    suspend fun existingPositionValidator(chain: Chain, netuid: BittensorNetuid.Subnet, validator: BittensorValidator): BittensorSubnetValidator {
+        return validators(chain, netuid).first { it.validator.hotkey == validator.hotkey && it.canAddToExistingPosition }
+    }
 }
 
 class RealBittensorSubnetValidatorRepository(
@@ -87,7 +91,7 @@ class RealBittensorSubnetValidatorRepository(
             val response = backend.validators(netuid.value)
             val candidates = mapCandidates(chain, response)
             val snapshot = loadDirectorySnapshot(chain, netuid, candidates)
-            val rows = mapUnavailablePolicyDirectory(chain, candidates, snapshot)
+            val rows = mapUnavailablePolicyDirectory(chain, netuid, candidates, snapshot)
             BittensorValidatorDirectory(rows, mapBittensorDirectoryStatus(response.meta), recommendationFailure = null)
         } ?: error("Validator directory timed out")
 
@@ -129,10 +133,10 @@ class RealBittensorSubnetValidatorRepository(
         val rows = ranking?.let {
             val gates = mapBittensorValidatorGates(BittensorRecommendationsRemote(it.meta))
             mapBittensorValidators(chain, netuid, namedCandidates, gates, snapshot)
-        } ?: mapUnavailablePolicyDirectory(chain, candidates, snapshot)
-        return rows.map { row -> row.copy(recommended = row.selectable && row.address in recommendedHotkeys) }
+        } ?: mapUnavailablePolicyDirectory(chain, netuid, candidates, snapshot)
+        return rows.map { row -> row.copy(recommended = row.canSelect && row.address in recommendedHotkeys) }
             .sortedWith(
-                compareByDescending<BittensorSubnetValidator> { it.selectable }
+                compareByDescending<BittensorSubnetValidator> { it.canSelect }
                     .thenByDescending { it.recommended }
                     .thenBy { it.validator.name }
             )
@@ -151,11 +155,19 @@ class RealBittensorSubnetValidatorRepository(
 
     private fun mapUnavailablePolicyDirectory(
         chain: Chain,
+        netuid: BittensorNetuid,
         candidates: List<BittensorValidator>,
         snapshot: BittensorValidatorSnapshot
     ): List<BittensorSubnetValidator> = candidates.mapNotNull { validator ->
         val take = snapshot.commissionsInU16[validator.hotkey] ?: return@mapNotNull null
-        BittensorSubnetValidator(validator, chain.addressOf(validator.hotkey), validatorCommissionRateFromU16(take), selectable = false)
+        BittensorSubnetValidator(
+            validator,
+            chain.addressOf(validator.hotkey),
+            validatorCommissionRateFromU16(take),
+            selectable = false,
+            inactive = snapshot.isInactive(netuid, validator.hotkey),
+            recommendationsAvailable = false
+        )
     }
 
     private fun recommendedHotkeys(rows: List<BittensorRankedValidatorsRemote.Item>): Set<String> = rows
@@ -215,8 +227,20 @@ class RealBittensorSubnetValidatorRepository(
             gates
         )
             .singleOrNull()
-        require(row?.selectable == true) { "Validator is no longer eligible in this subnet" }
+        require(row?.canSelect == true) { "Validator is no longer eligible in this subnet" }
     } ?: error("Validator eligibility checks timed out")
+
+    override suspend fun existingPositionValidator(
+        chain: Chain,
+        netuid: BittensorNetuid.Subnet,
+        validator: BittensorValidator
+    ): BittensorSubnetValidator = withTimeout(REQUEST_TIMEOUT_MILLIS) {
+        val directory = backend.validators(netuid.value)
+        val identifiedValidator = mapCandidates(chain, directory).firstOrNull { it.hotkey == validator.hotkey } ?: validator
+        val gates = backend.gates()
+        val row = enrich(chain, netuid, listOf(identifiedValidator), gates).singleOrNull()
+        requireNotNull(row?.takeIf { it.canAddToExistingPosition }) { "Validator is no longer eligible for additional stake" }
+    }
 
     private suspend fun enrich(
         chain: Chain,

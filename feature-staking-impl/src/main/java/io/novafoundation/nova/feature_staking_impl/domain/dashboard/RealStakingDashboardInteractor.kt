@@ -36,6 +36,7 @@ import io.novafoundation.nova.feature_wallet_api.data.network.blockhain.types.Ba
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.runtime.ext.StakingTypeGroup
+import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novafoundation.nova.runtime.ext.alphabeticalOrder
 import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.ext.group
@@ -387,7 +388,8 @@ class RealStakingDashboardInteractor(
         val chainTotalStakeComparator = totalStakeChainComparatorProvider.getTotalStakeComparator()
 
         return sortedWith(
-            compareBy<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.mainChainsFirstAscendingOrder }
+            compareByDescending<AggregatedStakingDashboardOption<WithoutStake>> { it.chain.id == ChainGeneses.BITTENSOR }
+                .thenBy { it.chain.mainChainsFirstAscendingOrder }
                 .thenByDescending { it.token.planksToFiat(it.stakingState.availableBalance()) }
                 .thenByDescending { it.stakingState.availableBalance() }
                 .thenComparing(Comparator.comparing(AggregatedStakingDashboardOption<*>::chain, chainTotalStakeComparator))
@@ -398,7 +400,8 @@ class RealStakingDashboardInteractor(
     @JvmName("sortedHasStakeByChain")
     private fun List<AggregatedStakingDashboardOption<HasStake>>.sortedByChain(): List<AggregatedStakingDashboardOption<HasStake>> {
         return sortedWith(
-            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { option -> option.stakingState.stake?.let(option.token::planksToFiat) }
+            compareByDescending<AggregatedStakingDashboardOption<HasStake>> { it.chain.id == ChainGeneses.BITTENSOR }
+                .thenByDescending { option -> option.stakingState.stake?.let(option.token::planksToFiat) }
                 .thenByDescending { it.stakingState.stake }
                 .thenBy { it.chain.testnetsLastAscendingOrder }
                 .thenBy { it.chain.alphabeticalOrder }

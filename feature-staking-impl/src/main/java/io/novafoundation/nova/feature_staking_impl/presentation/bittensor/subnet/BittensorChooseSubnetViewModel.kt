@@ -177,9 +177,13 @@ class BittensorChooseSubnetViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    val list = combine(rootIcon, subnets, isLoading) { icon, subnets, loading ->
-        bittensorSubnetList(icon, if (loading) emptyList() else subnets)
+    val listState = combine(rootIcon, subnets, isLoading) { icon, subnets, loading ->
+        BittensorSubnetListState(
+            items = bittensorSubnetList(icon, if (loading) emptyList() else subnets),
+            loading = loading
+        )
     }
+        .distinctUntilChanged()
         .shareInBackground()
 
     val subnetCount = combine(filteredCatalogue, catalogue, query) { filtered, all, query ->

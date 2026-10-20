@@ -13,6 +13,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletReposit
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
+import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.runtime.AccountId
 import java.io.IOException
 import java.math.BigDecimal
@@ -76,7 +77,9 @@ class BittensorStakePreflightValidationTest {
 
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
 
-    private val validation = BittensorStakePreflightValidation(repository, accounts, wallets, stakeValidationSystem, subnetInteractor)
+    private val validators = mock(io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository::class.java)
+
+    private val validation = BittensorStakePreflightValidation(repository, accounts, wallets, stakeValidationSystem, subnetInteractor, validators)
 
     private val system = ValidationSystem(validation)
 
@@ -146,6 +149,23 @@ class BittensorStakePreflightValidationTest {
         val result = system.validate(subnetPayload)
 
         assertEquals("Market unavailable", result.exceptionOrNull()?.message)
+    }
+
+    @Test
+    fun `existing inactive validator warns and rereads status after acceptance`() = runBlocking {
+        val quote = quote(System.currentTimeMillis())
+        val validator = BittensorValidator(io.novafoundation.nova.common.address.AccountIdKey(hotkey), chain.addressOf(hotkey))
+        val row = BittensorSubnetValidator(validator, "address", BigDecimal.ZERO, false, inactive = true, canAddToExistingPosition = true)
+        `when`(subnetInteractor.quote(quote.subnetId, quote.totalTaoInPlanks)).thenReturn(quote)
+        `when`(validators.existingPositionValidator(chain, quote.subnetId, validator)).thenReturn(row)
+        val existing = payload.copy(netuid = quote.subnetId, quote = quote, existingPosition = true)
+        assertEquals(BittensorStakeValidationFailure.INACTIVE_VALIDATOR, system.validate(existing).getOrThrow().notValidOrNull()?.reason)
+        assertNull(system.validate(existing.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull())
+        snapshot = snapshot.copy(safeModeActive = true)
+        assertEquals(
+            BittensorStakeValidationFailure.SAFE_MODE_ACTIVE,
+            system.validate(existing.copy(inactiveValidatorAccepted = true)).getOrThrow().notValidOrNull()?.reason
+        )
     }
 
     @Test

@@ -41,6 +41,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBitte
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorNeedsFunding
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
@@ -54,6 +55,9 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.MaxActionProvider
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.actualAmount
+import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.maxAction.create
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.setAmountInput
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeDisplay
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.model.FeeStatus
@@ -133,10 +137,25 @@ class BittensorStakeAmountViewModel(
     private val stakingDetails = selectedStakingDetailsState.filterLoaded()
         .shareInBackground()
 
+    private val feeContext = stakingDetails
+        .map { it.asset.token.configuration }
+        .asFeeContextFromSelf()
+
+    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorRootStakeRequest>>(
+        scope = this,
+        feeContext = feeContext
+    )
+
+    private val maxActionProvider = MaxActionProvider.create(this) {
+        stakingDetails.map { it.asset }
+            .providingMaxOf { maximumBittensorStake(it.transferableInPlanks, BigInteger.ZERO) }
+            .deductFee(feeLoaderMixin)
+    }
+
     private val amountChooser = amountChooserFactory.create(
         scope = this,
         assetFlow = stakingDetails.map { it.asset },
-        maxActionProvider = null
+        maxActionProvider = maxActionProvider
     )
 
     val amount = amountChooser.inputState.map { it.value }
@@ -159,15 +178,6 @@ class BittensorStakeAmountViewModel(
     private val feeRequest = combine(stakingDetails, amount, ::createFeeRequest)
         .distinctUntilChanged()
         .shareInBackground()
-
-    private val feeContext = stakingDetails
-        .map { it.asset.token.configuration }
-        .asFeeContextFromSelf()
-
-    val feeLoaderMixin = feeLoaderMixinFactory.createDefaultBy<BittensorFeeEstimate<BittensorRootStakeRequest>>(
-        scope = this,
-        feeContext = feeContext
-    )
 
     val fee = combine(
         feeRequest,
@@ -244,13 +254,11 @@ class BittensorStakeAmountViewModel(
     }
         .shareInBackground()
 
-    val maxAmount = combine(
-        stakingDetails,
-        fee
-    ) { details, fee ->
-        val available = maxAvailableInPlanks(details, fee.loadedFeeOrNull())
-        formatToken(details.asset.token.amountFromPlanks(available), details.asset.token.configuration.symbol)
-    }
+    private val maximumAmount = maxActionProvider.maxAvailableBalance
+        .map { BittensorMaxAmount(it.actualAmount, it.chainAsset.symbol) }
+        .shareInBackground()
+
+    val maxAmount = maximumAmount.map { formatToken(it.amount, it.symbol) }
         .shareInBackground()
 
     val validator = stakingDetails
@@ -329,25 +337,13 @@ class BittensorStakeAmountViewModel(
     }
 
     fun amountChanged(amount: String) {
+        if (amountChooser.inputState.value.value == amount) return
         amountChooser.setAmountInput(amount, initiatedByUser = true)
     }
 
     fun maxClicked() = launchUnit {
         if (preparing.value) return@launchUnit
-        preparing.value = true
-        try {
-            val details = stakingDetails.first()
-            val maximum = bittensorStakingInteractor.maximumStake(details)
-            amountChooser.setAmountInput(
-                details.asset.token.amountFromPlanks(maximum).toStripTrailingZerosString()
-            )
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            showError(e)
-        } finally {
-            preparing.value = false
-        }
+        amountChooser.maxAction.maxClick.first()?.invoke()
     }
 
     fun validatorClicked() = launchUnit {

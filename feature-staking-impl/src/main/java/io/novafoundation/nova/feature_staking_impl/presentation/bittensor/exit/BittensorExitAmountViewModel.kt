@@ -15,7 +15,6 @@ import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
-import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
@@ -37,6 +36,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorMaxAmount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
@@ -68,8 +68,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-
-private data class ExitAmountInput(val text: String, val revision: Long = 0)
+import kotlinx.coroutines.flow.update
 
 private data class ExitPreparationRequest(
     val position: BittensorExitPosition?,
@@ -224,8 +223,17 @@ class BittensorExitAmountViewModel(
     }
         .shareInBackground()
 
-    val maxAmount = combine(position, selectedSlippage) { position, slippage ->
-        position?.let { formatInput(it, bittensorExitInteractor.maximumAmount(it, slippage)) }
+    private val maximumAmount = combine(position, selectedSlippage) { position, slippage ->
+        position?.let {
+            val maximum = bittensorExitInteractor.maximumAmount(it, slippage).coerceAtLeast(BigInteger.ZERO)
+            val symbol = if (isRoot) it.asset.token.configuration.symbol else TokenSymbol(it.subnet?.symbol?.ifBlank { "—" } ?: "—")
+            BittensorMaxAmount(BigDecimal(maximum, it.amountPrecision), symbol)
+        }
+    }
+        .shareInBackground()
+
+    val maxAmount = maximumAmount.map { maximum ->
+        maximum?.let { tokenFormatter.formatToken(it.amount, it.symbol).toString() }
     }
         .shareInBackground()
 
@@ -340,6 +348,10 @@ class BittensorExitAmountViewModel(
         .shareInBackground()
 
     init {
+        maximumAmount
+            .onEach { maximum -> input.update { it.updateMax(maximum?.amount) } }
+            .launchIn(this)
+
         if (!isRoot) {
             slippageSettingsCommunicator.responseFlow
                 .onEach { slippageSettings.set(BigDecimal.valueOf(it.fraction)) }
@@ -355,7 +367,7 @@ class BittensorExitAmountViewModel(
     }
 
     fun amountChanged(value: String) {
-        if (input.value.text != value) input.value = ExitAmountInput(value)
+        input.update { it.edit(value) }
     }
 
     fun openSlippageSettings() {
@@ -363,11 +375,8 @@ class BittensorExitAmountViewModel(
     }
 
     fun maxClicked() = launchUnit {
-        val position = position.first() ?: return@launchUnit
-        val max = bittensorExitInteractor.maximumAmount(position, currentSlippage())
-        input.value = ExitAmountInput(
-            BigDecimal(max, position.amountPrecision).toStripTrailingZerosString()
-        )
+        val maximum = maximumAmount.first() ?: return@launchUnit
+        input.update { it.selectMax(maximum.amount) }
     }
 
     fun continueClicked(): Unit = continueWithImpact(null)
@@ -448,9 +457,4 @@ class BittensorExitAmountViewModel(
         val quote = bittensorExitInteractor.quote(position, amount, fullExit, request.slippageFraction)
         return ExitAmountRequest(request, BittensorExitRequest(position, quote), estimateOnly)
     }
-
-    private fun formatInput(position: BittensorExitPosition, amount: BigInteger): String = tokenFormatter.formatToken(
-        BigDecimal(amount, position.amountPrecision),
-        if (isRoot) position.asset.token.configuration.symbol else TokenSymbol(position.subnet?.symbol?.ifBlank { "—" } ?: "—")
-    ).toString()
 }

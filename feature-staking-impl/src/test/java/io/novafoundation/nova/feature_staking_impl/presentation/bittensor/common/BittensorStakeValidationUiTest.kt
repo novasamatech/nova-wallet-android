@@ -51,6 +51,24 @@ class BittensorStakeValidationUiTest {
     }
 
     @Test
+    fun `inactive warning cancel stays put and continue repeats validations`() {
+        val failure = validOrWarning(false) { BittensorStakeValidationFailure.INACTIVE_VALIDATOR }
+            .notValidOrNull()!!
+        val transformed = bittensorStakeValidationFailureUi(
+            failure,
+            actions,
+            resources
+        ) { refreshes += 1 } as TransformedFailure.Custom
+
+        transformed.dialogPayload.cancelAction!!.action()
+        assertEquals(0, revalidations)
+        transformed.dialogPayload.okAction!!.action()
+        assertEquals(1, revalidations)
+        assertEquals(0, resumptions)
+        assertEquals(0, refreshes)
+    }
+
+    @Test
     fun `accepting price impact repeats validations instead of resuming past them`() {
         val failure = validOrWarning(false) { BittensorStakeValidationFailure.HIGH_PRICE_IMPACT }
             .notValidOrNull()!!

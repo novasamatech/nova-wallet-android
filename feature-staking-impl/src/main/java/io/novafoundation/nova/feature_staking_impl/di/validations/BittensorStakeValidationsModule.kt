@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.di.validations
 
 import dagger.Module
 import dagger.Provides
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorInactiveValidatorValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorColdkeySwapValidation
@@ -43,6 +44,8 @@ class BittensorStakeValidationsModule {
 
         val priceImpact = BittensorPriceImpactValidation()
 
+        val inactiveValidator = BittensorInactiveValidatorValidation()
+
         return bittensorStakeValidationSystem(
             listOf(
                 feeReserve,
@@ -55,7 +58,8 @@ class BittensorStakeValidationsModule {
                 quoteTerms,
                 quoteFreshness,
                 slippage,
-                priceImpact
+                priceImpact,
+                inactiveValidator
             )
         )
     }

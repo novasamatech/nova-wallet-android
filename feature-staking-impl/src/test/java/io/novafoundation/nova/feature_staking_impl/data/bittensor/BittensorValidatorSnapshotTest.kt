@@ -32,7 +32,9 @@ class BittensorValidatorSnapshotTest {
     @Test
     fun `subnet permit and activity gates are evaluated from the same snapshot`() {
         assertTrue(mapBittensorValidators(chain, BittensorNetuid.Subnet(1), listOf(validator), gates, snapshot).single().selectable)
-        assertTrue(mapBittensorValidators(chain, BittensorNetuid.Subnet(1), listOf(validator), gates, snapshot.copy(permits = listOf(false))).isEmpty())
+        val noPermit = mapBittensorValidators(chain, BittensorNetuid.Subnet(1), listOf(validator), gates, snapshot.copy(permits = listOf(false))).single()
+        assertFalse(noPermit.canSelect)
+        assertTrue(noPermit.inactive)
         val inactive = snapshot.copy(lastUpdates = listOf(BigInteger.ONE))
         assertFalse(mapBittensorValidators(chain, BittensorNetuid.Subnet(1), listOf(validator), gates, inactive).single().selectable)
     }
@@ -55,9 +57,41 @@ class BittensorValidatorSnapshotTest {
 
         assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, withoutPermit).single().selectable)
         assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, inactive).single().selectable)
-        assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, snapshot.copy(uids = emptyMap())).isEmpty())
+        val unregistered = mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, snapshot.copy(uids = emptyMap())).single()
+        assertFalse(unregistered.canSelect)
+        assertTrue(unregistered.inactive)
+        assertTrue(unregistered.canAddToExistingPosition)
         val excessiveTake = snapshot.copy(commissionsInU16 = mapOf(validator.hotkey to BigInteger.valueOf(65535)))
         assertTrue(mapBittensorValidators(chain, subnet, listOf(validator), disabledGates, excessiveTake).isEmpty())
+    }
+
+    @Test
+    fun `inactive status prevents new selection even when attested gates allow it`() {
+        val disabledGates = gates.copy(requirePermit = false, requireActive = false)
+        val row = mapBittensorValidators(
+            chain,
+            BittensorNetuid.Subnet(1),
+            listOf(validator),
+            disabledGates,
+            snapshot.copy(permits = listOf(false))
+        ).single()
+        assertTrue(row.selectable)
+        assertFalse(row.canSelect)
+        assertTrue(row.canAddToExistingPosition)
+    }
+
+    @Test
+    fun `missing chain status is not labelled inactive`() {
+        val row = mapBittensorValidators(
+            chain,
+            BittensorNetuid.Subnet(1),
+            listOf(validator),
+            gates,
+            snapshot.copy(permits = emptyList(), lastUpdates = emptyList())
+        ).single()
+        assertFalse(row.inactive)
+        assertFalse(row.canSelect)
+        assertFalse(row.canAddToExistingPosition)
     }
 
     @Test

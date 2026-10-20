@@ -129,8 +129,20 @@ class BittensorSelectValidatorViewModel(
     val isEmpty = combine(rows, isLoading) { rows, loading -> rows.isEmpty() && !loading }
         .shareInBackground()
 
+    val canRemoveFilters = combine(filteredRows, validatorsState, filters) { rows, state, filters ->
+        !state.isLoading() && !state.dataOrNull.isNullOrEmpty() && rows.isEmpty() && filters.hideUnusualApy
+    }.shareInBackground()
+
+    val emptyMessage = combine(canRemoveFilters, query) { filtered, query ->
+        when {
+            filtered -> resources.getString(R.string.bittensor_validators_filtered_empty)
+            query.isNotBlank() -> resources.getString(R.string.bittensor_validators_search_empty, query.trim())
+            else -> resources.getString(R.string.bittensor_no_validators)
+        }
+    }.shareInBackground()
+
     private val selectedValidator = combine(rows, selectedAddress) { rows, address ->
-        rows.firstOrNull { it.eligibility.address == address && it.eligibility.selectable }
+        rows.firstOrNull { it.eligibility.address == address && it.eligibility.canSelect }
     }
         .shareInBackground()
 
@@ -182,8 +194,12 @@ class BittensorSelectValidatorViewModel(
         filters.value = value
     }
 
+    fun removeFilters() {
+        filters.value = filters.value.copy(hideUnusualApy = false)
+    }
+
     fun select(row: BittensorValidatorUi) = launchUnit {
-        if (row.eligibility.selectable && row in rows.first()) selectedValidatorAddress.value = row.eligibility.address
+        if (row.eligibility.canSelect && row in rows.first()) selectedValidatorAddress.value = row.eligibility.address
     }
 
     fun infoClicked(row: BittensorValidatorUi) = launchUnit {

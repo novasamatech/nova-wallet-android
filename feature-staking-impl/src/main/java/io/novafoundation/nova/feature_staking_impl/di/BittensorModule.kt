@@ -154,13 +154,15 @@ class BittensorModule {
         accounts: AccountRepository,
         wallets: WalletRepository,
         balanceValidationSystem: BittensorStakeValidationSystem,
-        bittensorSubnetInteractor: BittensorSubnetInteractor
+        bittensorSubnetInteractor: BittensorSubnetInteractor,
+        validatorRepository: BittensorSubnetValidatorRepository
     ) = BittensorStakePreflightValidation(
         repository,
         accounts,
         wallets,
         balanceValidationSystem,
-        bittensorSubnetInteractor
+        bittensorSubnetInteractor,
+        validatorRepository
     )
 
     @Provides

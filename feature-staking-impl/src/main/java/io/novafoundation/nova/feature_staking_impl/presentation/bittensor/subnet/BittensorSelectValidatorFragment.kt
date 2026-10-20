@@ -41,8 +41,10 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
         binder.toolbar.setHomeButtonListener { viewModel.back() }
         binder.toolbar.toolbar.setHomeButtonIcon(R.drawable.ic_arrow_back)
         onBackPressed { viewModel.back() }
+        binder.list.itemAnimator = null
         binder.list.adapter = adapter
         binder.confirm.setOnClickListener { viewModel.confirmClicked() }
+        binder.removeFilters.setOnClickListener { viewModel.removeFilters() }
         binder.toolbar.toolbar.setRightIconRes(R.drawable.ic_filter)
         binder.toolbar.toolbar.setRightActionClickListener { showFilters() }
         binder.toolbar.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
@@ -63,7 +65,12 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
         viewModel.isLoading.observe {
             progress.isVisible = it
         }
-        viewModel.isEmpty.observe { empty.isVisible = it }
+        viewModel.isEmpty.observe { emptyState.isVisible = it }
+        viewModel.emptyMessage.observe { empty.text = it }
+        viewModel.canRemoveFilters.observe {
+            removeFilters.isVisible = it
+            emptyIcon.isVisible = it
+        }
     }
 
     override fun onDestroyView() {

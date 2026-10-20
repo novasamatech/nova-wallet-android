@@ -40,33 +40,69 @@
             android:textColor="@color/text_secondary" />
     </LinearLayout>
 
-    <ProgressBar
-        android:id="@+id/progress"
-        style="@style/Widget.Nova.ProgressBar.Indeterminate"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_margin="16dp" />
-
-    <TextView
-        android:id="@+id/empty"
-        style="@style/TextAppearance.NovaFoundation.Regular.Body"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:visibility="gone"
-        android:text="@string/bittensor_no_validators" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/list"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        android:layout_weight="1">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            style="@style/Widget.Nova.ProgressBar.Indeterminate"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center" />
+
+        <LinearLayout
+            android:id="@+id/emptyState"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/emptyIcon"
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:layout_marginBottom="16dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_placeholder"
+                android:visibility="gone"
+                app:tint="@color/icon_secondary" />
+
+            <TextView
+                android:id="@+id/empty"
+                style="@style/TextAppearance.NovaFoundation.Regular.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/text_secondary"
+                android:text="@string/bittensor_no_validators" />
+
+            <TextView
+                android:id="@+id/removeFilters"
+                style="@style/Widget.Nova.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
+                android:visibility="gone"
+                android:text="@string/bittensor_remove_validator_filters" />
+        </LinearLayout>
+    </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

@@ -17,7 +17,9 @@ data class BittensorStakeValidationPayload(
     val netuid: BittensorNetuid,
     val priceImpactAccepted: Boolean,
     val checkedAtMillis: Long,
-    val latestQuote: BittensorSubnetBuyQuote? = null
+    val latestQuote: BittensorSubnetBuyQuote? = null,
+    val inactiveValidator: Boolean = false,
+    val inactiveValidatorAccepted: Boolean = false
 )
 
 enum class BittensorStakeValidationFailure {
@@ -32,7 +34,8 @@ enum class BittensorStakeValidationFailure {
     QUOTE_UNAVAILABLE,
     QUOTE_EXPIRED,
     SLIPPAGE_EXCEEDED,
-    HIGH_PRICE_IMPACT
+    HIGH_PRICE_IMPACT,
+    INACTIVE_VALIDATOR
 }
 
 typealias BittensorStakeValidationSystem = ValidationSystem<BittensorStakeValidationPayload, BittensorStakeValidationFailure>

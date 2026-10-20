@@ -7,5 +7,10 @@ sealed interface BittensorSubnetListItem {
     data class Subnet(val row: BittensorSubnetRowUi) : BittensorSubnetListItem
 }
 
+data class BittensorSubnetListState(
+    val items: List<BittensorSubnetListItem>,
+    val loading: Boolean
+)
+
 internal fun bittensorSubnetList(rootIcon: Icon, subnets: List<BittensorSubnetRowUi>): List<BittensorSubnetListItem> =
     listOf(BittensorSubnetListItem.Root(rootIcon)) + subnets.map { BittensorSubnetListItem.Subnet(it) }

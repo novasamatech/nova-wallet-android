@@ -64,7 +64,7 @@ class BittensorStakingInteractor(
     suspend fun rootValidator(chain: Chain, address: String): BittensorValidator {
         val validatorRepository = validatorRepository.rootValidators(chain)
         val selectedValidator = validatorRepository
-            .firstOrNull { it.address == address && it.selectable }
+            .firstOrNull { it.address == address && it.canSelect }
         return requireNotNull(selectedValidator) { "Validator is no longer eligible for root staking" }
             .validator
     }

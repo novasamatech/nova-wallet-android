@@ -85,6 +85,18 @@ class BittensorSubnetValidatorRepositoryTest {
     }
 
     @Test
+    fun `missing subnet UID remains visibly inactive during policy recovery without authorizing stake`() = runBlocking {
+        prepare(directoryMetadata())
+        storage.snapshot = storage.snapshot.copy(uids = emptyMap())
+        `when`(api.rankedValidators(RANKING_URL)).thenReturn(Response.error(503, "".toResponseBody()))
+
+        val row = repository.directory(chain, subnet).validators.single()
+        assertTrue(row.inactive)
+        assertFalse(row.canSelect)
+        assertFalse(row.canAddToExistingPosition)
+    }
+
+    @Test
     fun `list consumer receives ranking failure and can retry successfully`() = runBlocking {
         prepare(directoryMetadata())
         `when`(api.rankedValidators(RANKING_URL)).thenReturn(Response.error(503, "".toResponseBody()))

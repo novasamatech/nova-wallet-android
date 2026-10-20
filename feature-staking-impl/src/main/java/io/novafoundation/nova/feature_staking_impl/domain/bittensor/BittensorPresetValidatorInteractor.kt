@@ -27,7 +27,7 @@ class BittensorPresetValidatorInteractor(
             logger.log(failure)
             emptyMap()
         }
-        val candidates = directory.filter { it.selectable && it.recommended }
+        val candidates = directory.filter { it.canSelect && it.recommended }
             .sortedWith(compareByDescending<BittensorSubnetValidator> { rates[it.validator.hotkey] })
             .take(MAX_ATTEMPTS)
         var lastFailure: Exception? = null
