@@ -5,6 +5,7 @@ import io.novafoundation.nova.common.data.network.runtime.binding.castToStruct
 import io.novafoundation.nova.common.utils.isZero
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnet
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetLinks
 import io.novafoundation.nova.runtime.call.MultiChainRuntimeCallsApi
 import io.novafoundation.nova.runtime.ext.ChainGeneses
 import io.novasama.substrate_sdk_android.hash.isPositive
@@ -123,7 +124,13 @@ private fun bindBittensorSubnet(decoded: Any?): BittensorSubnet? {
         registrationBlock = value.get<Any?>("networkRegisteredAt")
             ?.let(::bindBittensorU64),
         alphaReserveInPlanks = value.get<Any?>("alphaIn")
-            ?.let(::bindBittensorU64)
+            ?.let(::bindBittensorU64),
+        websiteUrl = identity?.get<Any?>("subnetUrl")
+            ?.let(::bindBittensorText)
+            ?.let(BittensorSubnetLinks::website),
+        githubUrl = identity?.get<Any?>("githubRepo")
+            ?.let(::bindBittensorText)
+            ?.let(BittensorSubnetLinks::github)
     )
 }
 

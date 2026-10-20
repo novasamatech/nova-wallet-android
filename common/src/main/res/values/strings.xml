@@ -2881,6 +2881,8 @@
     <string name="bittensor_price_range">30-day range</string>
     <string name="bittensor_more_details">More details</string>
     <string name="bittensor_subnet_id">UID</string>
+    <string name="bittensor_subnet_website">Website</string>
+    <string name="bittensor_subnet_github">GitHub</string>
     <string name="bittensor_available_validators">Available validators</string>
     <string name="bittensor_use_subnet">Use this subnet</string>
     <string name="bittensor_no_validators">No eligible validators found</string>

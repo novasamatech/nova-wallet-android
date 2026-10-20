@@ -41,6 +41,36 @@ class BittensorSubnetRepositoryTest {
         assertEquals(null, subnets[1].logoUrl)
     }
 
+    @Test
+    fun `owner links are normalised and junk is dropped`() {
+        val identity = Struct.Instance(
+            mapOf(
+                "logoUrl" to "https://chutes.ai/logo.png".encodeToByteArray(),
+                "subnetUrl" to "chutes.ai".encodeToByteArray(),
+                "githubRepo" to "https://github.com/chutesai/chutes/".encodeToByteArray()
+            )
+        )
+        val junk = Struct.Instance(
+            mapOf(
+                "subnetUrl" to "not a url".encodeToByteArray(),
+                "githubRepo" to "https://gitlab.com/a/b".encodeToByteArray()
+            )
+        )
+        val subnets = bindBittensorSubnets(
+            listOf(
+                Struct.Instance(subnet(1).mapping + mapOf("subnetIdentity" to identity)),
+                Struct.Instance(subnet(2).mapping + mapOf("subnetIdentity" to junk)),
+                subnet(3)
+            )
+        )
+        assertEquals("https://chutes.ai/", subnets[0].websiteUrl)
+        assertEquals("https://github.com/chutesai/chutes", subnets[0].githubUrl)
+        assertEquals(null, subnets[1].websiteUrl)
+        assertEquals(null, subnets[1].githubUrl)
+        assertEquals(null, subnets[2].websiteUrl)
+        assertEquals(null, subnets[2].githubUrl)
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun `wrong field names do not silently turn into unnamed subnets`() {
         bindBittensorSubnets(listOf(Struct.Instance(mapOf("netuid" to BigInteger.ONE, "subnet_name" to byteArrayOf()))))

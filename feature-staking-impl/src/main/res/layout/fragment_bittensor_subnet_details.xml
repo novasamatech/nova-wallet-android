@@ -219,6 +219,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="44dp"
                         app:title="@string/bittensor_emission" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/website"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:visibility="gone"
+                        app:title="@string/bittensor_subnet_website"
+                        app:primaryValueStyle="link" />
+
+                    <io.novafoundation.nova.common.view.TableCellView
+                        android:id="@+id/github"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:visibility="gone"
+                        app:title="@string/bittensor_subnet_github"
+                        app:primaryValueStyle="link" />
                 </io.novafoundation.nova.common.view.TableView>
             </io.novafoundation.nova.common.view.TableView>
         </LinearLayout>

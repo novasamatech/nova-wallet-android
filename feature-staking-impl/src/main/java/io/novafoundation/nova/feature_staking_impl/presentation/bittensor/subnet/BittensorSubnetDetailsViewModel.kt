@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.mixin.api.Browserable
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetLinks
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.domain.isLoading
@@ -89,7 +91,7 @@ class BittensorSubnetDetailsViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val replaceAmount: Boolean,
     initialValidatorAddress: String?
-) : BaseViewModel() {
+) : BaseViewModel(), Browserable.Presentation by Browserable() {
 
     private val chartSelection = MutableStateFlow<PriceChartSelection?>(null)
 
@@ -159,6 +161,12 @@ class BittensorSubnetDetailsViewModel(
             }
         }
     }
+        .shareInBackground()
+
+    val website = subnet.map { it.websiteUrl?.let(BittensorSubnetLinks::websiteLabel) }
+        .shareInBackground()
+
+    val github = subnet.map { it.githubUrl?.let(BittensorSubnetLinks::githubLabel) }
         .shareInBackground()
 
     val parameters = combine(
@@ -421,6 +429,14 @@ class BittensorSubnetDetailsViewModel(
         selectedValidatorAddress.value?.let { return it }
         val preview = validatorState.first().dataOrNull?.takeIf { it.canPreselect } ?: return null
         return validatorInteractor.chain().addressOf(preview.validator.hotkey.value)
+    }
+
+    fun websiteClicked() = launchUnit {
+        subnet.first().websiteUrl?.let(::showBrowser)
+    }
+
+    fun githubClicked() = launchUnit {
+        subnet.first().githubUrl?.let(::showBrowser)
     }
 
     fun back() = router.back()

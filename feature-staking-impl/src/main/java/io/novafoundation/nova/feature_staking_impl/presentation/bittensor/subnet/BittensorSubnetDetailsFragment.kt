@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detail
 import coil.request.ImageRequest
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
@@ -76,10 +77,21 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             moreDetails.isVisible = !moreDetails.isVisible
             moreArrow.setImageResource(if (moreDetails.isVisible) R.drawable.ic_chevron_up else R.drawable.ic_chevron_down)
         }
+        website.setOnClickListener { viewModel.websiteClicked() }
+        github.setOnClickListener { viewModel.githubClicked() }
     }
 
     override fun subscribe(viewModel: BittensorSubnetDetailsViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
+        observeBrowserEvents(viewModel)
+        viewModel.website.observe { label ->
+            label?.let { website.showValue(it) }
+            website.isVisible = label != null
+        }
+        viewModel.github.observe { label ->
+            label?.let { github.showValue(it) }
+            github.isVisible = label != null
+        }
         viewModel.selectedChartIndex.observe(chart::setSelectedPeriod)
         viewModel.nativeTokenSymbol.observe { tao.text = it }
         viewModel.subnet.observe { subnet ->
