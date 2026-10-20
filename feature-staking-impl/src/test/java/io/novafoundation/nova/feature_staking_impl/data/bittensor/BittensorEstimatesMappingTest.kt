@@ -84,29 +84,6 @@ class BittensorEstimatesMappingTest {
             "unknown",
             "ALPHA_VALIDATOR_APY"
         )
-        val unreliable = BittensorAlphaYieldsRemote.Item(
-            1,
-            address,
-            "669990.45",
-            "ALPHA_VALIDATOR_APY",
-            rateReliability = "UNRELIABLE",
-            rateFlags = listOf("nominated_stake_below_min", "rate_above_cap")
-        )
-        val reliable = BittensorAlphaYieldsRemote.Item(
-            1,
-            address,
-            "79.56",
-            "ALPHA_VALIDATOR_APY",
-            rateReliability = "RELIABLE",
-            rateFlags = emptyList()
-        )
-        val unknownVerdict = BittensorAlphaYieldsRemote.Item(
-            1,
-            address,
-            "79.56",
-            "ALPHA_VALIDATOR_APY",
-            rateReliability = "MAYBE"
-        )
 
         assertEquals(
             BigDecimal.ZERO,
@@ -116,12 +93,29 @@ class BittensorEstimatesMappingTest {
         assertNull(mapBittensorValidatorYield(negative, chain, subnetId))
         assertNull(mapBittensorValidatorYield(missing, chain, subnetId))
         assertNull(mapBittensorValidatorYield(malformed, chain, subnetId))
-        assertNull(mapBittensorValidatorYield(unreliable, chain, subnetId))
-        assertNull(mapBittensorValidatorYield(unknownVerdict, chain, subnetId))
+    }
+
+    @Test
+    fun `only a RELIABLE verdict or an absent one keeps the yield`() {
+        val address = chain.addressOf(ByteArray(32) { 1 })
+        fun item(rate: String, verdict: String?) = BittensorAlphaYieldsRemote.Item(
+            1,
+            address,
+            rate,
+            "ALPHA_VALIDATOR_APY",
+            rateReliability = verdict
+        )
+
+        // A dust nominated stake compounded into 669,990 percent: the backend verdict hides it.
+        assertNull(mapBittensorValidatorYield(item("669990.45", "UNRELIABLE"), chain, subnetId))
+        assertNull(mapBittensorValidatorYield(item("79.56", "MAYBE"), chain, subnetId))
         assertEquals(
             BigDecimal("79.56"),
-            mapBittensorValidatorYield(reliable, chain, subnetId)
-                ?.annualPercentageYield
+            mapBittensorValidatorYield(item("79.56", "RELIABLE"), chain, subnetId)?.annualPercentageYield
+        )
+        assertEquals(
+            BigDecimal("79.56"),
+            mapBittensorValidatorYield(item("79.56", null), chain, subnetId)?.annualPercentageYield
         )
     }
 

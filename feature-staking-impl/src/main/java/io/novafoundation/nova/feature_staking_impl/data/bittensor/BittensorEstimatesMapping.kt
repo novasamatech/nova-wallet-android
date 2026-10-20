@@ -10,6 +10,8 @@ import java.math.BigDecimal
 
 internal data class BittensorValidatorYield(val hotkey: AccountIdKey, val annualPercentageYield: BigDecimal)
 
+private const val RELIABLE_VERDICT = "RELIABLE"
+
 internal fun mapBittensorReportedOperation(remote: BittensorOperationsRemote.Item): BittensorReportedOperation {
     val netuid = BittensorNetuid.from(requireNotNull(remote.netuid))
     return BittensorReportedOperation(
@@ -25,6 +27,16 @@ internal fun mapBittensorReportedOperation(remote: BittensorOperationsRemote.Ite
     )
 }
 
+/**
+ * Maps one provider row to a validator yield.
+ *
+ * Returns null, and the row is skipped, when the hotkey is absent or not a valid address on [chain],
+ * when the backend marks the rate as anything other than `RELIABLE` (ADR-0045: a dust nominated stake
+ * compounded into absurd percentages), or when [BittensorAlphaYieldsRemote.Item.reportedRate] is absent,
+ * malformed or negative. An absent verdict (older backend) is accepted.
+ *
+ * @throws IllegalArgumentException when the row belongs to another subnet or metric kind.
+ */
 internal fun mapBittensorValidatorYield(
     remote: BittensorAlphaYieldsRemote.Item,
     chain: Chain,
@@ -36,10 +48,8 @@ internal fun mapBittensorValidatorYield(
     val hotkey = runCatching { AccountIdKey(chain.accountIdOf(address)) }
         .getOrNull() ?: return null
 
-    // An unreliable rate (dust nominated stake compounded into absurd percentages) is never shown or ranked;
-    // a backend without the verdict keeps the previous behavior.
     val reliability = remote.rateReliability
-    if (reliability != null && reliability != BittensorAlphaYieldsRemote.RELIABLE_RATE) return null
+    if (reliability != null && reliability != RELIABLE_VERDICT) return null
 
     val percentage = remote.reportedRate?.toBigDecimalOrNull()
         ?.takeIf { it.isNonNegative } ?: return null

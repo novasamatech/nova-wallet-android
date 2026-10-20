@@ -171,8 +171,7 @@ class BittensorEstimatesRepositoryTest {
                     address,
                     "669990.45",
                     "ALPHA_VALIDATOR_APY",
-                    rateReliability = "UNRELIABLE",
-                    rateFlags = listOf("nominated_stake_below_min", "rate_above_cap")
+                    rateReliability = "UNRELIABLE"
                 ),
                 BittensorAlphaYieldsRemote.Item(
                     1,
