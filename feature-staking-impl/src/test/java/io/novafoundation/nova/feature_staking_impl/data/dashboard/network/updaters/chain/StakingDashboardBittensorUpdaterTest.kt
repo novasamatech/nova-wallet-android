@@ -109,7 +109,16 @@ class StakingDashboardBittensorUpdaterTest {
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val positionRepository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger)
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
+
+    private val positionRepository = RealBittensorPositionRepository(
+        positionSource,
+        portfolioLoader,
+        chainStateRepository,
+        computationalCache,
+        logger,
+        positionUpdates
+    )
 
     private fun updater() = StakingDashboardBittensorUpdater(
         chain,

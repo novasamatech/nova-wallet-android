@@ -48,7 +48,7 @@ class BittensorSubnetMarketRepository(private val api: BittensorSubnetMarketsApi
         }
     }
 
-    private suspend fun loadMarkets(): List<BittensorSubnetMarketRemote> = withTimeoutOrNull(20_000L) {
+    private suspend fun loadMarkets(): List<BittensorSubnetMarketRemote> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         buildList {
             for (page in 1..MAX_MARKET_PAGES) {
                 val markets = api.markets(perPage = MARKET_PAGE_SIZE, page = page)

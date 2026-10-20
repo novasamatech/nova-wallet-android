@@ -9,6 +9,9 @@ import java.math.BigDecimal
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 data class BittensorPortfolioChartHistory(
     val request: BittensorPortfolioHistoryRequest,
@@ -19,16 +22,25 @@ class BittensorPortfolioChartInteractor(
     private val historyRepository: BittensorPortfolioHistoryRepository,
     private val calculator: BittensorPortfolioChartCalculator,
     private val accounts: AccountRepository,
-    private val chainRegistry: ChainRegistry
+    private val chainRegistry: ChainRegistry,
+    private val positionUpdates: BittensorPositionUpdates
 ) {
 
-    fun observeHistory(request: BittensorPortfolioHistoryRequest): Flow<BittensorPortfolioChartHistory> = flow {
-        while (true) {
+    fun observeHistory(request: BittensorPortfolioHistoryRequest): Flow<BittensorPortfolioChartHistory> {
+        val periodic = flow {
+            while (true) {
+                emit(Unit)
+                delay(HISTORY_REFRESH_MILLIS)
+            }
+        }
+        val confirmed = positionUpdates.updates
+            .filter { it.metaId == request.metaId && it.chainId == request.chainId }
+            .map { Unit }
+        return merge(periodic, confirmed).map {
             val chain = chainRegistry.getChain(request.chainId)
             val account = accounts.getMetaAccount(request.metaId)
             val address = chain.addressOf(account.requireAccountIdIn(chain))
-            emit(BittensorPortfolioChartHistory(request, historyRepository.load(request, address)))
-            delay(HISTORY_REFRESH_MILLIS)
+            BittensorPortfolioChartHistory(request, historyRepository.load(request, address))
         }
     }
 

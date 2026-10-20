@@ -13,7 +13,8 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 class BittensorSubmissionExecutor(
-    private val extrinsicService: ExtrinsicService
+    private val extrinsicService: ExtrinsicService,
+    private val positionUpdates: BittensorPositionUpdates
 ) {
 
     private val mutex = Mutex()
@@ -48,6 +49,7 @@ class BittensorSubmissionExecutor(
             } else {
                 null
             }
+            if (result is BittensorOperationResult.Success) positionUpdates.confirmed(metaId, chain.id, coldkey)
             when (result) {
                 is BittensorOperationResult.Success -> result.copy(outcome = outcome)
                 // Failed calls may still have paid fees; never expose their trade events as executed amounts.

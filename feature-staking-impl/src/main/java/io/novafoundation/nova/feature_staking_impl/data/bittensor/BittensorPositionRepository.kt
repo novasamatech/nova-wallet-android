@@ -21,6 +21,8 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import io.novafoundation.nova.common.address.AccountIdKey
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
@@ -49,7 +51,8 @@ class RealBittensorPositionRepository(
     private val portfolioLoader: BittensorPortfolioLoader,
     private val chainStateRepository: ChainStateRepository,
     private val computationalCache: ComputationalCache,
-    private val logger: Logger
+    private val logger: Logger,
+    private val positionUpdates: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates
 ) : BittensorPositionRepository {
 
     private data class PortfolioPrices(
@@ -84,7 +87,13 @@ class RealBittensorPositionRepository(
         var cachedPositions: BittensorStakePositions? = null
         emit(BittensorPositionState(null, BittensorDataStatus.Loading))
 
-        flowOfAll { chainStateRepository.currentRemoteBlockNumberFlow(chainId) }
+        val confirmed = positionUpdates.updates
+            .filter { it.chainId == chainId && it.coldkey == AccountIdKey(coldKey) }
+            .map { Unit }
+        kotlinx.coroutines.flow.merge(
+            flowOfAll { chainStateRepository.currentRemoteBlockNumberFlow(chainId) }.map { Unit },
+            confirmed
+        )
             .conflate()
             .map {
                 val state = loadPositions(chainId, coldKey, cachedPositions)
@@ -105,7 +114,7 @@ class RealBittensorPositionRepository(
         coldKey: AccountId,
         cachedPositions: BittensorStakePositions?
     ): BittensorPositionState = try {
-        val positions = withTimeout(POSITIONS_TIMEOUT_MILLIS) { positionSource.positions(chainId, coldKey) }
+        val positions = withTimeout(BITTENSOR_REQUEST_TIMEOUT) { positionSource.positions(chainId, coldKey) }
         BittensorPositionState(positions, BittensorDataStatus.Fresh)
     } catch (e: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
@@ -166,8 +175,6 @@ class RealBittensorPositionRepository(
     }
 
     private companion object {
-
-        const val POSITIONS_TIMEOUT_MILLIS = 20_000L
 
         const val SUBSCRIPTION_RETRY_DELAY_MILLIS = 1_000L
     }

@@ -33,10 +33,13 @@ class BittensorPortfolioHistoryRepositoryTest {
 
     private var stale = false
 
+    private var responseDelay = 0L
+
     private val api = object : BittensorPortfolioHistoryApi {
         override suspend fun history(url: String, accountSubject: String, period: String): BittensorPortfolioHistoryRemote {
             assertEquals("https://infra.example/v1/bittensor/portfolio/history/search", url)
             subjects += accountSubject
+            kotlinx.coroutines.delay(responseDelay)
             failure?.let { throw it }
             return portfolioHistoryResponse(period = period, freshness = if (stale) "STALE" else "FRESH")
         }
@@ -86,6 +89,15 @@ class BittensorPortfolioHistoryRepositoryTest {
         assertTrue(result.account.points.isEmpty())
         failure = IllegalStateException("Offline")
         assertTrue(runCatching { repository.load(request, "account-one") }.isFailure)
+    }
+
+    @Test
+    fun `request times out after twenty seconds and exposes a retryable error`() = kotlinx.coroutines.test.runTest {
+        responseDelay = 20_001L
+        val error = runCatching { repository.load(request, "account-one") }.exceptionOrNull()
+        assertTrue(error is IllegalStateException)
+        assertTrue(error?.cause is kotlinx.coroutines.TimeoutCancellationException)
+        assertEquals(20_000L, testScheduler.currentTime)
     }
 
     @Test(expected = CancellationException::class)

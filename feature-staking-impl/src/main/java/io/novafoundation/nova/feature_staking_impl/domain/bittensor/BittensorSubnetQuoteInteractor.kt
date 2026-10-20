@@ -8,6 +8,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 import kotlinx.coroutines.withTimeout
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
 
 /**
  * A buy quote denominated in atomic TAO/alpha units (10^9). The user's total TAO input
@@ -55,7 +56,7 @@ class BittensorSubnetQuoteInteractor(
         subnetId: BittensorNetuid.Subnet,
         totalTaoInPlanks: BigInteger,
         slippage: BittensorSlippage
-    ): BittensorSubnetBuyQuote = withTimeout(20_000L) {
+    ): BittensorSubnetBuyQuote = withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
         val commission = configRepository.config().commission
         val serviceFee = commission.feeFor(totalTaoInPlanks)
         val stakeAmount = totalTaoInPlanks - serviceFee

@@ -4,7 +4,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryRequest
 import io.novafoundation.nova.feature_wallet_api.data.repository.CoinPriceRepository
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
-import io.novafoundation.nova.infrastructure.resolve
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -21,7 +20,7 @@ class BittensorPortfolioHistoryRepository(
     suspend fun load(request: BittensorPortfolioHistoryRequest, accountSubject: String): BittensorPortfolioHistory {
         require(accountSubject.length in 1..128 && accountSubject.all { it in '!'..'~' }) { "Invalid account subject" }
         return try {
-            withTimeout(REQUEST_TIMEOUT_MILLIS) {
+            withTimeout(BITTENSOR_REQUEST_TIMEOUT) {
                 loadHistory(request, accountSubject)
             }
         } catch (e: TimeoutCancellationException) {
@@ -39,14 +38,9 @@ class BittensorPortfolioHistoryRepository(
                 coinPriceRepository.getLastHistoryForPeriod(priceId, request.currency, request.period.priceSource)
             }
         }
-        val url = urls.resolve("/v1/bittensor/portfolio/history/search").toString()
+        val url = urls.bittensorBackendUrl("portfolio/history/search")
         val response = api.history(url, accountSubject, request.period.name)
         val accountHistory = mapBittensorPortfolioHistory(response, request.period)
         BittensorPortfolioHistory(accountHistory, nativePrices.await())
-    }
-
-    private companion object {
-
-        const val REQUEST_TIMEOUT_MILLIS = 25_000L
     }
 }

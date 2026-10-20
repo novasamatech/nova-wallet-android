@@ -75,6 +75,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetDetailsInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetMetadataInteractor
@@ -341,13 +342,15 @@ class BittensorModule {
         portfolioLoader: BittensorPortfolioLoader,
         chainStateRepository: ChainStateRepository,
         computationalCache: ComputationalCache,
-        logger: Logger
+        logger: Logger,
+        positionUpdates: BittensorPositionUpdates
     ): BittensorPositionRepository = RealBittensorPositionRepository(
         positionSource,
         portfolioLoader,
         chainStateRepository,
         computationalCache,
-        logger
+        logger,
+        positionUpdates
     )
 
     @Provides
@@ -447,8 +450,12 @@ class BittensorModule {
 
     @Provides
     @FeatureScope
-    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService) =
-        BittensorSubmissionExecutor(extrinsics)
+    fun provideBittensorSubmissionExecutor(extrinsics: ExtrinsicService, positionUpdates: BittensorPositionUpdates) =
+        BittensorSubmissionExecutor(extrinsics, positionUpdates)
+
+    @Provides
+    @FeatureScope
+    fun provideBittensorPositionUpdates() = BittensorPositionUpdates()
 
     @Provides
     fun provideBittensorRootClaimSource(

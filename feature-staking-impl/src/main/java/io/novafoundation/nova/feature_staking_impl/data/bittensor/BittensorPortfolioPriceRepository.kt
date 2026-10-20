@@ -54,7 +54,7 @@ class RealBittensorPortfolioPriceRepository(
         source: String,
         load: suspend () -> Map<BittensorNetuid.Subnet, BigInteger>
     ): Map<BittensorNetuid.Subnet, BigInteger> = try {
-        withTimeout(SOURCE_TIMEOUT_MILLIS) { load() }
+        withTimeout(BITTENSOR_REQUEST_TIMEOUT) { load() }
     } catch (e: TimeoutCancellationException) {
         currentCoroutineContext().ensureActive()
         logFailure(source, e)
@@ -69,10 +69,6 @@ class RealBittensorPortfolioPriceRepository(
     private fun logFailure(source: String, cause: Throwable) {
         logger.log("[BittensorPortfolio] Failed to load $source prices")
         logger.log(cause)
-    }
-
-    private companion object {
-        const val SOURCE_TIMEOUT_MILLIS = 20_000L
     }
 }
 

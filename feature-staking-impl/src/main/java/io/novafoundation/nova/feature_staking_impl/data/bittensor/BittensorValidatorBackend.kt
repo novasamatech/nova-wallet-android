@@ -195,7 +195,7 @@ class BittensorValidatorBackend(
         return base
     }
 
-    private fun endpoint(baseUrl: HttpUrl, path: String): String = requireNotNull(baseUrl.resolve("/v1/bittensor/$path")).toString()
+    private fun endpoint(baseUrl: HttpUrl, path: String): String = bittensorBackendUrl(baseUrl, path)
 
     private fun <T> readCacheEntry(response: Response<T>, startedAt: Long): Cached<T> {
         if (!response.isSuccessful) throw HttpException(response)

@@ -47,7 +47,9 @@ class BittensorPositionRepositoryTest {
 
     private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
 
-    private val repository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger)
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
+
+    private val repository = RealBittensorPositionRepository(positionSource, portfolioLoader, chainStateRepository, computationalCache, logger, positionUpdates)
 
     private val blocks = MutableStateFlow(BigInteger.ONE)
 
@@ -61,6 +63,29 @@ class BittensorPositionRepositoryTest {
         listOf(BittensorRootPosition(hotkey, BigInteger.TEN)),
         listOf(BittensorSubnetPosition(subnetId, hotkey, BigInteger.ONE))
     )
+
+    @Test
+    fun `confirmed operation refreshes positions without waiting for a block`() = runBlocking<Unit> {
+        prepare()
+        val states = Channel<BittensorPositionState>(Channel.UNLIMITED)
+        val observer = launch {
+            repository.observePositions("chain", coldKey)
+                .filter { it.status is BittensorDataStatus.Fresh }
+                .collect { states.send(it) }
+        }
+        try {
+            withTimeout(3_000L) {
+                states.receive()
+                positionUpdates.confirmed(1L, "other-chain", AccountIdKey(coldKey))
+                positionUpdates.confirmed(1L, "chain", AccountIdKey(ByteArray(32) { 1 }))
+                positionUpdates.confirmed(1L, "chain", AccountIdKey(coldKey))
+                states.receive()
+                verify(positionSource, times(2)).positions("chain", coldKey)
+            }
+        } finally {
+            observer.cancelAndJoin()
+        }
+    }
 
     @Test
     fun `root and portfolio consumers share requests and independent priced state`() = runBlocking<Unit> {
@@ -121,7 +146,14 @@ class BittensorPositionRepositoryTest {
             }
         }
         val slowPortfolioLoader = BittensorPortfolioLoader(slowPriceRepository, logger)
-        val sharedPositions = RealBittensorPositionRepository(positionSource, slowPortfolioLoader, chainStateRepository, computationalCache, logger)
+        val sharedPositions = RealBittensorPositionRepository(
+            positionSource,
+            slowPortfolioLoader,
+            chainStateRepository,
+            computationalCache,
+            logger,
+            positionUpdates
+        )
         val portfolioJob = launch { sharedPositions.observePortfolio("chain", coldKey).collect {} }
         try {
             withTimeout(3_000L) {
@@ -169,7 +201,7 @@ class BittensorPositionRepositoryTest {
             }
         }
         val loader = BittensorPortfolioLoader(slowPrices, logger)
-        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger)
+        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates)
         val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
         val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
         try {
@@ -222,7 +254,7 @@ class BittensorPositionRepositoryTest {
             }
         }
         val loader = BittensorPortfolioLoader(slowPrices, logger)
-        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger)
+        val repository = RealBittensorPositionRepository(positionSource, loader, chainStateRepository, computationalCache, logger, positionUpdates)
         val updates = Channel<BittensorPortfolioState>(Channel.UNLIMITED)
         val observer = launch { repository.observePortfolio("chain", coldKey).collect { updates.send(it) } }
         try {

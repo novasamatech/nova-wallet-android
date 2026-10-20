@@ -1137,6 +1137,8 @@
     <string name="account_proxy_type_nomination_pools">Nomination Pools</string>
 
     <string name="deep_linking_chain_id_is_not_found">Chain is not found</string>
+    <string name="deep_linking_staking_asset_not_found">The asset in this staking link was not found.</string>
+    <string name="deep_linking_staking_not_supported">Staking is not supported for this asset.</string>
     <string name="deep_linking_governance_type_is_not_specified">Governance type is not specified</string>
     <string name="deep_linking_governance_type_is_not_supported">Governance type is not supported</string>
     <string name="deep_linking_url_is_invalid">Invalid url</string>
@@ -2954,6 +2956,7 @@
     <string name="bittensor_weekly_change">%1$s · %2$s</string>
     <string name="bittensor_chart_month">30D</string>
     <string name="bittensor_chart_quarter">90D</string>
+    <string name="bittensor_chart_three_months">3M</string>
     <string name="bittensor_portfolio_history_stale">Portfolio history is outdated. Showing the last available reported data.</string>
     <string name="bittensor_staking_progress_title">Staking…</string>
     <string name="bittensor_staking_progress_description">Staking %1$s to root · usually a few seconds</string>

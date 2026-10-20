@@ -99,12 +99,15 @@ class BittensorStakingRepositoryTest {
 
     private val portfolioLoader = BittensorPortfolioLoader(priceRepository, logger)
 
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
+
     private val positionRepository = RealBittensorPositionRepository(
         positions,
         portfolioLoader,
         chainStateRepository,
         computationalCache,
-        logger
+        logger,
+        positionUpdates
     )
 
     private val repository = RealBittensorStakingRepository(

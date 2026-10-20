@@ -14,7 +14,8 @@ private const val STAKING_DASHBOARD_DEEP_LINK_PREFIX = "/open/staking"
 
 class StakingDashboardDeepLinkHandler(
     private val stakingRouter: StakingRouter,
-    private val automaticInteractionGate: AutomaticInteractionGate
+    private val automaticInteractionGate: AutomaticInteractionGate,
+    private val targetResolver: StakingDeepLinkTargetResolver
 ) : DeepLinkHandler {
 
     override val callbackFlow: Flow<CallbackEvent> = emptyFlow()
@@ -25,11 +26,16 @@ class StakingDashboardDeepLinkHandler(
     }
 
     override suspend fun handleDeepLink(data: Uri) = runCatching {
-        val target = parseStakingDeepLinkTarget(data.getQueryParameter("chainId"), data.getQueryParameter("assetId"))
         automaticInteractionGate.awaitInteractionAllowed()
+        val target = targetResolver.resolve(data.parameterIgnoreCase("chainId"), data.parameterIgnoreCase("assetId"))
 
         stakingRouter.openStakingDashboard(target)
     }.onFailure {
         if (it is CancellationException) throw it
+    }
+
+    private fun Uri.parameterIgnoreCase(name: String): String? {
+        val key = queryParameterNames.firstOrNull { it.equals(name, ignoreCase = true) } ?: return null
+        return getQueryParameter(key)
     }
 }

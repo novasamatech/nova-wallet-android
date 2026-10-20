@@ -27,16 +27,20 @@ class BittensorPortfolioChangeTextInjector(private val change: BigDecimal?, priv
     }
 
     fun format(textView: TextView) {
-        formatBittensorChartChange(change?.movePointRight(2), period, textView)
+        formatBittensorChartChange(change?.movePointRight(2), period, textView, missingText = "— · $period")
     }
 }
 
-private fun formatBittensorChartChange(change: BigDecimal?, period: String, textView: TextView) {
+internal fun formatBittensorChartChangeText(change: BigDecimal?, period: String, missingText: String = ""): String {
     val formatted = change?.let {
         val number = NumberFormat.getNumberInstance().apply { maximumFractionDigits = 1 }.format(it)
         if (it.isPositive) "+$number" else number
     }
-    textView.text = if (formatted != null) "$formatted% · $period" else ""
+    return if (formatted != null) "$formatted% · $period" else missingText
+}
+
+private fun formatBittensorChartChange(change: BigDecimal?, period: String, textView: TextView, missingText: String = "") {
+    textView.text = formatBittensorChartChangeText(change, period, missingText)
     textView.setTextColorRes(
         when {
             change == null -> R.color.text_secondary

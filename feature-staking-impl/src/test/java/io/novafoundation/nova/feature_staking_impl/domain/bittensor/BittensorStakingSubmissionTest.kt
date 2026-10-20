@@ -32,6 +32,7 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
@@ -81,7 +82,9 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
 
     private val extrinsicService = RecordingExtrinsicService(unusedExtrinsicService, fee, Result.success(successfulExecution))
 
-    private val submission = BittensorSubmissionExecutor(extrinsicService)
+    private val positionUpdates = BittensorPositionUpdates()
+
+    private val submission = BittensorSubmissionExecutor(extrinsicService, positionUpdates)
 
     private val validator = BittensorValidator(
         AccountIdKey(ByteArray(32) { 1 }),
@@ -252,6 +255,28 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
         extrinsicService.result = Result.success(successfulExecution)
         assertEquals(BittensorOperationResult.Success(successfulExecution.extrinsicHash), execute())
         assertEquals(2, extrinsicService.submissions)
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test
+    fun `only confirmed execution publishes a position and history refresh`() = runTest {
+        val notifications = mutableListOf<BittensorPositionUpdates.Update>()
+        backgroundScope.launch(kotlinx.coroutines.test.UnconfinedTestDispatcher(testScheduler)) {
+            positionUpdates.updates.collect { notifications += it }
+        }
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Unknown))
+        execute()
+        extrinsicService.result = Result.success(successfulExecution.copy(outcome = ExtrinsicDispatch.Failed(DispatchError.Token)))
+        execute()
+        val delayed = SubmissionHierarchy(selectedAccount, CallExecutionType.DELAYED)
+        extrinsicService.result = Result.success(successfulExecution.copy(submissionHierarchy = delayed))
+        execute()
+        assertTrue(notifications.isEmpty())
+        extrinsicService.result = Result.success(successfulExecution)
+        execute()
+        assertEquals(1, notifications.size)
+        assertEquals(1L, notifications.single().metaId)
+        assertEquals(ChainGeneses.BITTENSOR, notifications.single().chainId)
     }
 
     @Test

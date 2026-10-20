@@ -24,7 +24,7 @@ class BittensorSubnetParametersSource @Inject constructor(
 
     suspend fun emissionSnapshot(
         subnetId: BittensorNetuid.Subnet
-    ): BittensorSubnetEmissionSnapshot = withTimeoutOrNull(SNAPSHOT_TIMEOUT_MILLIS) {
+    ): BittensorSubnetEmissionSnapshot = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         val chainId = ChainGeneses.BITTENSOR
         val hash = rpcCalls.getBlockHash(chainId)
         coroutineScope {
@@ -48,7 +48,5 @@ class BittensorSubnetParametersSource @Inject constructor(
     } ?: error("Subnet parameter snapshot timed out")
 
     private companion object {
-
-        const val SNAPSHOT_TIMEOUT_MILLIS = 20_000L
     }
 }

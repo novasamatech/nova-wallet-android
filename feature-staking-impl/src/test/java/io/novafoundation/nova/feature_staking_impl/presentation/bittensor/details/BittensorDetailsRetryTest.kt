@@ -160,7 +160,9 @@ class BittensorDetailsRetryTest {
 
     private val chainRegistry = mock(ChainRegistry::class.java)
 
-    private val priceChartInteractor = BittensorPortfolioChartInteractor(historyRepository, chartCalculator, accountRepository, chainRegistry)
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
+
+    private val priceChartInteractor = BittensorPortfolioChartInteractor(historyRepository, chartCalculator, accountRepository, chainRegistry, positionUpdates)
 
     private val retryController = BittensorRetryController(resources, logger)
 

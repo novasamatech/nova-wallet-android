@@ -209,7 +209,16 @@ class BittensorPortfolioRepositoryTest {
 
     private val computationalCache = commonModule.provideComputationalCache()
 
-    private val positionRepository = RealBittensorPositionRepository(positions, portfolioLoader, chainStateRepository, computationalCache, logger)
+    private val positionUpdates = io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates()
+
+    private val positionRepository = RealBittensorPositionRepository(
+        positions,
+        portfolioLoader,
+        chainStateRepository,
+        computationalCache,
+        logger,
+        positionUpdates
+    )
 
     private fun repository() = RealBittensorPortfolioRepository(registry, accounts, wallet, positionRepository, signerProvider)
 }

@@ -25,7 +25,9 @@ class BittensorPortfolioChartInteractorTest {
 
     private val chains = mock(ChainRegistry::class.java)
 
-    private val interactor = BittensorPortfolioChartInteractor(repository, calculator, accounts, chains)
+    private val positionUpdates = BittensorPositionUpdates()
+
+    private val interactor = BittensorPortfolioChartInteractor(repository, calculator, accounts, chains, positionUpdates)
 
     private val chain = mock(Chain::class.java)
 

@@ -21,6 +21,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootV
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetMarketRepository
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartCalculator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioChartInteractor
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionUpdates
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioRowInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
@@ -71,8 +72,9 @@ class BittensorDetailsModule {
         historyRepository: BittensorPortfolioHistoryRepository,
         calculator: BittensorPortfolioChartCalculator,
         accounts: AccountRepository,
-        chainRegistry: ChainRegistry
-    ) = BittensorPortfolioChartInteractor(historyRepository, calculator, accounts, chainRegistry)
+        chainRegistry: ChainRegistry,
+        positionUpdates: BittensorPositionUpdates
+    ) = BittensorPortfolioChartInteractor(historyRepository, calculator, accounts, chainRegistry, positionUpdates)
 
     @Provides
     @IntoMap

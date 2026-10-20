@@ -48,7 +48,7 @@ class RealBittensorSubnetRepository(
         catalogue
     }
 
-    override suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = withTimeoutOrNull(20_000L) {
+    override suspend fun subnet(subnetId: BittensorNetuid.Subnet): BittensorSubnet = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         val catalogue = subnets()
         val subnet = catalogue.firstOrNull { it.id == subnetId }
             ?: throw NoSuchElementException("Subnet ${subnetId.value} is unavailable")
@@ -56,11 +56,11 @@ class RealBittensorSubnetRepository(
         subnet.copy(priceInRao = price)
     } ?: error("Subnet details timed out")
 
-    override suspend fun quickPickSubnets(): List<BittensorSubnet> = withTimeoutOrNull(20_000L) {
+    override suspend fun quickPickSubnets(): List<BittensorSubnet> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         loadDynamicSubnets(requireComplete = true)
     } ?: error("Subnet quick-pick catalogue timed out")
 
-    private suspend fun loadCatalogue(): List<BittensorSubnet> = withTimeoutOrNull(20_000L) {
+    private suspend fun loadCatalogue(): List<BittensorSubnet> = withTimeoutOrNull(BITTENSOR_REQUEST_TIMEOUT) {
         coroutineScope {
             val subnetLogos = async { configRepository.subnetLogos() }
             val subnets = loadDynamicSubnets()

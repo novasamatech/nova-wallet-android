@@ -123,7 +123,7 @@ class BittensorDetailsViewModel(
         R.string.price_chart_day,
         R.string.bittensor_chart_week,
         R.string.bittensor_chart_month,
-        R.string.bittensor_chart_quarter
+        R.string.bittensor_chart_three_months
     )
         .map(resources::getString)
 
