@@ -36,6 +36,11 @@ internal fun mapBittensorValidatorYield(
     val hotkey = runCatching { AccountIdKey(chain.accountIdOf(address)) }
         .getOrNull() ?: return null
 
+    // An unreliable rate (dust nominated stake compounded into absurd percentages) is never shown or ranked;
+    // a backend without the verdict keeps the previous behavior.
+    val reliability = remote.rateReliability
+    if (reliability != null && reliability != BittensorAlphaYieldsRemote.RELIABLE_RATE) return null
+
     val percentage = remote.reportedRate?.toBigDecimalOrNull()
         ?.takeIf { it.isNonNegative } ?: return null
 

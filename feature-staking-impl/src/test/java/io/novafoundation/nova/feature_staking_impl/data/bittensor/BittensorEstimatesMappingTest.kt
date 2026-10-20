@@ -84,6 +84,29 @@ class BittensorEstimatesMappingTest {
             "unknown",
             "ALPHA_VALIDATOR_APY"
         )
+        val unreliable = BittensorAlphaYieldsRemote.Item(
+            1,
+            address,
+            "669990.45",
+            "ALPHA_VALIDATOR_APY",
+            rateReliability = "UNRELIABLE",
+            rateFlags = listOf("nominated_stake_below_min", "rate_above_cap")
+        )
+        val reliable = BittensorAlphaYieldsRemote.Item(
+            1,
+            address,
+            "79.56",
+            "ALPHA_VALIDATOR_APY",
+            rateReliability = "RELIABLE",
+            rateFlags = emptyList()
+        )
+        val unknownVerdict = BittensorAlphaYieldsRemote.Item(
+            1,
+            address,
+            "79.56",
+            "ALPHA_VALIDATOR_APY",
+            rateReliability = "MAYBE"
+        )
 
         assertEquals(
             BigDecimal.ZERO,
@@ -93,6 +116,13 @@ class BittensorEstimatesMappingTest {
         assertNull(mapBittensorValidatorYield(negative, chain, subnetId))
         assertNull(mapBittensorValidatorYield(missing, chain, subnetId))
         assertNull(mapBittensorValidatorYield(malformed, chain, subnetId))
+        assertNull(mapBittensorValidatorYield(unreliable, chain, subnetId))
+        assertNull(mapBittensorValidatorYield(unknownVerdict, chain, subnetId))
+        assertEquals(
+            BigDecimal("79.56"),
+            mapBittensorValidatorYield(reliable, chain, subnetId)
+                ?.annualPercentageYield
+        )
     }
 
     private fun operation(netuid: Int?) = BittensorOperationsRemote.Item(

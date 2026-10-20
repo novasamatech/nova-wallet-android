@@ -9,10 +9,18 @@ class BittensorAlphaYieldsRemote(
         val netuid: Int?,
         val hotkey: String?,
         val reportedRate: String?,
-        val metricKind: String?
+        val metricKind: String?,
+        /** The server's verdict on [reportedRate] (ADR-0045): `RELIABLE` or `UNRELIABLE`; absent on an older backend. */
+        val rateReliability: String? = null,
+        /** Why the rate is not reliable; an open lower-snake-case vocabulary. */
+        val rateFlags: List<String>? = null
     )
     class Meta(val components: Components?)
     class Components(val alphaYield: BittensorRecommendationsRemote.Component?)
+
+    companion object {
+        const val RELIABLE_RATE = "RELIABLE"
+    }
 }
 
 class BittensorHistoryPageInfo(val page: Int?, val nextPage: Int?)
