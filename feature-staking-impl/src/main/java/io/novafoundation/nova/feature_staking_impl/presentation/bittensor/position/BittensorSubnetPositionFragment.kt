@@ -27,6 +27,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPositionAdapter
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+import kotlinx.coroutines.flow.combine
 
 class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionViewModel, FragmentBittensorSubnetPositionBinding>() {
 
@@ -96,13 +97,19 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             priceTitle.text = getString(R.string.price_chart_title, name)
         }
         viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
-        viewModel.earned.observe { state ->
-            earned.showBittensorLoadingAmount(state.map { it.amount })
-            earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+        viewModel.earned.observe { model ->
+            model.bind(
+                renderValue = { state ->
+                    earned.showBittensorLoadingAmount(state.map { it.amount })
+                    earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+                },
+                renderVisibility = { earned.isVisible = it }
+            )
         }
         viewModel.price.observe { price.text = it }
-        viewModel.priceChangeFormatter.observe { formatter ->
+        combine(viewModel.charts, viewModel.priceChangeFormatter, ::Pair).observe { (charts, formatter) ->
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
+            chart.setCharts(charts)
         }
         viewModel.averageChartPrice.observe { value ->
             chart.setReferencePrice(value?.toFloat(), getString(R.string.bittensor_exit_avg_buy_price))
@@ -121,7 +128,6 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
             withdrawalHint.isVisible = it != null
         }
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
-        viewModel.charts.observe(chart::setCharts)
         viewModel.selectedChartIndex.observe(chart::setSelectedPeriod)
         viewModel.positionError.observe {
             positionError.text = it

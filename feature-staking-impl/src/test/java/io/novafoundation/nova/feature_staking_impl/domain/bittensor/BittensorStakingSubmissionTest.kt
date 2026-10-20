@@ -245,6 +245,20 @@ class BittensorStakingSubmissionTest(private val stakingType: StakingType) {
     }
 
     @Test
+    fun `signing cancellation proves non submission and permits a fresh attempt`() = runBlocking {
+        val cancellation = io.novafoundation.nova.common.base.errors.SigningCancelledException()
+        extrinsicService.result = Result.failure(cancellation)
+
+        val result = execute() as BittensorOperationResult.Failure
+        assertSame(cancellation, result.cause)
+        assertEquals(BittensorFailureStage.NOT_SUBMITTED, result.stage)
+        assertTrue(result.isSigningCancelled)
+
+        extrinsicService.result = Result.success(successfulExecution)
+        assertTrue(execute() is BittensorOperationResult.Success)
+    }
+
+    @Test
     fun `submission error is unknown without a persistent lock`() = runBlocking {
         val failure = IOException("Connection lost")
         extrinsicService.result = Result.failure(failure)

@@ -52,7 +52,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
-import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -116,8 +115,11 @@ class BittensorSubnetAmountViewModel(
     private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
-    subnetFactsInteractor: BittensorSubnetFactsInteractor
+    subnetFactsInteractor: BittensorSubnetFactsInteractor,
+    initialSelectionState: BittensorSelectionState = BittensorSelectionState()
 ) : BaseViewModel(), Validatable by validationExecutor {
+
+    private var selectionState = initialSelectionState
 
     val retryEvents = retryController.events
 
@@ -553,8 +555,10 @@ class BittensorSubnetAmountViewModel(
     init {
         validatorCommunicator.responseFlow
             .onEach { response ->
-                if (!existingPosition && response.subnetId == subnet.first()?.id?.value) {
-                    selectedValidatorOverride.value = response.address
+                if (!selectionState.accepts(response)) return@onEach
+                selectionState = selectionState.withResponse(response)
+                if (!existingPosition && response.address != null && response.subnetId == subnet.first()?.id?.value) {
+                    response.address?.let { selectedValidatorOverride.value = it }
                 }
             }
             .launchIn(this)
@@ -597,7 +601,7 @@ class BittensorSubnetAmountViewModel(
     fun validatorClicked() = launchUnit {
         if (existingPosition || validating.value) return@launchUnit
         val subnetId = subnet.first()?.id ?: return@launchUnit
-        val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, selectedValidatorAddress.first())
+        val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, selectedValidatorAddress.first(), selectionState)
         validatorCommunicator.openRequest(request)
     }
 
@@ -612,12 +616,17 @@ class BittensorSubnetAmountViewModel(
         val payload = BittensorSubnetDetailsPayload(
             subnetId = selectedSubnet.id.value,
             replaceAmount = true,
-            validatorAddress = selectedValidatorAddress.first()
+            validatorAddress = selectedValidatorAddress.first(),
+            selectionState = selectionState
         )
         router.openBittensorSubnetDetails(payload)
     }
 
-    fun chooseSubnetClicked() = router.openBittensorChooseSubnet(BittensorChooseSubnetPayload(replaceAmount = true))
+    fun chooseSubnetClicked() {
+        val browseState = selectionState.browseState ?: BittensorSubnetBrowseState.fromQuickPick(quickPickOrder)
+        val payload = BittensorChooseSubnetPayload(replaceAmount = true, browseState = browseState, selectionState = selectionState)
+        router.openBittensorChooseSubnet(payload)
+    }
 
     fun continueClicked() = launchUnit {
         if (validating.value) return@launchUnit
@@ -685,7 +694,10 @@ class BittensorSubnetAmountViewModel(
         showError(resources.getString(R.string.common_retry_message))
     }
 
-    fun back() = router.back()
+    fun back() {
+        validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
+        router.back()
+    }
 
     private data class QuoteValidator(val address: String, val validator: BittensorValidator?)
 

@@ -2,6 +2,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicService
+import io.novafoundation.nova.feature_account_api.data.extrinsic.FormExtrinsicWithOrigin
+import io.novafoundation.nova.feature_account_api.data.extrinsic.execution.ExtrinsicExecutionResult
+import io.novafoundation.nova.feature_account_api.data.ethereum.transaction.TransactionOrigin
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
@@ -110,6 +113,34 @@ class BittensorRootClaimExecutionTest {
             assertTrue(pending.pendingTargets("chain", coldkey).isEmpty())
         }
         assertEquals(3, submissions)
+    }
+
+    @Test
+    fun `proven signing cancellation releases lease for another review attempt`() = runBlocking {
+        configure()
+        val cancellation = io.novafoundation.nova.common.base.errors.SigningCancelledException()
+        val cancellingExtrinsics = object : ExtrinsicService by extrinsics {
+            override suspend fun submitExtrinsicAndAwaitExecution(
+                chain: Chain,
+                origin: TransactionOrigin,
+                submissionOptions: ExtrinsicService.SubmissionOptions,
+                formExtrinsic: FormExtrinsicWithOrigin
+            ): Result<ExtrinsicExecutionResult> {
+                return Result.failure(cancellation)
+            }
+        }
+        val positionUpdates = BittensorPositionUpdates()
+        val realExecutor = BittensorSubmissionExecutor(cancellingExtrinsics, positionUpdates)
+        val cancellingInteractor = BittensorRootClaimInteractor(
+            chains, accounts, wallets, source, cancellingExtrinsics, realExecutor, constants, immediate, pending
+        )
+        val lease = requireNotNull(cancellingInteractor.tryAcquire(draft))
+
+        val result = cancellingInteractor.execute(draft, lease) as BittensorOperationResult.Failure
+
+        assertTrue(result.isSigningCancelled)
+        assertTrue(pending.pendingTargets("chain", coldkey).isEmpty())
+        assertNotNull(cancellingInteractor.tryAcquire(draft))
     }
 
     @Test

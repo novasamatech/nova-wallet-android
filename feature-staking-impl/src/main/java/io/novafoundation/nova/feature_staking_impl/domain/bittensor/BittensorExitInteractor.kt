@@ -25,6 +25,14 @@ import java.math.BigInteger
 import java.math.BigDecimal
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
+import io.novafoundation.nova.common.utils.flowOfAll
+import io.novafoundation.nova.runtime.repository.ChainStateRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 
 class BittensorExitInteractor(
     private val chainRegistry: ChainRegistry,
@@ -41,10 +49,27 @@ class BittensorExitInteractor(
     private val beneficiaryAddress: String,
     private val logger: Logger,
     private val immediateExecution: BittensorImmediateExecution,
-    private val costBasisInteractor: BittensorCostBasisInteractor
+    private val costBasisInteractor: BittensorCostBasisInteractor,
+    private val chainState: ChainStateRepository
 ) {
 
     private val options = ExtrinsicService.SubmissionOptions(batchMode = BatchMode.BATCH_ALL)
+
+    fun observe(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): Flow<BittensorExitPosition> = flowOfAll {
+        val initial = load(metaId, netuid, hotkeyAddress)
+        val snapshots = flowOfAll { chainState.currentRemoteBlockNumberFlow(initial.chain.id) }
+            .conflate()
+            .map {
+                requireWallet(metaId, initial.coldkey, initial.chain)
+                exitRuntimeSource.preflight(initial.chain.id, initial.coldkey.value, initial.hotkey.value, netuid)
+                    .withWithdrawalFloor(netuid)
+            }
+            .onStart { emit(initial.preflight) }
+        combine(snapshots, walletRepository.assetFlow(metaId, initial.chain.utilityAsset)) { preflight, asset ->
+            initial.copy(preflight = preflight, asset = asset)
+        }
+            .distinctUntilChanged()
+    }
 
     suspend fun load(metaId: Long, netuid: BittensorNetuid, hotkeyAddress: String): BittensorExitPosition {
         val wallet = accountRepository.getMetaAccount(metaId)

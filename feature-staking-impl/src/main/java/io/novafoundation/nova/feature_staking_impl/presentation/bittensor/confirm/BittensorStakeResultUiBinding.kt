@@ -16,13 +16,13 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
     var resultSheet: BittensorStakeResultBottomSheet? = null
     lifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
         override fun onDestroy(owner: LifecycleOwner) {
-            resultSheet?.setOnDismissListener(null)
-            resultSheet?.dismiss()
-            resultSheet = null
+            resultSheet = resultSheet.dismissWithoutResultCallback()
         }
     })
     results.observeWhenVisible { state ->
-        if (state != null) {
+        if (state == null) {
+            resultSheet = resultSheet.dismissWithoutResultCallback()
+        } else {
             val sheet = resultSheet ?: BittensorStakeResultBottomSheet(
                 context = fragment.requireContext(),
                 onClose = { resultSheet?.dismiss() },
@@ -49,4 +49,11 @@ fun BaseFragmentMixin<*>.bindBittensorStakeResults(
             if (!sheet.isShowing) sheet.show()
         }
     }
+}
+
+internal fun BittensorStakeResultBottomSheet?.dismissWithoutResultCallback(): BittensorStakeResultBottomSheet? {
+    // A model-driven reset (including signing cancellation) must not run user-dismiss navigation.
+    this?.setOnDismissListener(null)
+    this?.dismiss()
+    return null
 }

@@ -19,6 +19,7 @@ import java.math.BigInteger
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.first
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorImmediateStakeValidation
 
 data class BittensorStakePreflightPayload(
     val chain: Chain,
@@ -41,11 +42,15 @@ class BittensorStakePreflightValidation(
     private val walletRepository: WalletRepository,
     private val stakeValidationSystem: BittensorStakeValidationSystem,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
-    private val validatorRepository: BittensorSubnetValidatorRepository
+    private val validatorRepository: BittensorSubnetValidatorRepository,
+    private val immediateExecution: BittensorImmediateExecution,
+    private val immediateValidation: BittensorImmediateStakeValidation
 ) : Validation<BittensorStakePreflightPayload, BittensorStakeValidationFailure> {
 
     override suspend fun validate(value: BittensorStakePreflightPayload): ValidationStatus<BittensorStakeValidationFailure> = coroutineScope {
         val account = accountRepository.getMetaAccount(value.metaId)
+        val executionStatus = immediateValidation.validate(immediateExecution.isSupported(account))
+        if (executionStatus is ValidationStatus.NotValid) return@coroutineScope executionStatus
         val preflight = async {
             preflightRepository.load(value.chain.id, value.netuid, account.requireAccountIdIn(value.chain), value.hotkey)
         }

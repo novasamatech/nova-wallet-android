@@ -3087,4 +3087,5 @@
     <string name="bittensor_remove_validator_filters">Remove all filters</string>
     <string name="bittensor_validators_filtered_empty">No quick-pick validators for this subnet yet. Remove filters to see all validators.</string>
     <string name="bittensor_validators_search_empty">No validators for ‘%s’</string>
+    <string name="bittensor_amount_precision_error">Use no more than %s decimal places.</string>
 </resources>

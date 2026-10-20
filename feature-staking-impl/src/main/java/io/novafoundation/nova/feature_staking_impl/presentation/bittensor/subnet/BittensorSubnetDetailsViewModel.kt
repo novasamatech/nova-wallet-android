@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetLinks
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.hasBittensorSubnetHistoryCoverage
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.utils.images.Icon
@@ -90,8 +91,11 @@ class BittensorSubnetDetailsViewModel(
     private val validatorCommunicator: BittensorSelectValidatorCommunicator,
     private val addressIconGenerator: AddressIconGenerator,
     private val replaceAmount: Boolean,
-    initialValidatorAddress: String?
+    initialValidatorAddress: String?,
+    initialSelectionState: BittensorSelectionState = BittensorSelectionState()
 ) : BaseViewModel(), Browserable.Presentation by Browserable() {
+
+    private var selectionState = initialSelectionState
 
     private val chartSelection = MutableStateFlow<PriceChartSelection?>(null)
 
@@ -274,7 +278,10 @@ class BittensorSubnetDetailsViewModel(
     val charts = combine(chartData, isFiatMode, ::mapCharts)
         .shareInBackground()
 
-    val priceChangeFormatter = period.map { BittensorChartChangeTextInjector(periodLabel(it)) }
+    val priceChangeFormatter = combine(chartData, period) { chart, selected ->
+        val covered = chart.period == selected && hasBittensorSubnetHistoryCoverage(chart.points.dataOrNull.orEmpty(), selected)
+        BittensorChartChangeTextInjector(periodLabel(selected), covered)
+    }
         .shareInBackground()
 
     private val ageState = subnetState.flatMapLatest { state ->
@@ -358,7 +365,9 @@ class BittensorSubnetDetailsViewModel(
     init {
         validatorCommunicator.responseFlow
             .onEach { response ->
-                if (response.subnetId == subnetId.value) selectedValidatorAddress.value = response.address
+                if (!selectionState.accepts(response)) return@onEach
+                selectionState = selectionState.withResponse(response)
+                if (response.subnetId == subnetId.value && response.address != null) selectedValidatorAddress.value = response.address
             }
             .launchIn(this)
     }
@@ -366,7 +375,7 @@ class BittensorSubnetDetailsViewModel(
     fun validatorClicked() = launchUnit {
         val validator = validatorState.first().dataOrNull?.validator
         val address = selectedValidatorAddress.value ?: validator?.let { validatorInteractor.chain().addressOf(it.hotkey.value) }
-        val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, address)
+        val request = BittensorSelectValidatorCommunicator.Request(subnetId.value, address, selectionState)
         validatorCommunicator.openRequest(request)
     }
 
@@ -422,7 +431,9 @@ class BittensorSubnetDetailsViewModel(
     fun continueClicked() = launchUnit {
         if (!canContinue.first()) return@launchUnit
         val address = currentValidatorAddress()
-        router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(subnetId.value, address, replaceAmount = replaceAmount))
+        router.openBittensorSubnetAmount(
+            BittensorSubnetAmountPayload(subnetId.value, address, replaceAmount = replaceAmount, selectionState = selectionState)
+        )
     }
 
     private suspend fun currentValidatorAddress(): String? {
@@ -439,7 +450,10 @@ class BittensorSubnetDetailsViewModel(
         subnet.first().githubUrl?.let(::showBrowser)
     }
 
-    fun back() = router.back()
+    fun back() {
+        validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
+        router.back()
+    }
 
     private suspend fun loadChartHistory(request: BittensorSubnetChartRequest): List<BittensorSubnetPricePoint> {
         val priceId = request.nativePriceId ?: return emptyList()

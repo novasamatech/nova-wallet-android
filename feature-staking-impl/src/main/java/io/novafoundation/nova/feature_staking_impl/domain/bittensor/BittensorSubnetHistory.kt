@@ -17,11 +17,28 @@ data class BittensorSubnetChart(
 internal fun convertBittensorSubnetHistory(
     alphaHistory: List<HistoricalCoinRate>,
     nativeHistory: List<HistoricalCoinRate>,
-    period: BittensorSubnetChartPeriod
+    period: BittensorSubnetChartPeriod,
+    nowSeconds: Long = System.currentTimeMillis() / 1000
 ): List<BittensorSubnetPricePoint> {
     val points = matchBittensorSubnetHistory(alphaHistory, nativeHistory, period.source.samplingInterval())
-    val cutoff = (points.lastOrNull()?.timestamp ?: return emptyList()) - period.duration.inWholeSeconds
-    return points.filter { it.timestamp >= cutoff }
+    val cutoff = if (period == BittensorSubnetChartPeriod.ALL) Long.MIN_VALUE else nowSeconds - period.duration.inWholeSeconds
+    return points.filter { it.timestamp in cutoff..nowSeconds }
+}
+
+/** A successful short/old response is not a return for the entire selected window. */
+internal fun hasBittensorSubnetHistoryCoverage(
+    points: List<BittensorSubnetPricePoint>,
+    period: BittensorSubnetChartPeriod,
+    nowSeconds: Long = System.currentTimeMillis() / 1000
+): Boolean {
+    if (points.size < 2) return false
+    val first = points.first()
+    val last = points.last()
+    val tolerance = 2 * period.source.samplingInterval().inWholeSeconds
+    if (first.timestamp > last.timestamp || last.timestamp > nowSeconds || nowSeconds - last.timestamp > tolerance) return false
+    if (period == BittensorSubnetChartPeriod.ALL) return true
+    val start = nowSeconds - period.duration.inWholeSeconds
+    return first.timestamp in (start - tolerance)..(start + tolerance)
 }
 
 internal fun matchBittensorSubnetHistory(

@@ -47,6 +47,9 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.runningFold
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class BittensorChooseSubnetViewModel(
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
@@ -59,10 +62,13 @@ class BittensorChooseSubnetViewModel(
     private val rowInteractor: BittensorPortfolioRowInteractor,
     private val resources: ResourceManager,
     listChooserMixinFactory: ListChooserMixin.Factory,
-    private val payload: BittensorChooseSubnetPayload
+    private val payload: BittensorChooseSubnetPayload,
+    private val validatorCommunicator: BittensorSelectValidatorCommunicator
 ) : BaseViewModel() {
 
     val retryEvents = retryController.events
+
+    private var selectionState = payload.selectionState
 
     val sortingMixin = listChooserMixinFactory.create(
         coroutineScope = viewModelScope,
@@ -74,12 +80,12 @@ class BittensorChooseSubnetViewModel(
                 BittensorSubnetSorting.SEVEN_DAY_CHANGE,
                 BittensorSubnetSorting.NAME
             ).map { ListChooserMixin.Model(it, sortingDisplay(it)) }
-            ListChooserMixin.Data(options, options.first { it.value == BittensorSubnetSorting.SEVEN_DAY_CHANGE })
+            ListChooserMixin.Data(options, options.first { it.value == payload.browseState.sorting })
         },
         selectorTitleRes = R.string.common_sort_by
     )
 
-    val hideThinPools = MutableStateFlow(false)
+    val hideThinPools = MutableStateFlow(payload.browseState.hideThinPools)
 
     private val catalogueState = retryController.observe(
         step = "subnet catalogue",
@@ -203,12 +209,21 @@ class BittensorChooseSubnetViewModel(
     }
         .shareInBackground()
 
+    init {
+        validatorCommunicator.responseFlow
+            .onEach { selectionState = selectionState.withResponse(it) }
+            .launchIn(this)
+    }
+
     fun search(query: String) {
         this.query.value = query.trim()
     }
 
-    fun select(row: BittensorSubnetRowUi) {
-        router.openBittensorSubnetDetails(BittensorSubnetDetailsPayload(row.subnet.id.value, payload.replaceAmount))
+    fun select(row: BittensorSubnetRowUi) = launchUnit {
+        rememberBrowseState()
+        router.openBittensorSubnetDetails(
+            BittensorSubnetDetailsPayload(row.subnet.id.value, payload.replaceAmount, selectionState = selectionState)
+        )
     }
 
     fun filterResult(hideThinPools: Boolean) = combine(orderedCatalogue, query, favorites) { subnets, query, favorites ->
@@ -228,16 +243,24 @@ class BittensorChooseSubnetViewModel(
         }
     }
 
-    fun rootStaking() {
+    fun rootStaking() = launchUnit {
+        rememberBrowseState()
         if (payload.replaceAmount) {
-            router.replaceBittensorSubnetAmountWithRoot()
+            router.replaceBittensorSubnetAmountWithRoot(selectionState)
         } else {
-            router.openBittensorRootStaking()
+            router.openBittensorRootStaking(selectionState = selectionState)
         }
     }
 
-    fun back() {
+    fun back() = launchUnit {
+        rememberBrowseState()
+        validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
+    }
+
+    private suspend fun rememberBrowseState() {
+        val browseState = BittensorSubnetBrowseState(sortingMixin.selectedValue.first(), hideThinPools.value)
+        selectionState = selectionState.copy(browseState = browseState)
     }
 
     private fun mapSubnetRows(

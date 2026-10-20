@@ -4,6 +4,7 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorFailureStage
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationResult
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorSubmissionState
 
@@ -28,6 +29,9 @@ fun BittensorOperationResult.Failure.mapResult(resources: ResourceManager): Bitt
             ?: resources.getString(R.string.common_error_general_title)
     )
 }
+
+fun BittensorOperationResult.Failure.toSubmissionState(resources: ResourceManager): BittensorSubmissionState =
+    if (isSigningCancelled) BittensorSubmissionState.Ready else mapResult(resources).toSubmissionState()
 
 fun BittensorStakeResultUi.toSubmissionState(): BittensorSubmissionState = when (this) {
     is BittensorStakeResultUi.Progress -> BittensorSubmissionState.Submitting(this)

@@ -9,6 +9,7 @@ import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepos
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakePreflightRepository
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorImmediateStakeValidation
 import io.novafoundation.nova.feature_wallet_api.domain.interfaces.WalletRepository
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.Token
@@ -79,7 +80,13 @@ class BittensorStakePreflightValidationTest {
 
     private val validators = mock(io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository::class.java)
 
-    private val validation = BittensorStakePreflightValidation(repository, accounts, wallets, stakeValidationSystem, subnetInteractor, validators)
+    private val immediateExecution = mock(BittensorImmediateExecution::class.java)
+
+    private val immediateValidation = BittensorImmediateStakeValidation()
+
+    private val validation = BittensorStakePreflightValidation(
+        repository, accounts, wallets, stakeValidationSystem, subnetInteractor, validators, immediateExecution, immediateValidation
+    )
 
     private val system = ValidationSystem(validation)
 
@@ -91,6 +98,7 @@ class BittensorStakePreflightValidationTest {
         `when`(chain.assets).thenReturn(listOf(chainAsset))
         `when`(account.accountIdIn(chain)).thenReturn(coldKey)
         `when`(accounts.getMetaAccount(7L)).thenReturn(account)
+        `when`(immediateExecution.isSupported(account)).thenReturn(true)
         `when`(wallets.assetFlow(7L, chainAsset)).thenReturn(flowOf(asset))
         `when`(asset.token).thenReturn(token)
         `when`(token.configuration).thenReturn(chainAsset)
@@ -98,6 +106,27 @@ class BittensorStakePreflightValidationTest {
         `when`(chainAsset.chainId).thenReturn("bittensor")
         `when`(asset.transferable).thenReturn(BigDecimal.ONE)
         `when`(asset.transferableInPlanks).thenReturn(BigInteger.TEN.pow(9))
+    }
+
+    @Test
+    fun `direct root and subnet review reject delayed operation wallet before loading transaction data`() = runBlocking {
+        `when`(immediateExecution.isSupported(account)).thenReturn(false)
+        for (netuid in listOf(BittensorNetuid.Root, BittensorNetuid.Subnet(1))) {
+            val failure = system.validate(payload.copy(netuid = netuid)).getOrThrow().notValidOrNull()
+            assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason)
+        }
+        assertEquals(0, loads)
+        verify(accounts, never()).getSelectedMetaAccount()
+        org.mockito.Mockito.verifyNoInteractions(wallets, subnetInteractor, validators)
+    }
+
+    @Test
+    fun `warning continuation rechecks execution type of explicit wallet`() = runBlocking {
+        assertNull(system.validate(payload).getOrThrow().notValidOrNull())
+        `when`(immediateExecution.isSupported(account)).thenReturn(false)
+        val failure = system.validate(payload.copy(priceImpactAccepted = true)).getOrThrow().notValidOrNull()
+        assertEquals(BittensorStakeValidationFailure.DELAYED_EXECUTION, failure?.reason)
+        assertEquals(1, loads)
     }
 
     @Test

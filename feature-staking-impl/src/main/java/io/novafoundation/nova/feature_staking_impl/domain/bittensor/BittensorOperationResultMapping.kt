@@ -12,6 +12,10 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.multiNetwork.runtime.repository.findEvents
 import io.novafoundation.nova.common.utils.instanceOf
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
+
+val BittensorOperationResult.Failure.isSigningCancelled: Boolean
+    get() = stage == BittensorFailureStage.NOT_SUBMITTED && cause is SigningCancelledException
 
 fun ExtrinsicExecutionResult.mapBittensorOperationResult(chain: Chain? = null): BittensorOperationResult = when (val dispatch = outcome) {
     is ExtrinsicDispatch.Failed -> BittensorOperationResult.Failure(dispatch.error, extrinsicHash, BittensorFailureStage.DISPATCHED)

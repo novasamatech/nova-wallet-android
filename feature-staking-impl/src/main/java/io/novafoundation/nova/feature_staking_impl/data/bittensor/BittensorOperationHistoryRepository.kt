@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.takeWhile
 import okhttp3.HttpUrl
 
@@ -23,6 +24,11 @@ data class BittensorHistoryRequest internal constructor(
     val address: String,
     val baseUrl: HttpUrl,
     internal val generation: Long
+)
+
+data class BittensorHistoryState(
+    val result: Result<BittensorOperationHistory>?,
+    val isSettling: Boolean
 )
 
 class BittensorOperationHistoryRepository(
@@ -40,6 +46,8 @@ class BittensorOperationHistoryRepository(
         var seedBlockedUntilNanos: Long? = null
 
         var latestFlight = 0L
+
+        var settledGeneration = 0L
     }
 
     private data class CacheAdmission(val mayCache: Boolean, val flight: Long)
@@ -52,7 +60,11 @@ class BittensorOperationHistoryRepository(
 
     private val cachedHistories = linkedMapOf<HistoryKey, CachedHistory>()
 
-    internal data class Snapshot(val request: BittensorHistoryRequest, val result: Result<BittensorOperationHistory>?)
+    internal data class Snapshot(
+        val request: BittensorHistoryRequest,
+        val result: Result<BittensorOperationHistory>?,
+        val isSettling: Boolean = false
+    )
 
     /** Capture before submission so an origin/account switch cannot invalidate another wallet's cache. */
     suspend fun request(address: String): BittensorHistoryRequest? {
@@ -72,11 +84,13 @@ class BittensorOperationHistoryRepository(
     }
 
     /** Shared while observed. Null means loading, never an unavailable or empty ledger. */
-    fun observe(address: String): Flow<Result<BittensorOperationHistory>?> = flow {
+    fun observe(address: String): Flow<Result<BittensorOperationHistory>?> = observeState(address).map { it.result }
+
+    fun observeState(address: String): Flow<BittensorHistoryState> = flow {
         while (true) {
             val request = request(address)
             if (request == null) {
-                emit(Result.failure(IllegalStateException("Cost basis origin is unavailable")))
+                emit(BittensorHistoryState(Result.failure(IllegalStateException("Cost basis origin is unavailable")), false))
                 delay(REFRESH_INTERVAL_MILLIS)
                 continue
             }
@@ -91,12 +105,16 @@ class BittensorOperationHistoryRepository(
                 val state = synchronized(lock) { histories.getValue(HistoryKey(request.baseUrl, address)) }
                 combine(shared, state.generation) { snapshot, generation ->
                     // Clear immediately even if a cancelled old transport is slow to finish.
-                    if (snapshot.request.generation == generation) snapshot.result else null
+                    if (snapshot.request.generation == generation) {
+                        BittensorHistoryState(snapshot.result, snapshot.isSettling)
+                    } else {
+                        BittensorHistoryState(null, true)
+                    }
                 }
                     .takeWhile { infrastructureUrls.baseUrl() == request.baseUrl }
                     .collect { emit(it) }
             }
-            emit(null)
+            emit(BittensorHistoryState(null, false))
         }
     }
 
@@ -108,8 +126,12 @@ class BittensorOperationHistoryRepository(
     }
 
     private fun refreshHistory(request: BittensorHistoryRequest): Flow<Snapshot> = flow {
-        emit(Snapshot(request, null))
+        emit(Snapshot(request, null, isSettling(request)))
         while (true) {
+            val startedDuringSettlement = synchronized(lock) {
+                val deadline = histories.getValue(HistoryKey(request.baseUrl, request.address)).seedBlockedUntilNanos
+                deadline != null && nowNanos() < deadline
+            }
             val result = try {
                 Result.success(history(request))
             } catch (e: CancellationException) {
@@ -117,11 +139,11 @@ class BittensorOperationHistoryRepository(
             } catch (e: Exception) {
                 Result.failure(e)
             }
-            emit(Snapshot(request, result))
+            emit(Snapshot(request, result, startedDuringSettlement || isSettling(request)))
             // A shared stream never migrates to another origin under its original cache key.
             if (result.exceptionOrNull() is OriginChanged) awaitCancellation()
             // Delay after completion: a ten-page request is not cancelled by a refresh tick.
-            delay(REFRESH_INTERVAL_MILLIS)
+            delay(refreshDelayMillis(request))
         }
     }
 
@@ -148,6 +170,7 @@ class BittensorOperationHistoryRepository(
         val history = BittensorOperationHistory(pages.items, pages.allPagesRead)
         synchronized(lock) {
             val state = requireCurrent(key, request)
+            if (admission.mayCache) state.settledGeneration = request.generation
             // Settlement responses may be displayed, but never seed a later subscription.
             // Admission uses eligibility at request start and the remote request-start TTL.
             if (admission.mayCache && state.latestFlight == admission.flight && nowNanos() < pages.validUntilNanos) {
@@ -157,6 +180,21 @@ class BittensorOperationHistoryRepository(
             }
         }
         return history
+    }
+
+    private fun isSettling(request: BittensorHistoryRequest): Boolean = synchronized(lock) {
+        val state = histories.getValue(HistoryKey(request.baseUrl, request.address))
+        state.settledGeneration != state.generation.value
+    }
+
+    private fun refreshDelayMillis(request: BittensorHistoryRequest): Long = synchronized(lock) {
+        val deadline = histories.getValue(HistoryKey(request.baseUrl, request.address)).seedBlockedUntilNanos
+        val remaining = deadline?.minus(nowNanos()) ?: 0L
+        if (remaining > 0) {
+            ((remaining + 999_999L) / 1_000_000L).coerceAtMost(REFRESH_INTERVAL_MILLIS)
+        } else {
+            REFRESH_INTERVAL_MILLIS
+        }
     }
 
     private fun requireCurrent(key: HistoryKey, request: BittensorHistoryRequest): AccountHistory {

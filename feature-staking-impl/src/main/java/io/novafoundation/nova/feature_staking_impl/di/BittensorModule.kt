@@ -72,6 +72,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightValidation
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorImmediateStakeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakeValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubmissionExecutor
@@ -155,18 +156,25 @@ class BittensorModule {
         wallets: WalletRepository,
         balanceValidationSystem: BittensorStakeValidationSystem,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
-        validatorRepository: BittensorSubnetValidatorRepository
+        validatorRepository: BittensorSubnetValidatorRepository,
+        immediateExecution: BittensorImmediateExecution,
+        immediateValidation: BittensorImmediateStakeValidation
     ) = BittensorStakePreflightValidation(
         repository,
         accounts,
         wallets,
         balanceValidationSystem,
         bittensorSubnetInteractor,
-        validatorRepository
+        validatorRepository,
+        immediateExecution,
+        immediateValidation
     )
 
     @Provides
     fun provideBittensorStakePreflightSystem(validation: BittensorStakePreflightValidation) = ValidationSystem(validation)
+
+    @Provides
+    fun provideBittensorImmediateStakeValidation() = BittensorImmediateStakeValidation()
 
     @Provides
     fun provideBittensorValidatorInteractor(
@@ -536,6 +544,7 @@ class BittensorModule {
         logger: Logger,
         immediateExecution: BittensorImmediateExecution,
         costBasis: BittensorCostBasisInteractor,
+        chainState: ChainStateRepository,
         @Named(SERVICE_FEE_BENEFICIARY) beneficiaryAddress: String
     ) = BittensorExitInteractor(
         chains,
@@ -552,6 +561,7 @@ class BittensorModule {
         beneficiaryAddress,
         logger,
         immediateExecution,
-        costBasis
+        costBasis,
+        chainState
     )
 }

@@ -92,6 +92,13 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             networkFee.setOnClickListener { showDescription(R.string.network_fee, description) }
             execution.networkFee.setOnClickListener { showDescription(R.string.network_fee, description) }
         }
+        if (viewModel.existingPosition) {
+            viewModel.averagePriceDescription.observe { description ->
+                projectedAveragePrice.setOnClickListener {
+                    description?.let { showDescription(R.string.bittensor_exit_avg_buy_price, it) }
+                }
+            }
+        }
         setupExternalActions(viewModel)
         viewModel.wallet.observe(wallet::showWallet)
         viewModel.account.observe(account::showAddress)

@@ -2,15 +2,18 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subne
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import android.view.LayoutInflater
 import io.novafoundation.nova.common.view.bottomSheet.BaseBottomSheet
 import io.novafoundation.nova.feature_staking_impl.databinding.BottomSheetBittensorValidatorFiltersBinding
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting
 
+@Parcelize
 data class BittensorValidatorFilters(
     val sorting: BittensorValidatorSorting = BittensorValidatorSorting.APY,
     val hideUnusualApy: Boolean = true
-)
+) : Parcelable
 
 class BittensorValidatorFiltersBottomSheet(
     context: Context,

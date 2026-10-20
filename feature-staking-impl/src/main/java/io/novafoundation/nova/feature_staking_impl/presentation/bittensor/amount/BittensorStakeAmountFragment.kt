@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amoun
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setBittensorFeeStatus
 
 import android.os.Bundle
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.common.view.setMessageOrHide
@@ -31,7 +32,15 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
 
         private const val PAYLOAD_KEY = "payload"
 
-        fun getBundle(payload: BittensorStakeAmountPayload?) = Bundle().apply { putParcelable(PAYLOAD_KEY, payload) }
+        private const val SELECTION_STATE_KEY = "selectionState"
+
+        fun getBundle(
+            payload: BittensorStakeAmountPayload?,
+            selectionState: BittensorSelectionState = BittensorSelectionState()
+        ) = Bundle().apply {
+            putParcelable(PAYLOAD_KEY, payload)
+            putParcelable(SELECTION_STATE_KEY, selectionState)
+        }
     }
 
     override fun createBinding() = FragmentBittensorStakeAmountBinding.inflate(layoutInflater)
@@ -54,7 +63,11 @@ class BittensorStakeAmountFragment : BaseFragment<BittensorStakeAmountViewModel,
     override fun inject() {
         FeatureUtils.getFeature<StakingFeatureComponent>(requireContext(), StakingFeatureApi::class.java)
             .bittensorStakeAmountComponentFactory()
-            .create(this, argumentOrNull<BittensorStakeAmountPayload>(PAYLOAD_KEY))
+            .create(
+                this,
+                argumentOrNull<BittensorStakeAmountPayload>(PAYLOAD_KEY),
+                argumentOrNull<BittensorSelectionState>(SELECTION_STATE_KEY) ?: BittensorSelectionState()
+            )
             .inject(this)
     }
 

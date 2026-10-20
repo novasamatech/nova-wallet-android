@@ -7,6 +7,8 @@ import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.mapLoading
 import io.novafoundation.nova.common.base.BaseViewModel
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetChart
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.hasBittensorSubnetHistoryCoverage
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.isLoading
 import io.novafoundation.nova.common.domain.map
@@ -169,10 +171,12 @@ class BittensorSubnetPositionViewModel(
     val canSell = combine(canAct, withdrawalState) { allowed, state -> allowed && state.dataOrNull?.canWithdraw == true }
         .shareInBackground()
 
-    private val costBasisState = estimatesMixin.observeCostBasis(
+    private val costBasisUpdate = estimatesMixin.observePositionCostBasis(
         portfolio.map { it?.let { BittensorEstimateContext(it.metaId, it.chain) } }
     )
         .shareInBackground()
+
+    private val costBasisState = costBasisUpdate.map { it.state }.shareInBackground()
 
     private val yieldState = estimatesMixin.observeAlphaYields(
         portfolio.map { it?.chain },
@@ -214,27 +218,17 @@ class BittensorSubnetPositionViewModel(
         subnet
     ) { state, assetState, subnet ->
         state.map { basis ->
-            val average = basis?.forSubnet(subnetId.value)
-                ?.averagePrice
-            val asset = assetState.dataOrNull
-            when {
-                average != null && asset != null -> AmountModel(
-                    tokenFormatter.formatToken(average, asset.token.configuration.symbol),
-                    subnet?.symbol?.takeIf { it.isNotBlank() }?.let { resources.getString(R.string.bittensor_avg_buy_price_per, it) }
-                )
-                basis?.canEstimate(subnetId.value) == true -> AmountModel(resources.getString(R.string.common_not_available), null)
-                else -> AmountModel("—", null)
-            }
+            costBasisFormatter.averagePrice(basis, subnetId.value, assetState.dataOrNull?.token, subnet?.symbol)
         }
     }
         .shareInBackground()
 
     val earned = combine(
-        costBasisState,
+        costBasisUpdate,
         portfolio,
         held
-    ) { state, data, positions ->
-        state.map { basis ->
+    ) { update, data, positions ->
+        val value = update.state.map { basis ->
             val totals = basis?.forSubnet(subnetId.value)
             val worth = data?.positions?.subnetStake(subnetId)
             if (totals == null || worth == null) {
@@ -247,6 +241,7 @@ class BittensorSubnetPositionViewModel(
                 )
             }
         }
+        BittensorPositionEarnedUi(value, update.showsEarned(subnetId))
     }
         .shareInBackground()
 
@@ -313,9 +308,6 @@ class BittensorSubnetPositionViewModel(
 
     private val period = MutableStateFlow(BittensorSubnetChartPeriod.WEEK)
 
-    val priceChangeFormatter = period.map { BittensorChartChangeTextInjector(resources.getString(it.labelRes())) }
-        .shareInBackground()
-
     private data class ChartRequest(val asset: Asset?, val period: BittensorSubnetChartPeriod)
 
     private val chartState = combine(
@@ -329,7 +321,14 @@ class BittensorSubnetPositionViewModel(
                 step = "position price chart",
                 transform = { it.withSafeLoading() }
             ) { loadChart(request) }
+                .map { BittensorSubnetChart(request.period, it) }
         }
+        .shareInBackground()
+
+    val priceChangeFormatter = combine(chartState, period) { chart, selected ->
+        val covered = chart.period == selected && hasBittensorSubnetHistoryCoverage(chart.points.dataOrNull.orEmpty(), selected)
+        BittensorChartChangeTextInjector(resources.getString(selected.labelRes()), covered)
+    }
         .shareInBackground()
 
     val axisFormatter = chartAssetState
@@ -337,9 +336,9 @@ class BittensorSubnetPositionViewModel(
         .map { BittensorPositionChartFormatter(tokenFormatter, it.token.configuration.symbol) }
         .shareInBackground()
 
-    val priceChange = chartState.map { state ->
-        val points = state.dataOrNull.orEmpty()
-        if (points.size < 2 || !points.first().tao.isPositive) {
+    val priceChange = chartState.map { chart ->
+        val points = chart.points.dataOrNull.orEmpty()
+        if (!hasBittensorSubnetHistoryCoverage(points, chart.period) || !points.first().tao.isPositive) {
             ""
         } else {
             val priceDifference = points.last().tao - points.first().tao
@@ -361,11 +360,12 @@ class BittensorSubnetPositionViewModel(
         chartState,
         period,
         chartAssetState
-    ) { state, selected, asset ->
+    ) { chart, selected, asset ->
+        val state = chart.points
         val points = state.dataOrNull.orEmpty()
         BittensorSubnetChartPeriod.entries.mapIndexed { index, period ->
             val label = resources.getString(period.labelRes())
-            if (selected == period && (state.isLoading() || asset.isLoading())) {
+            if (selected == period && (chart.period != selected || state.isLoading() || asset.isLoading())) {
                 PriceChartModel.Loading(label)
             } else if (selected != period || points.isEmpty()) {
                 PriceChartModel.Empty(label, "")

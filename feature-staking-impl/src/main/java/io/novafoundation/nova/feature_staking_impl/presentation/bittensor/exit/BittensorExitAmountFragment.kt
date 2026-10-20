@@ -82,23 +82,31 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         viewModel.amount.observe { if (amount.amountInput.text.toString() != it) amount.amountInput.setText(it) }
         viewModel.maxAmount.observe(amount::setMaxAmountDisplay)
         viewModel.fiatAmount.observe(amount::setFiatAmount)
+        viewModel.amountError.observe(amount::setError)
         validator.showValue(viewModel.validator)
-        viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
-        viewModel.averagePriceDescription.observe { description ->
-            averagePrice.setOnClickListener {
-                description?.let { DescriptionBottomSheet(requireContext(), getString(R.string.bittensor_exit_avg_buy_price), it).show() }
+        if (!viewModel.isRoot) {
+            viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
+            viewModel.averagePriceDescription.observe { description ->
+                averagePrice.setOnClickListener {
+                    description?.let { DescriptionBottomSheet(requireContext(), getString(R.string.bittensor_exit_avg_buy_price), it).show() }
+                }
             }
-        }
-        viewModel.earned.observe { state ->
-            earned.showBittensorLoadingAmount(state.map { it.amount })
-            earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+            viewModel.earned.observe { state ->
+                earned.showBittensorLoadingAmount(state.map { it.amount })
+                earned.valuePrimary.setTextColorRes(state.dataOrNull?.colorRes ?: R.color.text_secondary)
+            }
+            viewModel.received.observe(receive::showBittensorLoadingValue)
+            viewModel.rate.observe(rate::showBittensorLoadingValue)
+            viewModel.swapRateDescription.observe { description ->
+                rate.setOnClickListener {
+                    description?.let { DescriptionBottomSheet(requireContext(), getString(R.string.bittensor_exchange_rate), it).show() }
+                }
+            }
         }
         viewModel.validatorIcon.observe {
             validator.image.isVisible = it != null
             validator.image.setImageDrawable(it)
         }
-        viewModel.received.observe(receive::showBittensorLoadingValue)
-        viewModel.rate.observe(rate::showBittensorLoadingValue)
         viewModel.fee.observe(fee::showBittensorLoadingValue)
         viewModel.feeCaption.observe {
             caption.text = it

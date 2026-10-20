@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 
 import androidx.fragment.app.Fragment
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -64,7 +65,8 @@ class BittensorSubnetModule {
         rowInteractor: BittensorPortfolioRowInteractor,
         resources: ResourceManager,
         listChooserMixinFactory: ListChooserMixin.Factory,
-        payload: BittensorChooseSubnetPayload
+        payload: BittensorChooseSubnetPayload,
+        validatorCommunicator: BittensorSelectValidatorCommunicator
     ): ViewModel = BittensorChooseSubnetViewModel(
         bittensorSubnetInteractor,
         router,
@@ -76,7 +78,8 @@ class BittensorSubnetModule {
         rowInteractor = rowInteractor,
         resources = resources,
         listChooserMixinFactory = listChooserMixinFactory,
-        payload = payload
+        payload = payload,
+        validatorCommunicator = validatorCommunicator
     )
 
     @Provides
@@ -89,8 +92,9 @@ class BittensorSubnetModule {
     fun whereToStake(
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
-        retryController: BittensorRetryController
-    ): ViewModel = BittensorWhereToStakeViewModel(bittensorSubnetInteractor, router, retryController)
+        retryController: BittensorRetryController,
+        validatorCommunicator: BittensorSelectValidatorCommunicator
+    ): ViewModel = BittensorWhereToStakeViewModel(bittensorSubnetInteractor, router, retryController, validatorCommunicator)
 
     @Provides
     fun whereToStakeVm(fragment: Fragment, factory: ViewModelProvider.Factory): BittensorWhereToStakeViewModel =

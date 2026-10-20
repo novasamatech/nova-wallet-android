@@ -17,8 +17,8 @@ enum class BittensorSubnetChartPeriod(val source: PricePeriod, val duration: Dur
     DAY(PricePeriod.DAY, 1.days),
     WEEK(PricePeriod.MONTH, 7.days),
     MONTH(PricePeriod.MONTH, 30.days),
-    QUARTER(PricePeriod.MAX, 90.days),
-    YEAR(PricePeriod.MAX, 365.days)
+    YEAR(PricePeriod.MAX, 365.days),
+    ALL(PricePeriod.MAX, Duration.INFINITE)
 }
 
 class BittensorSubnetDetailsInteractor(

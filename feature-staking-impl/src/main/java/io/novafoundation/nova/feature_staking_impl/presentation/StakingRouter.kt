@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
+
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
 
 import io.novafoundation.nova.feature_staking_impl.domain.staking.redeem.RedeemConsequences
@@ -121,7 +123,10 @@ interface StakingRouter {
 
     fun openBittensorRootClaim(payload: BittensorRootClaimPayload)
 
-    fun openBittensorRootStaking(payload: BittensorStakeAmountPayload? = null)
+    fun openBittensorRootStaking(
+        payload: BittensorStakeAmountPayload? = null,
+        selectionState: BittensorSelectionState = BittensorSelectionState()
+    )
 
     fun openBittensorPortfolio()
 
@@ -131,7 +136,9 @@ interface StakingRouter {
 
     fun openBittensorChooseSubnet(payload: BittensorChooseSubnetPayload = BittensorChooseSubnetPayload())
 
-    fun replaceBittensorSubnetAmountWithRoot()
+    fun replaceBittensorSubnetAmountWithRoot(
+        selectionState: BittensorSelectionState
+    )
 
     fun openBittensorWhereToStake()
 

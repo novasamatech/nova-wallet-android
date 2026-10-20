@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
+
 import android.os.SystemClock
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.domain.onError
@@ -562,6 +564,10 @@ class BittensorExitReviewViewModel(
                     draft
                 )
                 is BittensorOperationResult.Failure -> {
+                    if (result.isSigningCancelled) {
+                        execution.value = ExitExecution.Idle
+                        return
+                    }
                     val model = result.mapResult(resources)
                     execution.value = when (model) {
                         is BittensorStakeResultUi.Failure -> ExitExecution.Failure(model)

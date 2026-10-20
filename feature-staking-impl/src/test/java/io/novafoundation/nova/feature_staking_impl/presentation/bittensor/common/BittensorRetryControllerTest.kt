@@ -128,6 +128,56 @@ class BittensorRetryControllerTest {
     }
 
     @Test
+    fun `request timeout exposes error and dialog retry reloads the source`() = runBlocking {
+        var attempts = 0
+        val states = mutableListOf<ExtendedLoadingState<Int>>()
+        val collection = launch {
+            controller.observe("chart", transform = { it.withSafeLoading() }) {
+                flow {
+                    attempts++
+                    if (attempts == 1) {
+                        withTimeout(20L) { awaitCancellation() }
+                    }
+                    emit(42)
+                }
+            }
+                .take(4)
+                .toList(states)
+        }
+
+        withTimeout(3_000L) {
+            controller.events.first().onRetry()
+            collection.join()
+        }
+
+        assertEquals(2, attempts)
+        assertEquals(ExtendedLoadingState.Loading, states[0])
+        assertTrue(states[1] is ExtendedLoadingState.Error)
+        assertEquals(ExtendedLoadingState.Loading, states[2])
+        assertEquals(ExtendedLoadingState.Loaded(42), states[3])
+    }
+
+    @Test
+    fun `collector cancellation during timed request does not produce a dialog`() = runBlocking {
+        val sourceStarted = CompletableDeferred<Unit>()
+        val collection = launch {
+            controller.observe("chart", transform = { it.withSafeLoading() }) {
+                flow<Int> {
+                    withTimeout(3_000L) {
+                        sourceStarted.complete(Unit)
+                        awaitCancellation()
+                    }
+                }
+            }.collect {}
+        }
+
+        withTimeout(3_000L) { sourceStarted.await() }
+        collection.cancelAndJoin()
+
+        assertNull(withTimeoutOrNull(50L) { controller.events.first() })
+    }
+
+    @Test
     fun `cancellation does not produce an error dialog`() = runBlocking {
         val sourceStarted = CompletableDeferred<Unit>()
         val collection = launch {

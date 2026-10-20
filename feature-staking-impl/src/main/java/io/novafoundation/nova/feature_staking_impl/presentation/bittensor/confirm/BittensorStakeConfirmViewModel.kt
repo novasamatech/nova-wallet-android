@@ -238,7 +238,7 @@ class BittensorStakeConfirmViewModel(
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    submission.value = result.mapResult(resourceManager).toSubmissionState()
+                    submission.value = result.toSubmissionState(resourceManager)
                 }
                 is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resourceManager).toSubmissionState()
             }

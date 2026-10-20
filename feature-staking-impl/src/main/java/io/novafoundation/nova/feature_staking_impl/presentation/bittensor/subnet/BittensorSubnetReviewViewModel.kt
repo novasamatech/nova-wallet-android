@@ -205,6 +205,13 @@ class BittensorSubnetReviewViewModel(
     }
         .shareInBackground()
 
+    val averagePriceDescription = preparationState.map { preparation ->
+        preparation.dataOrNull?.subnet?.let { subnet ->
+            resources.getString(R.string.bittensor_average_price_description, subnet.symbol, subnet.name)
+        }
+    }
+        .shareInBackground()
+
     private val hasError = combine(
         walletState,
         preparationState
@@ -461,7 +468,7 @@ class BittensorSubnetReviewViewModel(
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(prepared, fee, result.outcome))
                 }
                 is BittensorOperationResult.Failure -> {
-                    submission.value = result.mapResult(resources).toSubmissionState()
+                    submission.value = result.toSubmissionState(resources)
                 }
                 is BittensorOperationResult.Unknown -> submission.value = result.mapResult(resources).toSubmissionState()
             }

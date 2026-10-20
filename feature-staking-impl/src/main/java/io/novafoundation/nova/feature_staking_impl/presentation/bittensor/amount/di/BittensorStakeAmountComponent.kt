@@ -6,6 +6,7 @@ import dagger.Subcomponent
 import io.novafoundation.nova.common.di.scope.ScreenScope
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorStakeAmountPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 
 @Subcomponent(
     modules = [
@@ -20,7 +21,8 @@ interface BittensorStakeAmountComponent {
 
         fun create(
             @BindsInstance fragment: Fragment,
-            @BindsInstance payload: BittensorStakeAmountPayload?
+            @BindsInstance payload: BittensorStakeAmountPayload?,
+            @BindsInstance selectionState: BittensorSelectionState
         ): BittensorStakeAmountComponent
     }
 

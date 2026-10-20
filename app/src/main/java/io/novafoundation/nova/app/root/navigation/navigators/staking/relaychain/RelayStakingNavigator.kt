@@ -1,5 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
+
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
 
@@ -329,9 +331,12 @@ class RelayStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorRootStaking(payload: BittensorStakeAmountPayload?) {
+    override fun openBittensorRootStaking(
+        payload: BittensorStakeAmountPayload?,
+        selectionState: BittensorSelectionState
+    ) {
         navigationBuilder().action(R.id.action_open_bittensor_root_staking)
-            .setArgs(BittensorStakeAmountFragment.getBundle(payload))
+            .setArgs(BittensorStakeAmountFragment.getBundle(payload, selectionState))
             .navigateInFirstAttachedContext()
     }
 
@@ -341,9 +346,11 @@ class RelayStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun replaceBittensorSubnetAmountWithRoot() {
+    override fun replaceBittensorSubnetAmountWithRoot(
+        selectionState: BittensorSelectionState
+    ) {
         navigationBuilder().action(R.id.action_replace_bittensor_subnet_amount_with_root)
-            .setArgs(BittensorStakeAmountFragment.getBundle(null))
+            .setArgs(BittensorStakeAmountFragment.getBundle(null, selectionState))
             .navigateInFirstAttachedContext()
     }
 

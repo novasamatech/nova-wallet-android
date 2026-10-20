@@ -31,6 +31,15 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.withTimeout
+import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.runtime.ext.ChainGeneses
+import io.novafoundation.nova.runtime.ext.accountIdOf
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertSame
@@ -145,10 +154,69 @@ class BittensorExitQuoteInteractorTest {
 
     private val costBasis = mock(BittensorCostBasisInteractor::class.java)
 
+    private val chainState = mock(io.novafoundation.nova.runtime.repository.ChainStateRepository::class.java)
+
     private val interactor = BittensorExitInteractor(
         registry, accounts, wallets, runtime, metadata, source, config, slippage, extrinsics, executor, constants,
-        "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", logger, immediate, costBasis
+        "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY", logger, immediate, costBasis, chainState
     )
+
+    @Test
+    fun `exit observation refreshes holds collateral and balances without reopening`() = runBlocking {
+        val wallet = mock(MetaAccount::class.java)
+        val token = mock(Token::class.java)
+        val chainAsset = mock(Chain.Asset::class.java)
+        val updatedAsset = mock(Asset::class.java)
+        val blocks = MutableStateFlow(BigInteger.ONE)
+        val assets = MutableStateFlow(asset)
+        val address = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"
+        `when`(chain.id).thenReturn("bittensor")
+        `when`(chain.assets).thenReturn(listOf(chainAsset))
+        `when`(chainAsset.id).thenReturn(0)
+        `when`(asset.token).thenReturn(token)
+        `when`(token.configuration).thenReturn(chainAsset)
+        `when`(registry.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
+        `when`(accounts.getMetaAccount(1)).thenReturn(wallet)
+        `when`(wallet.id).thenReturn(1L)
+        `when`(wallet.type).thenReturn(LightMetaAccount.Type.SECRETS)
+        `when`(wallet.accountIdIn(chain)).thenReturn(hotkey.value)
+        `when`(wallets.assetFlow(1, chainAsset)).thenReturn(assets)
+        `when`(constants.existentialDeposit(chain.id)).thenReturn(BigInteger.ONE)
+        `when`(chainState.currentRemoteBlockNumberFlow(chain.id)).thenReturn(blocks)
+        val validator = AccountIdKey(chain.accountIdOf(address))
+        val member = BittensorExitMember(amount, BigInteger.ZERO, false, BigInteger.ONE)
+        var snapshot = preflight.copy(
+            rootHoldRemaining = BigInteger.ONE,
+            groupStakes = mapOf(validator to amount),
+            groupMembers = mapOf(validator to member)
+        )
+        `when`(runtime.preflight(chain.id, hotkey.value, validator.value, BittensorNetuid.Root)).thenAnswer { snapshot }
+        val received = Channel<BittensorExitPosition>(Channel.UNLIMITED)
+        val observation = launch {
+            interactor.observe(1, BittensorNetuid.Root, address).collect { received.send(it) }
+        }
+        try {
+            val held = withTimeout(2_000) { received.receive() }
+            assertEquals(BigInteger.ZERO, interactor.maximumAmount(held))
+            snapshot = snapshot.copy(
+                rootHoldRemaining = BigInteger.ZERO,
+                groupMembers = mapOf(validator to member.copy(holdRemaining = BigInteger.ZERO))
+            )
+            blocks.value = BigInteger.TWO
+            val unlocked = withTimeout(2_000) { received.receive() }
+            assertEquals(amount, interactor.maximumAmount(unlocked))
+            snapshot = snapshot.copy(groupMembers = mapOf(validator to member.copy(holdRemaining = BigInteger.ZERO, collateral = amount / BigInteger.TWO)))
+            blocks.value = BigInteger.valueOf(3)
+            val collateral = withTimeout(2_000) { received.receive() }
+            assertEquals(amount / BigInteger.TWO, interactor.maximumAmount(collateral))
+            assets.value = updatedAsset
+            val funded = withTimeout(2_000) { received.receive() }
+            assertSame(updatedAsset, funded.asset)
+            assertEquals(collateral.preflight, funded.preflight)
+        } finally {
+            observation.cancelAndJoin()
+        }
+    }
 
     @Test
     fun `sell and explicit refresh use only pinned simulation and spot price`() = runBlocking {

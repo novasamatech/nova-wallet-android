@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.MetaAccount
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorHistoryRequest
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorHistoryState
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorOperationHistoryRepository
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -12,6 +13,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -69,7 +71,8 @@ class BittensorCostBasisInteractorTest {
     @Test
     fun `history loading invalidation and failure are distinct from absent context`() = runTest {
         val updates = MutableStateFlow<Result<BittensorOperationHistory>?>(null)
-        `when`(history.observe(chain.addressOf(coldKey))).thenReturn(updates)
+        val historyStates = updates.map { BittensorHistoryState(it, false) }
+        `when`(history.observeState(chain.addressOf(coldKey))).thenReturn(historyStates)
         val contexts = MutableStateFlow<BittensorEstimateContext?>(context)
         val states = mutableListOf<BittensorCostBasisState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -87,11 +90,30 @@ class BittensorCostBasisInteractorTest {
     }
 
     @Test
+    fun `position updates retain settlement on loading and successful history`() = runTest {
+        val historyStates = flowOf(
+            BittensorHistoryState(null, true),
+            BittensorHistoryState(Result.success(ledger), true),
+            BittensorHistoryState(Result.success(ledger), false)
+        )
+        `when`(history.observeState(chain.addressOf(coldKey))).thenReturn(historyStates)
+        val contexts = flowOf(context)
+
+        val states = interactor.observeUpdates(contexts).toList()
+
+        assertEquals(listOf(false, true, true, false), states.map { it.isSettling })
+        assertEquals(BittensorCostBasisState.Loading, states[1].state)
+        assertTrue(states[2].state is BittensorCostBasisState.Loaded)
+        assertTrue(states[3].state is BittensorCostBasisState.Loaded)
+    }
+
+    @Test
     fun `same account emissions never restart history independent of passive stake changes`() = runTest {
         val accountUpdates = MutableStateFlow(account)
         val updates = MutableStateFlow<Result<BittensorOperationHistory>?>(Result.success(ledger))
         `when`(accounts.metaAccountFlow(7L)).thenReturn(accountUpdates)
-        `when`(history.observe(chain.addressOf(coldKey))).thenReturn(updates)
+        val historyStates = updates.map { BittensorHistoryState(it, false) }
+        `when`(history.observeState(chain.addressOf(coldKey))).thenReturn(historyStates)
         val states = mutableListOf<BittensorCostBasisState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             interactor.observe(flowOf(context)).toList(states)
@@ -103,7 +125,7 @@ class BittensorCostBasisInteractorTest {
             accountUpdates.value = sameColdKeyAccount
         }
         assertEquals(count, states.size)
-        verify(history, times(1)).observe(chain.addressOf(coldKey))
+        verify(history, times(1)).observeState(chain.addressOf(coldKey))
         // No PositionRepository dependency exists: stake amounts cannot clear/cancel this source.
     }
 
@@ -116,8 +138,10 @@ class BittensorCostBasisInteractorTest {
         val first = MutableStateFlow<Result<BittensorOperationHistory>?>(Result.success(ledger))
         val second = MutableStateFlow<Result<BittensorOperationHistory>?>(null)
         `when`(accounts.metaAccountFlow(7L)).thenReturn(wallets)
-        `when`(history.observe(chain.addressOf(coldKey))).thenReturn(first)
-        `when`(history.observe(chain.addressOf(secondKey))).thenReturn(second)
+        val firstStates = first.map { BittensorHistoryState(it, false) }
+        val secondStates = second.map { BittensorHistoryState(it, false) }
+        `when`(history.observeState(chain.addressOf(coldKey))).thenReturn(firstStates)
+        `when`(history.observeState(chain.addressOf(secondKey))).thenReturn(secondStates)
         val states = mutableListOf<BittensorCostBasisState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             interactor.observe(flowOf(context)).toList(states)

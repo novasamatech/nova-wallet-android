@@ -15,6 +15,7 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortf
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioHistoryRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPortfolioRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimPreview
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.portfolioHistoryResponse
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
@@ -176,6 +177,8 @@ class BittensorDetailsRetryTest {
 
     private val rootClaimInteractor = mock(BittensorRootClaimInteractor::class.java)
 
+    private lateinit var rootClaims: MutableStateFlow<BittensorRootClaimState>
+
     private val externalActions = mock(ExternalActions.Presentation::class.java)
 
     private val fiatFormatter = mock(FiatFormatter::class.java)
@@ -219,8 +222,10 @@ class BittensorDetailsRetryTest {
         `when`(subnetRepository.subnets()).thenReturn(emptyList())
         val claims = BittensorRootClaims(emptyList(), BigInteger.ONE)
         val claimState = BittensorRootClaimState(1L, hotkey, chain, asset, claims, true)
-        `when`(rootClaimInteractor.load(1L)).thenReturn(claimState)
-        `when`(rootClaimInteractor.load(2L)).thenReturn(claimState.copy(metaId = 2L))
+        rootClaims = MutableStateFlow(claimState)
+        val otherClaims = flowOf(claimState.copy(metaId = 2L))
+        `when`(rootClaimInteractor.observe(1L)).thenReturn(rootClaims)
+        `when`(rootClaimInteractor.observe(2L)).thenReturn(otherClaims)
         `when`(rowInteractor.weeklyChanges("native", emptySet())).thenReturn(emptyMap())
     }
 
@@ -228,6 +233,28 @@ class BittensorDetailsRetryTest {
     fun cleanUp() = runBlocking<Unit> {
         if (::viewModel.isInitialized) viewModel.coroutineContext.job.cancelAndJoin()
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `root reward updates change empty portfolio without reopening and do not leak across wallets`() = runBlocking<Unit> {
+        portfolioUpdates.value = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
+        createViewModel()
+        withTimeout(3_000L) {
+            viewModel.empty.first { it }
+            val preview = BittensorRootClaimPreview(hotkey, BigInteger.TEN, BigInteger.TEN, BigInteger.ZERO)
+            val rewarded = rootClaims.value.copy(claims = BittensorRootClaims(listOf(preview), BigInteger.ONE))
+            rootClaims.value = rewarded
+            viewModel.empty.first { !it }
+            rootClaims.value = rewarded.copy(claims = BittensorRootClaims(emptyList(), BigInteger.ONE))
+            viewModel.empty.first { it }
+            rootClaims.value = rewarded
+            viewModel.empty.first { !it }
+            portfolioUpdates.value = portfolioUpdates.value.copy(metaId = 2L)
+            viewModel.empty.first { it }
+            rootClaims.value = rewarded.copy(claims = BittensorRootClaims(emptyList(), BigInteger.ONE))
+            rootClaims.value = rewarded
+            assertNull(withTimeoutOrNull(100L) { viewModel.empty.first { !it } })
+        }
     }
 
     @Test

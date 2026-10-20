@@ -11,6 +11,7 @@ import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
 
 class BittensorSubmissionExecutor(
     private val extrinsicService: ExtrinsicService,
@@ -56,6 +57,8 @@ class BittensorSubmissionExecutor(
                 is BittensorOperationResult.Failure -> result.copy(outcome = outcome?.copy(tao = null, alpha = null, serviceFee = null))
                 is BittensorOperationResult.Unknown -> result
             }
+        } catch (e: SigningCancelledException) {
+            e.mapBittensorPreSubmissionError()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

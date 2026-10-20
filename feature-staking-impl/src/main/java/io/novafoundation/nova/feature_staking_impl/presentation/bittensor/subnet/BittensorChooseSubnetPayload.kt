@@ -4,4 +4,8 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class BittensorChooseSubnetPayload(val replaceAmount: Boolean = false) : Parcelable
+data class BittensorChooseSubnetPayload(
+    val replaceAmount: Boolean = false,
+    val browseState: BittensorSubnetBrowseState = BittensorSubnetBrowseState(),
+    val selectionState: BittensorSelectionState = BittensorSelectionState()
+) : Parcelable

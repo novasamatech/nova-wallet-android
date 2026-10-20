@@ -9,12 +9,17 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class BittensorWhereToStakeViewModel(
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
-    private val retryController: BittensorRetryController
+    private val retryController: BittensorRetryController,
+    private val validatorCommunicator: BittensorSelectValidatorCommunicator
 ) : BaseViewModel() {
+
+    private var selectionState = BittensorSelectionState()
 
     val retryEvents = retryController.events
 
@@ -26,12 +31,20 @@ class BittensorWhereToStakeViewModel(
         .map { it.token.configuration.symbol.value }
         .shareInBackground()
 
+    init {
+        validatorCommunicator.responseFlow
+            .onEach { selectionState = selectionState.withResponse(it) }
+            .launchIn(this)
+    }
+
     fun quickPick(order: BittensorQuickPickOrder) {
-        router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(quickPickOrder = order))
+        val browseState = BittensorSubnetBrowseState.fromQuickPick(order)
+        val visitState = selectionState.copy(browseState = browseState)
+        router.openBittensorSubnetAmount(BittensorSubnetAmountPayload(quickPickOrder = order, selectionState = visitState))
     }
 
     fun rootStaking() {
-        router.openBittensorRootStaking()
+        router.openBittensorRootStaking(selectionState = selectionState)
     }
 
     fun back() {

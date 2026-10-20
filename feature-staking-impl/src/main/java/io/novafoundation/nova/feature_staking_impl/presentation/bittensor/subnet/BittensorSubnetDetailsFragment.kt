@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showBittensorLoadingValue
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartSelectionListener
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
+import kotlinx.coroutines.flow.combine
 
 private const val PAYLOAD_KEY = "payload"
 
@@ -122,10 +123,10 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
             tao.isSelected = !it
             fiat.isSelected = it
         }
-        viewModel.priceChangeFormatter.observe { formatter ->
+        combine(viewModel.charts, viewModel.priceChangeFormatter, ::Pair).observe { (charts, formatter) ->
             chart.onPriceChange = { from, to -> formatter.format(from, to, change) }
+            chart.setCharts(charts)
         }
-        viewModel.charts.observe(chart::setCharts)
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.age.observe(age::showBittensorLoadingValue)
         viewModel.parameters.observe { bindSubnetParameters(it) }

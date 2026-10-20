@@ -19,6 +19,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStake
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorStakingRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.di.validations.BittensorStakeValidationsModule
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorImmediateExecution
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validations.BittensorImmediateStakeValidation
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorDataStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootStakeRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootPosition
@@ -160,13 +162,19 @@ class BittensorStakeAmountViewModelTest {
 
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
 
+    private val immediateExecution = mock(BittensorImmediateExecution::class.java)
+
+    private val immediateValidation = BittensorImmediateStakeValidation()
+
     private val preflightValidation = BittensorStakePreflightValidation(
         preflightRepository,
         accounts,
         wallets,
         balanceValidationSystem,
         subnetInteractor,
-        validators
+        validators,
+        immediateExecution,
+        immediateValidation
     )
 
     private val validationSystem = ValidationSystem(preflightValidation)

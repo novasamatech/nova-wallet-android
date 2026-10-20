@@ -195,7 +195,7 @@ class BittensorDetailsViewModel(
             step = "portfolio root rewards",
             transform = { it.withSafeLoading() }
         ) {
-            flowOf { rootClaimInteractor.load(metaId).claims.totalRedeemable }
+            rootClaimInteractor.observe(metaId).map { it.claims.totalRedeemable }
         }.map { AccountRowValue(metaId, it) }
     }
         .shareInBackground()

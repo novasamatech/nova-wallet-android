@@ -107,7 +107,8 @@ class BittensorSubnetAmountModule {
         slippageSettingsCommunicator = slippageSettingsCommunicator,
         validatorCommunicator = validatorCommunicator,
         getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
-        subnetFactsInteractor = subnetFactsInteractor
+        subnetFactsInteractor = subnetFactsInteractor,
+        initialSelectionState = payload.selectionState
     )
 
     @Provides

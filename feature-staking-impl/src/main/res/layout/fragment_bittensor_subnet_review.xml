@@ -73,7 +73,8 @@
                     android:id="@+id/projectedAveragePrice"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    app:title="@string/bittensor_exit_avg_buy_price" />
+                    app:title="@string/bittensor_exit_avg_buy_price"
+                    app:titleIcon="@drawable/ic_info" />
                 <io.novafoundation.nova.feature_wallet_api.presentation.view.FeeView
                     android:id="@+id/networkFee"
                     android:layout_width="match_parent"

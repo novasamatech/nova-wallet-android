@@ -36,7 +36,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBittensorStake
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
@@ -49,6 +48,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -78,7 +78,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -101,8 +100,11 @@ class BittensorStakeAmountViewModel(
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
     private val externalActions: ExternalActions.Presentation,
     getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
-    private val payload: BittensorStakeAmountPayload? = null
+    private val payload: BittensorStakeAmountPayload? = null,
+    initialSelectionState: BittensorSelectionState = BittensorSelectionState()
 ) : BaseViewModel(), Validatable by validationExecutor, ExternalActions by externalActions {
+
+    private var selectionState = initialSelectionState
 
     val retryEvents = retryController.events
 
@@ -325,14 +327,18 @@ class BittensorStakeAmountViewModel(
             .launchIn(viewModelScope)
 
         validatorCommunicator.responseFlow
-            .filter {
-                payload?.validatorAddress == null && BittensorNetuid.from(it.subnetId).isRoot()
+            .onEach { response ->
+                if (!selectionState.accepts(response)) return@onEach
+                selectionState = selectionState.withResponse(response)
+                if (payload?.validatorAddress == null && response.subnetId == BittensorNetuid.Root.value) {
+                    response.address?.let { selectValidator(it) }
+                }
             }
-            .onEach { selectValidator(it.address) }
             .launchIn(viewModelScope)
     }
 
     fun back() {
+        validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
     }
 
@@ -357,7 +363,8 @@ class BittensorStakeAmountViewModel(
         validatorCommunicator.openRequest(
             BittensorSelectValidatorCommunicator.Request(
                 BittensorNetuid.Root.value,
-                details.validator?.let { details.chain.addressOf(it.hotkey) }
+                details.validator?.let { details.chain.addressOf(it.hotkey) },
+                selectionState
             )
         )
     }

@@ -10,7 +10,8 @@ class BittensorSubnetAmountPayload(
     val validatorAddress: String? = null,
     val existingPosition: Boolean = false,
     val replaceAmount: Boolean = false,
-    val quickPickOrder: BittensorQuickPickOrder? = null
+    val quickPickOrder: BittensorQuickPickOrder? = null,
+    val selectionState: BittensorSelectionState = BittensorSelectionState()
 ) : Parcelable {
 
     init {

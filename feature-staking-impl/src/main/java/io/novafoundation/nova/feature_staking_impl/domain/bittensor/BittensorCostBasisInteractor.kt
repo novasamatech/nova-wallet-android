@@ -23,16 +23,20 @@ sealed interface BittensorCostBasisState {
     data class Failed(val cause: Throwable) : BittensorCostBasisState
 }
 
+data class BittensorCostBasisUpdate(val state: BittensorCostBasisState, val isSettling: Boolean)
+
 class BittensorCostBasisInteractor(
     private val historyRepository: BittensorOperationHistoryRepository,
     private val accountRepository: AccountRepository,
     private val logger: Logger
 ) {
 
-    fun observe(context: Flow<BittensorEstimateContext?>): Flow<BittensorCostBasisState> =
+    fun observe(context: Flow<BittensorEstimateContext?>): Flow<BittensorCostBasisState> = observeUpdates(context).map { it.state }
+
+    fun observeUpdates(context: Flow<BittensorEstimateContext?>): Flow<BittensorCostBasisUpdate> =
         context.distinctUntilChanged()
             .flatMapLatest { current ->
-                if (current == null) flowOf(BittensorCostBasisState.Unavailable) else observeAccount(current)
+                if (current == null) flowOf(BittensorCostBasisUpdate(BittensorCostBasisState.Unavailable, false)) else observeAccount(current)
             }
 
     suspend fun ownTradeRequest(metaId: Long, chain: Chain): BittensorHistoryRequest? {
@@ -58,18 +62,19 @@ class BittensorCostBasisInteractor(
         }
     }
 
-    private fun observeAccount(context: BittensorEstimateContext): Flow<BittensorCostBasisState> =
+    private fun observeAccount(context: BittensorEstimateContext): Flow<BittensorCostBasisUpdate> =
         accountRepository.metaAccountFlow(context.metaId)
             .map { AccountIdKey(it.requireAccountIdIn(context.chain)) }
             .distinctUntilChanged()
             .flatMapLatest { coldKey ->
-                historyRepository.observe(context.chain.addressOf(coldKey.value))
-                    .map { result ->
-                        result?.fold(
+                historyRepository.observeState(context.chain.addressOf(coldKey.value))
+                    .map { update ->
+                        val state = update.result?.fold(
                             onSuccess = { BittensorCostBasisState.Loaded(BittensorEstimatedCostBasis(it.operations, it.allProviderPagesRead)) },
                             onFailure = { BittensorCostBasisState.Failed(it) }
                         ) ?: BittensorCostBasisState.Loading
+                        BittensorCostBasisUpdate(state, update.isSettling)
                     }
-                    .onStart { emit(BittensorCostBasisState.Loading) }
+                    .onStart { emit(BittensorCostBasisUpdate(BittensorCostBasisState.Loading, false)) }
             }
 }

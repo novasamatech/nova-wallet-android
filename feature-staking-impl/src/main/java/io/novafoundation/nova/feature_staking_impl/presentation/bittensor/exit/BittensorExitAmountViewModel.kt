@@ -15,6 +15,7 @@ import io.novafoundation.nova.common.presentation.fallbackIcon
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
+import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.asUrlIcon
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
@@ -59,6 +60,8 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import java.math.RoundingMode
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -96,7 +99,8 @@ class BittensorExitAmountViewModel(
     private val exitFormatter: BittensorExitFormatter,
     private val slippageSettings: BittensorSlippageSettings,
     private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
-    private val costBasisFormatter: BittensorSaleCostBasisFormatter
+    private val costBasisFormatter: BittensorSaleCostBasisFormatter,
+    precisionValidator: BittensorExitPrecisionValidator
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     val isRoot = payload.netuid().isRoot()
@@ -112,6 +116,8 @@ class BittensorExitAmountViewModel(
 
     private val input = MutableStateFlow(ExitAmountInput(""))
 
+    private var continuationJob: Job? = null
+
     private val selectedSlippage = if (isRoot) {
         flowOf { bittensorExitInteractor.slippage.fraction }
     } else {
@@ -125,11 +131,16 @@ class BittensorExitAmountViewModel(
         step = "exit position",
         transform = { it.withSafeLoading() }
     ) {
-        flowOf { bittensorExitInteractor.load(payload.metaId, payload.netuid(), payload.hotkeyAddress) }
+        bittensorExitInteractor.observe(payload.metaId, payload.netuid(), payload.hotkeyAddress)
     }
         .shareInBackground()
 
     val position = positionState.map { it.dataOrNull }
+        .shareInBackground()
+
+    private val amountValidator = precisionValidator.forPrecision(position.map { it?.amountPrecision })
+
+    val amountError = amountValidator.observe(amount)
         .shareInBackground()
 
     private val requestState = combine(
@@ -302,6 +313,18 @@ class BittensorExitAmountViewModel(
     val rate = requestState.mapLoading { state -> state?.exit?.let { exitFormatter.exchangeRate(it.position, it.quote) } ?: "—" }
         .shareInBackground()
 
+    val swapRateDescription = request.map { request ->
+        if (isRoot || request == null) return@map null
+        val percentage = request.quote.serviceFeeRate?.movePointRight(2)?.toStripTrailingZerosString() ?: return@map null
+        resources.getString(
+            R.string.bittensor_swap_rate_sell_description,
+            request.position.asset.token.configuration.symbol.value,
+            request.position.subnet?.name.orEmpty(),
+            percentage
+        )
+    }
+        .shareInBackground()
+
     val fee = combine(positionState, requestState, feeStatus) { position, quote, status ->
         val estimate = status.loadedFeeOrNull()
         when {
@@ -437,8 +460,58 @@ class BittensorExitAmountViewModel(
         return quoted.preparation == current && requestState.first().dataOrNull == quoted
     }
 
-    private fun withCurrentRequest(quoted: ExitAmountRequest, action: () -> Unit): Unit = launchUnit {
-        if (isCurrent(quoted)) action()
+    private fun withCurrentRequest(quoted: ExitAmountRequest, action: () -> Unit) {
+        continuationJob?.cancel()
+        continuationJob = launch {
+            // Validation callbacks can run before the owning validation's finally block.
+            validating.first { !it }
+            val decision = exitContinuationDecision(
+                quoted.preparation.input,
+                input.value,
+                quoted.preparation.slippageFraction,
+                currentSlippage(),
+                isCurrent(quoted)
+            )
+            when (decision) {
+                ExitContinuationDecision.CANCEL -> Unit
+                ExitContinuationDecision.CONTINUE -> action()
+                ExitContinuationDecision.REVALIDATE -> reprepareAndValidate()
+            }
+        }
+    }
+
+    private suspend fun reprepareAndValidate() {
+        val refreshed = input.value.copy(revision = input.value.revision + 1)
+        val slippage = currentSlippage()
+        input.value = refreshed
+        val readyDraft = combine(requestState, prepared, input, positionState, selectedSlippage) { quote, draft, current, position, currentSlippage ->
+            when {
+                !refreshed.hasSameIntent(current) || slippage != currentSlippage -> false
+                position is ExtendedLoadingState.Error || quote is ExtendedLoadingState.Error || draft is ExtendedLoadingState.Error -> false
+                position.isLoading() || quote.isLoading() || draft.isLoading() -> null
+                quote.dataOrNull == null -> false
+                else -> {
+                    val request = quote.dataOrNull
+                    val prepared = draft.dataOrNull
+                    val expected = ExitPreparationRequest(position.dataOrNull, current, currentSlippage)
+                    when {
+                        request == null || request.preparation != expected -> null
+                        prepared == null -> false
+                        request.exit != BittensorExitRequest(prepared.position, prepared.quote) -> null
+                        else -> true
+                    }
+                }
+            }
+        }
+        val ready = combine(readyDraft, continueButtonState) { draftReady, button ->
+            when {
+                draftReady == false -> false
+                draftReady == true && button is DescriptiveButtonState.Enabled -> true
+                else -> null
+            }
+        }.first { it != null }
+        // A changed position/quote must never inherit a warning's price-impact consent.
+        if (ready == true && refreshed.hasSameIntent(input.value) && slippage == currentSlippage()) continueWithImpact(null)
     }
 
     private suspend fun prepareRequest(request: ExitPreparationRequest): ExitAmountRequest? {

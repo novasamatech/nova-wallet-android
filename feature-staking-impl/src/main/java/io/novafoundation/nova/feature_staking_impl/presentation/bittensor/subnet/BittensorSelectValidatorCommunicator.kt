@@ -8,8 +8,16 @@ interface BittensorSelectValidatorCommunicator :
     InterScreenCommunicator<BittensorSelectValidatorCommunicator.Request, BittensorSelectValidatorCommunicator.Response> {
 
     @Parcelize
-    data class Request(val subnetId: Int, val selectedAddress: String?) : Parcelable
+    data class Request(
+        val subnetId: Int,
+        val selectedAddress: String?,
+        val selectionState: BittensorSelectionState = BittensorSelectionState()
+    ) : Parcelable
 
     @Parcelize
-    data class Response(val subnetId: Int, val address: String) : Parcelable
+    data class Response(
+        val subnetId: Int?,
+        val address: String?,
+        val selectionState: BittensorSelectionState
+    ) : Parcelable
 }

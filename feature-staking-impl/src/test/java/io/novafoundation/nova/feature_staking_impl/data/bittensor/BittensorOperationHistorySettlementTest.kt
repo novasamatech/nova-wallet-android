@@ -52,6 +52,88 @@ class BittensorOperationHistorySettlementTest {
     private val repository = BittensorOperationHistoryRepository(source, urls, cache, clock)
 
     @Test
+    fun `settlement remains visible through loading and failures until a post barrier fetch succeeds`() = runTest {
+        val initial = request()
+        repository.ownTradeSubmitted(initial)
+        val updates = mutableListOf<BittensorOperationHistoryRepository.Snapshot>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            repository.observeHistory(request()).toList(updates)
+        }
+        runCurrent()
+        assertNull(updates.first().result)
+        assertTrue(updates.all { it.isSettling })
+        assertTrue(updates.last().result!!.isSuccess)
+
+        nowNanos += 300_000_000_000L
+        api.failure = IllegalStateException("offline")
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertTrue(updates.last().result!!.isFailure)
+        assertTrue(updates.last().isSettling)
+
+        api.failure = null
+        val release = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = { release.await() }
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertTrue(updates.last().isSettling)
+        release.complete(Unit)
+        runCurrent()
+        assertTrue(updates.last().result!!.isSuccess)
+        assertFalse(updates.last().isSettling)
+
+        repository.ownTradeSubmitted(request())
+        runCurrent()
+        assertTrue(updates.last().isSettling)
+    }
+
+    @Test
+    fun `fetch started during settlement cannot release earned after crossing the deadline`() = runTest {
+        repository.ownTradeSubmitted(request())
+        val release = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = { release.await() }
+        val updates = mutableListOf<BittensorOperationHistoryRepository.Snapshot>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            repository.observeHistory(request()).toList(updates)
+        }
+        runCurrent()
+        nowNanos += 300_000_000_000L
+        release.complete(Unit)
+        runCurrent()
+        assertTrue(updates.last().result!!.isSuccess)
+        assertTrue(updates.last().isSettling)
+
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertFalse(updates.last().isSettling)
+    }
+
+    @Test
+    fun `settlement is account scoped and public stream clears immediately on own trade`() = runTest {
+        val sharedCache = SharedCache(backgroundScope)
+        val repository = BittensorOperationHistoryRepository(source, urls, sharedCache, clock)
+        val first = mutableListOf<BittensorHistoryState>()
+        val second = mutableListOf<BittensorHistoryState>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            repository.observeState("first").toList(first)
+        }
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            repository.observeState("second").toList(second)
+        }
+        runCurrent()
+        val release = CompletableDeferred<Unit>()
+        api.beforeHistoryResponse = { release.await() }
+        repository.ownTradeSubmitted(requireNotNull(repository.request("first")))
+        runCurrent()
+        assertNull(first.last().result)
+        assertTrue(first.last().isSettling)
+        assertFalse(second.last().isSettling)
+        release.complete(Unit)
+        runCurrent()
+        assertTrue(first.last().isSettling)
+    }
+
+    @Test
     fun `own trade drops cache and settlement remote results never seed cache`() = runTest {
         val initial = request()
         repository.history(initial)

@@ -11,14 +11,19 @@ internal data class ExitAmountInput(
 ) {
 
     fun edit(value: String): ExitAmountInput {
-        return if (value == text) this else copy(text = value, inputKind = InputKind.REGULAR)
+        return if (value == text) this else copy(text = value, revision = revision + 1, inputKind = InputKind.REGULAR)
     }
 
     fun selectMax(amount: BigDecimal): ExitAmountInput {
-        return copy(text = amount.max(BigDecimal.ZERO).toStripTrailingZerosString(), inputKind = InputKind.MAX_ACTION)
+        return copy(text = amount.max(BigDecimal.ZERO).toStripTrailingZerosString(), revision = revision + 1, inputKind = InputKind.MAX_ACTION)
     }
 
     fun updateMax(amount: BigDecimal?): ExitAmountInput {
-        return if (inputKind == InputKind.MAX_ACTION && amount != null) selectMax(amount) else this
+        return if (inputKind == InputKind.MAX_ACTION && amount != null) selectMax(amount).copy(revision = revision) else this
+    }
+
+    fun hasSameIntent(other: ExitAmountInput): Boolean {
+        return revision == other.revision && inputKind == other.inputKind &&
+            (inputKind == InputKind.MAX_ACTION || text == other.text)
     }
 }

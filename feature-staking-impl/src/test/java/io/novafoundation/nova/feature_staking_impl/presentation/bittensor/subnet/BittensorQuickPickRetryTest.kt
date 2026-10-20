@@ -9,6 +9,7 @@ import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.job
 import kotlinx.coroutines.runBlocking
@@ -39,13 +40,18 @@ class BittensorQuickPickRetryTest {
 
     private val retryController = BittensorRetryController(resources, logger)
 
+    private val validatorCommunicator = mock(BittensorSelectValidatorCommunicator::class.java)
+
+    private val responses = MutableSharedFlow<BittensorSelectValidatorCommunicator.Response>(extraBufferCapacity = 1)
+
     private lateinit var viewModel: BittensorWhereToStakeViewModel
 
     @Before
     fun prepare() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         `when`(subnetInteractor.observeAsset()).thenReturn(emptyFlow())
-        viewModel = BittensorWhereToStakeViewModel(subnetInteractor, router, retryController)
+        `when`(validatorCommunicator.responseFlow).thenReturn(responses)
+        viewModel = BittensorWhereToStakeViewModel(subnetInteractor, router, retryController, validatorCommunicator)
     }
 
     @After
@@ -63,14 +69,53 @@ class BittensorQuickPickRetryTest {
         assertEquals(BittensorQuickPickOrder.POOL_SIZE, payload.value.quickPickOrder)
         assertNull(payload.value.subnetId)
         assertNull(payload.value.validatorAddress)
+        assertEquals(BittensorSubnetBrowseState.fromQuickPick(BittensorQuickPickOrder.POOL_SIZE), payload.value.selectionState.browseState)
         verifyNoMoreInteractions(router)
     }
 
     @Test
     fun `root opens directly without any quick pick work`() {
         viewModel.rootStaking()
-        verify(router).openBittensorRootStaking()
+        val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
+        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
         verifyNoMoreInteractions(router)
+    }
+
+    @Test
+    fun `return from a subnet preserves its filters when entering root in the same flow`() = runBlocking {
+        viewModel.quickPick(BittensorQuickPickOrder.AGE)
+        val payload = ArgumentCaptor.forClass(BittensorSubnetAmountPayload::class.java)
+        verify(router).openBittensorSubnetAmount(payload.capture() ?: BittensorSubnetAmountPayload(1))
+        val filters = BittensorValidatorFilters(
+            io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting.NAME,
+            false
+        )
+        val changed = payload.value.selectionState.withFilters(
+            io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid.Subnet(1),
+            filters
+        )
+        responses.emit(BittensorSelectValidatorCommunicator.Response(null, null, changed))
+
+        viewModel.rootStaking()
+        val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
+        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        assertEquals(filters, state.value.subnetFilters)
+        assertEquals(BittensorValidatorFilters(), state.value.rootFilters)
+    }
+
+    @Test
+    fun `a foreign flow response cannot change the carousel filter state`() = runBlocking {
+        val filters = BittensorValidatorFilters(
+            io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting.NAME,
+            false
+        )
+        val foreign = BittensorSelectionState(rootFilters = filters)
+        responses.emit(BittensorSelectValidatorCommunicator.Response(0, "foreign-validator", foreign))
+        viewModel.rootStaking()
+
+        val state = ArgumentCaptor.forClass(BittensorSelectionState::class.java)
+        verify(router).openBittensorRootStaking(org.mockito.ArgumentMatchers.isNull(), state.capture() ?: BittensorSelectionState())
+        assertEquals(BittensorValidatorFilters(), state.value.rootFilters)
     }
 
     @Test(expected = IllegalArgumentException::class)

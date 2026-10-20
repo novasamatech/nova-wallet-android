@@ -7,6 +7,6 @@ internal fun BittensorSubnetChartPeriod.labelRes(): Int = when (this) {
     BittensorSubnetChartPeriod.DAY -> R.string.price_chart_day
     BittensorSubnetChartPeriod.WEEK -> R.string.bittensor_chart_week
     BittensorSubnetChartPeriod.MONTH -> R.string.bittensor_chart_month
-    BittensorSubnetChartPeriod.QUARTER -> R.string.bittensor_chart_quarter
     BittensorSubnetChartPeriod.YEAR -> R.string.price_chart_year
+    BittensorSubnetChartPeriod.ALL -> R.string.common_all
 }

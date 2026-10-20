@@ -20,6 +20,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.amountChooser.AmountChooserMixin
@@ -48,7 +49,8 @@ class BittensorStakeAmountModule {
         feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
         externalActions: ExternalActions.Presentation,
         getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
-        payload: BittensorStakeAmountPayload?
+        payload: BittensorStakeAmountPayload?,
+        selectionState: BittensorSelectionState
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             resourceManager = resourceManager,
@@ -66,7 +68,8 @@ class BittensorStakeAmountModule {
             feeLoaderMixinFactory = feeLoaderMixinFactory,
             externalActions = externalActions,
             getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
-            payload = payload
+            payload = payload,
+            initialSelectionState = selectionState
         )
     }
 

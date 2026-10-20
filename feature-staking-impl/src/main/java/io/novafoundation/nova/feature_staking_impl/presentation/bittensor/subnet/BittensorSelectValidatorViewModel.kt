@@ -56,7 +56,7 @@ class BittensorSelectValidatorViewModel(
 
     val retryEvents = retryController.events
 
-    val filters = MutableStateFlow(BittensorValidatorFilters())
+    val filters = MutableStateFlow(request.selectionState.filtersFor(BittensorNetuid.from(request.subnetId)))
 
     private val query = MutableStateFlow("")
 
@@ -141,7 +141,7 @@ class BittensorSelectValidatorViewModel(
         }
     }.shareInBackground()
 
-    private val selectedValidator = combine(rows, selectedAddress) { rows, address ->
+    private val selectedValidator = combine(filteredRows, selectedAddress) { rows, address ->
         rows.firstOrNull { it.eligibility.address == address && it.eligibility.canSelect }
     }
         .shareInBackground()
@@ -214,11 +214,16 @@ class BittensorSelectValidatorViewModel(
 
     fun confirmClicked() = launchUnit {
         val row = selectedValidator.first() ?: return@launchUnit
-        communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, row.eligibility.address))
+        communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, row.eligibility.address, selectionState()))
         router.back()
     }
 
-    fun back() = router.back()
+    fun back() {
+        communicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState()))
+        router.back()
+    }
+
+    private fun selectionState(): BittensorSelectionState = request.selectionState.withFilters(netuid, filters.value)
 
     private fun sortingDisplay(sorting: BittensorValidatorSorting): String = resources.getString(
         when (sorting) {

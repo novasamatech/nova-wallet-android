@@ -6,6 +6,9 @@ import io.novafoundation.nova.common.utils.flowOfAll
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +33,10 @@ class BittensorRetryController(private val resources: ResourceManager, private v
         return reload.flatMapLatest {
             val attempt = flowOfAll { source() }
                 .catch { cause ->
-                    if (cause is CancellationException) throw cause
+                    // A child request timing out is a failed read, not cancellation of this screen.
+                    // Never show a retry dialog after the collecting coroutine has been cancelled.
+                    currentCoroutineContext().ensureActive()
+                    if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
                     report(step, cause) { reload.update { it + 1 } }
                     throw cause
                 }

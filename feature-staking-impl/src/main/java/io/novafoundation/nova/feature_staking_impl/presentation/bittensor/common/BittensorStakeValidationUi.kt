@@ -11,6 +11,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 
 fun BittensorStakeValidationFailure.message(resources: ResourceManager): String = resources.getString(
     when (this) {
+        BittensorStakeValidationFailure.DELAYED_EXECUTION -> R.string.bittensor_multisig_unavailable
         BittensorStakeValidationFailure.NON_POSITIVE_AMOUNT -> R.string.common_enter_amount
         BittensorStakeValidationFailure.INSUFFICIENT_BALANCE -> R.string.common_error_not_enough_tokens
         BittensorStakeValidationFailure.FEE_RESERVE -> R.string.bittensor_validation_fee_reserve

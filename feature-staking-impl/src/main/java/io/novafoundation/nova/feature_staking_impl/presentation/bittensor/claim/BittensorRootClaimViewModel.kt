@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim
 
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
+
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.createSubstrateAddressModel
@@ -370,7 +372,11 @@ class BittensorRootClaimViewModel(
                         amount = formatBittensorNativeResult(result.outcome?.tao, draft.preview.redeemable, draft.state.chain, tokenFormatter)
                     )
                 )
-                is BittensorOperationResult.Failure -> ClaimExecution.Result(result.mapResult(resources))
+                is BittensorOperationResult.Failure -> if (result.isSigningCancelled) {
+                    ClaimExecution.Idle
+                } else {
+                    ClaimExecution.Result(result.mapResult(resources))
+                }
                 is BittensorOperationResult.Unknown -> ClaimExecution.Result(result.mapResult(resources))
             }
         } catch (e: CancellationException) {

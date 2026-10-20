@@ -23,6 +23,7 @@ data class BittensorStakeValidationPayload(
 )
 
 enum class BittensorStakeValidationFailure {
+    DELAYED_EXECUTION,
     NON_POSITIVE_AMOUNT,
     INSUFFICIENT_BALANCE,
     FEE_RESERVE,

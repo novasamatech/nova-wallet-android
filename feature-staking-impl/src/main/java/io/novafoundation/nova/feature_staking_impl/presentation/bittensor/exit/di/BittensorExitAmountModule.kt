@@ -24,6 +24,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitAmountViewModel
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPrecisionValidator
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
@@ -53,7 +54,8 @@ class BittensorExitAmountModule {
         exitFormatter: BittensorExitFormatter,
         slippageSettings: BittensorSlippageSettings,
         slippageSettingsCommunicator: SlippageSettingsCommunicator,
-        costBasisFormatter: BittensorSaleCostBasisFormatter
+        costBasisFormatter: BittensorSaleCostBasisFormatter,
+        precisionValidator: BittensorExitPrecisionValidator
     ): ViewModel {
         return BittensorExitAmountViewModel(
             payload,
@@ -73,7 +75,8 @@ class BittensorExitAmountModule {
             exitFormatter,
             slippageSettings = slippageSettings,
             slippageSettingsCommunicator = slippageSettingsCommunicator,
-            costBasisFormatter = costBasisFormatter
+            costBasisFormatter = costBasisFormatter,
+            precisionValidator = precisionValidator
         )
     }
 
