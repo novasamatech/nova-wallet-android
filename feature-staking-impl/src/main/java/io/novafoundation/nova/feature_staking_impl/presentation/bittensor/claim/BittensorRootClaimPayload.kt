@@ -4,4 +4,4 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class BittensorRootClaimPayload(val metaId: Long) : Parcelable
+data class BittensorRootClaimPayload(val metaId: Long, val previewOnly: Boolean = false) : Parcelable

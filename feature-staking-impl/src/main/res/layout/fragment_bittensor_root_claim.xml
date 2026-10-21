@@ -12,6 +12,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:dividerVisible="false"
         app:titleText="@string/bittensor_claim_action" />
 
     <ScrollView
@@ -19,35 +20,21 @@
         android:layout_height="0dp"
         android:layout_weight="1"><LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="16dp">
 
+        <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.PrimaryAmountView
+            android:id="@+id/amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp" />
+
         <io.novafoundation.nova.feature_wallet_api.presentation.view.extrinsic.GenericExtrinsicInformationView
             android:id="@+id/information"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="12dp" />
 
         <io.novafoundation.nova.common.view.TableView
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/amount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/bittensor_claim_redeemable"
-                app:primaryValue="—" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/forfeited"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/bittensor_claim_forfeited"
-                app:primaryValue="—" />
-
-            <io.novafoundation.nova.common.view.TableCellView
-                android:id="@+id/stakeAfterClaim"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:title="@string/bittensor_claim_stake_after" />
 
             <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/validator"
@@ -55,31 +42,20 @@
                 android:layout_height="wrap_content"
                 app:title="@string/bittensor_validator"
                 app:primaryValueEndIcon="@drawable/ic_info" />
+
+            <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/stakeAfterClaim"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:title="@string/bittensor_claim_stake_after" />
         </io.novafoundation.nova.common.view.TableView>
 
-        <TextView
+        <io.novafoundation.nova.common.view.AlertView
             android:id="@+id/disclosure"
-            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textColor="@color/text_secondary" />
-
-        <TextView
-            android:id="@+id/remaining"
-            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textColor="@color/text_secondary" />
-
-        <TextView
-            style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:id="@+id/feeCaption"
-            android:textColor="@color/text_secondary" />
+            android:layout_marginTop="12dp"
+            app:alertMode="info" />
 
         <TextView
             android:id="@+id/error"

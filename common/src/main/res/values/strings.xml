@@ -3057,13 +3057,14 @@
     <string name="bittensor_validators_count">Validators</string>
     <string name="staking_new_feature">NEW</string>
     <string name="bittensor_claim_pending">A claim for this validator is already pending. Check its outcome before trying again.</string>
-    <string name="bittensor_claim_stake_after">Root stake after claiming</string>
+    <string name="bittensor_claim_stake_after">Stake after</string>
     <string name="bittensor_claim_uneconomic_title">Claim may not be profitable</string>
     <string name="bittensor_claim_uneconomic_message">The network fee is equal to or greater than the rewards you can claim. Do you still want to continue?</string>
     <string name="bittensor_claim_review_updated">Review updated rewards</string>
-    <string name="bittensor_claim_restake_notice">Claimed rewards are added to your root stake with %1$s, not to your transferable balance.</string>
-    <string name="bittensor_claim_hold_notice">Claiming starts a withdrawal hold of approximately %1$s for this validator.</string>
-    <string name="bittensor_claim_forfeit_notice">Approximately %1$s will be forfeited by this claim.</string>
+    <string name="bittensor_claim_restake_notice">Claimed rewards are restaked on root with %1$s. They do not go to your free balance.</string>
+    <string name="bittensor_claim_hold_notice">Claiming restarts the root hold: your root stake with %1$s stays locked for %2$s.</string>
+    <string name="bittensor_claim_forfeit_notice">About %1$s in very small holdings stays in the validator\'s fund and is not paid to you.</string>
+    <string name="bittensor_claim_other_validators_notice">Rewards from your other validators are claimed separately.</string>
     <string name="bittensor_claim_stale">Rewards could not be refreshed. Claiming is unavailable until fresh data is loaded.</string>
     <string name="bittensor_position_withdrawable">Available to withdraw: %1$s</string>
     <string name="bittensor_position_locked">Locked or held: %1$s. Only the available amount can be withdrawn.</string>
@@ -3088,4 +3089,17 @@
     <string name="bittensor_validators_filtered_empty">No quick-pick validators for this subnet yet. Remove filters to see all validators.</string>
     <string name="bittensor_validators_search_empty">No validators for ‘%s’</string>
     <string name="bittensor_amount_precision_error">Use no more than %s decimal places.</string>
+    <string name="bittensor_claim_preview_notice">Debug simulation. Rewards may be below the claim minimum. This screen runs system_dryRun, not a real claim.</string>
+    <string name="debug_settings_title">Debug settings</string>
+    <string name="bittensor_claim_debug_setting">Bittensor claim rewards debug</string>
+    <string name="bittensor_claim_debug_description">Open Claim below the minimum and simulate a signed transaction without broadcasting it. Regular signing wallets only.</string>
+    <string name="bittensor_claim_button_debug_setting">Bittensor claim button always enabled</string>
+    <string name="bittensor_claim_button_debug_description">Open the normal Claim screen below the minimum. Submission checks still apply. Eligible claims can send real transactions when dry run is off.</string>
+    <string name="bittensor_claim_dry_run">Run dry run</string>
+    <string name="bittensor_claim_dry_run_signing_notice">This signs a real extrinsic and sends it to the selected node using system_dryRun. The app will not broadcast it or fall back to submission. A signed extrinsic can be broadcast by anyone who receives it while it remains valid. Use a trusted node and a test wallet.</string>
+    <string name="bittensor_claim_dry_run_success">Simulation succeeded. The app did not broadcast a transaction. This is not an on-chain claim.</string>
+    <string name="bittensor_claim_dry_run_dispatch_failure">Simulation: claim execution failed.\n%1$s\nNo transaction was broadcast by the app.</string>
+    <string name="bittensor_claim_dry_run_invalid">Simulation: transaction validation failed.\n%1$s\nNo transaction was broadcast by the app.</string>
+    <string name="bittensor_claim_dry_run_error">Dry run could not complete (%1$s). Check node support and connection. No fallback submission was attempted.</string>
+    <string name="bittensor_claim_dry_run_cancelled">Signing cancelled. No dry-run request or transaction was sent.</string>
 </resources>

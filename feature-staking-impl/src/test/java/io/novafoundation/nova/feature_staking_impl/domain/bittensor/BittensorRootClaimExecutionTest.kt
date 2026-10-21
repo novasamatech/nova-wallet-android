@@ -45,7 +45,19 @@ class BittensorRootClaimExecutionTest {
 
     private val source = mock(BittensorRootClaimSource::class.java)
 
-    private val extrinsics = mock(ExtrinsicService::class.java)
+    private var dryRuns = 0
+
+    private var dryRunError: Throwable? = null
+
+    private val extrinsics = mock(ExtrinsicService::class.java) { invocation ->
+        if (invocation.method.name == "dryRunExtrinsic") {
+            dryRuns++
+            dryRunError?.let { throw it }
+            io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult.Success
+        } else {
+            RETURNS_DEFAULTS.answer(invocation)
+        }
+    }
 
     private val constants = mock(WalletConstants::class.java)
 
@@ -91,11 +103,90 @@ class BittensorRootClaimExecutionTest {
 
     private val draft = BittensorRootClaimDraft(state, preview, operation, fee)
 
+    @Test
+    fun `button override shows real preview without enabling dry run or claim eligibility`() {
+        val belowMinimum = claims.copy(minimum = BigInteger.valueOf(100))
+        val displayState = state.copy(claims = belowMinimum, allowBelowMinimumPreview = true)
+        assertEquals(preview, displayState.selectedPreview)
+        assertTrue(displayState.availableClaims.isEmpty())
+        assertTrue(!displayState.previewOnly)
+        assertNull(displayState.copy(pendingHotkeys = setOf(hotkey)).selectedPreview)
+    }
+
+    @Test
+    fun `preview shows below minimum and zero rewards without changing live eligibility`() {
+        val belowMinimum = claims.copy(minimum = BigInteger.valueOf(100))
+        val liveState = state.copy(claims = belowMinimum)
+        assertNull(liveState.selectedPreview)
+        assertEquals(preview, liveState.copy(previewOnly = true).selectedPreview)
+        assertTrue(liveState.copy(previewOnly = true).availableClaims.isEmpty())
+
+        val zero = preview.copy(accrued = BigInteger.ZERO, redeemable = BigInteger.ZERO)
+        val zeroState = liveState.copy(claims = belowMinimum.copy(previews = listOf(zero)), previewOnly = true)
+        assertEquals(zero, zeroState.selectedPreview)
+        assertNull(zeroState.copy(pendingHotkeys = setOf(hotkey)).selectedPreview)
+        assertNull(zeroState.copy(claims = belowMinimum.copy(previews = emptyList())).selectedPreview)
+    }
+
+    @Test
+    fun `preview cannot acquire or execute even with a valid lease`() = runBlocking {
+        configure()
+        val previewDraft = draft.copy(state = state.copy(previewOnly = true))
+        assertNull(interactor.tryAcquire(previewDraft))
+        val lease = requireNotNull(interactor.tryAcquire(draft))
+
+        val result = interactor.execute(previewDraft, lease)
+
+        assertTrue(result is BittensorOperationResult.Failure)
+        assertEquals(0, submissions)
+        assertTrue(pending.pendingTargets(chain.id, coldkey).isEmpty())
+    }
+
     private suspend fun configure() {
         `when`(chain.id).thenReturn("chain")
         `when`(wallet.id).thenReturn(1L)
         `when`(wallet.accountIdIn(chain)).thenReturn(coldkey.value)
         `when`(accounts.getMetaAccount(1)).thenReturn(wallet)
+    }
+
+    @Test
+    fun `debug dry run accepts below minimum without submission or pending claims`() = runBlocking {
+        configure()
+        `when`(wallet.type).thenReturn(io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.SECRETS)
+        val debugState = state.copy(previewOnly = true, claims = claims.copy(minimum = BigInteger.valueOf(100)))
+
+        assertEquals(io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult.Success, interactor.dryRun(debugState))
+        assertEquals(1, dryRuns)
+        assertEquals(0, submissions)
+        assertTrue(pending.pendingTargets(chain.id, coldkey).isEmpty())
+    }
+
+    @Test
+    fun `dry run errors and cancellation never fall back to submission`() = runBlocking {
+        configure()
+        `when`(wallet.type).thenReturn(io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.SECRETS)
+        val errors = listOf(IOException("node unavailable"), CancellationException("cancelled"))
+        for (error in errors) {
+            dryRunError = error
+            val actual = runCatching { interactor.dryRun(state.copy(previewOnly = true)) }.exceptionOrNull()
+            assertEquals(error, actual)
+        }
+        assertEquals(0, submissions)
+        assertTrue(pending.pendingTargets(chain.id, coldkey).isEmpty())
+    }
+
+    @Test
+    fun `dry run requires debug payload and a regular signing wallet`() = runBlocking {
+        configure()
+        assertTrue(runCatching { interactor.dryRun(state) }.isFailure)
+        val types = io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.values()
+            .filterNot { it == io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount.Type.SECRETS }
+        for (type in types) {
+            `when`(wallet.type).thenReturn(type)
+            assertTrue(runCatching { interactor.dryRun(state.copy(previewOnly = true)) }.isFailure)
+        }
+        assertEquals(0, dryRuns)
+        assertEquals(0, submissions)
     }
 
     @Test

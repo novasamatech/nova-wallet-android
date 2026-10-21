@@ -65,7 +65,8 @@ class BittensorRootDetailsViewModel(
     private val withdrawalInteractor: BittensorPositionWithdrawalInteractor,
     slippageSettings: BittensorSlippageSettings,
     private val rootValidatorSource: BittensorRootValidatorSource,
-    private val rootHoldFormatter: BittensorRootHoldFormatter
+    private val rootHoldFormatter: BittensorRootHoldFormatter,
+    private val debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     val retryEvents = retryController.events
@@ -108,8 +109,11 @@ class BittensorRootDetailsViewModel(
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
-    val canClaim = claimState.map { state ->
-        state.dataOrNull?.let { it.supportsImmediateOperations && it.dataStatus is BittensorDataStatus.Fresh && it.availableClaims.isNotEmpty() } == true
+    val canClaim = combine(claimState, debugSettings.observeBittensorClaimButton()) { state, debugEnabled ->
+        state.dataOrNull?.let {
+            val hasPreview = debugEnabled && it.copy(previewOnly = true).selectedPreview != null
+            it.supportsImmediateOperations && it.dataStatus is BittensorDataStatus.Fresh && (it.availableClaims.isNotEmpty() || hasPreview)
+        } == true
     }
         .shareInBackground(SharingStarted.WhileSubscribed(5_000))
 
@@ -209,7 +213,7 @@ class BittensorRootDetailsViewModel(
     fun claimClicked() = launchUnit {
         if (!canClaim.first()) return@launchUnit
         val claim = claimState.first().dataOrNull ?: return@launchUnit
-        router.openBittensorRootClaim(BittensorRootClaimPayload(claim.metaId))
+        router.openBittensorRootClaim(BittensorRootClaimPayload(claim.metaId, previewOnly = debugSettings.bittensorClaimEnabled()))
     }
 
     fun unstakeRoot() = launchUnit {

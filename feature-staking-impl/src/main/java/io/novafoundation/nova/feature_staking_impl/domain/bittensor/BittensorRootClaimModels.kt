@@ -16,14 +16,23 @@ data class BittensorRootClaimState(
     val supportsImmediateOperations: Boolean,
     val selectedHotkey: AccountIdKey? = null,
     val dataStatus: BittensorDataStatus = BittensorDataStatus.Fresh,
-    val pendingHotkeys: Set<AccountIdKey> = emptySet()
+    val pendingHotkeys: Set<AccountIdKey> = emptySet(),
+    val previewOnly: Boolean = false,
+    val allowBelowMinimumPreview: Boolean = false
 ) {
 
     val availableClaims: List<BittensorRootClaimPreview>
         get() = claims.claimable.filterNot { it.hotkey in pendingHotkeys }
 
     val selectedPreview: BittensorRootClaimPreview?
-        get() = if (selectedHotkey == null) availableClaims.firstOrNull() else availableClaims.singleOrNull { it.hotkey == selectedHotkey }
+        get() {
+            val candidates = if (previewOnly || (io.novafoundation.nova.feature_staking_impl.BuildConfig.DEBUG && allowBelowMinimumPreview)) {
+                claims.previews.filterNot { it.hotkey in pendingHotkeys }.sortedByDescending { it.redeemable }
+            } else {
+                availableClaims
+            }
+            return if (selectedHotkey == null) candidates.firstOrNull() else candidates.singleOrNull { it.hotkey == selectedHotkey }
+        }
 }
 
 data class BittensorRootClaimDraft(

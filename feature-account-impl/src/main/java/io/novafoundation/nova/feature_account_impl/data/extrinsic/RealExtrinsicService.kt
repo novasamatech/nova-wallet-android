@@ -46,6 +46,8 @@ import io.novafoundation.nova.feature_account_impl.data.signer.signingContext.wi
 import io.novafoundation.nova.runtime.ext.commissionAsset
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicBuilderFactory
 import io.novafoundation.nova.runtime.extrinsic.ExtrinsicStatus
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
+import io.novafoundation.nova.feature_account_impl.BuildConfig
 import io.novafoundation.nova.runtime.extrinsic.multi.SimpleCallBuilder
 import io.novafoundation.nova.runtime.multiNetwork.ChainRegistry
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -76,6 +78,18 @@ class RealExtrinsicService(
     private val signingContextFactory: SigningContext.Factory,
     private val coroutineScope: CoroutineScope? // TODO: Make it non-nullable
 ) : ExtrinsicService {
+
+    override suspend fun dryRunExtrinsic(
+        chain: Chain,
+        origin: TransactionOrigin,
+        submissionOptions: SubmissionOptions,
+        formExtrinsic: FormExtrinsicWithOrigin
+    ): ExtrinsicDryRunResult {
+        check(BuildConfig.DEBUG) { "Dry run is debug-only" }
+        rpcCalls.requireDryRunSupported(chain.id)
+        val submission = buildSubmissionExtrinsic(chain, origin, formExtrinsic, submissionOptions)
+        return rpcCalls.dryRunExtrinsic(chain.id, submission.extrinsic)
+    }
 
     override suspend fun submitExtrinsic(
         chain: Chain,

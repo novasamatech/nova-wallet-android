@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim
 
+import io.novafoundation.nova.runtime.extrinsic.DryRunRpcException
+
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
 
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -8,6 +10,7 @@ import io.novafoundation.nova.common.address.createSubstrateAddressModel
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.mapLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.mixin.api.Validatable
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -25,6 +28,17 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.wallet.W
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.BuildConfig
+import io.novafoundation.nova.common.data.storage.DebugSettings
+import io.novafoundation.nova.common.base.errors.SigningCancelledException
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
+import kotlinx.coroutines.TimeoutCancellationException
+import io.novafoundation.nova.common.presentation.ellipsizeAddress
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootValidatorSource
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
+import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
+import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import kotlinx.coroutines.flow.distinctUntilChanged
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorClaimValidationFailureUi
@@ -53,6 +67,8 @@ import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.creat
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
@@ -84,10 +100,19 @@ class BittensorRootClaimViewModel(
     private val validationExecutor: ValidationExecutor,
     private val claimValidationSystem: BittensorClaimValidationSystem,
     feeLoaderMixinFactory: FeeLoaderMixinV2.Factory,
-    private val durationFormatter: DurationFormatter
+    private val durationFormatter: DurationFormatter,
+    private val amountFormatter: BittensorAmountFormatter,
+    private val rootValidatorSource: BittensorRootValidatorSource,
+    private val debugSettings: DebugSettings
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val confirmMutex = Mutex()
+
+    private val previewOnly = BuildConfig.DEBUG && payload.previewOnly
+
+    private val dryRunRunning = MutableStateFlow(false)
+
+    val dryRunResult = MutableStateFlow<String?>(null)
 
     private val validating = MutableStateFlow(false)
 
@@ -104,7 +129,12 @@ class BittensorRootClaimViewModel(
             step = "root claim preview",
             transform = { it.withSafeLoading() }
         ) {
-            flowOf { bittensorRootClaimInteractor.load(payload.metaId, request.hotkey) }
+            flowOf {
+                bittensorRootClaimInteractor.load(payload.metaId, request.hotkey).copy(
+                    previewOnly = previewOnly,
+                    allowBelowMinimumPreview = debugSettings.bittensorClaimButtonEnabled()
+                )
+            }
         }
     }
         .shareInBackground()
@@ -138,6 +168,7 @@ class BittensorRootClaimViewModel(
 
     val warning = state.map { state ->
         when {
+            previewOnly -> resources.getString(R.string.bittensor_claim_preview_notice)
             state.dataOrNull?.let { claim ->
                 claim.selectedHotkey?.let { it in claim.pendingHotkeys } == true || claim.availableClaims.isEmpty() && claim.pendingHotkeys.isNotEmpty()
             } == true -> resources.getString(R.string.bittensor_claim_pending)
@@ -164,35 +195,35 @@ class BittensorRootClaimViewModel(
         }
         .shareInBackground()
 
-    val feeCaption = state.map { state ->
-        val symbol = state.dataOrNull?.asset?.token?.configuration?.symbol?.value ?: return@map null
-        resources.getString(R.string.bittensor_exit_fee_from_free, symbol)
-    }
-        .shareInBackground()
-
     val amount = state.mapLoading { claim ->
         claim.selectedPreview?.let { preview ->
-            tokenFormatter.formatToken(
-                claim.asset.token.amountFromPlanks(preview.redeemable),
-                claim.asset.token.configuration.symbol
+            val token = claim.asset.token
+            val value = token.amountFromPlanks(preview.redeemable)
+            val formatted = amountFormatter.amount(
+                value,
+                token.configuration.symbol,
+                token.toFiatOrNull(value),
+                token.currency
             )
-        } ?: "—"
+            formatted.copy(token = "≈ ${formatted.token}")
+        } ?: AmountModel("—", null)
     }
         .shareInBackground()
 
-    val forfeited = state.mapLoading { claim ->
-        claim.selectedPreview?.let { preview ->
-            tokenFormatter.formatToken(
-                claim.asset.token.amountFromPlanks(preview.forfeitedEstimate),
-                claim.asset.token.configuration.symbol
-            )
-        } ?: "—"
-    }
+    private val validatorDetails = claimState.mapNotNull { it?.chain }
+        .distinctUntilChanged()
+        .flatMapLatest { chain ->
+            flowOf { rootValidatorSource.validatorDetails(chain) }.withSafeLoading()
+        }
         .shareInBackground()
 
-    val validator = state.mapLoading { claim ->
-        claim.selectedPreview
-            ?.let { claim.chain.addressOf(it.hotkey.value) } ?: "—"
+    val validator = combine(state, validatorDetails) { state, details ->
+        state.map { claim ->
+            claim.selectedPreview?.let { preview ->
+                details.dataOrNull?.get(preview.hotkey)?.validator?.name?.takeIf { it.isNotBlank() }
+                    ?: claim.chain.addressOf(preview.hotkey.value).ellipsizeAddress()
+            } ?: "—"
+        }
     }
         .shareInBackground()
 
@@ -204,26 +235,36 @@ class BittensorRootClaimViewModel(
         } else {
             val before = tokenFormatter.formatToken(claim.asset.token.amountFromPlanks(stake), claim.asset.token.configuration.symbol)
             val after = tokenFormatter.formatToken(claim.asset.token.amountFromPlanks(stake + preview.redeemable), claim.asset.token.configuration.symbol)
-            "$before → $after"
+            "$before → ≈ $after"
         }
     }.shareInBackground()
 
-    val disclosure = state.map { loaded ->
-        val claim = loaded.dataOrNull ?: return@map null
-        val preview = claim.selectedPreview ?: return@map null
+    val disclosure = combine(state, validator) { loaded, validator ->
+        val claim = loaded.dataOrNull ?: return@combine null
+        val preview = claim.selectedPreview ?: return@combine null
+        val name = validator.dataOrNull ?: claim.chain.addressOf(preview.hotkey.value).ellipsizeAddress()
         buildList {
-            add(resources.getString(R.string.bittensor_claim_restake_notice, claim.chain.addressOf(preview.hotkey.value)))
+            add(resources.getString(R.string.bittensor_claim_restake_notice, name))
             claim.claims.rootHoldDurationMillis?.takeIf { it.isPositive() }?.let { duration ->
-                add(resources.getString(R.string.bittensor_claim_hold_notice, durationFormatter.format(duration.toLong().milliseconds)))
+                add(
+                    resources.getString(
+                        R.string.bittensor_claim_hold_notice,
+                        name,
+                        durationFormatter.format(duration.toLong().milliseconds)
+                    )
+                )
             }
             if (preview.forfeitedEstimate.isPositive()) {
-                val forfeiture = tokenFormatter.formatToken(
+                val forfeiture = amountFormatter.minimumAmount(
                     claim.asset.token.amountFromPlanks(preview.forfeitedEstimate),
                     claim.asset.token.configuration.symbol
                 )
                 add(resources.getString(R.string.bittensor_claim_forfeit_notice, forfeiture))
             }
-        }.joinToString("\n\n")
+            if (claim.claims.claimable.any { it.hotkey != preview.hotkey }) {
+                add(resources.getString(R.string.bittensor_claim_other_validators_notice))
+            }
+        }.joinToString("\n")
     }.shareInBackground()
 
     val validatorIcon = prepared.map {
@@ -240,28 +281,21 @@ class BittensorRootClaimViewModel(
     val fee = prepared.map { it.dataOrNull?.let { draft -> tokenFormatter.formatToken(draft.fee.decimalAmount, draft.fee.asset.symbol) } ?: "—" }
         .shareInBackground()
 
-    val remaining = state.map {
-        resources.getString(
-            R.string.bittensor_claim_other_hotkeys,
-            ((it.dataOrNull?.claims?.claimable?.size ?: 0) - 1)
-                .coerceAtLeast(0)
-        )
-    }
-        .shareInBackground()
-
     val confirmButtonState = combine(
         prepared,
         execution,
-        validating
-    ) { prepared, execution, validating ->
-        val label = resources.getString(R.string.bittensor_claim_action)
+        validating,
+        dryRunRunning,
+        debugSettings.observeBittensorClaim()
+    ) { prepared, execution, validating, dryRunRunning, debugEnabled ->
+        val label = resources.getString(if (previewOnly) R.string.bittensor_claim_dry_run else R.string.bittensor_claim_action)
         val result = (execution as? ClaimExecution.Result)
             ?.model
         val blocked = execution is ClaimExecution.Running || result is BittensorStakeResultUi.Success || result is BittensorStakeResultUi.Unconfirmed ||
             result is BittensorStakeResultUi.Failure && !result.canRetry
-        if (validating) {
+        if (validating || dryRunRunning) {
             DescriptiveButtonState.Loading
-        } else if (prepared.dataOrNull == null || blocked) {
+        } else if (previewOnly != debugEnabled || prepared.dataOrNull == null || blocked) {
             DescriptiveButtonState.Disabled(label)
         } else {
             DescriptiveButtonState.Enabled(label)
@@ -301,9 +335,58 @@ class BittensorRootClaimViewModel(
         state.first().dataOrNull?.let { externalActions.showAddressActions(it.chain.addressOf(it.coldkey.value), it.chain) }
     }
 
-    fun confirmClicked(): Unit = confirmWithProfit(null)
+    val isDryRun: Boolean get() = previewOnly
+
+    fun confirmClicked() {
+        if (previewOnly) {
+            runDryRun()
+        } else {
+            confirmWithProfit(null)
+        }
+    }
+
+    private fun runDryRun() = launchUnit {
+        if (!previewOnly || !debugSettings.bittensorClaimEnabled() || !confirmMutex.tryLock()) return@launchUnit
+        try {
+            if (confirmButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
+            val current = claimState.first() ?: return@launchUnit
+            dryRunRunning.value = true
+            dryRunResult.value = null
+            val result = bittensorRootClaimInteractor.dryRun(current)
+            dryRunResult.value = when (result) {
+                ExtrinsicDryRunResult.Success ->
+                    resources.getString(R.string.bittensor_claim_dry_run_success)
+                is ExtrinsicDryRunResult.DispatchFailure ->
+                    resources.getString(R.string.bittensor_claim_dry_run_dispatch_failure, result.description)
+                is ExtrinsicDryRunResult.InvalidTransaction ->
+                    resources.getString(R.string.bittensor_claim_dry_run_invalid, result.description)
+            }
+        } catch (e: TimeoutCancellationException) {
+            currentCoroutineContext().ensureActive()
+            dryRunResult.value = resources.getString(R.string.bittensor_claim_dry_run_error, "timeout")
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: SigningCancelledException) {
+            dryRunResult.value = resources.getString(R.string.bittensor_claim_dry_run_cancelled)
+        } catch (e: DryRunRpcException) {
+            dryRunResult.value = resources.getString(R.string.bittensor_claim_dry_run_error, e.diagnostic)
+        } catch (e: UnsupportedOperationException) {
+            dryRunResult.value = resources.getString(R.string.bittensor_claim_dry_run_error, e.message.orEmpty())
+        } catch (e: Exception) {
+            // Do not log signed extrinsics or RPC payloads.
+            dryRunResult.value = resources.getString(R.string.bittensor_claim_dry_run_error, e.javaClass.simpleName)
+        } finally {
+            dryRunRunning.value = false
+            confirmMutex.unlock()
+        }
+    }
+
+    fun dryRunResultShown() {
+        dryRunResult.value = null
+    }
 
     private fun confirmWithProfit(accepted: BittensorClaimValidationPayload?): Unit = launchUnit {
+        if (previewOnly || debugSettings.bittensorClaimEnabled()) return@launchUnit
         if (!confirmMutex.tryLock()) return@launchUnit
         try {
             if (confirmButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
@@ -347,6 +430,10 @@ class BittensorRootClaimViewModel(
     }
 
     private suspend fun submit(draft: BittensorRootClaimDraft, validated: BittensorClaimValidationPayload) {
+        if (previewOnly || debugSettings.bittensorClaimEnabled()) {
+            execution.value = ClaimExecution.Idle
+            return
+        }
         val lease = bittensorRootClaimInteractor.tryAcquire(draft)
         if (lease == null) {
             execution.value = ClaimExecution.Idle
@@ -407,6 +494,6 @@ class BittensorRootClaimViewModel(
     }
 
     fun back() {
-        if (execution.value !is ClaimExecution.Running) router.back()
+        if (execution.value !is ClaimExecution.Running && !dryRunRunning.value) router.back()
     }
 }

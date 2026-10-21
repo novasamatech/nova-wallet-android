@@ -122,7 +122,8 @@ class BittensorDetailsModule {
         withdrawalInteractor: io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPositionWithdrawalInteractor,
         slippageSettings: io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorSlippageSettings,
         rootValidatorSource: BittensorRootValidatorSource,
-        rootHoldFormatter: BittensorRootHoldFormatter
+        rootHoldFormatter: BittensorRootHoldFormatter,
+        debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
     ): ViewModel = BittensorRootDetailsViewModel(
         interactor,
         router,
@@ -137,7 +138,8 @@ class BittensorDetailsModule {
         withdrawalInteractor = withdrawalInteractor,
         slippageSettings = slippageSettings,
         rootValidatorSource = rootValidatorSource,
-        rootHoldFormatter = rootHoldFormatter
+        rootHoldFormatter = rootHoldFormatter,
+        debugSettings = debugSettings
     )
 
     @Provides

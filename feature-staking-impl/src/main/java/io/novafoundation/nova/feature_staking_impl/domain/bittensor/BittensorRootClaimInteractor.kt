@@ -6,6 +6,9 @@ import io.novafoundation.nova.feature_account_api.data.extrinsic.ExtrinsicServic
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.domain.interfaces.AccountRepository
 import io.novafoundation.nova.feature_account_api.domain.model.requireAccountIdIn
+import io.novafoundation.nova.feature_account_api.domain.model.LightMetaAccount
+import io.novafoundation.nova.feature_staking_impl.BuildConfig
+import io.novafoundation.nova.runtime.extrinsic.ExtrinsicDryRunResult
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaimSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootClaims
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorPendingClaims
@@ -131,11 +134,29 @@ class BittensorRootClaimInteractor(
         )
     }
 
-    fun tryAcquire(draft: BittensorRootClaimDraft): BittensorClaimLease? = pendingClaims.tryAcquire(draft.target())
+    fun tryAcquire(draft: BittensorRootClaimDraft): BittensorClaimLease? =
+        if (draft.state.previewOnly) null else pendingClaims.tryAcquire(draft.target())
+
+    suspend fun dryRun(state: BittensorRootClaimState): ExtrinsicDryRunResult {
+        check(BuildConfig.DEBUG && state.previewOnly)
+        requireWallet(state)
+        val wallet = accountRepository.getMetaAccount(state.metaId)
+        if (wallet.type != LightMetaAccount.Type.SECRETS) {
+            throw UnsupportedOperationException("Claim dry run currently supports regular signing wallets only")
+        }
+        val preview = requireNotNull(state.selectedPreview) { "No claim preview is available" }
+        val operation = BittensorRootClaimOperation(preview.hotkey)
+        return extrinsicService.dryRunExtrinsic(
+            state.chain,
+            TransactionOrigin.WalletWithId(state.metaId),
+            options
+        ) { operation.build(this) }
+    }
 
     suspend fun execute(draft: BittensorRootClaimDraft, lease: BittensorClaimLease): BittensorOperationResult {
         require(lease.target == draft.target())
         try {
+            check(!draft.state.previewOnly) { "Claim preview cannot be submitted" }
             requireWallet(draft.state)
         } catch (e: CancellationException) {
             pendingClaims.finish(lease, BittensorOperationResult.Failure(e, stage = BittensorFailureStage.NOT_SUBMITTED))
