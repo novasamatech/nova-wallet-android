@@ -8,7 +8,10 @@ import java.math.RoundingMode
 /** Current fully priced holdings; a missing market rate is not a zero price. */
 data class BittensorPortfolioLiveAnchor(val tao: BigDecimal, val currentNativePrice: BigDecimal?)
 
-/** Reported account history, with an optional final point supplied by current chain holdings. */
+/**
+ * Reported account history drawn on the server window grid: zero before the first completed point, the last value
+ * carried across gaps, and an optional final point supplied by current chain holdings.
+ */
 class BittensorPortfolioChartCalculator {
 
     private class HistoricalFx(val prices: List<HistoricalCoinRate>) {
@@ -21,17 +24,70 @@ class BittensorPortfolioChartCalculator {
         liveAnchor: BittensorPortfolioLiveAnchor?,
         now: Long = System.currentTimeMillis() / 1000
     ): BittensorPortfolioValueSeries {
-        val historical = historicalPoints(history)
+        val fx = historicalFx(history)
+        val historical = gridPoints(history.account, completedPoints(history, fx), fx, now)
         val livePoint = livePoint(history, liveAnchor, historical.lastOrNull(), now)
         val points = if (livePoint == null) historical else historical + livePoint
         return BittensorPortfolioValueSeries(points, periodChange(points, history.account))
     }
 
-    private fun historicalPoints(history: BittensorPortfolioHistory): List<BittensorPortfolioValuePoint> {
-        val fx = historicalFx(history)
+    private fun completedPoints(history: BittensorPortfolioHistory, fx: HistoricalFx?): List<BittensorPortfolioValuePoint> {
         return history.account.points
             .filter { it.completed }
             .mapNotNull { historicalPoint(it, fx, history.account.period.fxToleranceSeconds) }
+            .sortedBy { it.timestamp }
+    }
+
+    /**
+     * Walks the server window with the period step. Each instant takes the newest completed point at or before it
+     * that was not taken yet, carries the previous value when there is none, and is zero before the first completed
+     * point. Instants at or after [now] are left to the live point.
+     */
+    private fun gridPoints(
+        account: BittensorAccountHistory,
+        completed: List<BittensorPortfolioValuePoint>,
+        fx: HistoricalFx?,
+        now: Long
+    ): List<BittensorPortfolioValuePoint> {
+        if (account.windowStart > account.windowEnd) return completed
+
+        val tolerance = account.period.fxToleranceSeconds
+        val points = mutableListOf<BittensorPortfolioValuePoint>()
+        var nextIndex = 0
+        var last: BittensorPortfolioValuePoint? = null
+        var instant = account.windowStart
+
+        while (instant <= account.windowEnd && instant < now) {
+            var matched: BittensorPortfolioValuePoint? = null
+            while (nextIndex < completed.size && completed[nextIndex].timestamp <= instant) {
+                matched = completed[nextIndex]
+                nextIndex++
+            }
+
+            val point = when {
+                matched != null -> matched
+                last != null -> carriedPoint(last, instant, fx, tolerance)
+                else -> BittensorPortfolioValuePoint(instant, BigDecimal.ZERO, BigDecimal.ZERO)
+            }
+            points += point
+            if (matched != null) last = matched
+
+            instant += account.period.sampleStepSeconds
+        }
+
+        return points
+    }
+
+    /** Repeats the last known TAO total at a later instant, repriced with the FX history when it covers that instant. */
+    private fun carriedPoint(
+        last: BittensorPortfolioValuePoint,
+        instant: Long,
+        fx: HistoricalFx?,
+        tolerance: Long
+    ): BittensorPortfolioValuePoint {
+        val price = fx?.let { historicalPrice(it, instant, tolerance) }
+        val fiat = if (price == null) last.fiat else last.tao * price
+        return BittensorPortfolioValuePoint(instant, last.tao, fiat)
     }
 
     private fun historicalFx(history: BittensorPortfolioHistory): HistoricalFx? {
