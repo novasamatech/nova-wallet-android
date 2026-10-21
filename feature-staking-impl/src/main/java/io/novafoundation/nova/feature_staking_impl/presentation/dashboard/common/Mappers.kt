@@ -65,7 +65,12 @@ class RealStakingDashboardPresentationMapper(
         amountFormatter: AmountFormatter,
         announcement: AnnouncementModel?
     ): StakingDashboardModel.HasStakeItem? = mapBittensorDashboardItem(
-        option, amountFormatter, announcement, resourceManager, maskableValueFormatter, assetIconProvider
+        option,
+        amountFormatter,
+        announcement,
+        resourceManager,
+        maskableValueFormatter,
+        assetIconProvider
     )
 
     @Suppress("UNCHECKED_CAST")
