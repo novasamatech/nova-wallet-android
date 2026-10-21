@@ -85,7 +85,22 @@ class ChartController(private val chart: LineChart, private val callback: Callba
 
     fun setEntries(entries: List<Entry>) {
         currentEntries = entries
+        keepAxisAboveZero(entries)
         updateChart()
+    }
+
+    /**
+     * The axis pads below the lowest value by [YAxis.getSpaceBottom] percent of the range, which for a series that
+     * starts at zero (a portfolio before its first stake) labels the bottom grid line with a negative amount.
+     */
+    private fun keepAxisAboveZero(entries: List<Entry>) {
+        chart.axisRight.resetAxisMinimum()
+        val min = entries.minOfOrNull { it.y } ?: return
+        val max = entries.maxOf { it.y }
+        val paddedMin = min - (max - min) * chart.axisRight.spaceBottom / 100f
+        if (min >= 0f && paddedMin < 0f) {
+            chart.axisRight.axisMinimum = 0f
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
