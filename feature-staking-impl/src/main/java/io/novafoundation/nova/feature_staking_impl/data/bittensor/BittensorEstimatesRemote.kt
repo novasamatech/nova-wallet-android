@@ -2,8 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 class BittensorAlphaYieldsRemote(
     val items: List<Item>?,
-    val meta: Meta?,
-    val pageInfo: BittensorHistoryPageInfo?
+    val meta: Meta?
 ) {
     class Item(
         val netuid: Int?,
