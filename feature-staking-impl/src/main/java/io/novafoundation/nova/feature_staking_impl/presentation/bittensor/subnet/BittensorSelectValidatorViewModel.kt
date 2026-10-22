@@ -1,5 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.ValidatorChangeSource
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -31,6 +39,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -41,6 +50,7 @@ import kotlinx.coroutines.flow.onStart
 import java.util.Locale
 
 class BittensorSelectValidatorViewModel(
+    private val analytics: AnalyticsService,
     private val request: BittensorSelectValidatorCommunicator.Request,
     private val communicator: BittensorSelectValidatorCommunicator,
     private val bittensorValidatorInteractor: BittensorValidatorInteractor,
@@ -54,6 +64,9 @@ class BittensorSelectValidatorViewModel(
     private val subnetInteractor: BittensorSubnetInteractor
 ) : BaseViewModel(), ExternalActions by externalActions {
 
+    private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.VALIDATOR_SELECT)
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.VALIDATOR_SELECT)
+
     val retryEvents = retryController.events
 
     val filters = MutableStateFlow(request.selectionState.filtersFor(BittensorNetuid.from(request.subnetId)))
@@ -64,6 +77,7 @@ class BittensorSelectValidatorViewModel(
 
     private val yields = retryController.observe(
         step = "validator yields",
+        analytics = validatorsReads,
         transform = { source ->
             source.onStart { emit(emptyMap()) }.catch { cause ->
                 if (cause is CancellationException) throw cause
@@ -71,7 +85,9 @@ class BittensorSelectValidatorViewModel(
             }
         }
     ) {
-        flowOf { bittensorValidatorInteractor.yields(netuid) }
+        filters.flatMapLatest { filter ->
+            flowOf { bittensorValidatorInteractor.yields(netuid, includeUnreliable = !filter.hideUnusualApy) }
+        }
     }
         .shareInBackground()
 
@@ -89,6 +105,7 @@ class BittensorSelectValidatorViewModel(
 
     private val stakeDisplay = retryController.observe(
         step = "validator reported stake price",
+        analytics = chainRpcReads,
         transform = { source ->
             source.onStart { emit(null) }.catch { cause ->
                 if (cause is CancellationException) throw cause
@@ -214,6 +231,13 @@ class BittensorSelectValidatorViewModel(
 
     fun confirmClicked() = launchUnit {
         val row = selectedValidator.first() ?: return@launchUnit
+        analytics.track(
+            BittensorAnalyticsEvent.ValidatorChanged(
+                if (request.subnetId == 0) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
+                if (query.value.isNotBlank()) ValidatorChangeSource.SEARCH else ValidatorChangeSource.LIST,
+                filters.value.hideUnusualApy
+            )
+        )
         communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, row.eligibility.address, selectionState()))
         router.back()
     }

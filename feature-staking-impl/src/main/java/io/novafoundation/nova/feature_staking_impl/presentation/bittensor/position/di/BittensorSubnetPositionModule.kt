@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -30,6 +32,7 @@ class BittensorSubnetPositionModule {
     @IntoMap
     @ViewModelKey(BittensorSubnetPositionViewModel::class)
     fun position(
+        analytics: AnalyticsService,
         payload: BittensorSubnetPositionPayload,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         bittensorSubnetDetailsInteractor: BittensorSubnetDetailsInteractor,
@@ -49,6 +52,7 @@ class BittensorSubnetPositionModule {
         costBasisFormatter: BittensorSaleCostBasisFormatter
     ): ViewModel =
         BittensorSubnetPositionViewModel(
+            analytics,
             payload.subnetId(),
             bittensorSubnetInteractor,
             bittensorSubnetDetailsInteractor,

@@ -1,5 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.analytics.StakingPortfolioSource
+import io.novafoundation.nova.analytics.StakingResultAction
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingMode
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import android.os.SystemClock
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -94,6 +108,8 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
 class BittensorSubnetReviewViewModel(
+    private val analytics: AnalyticsService,
+    private val operationAnalytics: BittensorOperationAnalytics,
     private val subnetId: BittensorNetuid.Subnet,
     private val totalInPlanks: BigInteger,
     private val metaId: Long,
@@ -120,6 +136,8 @@ class BittensorSubnetReviewViewModel(
     val existingPosition: Boolean = false,
     private val inactiveValidatorAccepted: Boolean = false
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
+
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.CONFIRM)
 
     val retryEvents = retryController.events
 
@@ -155,6 +173,7 @@ class BittensorSubnetReviewViewModel(
 
     private val preparationState = retryController.observe(
         step = "stake preparation",
+        analytics = chainRpcReads,
         transform = { it.withSafeLoading() }
     ) {
         preparationRefresh.flatMapLatest {
@@ -439,7 +458,20 @@ class BittensorSubnetReviewViewModel(
                     bittensorStakeValidationFailureUi(
                         failure,
                         actions,
-                        resources
+                        resources,
+                        onOutcome = { outcome ->
+                            failure.reason.analyticsKind()?.let { kind ->
+                                analytics.track(
+                                    BittensorAnalyticsEvent.ValidationShown(
+                                        StakingFlow.STAKE,
+                                        kind,
+                                        StakingValidationStage.CONFIRM,
+                                        outcome,
+                                        StakingAnalyticsTarget.SUBNET
+                                    )
+                                )
+                            }
+                        }
                     ) { preparationRefresh.value += 1 }
                 }
             ) { validated ->
@@ -455,12 +487,25 @@ class BittensorSubnetReviewViewModel(
         }
     }
 
+    private val analyticsMode get() = if (existingPosition) StakingMode.BUY_MORE else StakingMode.NEW_POSITION
+
     private fun executeStake(prepared: BittensorSubnetStakeDraft, fee: Fee) = launchUnit {
         if (!submission.value.canSubmit) return@launchUnit
         executionStartedAt = SystemClock.elapsedRealtime()
         submission.value = BittensorSubmissionState.Submitting(mapProgress())
         try {
+            operationAnalytics.startOperation()
+            analytics.track(
+                BittensorAnalyticsEvent.Confirmed(
+                    BittensorAnalyticsEvent.NETWORK,
+                    StakingAnalyticsTarget.SUBNET,
+                    analyticsMode,
+                    false,
+                    null
+                )
+            )
             val result = bittensorSubnetStakingInteractor.execute(prepared)
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.SUBNET, StakingFlow.STAKE, mode = analyticsMode)
             executionCompletedAt = System.currentTimeMillis()
             when (result) {
                 is BittensorOperationResult.Success -> {
@@ -476,7 +521,9 @@ class BittensorSubnetReviewViewModel(
             throw e
         } catch (e: Exception) {
             executionCompletedAt = System.currentTimeMillis()
-            submission.value = e.mapBittensorSubmissionError().mapResult(resources).toSubmissionState()
+            val result = e.mapBittensorSubmissionError()
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.SUBNET, StakingFlow.STAKE, mode = analyticsMode)
+            submission.value = result.mapResult(resources).toSubmissionState()
         } finally {
             validating.value = false
         }
@@ -557,7 +604,14 @@ class BittensorSubnetReviewViewModel(
 
     fun viewPositionClicked() {
         if (submission.value is BittensorSubmissionState.Completed) {
-            router.openBittensorPortfolio()
+            analytics.track(
+                BittensorAnalyticsEvent.ResultAction(
+                    StakingResultAction.YOUR_BITTENSOR,
+                    StakingFlow.STAKE,
+                    StakingAnalyticsTarget.SUBNET
+                )
+            )
+            router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
         } else if (submission.value is BittensorSubmissionState.Unconfirmed) {
             router.back()
         }

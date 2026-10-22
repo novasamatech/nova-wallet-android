@@ -100,6 +100,23 @@ Renew a rejected bearer only on the contract's complete invalid-token signal, wi
 
 Distinguish optional presentation fallbacks from transaction inputs. Missing logos may use a placeholder, but a failed commission-config request must not silently supply a default fee. A documented default for an absent or invalid field in a successfully decoded config is a separate case.
 
+## Analytics event declarations
+
+Declare each analytics event as a separate class directly extending `AnalyticsEvent`, with explicit named `name` and `properties` arguments, following the existing events. Use `mapOf` for required properties and `buildMap` with explicit null checks for optional properties. Omit unknown optional values; preserve meaningful `false` and zero values. Parameterless events may use `object`, following existing examples.
+
+```kotlin
+class SignRequestShown(source: SignSource, method: String, chain: String) : AnalyticsEvent(
+    name = "sign_request_shown",
+    properties = mapOf(
+        "source" to source.value,
+        "method" to method,
+        "chain" to chain
+    )
+)
+```
+
+Do not replace event classes with factory functions such as `fun typeSelected(...) = event(...)` or generic vararg event builders. Feature namespaces may group event classes, but each event must still directly extend `AnalyticsEvent`. Send events through the existing `AnalyticsService`; do not introduce a parallel analytics pipeline. When refactoring declarations, preserve wire event names, property keys and types, omission rules, and emission timing.
+
 ## Runtime response decoding
 
 Use the SDK's `AccountId` alias for raw Substrate account identifiers in signatures and explicitly typed properties, not `ByteArray`. Preserve meaningful domain names such as `coldKey` when they clarify the account's role; changing the type does not require renaming the identifier. Keep protocol-specific wire field names unchanged. Keep `AccountIdKey` for content-based equality and collection keys, and reserve `ByteArray` for actual binary payloads rather than account IDs.

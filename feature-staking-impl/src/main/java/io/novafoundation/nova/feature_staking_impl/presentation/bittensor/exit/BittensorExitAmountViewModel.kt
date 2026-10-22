@@ -1,5 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.UnstakeMode
+import io.novafoundation.nova.analytics.SlippageBucket
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLoadingValue
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -82,6 +95,7 @@ private data class ExitPreparationRequest(
 private data class ExitAmountRequest(val preparation: ExitPreparationRequest, val exit: BittensorExitRequest, val estimateOnly: Boolean)
 
 class BittensorExitAmountViewModel(
+    private val analytics: AnalyticsService,
     private val payload: BittensorExitPositionPayload,
     private val bittensorExitInteractor: BittensorExitInteractor,
     private val router: StakingRouter,
@@ -110,6 +124,8 @@ class BittensorExitAmountViewModel(
         const val AMOUNT_DEBOUNCE_MILLIS = 350L
     }
 
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.UNSTAKE_SETUP)
+
     val retryEvents = retryController.events
 
     private val validating = MutableStateFlow(false)
@@ -129,6 +145,7 @@ class BittensorExitAmountViewModel(
 
     private val positionState = retryController.observe(
         step = "exit position",
+        analytics = chainRpcReads,
         transform = { it.withSafeLoading() }
     ) {
         bittensorExitInteractor.observe(payload.metaId, payload.netuid(), payload.hotkeyAddress)
@@ -151,6 +168,7 @@ class BittensorExitAmountViewModel(
         .flatMapLatest { request ->
             retryController.observe(
                 step = "exit quote",
+                analytics = chainRpcReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf {
@@ -377,7 +395,10 @@ class BittensorExitAmountViewModel(
 
         if (!isRoot) {
             slippageSettingsCommunicator.responseFlow
-                .onEach { slippageSettings.set(BigDecimal.valueOf(it.fraction)) }
+                .onEach {
+                    slippageSettings.set(BigDecimal.valueOf(it.fraction))
+                    analytics.track(it.bittensorAnalyticsEvent())
+                }
                 .launchIn(this)
         }
 
@@ -429,13 +450,39 @@ class BittensorExitAmountViewModel(
                     bittensorExitValidationFailureUi(
                         failure.reason,
                         resources,
+                        onOutcome = { outcome ->
+                            failure.reason.analyticsKind()?.let { kind ->
+                                analytics.track(
+                                    BittensorAnalyticsEvent.ValidationShown(
+                                        StakingFlow.UNSTAKE,
+                                        kind,
+                                        StakingValidationStage.SETUP,
+                                        outcome,
+                                        if (isRoot) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET
+                                    )
+                                )
+                            }
+                        },
                         unstakeAll = { withCurrentRequest(quoted) { maxClicked() } },
                         refreshQuote = { withCurrentRequest(quoted) { input.value = current.copy(revision = current.revision + 1) } },
                         acceptImpact = { withCurrentRequest(quoted) { continueWithImpact(validationPayload.latestQuote) } }
                     )
                 }
             ) {
-                withCurrentRequest(quoted) { router.openBittensorExitReview(draft.quote.toPayload(payload)) }
+                withCurrentRequest(quoted) {
+                    analytics.track(
+                        BittensorAnalyticsEvent.UnstakeInitiated(
+                            BittensorAnalyticsEvent.NETWORK,
+                            if (isRoot) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
+                            if (draft.quote.fullExit) UnstakeMode.FULL else UnstakeMode.PARTIAL,
+                            draft.quote.groupHotkeys.size.takeIf { it > 0 } ?: 1,
+                            draft.position.preflight.availability.locked.signum() > 0,
+                            draft.quote.slippageFraction.takeUnless { isRoot }?.let { SlippageBucket.from(it.movePointRight(2)) },
+                            null
+                        )
+                    )
+                    router.openBittensorExitReview(draft.quote.toPayload(payload))
+                }
             }
         } catch (e: CancellationException) {
             throw e

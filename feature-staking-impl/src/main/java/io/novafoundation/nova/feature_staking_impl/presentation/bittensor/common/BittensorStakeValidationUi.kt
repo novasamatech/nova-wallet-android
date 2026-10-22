@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.TransformedFailure
@@ -32,6 +33,7 @@ fun bittensorStakeValidationFailureUi(
     failure: ValidationStatus.NotValid<BittensorStakeValidationFailure>,
     actions: ValidationFlowActions<BittensorStakePreflightPayload>,
     resources: ResourceManager,
+    onOutcome: (StakingValidationOutcome) -> Unit = {},
     refreshQuote: () -> Unit
 ): TransformedFailure {
     val reason = failure.reason
@@ -41,9 +43,14 @@ fun bittensorStakeValidationFailureUi(
                 title = resources.getString(R.string.bittensor_inactive_validator_title),
                 message = reason.message(resources),
                 okAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_continue)) {
+                    onOutcome(StakingValidationOutcome.PROCEEDED)
                     actions.revalidate { it.copy(inactiveValidatorAccepted = true) }
                 },
-                cancelAction = CustomDialogDisplayer.Payload.DialogAction.noOp(resources.getString(R.string.common_cancel))
+                cancelAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_cancel)) {
+                    onOutcome(
+                        StakingValidationOutcome.CANCELLED
+                    )
+                }
             )
         )
     }
@@ -52,12 +59,20 @@ fun bittensorStakeValidationFailureUi(
             CustomDialogDisplayer.Payload(
                 title = resources.getString(R.string.common_error_general_title),
                 message = reason.message(resources),
-                okAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.bittensor_review_updated_quote), refreshQuote),
-                cancelAction = CustomDialogDisplayer.Payload.DialogAction.noOp(resources.getString(R.string.common_cancel))
+                okAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.bittensor_review_updated_quote)) {
+                    onOutcome(StakingValidationOutcome.PROCEEDED)
+                    refreshQuote()
+                },
+                cancelAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_cancel)) {
+                    onOutcome(
+                        StakingValidationOutcome.CANCELLED
+                    )
+                }
             )
         )
     }
     if (reason != BittensorStakeValidationFailure.HIGH_PRICE_IMPACT) {
+        onOutcome(StakingValidationOutcome.BLOCKED)
         return TransformedFailure.Default(resources.getString(R.string.common_error_general_title) to reason.message(resources))
     }
 
@@ -66,9 +81,14 @@ fun bittensorStakeValidationFailureUi(
             title = resources.getString(R.string.bittensor_price_impact_title),
             message = reason.message(resources),
             okAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_continue)) {
+                onOutcome(StakingValidationOutcome.PROCEEDED)
                 actions.revalidate { it.copy(priceImpactAccepted = true) }
             },
-            cancelAction = CustomDialogDisplayer.Payload.DialogAction.noOp(resources.getString(R.string.common_cancel))
+            cancelAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_cancel)) {
+                onOutcome(
+                    StakingValidationOutcome.CANCELLED
+                )
+            }
         )
     )
 }

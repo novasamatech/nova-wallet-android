@@ -8,9 +8,7 @@ import retrofit2.http.Url
 interface BittensorEstimatesApi {
     @GET
     suspend fun alphaYields(
-        @Url url: String,
-        @Query("page") page: Int,
-        @Query("pageSize") pageSize: Int
+        @Url url: String
     ): Response<BittensorAlphaYieldsRemote>
 
     @GET

@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -38,6 +41,8 @@ class BittensorExitReviewModule {
     @IntoMap
     @ViewModelKey(BittensorExitReviewViewModel::class)
     fun review(
+        analytics: AnalyticsService,
+        operationAnalytics: BittensorOperationAnalytics,
         payload: BittensorExitReviewPayload,
         bittensorExitInteractor: BittensorExitInteractor,
         router: StakingRouter,
@@ -62,7 +67,7 @@ class BittensorExitReviewModule {
         logger: Logger
     ): ViewModel {
         return BittensorExitReviewViewModel(
-            payload,
+            analytics, operationAnalytics, payload,
             bittensorExitInteractor,
             router,
             resources,

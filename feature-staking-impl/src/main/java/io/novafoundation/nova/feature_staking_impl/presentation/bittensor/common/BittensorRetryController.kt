@@ -26,6 +26,7 @@ class BittensorRetryController(private val resources: ResourceManager, private v
 
     fun <T, R> observe(
         step: String,
+        analytics: BittensorReadAnalytics? = null,
         transform: (Flow<T>) -> Flow<R>,
         source: () -> Flow<T>
     ): Flow<R> {
@@ -37,7 +38,11 @@ class BittensorRetryController(private val resources: ResourceManager, private v
                     // Never show a retry dialog after the collecting coroutine has been cancelled.
                     currentCoroutineContext().ensureActive()
                     if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
-                    report(step, cause) { reload.update { it + 1 } }
+                    analytics?.failed(cause)
+                    report(step, cause) {
+                        analytics?.retry()
+                        reload.update { it + 1 }
+                    }
                     throw cause
                 }
             transform(attempt)

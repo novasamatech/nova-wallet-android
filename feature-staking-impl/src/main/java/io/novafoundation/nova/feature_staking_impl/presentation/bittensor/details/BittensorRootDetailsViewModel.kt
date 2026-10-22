@@ -1,5 +1,13 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingRewardsState
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -52,6 +60,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class BittensorRootDetailsViewModel(
+    private val analytics: AnalyticsService,
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
     private val router: StakingRouter,
     private val resources: ResourceManager,
@@ -69,10 +78,17 @@ class BittensorRootDetailsViewModel(
     private val debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
 ) : BaseViewModel(), ExternalActions by externalActions {
 
+    private var isOpenedTracked = false
+
+    private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.POSITION)
+    private val claimPreviewsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CLAIM_PREVIEWS, BittensorScreen.POSITION)
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.POSITION)
+
     val retryEvents = retryController.events
 
     private val portfolioState = retryController.observe(
         step = "root positions",
+        analytics = rootOverviewReads,
         transform = { it.withSafeLoading() },
         source = bittensorPortfolioInteractor::observeRootPortfolio
     )
@@ -91,6 +107,7 @@ class BittensorRootDetailsViewModel(
     private val claimState = selectedMetaId.flatMapLatest { metaId ->
         retryController.observe(
             step = "claimable root rewards",
+            analytics = claimPreviewsReads,
             transform = { it.withSafeLoading() }
         ) {
             rootClaimInteractor.observe(metaId)
@@ -134,13 +151,34 @@ class BittensorRootDetailsViewModel(
     }.distinctUntilChanged().flatMapLatest { request ->
         retryController.observe(
             step = "root withdrawal availability",
+            analytics = chainRpcReads,
             transform = { it.withSafeLoading() }
         ) {
             if (request == null) flowOf(null) else withdrawalInteractor.observe(request)
         }
     }.shareInBackground()
 
-    val rootHold = withdrawalState.map { state ->
+    val rootHold = combine(withdrawalState, claimState) { state, claims ->
+        val withdrawal = state.dataOrNull
+        if (!isOpenedTracked && withdrawal != null && !claims.isLoading()) {
+            val claim = claims.dataOrNull
+            val rewards = when {
+                claim == null -> StakingRewardsState.UNAVAILABLE
+                claim.availableClaims.isNotEmpty() -> StakingRewardsState.CLAIMABLE
+                claim.claims.totalRedeemable.signum() > 0 -> StakingRewardsState.BELOW_MINIMUM
+                else -> StakingRewardsState.NONE
+            }
+            isOpenedTracked = true
+            analytics.track(
+                BittensorAnalyticsEvent.PositionOpened(
+                    StakingAnalyticsTarget.ROOT,
+                    0,
+                    withdrawal.holdDurationMillis.signum() > 0,
+                    withdrawal.locked.signum() > 0,
+                    rewards
+                )
+            )
+        }
         state.dataOrNull?.rootHold?.let(rootHoldFormatter::format)
     }
         .shareInBackground()

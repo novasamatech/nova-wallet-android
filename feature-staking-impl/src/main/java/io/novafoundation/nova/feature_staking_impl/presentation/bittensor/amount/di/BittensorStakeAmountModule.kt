@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +36,7 @@ class BittensorStakeAmountModule {
     @IntoMap
     @ViewModelKey(BittensorStakeAmountViewModel::class)
     fun provideViewModel(
+        analytics: AnalyticsService,
         resourceManager: ResourceManager,
         router: StakingRouter,
         bittensorStakingInteractor: BittensorStakingInteractor,
@@ -53,7 +56,7 @@ class BittensorStakeAmountModule {
         selectionState: BittensorSelectionState
     ): ViewModel {
         return BittensorStakeAmountViewModel(
-            resourceManager = resourceManager,
+            analytics, resourceManager = resourceManager,
             router = router,
             bittensorStakingInteractor = bittensorStakingInteractor,
             iconGenerator = iconGenerator,

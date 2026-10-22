@@ -1,5 +1,12 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
+import androidx.navigation.NavOptions
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
+
+import io.novafoundation.nova.analytics.StakingPortfolioSource
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetFragment
@@ -384,8 +391,23 @@ class RelayStakingNavigator(
             .navigateInFirstAttachedContext()
     }
 
-    override fun openBittensorPortfolio() {
-        navigationBuilder().action(R.id.action_open_bittensor_portfolio).navigateInFirstAttachedContext()
+    override fun openBittensorPortfolio(
+        source: StakingPortfolioSource,
+        entry: BittensorPortfolioEntry
+    ) {
+        navigationBuilder().action(R.id.action_open_bittensor_portfolio)
+            .setArgs(BittensorPortfolioFragment.sourceBundle(source, entry))
+            .navigateInFirstAttachedContext()
+    }
+
+    override fun replaceBittensorPortfolioWithStart(
+        payload: StartStakingLandingPayload
+    ) {
+        val options = NavOptions.Builder().setPopUpTo(R.id.bittensorPortfolioFragment, true).build()
+        navigationBuilder().action(R.id.action_mainFragment_to_startStackingLanding)
+            .setArgs(StartStakingLandingFragment.getBundle(payload))
+            .setNavOptions(options)
+            .navigateInFirstAttachedContext()
     }
 
     override fun openBittensorRootDetails() {

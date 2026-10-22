@@ -443,18 +443,16 @@ class BittensorValidatorBackendTest {
     }
 
     @Test
-    fun `network root rate uses d30 overview and rejects stale or malformed data before cache`() = runBlocking {
+    fun `network root rate accepts stale d30 yields but rejects malformed data before cache`() = runBlocking {
         val api = Api("max-age=60")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
-        api.overview = overview("STALE", "8.5")
-        assertTrue(runCatching { backend.networkRootRate() }.isFailure)
         api.overview = overview("FRESH", "invalid")
         assertTrue(runCatching { backend.networkRootRate() }.isFailure)
-        api.overview = overview("FRESH", "8.5")
+        api.overview = overview("STALE", "8.5")
         assertEquals(BigDecimal("0.085"), backend.networkRootRate())
         assertEquals(BigDecimal("0.085"), backend.networkRootRate())
-        assertEquals(List(3) { "https://infra.test/v1/bittensor/root/overview" }, api.requests)
+        assertEquals(List(2) { "https://infra.test/v1/bittensor/root/overview" }, api.requests)
     }
 
     @Test
@@ -486,7 +484,7 @@ class BittensorValidatorBackendTest {
     }
 
     @Test
-    fun `root yield window freshness is required independently of directory freshness`() = runBlocking {
+    fun `available stale root yield windows remain displayable`() = runBlocking {
         val api = Api("max-age=60")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
@@ -495,10 +493,8 @@ class BittensorValidatorBackendTest {
         val components = BittensorRootValidatorRemote.Components(fresh, stale)
         val meta = BittensorRootValidatorRemote.Meta(components)
         api.root = BittensorRootValidatorRemote(emptyList(), meta)
-        assertTrue(runCatching { backend.rootValidators() }.isFailure)
-        api.root = BittensorRootValidatorRemote(emptyList(), rootMeta())
         assertTrue(backend.rootValidators().items!!.isEmpty())
-        assertEquals(2, api.requests.size)
+        assertEquals(1, api.requests.size)
     }
 
     @Test

@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -86,6 +87,9 @@ import org.mockito.Mockito.verify
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorStakeAmountViewModelTest {
+
+    private val analyticsService = RecordingBittensorAnalytics()
+    private val analytics = analyticsService
 
     private val resources = mock(ResourceManager::class.java)
 
@@ -262,7 +266,7 @@ class BittensorStakeAmountViewModelTest {
         }
         val externalActions = mock(ExternalActions.Presentation::class.java)
         viewModel = BittensorStakeAmountViewModel(
-            resourceManager = resources,
+            analytics, resourceManager = resources,
             router = router,
             bittensorStakingInteractor = interactor,
             iconGenerator = addressIcons,

@@ -1,5 +1,16 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.analytics.SubnetListSource
+import io.novafoundation.nova.analytics.SubnetSortKey
+import kotlinx.coroutines.flow.drop
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingAnalyticsSelectionMethod
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -52,6 +63,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class BittensorChooseSubnetViewModel(
+    private val analytics: AnalyticsService,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
     assetIconProvider: AssetIconProvider,
@@ -65,6 +77,12 @@ class BittensorChooseSubnetViewModel(
     private val payload: BittensorChooseSubnetPayload,
     private val validatorCommunicator: BittensorSelectValidatorCommunicator
 ) : BaseViewModel() {
+
+    private var isSearchTracked = false
+
+    private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SUBNET_SELECT)
+    private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SUBNET_SELECT)
+    private val priceServerReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.PRICE_SERVER, BittensorScreen.SUBNET_SELECT)
 
     val retryEvents = retryController.events
 
@@ -89,6 +107,7 @@ class BittensorChooseSubnetViewModel(
 
     private val catalogueState = retryController.observe(
         step = "subnet catalogue",
+        analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { browseRepository.subnets() }
@@ -137,6 +156,7 @@ class BittensorChooseSubnetViewModel(
         } else {
             retryController.observe(
                 step = "subnet APY",
+                analytics = validatorsReads,
                 transform = { source ->
                     source.onStart { emit(emptyMap()) }.catch { cause ->
                         if (cause is CancellationException) throw cause
@@ -157,6 +177,7 @@ class BittensorChooseSubnetViewModel(
         .flatMapLatest { request ->
             retryController.observe(
                 step = "subnet weekly changes",
+                analytics = priceServerReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf {
@@ -210,12 +231,29 @@ class BittensorChooseSubnetViewModel(
         .shareInBackground()
 
     init {
+        analytics.track(
+            BittensorAnalyticsEvent.SubnetListOpened(
+                if (payload.replaceAmount) SubnetListSource.SEE_ALL_SUBNETS else SubnetListSource.SEE_ALL_OPTIONS,
+                payload.browseState.sorting.analyticsSort(),
+                hideThinPools.value
+            )
+        )
+        sortingMixin.selectedValue.distinctUntilChanged().drop(1).onEach {
+            analytics.track(BittensorAnalyticsEvent.SubnetSort(it.analyticsSort()))
+        }.launchIn(this)
+        hideThinPools.drop(1).onEach {
+            analytics.track(BittensorAnalyticsEvent.SubnetFilter(it))
+        }.launchIn(this)
         validatorCommunicator.responseFlow
             .onEach { selectionState = selectionState.withResponse(it) }
             .launchIn(this)
     }
 
     fun search(query: String) {
+        if (query.isNotBlank() && !isSearchTracked) {
+            isSearchTracked = true
+            analytics.track(BittensorAnalyticsEvent.SubnetSearch())
+        }
         this.query.value = query.trim()
     }
 
@@ -236,6 +274,7 @@ class BittensorChooseSubnetViewModel(
     fun toggleFavorite(row: BittensorSubnetRowUi) = launchUnit {
         try {
             bittensorSubnetInteractor.toggleFavorite(row.metaId, row.subnet)
+            analytics.track(BittensorAnalyticsEvent.SubnetFavorite(!row.favorite))
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
@@ -244,6 +283,14 @@ class BittensorChooseSubnetViewModel(
     }
 
     fun rootStaking() = launchUnit {
+        analytics.track(
+            BittensorAnalyticsEvent.TypeSelected(
+                BittensorAnalyticsEvent.NETWORK,
+                StakingAnalyticsTarget.ROOT,
+                StakingAnalyticsSelectionMethod.PICKER_ROOT_ROW,
+                0
+            )
+        )
         rememberBrowseState()
         if (payload.replaceAmount) {
             router.replaceBittensorSubnetAmountWithRoot(selectionState)
@@ -253,6 +300,7 @@ class BittensorChooseSubnetViewModel(
     }
 
     fun back() = launchUnit {
+        if (!payload.replaceAmount) analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.SUBNET_SELECT, null))
         rememberBrowseState()
         validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
@@ -281,6 +329,14 @@ class BittensorChooseSubnetViewModel(
         name.contains(query, ignoreCase = true) ||
         symbol.contains(query, ignoreCase = true) ||
         id.value.toString() == query
+
+    private fun BittensorSubnetSorting.analyticsSort() = when (this) {
+        BittensorSubnetSorting.POOL_DEPTH -> SubnetSortKey.POOL_SIZE
+        BittensorSubnetSorting.AGE -> SubnetSortKey.AGE
+        BittensorSubnetSorting.APY -> SubnetSortKey.APY
+        BittensorSubnetSorting.SEVEN_DAY_CHANGE -> SubnetSortKey.SEVEN_DAY_CHANGE
+        BittensorSubnetSorting.NAME -> SubnetSortKey.NAME
+    }
 
     private fun sortingDisplay(sorting: BittensorSubnetSorting): String = resources.getString(
         when (sorting) {

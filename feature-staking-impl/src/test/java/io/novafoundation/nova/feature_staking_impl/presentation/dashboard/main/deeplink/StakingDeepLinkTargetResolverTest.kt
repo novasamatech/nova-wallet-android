@@ -40,13 +40,20 @@ class StakingDeepLinkTargetResolverTest {
 
     @Test
     fun `native asset default and hex prefix are preserved`() = runBlocking {
-        assertEquals(StakingDeepLinkTarget("chain", 0), resolver.resolve("0xchain", null))
+        assertEquals(StakingDeepLinkTarget("chain", 0, StakingDeepLinkTarget.Destination.BITTENSOR_PORTFOLIO), resolver.resolve("0xchain", null))
     }
 
     @Test
     fun `explicit staking asset is preserved`() = runBlocking {
         `when`(asset.id).thenReturn(12)
-        assertEquals(StakingDeepLinkTarget("chain", 12), resolver.resolve("chain", "12"))
+        assertEquals(StakingDeepLinkTarget("chain", 12, StakingDeepLinkTarget.Destination.BITTENSOR_PORTFOLIO), resolver.resolve("chain", "12"))
+    }
+
+    @Test
+    fun `other networks keep position resolution`() = runBlocking {
+        `when`(asset.staking).thenReturn(listOf(Chain.Asset.StakingType.RELAYCHAIN))
+
+        assertEquals(StakingDeepLinkTarget("chain", 0), resolver.resolve("chain", null))
     }
 
     @Test

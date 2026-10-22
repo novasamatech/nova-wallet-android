@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_swap_impl.presentation.options
 
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.presentation.DescriptiveButtonState
@@ -68,6 +70,8 @@ class SwapOptionsViewModel(
 
     val slippageInput = MutableStateFlow("")
 
+    private var selectedMethod: Pair<String, SlippageSettingsCommunicator.Method>? = null
+
     private val slippageFieldValidator = slippageConfig.map { slippageFieldValidatorFactory.create(it) }
         .shareInBackground()
 
@@ -96,6 +100,9 @@ class SwapOptionsViewModel(
         .mapList { it.formatPercents() }
 
     init {
+        slippageInput.onEach { value ->
+            if (selectedMethod?.first != value) selectedMethod = null
+        }.launchIn(this)
         launch {
             val selectedSlippage = swapSettingsStateFlow.first().slippage
             val defaultSlippage = slippageConfig.first().defaultSlippage
@@ -112,7 +119,9 @@ class SwapOptionsViewModel(
     fun tipClicked(index: Int) {
         launch {
             val slippageTips = slippageConfig.first().slippageTips
-            slippageInput.value = slippageTips[index].formatPercents(includeSymbol = false)
+            val value = slippageTips[index].formatPercents(includeSymbol = false)
+            selectedMethod = value to SlippageSettingsCommunicator.Method.PRESET
+            slippageInput.value = value
         }
     }
 
@@ -122,7 +131,8 @@ class SwapOptionsViewModel(
             val config = slippageConfig.first()
             if (slippage !in config.minAvailableSlippage..config.maxAvailableSlippage) return@launch
             if (payload != null) {
-                slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction))
+                val method = selectedMethod?.takeIf { it.first == slippageInput.value }?.second ?: SlippageSettingsCommunicator.Method.CUSTOM
+                slippageSettingsCommunicator.respond(SlippageSettingsCommunicator.Response(slippage.inFraction, method))
             } else {
                 swapSettingState.await().setSlippage(slippage)
             }
@@ -131,6 +141,7 @@ class SwapOptionsViewModel(
     }
 
     fun resetClicked() {
+        selectedMethod = "" to SlippageSettingsCommunicator.Method.RESET
         slippageInput.value = ""
     }
 

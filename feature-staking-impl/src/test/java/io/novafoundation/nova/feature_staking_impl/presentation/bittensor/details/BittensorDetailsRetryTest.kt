@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.presentation.AssetIconProvider
 import io.novafoundation.nova.common.resources.ResourceManager
@@ -70,6 +71,9 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.verifyNoInteractions
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
@@ -78,6 +82,9 @@ import org.mockito.Mockito.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorDetailsRetryTest {
+
+    private val analyticsService = RecordingBittensorAnalytics()
+    private val analytics = analyticsService
 
     private val accountRepository = mock(AccountRepository::class.java)
 
@@ -195,6 +202,7 @@ class BittensorDetailsRetryTest {
     fun prepare(): Unit = runBlocking {
         `when`(metaAccount.id).thenReturn(1L)
         `when`(chain.id).thenReturn("chain")
+        `when`(chain.name).thenReturn("Bittensor")
         `when`(chainRegistry.getChain("chain")).thenReturn(chain)
         `when`(metaAccount.accountIdIn(chain)).thenReturn(ByteArray(32))
         `when`(accountRepository.getMetaAccount(1L)).thenReturn(metaAccount)
@@ -278,6 +286,20 @@ class BittensorDetailsRetryTest {
     }
 
     @Test
+    fun `portfolio opened is local to screen and not repeated by refreshed data`() = runBlocking {
+        createViewModel()
+        withTimeout(3_000L) { viewModel.empty.first { !it } }
+        portfolioUpdates.value = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
+        withTimeout(3_000L) { viewModel.empty.first { it } }
+        assertEquals(1, analyticsService.events.count { it.name == "staking_portfolio_opened" })
+
+        viewModel.coroutineContext.job.cancelAndJoin()
+        createViewModel()
+        withTimeout(3_000L) { viewModel.empty.first { it } }
+        assertEquals(2, analyticsService.events.count { it.name == "staking_portfolio_opened" })
+    }
+
+    @Test
     fun `chart dialog retries prices without restarting portfolio`() = runBlocking {
         failFirstChart = true
         createViewModel()
@@ -347,9 +369,9 @@ class BittensorDetailsRetryTest {
         }
     }
 
-    private fun createViewModel() {
+    private fun createViewModel(entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO) {
         viewModel = BittensorDetailsViewModel(
-            bittensorPortfolioInteractor = portfolioInteractor,
+            analytics, bittensorPortfolioInteractor = portfolioInteractor,
             router = router,
             resources = resources,
             amountFormatter = amountFormatter,
@@ -359,8 +381,54 @@ class BittensorDetailsRetryTest {
             retryController = retryController,
             chartAxisFormatterFactory = axisFormatterFactory,
             rowInteractor = rowInteractor,
-            rootClaimInteractor = rootClaimInteractor
+            rootClaimInteractor = rootClaimInteractor,
+            entry = entry
         )
+    }
+
+    @Test
+    fun `deep link with no stake replaces portfolio with start exactly once`() = runBlocking {
+        portfolioUpdates.value = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
+        createViewModel(BittensorPortfolioEntry.DEEP_LINK)
+
+        val resolution = withTimeout(3_000L) { viewModel.entryResolution.first { it != null } }
+        assertTrue(resolution is BittensorEntryResolution.Start)
+        val start = resolution as BittensorEntryResolution.Start
+        viewModel.completeEntry(start)
+        viewModel.completeEntry(start)
+
+        verify(router).replaceBittensorPortfolioWithStart(start.payload)
+    }
+
+    @Test
+    fun `deep link with stake stays on portfolio`() = runBlocking {
+        createViewModel(BittensorPortfolioEntry.DEEP_LINK)
+
+        val resolution = withTimeout(3_000L) { viewModel.entryResolution.first { it != null } }
+        assertEquals(BittensorEntryResolution.Portfolio, resolution)
+        viewModel.completeEntry(requireNotNull(resolution))
+
+        verifyNoInteractions(router)
+    }
+
+    @Test
+    fun `entry does not interpret loading stale or missing rewards as no stake`() {
+        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
+        val claims = rootClaims.value
+        assertNull(resolveBittensorEntry(emptyPortfolio.copy(dataStatus = BittensorDataStatus.Loading), claims))
+        assertNull(resolveBittensorEntry(emptyPortfolio.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException())), claims))
+        assertNull(resolveBittensorEntry(emptyPortfolio, null))
+        assertNull(resolveBittensorEntry(emptyPortfolio, claims.copy(dataStatus = BittensorDataStatus.Stale(IllegalStateException()))))
+        assertNull(resolveBittensorEntry(emptyPortfolio, claims.copy(metaId = 2L)))
+    }
+
+    @Test
+    fun `redeemable root rewards without stake keep portfolio accessible`() {
+        val emptyPortfolio = portfolioUpdates.value.copy(positions = positions.copy(root = emptyList()))
+        val preview = BittensorRootClaimPreview(hotkey, BigInteger.TEN, BigInteger.TEN, BigInteger.ZERO)
+        val claims = BittensorRootClaims(listOf(preview), BigInteger.ONE)
+
+        assertEquals(BittensorEntryResolution.Portfolio, resolveBittensorEntry(emptyPortfolio, rootClaims.value.copy(claims = claims)))
     }
 
     @Test

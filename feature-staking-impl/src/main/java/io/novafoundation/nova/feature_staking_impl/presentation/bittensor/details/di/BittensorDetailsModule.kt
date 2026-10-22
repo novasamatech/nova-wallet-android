@@ -1,5 +1,9 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.di
 
+import io.novafoundation.nova.analytics.StakingPortfolioSource
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioFragment
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -80,6 +84,8 @@ class BittensorDetailsModule {
     @IntoMap
     @ViewModelKey(BittensorDetailsViewModel::class)
     fun provideViewModel(
+        fragment: Fragment,
+        analytics: AnalyticsService,
         bittensorPortfolioInteractor: BittensorPortfolioInteractor,
         router: StakingRouter,
         resources: ResourceManager,
@@ -92,7 +98,7 @@ class BittensorDetailsModule {
         rowInteractor: BittensorPortfolioRowInteractor,
         rootClaimInteractor: BittensorRootClaimInteractor
     ): ViewModel = BittensorDetailsViewModel(
-        bittensorPortfolioInteractor = bittensorPortfolioInteractor,
+        analytics, bittensorPortfolioInteractor = bittensorPortfolioInteractor,
         router = router,
         resources = resources,
         amountFormatter = amountFormatter,
@@ -102,13 +108,18 @@ class BittensorDetailsModule {
         retryController = retryController,
         chartAxisFormatterFactory = chartAxisFormatterFactory,
         rowInteractor = rowInteractor,
-        rootClaimInteractor = rootClaimInteractor
+        rootClaimInteractor = rootClaimInteractor,
+        analyticsSource = StakingPortfolioSource.entries.firstOrNull {
+            it.name == fragment.arguments?.getString(BittensorPortfolioFragment.ANALYTICS_SOURCE)
+        } ?: StakingPortfolioSource.DASHBOARD,
+        entry = BittensorPortfolioFragment.entryFrom(fragment.arguments)
     )
 
     @Provides
     @IntoMap
     @ViewModelKey(BittensorRootDetailsViewModel::class)
     fun provideRootViewModel(
+        analytics: AnalyticsService,
         interactor: BittensorPortfolioInteractor,
         router: StakingRouter,
         resources: ResourceManager,
@@ -125,7 +136,7 @@ class BittensorDetailsModule {
         rootHoldFormatter: BittensorRootHoldFormatter,
         debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
     ): ViewModel = BittensorRootDetailsViewModel(
-        interactor,
+        analytics, interactor,
         router,
         resources,
         icons,

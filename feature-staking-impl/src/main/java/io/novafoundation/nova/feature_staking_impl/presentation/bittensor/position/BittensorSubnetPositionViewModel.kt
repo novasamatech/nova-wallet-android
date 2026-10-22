@@ -1,5 +1,14 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.position
 
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingRewardsState
+import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novasama.substrate_sdk_android.extensions.toHexString
 
 import androidx.lifecycle.MutableLiveData
@@ -77,6 +86,7 @@ enum class BittensorPositionTradeAction { BUY, SELL }
 data class BittensorPositionChoiceRequest(val action: BittensorPositionTradeAction, val positions: List<BittensorExitPositionPayload>)
 
 class BittensorSubnetPositionViewModel(
+    private val analytics: AnalyticsService,
     private val subnetId: BittensorNetuid.Subnet,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val bittensorSubnetDetailsInteractor: BittensorSubnetDetailsInteractor,
@@ -96,14 +106,21 @@ class BittensorSubnetPositionViewModel(
     private val costBasisFormatter: BittensorSaleCostBasisFormatter
 ) : BaseViewModel(), ExternalActions by externalActions {
 
+    private var isOpenedTracked = false
+
     private val chartSelection = MutableStateFlow<PriceChartSelection?>(null)
 
     val chartDateFormatter = RealDateChartTextInjector(resources)
+
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.POSITION)
+    private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.POSITION)
+    private val priceServerReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.PRICE_SERVER, BittensorScreen.POSITION)
 
     val retryEvents = retryController.events
 
     private val portfolioState = retryController.observe(
         step = "subnet portfolio",
+        analytics = chainRpcReads,
         transform = { it.withSafeLoading() },
         source = bittensorSubnetInteractor::observePortfolio
     )
@@ -114,6 +131,7 @@ class BittensorSubnetPositionViewModel(
 
     private val metadataState = retryController.observe(
         step = "subnet metadata",
+        analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { subnetMetadataInteractor.subnet(subnetId) }
@@ -154,13 +172,27 @@ class BittensorSubnetPositionViewModel(
     }.distinctUntilChanged().flatMapLatest { request ->
         retryController.observe(
             step = "subnet withdrawal availability",
+            analytics = chainRpcReads,
             transform = { it.withSafeLoading() }
         ) {
             if (request == null) kotlinx.coroutines.flow.flowOf(null) else withdrawalInteractor.observe(request)
         }
     }.shareInBackground()
 
-    val withdrawalLoading = withdrawalState.map { it.isLoading() }.shareInBackground()
+    val withdrawalLoading = withdrawalState.onEach { state ->
+        state.dataOrNull?.takeUnless { isOpenedTracked }?.let { withdrawal ->
+            isOpenedTracked = true
+            analytics.track(
+                BittensorAnalyticsEvent.PositionOpened(
+                    StakingAnalyticsTarget.SUBNET,
+                    subnetId.value,
+                    withdrawal.holdDurationMillis.signum() > 0,
+                    withdrawal.locked.signum() > 0,
+                    StakingRewardsState.NONE
+                )
+            )
+        }
+    }.map { it.isLoading() }.shareInBackground()
 
     val withdrawalHint = combine(withdrawalState, subnet) { state, subnet ->
         val withdrawal = state.dataOrNull ?: return@combine null
@@ -319,6 +351,7 @@ class BittensorSubnetPositionViewModel(
         .flatMapLatest { request ->
             retryController.observe(
                 step = "position price chart",
+                analytics = priceServerReads,
                 transform = { it.withSafeLoading() }
             ) { loadChart(request) }
                 .map { BittensorSubnetChart(request.period, it) }

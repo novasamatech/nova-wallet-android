@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickOrder
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -30,6 +31,9 @@ import org.mockito.Mockito.`when`
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorQuickPickRetryTest {
 
+    private val analyticsService = RecordingBittensorAnalytics()
+    private val analytics = analyticsService
+
     private val subnetInteractor = mock(BittensorSubnetInteractor::class.java)
 
     private val router = mock(StakingRouter::class.java)
@@ -51,7 +55,7 @@ class BittensorQuickPickRetryTest {
         Dispatchers.setMain(UnconfinedTestDispatcher())
         `when`(subnetInteractor.observeAsset()).thenReturn(emptyFlow())
         `when`(validatorCommunicator.responseFlow).thenReturn(responses)
-        viewModel = BittensorWhereToStakeViewModel(subnetInteractor, router, retryController, validatorCommunicator)
+        viewModel = BittensorWhereToStakeViewModel(analytics, subnetInteractor, router, retryController, validatorCommunicator)
     }
 
     @After

@@ -1,10 +1,20 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.AnalyticsEvent
+import io.novafoundation.nova.analytics.StakingPortfolioSource
+import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.domain.dataOrNull
 import io.novafoundation.nova.common.domain.filterLoaded
 import io.novafoundation.nova.common.domain.isLoading
+import io.novafoundation.nova.common.domain.map
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.launchUnit
@@ -53,6 +63,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
 class BittensorDetailsViewModel(
+    private val analytics: AnalyticsService,
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
     private val router: StakingRouter,
     private val resources: ResourceManager,
@@ -64,22 +75,46 @@ class BittensorDetailsViewModel(
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
     private val rowInteractor: BittensorPortfolioRowInteractor,
     private val rootClaimInteractor: BittensorRootClaimInteractor,
+    private val analyticsSource: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD,
+    private val entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO,
 ) : BaseViewModel(), ExternalActions by externalActions {
+
+    private var entryConsumed = false
+
+    private var isOpenedTracked = false
 
     private val chartSelection = MutableStateFlow<PriceChartSelection?>(null)
 
     val chartDateFormatter = RealDateChartTextInjector(resources)
 
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.PORTFOLIO)
+    private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.PORTFOLIO)
+    private val claimPreviewsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CLAIM_PREVIEWS, BittensorScreen.PORTFOLIO)
+    private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.PORTFOLIO)
+    private val priceServerReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.PRICE_SERVER, BittensorScreen.PORTFOLIO)
+    private val portfolioHistoryReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.PORTFOLIO_HISTORY, BittensorScreen.PORTFOLIO)
+
     val retryEvents = retryController.events
 
     private val portfolioState = retryController.observe(
         step = "portfolio",
+        analytics = chainRpcReads,
         transform = { it.withSafeLoading() },
         source = bittensorPortfolioInteractor::observePortfolio
     )
         .shareInBackground()
 
     private val portfolio = portfolioState.filterLoaded()
+        .onEach { data ->
+            val positions = data.positions
+            if (!isOpenedTracked && positions != null && data.dataStatus !is BittensorDataStatus.Loading) {
+                val hasRoot = positions.rootStake.signum() > 0
+                val count = positions.subnets.filter { it.alphaInPlanks.signum() > 0 }.distinctBy { it.subnetId }.size +
+                    if (hasRoot) 1 else 0
+                isOpenedTracked = true
+                analytics.track(BittensorAnalyticsEvent.PortfolioOpened(analyticsSource, count, hasRoot, null))
+            }
+        }
         .shareInBackground()
 
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
@@ -183,6 +218,7 @@ class BittensorDetailsViewModel(
 
     private val subnetMetadata = retryController.observe(
         step = "subnet metadata",
+        analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { bittensorPortfolioInteractor.subnets() }
@@ -190,13 +226,28 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
-    private val rootRewards = portfolio.map { it.metaId }.distinctUntilChanged().flatMapLatest { metaId ->
+    private val rootClaimStates = portfolio.map { it.metaId }.distinctUntilChanged().flatMapLatest { metaId ->
         retryController.observe(
             step = "portfolio root rewards",
+            analytics = claimPreviewsReads,
             transform = { it.withSafeLoading() }
         ) {
-            rootClaimInteractor.observe(metaId).map { it.claims.totalRedeemable }
+            rootClaimInteractor.observe(metaId)
         }.map { AccountRowValue(metaId, it) }
+    }
+        .shareInBackground()
+
+    private val rootRewards = rootClaimStates.map { claims ->
+        AccountRowValue(claims.metaId, claims.state.map { it.claims.totalRedeemable })
+    }
+        .shareInBackground()
+
+    val entryResolution = if (entry == BittensorPortfolioEntry.DEEP_LINK) {
+        combine(portfolioState, rootClaimStates.onStart { emit(AccountRowValue(null, ExtendedLoadingState.Loading)) }) { state, claims ->
+            resolveBittensorEntry(state.dataOrNull, claims.state.dataOrNull)
+        }
+    } else {
+        flowOf(null)
     }
         .shareInBackground()
 
@@ -205,6 +256,7 @@ class BittensorDetailsViewModel(
         .flatMapLatest { request ->
             retryController.observe(
                 step = "portfolio root APY",
+                analytics = rootOverviewReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf { rowInteractor.rootApy(request.chain, request.positions) }
@@ -228,6 +280,7 @@ class BittensorDetailsViewModel(
             } else {
                 retryController.observe(
                     step = "portfolio weekly changes",
+                    analytics = priceServerReads,
                     transform = { it.withSafeLoading() }
                 ) {
                     flowOf { rowInteractor.weeklyChanges(request.nativePriceId, request.subnetIds) }
@@ -282,6 +335,7 @@ class BittensorDetailsViewModel(
     private fun observePortfolioHistory(request: BittensorPortfolioHistoryRequest): Flow<ExtendedLoadingState<BittensorPortfolioChartHistory?>> {
         return retryController.observe(
             step = "portfolio account history",
+            analytics = portfolioHistoryReads,
             transform = { it.withSafeLoading() }
         ) {
             bittensorPortfolioChartInteractor.observeHistory(request)
@@ -318,6 +372,15 @@ class BittensorDetailsViewModel(
     }
 
     fun back() = router.back()
+
+    fun completeEntry(resolution: BittensorEntryResolution) {
+        if (entryConsumed || entry != BittensorPortfolioEntry.DEEP_LINK) return
+        entryConsumed = true
+        if (resolution is BittensorEntryResolution.Start) {
+            analytics.track(AnalyticsEvent.StakingFlowOpened(resolution.network, "deep_link"))
+            router.replaceBittensorPortfolioWithStart(resolution.payload)
+        }
+    }
 
     fun addPosition() = router.openBittensorChooseSubnet()
 

@@ -12,8 +12,8 @@ class BittensorEstimatesApiContractTest {
     }
 
     @Test
-    fun `yield pagination still supports a client selected page size`() {
-        assertEquals(setOf("page", "pageSize"), queryParameters("alphaYields"))
+    fun `yield snapshot sends no query parameters`() {
+        assertEquals(emptySet<String>(), queryParameters("alphaYields"))
     }
 
     private fun queryParameters(methodName: String): Set<String> {

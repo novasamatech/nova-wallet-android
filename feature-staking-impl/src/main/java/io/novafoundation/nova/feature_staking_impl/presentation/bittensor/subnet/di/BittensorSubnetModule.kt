@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 
@@ -55,6 +57,7 @@ class BittensorSubnetModule {
     @IntoMap
     @ViewModelKey(BittensorChooseSubnetViewModel::class)
     fun chooser(
+        analytics: AnalyticsService,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
         icons: AssetIconProvider,
@@ -68,7 +71,7 @@ class BittensorSubnetModule {
         payload: BittensorChooseSubnetPayload,
         validatorCommunicator: BittensorSelectValidatorCommunicator
     ): ViewModel = BittensorChooseSubnetViewModel(
-        bittensorSubnetInteractor,
+        analytics, bittensorSubnetInteractor,
         router,
         icons,
         tokenFormatter,
@@ -90,11 +93,12 @@ class BittensorSubnetModule {
     @IntoMap
     @ViewModelKey(BittensorWhereToStakeViewModel::class)
     fun whereToStake(
+        analytics: AnalyticsService,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
         retryController: BittensorRetryController,
         validatorCommunicator: BittensorSelectValidatorCommunicator
-    ): ViewModel = BittensorWhereToStakeViewModel(bittensorSubnetInteractor, router, retryController, validatorCommunicator)
+    ): ViewModel = BittensorWhereToStakeViewModel(analytics, bittensorSubnetInteractor, router, retryController, validatorCommunicator)
 
     @Provides
     fun whereToStakeVm(fragment: Fragment, factory: ViewModelProvider.Factory): BittensorWhereToStakeViewModel =

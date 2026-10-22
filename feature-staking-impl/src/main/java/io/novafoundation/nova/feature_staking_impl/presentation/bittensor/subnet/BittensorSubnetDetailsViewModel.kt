@@ -1,5 +1,15 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.SubnetDetailsSource
+import io.novafoundation.nova.analytics.AnalyticsPricePeriod
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingAnalyticsSelectionMethod
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.common.mixin.api.Browserable
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetLinks
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -74,6 +84,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 class BittensorSubnetDetailsViewModel(
+    private val analytics: AnalyticsService,
     private val subnetId: BittensorNetuid.Subnet,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val bittensorSubnetStakingInteractor: BittensorSubnetStakingInteractor,
@@ -92,7 +103,8 @@ class BittensorSubnetDetailsViewModel(
     private val addressIconGenerator: AddressIconGenerator,
     private val replaceAmount: Boolean,
     initialValidatorAddress: String?,
-    initialSelectionState: BittensorSelectionState = BittensorSelectionState()
+    initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
+    private val analyticsSource: SubnetDetailsSource = SubnetDetailsSource.PICKER
 ) : BaseViewModel(), Browserable.Presentation by Browserable() {
 
     private var selectionState = initialSelectionState
@@ -101,10 +113,16 @@ class BittensorSubnetDetailsViewModel(
 
     val chartDateFormatter = RealDateChartTextInjector(resources)
 
+    private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SUBNET_DETAILS)
+    private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SUBNET_DETAILS)
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.SUBNET_DETAILS)
+    private val priceServerReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.PRICE_SERVER, BittensorScreen.SUBNET_DETAILS)
+
     val retryEvents = retryController.events
 
     private val subnetState = retryController.observe(
         step = "subnet",
+        analytics = subnetsReads,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { bittensorSubnetInteractor.subnet(subnetId) }
@@ -144,6 +162,7 @@ class BittensorSubnetDetailsViewModel(
 
     val validatorCount = retryController.observe(
         step = "subnet validator count",
+        analytics = validatorsReads,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { bittensorSubnetStakingInteractor.validatorCount(subnetId).toString() }
@@ -159,6 +178,7 @@ class BittensorSubnetDetailsViewModel(
             val reference = BittensorSubnetReference(subnet.id, registration)
             retryController.observe(
                 step = "subnet emission",
+                analytics = chainRpcReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf<BittensorSubnetEmission?> { subnetParametersInteractor.emission(reference) }
@@ -267,6 +287,7 @@ class BittensorSubnetDetailsViewModel(
         .distinctUntilChanged().flatMapLatest { request ->
             retryController.observe(
                 step = "subnet chart",
+                analytics = priceServerReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf { loadChartHistory(request) }
@@ -291,6 +312,7 @@ class BittensorSubnetDetailsViewModel(
         } else {
             retryController.observe(
                 step = "subnet age",
+                analytics = subnetsReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf { subnetSafetyInteractor.ageInDays(subnet) }
@@ -314,6 +336,7 @@ class BittensorSubnetDetailsViewModel(
     private val validatorCandidates = selectedValidatorAddress.flatMapLatest { address ->
         retryController.observe(
             step = "subnet validator preview",
+            analytics = validatorsReads,
             transform = { it.withSafeLoading() }
         ) {
             flowOf { validatorInteractor.previews(subnetId, address) }
@@ -323,6 +346,7 @@ class BittensorSubnetDetailsViewModel(
 
     private val validatorYields = retryController.observe(
         step = "subnet validator preview APY",
+        analytics = validatorsReads,
         transform = { it.withSafeLoading() }
     ) {
         flowOf { validatorInteractor.yields(subnetId) }
@@ -363,6 +387,7 @@ class BittensorSubnetDetailsViewModel(
         .shareInBackground()
 
     init {
+        analytics.track(BittensorAnalyticsEvent.SubnetDetailsOpened(subnetId.value, analyticsSource, AnalyticsPricePeriod.WEEK))
         validatorCommunicator.responseFlow
             .onEach { response ->
                 if (!selectionState.accepts(response)) return@onEach
@@ -431,6 +456,14 @@ class BittensorSubnetDetailsViewModel(
     fun continueClicked() = launchUnit {
         if (!canContinue.first()) return@launchUnit
         val address = currentValidatorAddress()
+        analytics.track(
+            BittensorAnalyticsEvent.TypeSelected(
+                BittensorAnalyticsEvent.NETWORK,
+                StakingAnalyticsTarget.SUBNET,
+                StakingAnalyticsSelectionMethod.SUBNET_DETAILS,
+                subnetId.value
+            )
+        )
         router.openBittensorSubnetAmount(
             BittensorSubnetAmountPayload(subnetId.value, address, replaceAmount = replaceAmount, selectionState = selectionState)
         )

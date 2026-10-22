@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.validation.TransformedFailure
 import io.novafoundation.nova.common.validation.ValidationFlowActions
@@ -83,6 +84,38 @@ class BittensorStakeValidationUiTest {
         assertEquals(1, revalidations)
         assertEquals(0, resumptions)
         assertEquals(0, refreshes)
+    }
+
+    @Test
+    fun `validation analytics reports only the chosen dialog outcome`() {
+        val outcomes = mutableListOf<StakingValidationOutcome>()
+        val failure = validOrError(false) { BittensorStakeValidationFailure.QUOTE_EXPIRED }.notValidOrNull()!!
+        val transformed = bittensorStakeValidationFailureUi(
+            failure,
+            actions,
+            resources,
+            onOutcome = { outcomes += it }
+        ) { refreshes += 1 } as TransformedFailure.Custom
+        assertEquals(emptyList<StakingValidationOutcome>(), outcomes)
+        transformed.dialogPayload.cancelAction!!.action()
+        assertEquals(listOf(StakingValidationOutcome.CANCELLED), outcomes)
+        assertEquals(0, refreshes)
+    }
+
+    @Test
+    fun `accepting an updated rate reports proceeded without submitting`() {
+        val outcomes = mutableListOf<StakingValidationOutcome>()
+        val failure = validOrError(false) { BittensorStakeValidationFailure.QUOTE_EXPIRED }.notValidOrNull()!!
+        val transformed = bittensorStakeValidationFailureUi(
+            failure,
+            actions,
+            resources,
+            onOutcome = { outcomes += it }
+        ) { refreshes += 1 } as TransformedFailure.Custom
+        transformed.dialogPayload.okAction!!.action()
+        assertEquals(listOf(StakingValidationOutcome.PROCEEDED), outcomes)
+        assertEquals(1, refreshes)
+        assertEquals(0, resumptions)
     }
 
     private fun assertExplicitQuoteReview(reason: BittensorStakeValidationFailure) {

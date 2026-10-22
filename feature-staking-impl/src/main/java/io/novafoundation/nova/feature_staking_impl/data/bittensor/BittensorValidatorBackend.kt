@@ -6,6 +6,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorVal
 import io.novafoundation.nova.infrastructure.InfrastructureUrlMissingException
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import java.math.BigDecimal
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import okhttp3.CacheControl
@@ -59,10 +60,16 @@ class BittensorValidatorBackend(
         val freshEntry = rootValidators?.takeIf { nanoTime() < it.deadlineNanos }
         if (freshEntry != null) return@withLock freshEntry.data
         val startedAt = nanoTime()
-        val response = api.rootValidators(endpoint(baseUrl, "root/validators"))
+        val response = try {
+            api.rootValidators(endpoint(baseUrl, "root/validators"))
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            return@withLock rootValidators?.data ?: throw e
+        }
         val cached = readCacheEntry(response, startedAt)
-        requireFreshRootComponent(cached.data.meta?.components?.rootValidators)
-        requireFreshRootComponent(cached.data.meta?.components?.stakeYieldWindows)
+        requireAvailableRootComponent(cached.data.meta?.components?.rootValidators)
+        requireAvailableRootComponent(cached.data.meta?.components?.stakeYieldWindows)
         requireNotNull(cached.data.items).forEach { row ->
             row.rootStakeTao?.toBigDecimal()
             row.stakeYield?.d30?.let { requireNotNull(it.apy).toBigDecimal() }
@@ -76,18 +83,24 @@ class BittensorValidatorBackend(
         val baseUrl = refreshInfrastructure()
         val cached = rootOverview?.takeIf { nanoTime() < it.deadlineNanos } ?: run {
             val startedAt = nanoTime()
-            val response = api.rootOverview(endpoint(baseUrl, "root/overview"))
-            readCacheEntry(response, startedAt)
+            try {
+                val response = api.rootOverview(endpoint(baseUrl, "root/overview"))
+                readCacheEntry(response, startedAt)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                rootOverview ?: throw e
+            }
         }
-        requireFreshRootComponent(cached.data.meta?.components?.indexes)
+        requireAvailableRootComponent(cached.data.meta?.components?.indexes)
         val rate = cached.data.stakeIndex?.stakeYield?.d30?.let { requireNotNull(it.apy).toBigDecimal() }
         rootOverview = cached
         rate?.takeIf { it.isNonNegative }?.movePointLeft(2)
     }
 
-    private fun requireFreshRootComponent(component: BittensorRecommendationsRemote.Component?) {
+    private fun requireAvailableRootComponent(component: BittensorRecommendationsRemote.Component?) {
         val metadata = requireNotNull(component) { "Missing root yield metadata" }
-        require(metadata.availability == "AVAILABLE" && metadata.freshness == "FRESH") { "Root yield data is unavailable or stale" }
+        require(metadata.availability == "AVAILABLE" && metadata.freshness in setOf("FRESH", "STALE")) { "Root yield data is unavailable" }
         parseBittensorTimestamp(requireNotNull(metadata.asOf))
     }
 

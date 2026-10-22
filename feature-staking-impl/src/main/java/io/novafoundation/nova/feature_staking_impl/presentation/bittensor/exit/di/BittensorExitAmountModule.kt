@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 
 import androidx.fragment.app.Fragment
@@ -37,6 +39,7 @@ class BittensorExitAmountModule {
     @IntoMap
     @ViewModelKey(BittensorExitAmountViewModel::class)
     fun amount(
+        analytics: AnalyticsService,
         payload: BittensorExitPositionPayload,
         bittensorExitInteractor: BittensorExitInteractor,
         router: StakingRouter,
@@ -58,7 +61,7 @@ class BittensorExitAmountModule {
         precisionValidator: BittensorExitPrecisionValidator
     ): ViewModel {
         return BittensorExitAmountViewModel(
-            payload,
+            analytics, payload,
             bittensorExitInteractor,
             router,
             resources,

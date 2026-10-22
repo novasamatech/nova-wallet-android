@@ -76,9 +76,26 @@ class StakingDeepLinkTargetTest {
     }
 
     @Test
-    fun `secondary synchronization must also settle`() {
+    fun `Bittensor without stake can navigate after primary synchronization`() {
         val option = AggregatedStakingDashboardOption(chain, token, noStake, SyncingStage.SYNCING_SECONDARY)
         val dashboard = StakingDashboard(emptyList(), listOf(option))
+
+        assertSame(option, resolveStakingDeepLink(target, dashboard)?.option)
+    }
+
+    @Test
+    fun `Bittensor with stake can navigate after primary synchronization`() {
+        val option = AggregatedStakingDashboardOption(chain, token, hasStake, SyncingStage.SYNCING_SECONDARY)
+        val dashboard = StakingDashboard(listOf(option), emptyList())
+
+        assertSame(option, resolveStakingDeepLink(target, dashboard)?.option)
+    }
+
+    @Test
+    fun `other staking still waits for secondary synchronization`() {
+        val state = HasStake(false, Chain.Asset.StakingType.RELAYCHAIN, null, ExtendedLoadingState.Loading)
+        val option = AggregatedStakingDashboardOption(chain, token, state, SyncingStage.SYNCING_SECONDARY)
+        val dashboard = StakingDashboard(listOf(option), emptyList())
 
         assertNull(resolveStakingDeepLink(target, dashboard))
     }

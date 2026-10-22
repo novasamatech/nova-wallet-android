@@ -1,5 +1,8 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -41,6 +44,8 @@ class BittensorRootClaimModule {
     @IntoMap
     @ViewModelKey(BittensorRootClaimViewModel::class)
     fun claim(
+        analytics: AnalyticsService,
+        operationAnalytics: BittensorOperationAnalytics,
         payload: BittensorRootClaimPayload,
         bittensorRootClaimInteractor: BittensorRootClaimInteractor,
         router: StakingRouter,
@@ -60,6 +65,7 @@ class BittensorRootClaimModule {
         debugSettings: io.novafoundation.nova.common.data.storage.DebugSettings
     ): ViewModel =
         BittensorRootClaimViewModel(
+            analytics, operationAnalytics,
             payload,
             bittensorRootClaimInteractor,
             router,

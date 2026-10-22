@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import android.os.Bundle
+import io.novafoundation.nova.analytics.StakingPortfolioSource
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
@@ -12,6 +14,19 @@ import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.P
 import io.novafoundation.nova.feature_wallet_api.presentation.view.priceCharts.PriceChartsView
 
 class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, FragmentBittensorPortfolioBinding>() {
+
+    companion object {
+        const val ANALYTICS_SOURCE = "bittensor_portfolio_analytics_source"
+        private const val ENTRY = "bittensor_portfolio_entry"
+
+        fun sourceBundle(source: StakingPortfolioSource, entry: BittensorPortfolioEntry) = Bundle().apply {
+            putString(ANALYTICS_SOURCE, source.name)
+            putString(ENTRY, entry.name)
+        }
+
+        fun entryFrom(arguments: Bundle?): BittensorPortfolioEntry = BittensorPortfolioEntry.entries
+            .firstOrNull { it.name == arguments?.getString(ENTRY) } ?: BittensorPortfolioEntry.PORTFOLIO
+    }
 
     private val imageLoader by lazy {
         FeatureUtils.getCommonApi(requireContext())
@@ -51,6 +66,12 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
     }
 
     override fun subscribe(viewModel: BittensorDetailsViewModel) = with(binder) {
+        viewModel.entryResolution.observe { resolution ->
+            if (resolution != null) {
+                arguments?.remove(ENTRY)
+                viewModel.completeEntry(resolution)
+            }
+        }
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
         viewModel.chartChangeFormatter.observe { it.format(chartChange) }

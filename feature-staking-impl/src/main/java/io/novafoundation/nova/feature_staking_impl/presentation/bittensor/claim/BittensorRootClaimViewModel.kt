@@ -1,5 +1,18 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.claim
 
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.analytics.StakingPortfolioSource
+import io.novafoundation.nova.analytics.StakingResultAction
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import io.novafoundation.nova.runtime.extrinsic.DryRunRpcException
 
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
@@ -38,6 +51,8 @@ import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorRootV
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.distinctUntilChanged
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorClaimValidationPayload
@@ -87,6 +102,8 @@ private sealed interface ClaimExecution {
 private data class ClaimPreviewRequest(val hotkey: AccountIdKey? = null, val revision: Long = 0)
 
 class BittensorRootClaimViewModel(
+    private val analytics: AnalyticsService,
+    private val operationAnalytics: BittensorOperationAnalytics,
     private val payload: BittensorRootClaimPayload,
     private val bittensorRootClaimInteractor: BittensorRootClaimInteractor,
     private val router: StakingRouter,
@@ -108,6 +125,8 @@ class BittensorRootClaimViewModel(
 
     private val confirmMutex = Mutex()
 
+    private var isClaimInitiatedTracked = false
+
     private val previewOnly = BuildConfig.DEBUG && payload.previewOnly
 
     private val dryRunRunning = MutableStateFlow(false)
@@ -115,6 +134,8 @@ class BittensorRootClaimViewModel(
     val dryRunResult = MutableStateFlow<String?>(null)
 
     private val validating = MutableStateFlow(false)
+
+    private val claimPreviewsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CLAIM_PREVIEWS, BittensorScreen.CLAIM)
 
     val retryEvents = retryController.events
 
@@ -127,6 +148,7 @@ class BittensorRootClaimViewModel(
     private val state = previewRequest.flatMapLatest { request ->
         retryController.observe(
             step = "root claim preview",
+            analytics = claimPreviewsReads,
             transform = { it.withSafeLoading() }
         ) {
             flowOf {
@@ -323,6 +345,21 @@ class BittensorRootClaimViewModel(
         .shareInBackground()
 
     init {
+        prepared.onEach { loading ->
+            val draft = loading.dataOrNull
+            if (!isClaimInitiatedTracked && !previewOnly && draft != null && draft.state.supportsImmediateOperations &&
+                draft.state.availableClaims.any { it.hotkey == draft.preview.hotkey }
+            ) {
+                isClaimInitiatedTracked = true
+                analytics.track(
+                    BittensorAnalyticsEvent.ClaimInitiated(
+                        BittensorAnalyticsEvent.NETWORK,
+                        null,
+                        draft.state.availableClaims.size
+                    )
+                )
+            }
+        }.launchIn(this)
         feeLoaderMixin.connectWith(claimState) { _, state ->
             state?.let { claimState ->
                 bittensorRootClaimInteractor.estimateFee(claimState)
@@ -404,6 +441,19 @@ class BittensorRootClaimViewModel(
                     bittensorClaimValidationFailureUi(
                         failure.reason,
                         resources,
+                        onOutcome = { outcome ->
+                            failure.reason.analyticsKind()?.let { kind ->
+                                analytics.track(
+                                    BittensorAnalyticsEvent.ValidationShown(
+                                        StakingFlow.CLAIM,
+                                        kind,
+                                        StakingValidationStage.CONFIRM,
+                                        outcome,
+                                        StakingAnalyticsTarget.ROOT
+                                    )
+                                )
+                            }
+                        },
                         reviewUpdated = {
                             if (previewRequest.value == request) {
                                 previewRequest.value = ClaimPreviewRequest(draft.preview.hotkey, request.revision + 1)
@@ -449,7 +499,10 @@ class BittensorRootClaimViewModel(
         execution.value = ClaimExecution.Running
         dismissed.value = false
         try {
-            execution.value = when (val result = bittensorRootClaimInteractor.execute(draft, lease)) {
+            operationAnalytics.startOperation()
+            val result = bittensorRootClaimInteractor.execute(draft, lease)
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.CLAIM)
+            execution.value = when (result) {
                 is BittensorOperationResult.Success -> ClaimExecution.Result(
                     BittensorStakeResultUi.Success(
                         resources.getString(R.string.bittensor_claim_completed),
@@ -471,7 +524,9 @@ class BittensorRootClaimViewModel(
         } catch (e: Exception) {
             logger.log("[BittensorClaim] Claim failed")
             logger.log(e)
-            execution.value = ClaimExecution.Result(e.mapBittensorSubmissionError().mapResult(resources))
+            val result = e.mapBittensorSubmissionError()
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.CLAIM)
+            execution.value = ClaimExecution.Result(result.mapResult(resources))
         }
     }
 
@@ -481,7 +536,16 @@ class BittensorRootClaimViewModel(
 
     fun done() {
         resultDismissed()
-        router.openBittensorPortfolio()
+        if (!previewOnly) {
+            analytics.track(
+                BittensorAnalyticsEvent.ResultAction(
+                    StakingResultAction.YOUR_BITTENSOR,
+                    StakingFlow.CLAIM,
+                    StakingAnalyticsTarget.ROOT
+                )
+            )
+        }
+        router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
     }
 
     fun validatorClicked() = launchUnit {

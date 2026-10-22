@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +29,7 @@ class BittensorSelectValidatorModule {
     @IntoMap
     @ViewModelKey(BittensorSelectValidatorViewModel::class)
     fun selectValidator(
+        analytics: AnalyticsService,
         request: BittensorSelectValidatorCommunicator.Request,
         communicator: BittensorSelectValidatorCommunicator,
         bittensorValidatorInteractor: BittensorValidatorInteractor,
@@ -39,7 +42,7 @@ class BittensorSelectValidatorModule {
         tokenFormatter: TokenFormatter,
         subnetInteractor: BittensorSubnetInteractor
     ): ViewModel = BittensorSelectValidatorViewModel(
-        request,
+        analytics, request,
         communicator,
         bittensorValidatorInteractor,
         icons,

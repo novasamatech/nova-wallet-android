@@ -1,5 +1,22 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.analytics.StakingBlockedReason
+import io.novafoundation.nova.analytics.StakingAnalyticsSelectionMethod
+import io.novafoundation.nova.analytics.SubnetDetailsSource
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingMode
+import io.novafoundation.nova.analytics.StakingValidatorSource
+import io.novafoundation.nova.analytics.SlippageBucket
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
@@ -90,6 +107,7 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 
 class BittensorSubnetAmountViewModel(
+    private val analytics: AnalyticsService,
     private val initialSubnetId: BittensorNetuid.Subnet?,
     private val quickPickOrder: BittensorQuickPickOrder?,
     private val quickPickInteractor: BittensorQuickPickInteractor,
@@ -121,6 +139,14 @@ class BittensorSubnetAmountViewModel(
 
     private var selectionState = initialSelectionState
 
+    private var isNoBalanceTracked = false
+
+    private var isTypeSelectedTracked = false
+
+    private val subnetsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.SUBNETS, BittensorScreen.SETUP)
+    private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SETUP)
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.SETUP)
+
     val retryEvents = retryController.events
 
     val isQuickPick = quickPickOrder != null
@@ -142,6 +168,7 @@ class BittensorSubnetAmountViewModel(
         } else {
             retryController.observe(
                 step = "subnet",
+                analytics = subnetsReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf { bittensorSubnetInteractor.subnet(requireNotNull(initialSubnetId)) }
@@ -174,6 +201,7 @@ class BittensorSubnetAmountViewModel(
         } else {
             retryController.observe(
                 step = "subnet validators",
+                analytics = validatorsReads,
                 transform = { it.withSafeLoading() }
             ) {
                 flowOf {
@@ -303,6 +331,7 @@ class BittensorSubnetAmountViewModel(
             } else {
                 retryController.observe(
                     step = "subnet quote",
+                    analytics = chainRpcReads,
                     transform = { it.withSafeLoading() }
                 ) {
                     flowOf { prepareQuote(request) }
@@ -449,6 +478,7 @@ class BittensorSubnetAmountViewModel(
         } else {
             retryController.observe(
                 step = "subnet facts",
+                analytics = subnetsReads,
                 transform = { source ->
                     source.onStart { emit(null) }.catch {
                         if (it is CancellationException) throw it
@@ -553,6 +583,39 @@ class BittensorSubnetAmountViewModel(
         .shareInBackground()
 
     init {
+        needsFunding.onEach { funding ->
+            if (funding && !isNoBalanceTracked) {
+                isNoBalanceTracked = true
+                analytics.track(
+                    BittensorAnalyticsEvent.Blocked(
+                        StakingFlow.STAKE,
+                        StakingBlockedReason.NO_BALANCE,
+                        null,
+                        StakingAnalyticsTarget.SUBNET
+                    )
+                )
+            }
+        }.launchIn(this)
+        if (quickPickOrder != null) {
+            subnet.onEach { selected ->
+                if (selected != null && !isTypeSelectedTracked) {
+                    val method = when (quickPickOrder) {
+                        BittensorQuickPickOrder.POOL_SIZE -> StakingAnalyticsSelectionMethod.QUICK_PICK_POOL_SIZE
+                        BittensorQuickPickOrder.AGE -> StakingAnalyticsSelectionMethod.QUICK_PICK_AGE
+                        BittensorQuickPickOrder.APY -> StakingAnalyticsSelectionMethod.QUICK_PICK_APY
+                    }
+                    isTypeSelectedTracked = true
+                    analytics.track(
+                        BittensorAnalyticsEvent.TypeSelected(
+                            BittensorAnalyticsEvent.NETWORK,
+                            StakingAnalyticsTarget.SUBNET,
+                            method,
+                            selected.id.value
+                        )
+                    )
+                }
+            }.launchIn(this)
+        }
         validatorCommunicator.responseFlow
             .onEach { response ->
                 if (!selectionState.accepts(response)) return@onEach
@@ -564,7 +627,10 @@ class BittensorSubnetAmountViewModel(
             .launchIn(this)
 
         slippageSettingsCommunicator.responseFlow
-            .onEach { slippageSettings.set(BigDecimal.valueOf(it.fraction)) }
+            .onEach {
+                slippageSettings.set(BigDecimal.valueOf(it.fraction))
+                analytics.track(it.bittensorAnalyticsEvent())
+            }
             .launchIn(this)
 
         feeLoaderMixin.connectWith(feeDraft) { _, draft ->
@@ -615,6 +681,7 @@ class BittensorSubnetAmountViewModel(
         val selectedSubnet = subnet.first() ?: return@launchUnit
         val payload = BittensorSubnetDetailsPayload(
             subnetId = selectedSubnet.id.value,
+            analyticsSource = SubnetDetailsSource.SETUP,
             replaceAmount = true,
             validatorAddress = selectedValidatorAddress.first(),
             selectionState = selectionState
@@ -648,7 +715,20 @@ class BittensorSubnetAmountViewModel(
                     bittensorStakeValidationFailureUi(
                         failure,
                         actions,
-                        resources
+                        resources,
+                        onOutcome = { outcome ->
+                            failure.reason.analyticsKind()?.let { kind ->
+                                analytics.track(
+                                    BittensorAnalyticsEvent.ValidationShown(
+                                        StakingFlow.STAKE,
+                                        kind,
+                                        StakingValidationStage.SETUP,
+                                        outcome,
+                                        StakingAnalyticsTarget.SUBNET
+                                    )
+                                )
+                            }
+                        }
                     ) { quoteRefresh.value += 1 }
                 }
             ) { validated -> openReview(request, validated.inactiveValidatorAccepted) }
@@ -664,6 +744,23 @@ class BittensorSubnetAmountViewModel(
     private fun openReview(request: QuoteRequest, inactiveValidatorAccepted: Boolean) = launchUnit {
         validating.value = false
         if (quoteRequest.first() != request) return@launchUnit
+        analytics.track(
+            BittensorAnalyticsEvent.Initiated(
+                BittensorAnalyticsEvent.NETWORK,
+                StakingAnalyticsTarget.SUBNET,
+                if (existingPosition) StakingMode.BUY_MORE else StakingMode.NEW_POSITION,
+                when {
+                    existingPosition -> StakingValidatorSource.EXISTING_HOTKEY
+                    request.validatorAddress != initialBittensorValidatorAddress(
+                        null,
+                        validatorsState.replayCache.lastOrNull()?.dataOrNull.orEmpty()
+                    ) -> StakingValidatorSource.MANUAL
+                    else -> StakingValidatorSource.RECOMMENDED
+                },
+                SlippageBucket.from(request.slippage.movePointRight(2)),
+                null
+            )
+        )
         router.openBittensorSubnetReview(
             BittensorSubnetReviewPayload(
                 request.subnetId.value,

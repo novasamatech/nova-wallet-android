@@ -1,5 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm
 
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.analytics.StakingValidationOutcome
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.analytics.StakingResultAction
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingMode
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.mapLoading
@@ -68,6 +82,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
 class BittensorStakeConfirmViewModel(
+    private val analytics: AnalyticsService,
+    private val operationAnalytics: BittensorOperationAnalytics,
     private val payload: BittensorStakeConfirmPayload,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
@@ -88,6 +104,8 @@ class BittensorStakeConfirmViewModel(
 
     private val chain by lazyAsync { chainRegistry.getChain(ChainGeneses.BITTENSOR) }
 
+    private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.CONFIRM)
+
     val retryEvents = retryController.events
 
     private val stakeRequest = flowOf { payload.toStakeRequest(chain.await()) }
@@ -95,6 +113,7 @@ class BittensorStakeConfirmViewModel(
 
     private val stakingDetailsState = retryController.observe(
         step = "root confirmation",
+        analytics = rootOverviewReads,
         transform = { it.withSafeLoading() }
     ) {
         bittensorStakingInteractor.observeRootStakingDetails(payload.metaId)
@@ -217,7 +236,20 @@ class BittensorStakeConfirmViewModel(
                 validationSystem = validationSystem,
                 payload = payload,
                 progressConsumer = validating.progressConsumer(),
-                validationFailureTransformer = { resourceManager.getString(R.string.common_error_general_title) to it.message(resourceManager) }
+                validationFailureTransformer = { failure ->
+                    failure.analyticsKind()?.let { kind ->
+                        analytics.track(
+                            BittensorAnalyticsEvent.ValidationShown(
+                                StakingFlow.STAKE,
+                                kind,
+                                StakingValidationStage.CONFIRM,
+                                StakingValidationOutcome.BLOCKED,
+                                StakingAnalyticsTarget.ROOT
+                            )
+                        )
+                    }
+                    resourceManager.getString(R.string.common_error_general_title) to failure.message(resourceManager)
+                }
             ) { executeStake(request, fee.fee) }
         } catch (e: CancellationException) {
             throw e
@@ -228,12 +260,26 @@ class BittensorStakeConfirmViewModel(
         }
     }
 
+    private val analyticsMode get() = if (payload.existingPosition) StakingMode.ADD_STAKE else StakingMode.NEW_POSITION
+
     private fun executeStake(request: BittensorRootStakeRequest, fee: Fee) = launchUnit {
         if (!submission.value.canSubmit) return@launchUnit
         try {
             val details = stakingDetails.first()
             submission.value = BittensorSubmissionState.Submitting(mapProgress(details, request))
-            when (val result = bittensorStakingInteractor.executeRootStake(request)) {
+            operationAnalytics.startOperation()
+            analytics.track(
+                BittensorAnalyticsEvent.Confirmed(
+                    BittensorAnalyticsEvent.NETWORK,
+                    StakingAnalyticsTarget.ROOT,
+                    analyticsMode,
+                    false,
+                    null
+                )
+            )
+            val result = bittensorStakingInteractor.executeRootStake(request)
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.STAKE, mode = analyticsMode)
+            when (result) {
                 is BittensorOperationResult.Success -> {
                     submission.value = BittensorSubmissionState.Completed(mapSuccess(details, request, fee, result.outcome))
                 }
@@ -245,7 +291,9 @@ class BittensorStakeConfirmViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            submission.value = e.mapBittensorSubmissionError().mapResult(resourceManager).toSubmissionState()
+            val result = e.mapBittensorSubmissionError()
+            operationAnalytics.outcome(result, StakingAnalyticsTarget.ROOT, StakingFlow.STAKE, mode = analyticsMode)
+            submission.value = result.mapResult(resourceManager).toSubmissionState()
         } finally {
             validating.value = false
         }
@@ -257,6 +305,13 @@ class BittensorStakeConfirmViewModel(
 
     fun viewPositionClicked() {
         if (submission.value is BittensorSubmissionState.Completed) {
+            analytics.track(
+                BittensorAnalyticsEvent.ResultAction(
+                    StakingResultAction.VIEW_POSITION,
+                    StakingFlow.STAKE,
+                    StakingAnalyticsTarget.ROOT
+                )
+            )
             router.openBittensorRootDetails()
         }
     }

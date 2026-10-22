@@ -51,9 +51,9 @@ class BittensorValidatorInteractor(
             ?: row.stakeSourceName?.takeIf { it.isNotBlank() }
     }
 
-    suspend fun yields(netuid: BittensorNetuid): Map<AccountIdKey, BigDecimal> {
+    suspend fun yields(netuid: BittensorNetuid, includeUnreliable: Boolean = false): Map<AccountIdKey, BigDecimal> {
         val chain = chain()
-        if (netuid is BittensorNetuid.Subnet) return alphaYields.alphaYields(chain, netuid)
+        if (netuid is BittensorNetuid.Subnet) return alphaYields.alphaYields(chain, netuid, includeUnreliable)
         val response = backend.rootValidators()
         return buildMap {
             response.items.orEmpty().forEach { row ->

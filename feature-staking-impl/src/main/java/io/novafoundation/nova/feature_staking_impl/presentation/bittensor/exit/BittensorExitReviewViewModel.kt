@@ -1,5 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.analytics.StakingPortfolioSource
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.UnstakeMode
+import io.novafoundation.nova.analytics.SlippageBucket
+import io.novafoundation.nova.analytics.AnalyticsService
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isSigningCancelled
 
 import android.os.SystemClock
@@ -96,6 +110,8 @@ private sealed interface ExitExecution {
 }
 
 class BittensorExitReviewViewModel(
+    private val analytics: AnalyticsService,
+    private val operationAnalytics: BittensorOperationAnalytics,
     private val payload: BittensorExitReviewPayload,
     private val bittensorExitInteractor: BittensorExitInteractor,
     private val router: StakingRouter,
@@ -135,6 +151,8 @@ class BittensorExitReviewViewModel(
 
     private val confirmMutex = Mutex()
 
+    private val chainRpcReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.CHAIN_RPC, BittensorScreen.CONFIRM)
+
     val retryEvents = retryController.events
 
     private val validating = MutableStateFlow(false)
@@ -148,6 +166,7 @@ class BittensorExitReviewViewModel(
     private val requestState = reviewedQuote.flatMapLatest { quote ->
         retryController.observe(
             step = "exit confirmation",
+            analytics = chainRpcReads,
             transform = { it.withSafeLoading() }
         ) {
             flowOf {
@@ -511,6 +530,19 @@ class BittensorExitReviewViewModel(
                     bittensorExitValidationFailureUi(
                         failure.reason,
                         resources,
+                        onOutcome = { outcome ->
+                            failure.reason.analyticsKind()?.let { kind ->
+                                analytics.track(
+                                    BittensorAnalyticsEvent.ValidationShown(
+                                        StakingFlow.UNSTAKE,
+                                        kind,
+                                        StakingValidationStage.CONFIRM,
+                                        outcome,
+                                        if (payload.position.netuid == 0) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET
+                                    )
+                                )
+                            }
+                        },
                         unstakeAll = { refreshQuote(draft.quote, fullExit = true) },
                         refreshQuote = { refreshQuote(draft.quote, fullExit = false) },
                         acceptImpact = { if (reviewedQuote.value == draft.quote) confirmWithImpact(validationPayload.latestQuote) }
@@ -557,7 +589,10 @@ class BittensorExitReviewViewModel(
     private suspend fun submit(draft: BittensorExitDraft) {
         sheetDismissed.value = false
         try {
-            when (val result = bittensorExitInteractor.execute(draft)) {
+            operationAnalytics.startOperation()
+            val result = bittensorExitInteractor.execute(draft)
+            trackOutcome(result, draft)
+            when (result) {
                 is BittensorOperationResult.Success -> execution.value = ExitExecution.Success(
                     System.currentTimeMillis(),
                     result.outcome,
@@ -580,8 +615,24 @@ class BittensorExitReviewViewModel(
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            execution.value = ExitExecution.Unconfirmed(e.mapBittensorSubmissionError().mapResult(resources))
+            val result = e.mapBittensorSubmissionError()
+            trackOutcome(result, draft)
+            execution.value = ExitExecution.Unconfirmed(result.mapResult(resources))
         }
+    }
+
+    private fun trackOutcome(result: BittensorOperationResult, draft: BittensorExitDraft) {
+        operationAnalytics.outcome(
+            result,
+            if (draft.position.isRoot) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
+            StakingFlow.UNSTAKE,
+            unstakeMode = if (draft.quote.fullExit) UnstakeMode.FULL else UnstakeMode.PARTIAL,
+            hotkeys = draft.quote.groupHotkeys.size.takeIf { it > 0 } ?: 1,
+            hasLocked = draft.position.preflight.availability.locked.signum() > 0,
+            slippage = draft.quote.slippageFraction.takeUnless { draft.position.isRoot }?.let {
+                SlippageBucket.from(it.movePointRight(2))
+            }
+        )
     }
 
     fun accountClicked() = launchUnit {
@@ -600,7 +651,7 @@ class BittensorExitReviewViewModel(
     }
 
     fun doneClicked() = launchUnit {
-        router.openBittensorPortfolio()
+        router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
     }
 
     fun back() {

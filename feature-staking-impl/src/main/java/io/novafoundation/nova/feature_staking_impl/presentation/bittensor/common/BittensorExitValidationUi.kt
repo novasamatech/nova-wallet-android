@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 
+import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.mixin.api.CustomDialogDisplayer
 import io.novafoundation.nova.common.validation.TransformedFailure
@@ -29,16 +30,29 @@ fun bittensorExitValidationFailureUi(
     resources: ResourceManager,
     unstakeAll: () -> Unit,
     refreshQuote: () -> Unit,
-    acceptImpact: () -> Unit
+    acceptImpact: () -> Unit,
+    onOutcome: (StakingValidationOutcome) -> Unit = {}
 ): TransformedFailure {
     val action = when (reason) {
         BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL ->
-            CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.staking_unstake_all), unstakeAll)
+            CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.staking_unstake_all)) {
+                onOutcome(StakingValidationOutcome.PROCEEDED)
+                unstakeAll()
+            }
         BittensorExitValidationFailure.QUOTE_CHANGED ->
-            CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.bittensor_review_updated_quote), refreshQuote)
+            CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.bittensor_review_updated_quote)) {
+                onOutcome(StakingValidationOutcome.PROCEEDED)
+                refreshQuote()
+            }
         BittensorExitValidationFailure.PRICE_IMPACT_TOO_HIGH ->
-            CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_continue), acceptImpact)
-        else -> return TransformedFailure.Default(resources.getString(R.string.common_error_general_title) to reason.message(resources))
+            CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_continue)) {
+                onOutcome(StakingValidationOutcome.PROCEEDED)
+                acceptImpact()
+            }
+        else -> {
+            onOutcome(StakingValidationOutcome.BLOCKED)
+            return TransformedFailure.Default(resources.getString(R.string.common_error_general_title) to reason.message(resources))
+        }
     }
     return TransformedFailure.Custom(
         CustomDialogDisplayer.Payload(
@@ -51,7 +65,11 @@ fun bittensorExitValidationFailureUi(
             ),
             message = reason.message(resources),
             okAction = action,
-            cancelAction = CustomDialogDisplayer.Payload.DialogAction.noOp(resources.getString(R.string.common_cancel))
+            cancelAction = CustomDialogDisplayer.Payload.DialogAction(resources.getString(R.string.common_cancel)) {
+                onOutcome(
+                    StakingValidationOutcome.CANCELLED
+                )
+            }
         )
     )
 }

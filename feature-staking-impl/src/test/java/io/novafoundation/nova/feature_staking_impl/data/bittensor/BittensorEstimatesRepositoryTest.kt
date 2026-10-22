@@ -188,21 +188,20 @@ class BittensorEstimatesRepositoryTest {
         val result = remoteSource.yields(baseUrl, chain, subnetId)
 
         assertTrue(result.validUntilNanos <= api.yieldResponseAtNanos + 60_000_000_000L)
-        assertEquals(listOf(100), api.yieldRequestedPageSizes)
     }
 
     @Test
-    fun `yield pages retain the first valid rate per hotkey without percent conversion`() = runBlocking {
+    fun `yield snapshot retains the first valid rate per hotkey without percent conversion`() = runBlocking {
         val address = chain.addressOf(ByteArray(32) { 2 })
-        api.nextYieldPage = { if (it == 1) 2 else null }
-        api.yieldItems = { page ->
+        api.yieldItems = {
             listOf(
                 BittensorAlphaYieldsRemote.Item(
                     1,
                     address,
-                    if (page == 1) "12.5" else "99",
+                    "12.5",
                     "ALPHA_VALIDATOR_APY"
                 ),
+                BittensorAlphaYieldsRemote.Item(1, address, "99", "ALPHA_VALIDATOR_APY"),
                 BittensorAlphaYieldsRemote.Item(
                     1,
                     "invalid",
@@ -215,20 +214,19 @@ class BittensorEstimatesRepositoryTest {
         val yields = yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
 
         assertEquals(listOf(BigDecimal("12.5")), yields.values.toList())
-        assertEquals(listOf(1, 2), api.yieldPages)
+        assertEquals(listOf("https://infra.test/v1/bittensor/subnets/1/yields/alpha"), api.yieldRequests)
     }
 
     @Test
-    fun `yield pagination does not inherit operation history throttling`() = runTest {
+    fun `yield snapshot does not inherit operation history throttling`() = runTest {
         val throttledSource = BittensorEstimatesRemoteSource(api, spacingMillis = 12_000L)
         val baseUrl = requireNotNull(infrastructureUrls.baseUrl())
-        api.nextYieldPage = { it + 1 }
 
         val pages = throttledSource.yields(baseUrl, chain, BittensorNetuid.Subnet(1))
 
-        assertEquals(listOf(1, 2, 3), api.yieldPages)
+        assertEquals(listOf("https://infra.test/v1/bittensor/subnets/1/yields/alpha"), api.yieldRequests)
         assertEquals(0L, testScheduler.currentTime)
-        assertFalse(pages.allPagesRead)
+        assertTrue(pages.allPagesRead)
     }
 
     @Test
@@ -245,9 +243,8 @@ class BittensorEstimatesRepositoryTest {
     }
 
     @Test
-    fun `unreliable yields are skipped so the next reliable row of the hotkey wins`() = runBlocking {
+    fun `unreliable first row is retained only for explicit unfiltered browsing`() = runBlocking {
         val address = chain.addressOf(ByteArray(32) { 2 })
-        api.nextYieldPage = { null }
         api.yieldItems = {
             listOf(
                 BittensorAlphaYieldsRemote.Item(
@@ -269,16 +266,16 @@ class BittensorEstimatesRepositoryTest {
 
         val yields = yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
 
-        assertEquals(listOf(BigDecimal("52.1")), yields.values.toList())
+        assertTrue(yields.isEmpty())
+        val allYields = yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1), includeUnreliable = true)
+        assertEquals(listOf(BigDecimal("669990.45")), allYields.values.toList())
     }
 
     @Test
-    fun `yield loading preserves the three page limit`() = runBlocking {
-        api.nextYieldPage = { it + 1 }
-
+    fun `yield snapshot is loaded with a single request`() = runBlocking {
         yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
 
-        assertEquals(listOf(1, 2, 3), api.yieldPages)
+        assertEquals(listOf("https://infra.test/v1/bittensor/subnets/1/yields/alpha"), api.yieldRequests)
     }
 
     @Test
@@ -300,6 +297,31 @@ class BittensorEstimatesRepositoryTest {
         )
     }
 
+    @Test
+    fun `stale yield snapshot remains displayable but recommendations exclude unreliable rates`() = runBlocking {
+        api.freshness = "STALE"
+        val address = chain.addressOf(ByteArray(32) { 2 })
+        api.yieldItems = {
+            listOf(BittensorAlphaYieldsRemote.Item(1, address, "12.5", "ALPHA_VALIDATOR_APY", rateReliability = "RELIABLE"))
+        }
+        assertEquals(listOf(BigDecimal("12.5")), yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1)).values.toList())
+    }
+
+    @Test
+    fun `failed yield refresh preserves cached rates without refreshing their expiry`() = runBlocking {
+        api.yieldCacheControl = "max-age=0"
+        val address = chain.addressOf(ByteArray(32) { 2 })
+        api.yieldItems = {
+            listOf(BittensorAlphaYieldsRemote.Item(1, address, "12.5", "ALPHA_VALIDATOR_APY"))
+        }
+        val first = yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1))
+        api.failure = java.io.IOException("offline")
+        repeat(2) {
+            assertEquals(first, yieldRepository.alphaYields(chain, BittensorNetuid.Subnet(1)))
+        }
+        assertEquals(3, api.yieldRequests.size)
+    }
+
     private suspend fun history(): io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory {
         val request = requireNotNull(historyRepository.request(address))
         return historyRepository.history(request)
@@ -311,9 +333,7 @@ class BittensorEstimatesRepositoryTest {
 
         val historyPages = mutableListOf<Int>()
 
-        val yieldPages = mutableListOf<Int>()
-
-        val yieldRequestedPageSizes = mutableListOf<Int>()
+        val yieldRequests = mutableListOf<String>()
 
         var historyPageSize: Int? = 100
 
@@ -325,13 +345,13 @@ class BittensorEstimatesRepositoryTest {
 
         var nextHistoryPage: (Int) -> Int? = { null }
 
-        var nextYieldPage: (Int) -> Int? = { null }
-
         var historyCacheControl: (Int) -> String = { "max-age=60" }
 
-        var yieldItems: (Int) -> List<BittensorAlphaYieldsRemote.Item> = { emptyList() }
+        var yieldItems: () -> List<BittensorAlphaYieldsRemote.Item> = { emptyList() }
 
         var freshness = "FRESH"
+
+        var yieldCacheControl = "max-age=60"
 
         var failure: Exception? = null
 
@@ -354,15 +374,14 @@ class BittensorEstimatesRepositoryTest {
             return Response.success(body, headers)
         }
 
-        override suspend fun alphaYields(url: String, page: Int, pageSize: Int): Response<BittensorAlphaYieldsRemote> {
-            yieldPages += page
-            yieldRequestedPageSizes += pageSize
+        override suspend fun alphaYields(url: String): Response<BittensorAlphaYieldsRemote> {
+            yieldRequests += url
+            failure?.let { throw it }
             val component = BittensorRecommendationsRemote.Component("AVAILABLE", freshness)
             val components = BittensorAlphaYieldsRemote.Components(component)
             val meta = BittensorAlphaYieldsRemote.Meta(components)
-            val pageInfo = BittensorHistoryPageInfo(page, nextYieldPage(page), pageSize)
-            val body = BittensorAlphaYieldsRemote(yieldItems(page), meta, pageInfo)
-            val headers = Headers.headersOf("Cache-Control", "max-age=60")
+            val body = BittensorAlphaYieldsRemote(yieldItems(), meta)
+            val headers = Headers.headersOf("Cache-Control", yieldCacheControl)
             yieldResponseAtNanos = System.nanoTime()
             return Response.success(body, headers)
         }

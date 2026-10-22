@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import android.graphics.drawable.Drawable
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -44,6 +45,9 @@ import org.mockito.Mockito.mock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorSelectValidatorViewModelTest {
+
+    private val analyticsService = RecordingBittensorAnalytics()
+    private val analytics = analyticsService
 
     private val resources = mock(ResourceManager::class.java) { invocation ->
         if (invocation.method.name == "getString") "label" else Mockito.RETURNS_DEFAULTS.answer(invocation)
@@ -134,7 +138,7 @@ class BittensorSelectValidatorViewModelTest {
 
     private fun createViewModel(request: BittensorSelectValidatorCommunicator.Request): BittensorSelectValidatorViewModel {
         return BittensorSelectValidatorViewModel(
-            request, communicator, interactor, icons, router, externalActions, resources, logger,
+            analytics, request, communicator, interactor, icons, router, externalActions, resources, logger,
             retryController, tokenFormatter, subnetInteractor
         ).also { models += it }
     }

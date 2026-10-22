@@ -1,5 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.di
 
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -58,6 +60,7 @@ class BittensorSubnetAmountModule {
     @IntoMap
     @ViewModelKey(BittensorSubnetAmountViewModel::class)
     fun provideViewModel(
+        analytics: AnalyticsService,
         payload: BittensorSubnetAmountPayload,
         bittensorSubnetInteractor: BittensorSubnetInteractor,
         router: StakingRouter,
@@ -82,7 +85,7 @@ class BittensorSubnetAmountModule {
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
         subnetFactsInteractor: BittensorSubnetFactsInteractor
     ): ViewModel = BittensorSubnetAmountViewModel(
-        initialSubnetId = payload.subnetId?.let { BittensorNetuid.Subnet(it) },
+        analytics, initialSubnetId = payload.subnetId?.let { BittensorNetuid.Subnet(it) },
         quickPickOrder = payload.quickPickOrder,
         quickPickInteractor = quickPickInteractor,
         presetValidatorInteractor = presetValidatorInteractor,

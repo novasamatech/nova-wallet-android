@@ -1,5 +1,19 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount
 
+import io.novafoundation.nova.analytics.StakingValidationStage
+import io.novafoundation.nova.analytics.StakingValidationOutcome
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
+import io.novafoundation.nova.analytics.StakingBlockedReason
+import io.novafoundation.nova.analytics.StakingFlow
+import io.novafoundation.nova.analytics.BittensorDataEndpoint
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingMode
+import io.novafoundation.nova.analytics.StakingValidatorSource
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import androidx.lifecycle.viewModelScope
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
@@ -85,6 +99,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 
 class BittensorStakeAmountViewModel(
+    private val analytics: AnalyticsService,
     private val resourceManager: ResourceManager,
     private val router: StakingRouter,
     private val bittensorStakingInteractor: BittensorStakingInteractor,
@@ -106,10 +121,16 @@ class BittensorStakeAmountViewModel(
 
     private var selectionState = initialSelectionState
 
+    private var isNoBalanceTracked = false
+
+    private val rootOverviewReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.ROOT_OVERVIEW, BittensorScreen.SETUP)
+    private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.SETUP)
+
     val retryEvents = retryController.events
 
     private val stakingDetailsState = retryController.observe(
         step = "root staking details",
+        analytics = rootOverviewReads,
         transform = { it.withSafeLoading() },
         source = ::observeStakingDetails
     )
@@ -314,6 +335,19 @@ class BittensorStakeAmountViewModel(
         .shareInBackground()
 
     init {
+        needsFunding.onEach { funding ->
+            if (funding && !isNoBalanceTracked) {
+                isNoBalanceTracked = true
+                analytics.track(
+                    BittensorAnalyticsEvent.Blocked(
+                        StakingFlow.STAKE,
+                        StakingBlockedReason.NO_BALANCE,
+                        null,
+                        StakingAnalyticsTarget.ROOT
+                    )
+                )
+            }
+        }.launchIn(this)
         feeLoaderMixin.connectWith(feeRequest) { _, request ->
             request?.let {
                 delay(FEE_DEBOUNCE_MILLIS)
@@ -382,7 +416,20 @@ class BittensorStakeAmountViewModel(
                 validationSystem = stakeValidationSystem,
                 payload = payload,
                 progressConsumer = preparing.progressConsumer(),
-                validationFailureTransformer = { resourceManager.getString(R.string.common_error_general_title) to it.message(resourceManager) }
+                validationFailureTransformer = { failure ->
+                    failure.analyticsKind()?.let { kind ->
+                        analytics.track(
+                            BittensorAnalyticsEvent.ValidationShown(
+                                StakingFlow.STAKE,
+                                kind,
+                                StakingValidationStage.SETUP,
+                                StakingValidationOutcome.BLOCKED,
+                                StakingAnalyticsTarget.ROOT
+                            )
+                        )
+                    }
+                    resourceManager.getString(R.string.common_error_general_title) to failure.message(resourceManager)
+                }
             ) { openConfirmation(request) }
         } catch (e: CancellationException) {
             throw e
@@ -405,6 +452,7 @@ class BittensorStakeAmountViewModel(
             ?: return kotlinx.coroutines.flow.flowOf(ExtendedLoadingState.Loaded(null))
         return retryController.observe(
             step = "root position validator",
+            analytics = validatorsReads,
             transform = { it.withSafeLoading() }
         ) {
             flowOf {
@@ -419,7 +467,24 @@ class BittensorStakeAmountViewModel(
             metaId = request.metaId,
             amountInPlanks = request.amountInPlanks,
             validatorAddress = request.chain.addressOf(request.validator.hotkey),
-            validatorName = request.validator.name
+            validatorName = request.validator.name,
+            existingPosition = this.payload?.validatorAddress != null
+        )
+        analytics.track(
+            BittensorAnalyticsEvent.Initiated(
+                BittensorAnalyticsEvent.NETWORK,
+                StakingAnalyticsTarget.ROOT,
+                if (payload.existingPosition) StakingMode.ADD_STAKE else StakingMode.NEW_POSITION,
+                when {
+                    payload.existingPosition -> StakingValidatorSource.EXISTING_HOTKEY
+                    selectedValidator.value?.validator?.hotkey?.let { selected ->
+                        selected != stakingDetailsState.replayCache.lastOrNull()?.dataOrNull?.validator?.hotkey
+                    } == true -> StakingValidatorSource.MANUAL
+                    else -> StakingValidatorSource.RECOMMENDED
+                },
+                null,
+                null
+            )
         )
         router.openBittensorStakeConfirm(payload)
         preparing.value = false

@@ -1,5 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.analytics.BittensorScreen
+import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
+import io.novafoundation.nova.analytics.StakingAnalyticsTarget
+import io.novafoundation.nova.analytics.StakingAnalyticsSelectionMethod
+import io.novafoundation.nova.analytics.AnalyticsService
+
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorQuickPickOrder
@@ -13,6 +19,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class BittensorWhereToStakeViewModel(
+    private val analytics: AnalyticsService,
     private val bittensorSubnetInteractor: BittensorSubnetInteractor,
     private val router: StakingRouter,
     private val retryController: BittensorRetryController,
@@ -44,10 +51,19 @@ class BittensorWhereToStakeViewModel(
     }
 
     fun rootStaking() {
+        analytics.track(
+            BittensorAnalyticsEvent.TypeSelected(
+                BittensorAnalyticsEvent.NETWORK,
+                StakingAnalyticsTarget.ROOT,
+                StakingAnalyticsSelectionMethod.QUICK_PICK_ROOT,
+                0
+            )
+        )
         router.openBittensorRootStaking(selectionState = selectionState)
     }
 
     fun back() {
+        analytics.track(BittensorAnalyticsEvent.Abandoned(BittensorScreen.WHERE_TO_STAKE, null))
         router.back()
     }
 }
