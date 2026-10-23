@@ -2,6 +2,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detai
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.DiffUtil
@@ -14,6 +15,7 @@ import io.novafoundation.nova.common.utils.images.setIcon
 import io.novafoundation.nova.common.utils.setTextColorRes
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.ItemBittensorPositionBinding
+import kotlin.math.ceil
 
 class BittensorPositionAdapter(
     private val imageLoader: ImageLoader,
@@ -59,6 +61,7 @@ class BittensorPositionAdapter(
                     R.style.TextAppearance_NovaFoundation_Regular_Footnote_Secondary
                 }
             )
+            keepWidestTitleWord(item.title)
             positionSubtitle.text = item.subtitle
             positionSubtitle.isVisible = !item.isSubtitleLoading && item.subtitle != null
             positionSubtitleProgress.isVisible = item.isSubtitleLoading
@@ -80,6 +83,18 @@ class BittensorPositionAdapter(
             positionChangeProgress.isVisible = item.isChangeLoading
             positionChevron.isVisible = true
             root.setOnClickListener { onClick(item) }
+        }
+
+        /**
+         * The amount column measures first, so a large amount at a large font scale would squeeze the title until a word breaks
+         * mid-way. The title column keeps at least its widest word (at most half the row), so it wraps between words instead.
+         */
+        private fun keepWidestTitleWord(title: String) = with(binding) {
+            val widestWord = title.split(' ').maxOfOrNull { positionTitle.paint.measureText(it) } ?: 0f
+            val limit = root.resources.displayMetrics.widthPixels / 2
+            positionTexts.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                matchConstraintMinWidth = ceil(widestWord).toInt().coerceAtMost(limit)
+            }
         }
     }
 

@@ -57,30 +57,29 @@
                         android:textColor="@color/text_secondary" />
                 </LinearLayout>
 
-                <LinearLayout
+                <!-- The fiat follows the total and wraps under it when both do not fit (large font scales). -->
+                <com.google.android.flexbox.FlexboxLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
+                    app:alignItems="baseline"
+                    app:flexWrap="wrap">
                     <TextView
                         android:id="@+id/totalAmount"
                         style="@style/TextAppearance.NovaFoundation.Bold.Title1"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
                         android:text="—" />
 
                     <TextView
                         android:id="@+id/totalFiat"
                         style="@style/TextAppearance.NovaFoundation.Regular.SubHeadline"
-                        android:layout_width="0dp"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="8dp"
                         android:textColor="@color/text_secondary"
-                        android:maxLines="1"
-                        android:ellipsize="end" />
-                </LinearLayout>
+                        android:maxLines="1" />
+                </com.google.android.flexbox.FlexboxLayout>
 
                 <TextView
                     android:id="@+id/chartDate"
