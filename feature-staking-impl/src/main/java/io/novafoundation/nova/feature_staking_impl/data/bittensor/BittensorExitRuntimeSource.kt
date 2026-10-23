@@ -51,5 +51,5 @@ class RealBittensorExitRuntimeSource(
                 bulkRetriever
             )
         }
-    } ?: error("Exit preflight timed out")
+    } ?: throw BittensorTimeoutException("Exit preflight")
 }

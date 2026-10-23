@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import io.novafoundation.nova.common.address.AccountIdKey
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorTimeoutException
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorDelegateSource
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BITTENSOR_REQUEST_TIMEOUT
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetBrowseRepository
@@ -31,7 +32,7 @@ class BittensorValidatorCoverageInteractor(
                 val listed = async { catalogue.subnets().map { it.id }.toSet() }
                 CoverageResult(bittensorValidatorCoverage(permits.await(), listed.await()))
             }
-        } ?: error("Validator coverage timed out")
+        } ?: throw BittensorTimeoutException("Validator coverage")
         return result.coverage
     }
 
