@@ -2825,6 +2825,7 @@
 
     <string name="bittensor_stake_to_root">Stake to root</string>
     <string name="bittensor_subnet_count">%1$d of %2$d</string>
+    <string name="bittensor_subnet_count_loading">— of —</string>
     <string name="bittensor_show_subnets">Show %1$d subnets</string>
     <string name="bittensor_sort_pool_description">Largest swap pools first</string>
     <string name="bittensor_sort_age_description">Longest-running first</string>

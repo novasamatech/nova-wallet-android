@@ -81,7 +81,7 @@ class BittensorSubnetPositionFragment : BaseFragment<BittensorSubnetPositionView
         setupExternalActions(viewModel)
         observeBittensorRetries(viewModel.retryEvents)
         viewModel.subnet.observe { subnet ->
-            val name = subnet?.name?.ifBlank { subnet.symbol } ?: getString(R.string.bittensor_exit_position)
+            val name = subnet?.name?.ifBlank { getString(R.string.bittensor_subnet_number, subnet.id.value) } ?: getString(R.string.bittensor_exit_position)
             toolbar.setTitle(name)
             subnetCaption.text = name
             subnetIcon.setIcon(

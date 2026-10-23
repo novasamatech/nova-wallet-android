@@ -32,6 +32,18 @@ class BittensorSubnetBrowseRepositoryTest {
     }
 
     @Test
+    fun `unnamed subnet placeholder is mapped to a blank name so the screen shows Subnet netuid`() {
+        val runtime = listOf(subnet(42, 10, 1))
+        val rows = listOf(BittensorSubnetCatalogueRemote.Subnet(42, "1", "Unknown", "S42", 10.toBigInteger(), "2000"))
+        val component = BittensorRecommendationsRemote.Component("AVAILABLE", "FRESH")
+        val response = BittensorSubnetCatalogueRemote(rows, BittensorSubnetCatalogueRemote.Meta(BittensorSubnetCatalogueRemote.Components(component, component)))
+
+        assertEquals("", mapBittensorBrowseSubnets(response, runtime).single().name)
+        assertEquals("", normalizeBittensorSubnetName(" unknown "))
+        assertEquals("Chutes", normalizeBittensorSubnetName("Chutes"))
+    }
+
+    @Test
     fun `validator count is permit population independent of policy selection`() {
         val permits = List(20) { true } + List(8) { false }
         assertEquals(20, bindBittensorValidatorCount(permits))
