@@ -5,6 +5,7 @@ import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.dialog.dialog
+import io.novafoundation.nova.common.view.setMessageOrHide
 import androidx.core.widget.doAfterTextChanged
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_account_api.presenatation.actions.setupExternalActions
@@ -59,6 +60,7 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
             count.text = it.count
             sortLabel.text = it.sorting
         }
+        viewModel.staleRankingWarning.observe(staleRankingWarning::setMessageOrHide)
         viewModel.rows.observe(adapter::submitList)
         viewModel.selectedAddress.observe(adapter::select)
         viewModel.buttonState.observe(confirm::setState)

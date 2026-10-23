@@ -3,10 +3,9 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorSubnetValidatorRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorAlphaYieldRepository
 import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorBackend
-import io.novafoundation.nova.feature_staking_impl.data.bittensor.hasFreshBittensorRecommendations
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootValidatorNames
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.mapBittensorRootYields
 import io.novafoundation.nova.common.address.AccountIdKey
-import io.novafoundation.nova.common.utils.isPositive
-import io.novafoundation.nova.common.utils.isNonNegative
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import java.math.BigDecimal
 import io.novafoundation.nova.runtime.ext.ChainGeneses
@@ -30,9 +29,9 @@ class BittensorValidatorInteractor(
             val validator = BittensorValidator(hotkey, validatorName(netuid, hotkey) ?: selectedAddress)
             return listOf(BittensorValidatorPreview(validator, canPreselect = true))
         }
+        // A STALE generation still recommends: the recommendations contract makes it usable data.
         val response = backend.rankedValidators(netuid.value)
-        val rankedRows = if (hasFreshBittensorRecommendations(response.meta)) response.items.orEmpty() else emptyList()
-        val recommended = rankedRows.mapNotNull { row ->
+        val recommended = response.items.orEmpty().mapNotNull { row ->
             mapBittensorValidatorPreview(chain, row)
         }
         if (recommended.isNotEmpty()) return recommended.map { BittensorValidatorPreview(it, canPreselect = true) }
@@ -51,6 +50,8 @@ class BittensorValidatorInteractor(
     suspend fun validatorNames(netuid: BittensorNetuid, hotkeys: Set<AccountIdKey>): Map<AccountIdKey, String> {
         if (hotkeys.isEmpty()) return emptyMap()
         val chain = chain()
+        // Root names come from the root list, so positions and exits name a root validator as the list does.
+        if (netuid.isRoot()) return mapBittensorRootValidatorNames(chain, backend.rootValidators()).filterKeys { it in hotkeys }
         val response = backend.validators(netuid.value)
         return buildMap {
             response.items.orEmpty().forEach { row ->
@@ -65,17 +66,7 @@ class BittensorValidatorInteractor(
     suspend fun yields(netuid: BittensorNetuid, includeUnreliable: Boolean = false): Map<AccountIdKey, BigDecimal> {
         val chain = chain()
         if (netuid is BittensorNetuid.Subnet) return alphaYields.alphaYields(chain, netuid, includeUnreliable)
-        val response = backend.rootValidators()
-        return buildMap {
-            response.items.orEmpty().forEach { row ->
-                val stake = row.rootStakeTao?.toBigDecimalOrNull() ?: return@forEach
-                if (!stake.isPositive) return@forEach
-                val rate = row.stakeYield?.d30?.apy?.toBigDecimalOrNull()?.takeIf { it.isNonNegative } ?: return@forEach
-                val address = row.hotkey ?: return@forEach
-                val hotkey = runCatching { AccountIdKey(chain.accountIdOf(address)) }.getOrNull() ?: return@forEach
-                put(hotkey, rate)
-            }
-        }
+        return mapBittensorRootYields(chain, backend.rootValidators())
     }
 
     suspend fun validators(netuid: BittensorNetuid): List<BittensorSubnetValidator> {

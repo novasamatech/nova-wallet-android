@@ -11,7 +11,6 @@ import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.address.AddressIconGenerator
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.dataOrNull
-import io.novafoundation.nova.common.domain.ExtendedLoadingState
 import io.novafoundation.nova.common.address.AccountIdKey
 import java.math.BigDecimal
 import io.novafoundation.nova.common.domain.isLoading
@@ -30,6 +29,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectoryStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorSorting
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.catch
@@ -77,28 +78,46 @@ class BittensorSelectValidatorViewModel(
 
     private val netuid = BittensorNetuid.from(request.subnetId)
 
-    private val yields = retryController.observe(
-        step = "validator yields",
-        analytics = validatorsReads,
-        transform = { source ->
-            source.onStart { emit(emptyMap()) }.catch { cause ->
-                if (cause is CancellationException) throw cause
-                emit(emptyMap())
+    // Each filter state is its own read, so a failed read never stops a later filter change from reloading the yields.
+    // Null until a read succeeds; a failed read keeps the rates already shown.
+    private val yields = filters.map { it.hideUnusualApy }.distinctUntilChanged().flatMapLatest { hideUnusualApy ->
+        retryController.observe(
+            step = "validator yields",
+            analytics = validatorsReads,
+            transform = { source ->
+                source.catch { cause ->
+                    if (cause is CancellationException) throw cause
+                }
             }
-        }
-    ) {
-        filters.flatMapLatest { filter ->
-            flowOf { bittensorValidatorInteractor.yields(netuid, includeUnreliable = !filter.hideUnusualApy) }
+        ) {
+            flowOf<Map<AccountIdKey, BigDecimal>?> { bittensorValidatorInteractor.yields(netuid, includeUnreliable = !hideUnusualApy) }
         }
     }
+        .onStart { emit(null) }
         .shareInBackground()
 
-    private val validatorsState = observeBittensorValidatorDirectory(
+    private val directoryState = observeBittensorValidatorDirectory(
         retryController = retryController,
+        hideUnusualApy = filters.map { it.hideUnusualApy }.distinctUntilChanged(),
         loadDirectory = { bittensorValidatorInteractor.directory(netuid) },
         rankDirectory = { bittensorValidatorInteractor.rankDirectory(netuid, it) }
     )
-        .mapLoading { directory -> directory.validators.map { mapValidator(it) } }
+        .shareInBackground()
+
+    private val validatorsState = directoryState
+        .mapLoading { directory ->
+            BittensorValidatorRows(
+                rows = directory.validators.map { mapValidator(it) },
+                total = directory.validators.size,
+                partial = directory.status.completeness == BittensorValidatorDirectoryStatus.Completeness.PARTIAL
+            )
+        }
+        .shareInBackground()
+
+    // A STALE ranking still drives the quick picks, so the list says so instead of using it silently.
+    val staleRankingWarning = directoryState.map { state ->
+        if (state.dataOrNull?.staleRecommendations == true) resources.getString(R.string.bittensor_validators_ranking_stale) else null
+    }
         .shareInBackground()
 
     private val selectedValidatorAddress = MutableStateFlow(request.selectedAddress)
@@ -127,10 +146,8 @@ class BittensorSelectValidatorViewModel(
         .shareInBackground()
 
     private val filteredList = combine(validatorsState, filters, selectedAddress, yields, stakeDisplay) { state, filters, address, yields, stake ->
-        BittensorValidatorRows(
-            rows = mapValidatorRows(state, filters.sorting, address, yields, filters.hideUnusualApy, stake),
-            total = state.dataOrNull?.size
-        )
+        val directory = state.dataOrNull ?: BittensorValidatorRows(rows = emptyList(), total = null)
+        directory.copy(rows = mapValidatorRows(directory.rows, filters.sorting, address, yields.orEmpty(), filters.hideUnusualApy, stake))
     }
         .shareInBackground()
 
@@ -146,15 +163,17 @@ class BittensorSelectValidatorViewModel(
     val rows = visibleList.map { it.rows }
         .shareInBackground()
 
-    val header = combine(visibleList, filters) { list, filters ->
+    val header = combine(visibleList, filters, yields) { list, filters, yields ->
         val total = list.total
+        // The header names the rates only once they have loaded.
+        val sorting = if (yields != null) R.string.bittensor_validator_list_sort else R.string.bittensor_validator_list_sort_only
         BittensorValidatorListHeader(
-            if (total == null) {
-                resources.getString(R.string.bittensor_validator_list_count_loading)
-            } else {
-                resources.getString(R.string.bittensor_validator_list_count, list.rows.size, total)
+            when {
+                total == null -> resources.getString(R.string.bittensor_validator_list_count_loading)
+                list.partial -> resources.getString(R.string.bittensor_validator_list_count_partial, list.rows.size)
+                else -> resources.getString(R.string.bittensor_validator_list_count, list.rows.size, total)
             },
-            resources.getString(R.string.bittensor_validator_list_sort, sortingDisplay(filters.sorting).uppercase(Locale.getDefault()))
+            resources.getString(sorting, sortingDisplay(filters.sorting).uppercase(Locale.getDefault()))
         )
     }
         .shareInBackground()
@@ -169,7 +188,7 @@ class BittensorSelectValidatorViewModel(
         .shareInBackground()
 
     val canRemoveFilters = combine(filteredRows, validatorsState, filters) { rows, state, filters ->
-        !state.isLoading() && !state.dataOrNull.isNullOrEmpty() && rows.isEmpty() && filters.hideUnusualApy
+        !state.isLoading() && !state.dataOrNull?.rows.isNullOrEmpty() && rows.isEmpty() && filters.hideUnusualApy
     }.shareInBackground()
 
     val emptyMessage = combine(canRemoveFilters, query) { filtered, query ->
@@ -189,7 +208,7 @@ class BittensorSelectValidatorViewModel(
         .shareInBackground()
 
     val buttonLabel = selectedValidator.map { row ->
-        if (row == null) return@map resources.getString(R.string.bittensor_select_validator)
+        if (row == null) return@map resources.getString(R.string.bittensor_select_validator_title)
 
         val name = bittensorValidatorDisplayName(row.eligibility)
         resources.getString(R.string.bittensor_select_named_validator, name)
@@ -197,14 +216,13 @@ class BittensorSelectValidatorViewModel(
         .shareInBackground()
 
     private fun mapValidatorRows(
-        state: ExtendedLoadingState<List<BittensorValidatorUi>>,
+        rows: List<BittensorValidatorUi>,
         sorting: BittensorValidatorSorting,
         address: String?,
         rates: Map<AccountIdKey, BigDecimal>,
         hideUnusual: Boolean,
         stake: BittensorValidatorStakeDisplay?
     ): List<BittensorValidatorUi> {
-        val rows = state.dataOrNull.orEmpty()
         val rowsByAddress = rows.associateBy { it.eligibility.address }
         return sortBittensorValidators(
             validators = rows.map { it.eligibility },
@@ -225,7 +243,6 @@ class BittensorSelectValidatorViewModel(
                 apy = rate?.formatAsPercentage(),
                 apyColorRes = bittensorYieldColor(rate),
                 subtitle = subtitle,
-                stakeInNative = nativeStake,
                 annualYield = rate
             )
         }
@@ -258,24 +275,26 @@ class BittensorSelectValidatorViewModel(
                 subnetId = request.subnetId,
                 address = validator.address,
                 name = validator.validator.name.trim().takeIf { it.isNotEmpty() && it != validator.address },
-                stakeInNative = row.stakeInNative,
+                reportedStake = validator.validator.reportedStake,
                 commissionRate = validator.commissionRate,
-                inactive = validator.inactive,
-                annualYield = row.annualYield
+                inactive = validator.inactive
             )
         )
     }
 
     fun confirmClicked() = launchUnit {
         val row = selectedValidator.first() ?: return@launchUnit
-        analytics.track(
-            BittensorAnalyticsEvent.ValidatorChanged(
-                if (request.subnetId == 0) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
-                if (query.value.isNotBlank()) ValidatorChangeSource.SEARCH else ValidatorChangeSource.LIST,
-                filters.value.hideUnusualApy
+        val address = row.eligibility.address
+        if (address != request.selectedAddress && address != request.recommendedAddress) {
+            analytics.track(
+                BittensorAnalyticsEvent.ValidatorChanged(
+                    if (request.subnetId == 0) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET,
+                    if (query.value.isEmpty()) ValidatorChangeSource.LIST else ValidatorChangeSource.SEARCH,
+                    filters.value.hideUnusualApy
+                )
             )
-        )
-        communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, row.eligibility.address, selectionState()))
+        }
+        communicator.respond(BittensorSelectValidatorCommunicator.Response(request.subnetId, address, selectionState()))
         router.back()
     }
 

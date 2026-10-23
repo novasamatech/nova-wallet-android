@@ -15,8 +15,8 @@ import retrofit2.HttpException
 import retrofit2.Response
 
 /**
- * Only HTTP-fresh responses are reused. A backend-STALE policy still gates selection, but a STALE recommendation
- * generation never preselects a validator (iOS SubtensorRecommendationOperationFactory).
+ * Only HTTP-fresh responses are reused. A backend-STALE policy still gates selection, and a STALE recommendation
+ * generation still recommends: the recommendations contract makes it usable data.
  */
 class BittensorValidatorBackend(
     private val api: BittensorValidatorsApi,
@@ -71,8 +71,8 @@ class BittensorValidatorBackend(
             return@withLock rootValidators?.data ?: throw e
         }
         val cached = readCacheEntry(response, startedAt)
+        // stakeYieldWindows is optional: the root list stays usable without it, only its yield consumers need it.
         requireAvailableRootComponent(cached.data.meta?.components?.rootValidators)
-        requireAvailableRootComponent(cached.data.meta?.components?.stakeYieldWindows)
         requireNotNull(cached.data.items).forEach { row ->
             row.rootStakeTao?.toBigDecimal()
             row.stakeYield?.d30?.let { requireNotNull(it.apy).toBigDecimal() }
@@ -147,11 +147,8 @@ class BittensorValidatorBackend(
         items.singleOrNull { it.netuid == subnet.value }
     }
 
-    /** Empty while the recommendation generation is STALE: a stale pick is never preselected. */
     suspend fun recommendedHotkeys(netuid: Int): List<String> {
-        val document = recommendationsDocument()
-        if (!hasFreshBittensorRecommendations(document.meta)) return emptyList()
-        return mapRecommendedValidators(document)
+        return mapRecommendedValidators(recommendationsDocument())
             .filter { it.netuid == netuid }
             .mapNotNull { it.hotkey }
             .distinct()

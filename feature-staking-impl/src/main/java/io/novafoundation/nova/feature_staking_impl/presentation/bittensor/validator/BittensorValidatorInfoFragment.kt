@@ -39,8 +39,11 @@ class BittensorValidatorInfoFragment : BaseFragment<BittensorValidatorInfoViewMo
         status.showValue(viewModel.status.text)
         status.setPrimaryValueStyle(viewModel.status.style)
         take.showValue(viewModel.take)
-        reward.showValue(viewModel.reward.value, viewModel.reward.detail)
-        reward.setPrimaryValueStyle(viewModel.reward.style)
+        reward.showProgress()
+        viewModel.reward.observe {
+            reward.showValue(it.value, it.detail)
+            reward.setPrimaryValueStyle(it.style)
+        }
         totalStake.showProgress()
         viewModel.totalStake.observe { amount ->
             if (amount == null) totalStake.showValue("—") else totalStake.showAmount(amount)

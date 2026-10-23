@@ -16,6 +16,8 @@ import io.novafoundation.nova.feature_account_api.presenatation.account.icon.cre
 import io.novafoundation.nova.feature_account_api.presenatation.actions.ExternalActions
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.data.bittensor.BittensorValidatorSubnetCatalogue
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverage
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorCoverageInteractor
@@ -26,6 +28,7 @@ import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.model.AmountModel
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novasama.substrate_sdk_android.wsrpc.logging.Logger
+import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
@@ -43,6 +46,7 @@ class BittensorValidatorInfoViewModel(
     private val validatorInteractor: BittensorValidatorInteractor,
     private val coverageInteractor: BittensorValidatorCoverageInteractor,
     private val subnetInteractor: BittensorSubnetInteractor,
+    private val subnetCatalogue: BittensorValidatorSubnetCatalogue,
     private val addressIconGenerator: AddressIconGenerator,
     private val amountFormatter: BittensorAmountFormatter,
     private val tokenFormatter: TokenFormatter,
@@ -50,6 +54,8 @@ class BittensorValidatorInfoViewModel(
     private val resources: ResourceManager,
     private val logger: Logger
 ) : BaseViewModel(), ExternalActions by externalActions {
+
+    private val netuid = BittensorNetuid.from(payload.subnetId)
 
     val account = flowOf {
         addressIconGenerator.createAccountAddressModel(validatorInteractor.chain(), payload.address, payload.name)
@@ -61,15 +67,15 @@ class BittensorValidatorInfoViewModel(
         style = if (payload.inactive) TableCellView.FieldStyle.SECONDARY else TableCellView.FieldStyle.POSITIVE
     )
 
-    /** Null means the directory reported no fresh stake. The amount shows at once; fiat follows the native price. */
+    /** Null means no reported stake or no FRESH subnet price to value it at. Fiat follows the native price. */
     val totalStake: Flow<AmountModel?> = flow {
-        val stake = payload.stakeInNative
-        if (stake == null) {
-            emit(null)
-            return@flow
-        }
         var emitted = false
-        val amounts = flow {
+        val amounts = flow<AmountModel?> {
+            val stake = payload.reportedStake?.let { nativeStake(it) }
+            if (stake == null) {
+                emit(null)
+                return@flow
+            }
             val symbol = validatorInteractor.chain().utilityAsset.symbol
             emit(AmountModel(tokenFormatter.formatToken(stake, symbol), null))
             emitAll(
@@ -83,7 +89,7 @@ class BittensorValidatorInfoViewModel(
                 .onEach { emitted = true }
                 .catch { cause ->
                     if (cause is CancellationException) throw cause
-                    logger.log("[BittensorValidatorInfo] Validator stake price unavailable")
+                    logger.log("[BittensorValidatorInfo] Validator stake value unavailable")
                     logger.log(cause)
                     // Keep the amount already shown; otherwise resolve the cell instead of leaving it loading.
                     if (!emitted) emit(null)
@@ -97,16 +103,18 @@ class BittensorValidatorInfoViewModel(
         payload.commissionRate.movePointRight(2).setScale(2, RoundingMode.HALF_EVEN).toStripTrailingZerosString()
     )
 
-    val reward = BittensorValidatorRewardUi(
-        value = payload.annualYield?.formatAsPercentage() ?: "—",
-        detail = payload.annualYield?.let { resources.getString(R.string.bittensor_validator_info_reward_average) },
-        style = if (payload.annualYield != null) TableCellView.FieldStyle.POSITIVE else TableCellView.FieldStyle.SECONDARY
-    )
+    /** The reliable rate only, whatever the list filter shows; a failed read shows no rate. */
+    val reward: Flow<BittensorValidatorRewardUi> = flowOf<BigDecimal?> { validatorInteractor.yields(netuid, includeUnreliable = false)[hotkey()] }
+        .catch { cause ->
+            if (cause is CancellationException) throw cause
+            logger.log("[BittensorValidatorInfo] Validator reward rate unavailable")
+            logger.log(cause)
+            emit(null)
+        }
+        .map(::formatReward)
+        .shareInBackground()
 
-    val coverage: Flow<ExtendedLoadingState<CharSequence?>> = flowOf {
-        val chain = validatorInteractor.chain()
-        coverageInteractor.coverage(AccountIdKey(chain.accountIdOf(payload.address)))
-    }
+    val coverage: Flow<ExtendedLoadingState<CharSequence?>> = flowOf { coverageInteractor.coverage(hotkey()) }
         .withSafeLoading()
         .map { state ->
             when (state) {
@@ -137,6 +145,22 @@ class BittensorValidatorInfoViewModel(
     fun back() {
         router.back()
     }
+
+    private suspend fun hotkey() = AccountIdKey(validatorInteractor.chain().accountIdOf(payload.address))
+
+    /** Root stake is TAO; subnet stake is valued at the FRESH backend price, as iOS values it on this screen. */
+    private suspend fun nativeStake(reportedStake: BigDecimal): BigDecimal? = when (val netuid = netuid) {
+        BittensorNetuid.Root -> reportedStake
+        is BittensorNetuid.Subnet -> subnetCatalogue.freshPrice(netuid)?.let { price ->
+            reportedStake * price.toBigDecimal(validatorInteractor.chain().utilityAsset.precision.value)
+        }
+    }
+
+    private fun formatReward(rate: BigDecimal?) = BittensorValidatorRewardUi(
+        value = rate?.formatAsPercentage() ?: "—",
+        detail = rate?.let { resources.getString(R.string.bittensor_validator_info_reward_average) },
+        style = if (rate != null) TableCellView.FieldStyle.POSITIVE else TableCellView.FieldStyle.SECONDARY
+    )
 
     private fun formatCoverage(coverage: BittensorValidatorCoverage?): CharSequence = coverage?.let {
         resources.getString(R.string.bittensor_validator_info_coverage_value, it.permitted, it.total)

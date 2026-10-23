@@ -11,6 +11,9 @@ import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import java.math.BigInteger
 
+// Subtensor's DefaultDelegateTake: the take of a hotkey without a Delegates entry, as iOS defaultDelegateTake.
+private val DEFAULT_DELEGATE_TAKE_IN_U16 = 11_796.toBigInteger()
+
 internal data class BittensorValidatorSnapshot(
     val uids: Map<AccountIdKey, Int?>,
     val commissionsInU16: Map<AccountIdKey, BigInteger?>,
@@ -20,42 +23,55 @@ internal data class BittensorValidatorSnapshot(
     val registeredAt: BigInteger? = null
 )
 
+/**
+ * Every validator is listed, as on iOS: the take limit and the permit and activity gates only decide recommendations
+ * (see [passesBittensorRecommendationGates]), and only an inactive validator cannot take a new stake.
+ */
 internal fun mapBittensorValidators(
     chain: Chain,
     netuid: BittensorNetuid,
     validators: List<BittensorValidator>,
-    gates: BittensorValidatorGates,
     snapshot: BittensorValidatorSnapshot
 ): List<BittensorSubnetValidator> {
-    return validators.mapNotNull { validator -> mapBittensorValidator(chain, netuid, validator, gates, snapshot) }
+    return validators.map { validator -> mapBittensorValidator(chain, netuid, validator, snapshot) }
 }
 
 private fun mapBittensorValidator(
     chain: Chain,
     netuid: BittensorNetuid,
     validator: BittensorValidator,
-    gates: BittensorValidatorGates,
     snapshot: BittensorValidatorSnapshot
-): BittensorSubnetValidator? {
-    val uid = snapshot.uids[validator.hotkey]
-    if (netuid.isRoot() && uid == null) return null
-    val commissionInU16 = snapshot.commissionsInU16[validator.hotkey] ?: return null
-    if (!gates.allowsCommission(commissionInU16)) return null
-    val hasPermit = uid?.let { snapshot.permits.getOrNull(it) }
-    val active = uid?.let { snapshot.lastUpdates.getOrNull(it) }?.let { it >= snapshot.activeThreshold }
+): BittensorSubnetValidator {
     val inactive = snapshot.isInactive(netuid, validator.hotkey)
-    val eligible = uid != null &&
-        (netuid.isRoot() || !gates.requirePermit || hasPermit == true) &&
-        (netuid.isRoot() || !gates.requireActive || active == true)
 
     return BittensorSubnetValidator(
         validator = validator,
         address = chain.addressOf(validator.hotkey),
-        commissionRate = validatorCommissionRateFromU16(commissionInU16),
-        selectable = eligible,
+        commissionRate = validatorCommissionRateFromU16(snapshot.commissionInU16(validator.hotkey)),
+        selectable = !inactive,
         inactive = inactive,
-        canAddToExistingPosition = eligible || inactive
+        // Buy more on an inactive validator asks to accept the warning instead.
+        canAddToExistingPosition = true
     )
+}
+
+internal fun BittensorValidatorSnapshot.commissionInU16(hotkey: AccountIdKey): BigInteger = commissionsInU16[hotkey] ?: DEFAULT_DELEGATE_TAKE_IN_U16
+
+/**
+ * As iOS SubtensorRecommendationVerifier.passesGates: only a validator registered on [netuid] with a readable chain status,
+ * a take within the limit and, on a subnet, the permit and activity the [gates] require can be recommended.
+ */
+internal fun BittensorValidatorSnapshot.passesBittensorRecommendationGates(
+    netuid: BittensorNetuid,
+    hotkey: AccountIdKey,
+    gates: BittensorValidatorGates
+): Boolean {
+    val uid = uids[hotkey] ?: return false
+    if (!gates.allowsCommission(commissionInU16(hotkey))) return false
+    if (netuid.isRoot()) return true
+    val hasPermit = permits.getOrNull(uid) ?: return false
+    val lastUpdate = lastUpdates.getOrNull(uid) ?: return false
+    return (!gates.requirePermit || hasPermit) && (!gates.requireActive || lastUpdate >= activeThreshold)
 }
 
 internal fun BittensorValidatorSnapshot.isInactive(netuid: BittensorNetuid, hotkey: AccountIdKey): Boolean {

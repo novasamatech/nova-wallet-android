@@ -35,12 +35,12 @@ class BittensorValidatorBackendTest {
     }
 
     @Test
-    fun `stale recommendations or missing generation cannot select a root validator`() = runBlocking {
+    fun `stale recommendations still select a root validator but a missing generation cannot`() = runBlocking {
         val api = Api("no-store")
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }
         val backend = BittensorValidatorBackend(api, urls)
         api.recommendationsDocument = recommendations("STALE")
-        assertEquals(emptyList<String>(), backend.recommendedHotkeys(0))
+        assertEquals(listOf("stable-root", "balanced-root", "higher-root"), backend.recommendedHotkeys(0))
         assertEquals(4, backend.recommendedValidators().size)
         api.recommendationsDocument = policy("FRESH")
         assertTrue(
@@ -223,7 +223,7 @@ class BittensorValidatorBackendTest {
     }
 
     @Test
-    fun `a stale ranking supplies selection gates but no recommendations`() = runBlocking {
+    fun `a stale ranking reads as not fresh and still supplies selection gates`() = runBlocking {
         val api = Api("max-age=60")
         api.rankedFreshness = "STALE"
         val urls = InfrastructureUrls { "https://infra.test/".toHttpUrl() }

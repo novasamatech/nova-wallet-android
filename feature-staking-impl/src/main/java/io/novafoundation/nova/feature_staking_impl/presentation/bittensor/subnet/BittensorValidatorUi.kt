@@ -11,6 +11,5 @@ data class BittensorValidatorUi(
     val apy: String? = null,
     val apyColorRes: Int = R.color.text_secondary,
     val subtitle: String? = null,
-    val stakeInNative: BigDecimal? = null,
     val annualYield: BigDecimal? = null
 )

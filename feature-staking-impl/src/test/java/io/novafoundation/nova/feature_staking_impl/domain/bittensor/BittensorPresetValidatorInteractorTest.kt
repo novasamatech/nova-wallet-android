@@ -52,7 +52,7 @@ class BittensorPresetValidatorInteractorTest {
     @Before
     fun prepare() = runBlocking<Unit> {
         `when`(chains.getChain(ChainGeneses.BITTENSOR)).thenReturn(chain)
-        `when`(repository.validators(chain, subnet)).thenReturn(listOf(first, second, third))
+        stubDirectory(first, second, third)
         `when`(yields.alphaYields(chain, subnet)).thenReturn(mapOf(first.validator.hotkey to BigDecimal.ONE, second.validator.hotkey to BigDecimal.TEN))
         `when`(portfolio.observePortfolio()).thenReturn(flowOf(portfolio(emptyList())))
     }
@@ -66,7 +66,7 @@ class BittensorPresetValidatorInteractorTest {
 
     @Test
     fun `inactive highest yield is skipped even when recommendation and gates allow it`() = runBlocking<Unit> {
-        `when`(repository.validators(chain, subnet)).thenReturn(listOf(second.copy(inactive = true), first, third))
+        stubDirectory(second.copy(inactive = true), first, third)
         assertEquals(first, interactor.validators(subnet).first())
         verify(repository, never()).validate(chain, subnet, second.validator)
     }
@@ -107,7 +107,7 @@ class BittensorPresetValidatorInteractorTest {
 
     @Test
     fun `unrecommended and disabled rows are never preset candidates`() = runBlocking<Unit> {
-        `when`(repository.validators(chain, subnet)).thenReturn(listOf(second.copy(recommended = false), first.copy(selectable = false), third))
+        stubDirectory(second.copy(recommended = false), first.copy(selectable = false), third)
         assertEquals(third, interactor.validators(subnet).first())
         verify(repository, never()).validate(chain, subnet, second.validator)
     }
@@ -117,7 +117,7 @@ class BittensorPresetValidatorInteractorTest {
         val yuma = candidate(4)
         val tbai = candidate(5)
         val arbos = candidate(6).copy(inactive = true)
-        `when`(repository.validators(chain, subnet)).thenReturn(listOf(arbos, tbai, yuma))
+        stubDirectory(arbos, tbai, yuma)
         `when`(yields.alphaYields(chain, subnet)).thenReturn(
             mapOf(yuma.validator.hotkey to BigDecimal("54.24"), tbai.validator.hotkey to BigDecimal("76.85"), arbos.validator.hotkey to BigDecimal("77.8"))
         )
@@ -130,8 +130,22 @@ class BittensorPresetValidatorInteractorTest {
     }
 
     @Test
+    fun `equal or unknown yields follow the ranking instead of the name order like iOS`() = runBlocking<Unit> {
+        val alpha = candidate(4).copy(recommendationRank = 2)
+        val beta = candidate(5).copy(recommendationRank = 0)
+        val gamma = candidate(6).copy(recommendationRank = 1)
+        stubDirectory(alpha, beta, gamma)
+        `when`(yields.alphaYields(chain, subnet)).thenReturn(mapOf(alpha.validator.hotkey to BigDecimal.TEN, gamma.validator.hotkey to BigDecimal("10.0")))
+
+        assertEquals(gamma, interactor.preset(subnet).preset)
+
+        `when`(yields.alphaYields(chain, subnet)).thenReturn(emptyMap())
+        assertEquals(beta, interactor.preset(subnet).preset)
+    }
+
+    @Test
     fun `no qualifying recommendation leaves the preset empty instead of failing`() = runBlocking<Unit> {
-        `when`(repository.validators(chain, subnet)).thenReturn(listOf(first.copy(recommended = false), second.copy(inactive = true)))
+        stubDirectory(first.copy(recommended = false), second.copy(inactive = true))
 
         assertNull(interactor.preset(subnet).preset)
         val failure = runCatching { interactor.validators(subnet) }.exceptionOrNull()
@@ -139,15 +153,31 @@ class BittensorPresetValidatorInteractorTest {
     }
 
     @Test
-    fun `existing position keeps its largest active validator`() = runBlocking<Unit> {
+    fun `existing position keeps its largest validator from the chain whatever the recommendation gates`() = runBlocking<Unit> {
         val held = candidate(7).copy(recommended = false)
-        `when`(repository.validators(chain, subnet)).thenReturn(listOf(first, second, held))
+        `when`(repository.chainValidator(chain, subnet, held.validator.hotkey)).thenReturn(held)
         `when`(portfolio.observePortfolio()).thenReturn(
             flowOf(portfolio(listOf(position(first, 10), position(held, 20), position(second, 30, BittensorNetuid.Subnet(2)))))
         )
 
-        assertEquals(held, interactor.preset(subnet).preset)
+        val result = interactor.preset(subnet)
+
+        assertEquals(held, result.preset)
+        assertEquals(listOf(held, first, second, third), result.directory)
         verify(repository, never()).validate(chain, subnet, second.validator)
+    }
+
+    @Test
+    fun `existing validator is preset even when recommendations cannot be read`() = runBlocking<Unit> {
+        val held = candidate(7)
+        stubDirectory(first, held.copy(selectable = false), failure = IllegalStateException("503"))
+        `when`(repository.chainValidator(chain, subnet, held.validator.hotkey)).thenReturn(held)
+        `when`(portfolio.observePortfolio()).thenReturn(flowOf(portfolio(listOf(position(held, 20)))))
+
+        val result = interactor.preset(subnet)
+
+        assertEquals(held, result.preset)
+        assertEquals(listOf(first, held), result.directory)
     }
 
     @Test
@@ -161,11 +191,22 @@ class BittensorPresetValidatorInteractorTest {
     }
 
     @Test
-    fun `inactive existing validator falls back to the recommendation`() = runBlocking<Unit> {
-        val held = candidate(7).copy(inactive = true)
-        `when`(repository.validators(chain, subnet)).thenReturn(listOf(first, second, held))
+    fun `equal root stakes resolve to the lexicographically smaller hotkey like iOS`() {
+        val low = candidate(1).validator.hotkey
+        val high = candidate(0x90).validator.hotkey
+
+        assertEquals(low, bittensorRootPrimaryHotkey(listOf(BittensorRootPosition(high, BigInteger.TEN), BittensorRootPosition(low, BigInteger.TEN))))
+        assertEquals(high, bittensorRootPrimaryHotkey(listOf(BittensorRootPosition(high, BigInteger.TEN), BittensorRootPosition(low, BigInteger.ONE))))
+    }
+
+    @Test
+    fun `inactive or unreadable existing validator falls back to the recommendation`() = runBlocking<Unit> {
+        val held = candidate(7)
+        `when`(repository.chainValidator(chain, subnet, held.validator.hotkey)).thenReturn(held.copy(inactive = true))
         `when`(portfolio.observePortfolio()).thenReturn(flowOf(portfolio(listOf(position(held, 20)))))
 
+        assertEquals(second, interactor.preset(subnet).preset)
+        `when`(repository.chainValidator(chain, subnet, held.validator.hotkey)).thenThrow(IllegalStateException("offline"))
         assertEquals(second, interactor.preset(subnet).preset)
     }
 
@@ -177,10 +218,17 @@ class BittensorPresetValidatorInteractorTest {
     }
 
     @Test
-    fun `unavailable recommendations are reported for retry`() = runBlocking<Unit> {
-        `when`(repository.validators(chain, subnet)).thenThrow(IllegalStateException("503"))
-
+    fun `unavailable directory or recommendations are reported for retry`() = runBlocking<Unit> {
+        stubDirectory(first, second, failure = IllegalStateException("503"))
         assertEquals("503", runCatching { interactor.preset(subnet) }.exceptionOrNull()?.message)
+
+        `when`(repository.directory(chain, subnet)).thenThrow(IllegalStateException("offline"))
+        assertEquals("offline", runCatching { interactor.preset(subnet) }.exceptionOrNull()?.message)
+    }
+
+    private suspend fun stubDirectory(vararg rows: BittensorSubnetValidator, failure: Throwable? = null) {
+        val status = mock(BittensorValidatorDirectoryStatus::class.java)
+        `when`(repository.directory(chain, subnet)).thenReturn(BittensorValidatorDirectory(rows.toList(), status, failure))
     }
 
     private fun portfolio(subnets: List<BittensorSubnetPosition>) = BittensorPortfolio(

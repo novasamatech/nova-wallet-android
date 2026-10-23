@@ -7,6 +7,7 @@ import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import io.novafoundation.nova.runtime.network.rpc.RpcCalls
 import io.novafoundation.nova.runtime.storage.source.StorageDataSource
+import io.novafoundation.nova.runtime.storage.source.query.StorageQueryContext
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -27,6 +28,8 @@ class BittensorValidatorTimeoutTest {
     private val api = object : BittensorValidatorsApi by apiDelegate {
         override suspend fun validators(url: String): Response<BittensorValidatorsRemote> = awaitCancellation()
 
+        override suspend fun rootValidators(url: String): Response<BittensorRootValidatorRemote> = awaitCancellation()
+
         override suspend fun recommendations(url: String): Response<BittensorRecommendationsRemote> = awaitCancellation()
     }
 
@@ -34,7 +37,14 @@ class BittensorValidatorTimeoutTest {
 
     private val backend = BittensorValidatorBackend(api, urls)
 
-    private val storage = mock(StorageDataSource::class.java)
+    private val storage = object : StorageDataSource by mock(StorageDataSource::class.java) {
+        override suspend fun <R> query(
+            chainId: String,
+            at: String?,
+            applyStorageDefault: Boolean,
+            query: suspend StorageQueryContext.() -> R
+        ): R = awaitCancellation()
+    }
 
     private val rpc = mock(RpcCalls::class.java)
 

@@ -8,9 +8,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSubnetValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectory
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorGates
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidatorDirectoryStatus
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.isRoot
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.validatorCommissionRateFromU16
 import io.novafoundation.nova.runtime.ext.accountIdOf
 import io.novafoundation.nova.runtime.ext.addressOf
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
@@ -24,8 +23,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.coroutines.async
-import java.math.BigDecimal
 
 interface BittensorSubnetValidatorRepository {
 
@@ -44,6 +41,12 @@ interface BittensorSubnetValidatorRepository {
     suspend fun rankDirectory(chain: Chain, netuid: BittensorNetuid, directory: BittensorValidatorDirectory): BittensorValidatorDirectory
 
     suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator)
+
+    /**
+     * [hotkey] as the chain reports it on [netuid], named by the listing when it is listed, without the recommendation gates,
+     * as iOS SubtensorValidatorDirectoryOperationFactory.createDetailWrapper.
+     */
+    suspend fun chainValidator(chain: Chain, netuid: BittensorNetuid, hotkey: AccountIdKey): BittensorSubnetValidator
 
     suspend fun existingPositionValidator(chain: Chain, netuid: BittensorNetuid.Subnet, validator: BittensorValidator): BittensorSubnetValidator {
         return validators(chain, netuid).first { it.validator.hotkey == validator.hotkey && it.canAddToExistingPosition }
@@ -68,37 +71,35 @@ class RealBittensorSubnetValidatorRepository(
 
     override suspend fun validateRoot(chain: Chain, validator: BittensorValidator) = validate(chain, BittensorNetuid.Root, validator)
 
+    /** Selection does not depend on the recommendations: a failed ranking leaves the rows unranked but selectable. */
     override suspend fun validators(chain: Chain, netuid: BittensorNetuid): List<BittensorSubnetValidator> {
-        val directory = directory(chain, netuid)
-        // List-only consumers cannot represent partial success. Preserve their standard retry path.
-        directory.recommendationFailure?.let { throw it }
-        return directory.validators
+        return directory(chain, netuid).validators
     }
 
     override suspend fun directory(chain: Chain, netuid: BittensorNetuid): BittensorValidatorDirectory = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
-        val response = backend.validators(netuid.value)
-        val rootStakes = async { loadRootStakes(chain, netuid) }
+        val listing = loadListing(chain, netuid)
         val ranking = loadRanking(netuid)
-        val listed = mapCandidates(chain, response)
-        val snapshot = loadDirectorySnapshot(chain, netuid, listed)
-        val candidates = listed.withRootStakes(rootStakes.await())
-        val admittedRanking = ranking.mapCatching { ranked ->
-            requireBittensorRegistrationFreshness(netuid, snapshot, ranked)
-            ranked
-        }
-        val validators = mapDirectoryRows(chain, netuid, candidates, snapshot, admittedRanking.getOrNull())
-        BittensorValidatorDirectory(validators, mapBittensorDirectoryStatus(response.meta), admittedRanking.exceptionOrNull())
+        val snapshot = loadDirectorySnapshot(chain, netuid, listing.candidates)
+        val validators = mapDirectoryRows(chain, netuid, listing.candidates, snapshot, ranking.getOrNull())
+        BittensorValidatorDirectory(validators, listing.status, ranking.exceptionOrNull(), ranking.getOrNull().isStale())
     } ?: throw BittensorTimeoutException("Validator directory")
 
     override suspend fun unrankedDirectory(chain: Chain, netuid: BittensorNetuid): BittensorValidatorDirectory =
         withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
-            val response = backend.validators(netuid.value)
-            val rootStakes = async { loadRootStakes(chain, netuid) }
-            val listed = mapCandidates(chain, response)
-            val snapshot = loadDirectorySnapshot(chain, netuid, listed)
-            val rows = mapUnavailablePolicyDirectory(chain, netuid, listed.withRootStakes(rootStakes.await()), snapshot)
-            BittensorValidatorDirectory(rows, mapBittensorDirectoryStatus(response.meta), recommendationFailure = null)
+            val listing = loadListing(chain, netuid)
+            val snapshot = loadDirectorySnapshot(chain, netuid, listing.candidates)
+            val rows = mapBittensorValidators(chain, netuid, listing.candidates, snapshot)
+            BittensorValidatorDirectory(rows, listing.status, recommendationFailure = null)
         } ?: throw BittensorTimeoutException("Validator directory")
+
+    /** Root lists the root validators resource, as iOS does for netuid 0; a subnet lists its own validator directory. */
+    private suspend fun loadListing(chain: Chain, netuid: BittensorNetuid): DirectoryListing = if (netuid.isRoot()) {
+        val response = backend.rootValidators()
+        DirectoryListing(mapBittensorRootValidators(chain, response), mapBittensorRootDirectoryStatus(response.meta))
+    } else {
+        val response = backend.validators(netuid.value)
+        DirectoryListing(mapCandidates(chain, response), mapBittensorDirectoryStatus(response.meta))
+    }
 
     override suspend fun rankDirectory(
         chain: Chain,
@@ -109,9 +110,8 @@ class RealBittensorSubnetValidatorRepository(
         val candidates = directory.validators.map { it.validator }
         // Retry only ranking and its live eligibility checks, never the independent directory HTTP request.
         val snapshot = loadDirectorySnapshot(chain, netuid, candidates)
-        requireBittensorRegistrationFreshness(netuid, snapshot, ranking)
         val rows = mapDirectoryRows(chain, netuid, candidates, snapshot, ranking)
-        directory.copy(validators = rows, recommendationFailure = null)
+        directory.copy(validators = rows, recommendationFailure = null, staleRecommendations = ranking.isStale())
     } ?: throw BittensorTimeoutException("Validator eligibility checks")
 
     private suspend fun loadDirectorySnapshot(
@@ -132,14 +132,20 @@ class RealBittensorSubnetValidatorRepository(
         snapshot: BittensorValidatorSnapshot,
         ranking: BittensorRankedValidatorsRemote?
     ): List<BittensorSubnetValidator> {
-        val rankedRows = ranking?.items.orEmpty()
-        val recommendedHotkeys = if (hasFreshBittensorRecommendations(ranking?.meta)) recommendedHotkeys(rankedRows) else emptySet()
-        val namedCandidates = applyRankedNames(chain, candidates, rankedRows)
-        val rows = ranking?.let {
-            val gates = mapBittensorValidatorGates(BittensorRecommendationsRemote(it.meta))
-            mapBittensorValidators(chain, netuid, namedCandidates, gates, snapshot)
-        } ?: mapUnavailablePolicyDirectory(chain, netuid, candidates, snapshot)
-        return rows.map { row -> row.copy(recommended = row.canSelect && row.address in recommendedHotkeys) }
+        // As in iOS SubtensorRecommendationOperationFactory, a generation older than the subnet's registration recommends nothing; nor do its names apply.
+        val rankedRows = ranking?.takeUnless { bittensorRankingPredatesRegistration(netuid, snapshot, it) }?.items.orEmpty()
+        // A STALE generation still recommends: the recommendations contract makes it usable data, shown as outdated.
+        val recommendationRanks = recommendationRanks(rankedRows)
+        // Root rows keep the names of the root list.
+        val namedCandidates = if (netuid.isRoot()) candidates else applyRankedNames(chain, candidates, rankedRows)
+        val gates = ranking?.let { mapBittensorValidatorGates(BittensorRecommendationsRemote(it.meta)) }
+        return mapBittensorValidators(chain, netuid, namedCandidates, snapshot)
+            .map { row ->
+                // The take limit and the other gates decide only which validators are recommended.
+                val rank = recommendationRanks[row.address]
+                    ?.takeIf { gates != null && snapshot.passesBittensorRecommendationGates(netuid, row.validator.hotkey, gates) }
+                row.copy(recommended = rank != null, recommendationRank = rank)
+            }
             .sortedWith(
                 compareByDescending<BittensorSubnetValidator> { it.canSelect }
                     .thenByDescending { it.recommended }
@@ -158,29 +164,15 @@ class RealBittensorSubnetValidatorRepository(
         Result.failure(exception)
     }
 
-    private fun mapUnavailablePolicyDirectory(
-        chain: Chain,
-        netuid: BittensorNetuid,
-        candidates: List<BittensorValidator>,
-        snapshot: BittensorValidatorSnapshot
-    ): List<BittensorSubnetValidator> = candidates.mapNotNull { validator ->
-        // Same membership as the ranked rows: root lists only hotkeys registered on the root network.
-        if (netuid.isRoot() && snapshot.uids[validator.hotkey] == null) return@mapNotNull null
-        val take = snapshot.commissionsInU16[validator.hotkey] ?: return@mapNotNull null
-        BittensorSubnetValidator(
-            validator,
-            chain.addressOf(validator.hotkey),
-            validatorCommissionRateFromU16(take),
-            selectable = false,
-            inactive = snapshot.isInactive(netuid, validator.hotkey),
-            recommendationsAvailable = false
-        )
-    }
-
-    private fun recommendedHotkeys(rows: List<BittensorRankedValidatorsRemote.Item>): Set<String> = rows
+    /** Recommended hotkeys by their position in the ranking, which breaks automatic preset ties as on iOS. */
+    private fun recommendationRanks(rows: List<BittensorRankedValidatorsRemote.Item>): Map<String, Int> = rows
         .filter { it.eligible == true && it.recommendationClass in RECOMMENDATION_CLASSES }
         .mapNotNull { it.hotkey }
-        .toSet()
+        .distinct()
+        .withIndex()
+        .associate { (rank, hotkey) -> hotkey to rank }
+
+    private fun BittensorRankedValidatorsRemote?.isStale(): Boolean = this != null && !hasFreshBittensorRecommendations(meta)
 
     private fun applyRankedNames(
         chain: Chain,
@@ -197,39 +189,16 @@ class RealBittensorSubnetValidatorRepository(
         }
     }
 
-    private fun List<BittensorValidator>.withRootStakes(stakes: Map<AccountIdKey, BigDecimal>?): List<BittensorValidator> {
-        if (stakes == null) return this
-        return map { it.copy(reportedStake = stakes[it.hotkey]) }
-    }
-
-    /**
-     * The subnet-0 directory carries no stake measurement; root stake comes from the root validators resource.
-     * Null for subnets (keep the directory's own stake); empty when the root stake is unavailable.
-     */
-    private suspend fun loadRootStakes(chain: Chain, netuid: BittensorNetuid): Map<AccountIdKey, BigDecimal>? {
-        if (!netuid.isRoot()) return null
-        return withTimeoutOrNull(RANKING_TIMEOUT_MILLIS) {
-            try {
-                mapBittensorRootStakes(chain, backend.rootValidators())
-            } catch (exception: CancellationException) {
-                throw exception
-            } catch (exception: Exception) {
-                // Stake is display and sort data only; its absence must not fail the directory.
-                emptyMap()
-            }
-        } ?: emptyMap()
-    }
-
     private fun mapCandidates(chain: Chain, response: BittensorValidatorsRemote): List<BittensorValidator> {
         val status = mapBittensorDirectoryStatus(response.meta)
-        val hasFreshStake = hasFreshBittensorDirectoryStake(status)
+        val hasUsableStake = hasUsableBittensorDirectoryStake(status)
         return requireNotNull(response.items)
-            .mapNotNull { mapValidator(chain, it, hasFreshStake) }
+            .mapNotNull { mapValidator(chain, it, hasUsableStake) }
             .distinctBy { it.hotkey }
             .take(MAX_VALIDATORS)
     }
 
-    private fun mapValidator(chain: Chain, remote: BittensorValidatorsRemote.Item, hasFreshStake: Boolean): BittensorValidator? {
+    private fun mapValidator(chain: Chain, remote: BittensorValidatorsRemote.Item, hasUsableStake: Boolean): BittensorValidator? {
         val address = remote.hotkey ?: return null
         val hotkey = runCatching { chain.accountIdOf(address) }
             .getOrNull() ?: return null
@@ -241,24 +210,40 @@ class RealBittensorSubnetValidatorRepository(
             ?.takeIf(String::isNotBlank)
 
         val reportedStake = remote.reportedMeasurements?.validatorStake
-            ?.takeIf { hasFreshStake }
+            ?.takeIf { hasUsableStake }
             ?.toBigDecimalOrNull()
             ?.takeIf { it.isNonNegative }
 
         return BittensorValidator(AccountIdKey(hotkey), identityName ?: stakeName ?: address, reportedStake)
     }
 
+    /** As on iOS, only an inactive validator cannot take a new stake; the take limit gates recommendations alone. */
     override suspend fun validate(chain: Chain, netuid: BittensorNetuid, validator: BittensorValidator) = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
-        val gates = backend.gates()
-        val row = enrich(
-            chain,
-            netuid,
-            listOf(validator),
-            gates
-        )
-            .singleOrNull()
-        require(row?.canSelect == true) { "Validator is no longer eligible in this subnet" }
+        val row = enrich(chain, netuid, listOf(validator)).single()
+        require(row.canSelect) { "Validator is no longer eligible in this subnet" }
     } ?: throw BittensorTimeoutException("Validator eligibility checks")
+
+    override suspend fun chainValidator(chain: Chain, netuid: BittensorNetuid, hotkey: AccountIdKey): BittensorSubnetValidator {
+        val validator = listedValidator(chain, netuid, hotkey) ?: BittensorValidator(hotkey, chain.addressOf(hotkey))
+        val snapshot = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
+            val hash = rpc.getBlockHash(chain.id)
+            storage.query(chain.id, at = hash, applyStorageDefault = true) {
+                loadBittensorValidatorSnapshot(netuid, listOf(validator))
+            }
+        } ?: throw BittensorTimeoutException("Validator eligibility checks")
+        return mapBittensorValidators(chain, netuid, listOf(validator), snapshot).single()
+    }
+
+    /** The listing only names the validator, so an unreadable listing leaves it unnamed, as on iOS. */
+    private suspend fun listedValidator(chain: Chain, netuid: BittensorNetuid, hotkey: AccountIdKey): BittensorValidator? = try {
+        withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
+            loadListing(chain, netuid).candidates.firstOrNull { it.hotkey == hotkey }
+        }
+    } catch (cancelled: CancellationException) {
+        throw cancelled
+    } catch (failure: Exception) {
+        null
+    }
 
     override suspend fun existingPositionValidator(
         chain: Chain,
@@ -267,16 +252,13 @@ class RealBittensorSubnetValidatorRepository(
     ): BittensorSubnetValidator = withTimeout(REQUEST_TIMEOUT_MILLIS) {
         val directory = backend.validators(netuid.value)
         val identifiedValidator = mapCandidates(chain, directory).firstOrNull { it.hotkey == validator.hotkey } ?: validator
-        val gates = backend.gates()
-        val row = enrich(chain, netuid, listOf(identifiedValidator), gates).singleOrNull()
-        requireNotNull(row?.takeIf { it.canAddToExistingPosition }) { "Validator is no longer eligible for additional stake" }
+        enrich(chain, netuid, listOf(identifiedValidator)).single()
     }
 
     private suspend fun enrich(
         chain: Chain,
         netuid: BittensorNetuid,
-        validators: List<BittensorValidator>,
-        gates: BittensorValidatorGates
+        validators: List<BittensorValidator>
     ): List<BittensorSubnetValidator> {
         if (validators.isEmpty()) return emptyList()
         val hash = rpc.getBlockHash(chain.id)
@@ -291,10 +273,12 @@ class RealBittensorSubnetValidatorRepository(
             chain,
             netuid,
             validators,
-            gates,
             snapshot
         )
     }
+
+    private class DirectoryListing(val candidates: List<BittensorValidator>, val status: BittensorValidatorDirectoryStatus)
+
     private companion object {
 
         val RECOMMENDATION_CLASSES = setOf("stable", "balanced", "higherUpside")
@@ -309,13 +293,13 @@ class RealBittensorSubnetValidatorRepository(
 
 internal fun bindBittensorValidatorCount(value: Any?): Int = bindList(value, ::bindBoolean).count { it }
 
-internal fun requireBittensorRegistrationFreshness(
+/** Whether [ranking] was computed for an earlier registration of the subnet, or the registration block is unreadable. */
+internal fun bittensorRankingPredatesRegistration(
     netuid: BittensorNetuid,
     snapshot: BittensorValidatorSnapshot,
     ranking: BittensorRankedValidatorsRemote
-) {
-    if (netuid.isRoot()) return
-    val registeredAt = requireNotNull(snapshot.registeredAt) { "Subnet registration is unavailable" }
-    val generation = mapBittensorRecommendationGeneration(ranking.meta)
-    require(registeredAt <= generation.sourceBlockNumber) { "Recommendations predate subnet registration" }
+): Boolean {
+    if (netuid.isRoot()) return false
+    val registeredAt = snapshot.registeredAt ?: return true
+    return registeredAt > mapBittensorRecommendationGeneration(ranking.meta).sourceBlockNumber
 }

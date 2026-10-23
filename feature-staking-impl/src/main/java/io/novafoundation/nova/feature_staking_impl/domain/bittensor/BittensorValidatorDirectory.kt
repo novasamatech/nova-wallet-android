@@ -2,10 +2,12 @@ package io.novafoundation.nova.feature_staking_impl.domain.bittensor
 
 import java.math.BigDecimal
 
+/** [staleRecommendations]: the recommendations come from a STALE generation, which is usable but shown as outdated. */
 data class BittensorValidatorDirectory(
     val validators: List<BittensorSubnetValidator>,
     val status: BittensorValidatorDirectoryStatus,
-    val recommendationFailure: Throwable?
+    val recommendationFailure: Throwable?,
+    val staleRecommendations: Boolean = false
 )
 
 data class BittensorValidatorDirectoryStatus(

@@ -69,12 +69,12 @@ class BittensorValidatorPreviewTest {
     }
 
     @Test
-    fun `stale recommendation generation never preselects and falls back to the directory card`() = runBlocking {
+    fun `stale recommendation generation still supplies the recommended card`() = runBlocking {
         val row = BittensorRankedValidatorsRemote.Item(subnet.value, chain.addressOf(hotkey), "Recommended", true, "balanced", null)
         `when`(backend.rankedValidators(subnet.value)).thenReturn(BittensorRankedValidatorsRemote(recommendationMeta("STALE"), listOf(row)))
         val result = interactor.previews(subnet, null).single()
-        assertEquals("Directory validator", result.validator.name)
-        assertFalse(result.canPreselect)
+        assertEquals("Recommended", result.validator.name)
+        assertTrue(result.canPreselect)
     }
 
     private fun recommendationMeta(freshness: String) = BittensorRecommendationsRemote.Meta(

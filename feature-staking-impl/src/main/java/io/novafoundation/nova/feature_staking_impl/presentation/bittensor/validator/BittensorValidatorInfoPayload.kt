@@ -5,16 +5,15 @@ import java.math.BigDecimal
 import kotlinx.parcelize.Parcelize
 
 /**
- * The validator as the list shows it: the info screen presents the same snapshot instead of re-deriving it.
- * [stakeInNative] is the reported stake converted to the native token, [annualYield] the same rate the row shows.
+ * The validator as the list row knows it. [reportedStake] is the directory stake in the subnet token (TAO on root); the screen
+ * loads the reward rate and the price itself, so a tap before the list has them still fills in.
  */
 @Parcelize
 class BittensorValidatorInfoPayload(
     val subnetId: Int,
     val address: String,
     val name: String?,
-    val stakeInNative: BigDecimal?,
+    val reportedStake: BigDecimal?,
     val commissionRate: BigDecimal,
-    val inactive: Boolean,
-    val annualYield: BigDecimal?
+    val inactive: Boolean
 ) : Parcelable

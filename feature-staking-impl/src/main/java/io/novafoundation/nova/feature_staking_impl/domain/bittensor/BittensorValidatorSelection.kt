@@ -38,7 +38,7 @@ data class BittensorSubnetValidator(
     val recommended: Boolean = false,
     val inactive: Boolean = false,
     val canAddToExistingPosition: Boolean = selectable,
-    val recommendationsAvailable: Boolean = true
+    val recommendationRank: Int? = null
 ) {
     val canSelect: Boolean get() = selectable && !inactive
 }

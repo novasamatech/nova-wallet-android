@@ -2841,6 +2841,7 @@
     <string name="bittensor_you_stake">You stake</string>
     <string name="bittensor_validator">Validator</string>
     <string name="bittensor_select_validator">Choose a validator</string>
+    <string name="bittensor_select_validator_title">Select validator</string>
     <string name="bittensor_what_you_could_get">What you could get</string>
     <string name="bittensor_max" translatable="false">Max</string>
     <string name="bittensor_validator_address_info">Validator address: %s</string>
@@ -2890,7 +2891,7 @@
     <string name="bittensor_subnet_github">GitHub</string>
     <string name="bittensor_available_validators">Available validators</string>
     <string name="bittensor_use_subnet">Use this subnet</string>
-    <string name="bittensor_no_validators">No eligible validators found</string>
+    <string name="bittensor_no_validators">No validator data available</string>
     <string name="bittensor_select_named_validator">Select %s</string>
     <string name="bittensor_validator_take">Validator fee: %1$s%%</string>
     <string name="bittensor_apy" translatable="false">APY</string>
@@ -3054,7 +3055,9 @@
     <string name="bittensor_validator_search_hint">Search by name or address</string>
     <string name="bittensor_validator_list_count">Validators: %1$d of %2$d</string>
     <string name="bittensor_validator_list_count_loading">Validators: — of —</string>
+    <string name="bittensor_validator_list_count_partial">Validators: %1$d of —</string>
     <string name="bittensor_validator_list_sort">Rewards (APY) · By %1$s</string>
+    <string name="bittensor_validator_list_sort_only">By %1$s</string>
     <string name="bittensor_validator_list_subtitle">%1$s staked · take %2$s%%</string>
     <string name="bittensor_validator_apy_value">APY: %1$s%%</string>
     <string name="bittensor_sort_pool">Pool size</string>
@@ -3119,6 +3122,7 @@
     <string name="bittensor_validator_info_reward_average">30-day average</string>
     <string name="bittensor_remove_validator_filters">Remove all filters</string>
     <string name="bittensor_validators_filtered_empty">No quick-pick validators for this subnet yet. Remove filters to see all validators.</string>
+    <string name="bittensor_validators_ranking_stale">Validator rankings are outdated. Quick picks are based on the last available data.</string>
     <string name="bittensor_validators_search_empty">No validators for ‘%s’</string>
     <string name="bittensor_amount_precision_error">Use no more than %s decimal places.</string>
     <string name="bittensor_claim_preview_notice">Debug simulation. Rewards may be below the claim minimum. This screen runs system_dryRun, not a real claim.</string>
