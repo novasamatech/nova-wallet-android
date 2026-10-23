@@ -2928,9 +2928,13 @@
     <string name="bittensor_quick_first_pool">FIRST BY POOL SIZE</string>
     <string name="bittensor_quick_first_age">FIRST BY AGE</string>
     <string name="bittensor_quick_first_apy">FIRST BY APY</string>
-    <string name="bittensor_quick_selection_loading">Choosing a subnet…</string>
-    <string name="bittensor_quick_selection_failed">Could not choose a subnet. Try again or choose a subnet manually.</string>
-    <string name="bittensor_quick_validator_failed">Could not choose an available validator. Try again or choose a validator manually.</string>
+    <string name="bittensor_quick_selection_loading">Finding a subnet for you…</string>
+    <string name="bittensor_quick_selection_failed_title">Couldn’t load rates</string>
+    <string name="bittensor_quick_selection_failed">The subnet and its rate did not load. Your stake is not affected.</string>
+    <string name="bittensor_quick_validator_failed_title">Unable to fetch validators</string>
+    <string name="bittensor_quick_validator_failed">The validator list did not load. Your stake is not affected.</string>
+    <string name="bittensor_quick_root_section">ROOT NETWORK</string>
+    <string name="bittensor_apy_leading">Est. %s APY</string>
     <string name="bittensor_monthly_tokens">Earn tokens a month</string>
     <string name="bittensor_fee_on_review">On confirmation</string>
     <string name="bittensor_slippage_title">Slippage tolerance</string>
@@ -2988,6 +2992,10 @@
     <string name="bittensor_staking_progress_description">Staking %1$s to root · usually a few seconds</string>
     <string name="bittensor_staking_success_title">You staked %1$s to root</string>
     <string name="bittensor_staking_success_description">Rewards accrue every day. Your position is live.</string>
+    <string name="bittensor_staking_more_progress_description">Staking %1$s more to root · usually a few seconds</string>
+    <string name="bittensor_staking_more_success_title">You staked %1$s more to root</string>
+    <string name="bittensor_staking_more_success_description_with">Your root stake is now %1$s with %2$s. Rewards accrue every day. Your position is live.</string>
+    <string name="bittensor_staking_more_success_description">Your root stake is now %1$s. Rewards accrue every day. Your position is live.</string>
     <string name="bittensor_discover_subnets">Discover subnets</string>
     <string name="bittensor_view_position">View position</string>
     <string name="bittensor_back_to_position">Back to position</string>
@@ -3092,6 +3100,8 @@
     <string name="bittensor_hide_thin_pools">Hide thin pools</string>
     <string name="bittensor_get_asset_message">You have %1$s. Swap another token for %2$s or buy it through a partner.</string>
     <string name="bittensor_get_asset_title">Get %s first</string>
+    <string name="bittensor_get_asset_action">Swap for %s</string>
+    <string name="bittensor_get_asset_root_caption">Get %s first — root staking stays selected</string>
     <string name="bittensor_fee_reserve_warning">Keep %1$s for fees — we hold back %2$s.</string>
     <string name="bittensor_fee_reserve_title">Keep %1$s for fees</string>
     <string name="bittensor_fee_reserve_message">Lower the amount to %1$s or less. We hold back %2$s so you can pay network fees later.</string>
