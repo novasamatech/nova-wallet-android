@@ -314,6 +314,13 @@ class RelayStakingNavigator(
     }
 
     override fun openStakingDashboard(target: StakingDeepLinkTarget?) {
+        val splitScreenBackStack = navigationHoldersRegistry.splitScreenNavigationHolder.navController?.backStackDestinationIds().orEmpty()
+        if (isBittensorFlowOpen(splitScreenBackStack)) return
+
+        // Drop screens pushed over the main screen (as iOS pops the staking tab to its root) before showing the dashboard.
+        navigationBuilder().action(R.id.back_to_main)
+            .navigateInFirstAttachedContext()
+
         if (currentDestination?.id != R.id.mainFragment) {
             navigationBuilder().action(R.id.action_open_split_screen)
                 .navigateInFirstAttachedContext()

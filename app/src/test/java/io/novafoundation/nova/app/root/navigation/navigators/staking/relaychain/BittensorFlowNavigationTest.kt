@@ -3,6 +3,8 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class BittensorFlowNavigationTest {
@@ -103,5 +105,15 @@ class BittensorFlowNavigationTest {
         val plan = planBittensorFlowExit(BittensorFlowExit.SUBNET_DISCOVERY, claimFromRootDetails)
 
         assertEquals(BittensorFlowExitPlan.PopTo(R.id.bittensorRootDetailsFragment, openWhereToStake = true), plan)
+    }
+
+    @Test
+    fun `an open flow blocks staking deep links while host screens do not`() {
+        assertTrue(isBittensorFlowOpen(firstRootStake))
+        assertTrue(isBittensorFlowOpen(claimFromRootDetails))
+        assertTrue(isBittensorFlowOpen(listOf(R.id.mainFragment, R.id.start_staking_nav_graph, R.id.startStakingLandingFragment)))
+
+        assertFalse(isBittensorFlowOpen(listOf(R.id.split_screen_nav_graph, R.id.mainFragment)))
+        assertFalse(isBittensorFlowOpen(listOf(R.id.mainFragment, R.id.bittensorPortfolioFragment, R.id.bittensorSubnetPosition)))
     }
 }

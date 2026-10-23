@@ -14,6 +14,23 @@ private val BITTENSOR_FLOW_HOSTS = setOf(
     R.id.bittensorSubnetPosition
 )
 
+/** Screens of an operation in progress (iOS presents them as a modal flow). */
+private val BITTENSOR_FLOW_SCREENS = setOf(
+    R.id.startStakingLandingFragment,
+    R.id.bittensorWhereToStake,
+    R.id.bittensorChooseSubnet,
+    R.id.bittensorSubnetDetails,
+    R.id.bittensorSelectValidator,
+    R.id.bittensorSubnetAmount,
+    R.id.bittensorSubnetReview,
+    R.id.bittensorStakeAmountFragment,
+    R.id.bittensorStakeConfirmFragment,
+    R.id.bittensorSelectUnstakePosition,
+    R.id.bittensorExitAmount,
+    R.id.bittensorExitReview,
+    R.id.bittensorRootClaim
+)
+
 internal sealed interface BittensorFlowExitPlan {
 
     /** Pops everything above [destination], then optionally continues to the "Where to stake" quick pick. */
@@ -42,6 +59,9 @@ internal fun planBittensorFlowExit(exit: BittensorFlowExit, backStack: List<Int>
         }
     }
 }
+
+/** A staking deep link must not tear down an operation the user is in the middle of (iOS `canPresentScreenWithoutBreakingFlow`). */
+internal fun isBittensorFlowOpen(backStack: List<Int>): Boolean = backStack.any { it in BITTENSOR_FLOW_SCREENS }
 
 @SuppressLint("RestrictedApi")
 internal fun NavController.backStackDestinationIds(): List<Int> = backStack.map { it.destination.id }
