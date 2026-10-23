@@ -70,7 +70,8 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
                 searchField.content.text.clear()
             }
         }
-        viewModel.searchFocusEvents.observe {
+        // One-shot events: collect per view, or every return from Validator info / Filters adds another collector
+        viewModel.searchFocusEvents.observeWhenVisible {
             searchField.content.requestFocus()
             searchField.content.showSoftKeyboard()
         }
@@ -96,7 +97,7 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
             progress.isVisible = it
         }
         viewModel.isEmpty.observe { emptyState.isVisible = it }
-        viewModel.inactiveValidatorEvents.observe {
+        viewModel.inactiveValidatorEvents.observeWhenVisible {
             dialog(requireContext()) {
                 setTitle(R.string.bittensor_inactive_validator_title)
                 setMessage(R.string.bittensor_inactive_validator_message)
