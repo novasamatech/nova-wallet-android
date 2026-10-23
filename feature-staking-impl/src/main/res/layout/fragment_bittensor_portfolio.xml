@@ -55,12 +55,6 @@
                         android:layout_height="wrap_content"
                         android:text="@string/staking_validator_total_stake"
                         android:textColor="@color/text_secondary" />
-
-                    <TextView
-                        android:id="@+id/chartChange"
-                        style="@style/TextAppearance.NovaFoundation.SemiBold.SubHeadline"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
                 </LinearLayout>
 
                 <LinearLayout
@@ -88,15 +82,6 @@
                         android:ellipsize="end" />
                 </LinearLayout>
 
-                <io.novafoundation.nova.common.view.AlertView
-                    android:id="@+id/ratesUnavailable"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:visibility="gone"
-                    android:text="@string/bittensor_portfolio_rates_unavailable"
-                    app:alertMode="info" />
-
                 <TextView
                     android:id="@+id/chartDate"
                     style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
@@ -110,15 +95,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp" />
-
-                <TextView
-                    android:id="@+id/chartDisclaimer"
-                    style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="@string/bittensor_portfolio_chart_disclaimer"
-                    android:textColor="@color/text_secondary" />
 
             </LinearLayout>
 

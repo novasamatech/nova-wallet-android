@@ -3043,8 +3043,6 @@
     <string name="bittensor_portfolio_root_claimable">Claimable rewards: %s</string>
     <string name="bittensor_portfolio_root_apy">APY %s · 30 days</string>
     <string name="bittensor_portfolio_weekly_change">%1$s %2$s</string>
-    <string name="bittensor_portfolio_rates_unavailable">Rates are temporarily unavailable — balances are live.</string>
-    <string name="bittensor_portfolio_chart_disclaimer">Partial portfolio history reported by the provider. It may not include every operation.</string>
     <string name="bittensor_subnet_execution_buying">Buying %1$s %2$s with TAO</string>
     <string name="bittensor_subnet_execution_operation">1 of 1 operation</string>
     <string name="bittensor_position_details">Position details</string>

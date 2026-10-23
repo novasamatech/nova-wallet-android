@@ -208,11 +208,6 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
-    val chartChangeFormatter = combine(chartData, chartSelection) { data, selection ->
-        BittensorPortfolioChangeTextInjector(data.change(selection), chartButtonTexts[periods.indexOf(data.range)])
-    }
-        .shareInBackground()
-
     val priceChartModels = chartData.map { data ->
         periods.mapIndexed { index, period -> mapPriceChart(data, period, chartButtonTexts[index]) }
     }
@@ -445,10 +440,10 @@ internal fun subnetPositionTitle(subnet: BittensorSubnet?, fallback: String): St
  * iOS `SubtensorPortfolioViewModelFactory`: balances stay live while rates are missing. Missing subnet rates hide the chart
  * (it is valued with them); a missing root rate only drops the APY subtitle.
  */
-enum class BittensorPortfolioRates(val showBanner: Boolean, val showChart: Boolean) {
-    AVAILABLE(showBanner = false, showChart = true),
-    ROOT_UNAVAILABLE(showBanner = true, showChart = true),
-    SUBNETS_UNAVAILABLE(showBanner = true, showChart = false)
+enum class BittensorPortfolioRates(val showChart: Boolean) {
+    AVAILABLE(showChart = true),
+    ROOT_UNAVAILABLE(showChart = true),
+    SUBNETS_UNAVAILABLE(showChart = false)
 }
 
 internal fun bittensorPortfolioRates(
