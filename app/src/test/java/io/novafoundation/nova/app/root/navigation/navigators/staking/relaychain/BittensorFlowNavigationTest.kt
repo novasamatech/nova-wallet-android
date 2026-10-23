@@ -53,14 +53,14 @@ class BittensorFlowNavigationTest {
     fun `re-entry from the portfolio pops back to it`() {
         val plan = planBittensorFlowExit(BittensorFlowExit.PORTFOLIO, addPositionFromPortfolio)
 
-        assertEquals(BittensorFlowExitPlan.PopTo(R.id.bittensorPortfolioFragment), plan)
+        assertEquals(BittensorFlowExitPlan.ReturnToPortfolio, plan)
     }
 
     @Test
     fun `emptied position pops past the stale position screen to the portfolio`() {
         val plan = planBittensorFlowExit(BittensorFlowExit.PORTFOLIO, sellFromPosition)
 
-        assertEquals(BittensorFlowExitPlan.PopTo(R.id.bittensorPortfolioFragment), plan)
+        assertEquals(BittensorFlowExitPlan.ReturnToPortfolio, plan)
     }
 
     @Test
@@ -115,20 +115,56 @@ class BittensorFlowNavigationTest {
     }
 
     @Test
-    fun `staking deep link is ignored while any flow is above the main screen`() {
-        assertFalse(canPresentStakingDeepLink(firstRootStake))
-        assertFalse(canPresentStakingDeepLink(claimFromRootDetails))
-        assertFalse(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.startStakingLandingFragment)))
-        assertFalse(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.stakingFragment, R.id.selectBondMoreFragment)))
-        assertFalse(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.sendFlowFragment)))
+    fun `staking deep link is ignored while any flow is open`() {
+        val firstStakeWithGraphs = listOf(
+            R.id.split_screen_nav_graph,
+            R.id.mainFragment,
+            R.id.start_staking_nav_graph,
+            R.id.startStakingLandingFragment,
+            R.id.bittensorWhereToStake,
+            R.id.bittensor_root_staking_graph,
+            R.id.bittensorStakeAmountFragment
+        )
+
+        assertFalse(canPresentOverSplitScreen(firstStakeWithGraphs))
+        assertFalse(canPresentOverSplitScreen(claimFromRootDetails))
+        assertFalse(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.staking_main_graph, R.id.stakingFragment, R.id.selectBondMoreFragment)))
+        assertFalse(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.sendFlowFragment)))
+        assertFalse(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.start_swap_nav_graph, R.id.swapSettingsFragment)))
     }
 
     @Test
-    fun `staking deep link replaces browse screens`() {
-        assertTrue(canPresentStakingDeepLink(emptyList()))
-        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment)))
-        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.bittensorPortfolioFragment, R.id.bittensorSubnetPosition)))
-        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.balanceDetailFragment, R.id.bittensorPortfolioFragment)))
-        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.stakingFragment)))
+    fun `staking deep link is ignored over screens iOS presents modally`() {
+        assertFalse(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.balanceDetailFragment, R.id.transferDetailFragment)))
+        assertFalse(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.manage_tokens_graph, R.id.manageTokensFragment)))
+        assertFalse(
+            canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.referendum_details_graph, R.id.referendumDetailsFragment, R.id.referendumVoters))
+        )
     }
+
+    @Test
+    fun `staking deep link replaces browse screens iOS pushes inside a tab`() {
+        assertTrue(canPresentOverSplitScreen(listOf(R.id.split_screen_nav_graph, R.id.mainFragment)))
+        assertTrue(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.bittensorPortfolioFragment, R.id.bittensorSubnetPosition)))
+        assertTrue(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.balanceDetailFragment, R.id.bittensorPortfolioFragment)))
+        assertTrue(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.staking_main_graph, R.id.stakingFragment)))
+        assertTrue(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.referendum_details_graph, R.id.referendumDetailsFragment)))
+        assertTrue(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.accountsFragment, R.id.walletDetailsFragment)))
+        assertTrue(canPresentOverSplitScreen(listOf(R.id.mainFragment, R.id.nfts_nav_graph, R.id.nftListFragment, R.id.nftDetailsFragment)))
+    }
+
+    @Test
+    fun `staking deep link is ignored while a root screen covers the split screen`() {
+        assertFalse(canPresentStakingDeepLink(R.id.dappBrowserFragment, null))
+        assertFalse(canPresentStakingDeepLink(R.id.ConfirmSignExtrinsicFragment, null))
+        assertFalse(canPresentStakingDeepLink(R.id.walletConnectApproveSessionFragment, null))
+        assertFalse(canPresentStakingDeepLink(R.id.selectWalletFragment, listOf(R.id.split_screen_nav_graph, R.id.mainFragment)))
+    }
+
+    @Test
+    fun `staking deep link resets a split screen whose view is not attached yet`() {
+        assertTrue(canPresentStakingDeepLink(R.id.splitScreenFragment, null))
+    }
+
+    private fun canPresentOverSplitScreen(splitScreenBackStack: List<Int>) = canPresentStakingDeepLink(R.id.splitScreenFragment, splitScreenBackStack)
 }

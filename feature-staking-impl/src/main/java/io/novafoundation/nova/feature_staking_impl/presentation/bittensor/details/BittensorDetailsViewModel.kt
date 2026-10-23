@@ -60,6 +60,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
@@ -76,13 +77,14 @@ class BittensorDetailsViewModel(
     private val chartAxisFormatterFactory: BittensorChartAxisFormatter.Factory,
     private val rowInteractor: BittensorPortfolioRowInteractor,
     private val rootClaimInteractor: BittensorRootClaimInteractor,
-    private val analyticsSource: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD,
+    analyticsSource: StakingPortfolioSource = StakingPortfolioSource.DASHBOARD,
     private val entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO,
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private var entryConsumed = false
 
-    private var isOpenedTracked = false
+    /** The source `staking_portfolio_opened` still has to report; null once reported. */
+    private val unreportedOpenSource = MutableStateFlow<StakingPortfolioSource?>(analyticsSource)
 
     private val chartSelection = MutableStateFlow<PriceChartSelection?>(null)
 
@@ -106,17 +108,26 @@ class BittensorDetailsViewModel(
         .shareInBackground()
 
     private val portfolio = portfolioState.filterLoaded()
-        .onEach { data ->
-            val positions = data.positions
-            if (!isOpenedTracked && positions != null && data.dataStatus !is BittensorDataStatus.Loading) {
-                val hasRoot = positions.rootStake.signum() > 0
-                val count = positions.subnets.filter { it.alphaInPlanks.signum() > 0 }.distinctBy { it.subnetId }.size +
-                    if (hasRoot) 1 else 0
-                isOpenedTracked = true
-                analytics.track(BittensorAnalyticsEvent.PortfolioOpened(analyticsSource, count, hasRoot, null))
-            }
-        }
         .shareInBackground()
+
+    init {
+        // A finished flow that returns here reports the opening again, as iOS `reopen(from: .result)`.
+        router.bittensorPortfolioReopenings
+            .onEach { unreportedOpenSource.value = it }
+            .launchIn(this)
+
+        combine(portfolio, unreportedOpenSource) { data, source ->
+            val positions = data.positions
+            if (source == null || positions == null || data.dataStatus is BittensorDataStatus.Loading) return@combine
+            if (!unreportedOpenSource.compareAndSet(source, null)) return@combine
+
+            val hasRoot = positions.rootStake.signum() > 0
+            val count = positions.subnets.filter { it.alphaInPlanks.signum() > 0 }.distinctBy { it.subnetId }.size +
+                if (hasRoot) 1 else 0
+            analytics.track(BittensorAnalyticsEvent.PortfolioOpened(source, count, hasRoot, null))
+        }
+            .launchIn(this)
+    }
 
     val isLoading = portfolioState.map { it.isLoading() || it.dataOrNull?.dataStatus is BittensorDataStatus.Loading }
         .shareInBackground()

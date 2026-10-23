@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details
 
+import io.novafoundation.nova.analytics.StakingPortfolioSource
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.RecordingBittensorAnalytics
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novafoundation.nova.common.presentation.AssetIconProvider
@@ -54,6 +55,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
@@ -73,7 +76,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyNoInteractions
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
@@ -181,6 +183,8 @@ class BittensorDetailsRetryTest {
 
     private val router = mock(StakingRouter::class.java)
 
+    private val portfolioReopenings = MutableSharedFlow<StakingPortfolioSource>(extraBufferCapacity = 1)
+
     private val assetIconProvider = mock(AssetIconProvider::class.java)
 
     private val rowMapper = mock(BittensorPortfolioRowMapper::class.java)
@@ -240,6 +244,7 @@ class BittensorDetailsRetryTest {
         `when`(rootClaimInteractor.observe(1L)).thenReturn(rootClaims)
         `when`(rootClaimInteractor.observe(2L)).thenReturn(otherClaims)
         `when`(rowInteractor.weeklyChanges("native", emptySet())).thenReturn(emptyMap())
+        `when`(router.bittensorPortfolioReopenings).thenReturn(portfolioReopenings)
     }
 
     @After
@@ -302,6 +307,17 @@ class BittensorDetailsRetryTest {
         createViewModel()
         withTimeout(3_000L) { viewModel.empty.first { it } }
         assertEquals(2, analyticsService.events.count { it.name == "staking_portfolio_opened" })
+    }
+
+    @Test
+    fun `returning from a finished flow reports the portfolio opened again from the result`() = runBlocking {
+        createViewModel()
+        withTimeout(3_000L) { while (portfolioOpenedSources().isEmpty()) delay(10L) }
+
+        portfolioReopenings.emit(StakingPortfolioSource.RESULT)
+
+        withTimeout(3_000L) { while (portfolioOpenedSources().size < 2) delay(10L) }
+        assertEquals(listOf("dashboard", "result"), portfolioOpenedSources())
     }
 
     @Test
@@ -374,6 +390,8 @@ class BittensorDetailsRetryTest {
         }
     }
 
+    private fun portfolioOpenedSources() = analyticsService.events.toList().filter { it.name == "staking_portfolio_opened" }.map { it.properties["source"] }
+
     private fun createViewModel(entry: BittensorPortfolioEntry = BittensorPortfolioEntry.PORTFOLIO) {
         viewModel = BittensorDetailsViewModel(
             analytics, bittensorPortfolioInteractor = portfolioInteractor,
@@ -418,6 +436,7 @@ class BittensorDetailsRetryTest {
         val options = captor.value.availableStakingOptions
         assertEquals("chain", options.chainId)
         assertEquals(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT), options.stakingTypes)
+        verify(router).bittensorPortfolioReopenings
         verifyNoMoreInteractions(router)
         val flowOpened = analyticsService.events.single { it.name == "staking_flow_opened" }
         assertEquals("portfolio_add_position", flowOpened.properties["source"])
@@ -431,7 +450,8 @@ class BittensorDetailsRetryTest {
         assertEquals(BittensorEntryResolution.Portfolio, resolution)
         viewModel.completeEntry(requireNotNull(resolution))
 
-        verifyNoInteractions(router)
+        verify(router).bittensorPortfolioReopenings
+        verifyNoMoreInteractions(router)
     }
 
     @Test

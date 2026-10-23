@@ -97,12 +97,6 @@ class BittensorRootClaimFragment : BaseFragment<BittensorRootClaimViewModel, Fra
                 }
             }
         }
-        bindBittensorStakeResults(
-            results = viewModel.resultState,
-            onDismiss = viewModel::resultDismissed,
-            onTryAgain = viewModel::resultDismissed,
-            onViewPosition = viewModel::viewPositionClicked,
-            onUnconfirmedDone = viewModel::unconfirmedDoneClicked
-        )
+        bindBittensorStakeResults(viewModel.resultState, viewModel::resultActionClicked)
     }
 }

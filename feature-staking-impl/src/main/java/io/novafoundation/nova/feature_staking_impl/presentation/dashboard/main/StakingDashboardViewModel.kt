@@ -2,7 +2,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main
 
 import io.novafoundation.nova.analytics.AnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlowSource
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.common.base.BaseViewModel
 import io.novafoundation.nova.common.domain.ExtendedLoadingState
@@ -40,8 +39,6 @@ import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.StakingDashboardPresentationMapperFactory
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.common.mapDashboardStakingStatus
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkDestination
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkNavigation
-import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.BittensorPortfolioDeepLink
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.StakingDeepLinkTarget
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.deeplink.resolveStakingDeepLink
 import io.novafoundation.nova.feature_staking_impl.presentation.dashboard.main.model.StakingDashboardModel
@@ -57,13 +54,18 @@ import io.novafoundation.nova.runtime.ext.fullId
 import io.novafoundation.nova.runtime.multiNetwork.chain.model.Chain
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 private class DashboardFormatters(
@@ -82,6 +84,7 @@ class StakingDashboardViewModel(
     private val stakingSharedState: StakingSharedState,
     private val presentationMapperFactory: StakingDashboardPresentationMapperFactory,
     private val dashboardUpdatePeriod: Duration = 200.milliseconds,
+    private val pendingDeepLinkTimeout: Duration = 10.seconds,
     private val maskableValueFormatterProvider: MaskableValueFormatterProvider,
     private val amountFormatter: AmountFormatter,
     private val assetIconProvider: AssetIconProvider,
@@ -105,13 +108,7 @@ class StakingDashboardViewModel(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val deepLinkDestination = pendingDeepLinkTarget.flatMapLatest { target ->
-        when {
-            target == null -> flowOf<StakingDeepLinkNavigation?>(null)
-            target.destination == StakingDeepLinkTarget.Destination.BITTENSOR_PORTFOLIO -> flowOf(BittensorPortfolioDeepLink(target))
-            else -> stakingDashboardFlow.map { state ->
-                state.dataOrNull?.let { resolveStakingDeepLink(target, it) }
-            }
-        }
+        if (target == null) flowOf(null) else pendingDeepLinkDestination(target)
     }
         .shareInBackground()
 
@@ -138,6 +135,7 @@ class StakingDashboardViewModel(
     }
 
     fun onHasStakeItemClicked(index: Int) = launch {
+        cancelDeepLink()
         val hasStakeItems = stakingDashboardFlow.firstLoaded().hasStake
         val hasStakeItem = hasStakeItems.getOrNull(index) ?: return@launch
 
@@ -149,6 +147,7 @@ class StakingDashboardViewModel(
     }
 
     fun onNoStakeItemClicked(index: Int) = launch {
+        cancelDeepLink()
         val withoutStakeItems = stakingDashboardFlow.firstLoaded().withoutStake
         val withoutStakeItem = withoutStakeItems.getOrNull(index) ?: return@launch
         val noStakeItemState = withoutStakeItem.stakingState as? NoStake ?: return@launch
@@ -156,25 +155,37 @@ class StakingDashboardViewModel(
         openStartStaking(withoutStakeItem.chain, withoutStakeItem.token.configuration, noStakeItemState, StakingFlowSource.DASHBOARD)
     }
 
-    fun setDeepLinkTarget(target: StakingDeepLinkTarget?) {
+    fun setDeepLinkTarget(target: StakingDeepLinkTarget) {
         pendingDeepLinkTarget.value = target
     }
 
-    fun openDeepLinkDestination(destination: StakingDeepLinkNavigation) {
+    fun cancelDeepLink() {
+        pendingDeepLinkTarget.value = null
+    }
+
+    /**
+     * As iOS `StakingDashboardPresenter`: waits until the dashboard settles the item, and once [pendingDeepLinkTimeout]
+     * passes takes the item as it is or drops the link.
+     */
+    private fun pendingDeepLinkDestination(target: StakingDeepLinkTarget) = flow<StakingDeepLinkDestination?> {
+        val settled = withTimeoutOrNull(pendingDeepLinkTimeout) {
+            stakingDashboardFlow.mapNotNull { state -> state.dataOrNull?.let { resolveStakingDeepLink(target, it, waitingForSync = true) } }
+                .first()
+        }
+        val destination = settled ?: stakingDashboardFlow.replayCache.lastOrNull()?.dataOrNull
+            ?.let { resolveStakingDeepLink(target, it, waitingForSync = false) }
+
+        if (destination != null) emit(destination) else pendingDeepLinkTarget.compareAndSet(target, null)
+    }
+
+    fun openDeepLinkDestination(destination: StakingDeepLinkDestination) {
         if (pendingDeepLinkTarget.value != destination.target) return
         pendingDeepLinkTarget.value = null
         launch {
-            when (destination) {
-                is BittensorPortfolioDeepLink -> router.openBittensorPortfolio(
-                    entry = BittensorPortfolioEntry.DEEP_LINK
-                )
-                is StakingDeepLinkDestination -> {
-                    val option = destination.option
-                    when (val state = option.stakingState) {
-                        is HasStake -> openChainStaking(option.chain, option.token.configuration, state.stakingType)
-                        is NoStake -> openStartStaking(option.chain, option.token.configuration, state, StakingFlowSource.DEEP_LINK)
-                    }
-                }
+            val option = destination.option
+            when (val state = option.stakingState) {
+                is HasStake -> openChainStaking(option.chain, option.token.configuration, state.stakingType)
+                is NoStake -> openStartStaking(option.chain, option.token.configuration, state, StakingFlowSource.DEEP_LINK)
             }
         }
     }
@@ -184,7 +195,8 @@ class StakingDashboardViewModel(
 
         stakingSharedState.setSelectedOption(chain, chainAsset, stakingTypes.first())
 
-        analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = source.value))
+        val hasNewBadge = if (source == StakingFlowSource.DASHBOARD) chain.additional?.newFeatures?.contains(Chain.NewFeature.STAKING) == true else null
+        analyticsService.track(AnalyticsEvent.StakingFlowOpened(network = chain.name, source = source.value, hasNewBadge = hasNewBadge))
 
         val payload = StartStakingLandingPayload(
             availableStakingOptions = AvailableStakingOptionsPayload(chain.id, chainAsset.id, stakingTypes)
@@ -194,14 +206,17 @@ class StakingDashboardViewModel(
     }
 
     fun onMoreOptionsClicked() {
+        cancelDeepLink()
         dashboardRouter.openMoreStakingOptions()
     }
 
     fun avatarClicked() {
+        cancelDeepLink()
         router.openSwitchWallet()
     }
 
     fun announcementLinkClicked(url: String) {
+        cancelDeepLink()
         router.openDAppBrowser(url)
     }
 

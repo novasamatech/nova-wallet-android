@@ -2992,6 +2992,7 @@
     <string name="bittensor_staking_success_description">Rewards accrue every day. Your position is live.</string>
     <string name="bittensor_discover_subnets">Discover subnets</string>
     <string name="bittensor_view_position">View position</string>
+    <string name="bittensor_back_to_position">Back to position</string>
     <string name="bittensor_staking_failed_title">Staking failed</string>
     <string name="bittensor_staking_failed_description">The staking operation failed. A network fee may have been charged.</string>
     <string name="bittensor_staking">Bittensor staking</string>
@@ -3037,8 +3038,12 @@
     <string name="bittensor_claim_none">No root rewards meet the minimum claim amount.</string>
     <string name="bittensor_claim_minimum_per_validator">Minimum claim is %1$s per validator</string>
     <string name="bittensor_claim_progress">Claiming root rewards</string>
-    <string name="bittensor_claim_completed">Rewards claimed</string>
-    <string name="bittensor_claim_completed_description">The claim was confirmed in a finalized block.</string>
+    <string name="bittensor_claim_success_title">You claimed %1$s to root</string>
+    <string name="bittensor_claim_root_stake_now_with">Your root stake is now %1$s with %2$s. Rewards accrue every day. Your position is live.</string>
+    <string name="bittensor_claim_root_stake_now">Your root stake is now %1$s. Rewards accrue every day. Your position is live.</string>
+    <string name="bittensor_claim_nothing_claimed">Nothing was claimed</string>
+    <string name="bittensor_claim_fee_charged">Only the network fee was charged.</string>
+    <string name="bittensor_claim_below_minimum_reason">Your rewards were below the network\'s minimum claim when the transaction ran.</string>
     <string name="bittensor_claim_available">Claimable rewards</string>
     <string name="bittensor_portfolio_root_claimable">Claimable rewards: %s</string>
     <string name="bittensor_portfolio_root_apy">APY %1$s · 30 days</string>

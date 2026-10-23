@@ -13,10 +13,10 @@ import org.mockito.Mockito.verify
 class BittensorStakeResultUiBindingTest {
 
     @Test
-    fun `clearing progress detaches navigation listener before dismiss and releases sheet`() {
+    fun `clearing the sheet detaches its dismiss listener before dismiss and releases it`() {
         val sheet = mock(BittensorStakeResultBottomSheet::class.java)
-        var navigationCalls = 0
-        var listener: DialogInterface.OnDismissListener? = DialogInterface.OnDismissListener { navigationCalls++ }
+        var dismissCalls = 0
+        var listener: DialogInterface.OnDismissListener? = DialogInterface.OnDismissListener { dismissCalls++ }
         doAnswer {
             listener = null
             null
@@ -30,7 +30,7 @@ class BittensorStakeResultUiBindingTest {
         currentSheet = currentSheet.dismissWithoutResultCallback()
 
         assertNull(currentSheet)
-        assertEquals(0, navigationCalls)
+        assertEquals(0, dismissCalls)
         val order = inOrder(sheet)
         order.verify(sheet).setOnDismissListener(null)
         order.verify(sheet).dismiss()

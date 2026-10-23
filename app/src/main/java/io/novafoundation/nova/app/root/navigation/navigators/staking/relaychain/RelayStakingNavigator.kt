@@ -73,6 +73,8 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.chang
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.change.custom.select.SelectCustomValidatorsFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.StakeTargetDetailsPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 class RelayStakingNavigator(
     private val navigationHoldersRegistry: NavigationHoldersRegistry,
@@ -80,6 +82,10 @@ class RelayStakingNavigator(
     private val stakingDashboardRouter: StakingDashboardRouter,
     private val dAppRouter: DAppRouter
 ) : BaseNavigator(navigationHoldersRegistry), StakingRouter {
+
+    private val portfolioReopenings = MutableSharedFlow<StakingPortfolioSource>(extraBufferCapacity = 1)
+
+    override val bittensorPortfolioReopenings: Flow<StakingPortfolioSource> = portfolioReopenings
 
     override fun returnToStakingMain() {
         navigationBuilder().action(R.id.back_to_staking_main)
@@ -316,8 +322,10 @@ class RelayStakingNavigator(
     }
 
     override fun openStakingDashboard(target: StakingDeepLinkTarget?) {
-        val splitScreenBackStack = navigationHoldersRegistry.splitScreenNavigationHolder.navController?.backStackDestinationIds().orEmpty()
-        if (!canPresentStakingDeepLink(splitScreenBackStack)) return
+        val splitScreen = navigationHoldersRegistry.splitScreenNavigationHolder.navController
+        if (splitScreen?.isShowingDialog() == true) return
+        val rootScreen = navigationHoldersRegistry.rootNavigationHolder.navController?.currentDestination?.id
+        if (!canPresentStakingDeepLink(rootScreen, splitScreen?.backStackIdsWithGraphs())) return
 
         // Only browse screens are left above the main screen here; drop them as iOS pops the staking tab to its root.
         navigationBuilder().action(R.id.back_to_main)
@@ -436,6 +444,11 @@ class RelayStakingNavigator(
             is BittensorFlowExitPlan.PopTo -> {
                 navController.popBackStack(plan.destination, false)
                 if (plan.openWhereToStake) openBittensorWhereToStake()
+            }
+
+            BittensorFlowExitPlan.ReturnToPortfolio -> {
+                navController.popBackStack(R.id.bittensorPortfolioFragment, false)
+                portfolioReopenings.tryEmit(StakingPortfolioSource.RESULT)
             }
 
             BittensorFlowExitPlan.OpenPortfolioOverDashboard -> navigationBuilder().action(R.id.action_finish_bittensor_flow_to_portfolio)
