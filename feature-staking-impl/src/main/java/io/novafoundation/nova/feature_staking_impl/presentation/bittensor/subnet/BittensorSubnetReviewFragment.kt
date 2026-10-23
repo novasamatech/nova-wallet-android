@@ -1,5 +1,10 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.common.domain.ExtendedLoadingState
+import io.novafoundation.nova.common.utils.setTextColorRes
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.setSelectable
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showTitleInfo
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.showValidator
 import android.os.Bundle
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -51,16 +56,14 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         binder.execution.stepContainer.background = requireContext()
             .getBlockDrawable()
         binder.confirm.prepareForProgress(viewLifecycleOwner)
-        binder.validator.image.updateLayoutParams {
-            width = 18.dp(requireContext())
-            height = 18.dp(requireContext())
-        }
+        binder.validator.setSelectable(false)
+        binder.validator.showTitleInfo()
         binder.done.setOnClickListener { viewModel.viewPositionClicked() }
         binder.retryExecution.setOnClickListener { viewModel.retryClicked() }
         binder.execution.toolbar.setHomeButtonListener { viewModel.back() }
         binder.confirm.setOnClickListener { viewModel.confirmClicked() }
         binder.account.setOnClickListener { viewModel.accountClicked() }
-        binder.validator.setOnClickListener {
+        binder.validator.root.setOnClickListener {
             showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
         }
         binder.monthlyTokens.setOnClickListener {
@@ -122,13 +125,9 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
         }
         slippage.showValue(viewModel.slippage)
         execution.slippage.showValue(viewModel.slippage)
-        viewModel.validator.observe {
-            validator.showValue(it)
-            execution.validator.showValue(it)
-        }
+        viewModel.validator.observe(execution.validator::showValue)
+        viewModel.validatorRow.observe { validator.showValidator(ExtendedLoadingState.Loaded(it), FeatureUtils.getCommonApi(requireContext()).imageLoader()) }
         viewModel.validatorIcon.observe {
-            validator.image.isVisible = it != null
-            validator.image.setImageDrawable(it)
             execution.validator.image.isVisible = it != null
             execution.validator.image.setImageDrawable(it)
         }
@@ -153,6 +152,9 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
                 if (complete) {
                     execution.timer.setState(ExecutionTimerView.State.Success)
                     execution.title.setText(R.string.common_completed)
+                    // iOS done page: green "Completed" over the date in secondary text.
+                    execution.title.setTextColorRes(R.color.text_positive)
+                    execution.subtitle.setTextColorRes(R.color.text_secondary)
                     execution.operationLabel.text = (result as BittensorStakeResultUi.Success).description
                 }
             }

@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
+import io.novafoundation.nova.common.address.AddressIconGenerator
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -72,7 +73,8 @@ class BittensorSubnetAmountModule {
         costBasisFormatter: BittensorSaleCostBasisFormatter,
         quickPickInteractor: BittensorQuickPickInteractor,
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
-        subnetFactsInteractor: BittensorSubnetFactsInteractor
+        subnetFactsInteractor: BittensorSubnetFactsInteractor,
+        iconGenerator: AddressIconGenerator
     ): ViewModel = BittensorSubnetAmountViewModel(
         analytics, initialSubnetId = payload.subnetId?.let { BittensorNetuid.Subnet(it) },
         quickPickOrder = payload.quickPickOrder,
@@ -101,6 +103,7 @@ class BittensorSubnetAmountModule {
         validatorCommunicator = validatorCommunicator,
         getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
         subnetFactsInteractor = subnetFactsInteractor,
+        iconGenerator = iconGenerator,
         initialSelectionState = payload.selectionState
     )
 

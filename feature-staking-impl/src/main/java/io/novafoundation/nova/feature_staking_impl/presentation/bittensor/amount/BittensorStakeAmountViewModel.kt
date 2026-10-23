@@ -49,7 +49,6 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRoo
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakePreflightSystem
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorStakingInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorValidator
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.bittensorMonthlyProjection
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.maximumBittensorStake
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
@@ -64,6 +63,13 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confir
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectionState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorChooseSubnetPayload
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetBrowseState
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorReplaceOrigin
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorLeadingApy
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorValidatorRowUi
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
+import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
@@ -117,7 +123,8 @@ class BittensorStakeAmountViewModel(
     private val externalActions: ExternalActions.Presentation,
     getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
     private val payload: BittensorStakeAmountPayload? = null,
-    initialSelectionState: BittensorSelectionState = BittensorSelectionState()
+    initialSelectionState: BittensorSelectionState = BittensorSelectionState(),
+    presentation: BittensorRootStakePresentation = BittensorRootStakePresentation.STANDARD
 ) : BaseViewModel(), Validatable by validationExecutor, ExternalActions by externalActions {
 
     private var selectionState = initialSelectionState
@@ -129,8 +136,14 @@ class BittensorStakeAmountViewModel(
 
     val retryEvents = retryController.events
 
-    /** As on iOS, adding to an existing root position is titled "Add stake to root". */
-    val titleRes = if (payload?.validatorAddress != null) R.string.bittensor_add_stake_to_root else R.string.bittensor_stake_to_root
+    val entry = bittensorRootStakeEntry(payload, presentation)
+
+    /** As on iOS: a quick pick keeps the Earn title, adding to an existing root position is titled "Add stake to root". */
+    val titleRes = when (entry) {
+        BittensorRootStakeEntry.QUICK_PICK -> R.string.bittensor_earn_title
+        BittensorRootStakeEntry.PICKER -> R.string.bittensor_stake_to_root
+        BittensorRootStakeEntry.ADD_STAKE -> R.string.bittensor_add_stake_to_root
+    }
 
     private val stakingDetailsState = retryController.observe(
         step = "root staking details",
@@ -251,6 +264,8 @@ class BittensorStakeAmountViewModel(
 
     val addStakeCaption = combine(selectedStakingDetailsState, needsFunding) { state, funding ->
         val details = state.dataOrNull ?: return@combine null
+        // As on iOS, the root lane without TAO explains that the choice is kept while the user gets TAO.
+        if (funding) return@combine resourceManager.getString(R.string.bittensor_get_asset_root_caption, details.asset.token.configuration.symbol.value)
         val stake = details.position?.stakeInPlanks?.takeIf { it.isPositive() } ?: return@combine null
         val validator = details.validator ?: return@combine null
         if (payload == null || funding || details.dataStatus !is BittensorDataStatus.Fresh) return@combine null
@@ -265,17 +280,8 @@ class BittensorStakeAmountViewModel(
     }
         .shareInBackground()
 
-    val monthlyEstimate = combine(
-        selectedStakingDetailsState,
-        amount
-    ) { state, text ->
-        state.map { details ->
-            val annual = details.annualPercentageYield ?: return@map "—"
-            val principal = text.toBigDecimalOrNull()
-                ?.takeIf { it.isPositive } ?: return@map "—"
-            val estimate = bittensorMonthlyProjection(principal, annual)
-            "≈ " + formatToken(estimate, details.asset.token.configuration.symbol)
-        }
+    val getAssetLabel = stakingDetails.map {
+        resourceManager.getString(R.string.bittensor_get_asset_action, it.asset.token.configuration.symbol.value)
     }
         .shareInBackground()
 
@@ -308,6 +314,24 @@ class BittensorStakeAmountViewModel(
 
     val apy = selectedStakingDetailsState
         .mapLoading { bittensorAmountFormatter.apy(it.annualPercentageYield, it.asset.token.configuration.symbol) }
+        .shareInBackground()
+
+    /** Quick pick: the validator with "Est. 6.18% APY" under its name. */
+    val quickPickValidator = combine(validator, selectedStakingDetailsState) { validator, state ->
+        val annual = state.dataOrNull?.annualPercentageYield
+        val row = BittensorValidatorRowUi(validator.name, validator.icon, resourceManager.bittensorLeadingApy(annual), bittensorYieldColor(annual))
+        if (state is ExtendedLoadingState.Loading) ExtendedLoadingState.Loading else ExtendedLoadingState.Loaded(row)
+    }
+        .onStart { emit(ExtendedLoadingState.Loading) }
+        .shareInBackground()
+
+    /** Picker card: the bare "6.17%" over "Est. APY". */
+    val bareApy = selectedStakingDetailsState
+        .mapLoading { it.annualPercentageYield?.formatAsPercentage() ?: "—" }
+        .shareInBackground()
+
+    val apyColorRes = selectedStakingDetailsState
+        .map { bittensorYieldColor(it.dataOrNull?.annualPercentageYield) }
         .shareInBackground()
 
     private val loadedContinueButtonState = combine(
@@ -399,6 +423,24 @@ class BittensorStakeAmountViewModel(
                 selectionState
             )
         )
+    }
+
+    fun quickPickHeaderClicked() {
+        if (entry != BittensorRootStakeEntry.QUICK_PICK || preparing.value) return
+        // The pushed root setup gets its own flow, so a validator picked there does not change this screen.
+        router.openBittensorRootStaking(selectionState = selectionState.forkedFlow())
+    }
+
+    fun seeAllSubnetsClicked() {
+        if (entry == BittensorRootStakeEntry.ADD_STAKE || preparing.value) return
+        val browseState = selectionState.browseState ?: BittensorSubnetBrowseState()
+        val payload = BittensorChooseSubnetPayload(
+            replaceAmount = true,
+            browseState = browseState,
+            selectionState = selectionState,
+            replaceOrigin = BittensorReplaceOrigin.ROOT_STAKE
+        )
+        router.openBittensorChooseSubnet(payload)
     }
 
     fun continueClicked() = launchUnit {

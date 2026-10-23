@@ -53,7 +53,8 @@ class BittensorStakeResultBottomSheet(
         binder.bittensorStakeResultSuccess.setVisible(state is BittensorStakeResultUi.Success)
         binder.bittensorStakeResultFailure.setVisible(state is BittensorStakeResultUi.Failure || state is BittensorStakeResultUi.Unconfirmed)
         binder.bittensorStakeResultError.isVisible = state is BittensorStakeResultUi.Failure
-        binder.bittensorStakeResultValidator.isVisible = state is BittensorStakeResultUi.Success
+        binder.bittensorStakeResultValidator.isVisible = state is BittensorStakeResultUi.Success && state.validator != null
+        binder.bittensorStakeResultStakeAfter.isVisible = state is BittensorStakeResultUi.Success && state.stakeAfter != null
         binder.bittensorStakeResultAmount.isVisible = state is BittensorStakeResultUi.Success && state.amount != null
         binder.bittensorStakeResultFee.isVisible = state is BittensorStakeResultUi.Success
         (binder.bittensorStakeResultFee.parent as View).isVisible = state is BittensorStakeResultUi.Success
@@ -89,7 +90,8 @@ class BittensorStakeResultBottomSheet(
         binder.bittensorStakeResultSuccessTitle.text = state.title
         binder.bittensorStakeResultSuccessDescription.text = state.description
         state.amount?.let { binder.bittensorStakeResultAmount.showValue(it.token, it.fiat) }
-        binder.bittensorStakeResultValidator.showValue(state.validator)
+        state.validator?.let(binder.bittensorStakeResultValidator::showValue)
+        state.stakeAfter?.let(binder.bittensorStakeResultStakeAfter::showValue)
         binder.bittensorStakeResultFee.showValue(state.fee.amount, state.fee.fiatAmount)
         binder.bittensorStakeResultDiscoverSubnets.isVisible = state.canDiscoverSubnets
         binder.bittensorStakeResultViewPosition.updateLayoutParams<ViewGroup.MarginLayoutParams> {

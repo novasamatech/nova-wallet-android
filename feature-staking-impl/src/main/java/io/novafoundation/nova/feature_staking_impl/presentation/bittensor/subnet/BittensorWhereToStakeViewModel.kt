@@ -1,5 +1,6 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorRootStakePresentation
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingAnalyticsTarget
@@ -59,7 +60,7 @@ class BittensorWhereToStakeViewModel(
                 0
             )
         )
-        router.openBittensorRootStaking(selectionState = selectionState)
+        router.openBittensorRootStaking(selectionState = selectionState, presentation = BittensorRootStakePresentation.QUICK_PICK)
     }
 
     fun back() {

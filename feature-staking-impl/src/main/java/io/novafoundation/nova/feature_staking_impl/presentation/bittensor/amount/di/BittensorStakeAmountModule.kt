@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.amount.BittensorRootStakePresentation
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -53,7 +54,8 @@ class BittensorStakeAmountModule {
         externalActions: ExternalActions.Presentation,
         getAssetOptionsMixinFactory: GetAssetOptionsMixin.Factory,
         payload: BittensorStakeAmountPayload?,
-        selectionState: BittensorSelectionState
+        selectionState: BittensorSelectionState,
+        presentation: BittensorRootStakePresentation
     ): ViewModel {
         return BittensorStakeAmountViewModel(
             analytics, resourceManager = resourceManager,
@@ -72,7 +74,8 @@ class BittensorStakeAmountModule {
             externalActions = externalActions,
             getAssetOptionsMixinFactory = getAssetOptionsMixinFactory,
             payload = payload,
-            initialSelectionState = selectionState
+            initialSelectionState = selectionState,
+            presentation = presentation
         )
     }
 
