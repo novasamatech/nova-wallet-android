@@ -389,7 +389,7 @@ class BittensorExitReviewViewModel(
         resources.getString(
             R.string.bittensor_swap_rate_sell_description,
             draft.position.asset.token.configuration.symbol.value,
-            draft.position.subnet?.title(resources).orEmpty(),
+            draft.position.subnet?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, payload.position.netuid),
             percentage
         )
     }

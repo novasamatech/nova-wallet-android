@@ -347,7 +347,7 @@ class BittensorSubnetReviewViewModel(
         } else {
             resources.getString(
                 R.string.bittensor_subnet_execution_buying,
-                prepared.dataOrNull?.subnet?.title(resources).orEmpty(),
+                prepared.dataOrNull?.subnet?.title(resources) ?: resources.getString(R.string.bittensor_subnet_number, subnetId.value),
                 prepared.dataOrNull?.subnet?.symbol.orEmpty()
             )
         }
