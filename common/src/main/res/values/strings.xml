@@ -2997,11 +2997,14 @@
     <string name="bittensor_validator_apr_period">APR · 30 days</string>
     <string name="bittensor_exit_root_title">Unstake from root</string>
     <string name="bittensor_exit_sell_title">Sell %1$s</string>
+    <string name="bittensor_exit_staked_header">Staked: %1$s · %2$s</string>
     <string name="bittensor_exit_review_sale">Review sale</string>
     <string name="bittensor_exit_you_unstake">You unstake</string>
     <string name="bittensor_exit_you_sell">You sell</string>
     <string name="bittensor_exit_stake_after">Stake after</string>
     <string name="bittensor_exit_avg_buy_price">Avg buy price</string>
+    <string name="bittensor_avg_buy_chart">Avg buy %s</string>
+    <string name="bittensor_you_earned">You earned</string>
     <string name="bittensor_exit_earned">Earned</string>
     <string name="bittensor_exit_fee_from_free">The network fee is paid from your free %1$s balance. Keep enough %1$s for the fee and the minimum account balance.</string>
     <string name="bittensor_exit_fee_from_stake">The network fee is taken from your root stake. %1$s returns to your free balance after confirmation.</string>
@@ -3052,6 +3055,7 @@
     <string name="bittensor_claim_available">Claimable rewards</string>
     <string name="bittensor_portfolio_root_claimable">Claimable rewards: %s</string>
     <string name="bittensor_portfolio_root_apy">APY %1$s · 30 days</string>
+    <string name="bittensor_portfolio_rates_unavailable">Rates are temporarily unavailable — balances are live.</string>
     <string name="bittensor_portfolio_chart_disclaimer">Partial portfolio history reported by the provider. It may not include every operation.</string>
     <string name="bittensor_subnet_execution_buying">Buying %1$s %2$s with TAO</string>
     <string name="bittensor_subnet_execution_operation">1 of 1 operation</string>

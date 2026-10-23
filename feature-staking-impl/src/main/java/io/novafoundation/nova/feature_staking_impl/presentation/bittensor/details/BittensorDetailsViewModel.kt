@@ -33,6 +33,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioHistoryRequest
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPeriod
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioPositions
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioRowInteractor
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorPortfolioValueSeries
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorRootClaimInteractor
@@ -120,7 +121,7 @@ class BittensorDetailsViewModel(
         when {
             portfolio == null || portfolio.dataStatus is BittensorDataStatus.Loading -> null
             portfolio.dataStatus is BittensorDataStatus.Stale -> resources.getString(R.string.bittensor_positions_stale)
-            portfolio.positions?.totalStake == null -> resources.getString(R.string.bittensor_valuation_unavailable)
+            // Missing subnet prices are explained by the rates banner in the header card (iOS).
             else -> null
         }
     }
@@ -275,6 +276,13 @@ class BittensorDetailsViewModel(
         }
         .shareInBackground()
 
+    val rates = combine(portfolio, subnetMetadata, rootApy) { portfolio, metadata, apy ->
+        bittensorPortfolioRates(portfolio.positions, metadata, apy.forAccount(portfolio.metaId))
+    }
+        .distinctUntilChanged()
+        .onStart { emit(BittensorPortfolioRates.AVAILABLE) }
+        .shareInBackground()
+
     val empty = combine(portfolio, rootRewards) { portfolio, rewards ->
         isPortfolioEmpty(portfolio.positions, rewards.forAccount(portfolio.metaId).dataOrNull)
     }
@@ -427,4 +435,31 @@ private data class WeeklyChangesRequest(val metaId: Long, val nativePriceId: Str
 
 private data class AccountRowValue<T>(val metaId: Long?, val state: ExtendedLoadingState<T>) {
     fun forAccount(metaId: Long): ExtendedLoadingState<T> = if (this.metaId == null || this.metaId == metaId) state else ExtendedLoadingState.Loading
+}
+
+/**
+ * iOS `SubtensorPortfolioViewModelFactory`: balances stay live while rates are missing. Missing subnet rates hide the chart
+ * (it is valued with them); a missing root rate only drops the APY subtitle.
+ */
+enum class BittensorPortfolioRates(val showBanner: Boolean, val showChart: Boolean) {
+    AVAILABLE(showBanner = false, showChart = true),
+    ROOT_UNAVAILABLE(showBanner = true, showChart = true),
+    SUBNETS_UNAVAILABLE(showBanner = true, showChart = false)
+}
+
+internal fun bittensorPortfolioRates(
+    positions: BittensorPortfolioPositions?,
+    metadata: ExtendedLoadingState<*>,
+    rootApy: ExtendedLoadingState<BigDecimal?>
+): BittensorPortfolioRates {
+    if (positions == null) return BittensorPortfolioRates.AVAILABLE
+    val hasSubnets = positions.subnets.any { it.alphaInPlanks.signum() > 0 }
+    val subnetsUnavailable = hasSubnets && (metadata is ExtendedLoadingState.Error || positions.totalStake == null)
+    val rootUnavailable = positions.rootStake.signum() > 0 &&
+        (rootApy is ExtendedLoadingState.Error || rootApy is ExtendedLoadingState.Loaded && rootApy.data == null)
+    return when {
+        subnetsUnavailable -> BittensorPortfolioRates.SUBNETS_UNAVAILABLE
+        rootUnavailable -> BittensorPortfolioRates.ROOT_UNAVAILABLE
+        else -> BittensorPortfolioRates.AVAILABLE
+    }
 }

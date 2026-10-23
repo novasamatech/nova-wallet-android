@@ -88,6 +88,15 @@
                         android:ellipsize="end" />
                 </LinearLayout>
 
+                <io.novafoundation.nova.common.view.AlertView
+                    android:id="@+id/ratesUnavailable"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    android:text="@string/bittensor_portfolio_rates_unavailable"
+                    app:alertMode="info" />
+
                 <TextView
                     android:id="@+id/chartDate"
                     style="@style/TextAppearance.NovaFoundation.Regular.Caption1"
@@ -148,7 +157,7 @@
         android:background="@drawable/bg_bittensor_bottom_button_container">
         <io.novafoundation.nova.common.view.PrimaryButton
             android:id="@+id/addPosition"
-            style="@style/Widget.Nova.Button.Primary"
+            style="@style/Widget.Nova.Button.Secondary"
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:enabled="false"
