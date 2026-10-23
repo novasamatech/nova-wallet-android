@@ -219,29 +219,27 @@ class BittensorRootClaimBindingTest {
         )
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun `inconsistent availability is rejected`() {
+    @Test fun `availability net of miner collateral is read as reported`() {
         val coldkey = ByteArray(32)
-        bindBittensorExitAvailability(
-            listOf(
-                listOf(
-                    coldkey,
-                    listOf(
-                        listOf(
-                            BigInteger.ONE,
-                            Struct.Instance(
-                                mapOf(
-                                    "total" to BigInteger.TEN,
-                                    "locked" to BigInteger.TEN,
-                                    "available" to BigInteger.ONE
-                                )
-                            )
-                        )
-                    )
-                )
-            ),
-            coldkey,
-            1
+        assertEquals(
+            BittensorExitAvailability(BigInteger.TEN, BigInteger.valueOf(3), BigInteger.valueOf(5)),
+            bindBittensorExitAvailability(availabilityResponse(coldkey, netuid = 1, total = 10, locked = 3, available = 5), coldkey, 1)
+        )
+    }
+
+    @Test fun `lock above the stake leaves nothing available`() {
+        val coldkey = ByteArray(32)
+        assertEquals(
+            BittensorExitAvailability(BigInteger.valueOf(4), BigInteger.valueOf(6), BigInteger.ZERO),
+            bindBittensorExitAvailability(availabilityResponse(coldkey, netuid = 1, total = 4, locked = 6, available = 0), coldkey, 1)
+        )
+    }
+
+    @Test fun `subnet omitted by the runtime has nothing available`() {
+        val coldkey = ByteArray(32)
+        assertEquals(
+            BittensorExitAvailability(BigInteger.ZERO, BigInteger.ZERO, BigInteger.ZERO),
+            bindBittensorExitAvailability(availabilityResponse(coldkey, netuid = 1, total = 10, locked = 0, available = 10), coldkey, 64)
         )
     }
 
@@ -274,6 +272,30 @@ class BittensorRootClaimBindingTest {
             claims.claimable.map { it.hotkey.value.first() }
         )
     }
+
+    private fun availabilityResponse(
+        coldkey: ByteArray,
+        netuid: Long,
+        total: Long,
+        locked: Long,
+        available: Long
+    ) = listOf(
+        listOf(
+            coldkey,
+            listOf(
+                listOf(
+                    BigInteger.valueOf(netuid),
+                    Struct.Instance(
+                        mapOf(
+                            "total" to BigInteger.valueOf(total),
+                            "locked" to BigInteger.valueOf(locked),
+                            "available" to BigInteger.valueOf(available)
+                        )
+                    )
+                )
+            )
+        )
+    )
 
     private fun preview(
         key: Byte,

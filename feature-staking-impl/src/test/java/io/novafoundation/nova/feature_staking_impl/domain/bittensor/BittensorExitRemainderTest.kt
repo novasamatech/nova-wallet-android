@@ -39,7 +39,7 @@ class BittensorExitRemainderTest {
         // 0.01999 TAO staked, 0.005 TAO unstaked: 0.01499 TAO stays, below 0.02 TAO.
         val payload = payload(rootPreflight(stake = rao(19_990_000)), rootQuote(rao(5_000_000), stake = rao(19_990_000)))
 
-        assertEquals(BittensorExitDustRemainder(rao(14_990_000), nominatorMinimum), payload.dustRemainder())
+        assertEquals(BittensorExitDustRemainder(rao(14_990_000), nominatorMinimum, returned = true), payload.dustRemainder())
         val status = validation.validate(payload) as ValidationStatus.NotValid
         assertEquals(BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL, status.reason)
         assertEquals(DefaultFailureLevel.WARNING, status.level)
@@ -55,19 +55,35 @@ class BittensorExitRemainderTest {
     }
 
     @Test
-    fun `subnet remainder is valued in TAO at the limit price`() = runBlocking {
+    fun `subnet remainder is valued in TAO at the limit price without a simulation`() = runBlocking {
         // 0.29745 alpha, sell 0.1: 0.19745 alpha stays at 0.067 TAO per alpha = 0.01322915 TAO, below 0.02 TAO.
         val stake = rao(297_450_000)
         val price = rao(67_000_000)
         val payload = payload(subnetPreflight(stake), subnetQuote(rao(100_000_000), stake, price))
 
-        assertEquals(BittensorExitDustRemainder(rao(13_229_150), nominatorMinimum), payload.dustRemainder())
+        assertEquals(BittensorExitDustRemainder(rao(13_229_150), nominatorMinimum, returned = true), payload.dustRemainder())
         assertEquals(BittensorExitValidationFailure.REMAINDER_CAN_EXIT_ALL, (validation.validate(payload) as ValidationStatus.NotValid).reason)
 
         // The same alpha remainder is enough at a higher price: 0.19745 × 0.2 = 0.03949 TAO.
         val pricier = payload(subnetPreflight(stake), subnetQuote(rao(100_000_000), stake, rao(200_000_000)))
         assertNull(pricier.dustRemainder())
         assertTrue(validation.validate(pricier) is ValidationStatus.Valid)
+    }
+
+    @Test
+    fun `subnet remainder is valued at the pool price the sale leaves`() = runBlocking {
+        // Selling 0.1 alpha at 0.11 spot for 0.0106 TAO leaves the pool at 0.10214545 TAO per alpha: 0.19745 alpha keeps 0.02016861 TAO.
+        val stake = rao(297_450_000)
+        val reviewed = subnetQuote(rao(100_000_000), stake, rao(67_000_000))
+        val latest = reviewed.copy(estimatedTaoOut = rao(10_600_000), spotPrice = rao(110_000_000), simulatedInput = rao(100_000_000))
+        val kept = payload(subnetPreflight(stake), reviewed).copy(latestQuote = latest)
+
+        assertNull(kept.dustRemainder())
+        assertTrue(validation.validate(kept) is ValidationStatus.Valid)
+
+        // 0.0105 TAO out leaves 0.10022727 TAO per alpha: 0.01978987 TAO stays, below 0.02 TAO.
+        val swept = kept.copy(latestQuote = latest.copy(estimatedTaoOut = rao(10_500_000)))
+        assertEquals(BittensorExitDustRemainder(rao(19_789_874), nominatorMinimum, returned = true), swept.dustRemainder())
     }
 
     @Test
@@ -92,10 +108,11 @@ class BittensorExitRemainderTest {
         assertTrue(validation.validate(full) is ValidationStatus.Valid)
     }
 
-    @Test(expected = BittensorExitExceedsStakeException::class)
-    fun `amount above the drawable stake is a typed insufficient stake failure`() {
+    @Test
+    fun `amount above the drawable stake has no plan`() {
         val stake = rao(19_990_000)
-        rootPreflight(stake).plan(stake + BigInteger.ONE, hotkey)
+        val group = rootPreflight(stake).exitGroup(hotkey)
+        assertNull(group.basis(group.resolve(null)).plan(stake + BigInteger.ONE, group.floors))
     }
 
     private fun rao(value: Long) = BigInteger.valueOf(value)

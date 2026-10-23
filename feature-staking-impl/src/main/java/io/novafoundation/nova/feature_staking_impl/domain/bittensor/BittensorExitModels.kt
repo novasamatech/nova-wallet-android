@@ -54,6 +54,18 @@ data class BittensorExitQuote(
             return average * average / spot
         }
 
+    /** iOS `isFillable(atLimit:)`: the pool price the sale leaves stays above [atLimit]. */
+    fun isFillable(atLimit: BigInteger): Boolean = postTradePrice?.let { it > atLimit } ?: false
+
+    /** iOS `tighterLimit(than:)`: a sale keeps the higher of the two limit prices. */
+    fun tighterLimit(than: BigInteger): BigInteger = requireNotNull(limitPrice).max(than)
+
+    /** The quote signed at [limit], as iOS signs a verified quote at its signing limit. */
+    fun signedAt(limit: BigInteger): BittensorExitQuote = copy(
+        limitPrice = limit,
+        minimumTaoOut = requireNotNull(simulatedInput) * limit / BittensorProtocolUnits.RAO_PER_TAO
+    )
+
     init {
         require(slippageFraction.isNonNegative && slippageFraction < BigDecimal.ONE)
         require(fullExit || exitHotkeys.isEmpty())
@@ -63,7 +75,6 @@ data class BittensorExitQuote(
         require(groupHotkeys.all { it.value.size == 32 })
         require(amount.isPositive() && amount.bitLength() <= 64)
         require(serviceFee.isNonNegative && minimumTaoOut > serviceFee)
-        require(estimatedTaoOut >= minimumTaoOut)
         if (netuid.isRoot()) {
             require(limitPrice == null && serviceFee == BigInteger.ZERO && estimatedTaoOut == amount)
         } else {

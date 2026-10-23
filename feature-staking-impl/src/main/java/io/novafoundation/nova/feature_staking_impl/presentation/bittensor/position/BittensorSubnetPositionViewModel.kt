@@ -60,6 +60,10 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detail
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorExitPositionPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.resolveSaleCostBasis
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.bittensorAlphaSymbol
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.bittensorValidatorFallbackName
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.resolvedValidatorNames
+import kotlinx.coroutines.flow.drop
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSubnetAmountPayload
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
@@ -158,19 +162,16 @@ class BittensorSubnetPositionViewModel(
     }
         .shareInBackground()
 
+    // As iOS on a positions update, the next portfolio update asks again after a failed lookup.
     private val validatorNames = held.map { positions -> positions.map { it.validatorHotkey }.toSet() }
-        .distinctUntilChanged()
-        .flatMapLatest { hotkeys ->
-            flowOf { validatorInteractor.validatorNames(subnetId, hotkeys) }
-                .withSafeLoading()
-                .onEach { state ->
-                    if (state is ExtendedLoadingState.Error) {
-                        logger.log("[BittensorSubnetPosition] Optional validator names unavailable")
-                        logger.log(state.exception)
-                    }
-                }
-        }
-        .map { it.dataOrNull.orEmpty() }
+        .resolvedValidatorNames(
+            retries = portfolio.drop(1).map { },
+            onFailure = { cause ->
+                logger.log("[BittensorSubnetPosition] Optional validator names unavailable")
+                logger.log(cause)
+            }
+        ) { hotkeys -> validatorInteractor.validatorNames(subnetId, hotkeys) }
+        .map { it.orEmpty() }
         .shareInBackground()
 
     val canAct = combine(
@@ -277,7 +278,7 @@ class BittensorSubnetPositionViewModel(
         subnet
     ) { update, assetState, subnet ->
         resolveSaleCostBasis(update, subnetId.value).map { sale ->
-            costBasisFormatter.averagePrice(sale, assetState.dataOrNull?.token, subnet?.symbol)
+            costBasisFormatter.averagePrice(sale, assetState.dataOrNull?.token, bittensorAlphaSymbol(subnetId.value, subnet?.symbol))
         }
     }
         .shareInBackground()
@@ -313,9 +314,7 @@ class BittensorSubnetPositionViewModel(
         val amount = positions.fold(BigInteger.ZERO) { sum, position -> sum + position.alphaInPlanks }
         tokenFormatter.formatToken(
             BigDecimal(amount, BittensorProtocolUnits.ALPHA_PRECISION),
-            TokenSymbol(
-                subnet?.symbol.orEmpty().ifBlank { "—" }
-            )
+            TokenSymbol(bittensorAlphaSymbol(subnetId.value, subnet?.symbol))
         ).toString()
     }
         .shareInBackground()
@@ -349,7 +348,7 @@ class BittensorSubnetPositionViewModel(
                 val annualYield = yields.dataOrNull?.get(position.validatorHotkey)
                 BittensorPositionUi(
                     address,
-                    names[position.validatorHotkey] ?: address.take(6) + "…" + address.takeLast(6),
+                    names[position.validatorHotkey] ?: address.bittensorValidatorFallbackName(),
                     resources.getString(R.string.bittensor_validator),
                     AmountModel(
                         annualYield?.formatAsPercentage() ?: "",

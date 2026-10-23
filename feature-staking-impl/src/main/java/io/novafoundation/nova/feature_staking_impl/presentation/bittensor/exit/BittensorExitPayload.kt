@@ -39,8 +39,9 @@ data class BittensorExitReviewPayload(
     val slippageFraction: String = "0.005",
     val groupHotkeys: List<String> = emptyList(),
     val serviceFeeRate: String? = null,
-    val remainderSweepAccepted: Boolean = false,
-    val costBasis: BittensorSaleCostBasisPayload? = null
+    val costBasis: BittensorSaleCostBasisPayload? = null,
+    // The setup's "All validators" selection; otherwise the sale stays with the position's validator.
+    val allValidators: Boolean = false
 ) : Parcelable {
 
     fun quote() = BittensorExitQuote(
@@ -62,10 +63,6 @@ data class BittensorExitReviewPayload(
         serviceFeeRate?.toBigDecimal()
     )
 }
-
-/** The setup's "Proceed" on a swept remainder covers the reviewed terms only; Max or a refreshed quote asks again. */
-fun BittensorExitReviewPayload.carriesRemainderSweepFor(reviewed: BittensorExitQuote): Boolean =
-    remainderSweepAccepted && reviewed == quote()
 
 fun BittensorExitQuote.toPayload(position: BittensorExitPositionPayload) = BittensorExitReviewPayload(
     position,

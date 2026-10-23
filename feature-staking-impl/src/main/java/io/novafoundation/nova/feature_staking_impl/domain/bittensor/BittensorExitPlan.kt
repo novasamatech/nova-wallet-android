@@ -71,40 +71,5 @@ data class BittensorExitPlan(val slices: List<BittensorExitSlice>) {
     val isBatched: Boolean get() = slices.size > 1
 }
 
-internal data class BittensorExitPlanMember(val hotkey: AccountIdKey, val position: BittensorExitMember)
-
 /** The amount exceeds what the group can withdraw at the current floor: shown as "Not enough tokens", not a generic error. */
 class BittensorExitExceedsStakeException : IllegalArgumentException("Withdrawal exceeds available group stake")
-
-internal fun planBittensorExit(
-    members: List<BittensorExitPlanMember>,
-    amount: BigInteger,
-    available: BigInteger,
-    floor: BigInteger
-): BittensorExitPlan {
-    val drawable = members.sumOf { it.position.drawable(floor) }.min(available)
-    require(amount.isPositive())
-    if (amount > drawable) throw BittensorExitExceedsStakeException()
-    val primary = members.firstOrNull()
-    if (primary != null && amount <= primary.position.drawable(floor) && amount < drawable) {
-        val slice = BittensorExitSlice(primary.hotkey, amount, fullExit = false)
-        return BittensorExitPlan(listOf(slice))
-    }
-    return distributeBittensorExit(members, amount, floor)
-}
-
-private fun distributeBittensorExit(members: List<BittensorExitPlanMember>, amount: BigInteger, floor: BigInteger): BittensorExitPlan {
-    var needed = amount
-    val slices = buildList {
-        for ((hotkey, member) in members.asReversed()) {
-            val draw = needed.min(member.drawable(floor))
-            if (draw.isPositive()) {
-                add(BittensorExitSlice(hotkey, draw, fullExit = draw == member.stake))
-                needed -= draw
-            }
-            if (!needed.isPositive()) break
-        }
-    }.sortedBy { !it.fullExit }
-    // Do not silently adjust a user's amount around the minimum: the validation UI offers Unstake all.
-    return BittensorExitPlan(slices)
-}

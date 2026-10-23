@@ -32,6 +32,9 @@ import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageS
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.mixin.fee.v2.FeeLoaderMixinV2
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorRootHoldFormatter
+import io.novafoundation.nova.common.utils.formatting.duration.DurationFormatter
+import javax.inject.Named
 
 @Module(includes = [ViewModelModule::class])
 class BittensorExitAmountModule {
@@ -60,7 +63,9 @@ class BittensorExitAmountModule {
         slippageSettingsCommunicator: SlippageSettingsCommunicator,
         costBasisFormatter: BittensorSaleCostBasisFormatter,
         precisionValidator: BittensorExitPrecisionValidator,
-        validatorInteractor: BittensorValidatorInteractor
+        validatorInteractor: BittensorValidatorInteractor,
+        rootHoldFormatter: BittensorRootHoldFormatter,
+        @Named("BittensorWithdrawalDuration") durationFormatter: DurationFormatter
     ): ViewModel {
         return BittensorExitAmountViewModel(
             analytics, payload,
@@ -82,7 +87,9 @@ class BittensorExitAmountModule {
             slippageSettingsCommunicator = slippageSettingsCommunicator,
             costBasisFormatter = costBasisFormatter,
             precisionValidator = precisionValidator,
-            validatorInteractor = validatorInteractor
+            validatorInteractor = validatorInteractor,
+            rootHoldFormatter = rootHoldFormatter,
+            durationFormatter = durationFormatter
         )
     }
 

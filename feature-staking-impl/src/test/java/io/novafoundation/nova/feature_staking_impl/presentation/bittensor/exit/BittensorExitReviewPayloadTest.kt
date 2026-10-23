@@ -9,11 +9,9 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNet
 import java.math.BigDecimal
 import java.math.BigInteger
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class BittensorExitConsentCarryTest {
+class BittensorExitReviewPayloadTest {
 
     private val hotkey = AccountIdKey(ByteArray(32) { 1 })
 
@@ -36,24 +34,8 @@ class BittensorExitConsentCarryTest {
     private val position = BittensorExitPositionPayload(1, 64, "5DU1dv")
 
     @Test
-    fun `setup proceed carries to the unchanged reviewed quote`() {
-        val payload = quote.toPayload(position).copy(remainderSweepAccepted = true)
-
-        assertTrue(payload.carriesRemainderSweepFor(payload.quote()))
-        assertTrue(payload.carriesRemainderSweepFor(quote))
-    }
-
-    @Test
-    fun `refreshed quote or max asks again`() {
-        val payload = quote.toPayload(position).copy(remainderSweepAccepted = true)
-
-        assertFalse(payload.carriesRemainderSweepFor(quote.copy(estimatedTaoOut = BigInteger.valueOf(6_900_000))))
-        assertFalse(payload.carriesRemainderSweepFor(quote.copy(fullExit = true, exitHotkeys = listOf(hotkey))))
-    }
-
-    @Test
-    fun `no consent is carried when the setup did not proceed past the warning`() {
-        assertFalse(quote.toPayload(position).carriesRemainderSweepFor(quote))
+    fun `reviewed quote survives the payload round trip`() {
+        assertEquals(quote, quote.toPayload(position).quote())
     }
 
     @Test

@@ -3,10 +3,11 @@ package io.novafoundation.nova.feature_staking_impl.data.bittensor
 import io.novafoundation.nova.common.address.AccountIdKey
 import io.novasama.substrate_sdk_android.extensions.toHexString
 import java.math.BigInteger
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitBasisPosition
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitFloors
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitGroup
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitMember
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPlan
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPlanMember
-import io.novafoundation.nova.feature_staking_impl.domain.bittensor.planBittensorExit
+import io.novasama.substrate_sdk_android.hash.isPositive
 
 /** Withdrawal floors within 1 % of each other: the Max shown from the older one is still accurate enough. */
 internal fun bittensorFloorsClose(first: BigInteger, second: BigInteger): Boolean =
@@ -31,7 +32,8 @@ data class BittensorExitPreflight(
     val withdrawalFloor: BigInteger = BigInteger.ZERO,
     val withdrawalPrice: BigInteger? = null,
     val swapFeeRate: BigInteger = BigInteger.ZERO,
-    val rootHoldInterval: BigInteger = BigInteger.ZERO
+    val rootHoldInterval: BigInteger = BigInteger.ZERO,
+    val sweepFloor: BigInteger = BigInteger.ZERO
 ) {
 
     val totalStake: BigInteger
@@ -44,9 +46,6 @@ data class BittensorExitPreflight(
                     .thenBy { it.key.value.toHexString() }
             )
             .map { it.key }
-
-    val canExitAll: Boolean
-        get() = availability.available >= totalStake && groupMembers.values.all { it.free == it.stake }
 
     val maximumAmount: BigInteger
         get() = if (groupMembers.isEmpty()) {
@@ -64,22 +63,16 @@ data class BittensorExitPreflight(
         groupRootHoldRemaining = groupRootHoldRemaining.signum().toBigInteger(),
         groupMembers = groupMembers.mapValues { (_, member) -> member.copy(holdRemaining = member.holdRemaining.signum().toBigInteger()) },
         withdrawalFloor = BigInteger.ZERO,
-        withdrawalPrice = null
+        withdrawalPrice = null,
+        sweepFloor = BigInteger.ZERO
     )
 
-    fun plan(amount: BigInteger, primary: AccountIdKey): BittensorExitPlan {
-        val hotkeys = orderedHotkeys.ifEmpty { listOf(primary) }
-        val members = hotkeys.map { hotkey ->
-            BittensorExitPlanMember(
-                hotkey,
-                groupMembers[hotkey] ?: BittensorExitMember(
-                    groupStakes[hotkey] ?: stake,
-                    BigInteger.ZERO,
-                    isOwnHotkey,
-                    rootHoldRemaining
-                )
-            )
+    /** The group in portfolio order; a snapshot without stake info stands for the [primary] position alone. */
+    fun exitGroup(primary: AccountIdKey): BittensorExitGroup {
+        val positions = orderedHotkeys.ifEmpty { listOf(primary) }.map { hotkey ->
+            val member = groupMembers[hotkey] ?: BittensorExitMember(groupStakes[hotkey] ?: stake, BigInteger.ZERO, isOwnHotkey, rootHoldRemaining)
+            BittensorExitBasisPosition(hotkey, member.stake, member.collateral, member.isOwnHotkey, member.holdRemaining.isPositive())
         }
-        return planBittensorExit(members, amount, availability.available, withdrawalFloor)
+        return BittensorExitGroup(positions, availability.available, BittensorExitFloors(withdrawalFloor, sweepFloor))
     }
 }
