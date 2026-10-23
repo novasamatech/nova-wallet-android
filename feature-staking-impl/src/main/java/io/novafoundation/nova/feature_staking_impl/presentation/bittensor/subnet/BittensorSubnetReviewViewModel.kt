@@ -11,8 +11,7 @@ import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorCompletedFlowExit
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.doneAnalyticsAction
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 
 import android.os.SystemClock
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -487,6 +486,14 @@ class BittensorSubnetReviewViewModel(
         }
     }
 
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.STAKE,
+        StakingAnalyticsTarget.SUBNET,
+        newPosition = !existingPosition
+    )
+
     private val analyticsMode get() = if (existingPosition) StakingMode.BUY_MORE else StakingMode.NEW_POSITION
 
     private fun executeStake(prepared: BittensorSubnetStakeDraft, fee: Fee) = launchUnit {
@@ -603,23 +610,14 @@ class BittensorSubnetReviewViewModel(
     }
 
     fun viewPositionClicked() {
-        val state = submission.value
-        if (state !is BittensorSubmissionState.Completed && state !is BittensorSubmissionState.Unconfirmed) return
-
-        val exit = bittensorCompletedFlowExit(newPosition = !existingPosition, emptiesPosition = false)
-        if (state is BittensorSubmissionState.Completed) {
-            analytics.track(
-                BittensorAnalyticsEvent.ResultAction(
-                    exit.doneAnalyticsAction,
-                    StakingFlow.STAKE,
-                    StakingAnalyticsTarget.SUBNET
-                )
-            )
-        }
-        router.finishBittensorFlow(exit)
+        if (submission.value.isFinished) resultNavigation.done()
     }
 
     fun back() {
-        if (submission.value !is BittensorSubmissionState.Submitting) router.back()
+        when {
+            submission.value is BittensorSubmissionState.Submitting -> Unit
+            submission.value.isFinished -> resultNavigation.leave()
+            else -> router.back()
+        }
     }
 }

@@ -3,7 +3,6 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confi
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.analytics.StakingValidationOutcome
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingResultAction
 import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
@@ -52,8 +51,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorCompletedFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
@@ -213,7 +211,11 @@ class BittensorStakeConfirmViewModel(
     }
 
     fun back() {
-        if (submission.value !is BittensorSubmissionState.Submitting) router.back()
+        when {
+            submission.value is BittensorSubmissionState.Submitting -> Unit
+            submission.value.isFinished -> resultNavigation.leave()
+            else -> router.back()
+        }
     }
 
     fun accountClicked() = launchUnit {
@@ -262,6 +264,14 @@ class BittensorStakeConfirmViewModel(
         }
     }
 
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.STAKE,
+        StakingAnalyticsTarget.ROOT,
+        newPosition = !payload.existingPosition
+    )
+
     private val analyticsMode get() = if (payload.existingPosition) StakingMode.ADD_STAKE else StakingMode.NEW_POSITION
 
     private fun executeStake(request: BittensorRootStakeRequest, fee: Fee) = launchUnit {
@@ -302,41 +312,23 @@ class BittensorStakeConfirmViewModel(
     }
 
     fun resultDismissed() {
-        submission.value = submission.value.dismissResult()
+        if (submission.value.isFinished) {
+            resultNavigation.leave()
+        } else {
+            submission.value = submission.value.dismissResult()
+        }
     }
 
     fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) {
-            analytics.track(
-                BittensorAnalyticsEvent.ResultAction(
-                    StakingResultAction.VIEW_POSITION,
-                    StakingFlow.STAKE,
-                    StakingAnalyticsTarget.ROOT
-                )
-            )
-            finishFlow()
-        }
+        if (submission.value is BittensorSubmissionState.Completed) resultNavigation.viewPosition()
     }
 
     fun unconfirmedDoneClicked() {
-        if (submission.value is BittensorSubmissionState.Unconfirmed) finishFlow()
+        if (submission.value is BittensorSubmissionState.Unconfirmed) resultNavigation.done()
     }
 
-    fun discoverSubnetsClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) {
-            analytics.track(
-                BittensorAnalyticsEvent.ResultAction(
-                    StakingResultAction.DISCOVER_SUBNETS,
-                    StakingFlow.STAKE,
-                    StakingAnalyticsTarget.ROOT
-                )
-            )
-            router.finishBittensorFlow(BittensorFlowExit.SUBNET_DISCOVERY)
-        }
-    }
-
-    private fun finishFlow() {
-        router.finishBittensorFlow(bittensorCompletedFlowExit(newPosition = !payload.existingPosition, emptiesPosition = false))
+    fun discoverSubnetsClicked() = launchUnit {
+        if (submission.value is BittensorSubmissionState.Completed) resultNavigation.discoverSubnets(chain.await().name)
     }
 
     private fun mapAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): AmountModel {
@@ -381,7 +373,8 @@ class BittensorStakeConfirmViewModel(
             description = resourceManager.getString(R.string.bittensor_staking_success_description),
             validator = request.validator.name,
             fee = outcome.formatNetworkFee(fee, request.chain, resourceManager, tokenFormatter),
-            amount = formatBittensorNativeResult(outcome?.tao, request.amountInPlanks, request.chain, tokenFormatter)
+            amount = formatBittensorNativeResult(outcome?.tao, request.amountInPlanks, request.chain, tokenFormatter),
+            canDiscoverSubnets = !payload.existingPosition
         )
     }
 

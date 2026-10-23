@@ -196,8 +196,7 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             results = viewModel.resultState,
             onDismiss = viewModel::resultDismissed,
             onTryAgain = viewModel::confirmClicked,
-            onViewPosition = viewModel::doneClicked,
-            onDiscoverSubnets = viewModel::discoverSubnetsClicked,
+            onViewPosition = viewModel::viewPositionClicked,
             onUnconfirmedDone = viewModel::doneClicked
         )
     }

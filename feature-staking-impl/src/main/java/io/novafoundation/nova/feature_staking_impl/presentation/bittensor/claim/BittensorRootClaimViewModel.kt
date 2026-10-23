@@ -4,9 +4,7 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorCompletedFlowExit
-import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.doneAnalyticsAction
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorResultNavigation
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -125,6 +123,15 @@ class BittensorRootClaimViewModel(
 ) : BaseViewModel(), ExternalActions by externalActions, Validatable by validationExecutor {
 
     private val confirmMutex = Mutex()
+
+    private val resultNavigation = BittensorResultNavigation(
+        router,
+        analytics,
+        StakingFlow.CLAIM,
+        StakingAnalyticsTarget.ROOT,
+        newPosition = false,
+        trackActions = !(BuildConfig.DEBUG && payload.previewOnly)
+    )
 
     private var isClaimInitiatedTracked = false
 
@@ -533,26 +540,21 @@ class BittensorRootClaimViewModel(
 
     fun resultDismissed() {
         dismissed.value = true
+        if (isFinished()) resultNavigation.leave()
     }
 
-    /** A claim never opens or empties a position, so "Done" returns to root details (iOS `completeAfterSuccess`). */
-    fun done() = finish(bittensorCompletedFlowExit(newPosition = false, emptiesPosition = false))
-
-    fun discoverSubnetsClicked() = finish(BittensorFlowExit.SUBNET_DISCOVERY)
-
-    private fun finish(exit: BittensorFlowExit) {
-        resultDismissed()
-        if (!previewOnly) {
-            analytics.track(
-                BittensorAnalyticsEvent.ResultAction(
-                    exit.doneAnalyticsAction,
-                    StakingFlow.CLAIM,
-                    StakingAnalyticsTarget.ROOT
-                )
-            )
-        }
-        router.finishBittensorFlow(exit)
+    /** A claim never opens or empties a position, so it returns to root details (iOS `completeAfterSuccess`). */
+    fun viewPositionClicked() {
+        if (resultModel() is BittensorStakeResultUi.Success) resultNavigation.viewPosition()
     }
+
+    fun unconfirmedDoneClicked() {
+        if (resultModel() is BittensorStakeResultUi.Unconfirmed) resultNavigation.done()
+    }
+
+    private fun resultModel() = (execution.value as? ClaimExecution.Result)?.model
+
+    private fun isFinished() = resultModel().let { it is BittensorStakeResultUi.Success || it is BittensorStakeResultUi.Unconfirmed }
 
     fun validatorClicked() = launchUnit {
         prepared.first().dataOrNull?.let {
@@ -564,6 +566,10 @@ class BittensorRootClaimViewModel(
     }
 
     fun back() {
-        if (execution.value !is ClaimExecution.Running && !dryRunRunning.value) router.back()
+        when {
+            execution.value is ClaimExecution.Running || dryRunRunning.value -> Unit
+            isFinished() -> resultNavigation.leave()
+            else -> router.back()
+        }
     }
 }
