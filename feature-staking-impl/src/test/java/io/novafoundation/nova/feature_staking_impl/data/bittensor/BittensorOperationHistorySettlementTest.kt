@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorOperationHistory
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import kotlinx.coroutines.CompletableDeferred
@@ -21,6 +22,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
+import java.lang.reflect.Proxy
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -49,7 +51,32 @@ class BittensorOperationHistorySettlementTest {
 
     private val clock = { nowNanos }
 
-    private val repository = BittensorOperationHistoryRepository(source, urls, cache, clock)
+    private var nowMillis = 1_790_000_000_000L
+
+    private val wallClock = { nowMillis }
+
+    private val storedDeadlines = mutableMapOf<String, Long>()
+
+    private val preferences = Proxy.newProxyInstance(
+        Preferences::class.java.classLoader,
+        arrayOf(Preferences::class.java)
+    ) { _, method, arguments ->
+        when (method.name) {
+            "contains" -> arguments[0] in storedDeadlines
+            "getLong" -> storedDeadlines[arguments[0]] ?: arguments[1]
+            "putLong" -> {
+                storedDeadlines[arguments[0] as String] = arguments[1] as Long
+                null
+            }
+            "removeField" -> {
+                storedDeadlines.remove(arguments[0])
+                null
+            }
+            else -> error("Unexpected preference access: ${method.name}")
+        }
+    } as Preferences
+
+    private val repository = newRepository()
 
     @Test
     fun `settlement remains visible through loading and failures until a post barrier fetch succeeds`() = runTest {
@@ -109,9 +136,50 @@ class BittensorOperationHistorySettlementTest {
     }
 
     @Test
+    fun `restart inside the own trade window keeps the history settling until it passes`() = runTest {
+        repository.ownTradeSubmitted(request())
+        nowNanos += 100_000_000_000L
+        nowMillis += 100_000L
+        val restarted = newRepository()
+        val updates = mutableListOf<BittensorOperationHistoryRepository.Snapshot>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            restarted.observeHistory(requireNotNull(restarted.request("account"))).toList(updates)
+        }
+        runCurrent()
+        assertTrue(updates.last().result!!.isSuccess)
+        assertTrue(updates.all { it.isSettling })
+
+        nowNanos += 200_000_000_000L
+        nowMillis += 200_000L
+        advanceTimeBy(60_000)
+        runCurrent()
+        assertTrue(updates.last().result!!.isSuccess)
+        assertFalse(updates.last().isSettling)
+    }
+
+    @Test
+    fun `restart restores only the remaining window and forgets an expired one`() = runTest {
+        repository.ownTradeSubmitted(request())
+        nowMillis += 299_000L
+        val restarted = newRepository()
+        val settling = requireNotNull(restarted.request("account"))
+        assertNotSame(restarted.history(settling), restarted.history(settling))
+
+        nowNanos += 1_000_000_000L
+        val settled = restarted.history(settling)
+        assertSame(settled, restarted.history(settling))
+
+        nowMillis += 1_000L
+        val expired = newRepository()
+        val request = requireNotNull(expired.request("account"))
+        assertSame(expired.history(request), expired.history(request))
+        assertTrue(storedDeadlines.isEmpty())
+    }
+
+    @Test
     fun `settlement is account scoped and public stream clears immediately on own trade`() = runTest {
         val sharedCache = SharedCache(backgroundScope)
-        val repository = BittensorOperationHistoryRepository(source, urls, sharedCache, clock)
+        val repository = BittensorOperationHistoryRepository(source, urls, sharedCache, preferences, clock, wallClock)
         val first = mutableListOf<BittensorHistoryState>()
         val second = mutableListOf<BittensorHistoryState>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
@@ -252,7 +320,7 @@ class BittensorOperationHistorySettlementTest {
     fun `live refresh keeps displayed value during pending request and recovers after failure`() = runTest {
         // This test exercises no-store admission, not settlement time travel. Use the
         // same monotonic clock as remote request deadlines so no-store cannot look fresh.
-        val repository = BittensorOperationHistoryRepository(source, urls, cache)
+        val repository = BittensorOperationHistoryRepository(source, urls, cache, preferences)
         val initial = requireNotNull(repository.request("account"))
         api.historyCacheControl = { "no-store" }
         val updates = mutableListOf<Result<BittensorOperationHistory>?>()
@@ -339,6 +407,8 @@ class BittensorOperationHistorySettlementTest {
 
     private suspend fun request(address: String = "account") = requireNotNull(repository.request(address))
 
+    private fun newRepository() = BittensorOperationHistoryRepository(source, urls, cache, preferences, clock, wallClock)
+
     @Test
     fun `cache hits promote payloads so ninth entry evicts least recently used without losing generation`() = runTest {
         val oldest = request("oldest")
@@ -378,7 +448,7 @@ class BittensorOperationHistorySettlementTest {
     @Test
     fun `new subscriber never replays another origin and logged cache key contains no address`() = runTest {
         val sharedCache = SharedCache(backgroundScope)
-        val repository = BittensorOperationHistoryRepository(source, urls, sharedCache, clock)
+        val repository = BittensorOperationHistoryRepository(source, urls, sharedCache, preferences, clock, wallClock)
         val first = mutableListOf<Result<BittensorOperationHistory>?>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
             repository.observe("private-account").toList(first)
@@ -410,7 +480,7 @@ class BittensorOperationHistorySettlementTest {
     @Test
     fun `eight payload bound preserves active generation and immediate invalidation while old load finishes`() = runTest {
         val sharedCache = SharedCache(backgroundScope)
-        val repository = BittensorOperationHistoryRepository(source, urls, sharedCache, clock)
+        val repository = BittensorOperationHistoryRepository(source, urls, sharedCache, preferences, clock, wallClock)
         val initial = requireNotNull(repository.request("active"))
         val updates = mutableListOf<Result<BittensorOperationHistory>?>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {

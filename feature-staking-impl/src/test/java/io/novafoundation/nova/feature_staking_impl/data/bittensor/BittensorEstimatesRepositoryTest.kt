@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.data.bittensor
 
 import io.novafoundation.nova.common.data.memory.ComputationalCache
+import io.novafoundation.nova.common.data.storage.Preferences
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorNetuid
 import io.novafoundation.nova.infrastructure.InfrastructureUrls
 import io.novafoundation.nova.runtime.ext.addressOf
@@ -33,7 +34,12 @@ class BittensorEstimatesRepositoryTest {
 
     private val computationalCache = mock(ComputationalCache::class.java)
 
-    private val historyRepository = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls, computationalCache)
+    private val historyRepository = BittensorOperationHistoryRepository(
+        remoteSource,
+        infrastructureUrls,
+        computationalCache,
+        mock(Preferences::class.java)
+    )
 
     private val yieldRepository = BittensorAlphaYieldRepository(remoteSource, infrastructureUrls)
 

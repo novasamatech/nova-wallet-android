@@ -451,8 +451,9 @@ class BittensorModule {
     fun provideBittensorHistoryRepository(
         remoteSource: BittensorEstimatesRemoteSource,
         infrastructureUrls: InfrastructureUrls,
-        computationalCache: ComputationalCache
-    ) = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls, computationalCache)
+        computationalCache: ComputationalCache,
+        preferences: Preferences
+    ) = BittensorOperationHistoryRepository(remoteSource, infrastructureUrls, computationalCache, preferences)
 
     @Provides
     @FeatureScope

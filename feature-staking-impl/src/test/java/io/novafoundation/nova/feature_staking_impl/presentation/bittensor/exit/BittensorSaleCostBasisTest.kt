@@ -12,7 +12,7 @@ import org.junit.Test
 
 class BittensorSaleCostBasisTest {
 
-    private val purchase = BittensorReportedOperation(1, "hotkey", "10", "100", "0.1", "buy", "2026-10-01T12:00:00Z", "purchase", "buy")
+    private val purchase = BittensorReportedOperation(1, "hotkey", "10", "100", "0.1", "StakeAdded", "2026-10-01T12:00:00Z", "purchase", "buy")
 
     private val withPurchase = BittensorEstimatedCostBasis(listOf(purchase), true)
 

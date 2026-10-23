@@ -49,7 +49,7 @@ class BittensorSaleCostBasisFormatterTest {
 
     private val chainAsset = mock(Chain.Asset::class.java)
 
-    private val purchase = BittensorReportedOperation(1, "hotkey", "10", "100", "0.1", "buy", "2026-10-01T12:00:00Z", "purchase", "buy")
+    private val purchase = BittensorReportedOperation(1, "hotkey", "10", "100", "0.1", "StakeAdded", "2026-10-01T12:00:00Z", "purchase", "buy")
 
     private val basis = BittensorEstimatedCostBasis(listOf(purchase), true)
 
