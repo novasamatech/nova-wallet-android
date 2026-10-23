@@ -283,6 +283,10 @@ class BittensorDetailsViewModel(
     }
         .shareInBackground()
 
+    val emptyRootSubtitle = portfolio.map { resources.getString(R.string.bittensor_root_row_description, it.asset.token.configuration.symbol.value) }
+        .distinctUntilChanged()
+        .shareInBackground()
+
     val positions = combine(portfolio, subnetMetadata, rootRewards, rootApy, weeklyChanges) { portfolio, metadata, rewards, apy, changes ->
         rowMapper.map(
             portfolio,

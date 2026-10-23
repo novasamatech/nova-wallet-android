@@ -73,10 +73,16 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         viewModel.totalStake.observe {
             totalAmount.text = it.token
             totalFiat.text = it.fiat
+            emptyTotal.text = it.token
+            emptyFiat.text = it.fiat
+            emptyFiat.isVisible = it.fiat != null
         }
+        viewModel.emptyRootSubtitle.observe { emptyRootSubtitle.text = it }
         viewModel.positions.observe(adapter::submitList)
         viewModel.empty.observe {
             empty.isVisible = it
+            totalCard.isVisible = !it
+            positionsHeader.isVisible = !it
             // iOS: the only action of an empty portfolio is primary, next to positions it is secondary.
             addPosition.setAppearance(if (it) PrimaryButton.Appearance.PRIMARY else PrimaryButton.Appearance.SECONDARY)
         }
