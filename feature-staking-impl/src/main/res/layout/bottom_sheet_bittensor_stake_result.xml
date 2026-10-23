@@ -98,6 +98,13 @@
                 app:title="@string/common_amount" />
 
             <io.novafoundation.nova.common.view.TableCellView
+                android:id="@+id/bittensorStakeResultStakeAfter"
+                android:layout_width="match_parent"
+                android:layout_height="44dp"
+                android:visibility="gone"
+                app:title="@string/bittensor_exit_stake_after" />
+
+            <io.novafoundation.nova.common.view.TableCellView
                 android:id="@+id/bittensorStakeResultValidator"
                 android:layout_width="match_parent"
                 android:layout_height="44dp"

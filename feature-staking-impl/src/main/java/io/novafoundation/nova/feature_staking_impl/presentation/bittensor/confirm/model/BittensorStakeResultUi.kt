@@ -20,10 +20,12 @@ sealed interface BittensorStakeResultUi {
     data class Success(
         val title: String,
         val description: String,
-        val validator: String,
+        /** Null hides the row: adding to a root position reports the stake after instead (iOS). */
+        val validator: String?,
         val fee: BittensorFeeUi,
         val outcome: BittensorOperationOutcome? = null,
         val amount: AmountModel? = null,
+        val stakeAfter: String? = null,
         /** "Discover subnets" is offered only after opening a new position (iOS `landingActions`). */
         val canDiscoverSubnets: Boolean = false
     ) : BittensorStakeResultUi

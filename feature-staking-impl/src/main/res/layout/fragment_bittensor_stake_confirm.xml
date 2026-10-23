@@ -51,6 +51,14 @@
             app:title="@string/staking_staking_type"
             tools:primaryValue="Root staking" />
 
+        <!-- Only when adding to an existing root position (iOS createStakeChange). -->
+        <io.novafoundation.nova.common.view.TableCellView
+            android:id="@+id/stakeAfter"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:visibility="gone"
+            app:title="@string/bittensor_exit_stake_after" />
+
         <io.novafoundation.nova.common.view.TableCellView
             android:id="@+id/bittensorStakeConfirmValidator"
             android:layout_width="match_parent"
@@ -64,14 +72,8 @@
             android:layout_width="match_parent"
             android:layout_height="44dp"
             app:primaryValueStyle="positive"
-            app:shouldDrawDivider="false"
             app:title="@string/bittensor_apy"
             tools:primaryValue="7% · paid in TAO" />
-        <io.novafoundation.nova.common.view.TableCellView
-            android:id="@+id/stakeAfter"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            app:title="@string/bittensor_exit_stake_after" />
     </io.novafoundation.nova.common.view.TableView>
 
     <Space
