@@ -4,8 +4,6 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingPortfolioSource
-import io.novafoundation.nova.analytics.StakingResultAction
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -13,6 +11,8 @@ import io.novafoundation.nova.analytics.StakingAnalyticsTarget
 import io.novafoundation.nova.analytics.StakingMode
 import io.novafoundation.nova.analytics.AnalyticsService
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorOperationAnalytics
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorCompletedFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.doneAnalyticsAction
 
 import android.os.SystemClock
 import io.novafoundation.nova.common.address.AccountIdKey
@@ -603,18 +603,20 @@ class BittensorSubnetReviewViewModel(
     }
 
     fun viewPositionClicked() {
-        if (submission.value is BittensorSubmissionState.Completed) {
+        val state = submission.value
+        if (state !is BittensorSubmissionState.Completed && state !is BittensorSubmissionState.Unconfirmed) return
+
+        val exit = bittensorCompletedFlowExit(newPosition = !existingPosition, emptiesPosition = false)
+        if (state is BittensorSubmissionState.Completed) {
             analytics.track(
                 BittensorAnalyticsEvent.ResultAction(
-                    StakingResultAction.YOUR_BITTENSOR,
+                    exit.doneAnalyticsAction,
                     StakingFlow.STAKE,
                     StakingAnalyticsTarget.SUBNET
                 )
             )
-            router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
-        } else if (submission.value is BittensorSubmissionState.Unconfirmed) {
-            router.back()
         }
+        router.finishBittensorFlow(exit)
     }
 
     fun back() {

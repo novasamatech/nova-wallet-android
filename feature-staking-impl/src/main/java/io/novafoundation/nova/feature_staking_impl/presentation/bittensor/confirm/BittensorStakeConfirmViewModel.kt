@@ -52,6 +52,8 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSta
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFeeEstimate
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorCompletedFlowExit
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
@@ -312,8 +314,29 @@ class BittensorStakeConfirmViewModel(
                     StakingAnalyticsTarget.ROOT
                 )
             )
-            router.openBittensorRootDetails()
+            finishFlow()
         }
+    }
+
+    fun unconfirmedDoneClicked() {
+        if (submission.value is BittensorSubmissionState.Unconfirmed) finishFlow()
+    }
+
+    fun discoverSubnetsClicked() {
+        if (submission.value is BittensorSubmissionState.Completed) {
+            analytics.track(
+                BittensorAnalyticsEvent.ResultAction(
+                    StakingResultAction.DISCOVER_SUBNETS,
+                    StakingFlow.STAKE,
+                    StakingAnalyticsTarget.ROOT
+                )
+            )
+            router.finishBittensorFlow(BittensorFlowExit.SUBNET_DISCOVERY)
+        }
+    }
+
+    private fun finishFlow() {
+        router.finishBittensorFlow(bittensorCompletedFlowExit(newPosition = !payload.existingPosition, emptiesPosition = false))
     }
 
     private fun mapAmount(details: BittensorRootStakingDetails, request: BittensorRootStakeRequest): AmountModel {

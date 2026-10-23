@@ -102,7 +102,8 @@ class BittensorRootClaimFragment : BaseFragment<BittensorRootClaimViewModel, Fra
             onDismiss = viewModel::resultDismissed,
             onTryAgain = viewModel::resultDismissed,
             onViewPosition = viewModel::done,
-            onDiscoverSubnets = viewModel::done
+            onDiscoverSubnets = viewModel::discoverSubnetsClicked,
+            onUnconfirmedDone = viewModel::done
         )
     }
 }

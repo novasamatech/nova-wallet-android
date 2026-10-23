@@ -4,8 +4,9 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingPortfolioSource
-import io.novafoundation.nova.analytics.StakingResultAction
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorCompletedFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.doneAnalyticsAction
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -534,18 +535,23 @@ class BittensorRootClaimViewModel(
         dismissed.value = true
     }
 
-    fun done() {
+    /** A claim never opens or empties a position, so "Done" returns to root details (iOS `completeAfterSuccess`). */
+    fun done() = finish(bittensorCompletedFlowExit(newPosition = false, emptiesPosition = false))
+
+    fun discoverSubnetsClicked() = finish(BittensorFlowExit.SUBNET_DISCOVERY)
+
+    private fun finish(exit: BittensorFlowExit) {
         resultDismissed()
         if (!previewOnly) {
             analytics.track(
                 BittensorAnalyticsEvent.ResultAction(
-                    StakingResultAction.YOUR_BITTENSOR,
+                    exit.doneAnalyticsAction,
                     StakingFlow.CLAIM,
                     StakingAnalyticsTarget.ROOT
                 )
             )
         }
-        router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
+        router.finishBittensorFlow(exit)
     }
 
     fun validatorClicked() = launchUnit {

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 
 import androidx.navigation.NavOptions
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.StartStakingLandingFragment
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
@@ -73,7 +74,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.validators.detai
 import io.novafoundation.nova.feature_staking_impl.presentation.validators.details.ValidatorDetailsFragment
 
 class RelayStakingNavigator(
-    navigationHoldersRegistry: NavigationHoldersRegistry,
+    private val navigationHoldersRegistry: NavigationHoldersRegistry,
     private val commonNavigator: Navigator,
     private val stakingDashboardRouter: StakingDashboardRouter,
     private val dAppRouter: DAppRouter
@@ -408,6 +409,21 @@ class RelayStakingNavigator(
             .setArgs(StartStakingLandingFragment.getBundle(payload))
             .setNavOptions(options)
             .navigateInFirstAttachedContext()
+    }
+
+    override fun finishBittensorFlow(exit: BittensorFlowExit) {
+        val navController = navigationHoldersRegistry.splitScreenNavigationHolder.navController ?: return
+
+        when (val plan = planBittensorFlowExit(exit, navController.backStackDestinationIds())) {
+            is BittensorFlowExitPlan.PopTo -> {
+                navController.popBackStack(plan.destination, false)
+                if (plan.openWhereToStake) openBittensorWhereToStake()
+            }
+
+            BittensorFlowExitPlan.OpenPortfolioOverDashboard -> navigationBuilder().action(R.id.action_finish_bittensor_flow_to_portfolio)
+                .setArgs(BittensorPortfolioFragment.sourceBundle(StakingPortfolioSource.RESULT, BittensorPortfolioEntry.PORTFOLIO))
+                .navigateInFirstAttachedContext()
+        }
     }
 
     override fun openBittensorRootDetails() {

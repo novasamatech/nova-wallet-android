@@ -4,7 +4,10 @@ import io.novafoundation.nova.analytics.BittensorAnalyticsEvent
 import io.novafoundation.nova.analytics.StakingFlow
 import io.novafoundation.nova.analytics.StakingValidationStage
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.analyticsKind
-import io.novafoundation.nova.analytics.StakingPortfolioSource
+import io.novafoundation.nova.analytics.StakingResultAction
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorCompletedFlowExit
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.doneAnalyticsAction
 import io.novafoundation.nova.analytics.BittensorDataEndpoint
 import io.novafoundation.nova.analytics.BittensorScreen
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadAnalytics
@@ -650,8 +653,33 @@ class BittensorExitReviewViewModel(
         sheetDismissed.value = true
     }
 
-    fun doneClicked() = launchUnit {
-        router.openBittensorPortfolio(StakingPortfolioSource.RESULT)
+    fun doneClicked() {
+        val state = execution.value
+        val emptiesPosition = when (state) {
+            is ExitExecution.Success -> state.draft.quote.fullExit
+            is ExitExecution.Unconfirmed -> payload.fullExit
+            else -> return
+        }
+        val exit = bittensorCompletedFlowExit(newPosition = false, emptiesPosition = emptiesPosition)
+        trackResultAction(exit.doneAnalyticsAction)
+        router.finishBittensorFlow(exit)
+    }
+
+    fun discoverSubnetsClicked() {
+        if (execution.value !is ExitExecution.Success) return
+        trackResultAction(StakingResultAction.DISCOVER_SUBNETS)
+        router.finishBittensorFlow(BittensorFlowExit.SUBNET_DISCOVERY)
+    }
+
+    private fun trackResultAction(action: StakingResultAction) {
+        if (execution.value !is ExitExecution.Success) return
+        analytics.track(
+            BittensorAnalyticsEvent.ResultAction(
+                action,
+                StakingFlow.UNSTAKE,
+                if (isRoot) StakingAnalyticsTarget.ROOT else StakingAnalyticsTarget.SUBNET
+            )
+        )
     }
 
     fun back() {

@@ -1,6 +1,7 @@
 package io.novafoundation.nova.feature_staking_impl.presentation
 
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.BittensorPortfolioEntry
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
 import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 import io.novafoundation.nova.analytics.StakingPortfolioSource
@@ -138,6 +139,9 @@ interface StakingRouter {
     )
 
     fun replaceBittensorPortfolioWithStart(payload: StartStakingLandingPayload)
+
+    /** Leaves a finished Bittensor operation, dropping its flow screens from the back stack. */
+    fun finishBittensorFlow(exit: BittensorFlowExit)
 
     fun openBittensorRootDetails()
 
