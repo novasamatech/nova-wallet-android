@@ -72,7 +72,13 @@ class BittensorPositionAdapter(
             positionFiat.isVisible = !item.isAmountLoading && item.amount.token.isNotEmpty() && item.amount.fiat != null
             positionChange.text = item.change?.text
             positionChange.isVisible = !item.isChangeLoading && item.change != null
-            positionChange.setTextColorRes(if (item.change?.isRising == false) R.color.text_negative else R.color.text_positive)
+            positionChange.setTextColorRes(
+                when {
+                    item.change?.isFlat == true -> R.color.text_secondary
+                    item.change?.isRising == false -> R.color.text_negative
+                    else -> R.color.text_positive
+                }
+            )
             positionChangeProgress.isVisible = item.isChangeLoading
             positionChevron.isVisible = true
             root.setOnClickListener { onClick(item) }

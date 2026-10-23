@@ -2997,13 +2997,13 @@
     <string name="bittensor_validator_apr_period">APR · 30 days</string>
     <string name="bittensor_exit_root_title">Unstake from root</string>
     <string name="bittensor_exit_sell_title">Sell %1$s</string>
-    <string name="bittensor_exit_staked_header">Staked: %1$s · %2$s</string>
+    <string name="bittensor_exit_staked_header">Staked: %1$s ·</string>
     <string name="bittensor_exit_review_sale">Review sale</string>
     <string name="bittensor_exit_you_unstake">You unstake</string>
     <string name="bittensor_exit_you_sell">You sell</string>
     <string name="bittensor_exit_stake_after">Stake after</string>
     <string name="bittensor_exit_avg_buy_price">Avg buy price</string>
-    <string name="bittensor_avg_buy_chart">Avg buy %s</string>
+    <string name="bittensor_avg_buy_chart">Avg buy %1$s</string>
     <string name="bittensor_you_earned">You earned</string>
     <string name="bittensor_exit_earned">Earned</string>
     <string name="bittensor_exit_fee_from_free">The network fee is paid from your free %1$s balance. Keep enough %1$s for the fee and the minimum account balance.</string>

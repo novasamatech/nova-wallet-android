@@ -46,6 +46,7 @@ import io.novafoundation.nova.feature_account_api.presenatation.actions.External
 import io.novafoundation.nova.feature_account_api.presenatation.actions.showAddressActions
 import io.novafoundation.nova.feature_account_api.presenatation.chain.getAssetIconOrFallback
 import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorEstimatedPurchaseTotals
 import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorEstimatesMixin
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitDraft
@@ -293,7 +294,7 @@ class BittensorExitReviewViewModel(
                     inIcon,
                     exitFormatter.amount(draft.position, actualAlpha ?: draft.quote.amount, true, draft.quote).let {
                         val amount = it.token.ltrIsolated()
-                        if (actualAlpha == null) it.copy(token = "≈ $amount") else it.copy(token = amount, fiat = null)
+                        if (actualAlpha == null) it.copy(token = "≈ $amount".ltrIsolated()) else it.copy(token = amount, fiat = null)
                     },
                     iconSizeDp = 48,
                     clipIconToOutline = true
@@ -353,10 +354,13 @@ class BittensorExitReviewViewModel(
         .shareInBackground()
 
     /** "You earned" on the done page (iOS `ui.you.earned`): only for a completed sale with a known cost basis. */
-    val completedEarned = combine(saleCostBasis, execution) { sale, state ->
+    // The settled totals behind "You will earn" at confirm time: after a full sale the live history may settle again or drop the subnet.
+    private var confirmedPurchaseTotals: BittensorEstimatedPurchaseTotals? = null
+
+    val completedEarned = execution.map { state ->
         val success = state as? ExitExecution.Success
-        if (isRoot || success == null) return@combine null
-        saleCostBasisFormatter.completedProfit(sale.dataOrNull, success.draft.quote, success.outcome, success.draft.position.asset.token)
+        if (isRoot || success == null) return@map null
+        saleCostBasisFormatter.completedProfit(confirmedPurchaseTotals, success.draft.quote, success.outcome, success.draft.position.asset.token)
     }
         .shareInBackground()
 
@@ -634,6 +638,7 @@ class BittensorExitReviewViewModel(
                 // Hand off only while no block re-quote has moved the price past the acknowledged limit since the tap.
                 if (current.acknowledged == acknowledged && !current.isPriceMoved && !handedOff) {
                     priceMoveBanner.takeAcknowledgement()
+                    confirmedPurchaseTotals = settledPurchaseTotals(saleCostBasis.replayCache.lastOrNull()?.dataOrNull)
                     execution.value = ExitExecution.Running(SystemClock.elapsedRealtime(), estimatedDuration)
                     launchUnit { submit(signedDraft(draft, validated)) }
                 }

@@ -71,4 +71,11 @@ class BittensorCompletedSaleProfitTest {
         assertTrue(free.copy(locked = BigInteger.ONE).hasWithdrawalRestriction())
         assertTrue(free.copy(holdDurationMillis = BigInteger.ONE).hasWithdrawalRestriction())
     }
+
+    @Test
+    fun `only settled totals back the completed profit`() {
+        assertEquals(totals, settledPurchaseTotals(BittensorSaleCostBasis.Known(totals, settled = true)))
+        assertEquals(null, settledPurchaseTotals(BittensorSaleCostBasis.Known(totals, settled = false)))
+        assertEquals(null, settledPurchaseTotals(BittensorSaleCostBasis.NoPurchases))
+    }
 }

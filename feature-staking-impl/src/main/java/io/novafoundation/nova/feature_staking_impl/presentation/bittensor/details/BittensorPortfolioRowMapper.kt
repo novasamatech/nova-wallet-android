@@ -90,7 +90,9 @@ class BittensorPortfolioRowMapper(
                 portfolio.asset.token.currency
             ).token.ltrIsolated()
         }
-        val change = if (subnet == null) {
+        // iOS drops the weekly change while subnet rates are unavailable; the rates banner explains it.
+        val ratesUnavailable = metadata is ExtendedLoadingState.Error || portfolio.positions?.totalStake == null
+        val change = if (subnet == null || ratesUnavailable) {
             null
         } else {
             weeklyChanges.dataOrNull?.get(subnetId)?.let {
@@ -100,7 +102,8 @@ class BittensorPortfolioRowMapper(
                         it.formatAsSingleDecimalChange(),
                         resources.getString(R.string.bittensor_chart_week)
                     ),
-                    it.isNonNegative
+                    isRising = it.isNonNegative,
+                    isFlat = it.isFlatChange()
                 )
             }
         }
@@ -113,7 +116,7 @@ class BittensorPortfolioRowMapper(
             action = BittensorPositionAction.SubnetDetails(subnetId),
             isSubtitleLoading = metadata.isLoading(),
             change = change,
-            isChangeLoading = subnet != null && weeklyChanges.isLoading()
+            isChangeLoading = subnet != null && !ratesUnavailable && weeklyChanges.isLoading()
         )
     }
 
@@ -140,9 +143,17 @@ private val singleDecimalFormatter = FixedPrecisionFormatter(1)
 
 /** Signed change with one decimal, as iOS `signedPercentSingle`: "+16.4%". */
 internal fun BigDecimal.formatAsSingleDecimalChange(): String {
-    val prefix = if (isNonNegative) "+" else ""
-    return prefix + singleDecimalFormatter.format(this, RoundingMode.HALF_EVEN) + "%"
+    val rounded = setScale(1, RoundingMode.HALF_EVEN)
+    val sign = when (rounded.signum()) {
+        1 -> "+"
+        -1 -> "−"
+        else -> ""
+    }
+    return sign + singleDecimalFormatter.format(rounded.abs(), RoundingMode.HALF_EVEN) + "%"
 }
+
+/** A change that rounds to 0.0% is neither rising nor falling. */
+internal fun BigDecimal.isFlatChange(): Boolean = setScale(1, RoundingMode.HALF_EVEN).signum() == 0
 
 private fun BigInteger?.isPositiveAmount(): Boolean = this != null && isPositive()
 

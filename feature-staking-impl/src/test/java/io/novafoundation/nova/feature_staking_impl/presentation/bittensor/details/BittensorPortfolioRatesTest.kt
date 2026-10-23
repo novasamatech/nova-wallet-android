@@ -49,4 +49,10 @@ class BittensorPortfolioRatesTest {
         val rootOnly = priced.copy(subnets = emptyList())
         assertEquals(BittensorPortfolioRates.AVAILABLE, bittensorPortfolioRates(rootOnly, ExtendedLoadingState.Error(Exception()), apy))
     }
+
+    @Test
+    fun `no banner while cached positions are refreshing`() {
+        val failedCatalogue = ExtendedLoadingState.Error(IllegalStateException())
+        assertEquals(BittensorPortfolioRates.AVAILABLE, bittensorPortfolioRates(priced, failedCatalogue, apy, isPortfolioLoading = true))
+    }
 }

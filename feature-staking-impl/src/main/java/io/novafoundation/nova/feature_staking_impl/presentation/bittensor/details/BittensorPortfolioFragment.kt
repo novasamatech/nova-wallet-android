@@ -4,6 +4,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.view.PrimaryButton
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
 import io.novafoundation.nova.feature_staking_impl.R
 import io.novafoundation.nova.feature_staking_impl.databinding.FragmentBittensorPortfolioBinding
@@ -88,7 +89,11 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
             totalFiat.text = it.fiat
         }
         viewModel.positions.observe(adapter::submitList)
-        viewModel.empty.observe { empty.isVisible = it }
+        viewModel.empty.observe {
+            empty.isVisible = it
+            // iOS: the only action of an empty portfolio is primary, next to positions it is secondary.
+            addPosition.setAppearance(if (it) PrimaryButton.Appearance.PRIMARY else PrimaryButton.Appearance.SECONDARY)
+        }
         viewModel.rates.observe { rates ->
             ratesUnavailable.isVisible = rates.showBanner
             priceChart.isVisible = rates.showChart

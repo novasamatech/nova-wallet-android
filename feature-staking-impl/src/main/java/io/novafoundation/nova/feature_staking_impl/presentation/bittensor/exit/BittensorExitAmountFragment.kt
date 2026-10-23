@@ -3,9 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit
 import io.novafoundation.nova.common.utils.setTextOrHide
 import io.novafoundation.nova.common.view.setMessageOrHide
 
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.ForegroundColorSpan
+import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import io.novafoundation.nova.common.utils.ltrIsolated
 import androidx.core.view.isVisible
@@ -58,8 +56,11 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         amount.setAssetIconRounded(!viewModel.isRoot)
         amount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
         if (viewModel.isRoot) {
+            amount.setTitle(null)
+            amount.updateLayoutParams<ViewGroup.MarginLayoutParams> { topMargin = 0 }
             amount.setMaxActionAvailability(MaxActionAvailability.NotAvailable)
-            stakedHeader.setOnClickListener { viewModel.maxClicked() }
+            rootAmountHeader.isVisible = true
+            unstakeAll.setOnClickListener { viewModel.maxClicked() }
         } else {
             amount.setMaxActionAvailability(MaxActionAvailability.Available { viewModel.maxClicked() })
         }
@@ -147,16 +148,9 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         super.onPause()
     }
 
-    private fun showStakedHeader(header: BittensorStakedHeaderUi?) = with(binder.stakedHeader) {
-        isVisible = header != null
-        header ?: return@with
-        val link = getString(R.string.staking_unstake_all)
-        val text = getString(R.string.bittensor_exit_staked_header, header.staked.ltrIsolated(), link)
-        val linkColor = requireContext().getColor(if (header.isEnabled) R.color.button_text_accent else R.color.text_secondary)
-        val start = text.lastIndexOf(link)
-        this.text = SpannableString(text).apply {
-            if (start >= 0) setSpan(ForegroundColorSpan(linkColor), start, start + link.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-        }
-        isEnabled = header.isEnabled
+    private fun showStakedHeader(header: BittensorStakedHeaderUi?) = with(binder) {
+        stakedValue.text = header?.let { getString(R.string.bittensor_exit_staked_header, it.staked.ltrIsolated()) }
+        unstakeAll.isEnabled = header?.isEnabled == true
+        unstakeAll.setTextColorRes(if (header?.isEnabled == true) R.color.button_text_accent else R.color.text_secondary)
     }
 }

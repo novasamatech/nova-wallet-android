@@ -27,28 +27,52 @@
             android:paddingHorizontal="16dp"
             android:paddingBottom="24dp">
 
-            <FrameLayout
+            <!-- Root only: "You unstake" with "Staked: X · Unstake all" in place of the Max action (iOS). -->
+            <LinearLayout
+                android:id="@+id/rootAmountHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp">
+                android:layout_marginTop="24dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
-                <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
-                    android:id="@+id/amount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <!-- Root only: "Staked: X · Unstake all" in place of the Max action (iOS). -->
                 <TextView
-                    android:id="@+id/stakedHeader"
                     style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top|end"
-                    android:layout_marginStart="120dp"
+                    android:maxLines="1"
+                    android:text="@string/bittensor_exit_you_unstake"
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/stakedValue"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
                     android:gravity="end"
-                    android:textColor="@color/text_secondary"
-                    android:visibility="gone" />
-            </FrameLayout>
+                    android:maxLines="1"
+                    android:textColor="@color/text_secondary" />
+
+                <TextView
+                    android:id="@+id/unstakeAll"
+                    style="@style/TextAppearance.NovaFoundation.Regular.Footnote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:maxLines="1"
+                    android:text="@string/staking_unstake_all"
+                    android:textColor="@color/button_text_accent" />
+            </LinearLayout>
+
+            <io.novafoundation.nova.feature_wallet_api.presentation.view.amount.ChooseAmountView
+                android:id="@+id/amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp" />
 
             <io.novafoundation.nova.common.view.TableView
                 android:layout_width="match_parent"

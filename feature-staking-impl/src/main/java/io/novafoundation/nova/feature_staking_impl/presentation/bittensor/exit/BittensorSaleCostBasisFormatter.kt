@@ -110,12 +110,12 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
 
     /** "You earned" on a completed sale; null without settled purchase totals, so the row stays hidden (iOS). */
     fun completedProfit(
-        sale: BittensorSaleCostBasis?,
+        totals: BittensorEstimatedPurchaseTotals?,
         quote: BittensorExitQuote,
         outcome: BittensorOperationOutcome?,
         token: TokenBase
     ): BittensorSaleProfitUi? {
-        val totals = (sale as? BittensorSaleCostBasis.Known)?.takeIf { it.settled }?.totals ?: return null
+        totals ?: return null
         return profit(token.amountFromPlanks(completedSaleProfit(totals, quote, outcome)), token)
     }
 
@@ -151,6 +151,10 @@ class BittensorSaleCostBasisFormatter @Inject constructor(
 
 internal fun estimatedSaleProfit(totals: BittensorEstimatedPurchaseTotals, quote: BittensorExitQuote) =
     totals.estimatedProfit(quote.amount, quote.estimatedTaoOut - quote.serviceFee)
+
+/** Only settled totals back "You will earn", so only they may back "You earned". */
+internal fun settledPurchaseTotals(sale: BittensorSaleCostBasis?): BittensorEstimatedPurchaseTotals? =
+    (sale as? BittensorSaleCostBasis.Known)?.takeIf { it.settled }?.totals
 
 /** The executed sale when the chain reported it (alpha sold, TAO out before the network fee), the reviewed quote otherwise. */
 internal fun completedSaleProfit(totals: BittensorEstimatedPurchaseTotals, quote: BittensorExitQuote, outcome: BittensorOperationOutcome?): BigInteger {
