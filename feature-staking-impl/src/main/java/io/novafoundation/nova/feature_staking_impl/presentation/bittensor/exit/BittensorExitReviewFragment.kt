@@ -76,10 +76,15 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             height = 18.dp(requireContext())
         }
         validator.setOnClickListener { viewModel.validatorClicked() }
-        validator.title.setOnClickListener {
-            showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
+        if (viewModel.isRoot) {
+            // iOS root review: plain title, the info accessory sits next to the validator only.
+            validator.setTitleIconEnd(null, null)
+            validator.setPrimaryValueEndIcon(R.drawable.ic_info)
+        } else {
+            validator.title.setOnClickListener {
+                showDescription(R.string.bittensor_validator, getString(R.string.bittensor_validator_description))
+            }
         }
-        if (viewModel.isRoot) validator.setPrimaryValueEndIcon(R.drawable.ic_info)
         information.setOnAccountClickedListener { viewModel.accountClicked() }
         saleAccount.setOnClickListener { viewModel.accountClicked() }
         slippage.setOnClickListener { showDescription(R.string.swap_slippage_title, viewModel.slippageDescription) }
@@ -127,9 +132,11 @@ class BittensorExitReviewFragment : BaseFragment<BittensorExitReviewViewModel, F
             information.setAccount(it)
             saleAccount.showAddress(it)
         }
-        viewModel.fee.observe {
-            information.setFeeStatus(it)
-            networkFee.setFeeStatus(it)
+        // FeeView / TableCellView make themselves visible when bound: bind only the fee row this operation shows.
+        if (viewModel.isRoot) {
+            viewModel.fee.observe(information::setFeeStatus)
+        } else {
+            viewModel.fee.observe(networkFee::setFeeStatus)
         }
         viewModel.executionFee.observe(execution.networkFee::setFeeStatus)
         viewModel.validatorName.observe {
