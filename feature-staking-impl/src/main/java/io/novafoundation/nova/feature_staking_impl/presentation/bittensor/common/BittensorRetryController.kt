@@ -52,6 +52,34 @@ class BittensorRetryController(private val resources: ResourceManager, private v
         }
     }
 
+    /**
+     * Like [observe], but the screen explains the failure itself (e.g. an inline warning with "Try again") instead of a dialog.
+     * [retry] reloads the source.
+     */
+    fun <T, R> observeInline(
+        step: String,
+        retry: BittensorInlineRetry,
+        analytics: BittensorReadAnalytics? = null,
+        transform: (Flow<T>) -> Flow<R>,
+        source: () -> Flow<T>
+    ): Flow<R> {
+        return retry.attempts.flatMapLatest { attempt ->
+            if (attempt > 0) analytics?.retry()
+            val read = flowOfAll { source() }
+                .catch { cause ->
+                    currentCoroutineContext().ensureActive()
+                    if (cause is CancellationException && cause !is TimeoutCancellationException) throw cause
+                    analytics?.failed(cause)
+                    logger.log("[Bittensor] Failed to load $step")
+                    logger.log(cause)
+                    // The screen already explains a device that cannot attest; later reads must not add a dialog for it.
+                    if (cause.bittensorReadFailureKind() == BittensorReadFailureKind.DEVICE_UNSUPPORTED) deviceFailureReported.set(true)
+                    throw cause
+                }
+            transform(read)
+        }
+    }
+
     private fun report(step: String, cause: Throwable, onRetry: () -> Unit) {
         logger.log("[Bittensor] Failed to load $step")
         logger.log(cause)
@@ -63,5 +91,15 @@ class BittensorRetryController(private val resources: ResourceManager, private v
             BittensorReadFailureKind.DEVICE_UNSUPPORTED -> R.string.bittensor_load_device_title to R.string.bittensor_load_device_message
         }
         errors.trySend(BittensorReadFailure(kind, resources.getString(title), resources.getString(message), onRetry))
+    }
+}
+
+/** Reload trigger for [BittensorRetryController.observeInline]. */
+class BittensorInlineRetry {
+
+    internal val attempts = MutableStateFlow(0L)
+
+    fun retry() {
+        attempts.update { it + 1 }
     }
 }

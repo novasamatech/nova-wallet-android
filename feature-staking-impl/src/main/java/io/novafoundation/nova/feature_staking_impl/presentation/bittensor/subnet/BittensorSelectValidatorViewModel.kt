@@ -50,6 +50,12 @@ import kotlinx.coroutines.flow.onStart
 import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
+import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
 
 class BittensorSelectValidatorViewModel(
     private val analytics: AnalyticsService,
@@ -63,7 +69,8 @@ class BittensorSelectValidatorViewModel(
     private val logger: Logger,
     private val retryController: BittensorRetryController,
     private val tokenFormatter: TokenFormatter,
-    private val subnetInteractor: BittensorSubnetInteractor
+    private val subnetInteractor: BittensorSubnetInteractor,
+    private val filtersCommunicator: BittensorValidatorFiltersCommunicator
 ) : BaseViewModel(), ExternalActions by externalActions {
 
     private val validatorsReads = BittensorReadAnalytics(analytics, BittensorDataEndpoint.VALIDATORS, BittensorScreen.VALIDATOR_SELECT)
@@ -74,6 +81,11 @@ class BittensorSelectValidatorViewModel(
     val filters = MutableStateFlow(request.selectionState.filtersFor(BittensorNetuid.from(request.subnetId)))
 
     private val query = MutableStateFlow("")
+
+    private val _searchVisible = MutableStateFlow(false)
+    val searchVisible = _searchVisible.asStateFlow()
+
+    private val directoryRetry = BittensorInlineRetry()
 
     private val netuid = BittensorNetuid.from(request.subnetId)
 
@@ -96,7 +108,8 @@ class BittensorSelectValidatorViewModel(
     private val validatorsState = observeBittensorValidatorDirectory(
         retryController = retryController,
         loadDirectory = { bittensorValidatorInteractor.directory(netuid) },
-        rankDirectory = { bittensorValidatorInteractor.rankDirectory(netuid, it) }
+        rankDirectory = { bittensorValidatorInteractor.rankDirectory(netuid, it) },
+        inlineDirectoryRetry = directoryRetry
     )
         .mapLoading { directory -> directory.validators.map { mapValidator(it) } }
         .shareInBackground()
@@ -159,13 +172,26 @@ class BittensorSelectValidatorViewModel(
     }
         .shareInBackground()
 
+    init {
+        filtersCommunicator.responseFlow
+            .onEach { applyFilters(it.filters) }
+            .launchIn(this)
+    }
+
     private val _inactiveValidatorEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
     val inactiveValidatorEvents: SharedFlow<Unit> = _inactiveValidatorEvents
 
     val isLoading = validatorsState.map { it.isLoading() }
         .shareInBackground()
 
-    val isEmpty = combine(rows, isLoading) { rows, loading -> rows.isEmpty() && !loading }
+    // The directory failure replaces the list with an inline warning, as on iOS; secondary reads keep their retry dialogs.
+    val listFailure = validatorsState.map { state ->
+        (state as? ExtendedLoadingState.Error)?.let { bittensorValidatorListFailure(it.exception, resources) }
+    }
+        .distinctUntilChanged()
+        .shareInBackground()
+
+    val isEmpty = combine(rows, isLoading, listFailure) { rows, loading, failure -> rows.isEmpty() && !loading && failure == null }
         .shareInBackground()
 
     val canRemoveFilters = combine(filteredRows, validatorsState, filters) { rows, state, filters ->
@@ -218,7 +244,7 @@ class BittensorSelectValidatorViewModel(
         ).map { validator ->
             val rate = rates[validator.validator.hotkey]
             val nativeStake = validator.validator.reportedStake?.let { amount -> stake?.nativePrice?.let { amount * it } }
-            val amount = nativeStake?.let { tokenFormatter.formatToken(it, requireNotNull(stake).symbol).toString() } ?: "—"
+            val amount = nativeStake?.let { tokenFormatter.formatToken(it, requireNotNull(stake).symbol, COMPACT_TOKEN_CONFIG).toString() } ?: "—"
             val take = validator.commissionRate.movePointRight(2).setScale(2, java.math.RoundingMode.HALF_EVEN).toStripTrailingZerosString()
             val subtitle = resources.getString(R.string.bittensor_validator_list_subtitle, amount, take)
             rowsByAddress.getValue(validator.address).copy(
@@ -233,6 +259,23 @@ class BittensorSelectValidatorViewModel(
 
     fun search(text: String) {
         query.value = text
+    }
+
+    fun searchClicked() {
+        val visible = !_searchVisible.value
+        _searchVisible.value = visible
+        if (!visible) query.value = ""
+    }
+
+    fun retryList() {
+        directoryRetry.retry()
+    }
+
+    fun filtersClicked() = launchUnit {
+        val symbol = runCatching { bittensorValidatorInteractor.chain().utilityAsset.symbol.value }
+            .onFailure { if (it is CancellationException) throw it }
+            .getOrNull()
+        filtersCommunicator.openRequest(BittensorValidatorFiltersCommunicator.Request(filters.value, symbol))
     }
 
     fun applyFilters(value: BittensorValidatorFilters) {
@@ -303,3 +346,6 @@ class BittensorSelectValidatorViewModel(
         return BittensorValidatorUi(validator, icon)
     }
 }
+
+// "54.2K TAO staked", as on iOS
+private val COMPACT_TOKEN_CONFIG = TokenConfig(useCompactAbbreviation = true)

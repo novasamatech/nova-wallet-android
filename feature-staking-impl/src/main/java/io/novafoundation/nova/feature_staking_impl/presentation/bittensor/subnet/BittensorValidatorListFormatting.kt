@@ -5,6 +5,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorSub
 import io.novafoundation.nova.common.utils.TokenSymbol
 import java.math.BigDecimal
 import java.text.Normalizer
+import io.novafoundation.nova.common.resources.ResourceManager
+import io.novafoundation.nova.feature_staking_impl.R
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorReadFailureKind
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorReadFailureKind
 
 data class BittensorValidatorListHeader(val count: String, val sorting: String)
 
@@ -25,3 +29,17 @@ internal fun matchesBittensorValidator(validator: BittensorSubnetValidator, quer
 }
 
 private fun normalizedBittensorSearch(text: String): String = Normalizer.normalize(text, Normalizer.Form.NFD).replace(Regex("\\p{M}+"), "")
+
+data class BittensorValidatorListFailure(val title: String, val message: String)
+
+/** Inline warning for a validator list that did not load. A device that cannot attest gets its own explanation, as on iOS. */
+internal fun bittensorValidatorListFailure(cause: Throwable, resources: ResourceManager): BittensorValidatorListFailure {
+    val message = when (cause.bittensorReadFailureKind()) {
+        BittensorReadFailureKind.DEVICE_UNSUPPORTED -> R.string.bittensor_validators_fetch_failed_device_message
+        BittensorReadFailureKind.GENERIC, BittensorReadFailureKind.SLOW_NETWORK -> R.string.bittensor_validators_fetch_failed_message
+    }
+    return BittensorValidatorListFailure(
+        title = resources.getString(R.string.bittensor_validators_fetch_failed_title),
+        message = resources.getString(message)
+    )
+}
