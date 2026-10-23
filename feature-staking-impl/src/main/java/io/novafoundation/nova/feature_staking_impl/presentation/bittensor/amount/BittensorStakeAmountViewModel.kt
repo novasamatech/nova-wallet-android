@@ -28,7 +28,6 @@ import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.presentation.ellipsizeAddress
-import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.common.utils.images.Icon
 import io.novafoundation.nova.common.utils.isPositive
 import io.novafoundation.nova.common.utils.launchUnit
@@ -59,6 +58,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorNeedsFunding
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.BittensorStakeConfirmPayload
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.model.BittensorValidatorUi
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
@@ -185,8 +185,6 @@ class BittensorStakeAmountViewModel(
         .shareInBackground()
 
     private val preparing = MutableStateFlow(false)
-
-    private var initializedMetaId: Long? = null
 
     private val amountInPlanks = combine(
         stakingDetails,
@@ -356,10 +354,6 @@ class BittensorStakeAmountViewModel(
             }
         }
 
-        stakingDetails
-            .onEach(::setInitialAmount)
-            .launchIn(viewModelScope)
-
         validatorCommunicator.responseFlow
             .onEach { response ->
                 if (!selectionState.accepts(response)) return@onEach
@@ -409,6 +403,7 @@ class BittensorStakeAmountViewModel(
         val fee = fee.first()
             .loadedFeeOrNull()
             ?.takeIf { it.request == request } ?: return@launchUnit
+        val token = stakingDetails.first().asset.token
         preparing.value = true
         try {
             val payload = bittensorStakingInteractor.validationPayload(request, fee)
@@ -428,7 +423,7 @@ class BittensorStakeAmountViewModel(
                             )
                         )
                     }
-                    resourceManager.getString(R.string.common_error_general_title) to failure.message(resourceManager)
+                    failure.title(resourceManager) to failure.message(resourceManager) { formatToken(token.amountFromPlanks(it), token.configuration.symbol) }
                 }
             ) { openConfirmation(request) }
         } catch (e: CancellationException) {
@@ -516,15 +511,6 @@ class BittensorStakeAmountViewModel(
         }
     }
 
-    private fun setInitialAmount(details: BittensorRootStakingDetails) {
-        if (initializedMetaId == details.metaId) return
-        initializedMetaId = details.metaId
-        if (amountChooser.inputState.value.value.isNotEmpty()) return
-
-        val suggested = minOf(SUGGESTED_AMOUNT, details.asset.transferable)
-        amountChooser.setAmountInput(suggested.toStripTrailingZerosString())
-    }
-
     private fun continueButtonState(
         details: BittensorRootStakingDetails,
         amount: BigInteger?,
@@ -563,7 +549,5 @@ class BittensorStakeAmountViewModel(
 
     private companion object {
         const val FEE_DEBOUNCE_MILLIS = 350L
-
-        val SUGGESTED_AMOUNT: BigDecimal = BigDecimal("5")
     }
 }
