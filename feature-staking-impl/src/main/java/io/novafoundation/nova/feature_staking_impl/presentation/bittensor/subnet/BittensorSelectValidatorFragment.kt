@@ -44,13 +44,15 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
 
     override fun initViews() {
         binder.toolbar.setHomeButtonListener { viewModel.back() }
-        onBackPressed { viewModel.back() }
+        onBackPressed { viewModel.backPressed() }
         binder.list.itemAnimator = null
         binder.list.adapter = adapter
         binder.confirm.setOnClickListener { viewModel.confirmClicked() }
         binder.removeFilters.setOnClickListener { viewModel.removeFilters() }
         filterAction = binder.toolbar.addCustomAction(R.drawable.ic_filter) { viewModel.filtersClicked() }
+            .apply { contentDescription = getString(R.string.common_filters) }
         binder.toolbar.addCustomAction(R.drawable.ic_search) { viewModel.searchClicked() }
+            .contentDescription = getString(R.string.common_search)
         binder.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
         binder.listFailure.setActionText(getString(R.string.common_try_again))
         binder.listFailure.setOnLinkClickedListener { viewModel.retryList() }
@@ -58,18 +60,18 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
 
     override fun subscribe(viewModel: BittensorSelectValidatorViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
-        // Accent while any filter differs from the defaults, as on iOS
-        viewModel.filters.observe { filterAction?.setImageTintRes(if (it.isDefault) R.color.icon_primary else R.color.icon_accent) }
+        viewModel.filters.observe { filterAction?.setImageTintRes(if (it.hideUnusualApy) R.color.icon_accent else R.color.icon_primary) }
         viewModel.searchVisible.observe { visible ->
             if (searchContainer.isVisible == visible) return@observe
             searchContainer.isVisible = visible
-            if (visible) {
-                searchField.content.requestFocus()
-                searchField.content.showSoftKeyboard()
-            } else {
+            if (!visible) {
                 searchField.content.hideSoftKeyboard()
                 searchField.content.text.clear()
             }
+        }
+        viewModel.searchFocusEvents.observe {
+            searchField.content.requestFocus()
+            searchField.content.showSoftKeyboard()
         }
         viewModel.listFailure.observe { failure ->
             listFailure.isVisible = failure != null

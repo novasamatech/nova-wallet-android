@@ -17,7 +17,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="12dp"
-            app:title=""
+            app:title="@string/bittensor_native_pool"
             app:primaryValue="—" />
 
         <io.novafoundation.nova.common.view.TableCellView

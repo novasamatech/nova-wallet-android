@@ -22,7 +22,6 @@ import io.novafoundation.nova.common.utils.flowOf
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.common.utils.shareInBackground
 import io.novafoundation.nova.common.view.ButtonState
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.runtime.ext.utilityAsset
 import io.novafoundation.nova.common.utils.formatting.toStripTrailingZerosString
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.bittensorYieldColor
@@ -50,12 +49,14 @@ import kotlinx.coroutines.flow.onStart
 import java.util.Locale
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorInlineRetry
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
-import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.model.TokenConfig
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 
 class BittensorSelectValidatorViewModel(
     private val analytics: AnalyticsService,
@@ -68,7 +69,7 @@ class BittensorSelectValidatorViewModel(
     private val resources: ResourceManager,
     private val logger: Logger,
     private val retryController: BittensorRetryController,
-    private val tokenFormatter: TokenFormatter,
+    private val amountFormatter: BittensorAmountFormatter,
     private val subnetInteractor: BittensorSubnetInteractor,
     private val filtersCommunicator: BittensorValidatorFiltersCommunicator
 ) : BaseViewModel(), ExternalActions by externalActions {
@@ -86,6 +87,19 @@ class BittensorSelectValidatorViewModel(
     val searchVisible = _searchVisible.asStateFlow()
 
     private val directoryRetry = BittensorInlineRetry()
+
+    private val _searchFocusEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    // Only a tap on the magnifier focuses the field; a recreated view keeps it open without popping the keyboard
+    val searchFocusEvents: SharedFlow<Unit> = _searchFocusEvents
+
+    // Unit of the "Total staked" sort on the Filters screen; null until known (or if the chain cannot be read)
+    private val tokenSymbol = flowOf<String?> { bittensorValidatorInteractor.chain().utilityAsset.symbol.value }
+        .catch { cause ->
+            if (cause is CancellationException) throw cause
+            emit(null)
+        }
+        .stateIn(this, SharingStarted.Eagerly, null)
 
     private val netuid = BittensorNetuid.from(request.subnetId)
 
@@ -244,7 +258,7 @@ class BittensorSelectValidatorViewModel(
         ).map { validator ->
             val rate = rates[validator.validator.hotkey]
             val nativeStake = validator.validator.reportedStake?.let { amount -> stake?.nativePrice?.let { amount * it } }
-            val amount = nativeStake?.let { tokenFormatter.formatToken(it, requireNotNull(stake).symbol, COMPACT_TOKEN_CONFIG).toString() } ?: "—"
+            val amount = nativeStake?.let { amountFormatter.compactToken(it, requireNotNull(stake).symbol).toString() } ?: "—"
             val take = validator.commissionRate.movePointRight(2).setScale(2, java.math.RoundingMode.HALF_EVEN).toStripTrailingZerosString()
             val subtitle = resources.getString(R.string.bittensor_validator_list_subtitle, amount, take)
             rowsByAddress.getValue(validator.address).copy(
@@ -264,18 +278,21 @@ class BittensorSelectValidatorViewModel(
     fun searchClicked() {
         val visible = !_searchVisible.value
         _searchVisible.value = visible
-        if (!visible) query.value = ""
+        if (visible) _searchFocusEvents.tryEmit(Unit) else query.value = ""
+    }
+
+    // System back closes an open search first, as on iOS
+    fun backPressed() {
+        if (_searchVisible.value) searchClicked() else back()
     }
 
     fun retryList() {
         directoryRetry.retry()
     }
 
-    fun filtersClicked() = launchUnit {
-        val symbol = runCatching { bittensorValidatorInteractor.chain().utilityAsset.symbol.value }
-            .onFailure { if (it is CancellationException) throw it }
-            .getOrNull()
-        filtersCommunicator.openRequest(BittensorValidatorFiltersCommunicator.Request(filters.value, symbol))
+    // Opens synchronously so a quick second tap cannot stack a second Filters screen
+    fun filtersClicked() {
+        filtersCommunicator.openRequest(BittensorValidatorFiltersCommunicator.Request(filters.value, tokenSymbol.value))
     }
 
     fun applyFilters(value: BittensorValidatorFilters) {
@@ -346,6 +363,3 @@ class BittensorSelectValidatorViewModel(
         return BittensorValidatorUi(validator, icon)
     }
 }
-
-// "54.2K TAO staked", as on iOS
-private val COMPACT_TOKEN_CONFIG = TokenConfig(useCompactAbbreviation = true)
