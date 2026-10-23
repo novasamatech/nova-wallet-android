@@ -19,6 +19,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.StartMultiStakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.details.select.BittensorSelectUnstakePositionCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet.BittensorSelectValidatorCommunicator
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.SelectMythosInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.mythos.start.selectCollatorSettings.SelectMythCollatorSettingsInterScreenCommunicator
 import io.novafoundation.nova.feature_staking_impl.presentation.parachainStaking.collator.common.SelectCollatorInterScreenCommunicator
@@ -45,6 +46,7 @@ class StakingFeatureHolder @Inject constructor(
     private val selectMythosCollatorSettingsInterScreenCommunicator: SelectMythCollatorSettingsInterScreenCommunicator,
     private val unstakePositionCommunicator: BittensorSelectUnstakePositionCommunicator,
     private val bittensorValidatorCommunicator: BittensorSelectValidatorCommunicator,
+    private val bittensorValidatorFiltersCommunicator: BittensorValidatorFiltersCommunicator,
     private val slippageSettingsCommunicator: SlippageSettingsCommunicator,
 ) : FeatureApiHolder(featureContainer) {
 
@@ -78,6 +80,7 @@ class StakingFeatureHolder @Inject constructor(
                 selectMythosCollatorSettingsInterScreenCommunicator = selectMythosCollatorSettingsInterScreenCommunicator,
                 unstakePositionCommunicator = unstakePositionCommunicator,
                 bittensorValidatorCommunicator = bittensorValidatorCommunicator,
+                bittensorValidatorFiltersCommunicator = bittensorValidatorFiltersCommunicator,
                 slippageSettingsCommunicator = slippageSettingsCommunicator,
                 deps = dependencies
             )

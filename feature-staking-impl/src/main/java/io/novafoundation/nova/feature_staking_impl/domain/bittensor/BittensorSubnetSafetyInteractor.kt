@@ -6,6 +6,7 @@ import io.novafoundation.nova.runtime.repository.ChainStateRepository
 import io.novafoundation.nova.runtime.repository.expectedBlockTime
 import java.math.BigDecimal
 import java.math.BigInteger
+import java.math.RoundingMode
 import kotlin.time.Duration.Companion.days
 
 class BittensorSubnetSafetyInteractor(
@@ -21,6 +22,9 @@ class BittensorSubnetSafetyInteractor(
         val blockTime = chainStateRepository.expectedBlockTime(ChainGeneses.BITTENSOR)
         require(blockTime.isPositive())
         val elapsedMillis = (latest - registration).toBigDecimal() * blockTime.inWholeMilliseconds.toBigDecimal()
-        return elapsedMillis / 1.days.inWholeMilliseconds.toBigDecimal()
+        // Keeps the fraction of a day: young subnets are shown in hours/minutes and the chart is clipped to the hour
+        return elapsedMillis.divide(1.days.inWholeMilliseconds.toBigDecimal(), AGE_DAYS_SCALE, RoundingMode.DOWN)
     }
 }
+
+private const val AGE_DAYS_SCALE = 6

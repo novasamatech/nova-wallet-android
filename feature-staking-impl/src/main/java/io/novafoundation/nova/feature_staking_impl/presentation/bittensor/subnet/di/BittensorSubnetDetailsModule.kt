@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorAmountFormatter
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.di.viewmodel.ViewModelKey
@@ -54,7 +55,8 @@ class BittensorSubnetDetailsModule {
         validatorInteractor: BittensorValidatorInteractor,
         presetValidatorInteractor: BittensorPresetValidatorInteractor,
         validatorCommunicator: BittensorSelectValidatorCommunicator,
-        addressIconGenerator: AddressIconGenerator
+        addressIconGenerator: AddressIconGenerator,
+        amountFormatter: BittensorAmountFormatter
     ): ViewModel = BittensorSubnetDetailsViewModel(
         analytics, subnetId = BittensorNetuid.Subnet(payload.subnetId),
         bittensorSubnetInteractor = bittensorSubnetInteractor,
@@ -73,6 +75,7 @@ class BittensorSubnetDetailsModule {
         presetValidatorInteractor = presetValidatorInteractor,
         validatorCommunicator = validatorCommunicator,
         addressIconGenerator = addressIconGenerator,
+        amountFormatter = amountFormatter,
         replaceAmount = payload.replaceAmount,
         initialValidatorAddress = payload.validatorAddress,
         initialSelectionState = payload.selectionState,

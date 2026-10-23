@@ -8,6 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.detail
 import coil.request.ImageRequest
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
+import io.novafoundation.nova.common.utils.ltrIsolated
 import io.novafoundation.nova.common.mixin.impl.observeBrowserEvents
 import io.novafoundation.nova.common.utils.dp
 import io.novafoundation.nova.feature_staking_api.di.StakingFeatureApi
@@ -97,7 +98,7 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         viewModel.nativeTokenSymbol.observe { tao.text = it }
         viewModel.subnet.observe { subnet ->
             val name = subnet.displayName(requireContext())
-            toolbar.setTitle("\u200e$name")
+            toolbar.setTitle(name.ltrIsolated())
             priceTitle.text = getString(R.string.price_chart_title, name)
             subnetNumber.showValue(subnet.id.value.toString())
             imageLoader.enqueue(
@@ -129,6 +130,10 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         }
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.age.observe(age::showBittensorLoadingValue)
+        viewModel.nativePoolTitle.observe {
+            poolSplit.nativeShare.setTitle(it)
+            nativePool.setTitle(it)
+        }
         viewModel.parameters.observe { bindSubnetParameters(it) }
         viewModel.validatorCount.observe(validatorCount::showBittensorLoadingValue)
         viewModel.isValidatorLoading.observe {

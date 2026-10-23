@@ -108,7 +108,7 @@
                     android:id="@+id/pool"
                     android:layout_width="match_parent"
                     android:layout_height="52dp"
-                    app:title="@string/bittensor_pool"
+                    app:title="@string/bittensor_quick_pick_pool"
                     app:primaryValue="—" />
             </io.novafoundation.nova.common.view.TableView>
 
@@ -212,7 +212,7 @@
                         android:id="@+id/alphaPool"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        app:title="@string/bittensor_alpha_pool" />
+                        app:title="@string/bittensor_alpha_in_pool" />
 
                     <io.novafoundation.nova.common.view.TableCellView
                         android:id="@+id/emission"

@@ -36,6 +36,22 @@ class BittensorSubnetListTest {
     }
 
     @Test
+    fun `only a loaded search without matches counts as no matches`() {
+        assertEquals(true, bittensorSearchHasNoMatches(loading = false, failed = false, query = "xyz", matches = 0))
+        assertEquals(false, bittensorSearchHasNoMatches(loading = false, failed = false, query = "xyz", matches = 1))
+        assertEquals(false, bittensorSearchHasNoMatches(loading = false, failed = false, query = "  ", matches = 0))
+        assertEquals(false, bittensorSearchHasNoMatches(loading = true, failed = false, query = "xyz", matches = 0))
+        assertEquals(false, bittensorSearchHasNoMatches(loading = false, failed = true, query = "xyz", matches = 0))
+    }
+
+    @Test
+    fun `picker change is signed with one decimal`() {
+        assertEquals("+48.5%", bittensorPickerChangePercent(java.math.BigDecimal("48.4987")))
+        assertEquals("-3.2%", bittensorPickerChangePercent(java.math.BigDecimal("-3.21")))
+        assertEquals("+16%", bittensorPickerChangePercent(java.math.BigDecimal("16.04")))
+    }
+
+    @Test
     fun `grouping preserves the sorted subnet rows and wallet identity`() {
         val rows = listOf(row(9), row(1))
         assertEquals(rows, bittensorSubnetList(icon, rows).filterIsInstance<BittensorSubnetListItem.Subnet>().map { it.row })
