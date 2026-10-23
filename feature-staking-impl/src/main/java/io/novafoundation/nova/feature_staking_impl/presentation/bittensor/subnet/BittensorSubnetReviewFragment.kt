@@ -98,12 +98,14 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             networkFee.setOnClickListener { showDescription(R.string.network_fee, description) }
             execution.networkFee.setOnClickListener { showDescription(R.string.network_fee, description) }
         }
+        // A loading TableCellView makes itself visible: bind Avg buy price only when the stake adds to a position.
         if (viewModel.existingPosition) {
             viewModel.averagePriceDescription.observe { description ->
                 projectedAveragePrice.setOnClickListener {
                     description?.let { showDescription(R.string.bittensor_exit_avg_buy_price, it) }
                 }
             }
+            viewModel.projectedAveragePrice.observe(projectedAveragePrice::showBittensorLoadingValue)
         }
         setupExternalActions(viewModel)
         viewModel.wallet.observe(wallet::showWallet)
@@ -135,7 +137,6 @@ class BittensorSubnetReviewFragment : BaseFragment<BittensorSubnetReviewViewMode
             execution.validator.image.setImageDrawable(it)
         }
         viewModel.monthlyEstimate.observe(monthlyTokens::showBittensorLoadingValue)
-        viewModel.projectedAveragePrice.observe(projectedAveragePrice::showBittensorLoadingValue)
         viewModel.fee.observe {
             networkFee.setFeeStatus(it)
         }
