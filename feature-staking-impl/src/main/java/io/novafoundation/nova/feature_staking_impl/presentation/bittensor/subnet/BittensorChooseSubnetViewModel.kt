@@ -45,6 +45,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.passesBitten
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.sortBittensorSubnets
 import io.novafoundation.nova.feature_staking_impl.presentation.StakingRouter
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_wallet_api.domain.model.Asset
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.TokenFormatter
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.formatToken
@@ -404,7 +405,8 @@ class BittensorChooseSubnetViewModel(
             input.yields,
             input.weekly,
             previousOrder,
-            Locale.getDefault()
+            Locale.getDefault(),
+            title = { it.title(resources) }
         )
     }
 

@@ -16,15 +16,16 @@ internal fun sortBittensorSubnets(
     yields: Map<BittensorNetuid.Subnet, BigDecimal>,
     weekly: Map<BittensorNetuid.Subnet, BigDecimal>,
     previousOrder: List<BittensorSubnetReference>,
-    locale: Locale
+    locale: Locale,
+    title: (BittensorSubnet) -> String = BittensorSubnet::name
 ): List<BittensorSubnet> {
-    val names = Collator.getInstance(locale)
+    val names = naturalOrder(Collator.getInstance(locale))
     val ranks = previousOrder.withIndex().associate { it.value to it.index }
     val order: Comparator<BittensorSubnet> = when (sorting) {
         BittensorSubnetSorting.SEVEN_DAY_CHANGE -> compareByDescending<BittensorSubnet> { weekly[it.id] }
         BittensorSubnetSorting.POOL_DEPTH -> compareByDescending { it.taoReserveInPlanks }
         BittensorSubnetSorting.AGE -> compareBy { it.registrationBlock }
-        BittensorSubnetSorting.NAME -> Comparator { first, second -> names.compare(first.name, second.name) }
+        BittensorSubnetSorting.NAME -> Comparator { first, second -> names.compare(title(first), title(second)) }
         BittensorSubnetSorting.APY -> compareByDescending { yields[it.id] }
     }
     val comparator = compareByDescending<BittensorSubnet> { it in favorites }.then(order)
@@ -39,3 +40,22 @@ internal fun passesBittensorThinPoolFilter(subnet: BittensorSubnet, favorites: B
     subnet in favorites || (subnet.taoReserveInPlanks ?: BigInteger.ZERO) >= THIN_POOL_THRESHOLD
 
 private val THIN_POOL_THRESHOLD = BigInteger.valueOf(2_000_000_000_000L)
+
+private val DIGITS_OR_TEXT = Regex("\\d+|\\D+")
+
+/** Like iOS `localizedStandardCompare`: digit runs compare as numbers, so "Subnet 9" sorts before "Subnet 42". */
+private fun naturalOrder(collator: Collator) = Comparator<String> { first, second ->
+    val firstParts = DIGITS_OR_TEXT.findAll(first).map { it.value }.iterator()
+    val secondParts = DIGITS_OR_TEXT.findAll(second).map { it.value }.iterator()
+    while (firstParts.hasNext() && secondParts.hasNext()) {
+        val left = firstParts.next()
+        val right = secondParts.next()
+        val result = if (left[0].isDigit() && right[0].isDigit()) {
+            left.toBigInteger().compareTo(right.toBigInteger())
+        } else {
+            collator.compare(left, right)
+        }
+        if (result != 0) return@Comparator result
+    }
+    firstParts.hasNext().compareTo(secondParts.hasNext())
+}
