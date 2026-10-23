@@ -42,13 +42,22 @@ class BittensorValidatorInteractor(
     }
 
     suspend fun validatorName(netuid: BittensorNetuid, hotkey: AccountIdKey): String? {
+        return validatorNames(netuid, setOf(hotkey))[hotkey]
+    }
+
+    /** Directory names of [hotkeys]; hotkeys without a name are absent, callers fall back to the address. */
+    suspend fun validatorNames(netuid: BittensorNetuid, hotkeys: Set<AccountIdKey>): Map<AccountIdKey, String> {
+        if (hotkeys.isEmpty()) return emptyMap()
         val chain = chain()
         val response = backend.validators(netuid.value)
-        val row = response.items.orEmpty().firstOrNull { item ->
-            item.hotkey?.let { runCatching { AccountIdKey(chain.accountIdOf(it)) }.getOrNull() } == hotkey
-        } ?: return null
-        return row.identitySourceName?.takeIf { it.isNotBlank() }
-            ?: row.stakeSourceName?.takeIf { it.isNotBlank() }
+        return buildMap {
+            response.items.orEmpty().forEach { row ->
+                val hotkey = row.hotkey?.let { runCatching { AccountIdKey(chain.accountIdOf(it)) }.getOrNull() } ?: return@forEach
+                if (hotkey !in hotkeys || hotkey in this) return@forEach
+                val name = row.identitySourceName?.takeIf { it.isNotBlank() } ?: row.stakeSourceName?.takeIf { it.isNotBlank() }
+                name?.let { put(hotkey, it) }
+            }
+        }
     }
 
     suspend fun yields(netuid: BittensorNetuid, includeUnreliable: Boolean = false): Map<AccountIdKey, BigDecimal> {

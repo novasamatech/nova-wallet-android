@@ -8,6 +8,10 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExi
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitPlanMember
 import io.novafoundation.nova.feature_staking_impl.domain.bittensor.planBittensorExit
 
+/** Withdrawal floors within 1 % of each other: the Max shown from the older one is still accurate enough. */
+internal fun bittensorFloorsClose(first: BigInteger, second: BigInteger): Boolean =
+    (first - second).abs() * BigInteger.valueOf(100) <= first.max(second)
+
 data class BittensorExitAvailability(val total: BigInteger, val locked: BigInteger, val available: BigInteger)
 
 data class BittensorExitPreflight(
@@ -50,6 +54,18 @@ data class BittensorExitPreflight(
         } else {
             groupMembers.values.sumOf { it.drawable(withdrawalFloor) }.min(availability.available)
         }
+
+    /**
+     * Equality key for background refreshes: ignores per-block price drift and hold countdowns (only whether a
+     * hotkey is held matters before the fresh validation read), so unchanged chain state does not re-quote.
+     */
+    fun refreshIdentity(): BittensorExitPreflight = copy(
+        rootHoldRemaining = rootHoldRemaining.signum().toBigInteger(),
+        groupRootHoldRemaining = groupRootHoldRemaining.signum().toBigInteger(),
+        groupMembers = groupMembers.mapValues { (_, member) -> member.copy(holdRemaining = member.holdRemaining.signum().toBigInteger()) },
+        withdrawalFloor = BigInteger.ZERO,
+        withdrawalPrice = null
+    )
 
     fun plan(amount: BigInteger, primary: AccountIdKey): BittensorExitPlan {
         val hotkeys = orderedHotkeys.ifEmpty { listOf(primary) }

@@ -83,7 +83,7 @@ class BittensorExitAmountFragment : BaseFragment<BittensorExitAmountViewModel, F
         viewModel.maxAmount.observe(amount::setMaxAmountDisplay)
         viewModel.fiatAmount.observe(amount::setFiatAmount)
         viewModel.amountError.observe(amount::setError)
-        validator.showValue(viewModel.validator)
+        viewModel.validator.observe { validator.showValue(it) }
         if (!viewModel.isRoot) {
             viewModel.averagePrice.observe(averagePrice::showBittensorLoadingAmount)
             viewModel.averagePriceDescription.observe { description ->

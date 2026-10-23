@@ -2,6 +2,8 @@ package io.novafoundation.nova.feature_staking_impl.di
 
 import com.google.gson.Gson
 import android.os.SystemClock
+import io.novafoundation.nova.common.data.network.rpc.BulkRetriever
+import io.novafoundation.nova.feature_staking_impl.di.staking.DefaultBulkRetriever
 import dagger.Module
 import dagger.Provides
 import io.novafoundation.nova.core_db.dao.ExternalBalanceDao
@@ -522,8 +524,12 @@ class BittensorModule {
         )
 
     @Provides
-    fun provideBittensorExitSource(@Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource, rpc: RpcCalls, chains: ChainRegistry): BittensorExitRuntimeSource =
-        RealBittensorExitRuntimeSource(storage, rpc, chains)
+    fun provideBittensorExitSource(
+        @Named(REMOTE_STORAGE_SOURCE) storage: StorageDataSource,
+        rpc: RpcCalls,
+        chains: ChainRegistry,
+        @DefaultBulkRetriever bulkRetriever: BulkRetriever
+    ): BittensorExitRuntimeSource = RealBittensorExitRuntimeSource(storage, rpc, chains, bulkRetriever)
 
     @Provides
     fun provideBittensorSubnetMetadata(subnets: BittensorSubnetRepository) =

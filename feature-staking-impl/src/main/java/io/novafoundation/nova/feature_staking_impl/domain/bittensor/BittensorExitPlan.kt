@@ -25,6 +25,15 @@ internal fun bittensorWithdrawalFloor(minimumTao: BigInteger, price: BigInteger,
     return floor + margin
 }
 
+/**
+ * Subtensor `get_nominator_min_required_stake`: `NominatorMinRequiredStake` is a per-million factor of
+ * `DefaultMinStake` (= `InitialMinStake`), not an absolute rao amount. A non-owner remainder below it is
+ * swept to the coldkey's free balance by `clear_small_nomination_if_required`.
+ */
+internal fun bittensorNominatorMinStake(minStake: BigInteger, perMillionFactor: BigInteger): BigInteger {
+    return minStake * perMillionFactor / BittensorProtocolUnits.NOMINATOR_FACTOR_DENOMINATOR
+}
+
 data class BittensorExitSlice(val hotkey: AccountIdKey, val amount: BigInteger, val fullExit: Boolean) {
 
     init {
@@ -64,6 +73,9 @@ data class BittensorExitPlan(val slices: List<BittensorExitSlice>) {
 
 internal data class BittensorExitPlanMember(val hotkey: AccountIdKey, val position: BittensorExitMember)
 
+/** The amount exceeds what the group can withdraw at the current floor: shown as "Not enough tokens", not a generic error. */
+class BittensorExitExceedsStakeException : IllegalArgumentException("Withdrawal exceeds available group stake")
+
 internal fun planBittensorExit(
     members: List<BittensorExitPlanMember>,
     amount: BigInteger,
@@ -71,7 +83,8 @@ internal fun planBittensorExit(
     floor: BigInteger
 ): BittensorExitPlan {
     val drawable = members.sumOf { it.position.drawable(floor) }.min(available)
-    require(amount.isPositive() && amount <= drawable) { "Withdrawal exceeds available group stake" }
+    require(amount.isPositive())
+    if (amount > drawable) throw BittensorExitExceedsStakeException()
     val primary = members.firstOrNull()
     if (primary != null && amount <= primary.position.drawable(floor) && amount < drawable) {
         val slice = BittensorExitSlice(primary.hotkey, amount, fullExit = false)

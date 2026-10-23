@@ -14,7 +14,9 @@ data class BittensorExitValidationPayload(
     val supportsFeeFromStake: Boolean,
     val expectedFeeFromStake: Boolean? = null,
     val latestQuote: BittensorExitQuote? = null,
-    val priceImpactAccepted: Boolean = false
+    val priceImpactAccepted: Boolean = false,
+    // The user chose to proceed although the network will sweep a dust remainder (iOS "Position will be closed").
+    val remainderSweepAccepted: Boolean = false
 ) {
 
     val feeFromStake: Boolean

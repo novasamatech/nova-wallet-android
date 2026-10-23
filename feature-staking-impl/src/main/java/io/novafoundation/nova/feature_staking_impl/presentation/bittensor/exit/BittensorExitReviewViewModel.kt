@@ -95,6 +95,10 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitExceedsStakeException
+import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorExitValidationFailure
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -296,30 +300,33 @@ class BittensorExitReviewViewModel(
     val rate = prepared.mapLoading { exitFormatter.exchangeRate(it) }
         .shareInBackground()
 
-    private val costBasisState = estimatesMixin.observeCostBasis(
-        position.map {
-            it?.takeUnless { it.isRoot }
+    // Keyed by the loaded position, not the fee-dependent draft, so a fee reload does not drop the estimate.
+    private val saleCostBasis = estimatesMixin.observePositionCostBasis(
+        request.map {
+            it?.position?.takeUnless { it.isRoot }
                 ?.let { BittensorEstimateContext(it.metaId, it.chain) }
-        }
+        }.distinctUntilChanged()
     )
+        .map { resolveSaleCostBasis(it, payload.position.netuid, carried = payload.costBasis?.totals()) }
         .shareInBackground()
 
     val averagePrice = combine(
-        costBasisState,
-        position
-    ) { state, position ->
-        state.map { basis ->
-            saleCostBasisFormatter.averagePrice(basis, position, payload.position.netuid)
+        saleCostBasis,
+        request
+    ) { state, request ->
+        state.map { sale ->
+            saleCostBasisFormatter.averagePrice(sale, request?.position?.asset?.token, request?.position?.subnet?.symbol)
         }
     }
         .shareInBackground()
 
     val earned = combine(
-        costBasisState,
-        prepared
-    ) { state, prepared ->
-        bittensorLoadingValue(state, prepared) {
-            saleCostBasisFormatter.profit(state.dataOrNull, prepared.dataOrNull, payload.position.netuid)
+        saleCostBasis,
+        requestState
+    ) { state, request ->
+        bittensorLoadingValue(state, request) {
+            val exit = request.dataOrNull
+            saleCostBasisFormatter.profit(state.dataOrNull, exit?.quote, exit?.position?.asset?.token)
         }
     }
         .shareInBackground()
@@ -519,9 +526,9 @@ class BittensorExitReviewViewModel(
         execution.value = ExitExecution.Idle
     }
 
-    fun confirmClicked(): Unit = confirmWithImpact(null)
+    fun confirmClicked(): Unit = confirmWith(acceptedImpactQuote = null, remainderSweepAccepted = false)
 
-    private fun confirmWithImpact(acceptedQuote: BittensorExitQuote?): Unit = launchUnit {
+    private fun confirmWith(acceptedImpactQuote: BittensorExitQuote?, remainderSweepAccepted: Boolean): Unit = launchUnit {
         if (!confirmMutex.tryLock()) return@launchUnit
         try {
             if (confirmButtonState.first() !is DescriptiveButtonState.Enabled) return@launchUnit
@@ -534,7 +541,10 @@ class BittensorExitReviewViewModel(
                 draft.fee,
                 draft.feeFromStake
             )
-            val validationPayload = freshPayload.copy(priceImpactAccepted = acceptedQuote != null && freshPayload.latestQuote == acceptedQuote)
+            val validationPayload = freshPayload.copy(
+                priceImpactAccepted = acceptedImpactQuote != null && freshPayload.latestQuote == acceptedImpactQuote,
+                remainderSweepAccepted = remainderSweepAccepted || payload.carriesRemainderSweepFor(draft.quote)
+            )
             validationExecutor.requireValid(
                 validationSystem = exitValidationSystem,
                 payload = validationPayload,
@@ -542,6 +552,8 @@ class BittensorExitReviewViewModel(
                     bittensorExitValidationFailureUi(
                         failure.reason,
                         resources,
+                        isRoot = isRoot,
+                        dustRemainder = exitFormatter.dustRemainder(validationPayload, draft.position),
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(
@@ -556,8 +568,14 @@ class BittensorExitReviewViewModel(
                             }
                         },
                         unstakeAll = { refreshQuote(draft.quote, fullExit = true) },
+                        acceptRemainder = {
+                            val acceptedImpact = validationPayload.latestQuote.takeIf { validationPayload.priceImpactAccepted }
+                            if (reviewedQuote.value == draft.quote) confirmWith(acceptedImpact, remainderSweepAccepted = true)
+                        },
                         refreshQuote = { refreshQuote(draft.quote, fullExit = false) },
-                        acceptImpact = { if (reviewedQuote.value == draft.quote) confirmWithImpact(validationPayload.latestQuote) }
+                        acceptImpact = {
+                            if (reviewedQuote.value == draft.quote) confirmWith(validationPayload.latestQuote, validationPayload.remainderSweepAccepted)
+                        }
                     )
                 }
             ) {
@@ -590,6 +608,8 @@ class BittensorExitReviewViewModel(
             }
         } catch (e: CancellationException) {
             throw e
+        } catch (e: BittensorExitExceedsStakeException) {
+            showError(resources.getString(R.string.common_error_general_title), BittensorExitValidationFailure.INSUFFICIENT_STAKE.message(resources))
         } catch (e: Exception) {
             showError(e)
         } finally {
