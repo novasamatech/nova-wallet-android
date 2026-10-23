@@ -24,6 +24,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
+import java.math.BigDecimal
 
 interface BittensorSubnetValidatorRepository {
 
@@ -75,7 +76,7 @@ class RealBittensorSubnetValidatorRepository(
 
     override suspend fun directory(chain: Chain, netuid: BittensorNetuid): BittensorValidatorDirectory = withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
         val response = backend.validators(netuid.value)
-        val candidates = mapCandidates(chain, response)
+        val candidates = loadCandidates(chain, netuid, response)
         val ranking = loadRanking(netuid)
         val snapshot = loadDirectorySnapshot(chain, netuid, candidates)
         val admittedRanking = ranking.mapCatching { ranked ->
@@ -89,7 +90,7 @@ class RealBittensorSubnetValidatorRepository(
     override suspend fun unrankedDirectory(chain: Chain, netuid: BittensorNetuid): BittensorValidatorDirectory =
         withTimeoutOrNull(REQUEST_TIMEOUT_MILLIS) {
             val response = backend.validators(netuid.value)
-            val candidates = mapCandidates(chain, response)
+            val candidates = loadCandidates(chain, netuid, response)
             val snapshot = loadDirectorySnapshot(chain, netuid, candidates)
             val rows = mapUnavailablePolicyDirectory(chain, netuid, candidates, snapshot)
             BittensorValidatorDirectory(rows, mapBittensorDirectoryStatus(response.meta), recommendationFailure = null)
@@ -159,6 +160,8 @@ class RealBittensorSubnetValidatorRepository(
         candidates: List<BittensorValidator>,
         snapshot: BittensorValidatorSnapshot
     ): List<BittensorSubnetValidator> = candidates.mapNotNull { validator ->
+        // Same membership as the ranked rows: root lists only hotkeys registered on the root network.
+        if (netuid.isRoot() && snapshot.uids[validator.hotkey] == null) return@mapNotNull null
         val take = snapshot.commissionsInU16[validator.hotkey] ?: return@mapNotNull null
         BittensorSubnetValidator(
             validator,
@@ -188,6 +191,23 @@ class RealBittensorSubnetValidatorRepository(
                 ?.takeIf(String::isNotBlank)
             validator.copy(name = name ?: validator.name)
         }
+    }
+
+    private suspend fun loadCandidates(chain: Chain, netuid: BittensorNetuid, response: BittensorValidatorsRemote): List<BittensorValidator> {
+        val candidates = mapCandidates(chain, response)
+        if (!netuid.isRoot()) return candidates
+        // The subnet-0 directory carries no stake measurement; root stake comes from the root validators resource.
+        val rootStakes = loadRootStakes(chain)
+        return candidates.map { it.copy(reportedStake = rootStakes[it.hotkey]) }
+    }
+
+    private suspend fun loadRootStakes(chain: Chain): Map<AccountIdKey, BigDecimal> = try {
+        mapBittensorRootStakes(chain, backend.rootValidators())
+    } catch (exception: CancellationException) {
+        throw exception
+    } catch (exception: Exception) {
+        // Stake is display and sort data only; its absence must not fail the directory.
+        emptyMap()
     }
 
     private fun mapCandidates(chain: Chain, response: BittensorValidatorsRemote): List<BittensorValidator> {

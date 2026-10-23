@@ -230,6 +230,53 @@ class BittensorSubnetValidatorRepositoryTest {
         }
     }
 
+    @Test
+    fun `root rows carry the fresh root stake and list only root-registered hotkeys`() = runBlocking<Unit> {
+        prepareRoot(rootFreshness = "FRESH")
+
+        val unranked = repository.unrankedDirectory(chain, BittensorNetuid.Root)
+        val ranked = repository.directory(chain, BittensorNetuid.Root)
+
+        listOf(unranked, ranked).forEach { directory ->
+            val row = directory.validators.single()
+            assertEquals(hotkey, row.validator.hotkey)
+            assertEquals(BigDecimal("1028782.5"), row.validator.reportedStake)
+        }
+        assertEquals(unranked.validators.size, ranked.validators.size)
+    }
+
+    @Test
+    fun `stale or failing root stake leaves the root directory readable without an amount`() = runBlocking<Unit> {
+        prepareRoot(rootFreshness = "STALE")
+        assertNull(repository.unrankedDirectory(chain, BittensorNetuid.Root).validators.single().validator.reportedStake)
+
+        val failing = RealBittensorSubnetValidatorRepository(BittensorValidatorBackend(api, urls), storage, rpc)
+        `when`(api.rootValidators(ROOT_VALIDATORS_URL)).thenReturn(Response.error(503, "".toResponseBody()))
+        assertNull(failing.unrankedDirectory(chain, BittensorNetuid.Root).validators.single().validator.reportedStake)
+    }
+
+    private suspend fun prepareRoot(rootFreshness: String) {
+        prepare(directoryMetadata())
+        val unregistered = AccountIdKey(ByteArray(32) { 2 })
+        val rows = listOf(hotkey, unregistered).map { key ->
+            BittensorValidatorsRemote.Item(0, chain.addressOf(key), "Root ${key.value[0]}", null, null)
+        }
+        `when`(api.validators(ROOT_DIRECTORY_URL)).thenReturn(Response.success(BittensorValidatorsRemote(rows, directoryMetadata())))
+        val ranking = api.rankedValidators(RANKING_URL).body()!!
+        `when`(api.rankedValidators(ROOT_RANKING_URL)).thenReturn(Response.success(ranking))
+        val component = BittensorRecommendationsRemote.Component("AVAILABLE", rootFreshness, AS_OF)
+        val rootRows = listOf(
+            BittensorRootValidatorRemote.Validator(chain.addressOf(hotkey), "Root", null, "1028782.5"),
+            BittensorRootValidatorRemote.Validator(chain.addressOf(unregistered), "Unregistered", null, "5")
+        )
+        val meta = BittensorRootValidatorRemote.Meta(BittensorRootValidatorRemote.Components(component, component))
+        `when`(api.rootValidators(ROOT_VALIDATORS_URL)).thenReturn(Response.success(BittensorRootValidatorRemote(rootRows, meta)))
+        storage.snapshot = storage.snapshot.copy(
+            uids = mapOf(hotkey to 0),
+            commissionsInU16 = mapOf(hotkey to BigInteger.ZERO, unregistered to BigInteger.ZERO)
+        )
+    }
+
     private suspend fun prepare(metadata: BittensorValidatorsRemote.Meta?) {
         `when`(chain.id).thenReturn("chain")
         `when`(chain.addressPrefix).thenReturn(42)
@@ -287,5 +334,8 @@ class BittensorSubnetValidatorRepositoryTest {
         const val AS_OF = "2026-10-19T00:00:00Z"
         const val DIRECTORY_URL = "https://infra.test/v1/bittensor/subnets/64/validators"
         const val RANKING_URL = "https://infra.test/v1/bittensor/recommendations/subnets/64/validators"
+        const val ROOT_DIRECTORY_URL = "https://infra.test/v1/bittensor/subnets/0/validators"
+        const val ROOT_RANKING_URL = "https://infra.test/v1/bittensor/recommendations/subnets/0/validators"
+        const val ROOT_VALIDATORS_URL = "https://infra.test/v1/bittensor/root/validators"
     }
 }
