@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import dagger.Module
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.validator.filters.BittensorValidatorFiltersCommunicator
 import dagger.Provides
 import dagger.multibindings.IntoMap
 import io.novafoundation.nova.common.address.AddressIconGenerator
@@ -40,7 +41,8 @@ class BittensorSelectValidatorModule {
         logger: Logger,
         retryController: BittensorRetryController,
         tokenFormatter: TokenFormatter,
-        subnetInteractor: BittensorSubnetInteractor
+        subnetInteractor: BittensorSubnetInteractor,
+        filtersCommunicator: BittensorValidatorFiltersCommunicator
     ): ViewModel = BittensorSelectValidatorViewModel(
         analytics, request,
         communicator,
@@ -52,7 +54,8 @@ class BittensorSelectValidatorModule {
         logger,
         retryController = retryController,
         tokenFormatter = tokenFormatter,
-        subnetInteractor = subnetInteractor
+        subnetInteractor = subnetInteractor,
+        filtersCommunicator = filtersCommunicator
     )
 
     @Provides

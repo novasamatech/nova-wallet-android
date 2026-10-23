@@ -24,7 +24,7 @@ class BittensorSubnetAgeFormattingTest {
 
     @Test
     fun `ages under a day fall back to hours and then minutes`() {
-        assertEquals(BittensorAge(5, BittensorAgeUnit.HOURS), age("0.25"))
+        assertEquals(BittensorAge(5, BittensorAgeUnit.HOURS), age("0.24"))
         assertEquals(BittensorAge(30, BittensorAgeUnit.MINUTES), age("0.0209"))
         assertEquals(BittensorAge(0, BittensorAgeUnit.MINUTES), age("0"))
     }

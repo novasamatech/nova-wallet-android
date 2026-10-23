@@ -1,7 +1,11 @@
 package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.subnet
 
 import android.os.Bundle
+import android.widget.ImageView
 import androidx.core.view.isVisible
+import io.novafoundation.nova.common.utils.keyboard.hideSoftKeyboard
+import io.novafoundation.nova.common.utils.keyboard.showSoftKeyboard
+import io.novafoundation.nova.common.utils.setImageTintRes
 import io.novafoundation.nova.common.base.BaseFragment
 import io.novafoundation.nova.common.di.FeatureUtils
 import io.novafoundation.nova.common.view.dialog.dialog
@@ -27,7 +31,7 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
 
     private val adapter by lazy { BittensorValidatorAdapter(viewModel::select, viewModel::infoClicked) }
 
-    private var filtersSheet: BittensorValidatorFiltersBottomSheet? = null
+    private var filterAction: ImageView? = null
 
     override fun createBinding() = FragmentBittensorSelectValidatorBinding.inflate(layoutInflater)
 
@@ -41,20 +45,41 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
 
     override fun initViews() {
         binder.toolbar.setHomeButtonListener { viewModel.back() }
-        binder.toolbar.toolbar.setHomeButtonIcon(R.drawable.ic_arrow_back)
         onBackPressed { viewModel.back() }
         binder.list.itemAnimator = null
         binder.list.adapter = adapter
         binder.confirm.setOnClickListener { viewModel.confirmClicked() }
         binder.removeFilters.setOnClickListener { viewModel.removeFilters() }
-        binder.toolbar.toolbar.setRightIconRes(R.drawable.ic_filter)
-        binder.toolbar.toolbar.setRightActionClickListener { showFilters() }
-        binder.toolbar.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
+        filterAction = binder.toolbar.addCustomAction(R.drawable.ic_filter) { viewModel.filtersClicked() }
+        binder.toolbar.addCustomAction(R.drawable.ic_search) { viewModel.searchClicked() }
+        binder.searchField.content.doAfterTextChanged { viewModel.search(it.toString()) }
+        binder.listFailure.setActionText(getString(R.string.common_try_again))
+        binder.listFailure.setOnLinkClickedListener { viewModel.retryList() }
     }
 
     override fun subscribe(viewModel: BittensorSelectValidatorViewModel) = with(binder) {
         observeBittensorRetries(viewModel.retryEvents)
-        viewModel.filters.observe { toolbar.toolbar.setRightActionTint(if (it.hideUnusualApy) R.color.icon_accent else R.color.icon_primary) }
+        // Accent while any filter differs from the defaults, as on iOS
+        viewModel.filters.observe { filterAction?.setImageTintRes(if (it.isDefault) R.color.icon_primary else R.color.icon_accent) }
+        viewModel.searchVisible.observe { visible ->
+            if (searchContainer.isVisible == visible) return@observe
+            searchContainer.isVisible = visible
+            if (visible) {
+                searchField.content.requestFocus()
+                searchField.content.showSoftKeyboard()
+            } else {
+                searchField.content.hideSoftKeyboard()
+                searchField.content.text.clear()
+            }
+        }
+        viewModel.listFailure.observe { failure ->
+            listFailure.isVisible = failure != null
+            listHeader.isVisible = failure == null
+            failure?.let {
+                listFailure.setMessage(it.title)
+                listFailure.setSubMessage(it.message)
+            }
+        }
         setupExternalActions(viewModel)
         viewModel.header.observe {
             count.text = it.count
@@ -84,15 +109,8 @@ class BittensorSelectValidatorFragment : BaseFragment<BittensorSelectValidatorVi
     }
 
     override fun onDestroyView() {
-        filtersSheet?.dismiss()
-        filtersSheet = null
+        filterAction = null
         binder.list.adapter = null
         super.onDestroyView()
-    }
-
-    private fun showFilters() {
-        filtersSheet?.dismiss()
-        filtersSheet = BittensorValidatorFiltersBottomSheet(requireContext(), viewModel.filters.value, viewModel::applyFilters)
-            .also { it.show() }
     }
 }
