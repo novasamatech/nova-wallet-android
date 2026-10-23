@@ -3,6 +3,7 @@ package io.novafoundation.nova.feature_staking_impl.presentation.bittensor.commo
 import io.novafoundation.nova.common.resources.ResourceManager
 import io.novafoundation.nova.common.utils.TokenSymbol
 import io.novafoundation.nova.common.utils.isPositive
+import io.novafoundation.nova.common.utils.ltrIsolatedRate
 import io.novafoundation.nova.common.utils.formatting.formatAsPercentage
 import io.novafoundation.nova.feature_account_api.data.model.Fee
 import io.novafoundation.nova.feature_account_api.data.model.decimalAmount
@@ -40,6 +41,20 @@ class BittensorAmountFormatter(
         )
     }
 
+    /**
+     * Big totals such as pool size or total staked: "8.4K TAO" with the regular fiat ("$2.19M") under it.
+     */
+    fun compactAmount(amount: BigDecimal, symbol: TokenSymbol, fiat: BigDecimal?, currency: Currency): AmountModel {
+        return AmountModel(
+            token = compactToken(amount, symbol),
+            fiat = fiat?.let { fiatFormatter.formatFiat(it, currency) }
+        )
+    }
+
+    fun compactToken(amount: BigDecimal, symbol: TokenSymbol): CharSequence {
+        return tokenFormatter.formatToken(amount, symbol, TokenConfig(useCompactAbbreviation = true))
+    }
+
     fun fee(fee: Fee, token: TokenBase): BittensorFeeUi {
         val fiat = token.toFiatOrNull(fee.decimalAmount)
         return BittensorFeeUi(
@@ -75,6 +90,6 @@ class BittensorAmountFormatter(
         val rate = output.divide(input, BITTENSOR_ALPHA_DECIMALS, RoundingMode.DOWN)
         val nativeAmount = tokenFormatter.formatToken(BigDecimal.ONE, token.configuration.symbol)
         val alphaAmount = tokenFormatter.formatToken(rate, TokenSymbol(subnet.symbol.ifBlank { "—" }))
-        return "$nativeAmount ≈ \u200e$alphaAmount"
+        return ltrIsolatedRate(nativeAmount, alphaAmount)
     }
 }
