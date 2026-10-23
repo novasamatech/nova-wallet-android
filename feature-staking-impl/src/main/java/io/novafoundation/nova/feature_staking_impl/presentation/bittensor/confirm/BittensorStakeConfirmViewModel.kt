@@ -55,6 +55,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorRetryController
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.message
+import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.title
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.mapResult
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.toSubmissionState
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.confirm.model.BittensorStakeResultUi
@@ -232,6 +233,7 @@ class BittensorStakeConfirmViewModel(
                 .loadedFeeOrNull()
                 ?.takeIf { it.request == request } ?: return@launchUnit
             val payload = bittensorStakingInteractor.validationPayload(request, fee)
+            val token = stakingDetails.first().asset.token
             validationExecutor.requireValid(
                 validationSystem = validationSystem,
                 payload = payload,
@@ -248,7 +250,7 @@ class BittensorStakeConfirmViewModel(
                             )
                         )
                     }
-                    resourceManager.getString(R.string.common_error_general_title) to failure.message(resourceManager)
+                    failure.title(resourceManager) to failure.message(resourceManager) { formatToken(token.amountFromPlanks(it), token.configuration.symbol) }
                 }
             ) { executeStake(request, fee.fee) }
         } catch (e: CancellationException) {

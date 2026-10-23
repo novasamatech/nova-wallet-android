@@ -446,6 +446,7 @@ class BittensorSubnetReviewViewModel(
         val fee = fee.first()
             .loadedFeeOrNull()
             ?.takeIf { it.request == prepared } ?: return@launchUnit
+        val token = walletContext.first().asset.token
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(prepared, fee.fee)
@@ -459,6 +460,7 @@ class BittensorSubnetReviewViewModel(
                         failure,
                         actions,
                         resources,
+                        formatAmount = { tokenFormatter.formatToken(token.amountFromPlanks(it), token.configuration.symbol) },
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(

@@ -69,6 +69,7 @@ import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.forRequest
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.exit.BittensorSaleCostBasisFormatter
 import io.novafoundation.nova.feature_swap_api.presentation.navigation.SlippageSettingsCommunicator
+import io.novafoundation.nova.feature_wallet_api.domain.model.amountFromPlanks
 import io.novafoundation.nova.feature_wallet_api.domain.model.planksFromAmount
 import io.novafoundation.nova.feature_wallet_api.domain.model.toFiatOrNull
 import io.novafoundation.nova.feature_wallet_api.presentation.formatters.amount.FiatFormatter
@@ -704,6 +705,7 @@ class BittensorSubnetAmountViewModel(
             .loadedFeeOrNull()
             ?.takeIf { it.request == quote.draft } ?: return@launchUnit
 
+        val token = walletContext.first().asset.token
         validating.value = true
         try {
             val payload = bittensorSubnetStakingInteractor.validationPayload(quote.draft, fee.fee)
@@ -716,6 +718,7 @@ class BittensorSubnetAmountViewModel(
                         failure,
                         actions,
                         resources,
+                        formatAmount = { tokenFormatter.formatToken(token.amountFromPlanks(it), token.configuration.symbol) },
                         onOutcome = { outcome ->
                             failure.reason.analyticsKind()?.let { kind ->
                                 analytics.track(

@@ -8,7 +8,7 @@ import io.novafoundation.nova.feature_staking_impl.domain.bittensor.BittensorCla
 fun BittensorStakeValidationFailure.analyticsKind(): StakingValidationKind? = when (this) {
     BittensorStakeValidationFailure.INSUFFICIENT_BALANCE -> StakingValidationKind.INSUFFICIENT_BALANCE
     BittensorStakeValidationFailure.FEE_RESERVE -> StakingValidationKind.FEE_RESERVE
-    BittensorStakeValidationFailure.BELOW_MINIMUM_STAKE -> StakingValidationKind.MIN_STAKE
+    is BittensorStakeValidationFailure.BelowMinimumStake -> StakingValidationKind.MIN_STAKE
     BittensorStakeValidationFailure.QUOTE_UNAVAILABLE -> StakingValidationKind.STALE_DATA
     BittensorStakeValidationFailure.QUOTE_EXPIRED, BittensorStakeValidationFailure.SLIPPAGE_EXCEEDED -> StakingValidationKind.RATE_UPDATED
     BittensorStakeValidationFailure.HIGH_PRICE_IMPACT -> StakingValidationKind.PRICE_IMPACT

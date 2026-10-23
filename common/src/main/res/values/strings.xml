@@ -2925,7 +2925,7 @@
     <string name="bittensor_subnet_staking_success">Staked to subnet %1$d</string>
     <string name="bittensor_subnet_staking_completed">The staking operation was included successfully.</string>
     <string name="bittensor_validation_fee_reserve">Leave enough balance for the network fee and the staking fee reserve.</string>
-    <string name="bittensor_validation_minimum_stake">The amount left after service and pool fees is below the minimum stake.</string>
+    <string name="bittensor_validation_minimum_stake">You can\'t stake less than the network minimum value (%1$s)</string>
     <string name="bittensor_validation_hotkey">This validator is no longer registered. Choose another validator.</string>
     <string name="bittensor_validation_staking_disabled">Staking is not available for this network.</string>
     <string name="bittensor_validation_root_locked">The root staking unlock interval has not elapsed. Try again later.</string>
