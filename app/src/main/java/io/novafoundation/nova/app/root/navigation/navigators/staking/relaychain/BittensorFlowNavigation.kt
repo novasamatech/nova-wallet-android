@@ -3,6 +3,7 @@ package io.novafoundation.nova.app.root.navigation.navigators.staking.relaychain
 import android.annotation.SuppressLint
 import androidx.annotation.IdRes
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph
 import io.novafoundation.nova.app.R
 import io.novafoundation.nova.feature_staking_impl.presentation.bittensor.common.BittensorFlowExit
 
@@ -14,21 +15,16 @@ private val BITTENSOR_FLOW_HOSTS = setOf(
     R.id.bittensorSubnetPosition
 )
 
-/** Screens of an operation in progress (iOS presents them as a modal flow). */
-private val BITTENSOR_FLOW_SCREENS = setOf(
-    R.id.startStakingLandingFragment,
-    R.id.bittensorWhereToStake,
-    R.id.bittensorChooseSubnet,
-    R.id.bittensorSubnetDetails,
-    R.id.bittensorSelectValidator,
-    R.id.bittensorSubnetAmount,
-    R.id.bittensorSubnetReview,
-    R.id.bittensorStakeAmountFragment,
-    R.id.bittensorStakeConfirmFragment,
-    R.id.bittensorSelectUnstakePosition,
-    R.id.bittensorExitAmount,
-    R.id.bittensorExitReview,
-    R.id.bittensorRootClaim
+/**
+ * Browse screens a staking deep link may replace. Anything else above the main screen is a flow in progress
+ * (a staking setup or confirmation, Send, Swap...), which iOS keeps modal and never interrupts.
+ */
+private val STAKING_DEEP_LINK_REPLACEABLE_SCREENS = setOf(
+    R.id.bittensorPortfolioFragment,
+    R.id.bittensorRootDetailsFragment,
+    R.id.bittensorSubnetPosition,
+    R.id.stakingFragment,
+    R.id.balanceDetailFragment
 )
 
 internal sealed interface BittensorFlowExitPlan {
@@ -60,8 +56,18 @@ internal fun planBittensorFlowExit(exit: BittensorFlowExit, backStack: List<Int>
     }
 }
 
-/** A staking deep link must not tear down an operation the user is in the middle of (iOS `canPresentScreenWithoutBreakingFlow`). */
-internal fun isBittensorFlowOpen(backStack: List<Int>): Boolean = backStack.any { it in BITTENSOR_FLOW_SCREENS }
+/**
+ * Whether a staking deep link may reset the split screen to the dashboard, as iOS `canPresentScreenWithoutBreakingFlow`:
+ * only when nothing above the main screen is a flow in progress. [backStack] holds screen ids, bottom to top.
+ */
+internal fun canPresentStakingDeepLink(backStack: List<Int>): Boolean {
+    val aboveMain = backStack.dropWhile { it != R.id.mainFragment }.drop(1)
+    return aboveMain.all { it in STAKING_DEEP_LINK_REPLACEABLE_SCREENS }
+}
 
+/** Screen ids on the back stack, bottom to top; nested graph entries are skipped. */
 @SuppressLint("RestrictedApi")
-internal fun NavController.backStackDestinationIds(): List<Int> = backStack.map { it.destination.id }
+internal fun NavController.backStackDestinationIds(): List<Int> = backStack
+    .map { it.destination }
+    .filterNot { it is NavGraph }
+    .map { it.id }

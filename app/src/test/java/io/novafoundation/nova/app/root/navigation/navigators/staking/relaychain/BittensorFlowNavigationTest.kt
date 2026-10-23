@@ -10,21 +10,16 @@ import org.junit.Test
 class BittensorFlowNavigationTest {
 
     private val firstRootStake = listOf(
-        R.id.split_screen_nav_graph,
         R.id.mainFragment,
-        R.id.start_staking_nav_graph,
         R.id.startStakingLandingFragment,
         R.id.bittensorWhereToStake,
-        R.id.bittensor_root_staking_graph,
         R.id.bittensorStakeAmountFragment,
         R.id.bittensorStakeConfirmFragment
     )
 
     private val addPositionFromPortfolio = listOf(
-        R.id.split_screen_nav_graph,
         R.id.mainFragment,
         R.id.bittensorPortfolioFragment,
-        R.id.start_staking_nav_graph,
         R.id.startStakingLandingFragment,
         R.id.bittensorChooseSubnet,
         R.id.bittensorSubnetDetails,
@@ -33,7 +28,6 @@ class BittensorFlowNavigationTest {
     )
 
     private val sellFromPosition = listOf(
-        R.id.split_screen_nav_graph,
         R.id.mainFragment,
         R.id.bittensorPortfolioFragment,
         R.id.bittensorSubnetPosition,
@@ -42,7 +36,6 @@ class BittensorFlowNavigationTest {
     )
 
     private val claimFromRootDetails = listOf(
-        R.id.split_screen_nav_graph,
         R.id.mainFragment,
         R.id.bittensorPortfolioFragment,
         R.id.bittensorRootDetailsFragment,
@@ -108,12 +101,34 @@ class BittensorFlowNavigationTest {
     }
 
     @Test
-    fun `an open flow blocks staking deep links while host screens do not`() {
-        assertTrue(isBittensorFlowOpen(firstRootStake))
-        assertTrue(isBittensorFlowOpen(claimFromRootDetails))
-        assertTrue(isBittensorFlowOpen(listOf(R.id.mainFragment, R.id.start_staking_nav_graph, R.id.startStakingLandingFragment)))
+    fun `sell from a position opened without the portfolio`() {
+        val sellFromWalletPosition = listOf(
+            R.id.mainFragment,
+            R.id.balanceDetailFragment,
+            R.id.bittensorSubnetPosition,
+            R.id.bittensorExitAmount,
+            R.id.bittensorExitReview
+        )
 
-        assertFalse(isBittensorFlowOpen(listOf(R.id.split_screen_nav_graph, R.id.mainFragment)))
-        assertFalse(isBittensorFlowOpen(listOf(R.id.mainFragment, R.id.bittensorPortfolioFragment, R.id.bittensorSubnetPosition)))
+        assertEquals(BittensorFlowExitPlan.OpenPortfolioOverDashboard, planBittensorFlowExit(BittensorFlowExit.PORTFOLIO, sellFromWalletPosition))
+        assertEquals(BittensorFlowExitPlan.PopTo(R.id.bittensorSubnetPosition), planBittensorFlowExit(BittensorFlowExit.ORIGIN, sellFromWalletPosition))
+    }
+
+    @Test
+    fun `staking deep link is ignored while any flow is above the main screen`() {
+        assertFalse(canPresentStakingDeepLink(firstRootStake))
+        assertFalse(canPresentStakingDeepLink(claimFromRootDetails))
+        assertFalse(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.startStakingLandingFragment)))
+        assertFalse(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.stakingFragment, R.id.selectBondMoreFragment)))
+        assertFalse(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.sendFlowFragment)))
+    }
+
+    @Test
+    fun `staking deep link replaces browse screens`() {
+        assertTrue(canPresentStakingDeepLink(emptyList()))
+        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment)))
+        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.bittensorPortfolioFragment, R.id.bittensorSubnetPosition)))
+        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.balanceDetailFragment, R.id.bittensorPortfolioFragment)))
+        assertTrue(canPresentStakingDeepLink(listOf(R.id.mainFragment, R.id.stakingFragment)))
     }
 }
