@@ -2853,6 +2853,7 @@
     <string name="bittensor_quick_pick">Quick pick</string>
     <string name="bittensor_where_to_stake">Where to stake</string>
     <string name="bittensor_quick_choose">Choose</string>
+    <string name="bittensor_start_earning">Start earning</string>
     <string name="bittensor_quick_all_options">See all options</string>
     <string name="bittensor_see_all_subnets">See all subnets</string>
     <string name="bittensor_chip_age_months">%1$d months old</string>
