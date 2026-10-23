@@ -3152,6 +3152,26 @@
     <string name="bittensor_validators_filtered_empty">No quick-pick validators for this subnet yet. Remove filters to see all validators.</string>
     <string name="bittensor_validators_ranking_stale">Validator rankings are outdated. Quick picks are based on the last available data.</string>
     <string name="bittensor_validators_search_empty">No validators for ‘%s’</string>
+    <string name="bittensor_token_in_pool">%s in pool</string>
+    <string name="bittensor_alpha_in_pool">Alpha in pool</string>
+    <plurals name="bittensor_age_months">
+        <item quantity="one">%d month</item>
+        <item quantity="other">%d months</item>
+    </plurals>
+    <plurals name="bittensor_age_days">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="bittensor_subnets_search_no_matches">No subnets for ‘%s’</string>
+    <string name="bittensor_picker_weekly_change">%s 7d</string>
+    <string name="bittensor_validators_fetch_failed_title">Unable to fetch validators</string>
+    <string name="bittensor_validators_fetch_failed_message">The validator list did not load. Your stake is not affected.</string>
+    <string name="bittensor_validators_fetch_failed_device_message">This device can’t load the validator list right now. Your stake is not affected.</string>
+    <string name="bittensor_validator_info_total_staked_root">TAO staked with this validator in root staking. A larger stake usually means a more established validator.</string>
+    <string name="bittensor_validator_info_total_staked_subnet">The subnet tokens staked with this validator in this subnet, valued in TAO at today’s price. A larger stake usually means a more established validator.</string>
+    <string name="bittensor_validator_info_take_description">The share of rewards the validator keeps for running its infrastructure. The APY figures you see are already after the take.</string>
+    <string name="bittensor_validator_filters_unusual_apy_subtitle">far from the subnet average</string>
+    <string name="bittensor_validator_sort_total_staked">Total staked (%s)</string>
     <string name="bittensor_amount_precision_error">Use no more than %s decimal places.</string>
     <string name="bittensor_claim_preview_notice">Debug simulation. Rewards may be below the claim minimum. This screen runs system_dryRun, not a real claim.</string>
     <string name="debug_settings_title">Debug settings</string>
