@@ -20,17 +20,6 @@ class BittensorChartChangeTextInjector(
     }
 }
 
-class BittensorPortfolioChangeTextInjector(private val change: BigDecimal?, private val period: String) : PriceChangeTextInjector {
-
-    override fun format(fromValue: Float, toValue: Float, textView: TextView) {
-        format(textView)
-    }
-
-    fun format(textView: TextView) {
-        formatBittensorChartChange(change?.movePointRight(2), period, textView, missingText = "— · $period")
-    }
-}
-
 internal fun formatBittensorChartChangeText(change: BigDecimal?, period: String, missingText: String = ""): String {
     val formatted = change?.let {
         val number = NumberFormat.getNumberInstance().apply { maximumFractionDigits = 1 }.format(it)

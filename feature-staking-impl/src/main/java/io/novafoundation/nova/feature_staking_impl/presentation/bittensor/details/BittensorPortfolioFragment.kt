@@ -29,18 +29,6 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
 
     private val adapter by lazy { BittensorPositionAdapter(imageLoader, viewModel::positionClicked) }
 
-    private var isChartContentVisible = false
-        set(value) {
-            field = value
-            updateChartChange()
-        }
-
-    private var isChartAvailable = true
-        set(value) {
-            field = value
-            updateChartChange()
-        }
-
     override fun createBinding() = FragmentBittensorPortfolioBinding.inflate(layoutInflater)
 
     override fun inject() {
@@ -55,7 +43,6 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         onBackPressed { viewModel.back() }
         positions.adapter = adapter
         addPosition.setOnClickListener { viewModel.addPosition() }
-        priceChart.onContentVisibilityChanged = { isChartContentVisible = it }
         priceChart.setPresentation(PriceChartsView.Presentation.PLOT_ONLY)
         priceChart.setTitle(getString(R.string.staking_validator_total_stake))
         priceChart.setPlotHeight(156)
@@ -75,7 +62,6 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
         observeBittensorRetries(viewModel.retryEvents)
         observeActionBottomSheet(viewModel.walletGate)
         viewModel.selectedChartIndex.observe(priceChart::setSelectedPeriod)
-        viewModel.chartChangeFormatter.observe { it.format(chartChange) }
         viewModel.priceChartModels.observe(priceChart::setCharts)
         viewModel.chartAxisFormatter.observe(priceChart::setAxisLabelFormatter)
         viewModel.isLoading.observe {
@@ -95,19 +81,12 @@ class BittensorPortfolioFragment : BaseFragment<BittensorDetailsViewModel, Fragm
             addPosition.setAppearance(if (it) PrimaryButton.Appearance.PRIMARY else PrimaryButton.Appearance.SECONDARY)
         }
         viewModel.rates.observe { rates ->
-            ratesUnavailable.isVisible = rates.showBanner
             priceChart.isVisible = rates.showChart
-            chartDisclaimer.isVisible = rates.showChart
             if (!rates.showChart) chartDate.isVisible = false
-            isChartAvailable = rates.showChart
         }
         viewModel.warning.observe {
             warning.text = it
             warning.isVisible = it != null
         }
-    }
-
-    private fun updateChartChange() {
-        binder.chartChange.isVisible = isChartContentVisible && isChartAvailable
     }
 }
