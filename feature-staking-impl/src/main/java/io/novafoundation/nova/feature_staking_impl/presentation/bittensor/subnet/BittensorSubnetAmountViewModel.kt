@@ -221,8 +221,8 @@ class BittensorSubnetAmountViewModel(
             combine(validatorRetry, selectedValidatorOverride) { _, explicitAddress -> explicitAddress }.flatMapLatest { explicitAddress ->
                 flowOf {
                     if (explicitAddress == null) {
-                        val validators = presetValidatorInteractor.validators(subnet.id)
-                        SubnetValidators(validators, validators.first().address)
+                        // A subnet without an eligible validator opens unselected, as on iOS, instead of a load error that a retry cannot fix.
+                        presetValidatorInteractor.preset(subnet.id).let { SubnetValidators(it.directory, it.preset?.address) }
                     } else {
                         val validators = bittensorSubnetStakingInteractor.validators(subnet.id)
                         require(validators.any { it.address == explicitAddress && it.canSelect }) { "Selected validator is unavailable" }
