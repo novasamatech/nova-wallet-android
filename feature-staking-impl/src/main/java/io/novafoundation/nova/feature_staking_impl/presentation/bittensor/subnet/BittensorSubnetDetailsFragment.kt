@@ -85,9 +85,6 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         }
         website.setOnClickListener { viewModel.websiteClicked() }
         github.setOnClickListener { viewModel.githubClicked() }
-        // Each half is narrow: the share value keeps its full width and the title wraps to a second line instead.
-        poolSplit.nativeShare.setTitleEllipsisable(true)
-        poolSplit.alphaShare.setTitleEllipsisable(true)
     }
 
     override fun subscribe(viewModel: BittensorSubnetDetailsViewModel) = with(binder) {
@@ -138,7 +135,7 @@ class BittensorSubnetDetailsFragment : BaseFragment<BittensorSubnetDetailsViewMo
         viewModel.axisFormatter.observe(chart::setAxisLabelFormatter)
         viewModel.age.observe(age::showBittensorLoadingValue)
         viewModel.nativePoolTitle.observe {
-            poolSplit.nativeShare.setTitle(it)
+            poolSplit.nativeShareTitle.text = it
             nativePool.setTitle(it)
         }
         viewModel.parameters.observe { bindSubnetParameters(it) }
