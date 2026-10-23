@@ -211,9 +211,9 @@ class BittensorChooseSubnetViewModel(
         .onStart { emit(emptyList()) }
         .shareInBackground()
 
-    // A search without matches shows only its message: no root row, sorting, filters or count. A failed load is not one.
+    // Only a search that matches nothing hides the root row and the sort/filter/count row; filters that hide every subnet keep them (as on iOS).
     private val searchHasNoMatches = combine(subnets, isLoading, hasError, query) { subnets, loading, failed, query ->
-        !loading && !failed && query.isNotBlank() && subnets.isEmpty()
+        bittensorSearchHasNoMatches(loading, failed, query, subnets.size)
     }
         .distinctUntilChanged()
         .shareInBackground()
@@ -250,11 +250,15 @@ class BittensorChooseSubnetViewModel(
     val isEmpty = combine(subnets, isLoading, hasError) { subnets, loading, failed -> subnets.isEmpty() && !loading && !failed }
         .shareInBackground()
 
+    val controlsVisible = searchHasNoMatches.map { !it }
+        .shareInBackground()
+
     val emptyMessage = query.map { query ->
-        if (query.isEmpty()) {
-            resources.getString(R.string.bittensor_subnet_filter_empty)
+        val trimmed = query.trim()
+        if (trimmed.isEmpty()) {
+            resources.getString(R.string.bittensor_no_subnets)
         } else {
-            resources.getString(R.string.bittensor_subnet_search_empty, query)
+            resources.getString(R.string.bittensor_subnets_search_no_matches, trimmed)
         }
     }
         .shareInBackground()
