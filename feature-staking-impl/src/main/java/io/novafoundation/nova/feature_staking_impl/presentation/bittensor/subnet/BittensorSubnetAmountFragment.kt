@@ -62,6 +62,8 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         toolbar.setRightActionClickListener {
             viewModel.slippageClicked()
         }
+        toolbar.setRightIconVisible(viewModel.showsSlippageSettings)
+        subnetSectionTitle.text = viewModel.subnetSectionTitle
         onBackPressed { viewModel.back() }
         amount.amountInput.doAfterTextChanged { viewModel.amountChanged(it.toString()) }
         amount.setMaxActionAvailability(
@@ -84,7 +86,6 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         validator.isClickable = !viewModel.existingPosition
         validator.setPrimaryValueEndIcon(if (viewModel.existingPosition) null else R.drawable.ic_chevron_right)
         if (viewModel.existingPosition) {
-            toolbar.setTitle(getString(R.string.bittensor_buy_more))
             amount.setTitle(getString(R.string.bittensor_you_pay))
         }
         rate.title.setOnClickListener { showInfo(R.string.bittensor_exchange_rate, getString(R.string.swap_rate_description)) }
@@ -126,6 +127,7 @@ class BittensorSubnetAmountFragment : BaseFragment<BittensorSubnetAmountViewMode
         viewModel.monthlyEstimate.observe(monthlyTokens::showBittensorLoadingValue)
         projectedAveragePrice.isVisible = viewModel.existingPosition
         if (viewModel.existingPosition) {
+            viewModel.buyMoreTitle.observe(toolbar::setTitle)
             viewModel.averagePriceDescription.observe { description ->
                 projectedAveragePrice.setOnClickListener {
                     description?.let { showInfo(R.string.bittensor_exit_avg_buy_price, it) }

@@ -50,11 +50,11 @@
                 app:alertMode="warning" />
 
             <TextView
+                android:id="@+id/subnetSectionTitle"
                 style="@style/TextAppearance.NovaFoundation.SemiBold.Caps1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                android:text="@string/bittensor_selected_subnet"
                 android:textColor="@color/text_secondary" />
 
             <LinearLayout

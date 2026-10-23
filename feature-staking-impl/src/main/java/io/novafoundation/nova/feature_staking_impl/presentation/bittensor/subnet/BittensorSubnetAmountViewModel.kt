@@ -151,6 +151,17 @@ class BittensorSubnetAmountViewModel(
 
     val isQuickPick = quickPickOrder != null
 
+    /** Buy more keeps the slippage chosen when the position was opened, so it offers no settings (as on iOS). */
+    val showsSlippageSettings = !existingPosition
+
+    val subnetSectionTitle = resources.getString(
+        when {
+            existingPosition -> R.string.bittensor_your_subnet
+            quickPickOrder != null -> quickPickOrder.sectionTitleRes()
+            else -> R.string.bittensor_your_pick
+        }
+    )
+
     private val validating = MutableStateFlow(false)
 
     private val quoteRefresh = MutableStateFlow(0)
@@ -177,6 +188,14 @@ class BittensorSubnetAmountViewModel(
         ).shareInBackground()
 
     val subnet = subnetState.map { it.dataOrNull }
+        .shareInBackground()
+
+    /** "Buy more <subnet>" for an existing position; new positions keep the screen's default title. */
+    val buyMoreTitle = subnet.map { subnet ->
+        val name = subnet?.name?.takeIf { it.isNotBlank() }
+            ?: resources.getString(R.string.bittensor_subnet_number, subnet?.id?.value ?: initialSubnetId?.value ?: 0)
+        resources.getString(R.string.bittensor_buy_more_subnet, name)
+    }
         .shareInBackground()
 
     private val validatorsState = subnetState.flatMapLatest { state ->
@@ -669,6 +688,7 @@ class BittensorSubnetAmountViewModel(
     }
 
     fun slippageClicked() {
+        if (!showsSlippageSettings) return
         slippageSettingsCommunicator.openRequest(slippageSettings.payload())
     }
 
@@ -801,6 +821,12 @@ class BittensorSubnetAmountViewModel(
     fun back() {
         validatorCommunicator.respond(BittensorSelectValidatorCommunicator.Response(null, null, selectionState))
         router.back()
+    }
+
+    private fun BittensorQuickPickOrder.sectionTitleRes(): Int = when (this) {
+        BittensorQuickPickOrder.POOL_SIZE -> R.string.bittensor_quick_first_pool
+        BittensorQuickPickOrder.AGE -> R.string.bittensor_quick_first_age
+        BittensorQuickPickOrder.APY -> R.string.bittensor_quick_first_apy
     }
 
     /** [presetAddress] is the automatic choice; null when the user picked the validator or nothing qualifies. */

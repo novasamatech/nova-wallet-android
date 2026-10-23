@@ -128,6 +128,9 @@ class BittensorStakeAmountViewModel(
 
     val retryEvents = retryController.events
 
+    /** As on iOS, adding to an existing root position is titled "Add stake to root". */
+    val titleRes = if (payload?.validatorAddress != null) R.string.bittensor_add_stake_to_root else R.string.bittensor_stake_to_root
+
     private val stakingDetailsState = retryController.observe(
         step = "root staking details",
         analytics = rootOverviewReads,
