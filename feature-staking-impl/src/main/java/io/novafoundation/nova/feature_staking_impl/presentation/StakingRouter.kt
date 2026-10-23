@@ -140,6 +140,9 @@ interface StakingRouter {
 
     fun replaceBittensorPortfolioWithStart(payload: StartStakingLandingPayload)
 
+    /** Opens the Bittensor Earn landing on top of the current screen ("Add position" on the portfolio). */
+    fun openBittensorStartStaking(payload: StartStakingLandingPayload)
+
     /** Leaves a finished Bittensor operation, dropping its flow screens from the back stack. */
     fun finishBittensorFlow(exit: BittensorFlowExit)
 

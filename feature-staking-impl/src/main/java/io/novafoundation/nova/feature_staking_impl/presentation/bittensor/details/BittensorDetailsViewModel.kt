@@ -62,6 +62,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 
+private const val ADD_POSITION_ANALYTICS_SOURCE = "portfolio_add_position"
+
 class BittensorDetailsViewModel(
     private val analytics: AnalyticsService,
     private val bittensorPortfolioInteractor: BittensorPortfolioInteractor,
@@ -382,7 +384,12 @@ class BittensorDetailsViewModel(
         }
     }
 
-    fun addPosition() = router.openBittensorChooseSubnet()
+    /** Re-entry goes through the same Earn landing as a first stake (iOS `SubtensorPortfolioWireframe.showAddPosition`). */
+    fun addPosition() = launchUnit {
+        val portfolio = portfolio.first()
+        analytics.track(AnalyticsEvent.StakingFlowOpened(portfolio.chain.name, ADD_POSITION_ANALYTICS_SOURCE))
+        router.openBittensorStartStaking(portfolio.startStakingPayload())
+    }
 
     fun positionClicked(position: BittensorPositionUi) {
         when (val action = position.action) {

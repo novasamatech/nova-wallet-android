@@ -22,6 +22,11 @@ internal fun resolveBittensorEntry(portfolio: BittensorPortfolio?, claims: Bitte
     if (claims?.dataStatus !is BittensorDataStatus.Fresh || claims.metaId != portfolio.metaId) return null
     if (!isPortfolioEmpty(positions, claims.claims.totalRedeemable)) return BittensorEntryResolution.Portfolio
 
-    val options = AvailableStakingOptionsPayload(portfolio.chain.id, portfolio.asset.token.configuration.id, listOf(Chain.Asset.StakingType.BITTENSOR_ROOT))
-    return BittensorEntryResolution.Start(StartStakingLandingPayload(options), portfolio.chain.name)
+    return BittensorEntryResolution.Start(portfolio.startStakingPayload(), portfolio.chain.name)
+}
+
+/** The Earn landing for this portfolio's asset: the first-stake entry and "Add position" share it. */
+internal fun BittensorPortfolio.startStakingPayload(): StartStakingLandingPayload {
+    val options = AvailableStakingOptionsPayload(chain.id, asset.token.configuration.id, listOf(Chain.Asset.StakingType.BITTENSOR_ROOT))
+    return StartStakingLandingPayload(options)
 }

@@ -79,6 +79,9 @@ import org.junit.Test
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.mockingDetails
+import kotlinx.coroutines.delay
+import io.novafoundation.nova.feature_staking_impl.presentation.staking.start.landing.model.StartStakingLandingPayload
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class BittensorDetailsRetryTest {
@@ -398,6 +401,29 @@ class BittensorDetailsRetryTest {
         viewModel.completeEntry(start)
 
         verify(router).replaceBittensorPortfolioWithStart(start.payload)
+    }
+
+    @Test
+    fun `add position opens the earn landing for the portfolio asset`() = runBlocking {
+        createViewModel()
+        withTimeout(3_000L) { viewModel.canAddStake.first { it } }
+
+        viewModel.addPosition()
+
+        val opened = withTimeout(3_000L) {
+            var calls = mockingDetails(router).invocations.filter { it.method.name == "openBittensorStartStaking" }
+            while (calls.isEmpty()) {
+                delay(10L)
+                calls = mockingDetails(router).invocations.filter { it.method.name == "openBittensorStartStaking" }
+            }
+            calls.single()
+        }
+        val options = (opened.arguments.single() as StartStakingLandingPayload).availableStakingOptions
+        assertEquals("chain", options.chainId)
+        assertEquals(listOf(Chain.Asset.StakingType.BITTENSOR_ROOT), options.stakingTypes)
+        assertEquals(listOf("openBittensorStartStaking"), mockingDetails(router).invocations.map { it.method.name })
+        val flowOpened = analyticsService.events.single { it.name == "staking_flow_opened" }
+        assertEquals("portfolio_add_position", flowOpened.properties["source"])
     }
 
     @Test
